@@ -1,0 +1,21 @@
+{
+  "workflow": "case-run",
+  "files_checked": [
+    "docs/guides/command-selection.md",
+    "docs/guides/glossary.md",
+    "docs/guides/intake-learning-backlog-flow.md",
+    "docs/guides/quickstart.md"
+  ],
+  "coupled_files_checked": [
+    "docs/README.md"
+  ],
+  "failures": [],
+  "warnings": [],
+  "doc_map_update_required": false,
+  "design_readme_update_required": false,
+  "requirements_readme_update_required": false,
+  "full_docs_check_recommended": false,
+  "extensions_check_required": false,
+  "docInputsCheckRequired": true,
+  "declared_files_check": null
+}

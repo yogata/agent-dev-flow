@@ -1,0 +1,173 @@
+{
+  "phase": "pre-merge",
+  "worktreeRoot": "C:/Users/ogatay/work/agent-dev-flow/.worktrees/3725-feature",
+  "repoRoot": "C:/Users/ogatay/work/agent-dev-flow",
+  "branch": "feature/issue-3725",
+  "prNumber": 3727,
+  "issueBodyPath": "C:/Users/ogatay/work/agent-dev-flow/.worktrees/3725-feature/.agentdev/tmp/cc-3725-issue-body.md",
+  "mergeablePolling": { "intervalSeconds": 10, "maxAttempts": 6 },
+  "generateIndexesGate": {
+    "command": "bun",
+    "args": [".opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts"],
+    "cwd": "C:/Users/ogatay/work/agent-dev-flow/.worktrees/3725-feature"
+  },
+  "traceabilityGate": {
+    "command": "bun",
+    "args": [
+      "src/common/skills/agentdev-traceability/scripts/src/check.ts",
+      "--root",
+      ".",
+      "--req",
+      "REQ-114-001,REQ-114-002,REQ-114-003,REQ-114-004,REQ-114-005,REQ-114-006,REQ-114-007,REQ-114-008,REQ-114-009,REQ-114-010,REQ-114-011,REQ-114-012,REQ-114-013,REQ-114-014,REQ-114-015"
+    ],
+    "cwd": "C:/Users/ogatay/work/agent-dev-flow/.worktrees/3725-feature"
+  },
+  "integrityGates": [
+    {
+      "name": "full-integrity-suite-1-integrity-scripts",
+      "command": "bun",
+      "args": ["test", "./.opencode/skills/repo-agentdev-integrity/scripts/"],
+      "cwd": "C:/Users/ogatay/work/agent-dev-flow/.worktrees/3725-feature"
+    },
+    {
+      "name": "full-integrity-suite-2-src-common-skills",
+      "command": "bun",
+      "args": ["test", "./src/common/skills/"],
+      "cwd": "C:/Users/ogatay/work/agent-dev-flow/.worktrees/3725-feature"
+    },
+    {
+      "name": "full-integrity-suite-3-plugins-scripts",
+      "command": "bun",
+      "args": ["test", "./.opencode/plugins/", "./scripts/"],
+      "cwd": "C:/Users/ogatay/work/agent-dev-flow/.worktrees/3725-feature"
+    }
+  ],
+  "textlintGate": {
+    "command": "bun",
+    "args": [
+      "run",
+      "src/opencode/plugins/agentdev-textlint-guard/gate.ts",
+      "--root",
+      "C:/Users/ogatay/work/agent-dev-flow/.worktrees/3725-feature",
+      "--purpose",
+      "final",
+      "--json"
+    ],
+    "cwd": "C:/Users/ogatay/work/agent-dev-flow"
+  },
+  "acceptanceSubjectKind": "root-case",
+  "acceptanceVerdicts": [
+    {
+      "conditionId": "cond-case-ready-definition-package-acceptance",
+      "required": true,
+      "category": "pass",
+      "grounds": {
+        "derivedFromContract": true,
+        "evidenceProvesSemanticProposition": true,
+        "evidenceUsesProcessState": true,
+        "processStateIsExplicitCondition": true
+      }
+    },
+    {
+      "conditionId": "AC-01",
+      "required": true,
+      "category": "pass",
+      "grounds": {
+        "derivedFromContract": true,
+        "evidenceProvesSemanticProposition": true
+      }
+    },
+    {
+      "conditionId": "AC-02",
+      "required": true,
+      "category": "pass",
+      "grounds": {
+        "derivedFromContract": true,
+        "evidenceProvesSemanticProposition": true
+      }
+    },
+    {
+      "conditionId": "AC-03",
+      "required": true,
+      "category": "pass",
+      "grounds": {
+        "derivedFromContract": true,
+        "evidenceProvesSemanticProposition": true
+      }
+    },
+    {
+      "conditionId": "AC-04",
+      "required": true,
+      "category": "pass",
+      "grounds": {
+        "derivedFromContract": true,
+        "evidenceProvesSemanticProposition": true
+      }
+    },
+    {
+      "conditionId": "AC-05",
+      "required": true,
+      "category": "pass",
+      "grounds": {
+        "derivedFromContract": true,
+        "evidenceProvesSemanticProposition": true,
+        "counterexampleSearch": {
+          "applicable": true,
+          "scopeCoversEvaluationRange": true
+        },
+        "methodChange": {
+          "equivalenceConfirmed": true,
+          "unprovenScopeIncreased": false
+        }
+      }
+    },
+    {
+      "conditionId": "AC-06",
+      "required": true,
+      "category": "pass",
+      "grounds": {
+        "derivedFromContract": true,
+        "evidenceProvesSemanticProposition": true
+      }
+    },
+    {
+      "conditionId": "AC-07",
+      "required": true,
+      "category": "pass",
+      "grounds": {
+        "derivedFromContract": true,
+        "evidenceProvesSemanticProposition": true,
+        "counterexampleSearch": {
+          "applicable": true,
+          "scopeCoversEvaluationRange": true
+        }
+      }
+    },
+    {
+      "conditionId": "AC-08",
+      "required": true,
+      "category": "pass",
+      "grounds": {
+        "derivedFromContract": true,
+        "evidenceProvesSemanticProposition": true,
+        "counterexampleSearch": {
+          "applicable": true,
+          "scopeCoversEvaluationRange": true
+        },
+        "methodChange": {
+          "equivalenceConfirmed": true,
+          "unprovenScopeIncreased": false
+        }
+      }
+    },
+    {
+      "conditionId": "AC-09",
+      "required": true,
+      "category": "pass",
+      "grounds": {
+        "derivedFromContract": true,
+        "evidenceProvesSemanticProposition": true
+      }
+    }
+  ]
+}

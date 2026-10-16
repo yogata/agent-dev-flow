@@ -1,0 +1,32 @@
+{
+  "ok": false,
+  "failures": [
+    {
+      "category": "adapter-failure",
+      "file": "C:\\Users\\ogatay\\work\\agent-dev-flow\\.worktrees\\3725-feature",
+      "line": 0,
+      "snippet": "zero scan targets found for projection 'link'",
+      "matched": "zero-targets:link"
+    }
+  ],
+  "stats": {
+    "scanned_files": 0,
+    "concrete_id_hits": 0,
+    "concrete_path_hits": 0,
+    "fixed_url_hits": 0,
+    "producer_metadata_hits": 0
+  },
+  "warnings": [
+    "zero-targets pre-warning: scan targets resolved to 0 files for projection 'link' — the scan did not run (invalid execution). Verify the inspected root (--root) and the junction propagation state of the execution environment before adopting the result."
+  ],
+  "rules": {
+    "ok": true,
+    "findings": [],
+    "stats": {
+      "ir046_hits": 0,
+      "ir047_hits": 0,
+      "ir048_hits": 0,
+      "scanned_files": 430
+    }
+  }
+}

@@ -1,0 +1,1 @@
+warning: zero-targets pre-warning: scan targets resolved to 0 files for projection 'link' — the scan did not run (invalid execution). Verify the inspected root (--root) and the junction propagation state of the execution environment before adopting the result.

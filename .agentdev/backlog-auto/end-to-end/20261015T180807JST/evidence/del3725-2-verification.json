@@ -1,0 +1,25 @@
+{
+  "delegation": "DEL-3725-2",
+  "startedAt": "2026-10-15T16:52:21+09:00",
+  "sourceRevision": "45c2b767b00f4fce08fa504fdac1ae120822aaca",
+  "canonicalAmendment": "38bc58c7",
+  "cwd": "C:/Users/ogatay/work/agent-dev-flow/.worktrees/3725-feature",
+  "environment": { "bun": "1.3.6", "typescript": "5.9.3", "bunTypes": "1.3.14", "nodeTypes": "22.20.1", "junctions": "not-propagated", "dependencies": "integrity scripts package bun install --frozen-lockfile" },
+  "runs": [
+    { "name": "red-regressions", "exitCode": 1, "pass": 70, "fail": 2, "stdout": "del3725-2-red.stdout.txt", "stderr": "del3725-2-red.stderr.txt" },
+    { "name": "suite1", "command": "bun test ./.opencode/skills/repo-agentdev-integrity/scripts/", "timeoutMs": 600000, "exitCode": 0, "pass": 2907, "fail": 0, "stdout": "del3725-2-suite1.stdout.txt", "stderr": "del3725-2-suite1.stderr.txt" },
+    { "name": "suite2", "command": "bun test ./src/common/skills/", "timeoutMs": 600000, "exitCode": 0, "pass": 680, "fail": 0, "stdout": "del3725-2-suite2.stdout.txt", "stderr": "del3725-2-suite2.stderr.txt" },
+    { "name": "suite3", "command": "bun test ./.opencode/plugins/ ./scripts/", "timeoutMs": 600000, "exitCode": 0, "pass": 348, "fail": 0, "stdout": "del3725-2-suite3.stdout.txt", "stderr": "del3725-2-suite3.stderr.txt" },
+    { "name": "typecheck", "command": "bun ./.opencode/skills/repo-agentdev-integrity/scripts/node_modules/typescript/bin/tsc --noEmit --target ES2022 --module ESNext --moduleResolution bundler --strict --noUncheckedIndexedAccess --noUnusedLocals --noUnusedParameters --noFallthroughCasesInSwitch --verbatimModuleSyntax --allowImportingTsExtensions --esModuleInterop --skipLibCheck --types bun,node --typeRoots ./.opencode/skills/repo-agentdev-integrity/scripts/node_modules/@types ./src/common/skills/agentdev-workflow-backlog-auto/tests/{end-to-end-contract.test,completion-model,completion-model.test,resume-model,resume-model.test}.ts", "exitCode": 0, "stdout": "del3725-2-typecheck.stdout.txt", "stderr": "del3725-2-typecheck.stderr.txt" },
+    { "name": "check_integrity", "exitCode": 0, "stdout": "del3725-2-integrity.stdout.json", "stderr": "del3725-2-integrity.stderr.txt" },
+    { "name": "traceability", "exitCode": 0, "stdout": "del3725-2-traceability.stdout.json", "stderr": "del3725-2-traceability.stderr.txt" },
+    { "name": "source", "exitCode": 0, "stdout": "del3725-2-boundary-source.stdout.json", "stderr": "del3725-2-boundary-source.stderr.txt" },
+    { "name": "link-mainroot-readonly", "exitCode": 0, "stdout": "del3725-2-boundary-link-mainroot.stdout.json", "stderr": "del3725-2-boundary-link-mainroot.stderr.txt", "inspectedRoot": "C:/Users/ogatay/work/agent-dev-flow" },
+    { "name": "targeted_docs", "exitCode": 0, "stdout": "del3725-2-docs.stdout.json", "stderr": "del3725-2-docs.stderr.txt" }
+  ],
+  "unverified": {
+    "publicEntryE2E": "実行により実際の副作用（Issue/PR/RU 生成）を伴うため本委譲では未実施",
+    "lsp": "five changed source files timed out; CLI typecheck succeeded",
+    "reviewWork": "five-agent workflow unavailable under executor tool/role and worktree-isolation constraints; not a PASS"
+  }
+}

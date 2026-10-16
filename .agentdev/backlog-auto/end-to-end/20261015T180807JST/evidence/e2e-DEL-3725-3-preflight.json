@@ -1,0 +1,47 @@
+{
+  "adf_delegation": "DEL-3725-3",
+  "firstObservedActionAt": "2026-10-15T18:02:39+09:00",
+  "checkpoint": "preflight-paused-before-workflow-dispatch",
+  "finalResult": null,
+  "launch": {
+    "requestedEntry": "/agentdev/backlog-auto",
+    "implementationRoot": "C:/Users/ogatay/work/agent-dev-flow/.worktrees/3725-feature",
+    "implementationCommit": "45c2b767b00f4fce08fa504fdac1ae120822aaca",
+    "domainRoot": "C:/Users/ogatay/work/agent-dev-flow",
+    "childWorkflowSource": "main current",
+    "actualWorkflowLaunchCount": 0,
+    "queueConsumed": false
+  },
+  "baselineObservation": {
+    "mainHead": "38bc58c74e4152c098ed8571a9cffa8bf23234de",
+    "reachableMaximumFormalTag": "v5.1.0",
+    "tagCommit": "3d8718cc63171e5f77a455fee31c41402e614f6e",
+    "ancestorCheckExitCode": 0,
+    "comparison": "formal numeric major.minor.patch only; rc and non-SemVer tags excluded",
+    "targetVersionAuthorizedByUser": "v5.1.1",
+    "releaseVersionReservedOrConsumed": false,
+    "newTagCreated": false
+  },
+  "stateObservation": {
+    "existingSetStateFilesFound": 0,
+    "requirementUnits": [],
+    "drafts": [],
+    "obligationSnapshot": "not-established-until-real-backlog-review-approval",
+    "mainSetStateCreated": false,
+    "existingUntrackedMainFiles": "present; left untouched"
+  },
+  "pause": {
+    "type": "executor-role-boundary-not-HITL",
+    "reason": "This executor role does not orchestrate workflows or delegate implementation. Research-only agents cannot substitute for child workflow execution.",
+    "resumeRequirement": "An authorized workflow orchestrator must dispatch the actual branch backlog-auto workflow and main child workflows. Reuse these baseline observations as preflight evidence, but establish the actual start commit at launch and do not count this preparation as a successful public-entry execution.",
+    "humanClassificationQuestions": [],
+    "humanApprovalsAppliedAutomatically": false
+  },
+  "verification": {
+    "completedTestStrategyItems": [],
+    "baselineObservationOnly": true,
+    "TS001PublicEntryMeasured": false,
+    "TS008ZeroRUEndPathMeasured": false,
+    "note": "RU absence before backlog-review is not the zero-RU completion path. No TS item is marked pass at this checkpoint."
+  }
+}

@@ -1,0 +1,9 @@
+# check_autogen_freshness.ts Report
+
+- 実行日時: 2026-10-16T00:38:01.639Z
+- スクリプト: check_autogen_freshness.ts
+- 検査索引ファイル数: 6
+- 検出鮮度違反: 0 件
+
+すべての AUTOGEN ブロックは鮮度が保たれています（再生成不要）。
+

@@ -1,0 +1,3 @@
+Report written to: C:\Users\ogatay\work\agent-dev-flow\.worktrees\3725-feature\.agentdev\integrity\reports\2026-10-15-integrity-report-6.md
+[integrity] Permanent exemptions applied: 3 warning(s) demoted to info (.opencode/skills/repo-agentdev-integrity/baselines/exemptions.json), excluded from the pre-demote warning total (49).
+[integrity] NG baseline applied: 2 baseline-known (demoted to info), 76 approved additions (provenance-tracked, demoted to info), 0 new unmanaged NG (delta, exit code driver).

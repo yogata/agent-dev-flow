@@ -1,0 +1,455 @@
+# check_integrity.ts Report
+
+- **実行日時**: 2026-10-16 00:39
+- **プロファイル**: source
+- **環境ラベル**: worktree / junction=absent-skills-dir-fallback / root=C:\Users\ogatay\work\agent-dev-flow\.worktrees\3725-feature
+- **スキャン対象**: REQ 72件、ADR 0件、Skill 58件、Command 18件、Guides 14件、Specs 184件、RetiredREQ 19件、DocMap 0件、Report 9件、Runtime 59件
+
+## サマリ
+
+| レベル | 件数 |
+|--------|------|
+| OK | 928 |
+| NG | 0 |
+| Warning | 0 |
+| Info | 129 |
+
+## ルーティングサマリ
+
+| 検査カテゴリ | OK | NG | Warning | Route |
+|-------------|-----|-----|---------|-------|
+| SourceProfile | 1 | 0 | 0 | - |
+| REQ | 146 | 0 | 0 | - |
+| ADR | 2 | 0 | 0 | - |
+| Skill | 59 | 0 | 0 | - |
+| Command | 22 | 0 | 0 | - |
+| Namespace | 4 | 0 | 0 | - |
+| Designs | 116 | 0 | 0 | - |
+| CompletionReport | 3 | 0 | 0 | - |
+| VariantReport | 1 | 0 | 0 | - |
+| LinkIntegrity | 2 | 0 | 0 | intake |
+| CanonicalBoundary | 1 | 0 | 0 | - |
+| LifecycleBoundary | 2 | 0 | 0 | - |
+| Inventory | 3 | 0 | 0 | - |
+| Implementation Pattern | 0 | 0 | 0 | - |
+| Canonical | 7 | 0 | 0 | - |
+| ReferencePath | 536 | 0 | 0 | - |
+| Decision | 0 | 0 | 0 | intake |
+| integrity-rule-gap | 2 | 0 | 0 | - |
+| DocumentDrift | 4 | 0 | 0 | - |
+| ScanScope | 3 | 0 | 0 | - |
+| CaptureBoundary | 2 | 0 | 0 | req-define |
+| DocsCheck | 1 | 0 | 0 | - |
+| CanonicalConflict | 2 | 0 | 0 | intake |
+| ExecutionSubject | 1 | 0 | 0 | - |
+| RuntimeReference | 1 | 0 | 0 | intake |
+| IndexGenerationConsistency | 1 | 0 | 0 | - |
+| CommonPolicyIdentifier | 1 | 0 | 0 | - |
+| UnresolvedPlaceholder | 0 | 0 | 0 | intake |
+| ObsoleteVocabulary | 0 | 0 | 0 | intake |
+| LegacyPathName | 1 | 0 | 0 | - |
+| ReqCitation | 0 | 0 | 0 | intake |
+| SkillProjection | 1 | 0 | 0 | - |
+| ReqNumbering | 1 | 0 | 0 | - |
+| IntegrityRuleRelatedReq | 1 | 0 | 0 | - |
+| ReqFreshness | 1 | 0 | 0 | - |
+| PluginProjection | 0 | 0 | 0 | intake |
+| ProfileScope | 0 | 0 | 0 | - |
+
+## 詳細
+
+### LinkIntegrity
+- **[INFO]** broken-req-ref: [baseline-known provenance=issue-2559-ou003-detector-vocabulary] REQ-0108 referenced but REQ file does not exist (NG baseline, not yet cleaned) (docs/designs/integrity/content-corruption-checker.md) → route: intake
+  - evidence: `REQ-0108`
+  - expected: `REQ-0108.md must exist in docs/requirements/`
+
+### Inventory
+- **[INFO]** docmap-req-sync: DOC-MAP.md not found
+- **[INFO]** docmap-spec-sync: DOC-MAP.md not found
+- **[INFO]** docmap-guide-sync: DOC-MAP.md not found
+- **[INFO]** adr-readme-index: ADR README.md not found
+- **[INFO]** skills-dir-fallback: Junction projection absent: scanning src/common/skills (SoT src/common/skills) instead of .opencode/skills (REQ-018-001, environment=worktree/junction=absent-skills-dir-fallback)
+
+### Implementation Pattern
+- **[INFO]** command-map-consistency: [recommendation: no-action] No command patterns parsed from command-map.md
+
+### Decision
+- **[INFO]** accepted-adr-only-citation: [exempted] Non-accepted Decision DEC-002 (status: superseded) cited in docs/designs/foundations/document-model.md (permanent exemption: .opencode/skills/repo-agentdev-integrity/baselines/exemptions.json) (docs/designs/foundations/document-model.md) → route: intake
+  - evidence: `DEC-002`
+  - expected: `only accepted Decisions should be cited as current basis`
+- **[INFO]** accepted-adr-only-citation: [exempted] Non-accepted Decision DEC-043 (status: superseded) cited in docs/designs/integrity/index-auto-generation.md (permanent exemption: .opencode/skills/repo-agentdev-integrity/baselines/exemptions.json) (docs/designs/integrity/index-auto-generation.md) → route: intake
+  - evidence: `DEC-043`
+  - expected: `only accepted Decisions should be cited as current basis`
+- **[INFO]** accepted-adr-only-citation: [baseline-known] Non-accepted Decision DEC-007 (status: superseded) cited in docs/designs/integrity/index-auto-generation.md (NG baseline, not yet cleaned) (docs/designs/integrity/index-auto-generation.md) → route: intake
+  - evidence: `DEC-007`
+  - expected: `only accepted Decisions should be cited as current basis`
+
+### CaptureBoundary
+- **[INFO]** command-capture-duty: [baseline-known] req-save.md not found in command directory (NG baseline, not yet cleaned) (src/common/commands/agentdev/req-save.md) → route: req-define
+
+### CanonicalConflict
+- **[INFO]** gh-direct-invocation: [exempted] Direct gh CLI invocation 'gh pr view' detected — route via the agentdev_gh Custom Tool (IR-053, v2:REQ-0152-001) (permanent exemption: .opencode/skills/repo-agentdev-integrity/baselines/exemptions.json) (src/common/skills/agentdev-git-worktree/references/worktree-operations.md:279) → route: intake
+  - evidence: `gh pr view`
+  - expected: `delegate GitHub I/O through the agentdev_gh Custom Tool operations (REQ-011-001)`
+
+### RuntimeReference
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/commands/agentdev/inspect-docs.md:37) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/commands/agentdev/inspect-docs.md:37) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/commands/agentdev/inspect-docs.md:37) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/guides/ reference 'docs/guides/' (IR-055 baseline, not yet cleaned) (src/common/commands/agentdev/inspect-docs.md:38) → route: intake
+  - evidence: `docs/guides/`
+  - expected: `distribution files should avoid docs/guides/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/commands/agentdev/inspect-docs.md:41) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/commands/agentdev/inspect-docs.md:41) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/commands/agentdev/inspect-skills.md:39) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/commands/agentdev/inspect-skills.md:39) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/commands/agentdev/inspect-skills.md:39) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/guides/ reference 'docs/guides/' (IR-055 baseline, not yet cleaned) (src/common/commands/agentdev/inspect-skills.md:40) → route: intake
+  - evidence: `docs/guides/`
+  - expected: `distribution files should avoid docs/guides/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/commands/agentdev/inspect-skills.md:43) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/commands/agentdev/inspect-skills.md:43) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-design-file-manager/SKILL.md:178) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-design-file-manager/references/design-lifecycle-application.md:59) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known strict violation: repo-* reference 'repo-local' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-git-worktree/references/worktree-operations.md:177) → route: intake
+  - evidence: `repo-local`
+  - expected: `distribution files must not contain repo-* references (unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-inspect-skills/SKILL.md:62) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-inspect-skills/references/spec-operation-contract-consistency.md:69) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-learning-pipeline/references/disposition-and-artifact-schema.md:35) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-learning-pipeline/references/disposition-and-artifact-schema.md:71) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-learning-pipeline/references/disposition-and-artifact-schema.md:179) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-req-analysis/references/analysis-viewpoints.md:134) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-req-analysis/references/investigation-scope-refinement.md:55) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-req-analysis/references/req-define-detailed-gates.md:23) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-req-file-manager/templates/doc_requirement.md:30) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-req-structure-diagnostics/references/req-structure-review.md:122) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/guides/ reference 'docs/guides/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-req-structure-diagnostics/references/req-structure-review.md:122) → route: intake
+  - evidence: `docs/guides/`
+  - expected: `distribution files should avoid docs/guides/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-req-structure-diagnostics/references/req-structure-review.md:197) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-workflow-backlog-review/references/analysis-composition-and-review.md:250) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md:61) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-workflow-case-ready/references/execution-structure.md:89) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-workflow-inspect-docs/references/scan-and-doc-diagnostics.md:30) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/guides/ reference 'docs/guides/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-workflow-inspect-docs/references/scan-and-doc-diagnostics.md:30) → route: intake
+  - evidence: `docs/guides/`
+  - expected: `distribution files should avoid docs/guides/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-workflow-inspect-docs/references/scan-and-doc-diagnostics.md:56) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/guides/ reference 'docs/guides/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-workflow-inspect-docs/references/scan-and-doc-diagnostics.md:57) → route: intake
+  - evidence: `docs/guides/`
+  - expected: `distribution files should avoid docs/guides/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-workflow-inspect-promote/references/auto-promote-and-review.md:72) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-workflow-intake-promote/references/classification-and-review.md:127) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-workflow-learning-promote/references/analysis-and-review.md:218) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-workflow-req-define/references/requirement-development.md:184) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-workflow-templates/templates/pr_desc.md:39) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+- **[INFO]** runtime-unresolved-reference: Baseline-known heuristic violation: docs/designs/ reference 'docs/designs/' (IR-055 baseline, not yet cleaned) (src/common/skills/agentdev-workflow-templates/templates/pr_desc.md:39) → route: intake
+  - evidence: `docs/designs/`
+  - expected: `distribution files should avoid docs/designs/ references (likely unresolved in consumer env)`
+
+### UnresolvedPlaceholder
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-adversarial-review/SKILL.md:17) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-adversarial-review/SKILL.md:88) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-adversarial-review/SKILL.md:95) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-adversarial-review/SKILL.md:96) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-adversarial-review/SKILL.md:97) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-adversarial-review/SKILL.md:98) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-adversarial-review/SKILL.md:99) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-adversarial-review/SKILL.md:100) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-adversarial-review/SKILL.md:101) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-adversarial-review/SKILL.md:102) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-adversarial-review/SKILL.md:103) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-backlog-integration/SKILL.md:37) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-backlog-integration/SKILL.md:38) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-backlog-integration/SKILL.md:39) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-backlog-integration/SKILL.md:40) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-backlog-integration/SKILL.md:41) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-backlog-integration/SKILL.md:42) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-backlog-integration/SKILL.md:43) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-backlog-integration/SKILL.md:44) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-backlog-integration/SKILL.md:45) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-backlog-integration/SKILL.md:46) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-backlog-integration/SKILL.md:47) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-case-run-execution-adapter/SKILL.md:253) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-case-run-execution-adapter/SKILL.md:254) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-case-run-execution-adapter/SKILL.md:255) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-case-run-execution-adapter/SKILL.md:256) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-case-run-execution-adapter/SKILL.md:257) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-case-run-execution-adapter/SKILL.md:258) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-case-run-execution-adapter/SKILL.md:259) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-case-run-execution-adapter/SKILL.md:260) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-case-run-execution-adapter/SKILL.md:261) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-case-run-execution-adapter/SKILL.md:262) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-case-run-execution-adapter/SKILL.md:263) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-intake-pipeline/SKILL.md:31) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-intake-pipeline/SKILL.md:32) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-intake-pipeline/SKILL.md:33) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-intake-pipeline/SKILL.md:34) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-req-analysis/references/pass-criteria-writing-guide.md:73) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-req-analysis/references/pass-criteria-writing-guide.md:74) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-req-analysis/references/pass-criteria-writing-guide.md:78) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-req-analysis/references/pass-criteria-writing-guide.md:87) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'REQ-{NNNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-req-analysis/references/pass-criteria-writing-guide.md:90) → route: intake
+  - evidence: `id-placeholder:REQ-{NNNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'TS-{NNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md:6) → route: intake
+  - evidence: `id-placeholder:TS-{NNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'TS-{NNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md:126) → route: intake
+  - evidence: `id-placeholder:TS-{NNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+- **[INFO]** unresolved-placeholder: [baseline-known provenance=issue-2372-ir064-initial-baseline] ID placeholder 'IR-{NNN}' appears bare in body text (not in code span, parentheses, or template) (REQ-010-065, IR-064) (NG baseline, not yet cleaned) (src/common/skills/agentdev-workflow-case-close/SKILL.md:46) → route: intake
+  - evidence: `id-placeholder:IR-{NNN}`
+  - expected: `wrap the placeholder in backticks or parenthesized delegation-notation, or resolve it to a concrete value`
+
+### ObsoleteVocabulary
+- **[INFO]** obsolete-vocabulary-current-use: [baseline-known provenance=issue-2372-ir065-initial-baseline] Obsolete vocabulary 'REQ/ADR/' (req-adr-kind-enumeration) used as current concept (REQ-010-066, IR-065) (NG baseline, not yet cleaned) (.agentdev/extensions/skills/agentdev-backlog-integration.yaml:7) → route: intake
+  - evidence: `req-adr-kind-enumeration:REQ/ADR/`
+  - expected: `replace with the current vocabulary or mark the mention as historical`
+- **[INFO]** obsolete-vocabulary-current-use: [baseline-known provenance=issue-2372-ir065-initial-baseline] Obsolete vocabulary 'REQ/ADR/' (req-adr-kind-enumeration) used as current concept (REQ-010-066, IR-065) (NG baseline, not yet cleaned) (.agentdev/extensions/skills/agentdev-quality-gates.yaml:15) → route: intake
+  - evidence: `req-adr-kind-enumeration:REQ/ADR/`
+  - expected: `replace with the current vocabulary or mark the mention as historical`
+- **[INFO]** obsolete-vocabulary-current-use: [baseline-known provenance=issue-2372-ir065-initial-baseline] Obsolete vocabulary 'REQ/ADR/' (req-adr-kind-enumeration) used as current concept (REQ-010-066, IR-065) (NG baseline, not yet cleaned) (.agentdev/extensions/skills/agentdev-req-analysis.yaml:15) → route: intake
+  - evidence: `req-adr-kind-enumeration:REQ/ADR/`
+  - expected: `replace with the current vocabulary or mark the mention as historical`
+
+### ReqCitation
+- **[INFO]** referenced-req-row-existence: [baseline-known provenance=preserved-history-or-out-of-scope] Phantom REQ row citation 'REQ-006-021' is referenced but no requirement row exists (REQ-010-069, IR-067) (NG baseline, not yet cleaned) (docs/designs/commands/case-run.md:396) → route: intake
+  - evidence: `REQ-006-021`
+  - expected: `REQ-006-021 must exist as a requirement row in docs/requirements/REQ-006.md`
+- **[INFO]** referenced-req-row-existence: [baseline-known provenance=preserved-history-or-out-of-scope] Phantom REQ row citation 'REQ-002-028' is referenced but no requirement row exists (REQ-010-069, IR-067) (NG baseline, not yet cleaned) (docs/designs/integrity/docs-spec-rebuild-integrity.md:76) → route: intake
+  - evidence: `REQ-002-028`
+  - expected: `REQ-002-028 must exist as a requirement row in docs/requirements/REQ-002.md`
+- **[INFO]** referenced-req-row-existence: [baseline-known provenance=preserved-history-or-out-of-scope] Phantom REQ row citation 'REQ-002-021' is referenced but no requirement row exists (REQ-010-069, IR-067) (NG baseline, not yet cleaned) (docs/designs/responsibilities/artifact-contracts.md:64) → route: intake
+  - evidence: `REQ-002-021`
+  - expected: `REQ-002-021 must exist as a requirement row in docs/requirements/REQ-002.md`
+- **[INFO]** referenced-req-row-existence: [baseline-known provenance=preserved-history-or-out-of-scope] Phantom REQ row citation 'REQ-002-021' is referenced but no requirement row exists (REQ-010-069, IR-067) (NG baseline, not yet cleaned) (docs/designs/responsibilities/req-impact-map.md:81) → route: intake
+  - evidence: `REQ-002-021`
+  - expected: `REQ-002-021 must exist as a requirement row in docs/requirements/REQ-002.md`
+- **[INFO]** referenced-req-row-existence: [baseline-known provenance=preserved-history-or-out-of-scope] Phantom REQ row citation 'REQ-002-028' is referenced but no requirement row exists (REQ-010-069, IR-067) (NG baseline, not yet cleaned) (docs/designs/responsibilities/req-impact-map.md:83) → route: intake
+  - evidence: `REQ-002-028`
+  - expected: `REQ-002-028 must exist as a requirement row in docs/requirements/REQ-002.md`
+- **[INFO]** referenced-req-row-existence: [baseline-known provenance=preserved-history-or-out-of-scope] Phantom REQ row citation 'REQ-006-021' is referenced but no requirement row exists (REQ-010-069, IR-067) (NG baseline, not yet cleaned) (docs/designs/skills/agentdev-case-run-execution-adapter.md:39) → route: intake
+  - evidence: `REQ-006-021`
+  - expected: `REQ-006-021 must exist as a requirement row in docs/requirements/REQ-006.md`
+- **[INFO]** referenced-req-row-existence: [baseline-known provenance=preserved-history-or-out-of-scope] Phantom REQ row citation 'REQ-006-021' is referenced but no requirement row exists (REQ-010-069, IR-067) (NG baseline, not yet cleaned) (docs/designs/workflows/capture-boundaries.md:63) → route: intake
+  - evidence: `REQ-006-021`
+  - expected: `REQ-006-021 must exist as a requirement row in docs/requirements/REQ-006.md`
+- **[INFO]** referenced-req-row-existence: [baseline-known provenance=preserved-history-or-out-of-scope] Phantom REQ row citation 'REQ-006-021' is referenced but no requirement row exists (REQ-010-069, IR-067) (NG baseline, not yet cleaned) (docs/designs/workflows/capture-boundaries.md:98) → route: intake
+  - evidence: `REQ-006-021`
+  - expected: `REQ-006-021 must exist as a requirement row in docs/requirements/REQ-006.md`
+- **[INFO]** referenced-req-row-existence: [baseline-known provenance=preserved-history-or-out-of-scope] Phantom REQ row citation 'REQ-003-030' is referenced but no requirement row exists (REQ-010-069, IR-067) (NG baseline, not yet cleaned) (docs/requirements/REQ-082.md:12) → route: intake
+  - evidence: `REQ-003-030`
+  - expected: `REQ-003-030 must exist as a requirement row in docs/requirements/REQ-003.md`
+- **[INFO]** referenced-req-row-existence: [baseline-known provenance=ru-0145-pending-correction] Phantom REQ row citation 'REQ-010-053' is referenced but no requirement row exists (REQ-010-069, IR-067) (NG baseline, not yet cleaned) (docs/decisions/DEC-013.md:14) → route: intake
+  - evidence: `REQ-010-053`
+  - expected: `REQ-010-053 must exist as a requirement row in docs/requirements/REQ-010.md`
+- **[INFO]** referenced-req-row-existence: [baseline-known provenance=ru-0145-pending-correction] Phantom REQ row citation 'REQ-010-053' is referenced but no requirement row exists (REQ-010-069, IR-067) (NG baseline, not yet cleaned) (docs/decisions/DEC-013.md:41) → route: intake
+  - evidence: `REQ-010-053`
+  - expected: `REQ-010-053 must exist as a requirement row in docs/requirements/REQ-010.md`
+- **[INFO]** referenced-req-row-existence: [baseline-known provenance=ru-0145-pending-correction] Phantom REQ row citation 'REQ-010-053' is referenced but no requirement row exists (REQ-010-069, IR-067) (NG baseline, not yet cleaned) (docs/decisions/DEC-013.md:51) → route: intake
+  - evidence: `REQ-010-053`
+  - expected: `REQ-010-053 must exist as a requirement row in docs/requirements/REQ-010.md`
+- **[INFO]** referenced-req-row-existence: [baseline-known provenance=ru-0145-pending-correction] Phantom REQ row citation 'REQ-010-053' is referenced but no requirement row exists (REQ-010-069, IR-067) (NG baseline, not yet cleaned) (docs/decisions/DEC-013.md:56) → route: intake
+  - evidence: `REQ-010-053`
+  - expected: `REQ-010-053 must exist as a requirement row in docs/requirements/REQ-010.md`
+- **[INFO]** referenced-req-row-existence: [baseline-known provenance=preserved-history-or-out-of-scope] Phantom REQ row citation 'REQ-002-028' is referenced but no requirement row exists (REQ-010-069, IR-067) (NG baseline, not yet cleaned) (docs/decisions/DEC-014.md:53) → route: intake
+  - evidence: `REQ-002-028`
+  - expected: `REQ-002-028 must exist as a requirement row in docs/requirements/REQ-002.md`
+- **[INFO]** referenced-req-row-existence: [baseline-known provenance=preserved-history-or-out-of-scope] Phantom REQ row citation 'REQ-010-053' is referenced but no requirement row exists (REQ-010-069, IR-067) (NG baseline, not yet cleaned) (docs/decisions/README.md:239) → route: intake
+  - evidence: `REQ-010-053`
+  - expected: `REQ-010-053 must exist as a requirement row in docs/requirements/REQ-010.md`
+
+### SkillProjection
+- **[INFO]** skill-projection-manifest: No non-repo projection entries under .opencode/skills (worktree / junction-absent environment); projection cross-check skipped, manifest↔src check only (IR-068, REQ-018)
+
+### PluginProjection
+- **[INFO]** repo-local-plugin-projection-symmetry: [baseline-known provenance=environment-specific-worktree] Repo-local Plugin projection missing: plugins/agentdev-distribution-boundary-guard (NG baseline, not yet cleaned) (.opencode/plugins/agentdev-distribution-boundary-guard) → route: intake
+  - evidence: `projection-missing:plugins/agentdev-distribution-boundary-guard`
+  - expected: `junction .opencode/plugins/agentdev-distribution-boundary-guard -> src/opencode/plugins/agentdev-distribution-boundary-guard (resync is an environment operation: scripts/self-sync.ps1)`
+- **[INFO]** repo-local-plugin-projection-symmetry: [baseline-known provenance=environment-specific-worktree] Repo-local Plugin loader shim missing: plugins/agentdev-distribution-boundary-guard.ts (NG baseline, not yet cleaned) (.opencode/plugins/agentdev-distribution-boundary-guard.ts) → route: intake
+  - evidence: `shim-missing:plugins/agentdev-distribution-boundary-guard.ts`
+  - expected: `depth-1 loader shim .opencode/plugins/agentdev-distribution-boundary-guard.ts re-exporting agentdev-distribution-boundary-guard/plugin.ts (resync is an environment operation: scripts/self-sync.ps1)`
+- **[INFO]** repo-local-plugin-projection-symmetry: [baseline-known provenance=environment-specific-worktree] Repo-local Plugin projection missing: plugins/agentdev-gh-tool (NG baseline, not yet cleaned) (.opencode/plugins/agentdev-gh-tool) → route: intake
+  - evidence: `projection-missing:plugins/agentdev-gh-tool`
+  - expected: `junction .opencode/plugins/agentdev-gh-tool -> src/opencode/plugins/agentdev-gh-tool (resync is an environment operation: scripts/self-sync.ps1)`
+- **[INFO]** repo-local-plugin-projection-symmetry: [baseline-known provenance=environment-specific-worktree] Repo-local Plugin loader shim missing: plugins/agentdev-gh-tool.ts (NG baseline, not yet cleaned) (.opencode/plugins/agentdev-gh-tool.ts) → route: intake
+  - evidence: `shim-missing:plugins/agentdev-gh-tool.ts`
+  - expected: `depth-1 loader shim .opencode/plugins/agentdev-gh-tool.ts re-exporting agentdev-gh-tool/plugin.ts (resync is an environment operation: scripts/self-sync.ps1)`
+- **[INFO]** repo-local-plugin-projection-symmetry: [baseline-known provenance=environment-specific-worktree] Repo-local Plugin projection missing: plugins/agentdev-gh-write-guard (NG baseline, not yet cleaned) (.opencode/plugins/agentdev-gh-write-guard) → route: intake
+  - evidence: `projection-missing:plugins/agentdev-gh-write-guard`
+  - expected: `junction .opencode/plugins/agentdev-gh-write-guard -> src/opencode/plugins/agentdev-gh-write-guard (resync is an environment operation: scripts/self-sync.ps1)`
+- **[INFO]** repo-local-plugin-projection-symmetry: [baseline-known provenance=environment-specific-worktree] Repo-local Plugin loader shim missing: plugins/agentdev-gh-write-guard.ts (NG baseline, not yet cleaned) (.opencode/plugins/agentdev-gh-write-guard.ts) → route: intake
+  - evidence: `shim-missing:plugins/agentdev-gh-write-guard.ts`
+  - expected: `depth-1 loader shim .opencode/plugins/agentdev-gh-write-guard.ts re-exporting agentdev-gh-write-guard/plugin.ts (resync is an environment operation: scripts/self-sync.ps1)`
+- **[INFO]** repo-local-plugin-projection-symmetry: [baseline-known provenance=environment-specific-worktree] Repo-local Plugin projection missing: plugins/agentdev-jev-tool (NG baseline, not yet cleaned) (.opencode/plugins/agentdev-jev-tool) → route: intake
+  - evidence: `projection-missing:plugins/agentdev-jev-tool`
+  - expected: `junction .opencode/plugins/agentdev-jev-tool -> src/opencode/plugins/agentdev-jev-tool (resync is an environment operation: scripts/self-sync.ps1)`
+- **[INFO]** repo-local-plugin-projection-symmetry: [baseline-known provenance=environment-specific-worktree] Repo-local Plugin loader shim missing: plugins/agentdev-jev-tool.ts (NG baseline, not yet cleaned) (.opencode/plugins/agentdev-jev-tool.ts) → route: intake
+  - evidence: `shim-missing:plugins/agentdev-jev-tool.ts`
+  - expected: `depth-1 loader shim .opencode/plugins/agentdev-jev-tool.ts re-exporting agentdev-jev-tool/plugin.ts (resync is an environment operation: scripts/self-sync.ps1)`
+- **[INFO]** repo-local-plugin-projection-symmetry: [baseline-known provenance=environment-specific-worktree] Repo-local Plugin projection missing: plugins/agentdev-textlint-guard (NG baseline, not yet cleaned) (.opencode/plugins/agentdev-textlint-guard) → route: intake
+  - evidence: `projection-missing:plugins/agentdev-textlint-guard`
+  - expected: `junction .opencode/plugins/agentdev-textlint-guard -> src/opencode/plugins/agentdev-textlint-guard (resync is an environment operation: scripts/self-sync.ps1)`
+- **[INFO]** repo-local-plugin-projection-symmetry: [baseline-known provenance=environment-specific-worktree] Repo-local Plugin loader shim missing: plugins/agentdev-textlint-guard.ts (NG baseline, not yet cleaned) (.opencode/plugins/agentdev-textlint-guard.ts) → route: intake
+  - evidence: `shim-missing:plugins/agentdev-textlint-guard.ts`
+  - expected: `depth-1 loader shim .opencode/plugins/agentdev-textlint-guard.ts re-exporting agentdev-textlint-guard/plugin.ts (resync is an environment operation: scripts/self-sync.ps1)`
+- **[INFO]** repo-local-plugin-projection-symmetry: [baseline-known provenance=environment-specific-worktree] Repo-local Plugin projection missing: plugins/agentdev-third-party-tool (NG baseline, not yet cleaned) (.opencode/plugins/agentdev-third-party-tool) → route: intake
+  - evidence: `projection-missing:plugins/agentdev-third-party-tool`
+  - expected: `junction .opencode/plugins/agentdev-third-party-tool -> src/opencode/plugins/agentdev-third-party-tool (resync is an environment operation: scripts/self-sync.ps1)`
+- **[INFO]** repo-local-plugin-projection-symmetry: [baseline-known provenance=environment-specific-worktree] Repo-local Plugin loader shim missing: plugins/agentdev-third-party-tool.ts (NG baseline, not yet cleaned) (.opencode/plugins/agentdev-third-party-tool.ts) → route: intake
+  - evidence: `shim-missing:plugins/agentdev-third-party-tool.ts`
+  - expected: `depth-1 loader shim .opencode/plugins/agentdev-third-party-tool.ts re-exporting agentdev-third-party-tool/plugin.ts (resync is an environment operation: scripts/self-sync.ps1)`
+
+### ProfileScope
+- **[INFO]** projection-check-scope: source profile: projection sync, broken-junction, junction-coverage checks are out of scope (Issue #1928 §7.3)
+

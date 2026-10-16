@@ -1,0 +1,122 @@
+{
+  "result": {
+    "phase": "pre-merge",
+    "exitCategory": "success",
+    "steps": [
+      {
+        "name": "mergeable-polling",
+        "status": "pass",
+        "detail": {
+          "mergeable": "MERGEABLE",
+          "attempts": 1
+        }
+      },
+      {
+        "name": "pre-merge-local-state-check",
+        "status": "pass",
+        "detail": {
+          "worktreeDirty": false,
+          "currentBranch": "feature/issue-3725",
+          "expectedBranch": "feature/issue-3725"
+        }
+      },
+      {
+        "name": "completion-checkbox-extraction",
+        "status": "pass",
+        "detail": {
+          "total": 10,
+          "checked": 1
+        }
+      },
+      {
+        "name": "final-acceptance-evaluation",
+        "status": "pass",
+        "detail": {
+          "subjectKind": "root-case",
+          "closeAllowed": true,
+          "populationState": "populated",
+          "violations": [],
+          "blockingUnmet": [],
+          "blockingCrossObligations": []
+        }
+      },
+      {
+        "name": "autogen-regeneration-diff",
+        "status": "pass",
+        "detail": {
+          "exitCode": 0,
+          "diffStat": ""
+        }
+      },
+      {
+        "name": "traceability-check",
+        "status": "pass",
+        "detail": {
+          "exitCode": 0,
+          "summary": "pass=11 fail=0"
+        }
+      },
+      {
+        "name": "full-integrity-suite",
+        "status": "pass",
+        "detail": {
+          "full-integrity-suite-1-integrity-scripts": {
+            "exitCode": 0,
+            "stdout": "bun test v1.3.6 (d530ed99)\n"
+          },
+          "full-integrity-suite-2-src-common-skills": {
+            "exitCode": 0,
+            "stdout": "bun test v1.3.6 (d530ed99)\n"
+          },
+          "full-integrity-suite-3-plugins-scripts": {
+            "exitCode": 0,
+            "stdout": "bun test v1.3.6 (d530ed99)\n"
+          },
+          "machineAcceptance": {
+            "accepted": true,
+            "violations": [],
+            "failedGateNames": []
+          }
+        }
+      },
+      {
+        "name": "textlint-final-check",
+        "status": "pass",
+        "detail": {
+          "exitCode": 0,
+          "stderrTail": ""
+        }
+      }
+    ]
+  },
+  "diff": {
+    "acceptanceEvaluation": {
+      "determined": true,
+      "population": {
+        "extractionSucceeded": true,
+        "contractConditionCount": 10,
+        "contractRequiredCount": 10
+      },
+      "closeAllowed": true,
+      "populationState": "populated",
+      "violations": [],
+      "blockingUnmet": [],
+      "blockingCrossObligations": []
+    },
+    "autogenRegeneration": {
+      "exitCode": 0,
+      "diffStat": ""
+    },
+    "integrityMachineAcceptance": {
+      "accepted": true,
+      "violations": [],
+      "failedGateNames": [],
+      "observedFailCounts": [],
+      "failureOrigins": []
+    }
+  },
+  "warnings": [],
+  "proposal": {
+    "completion_checkboxes": "[\n  {\n    \"text\": \"case-ready が Definition Package 受入時に確定する（受け入れ条件 AC-01〜AC-09 と検証義務 TS-001〜TS-010 は合意済み要件doc を正とする）\",\n    \"checked\": true\n  },\n  {\n    \"text\": \"AC-01 単一起動一気通貫（REQ-114-001）: `/agentdev/backlog-auto` の単一起動で整理サイクルから要件定義・実行・検証・統合・全体完了判定・パッチリリース作成まで接続され、次工程開始のみを目的とする手動コマンド入力が実行経路に存在しない。検証方法: TS-001（ADF本体の実リポジトリで 1 回起動し、実行記録を通しで確認）。合格条件: 実際の公開コマンド入口から後続工程とリリースまでの実行結果が確認でき、工程開始のみを目的とする手動コマンド入力が存在しないこと。利用者判断境界（REQ-114-014）の維持を含めて検証する\",\n    \"checked\": false\n  },\n  {\n    \"text\": \"AC-02 RU 一式の完全引継ぎ（REQ-114-002）: 元 RU 一式の要求・義務が漏れ・重複・無関係対象の取り込みなしに set-state の対応表へ対応付けられ、後続対象（要件doc・実行単位）へ反映されている。検証方法: TS-002（統合・分割と無関係ドラフト混在状態での実行、対応表と実際の対応の突合）。合格条件: 義務スナップショットと対応表が元 RU 一式と過不足なく対応すること\",\n    \"checked\": false\n  },\n  {\n    \"text\": \"AC-03 一式全体の並列実行（REQ-114-003、REQ-114-004）: 一式が単一要件doc・単一 case-auto 実行へ写像され、独立した実行可能 Issue が Issue・Epic 横断で並列実行される。検証方法: TS-003（実行可能 Issue 数が共有並列上限を超える構成での実行記録確認）。合格条件: 一式が複数 case-auto 呼び出しへ分断されず、実行可能 Issue が残っている状態での先行グループ待ちの逐次化が存在しないこと\",\n    \"checked\": false\n  },\n  {\n    \"text\": \"AC-04 一式の中断再開（REQ-114-006）: 中断時点から set-state を通じて同じ一式の対象と進捗が復元され、完了済み操作が重複実行されない。検証方法: TS-004（RU 生成後・要件定義後・Issue 生成後・実装中の各点での中断と再開の実測）。合格条件: 中断前後で一式の対象が同一として扱われ、Issue が二重に生成されないこと\",\n    \"checked\": false\n  },\n  {\n    \"text\": \"AC-05 一式全体の完了判定（REQ-114-007、REQ-114-015）: 義務スナップショットと対応表を正として、要件定義・実行対象・検証結果の過不足ない突合と必要範囲の検証結果の成立のみで完遂と判定する。検証方法: TS-005 と TS-010（全 Issue クローズでも義務対応の証拠が欠落するケースで完遂とならないことの確認。RU・要件doc 削除後の set-state による復元・突合・再開と REQ-034-020 ゲートの誤検出不在の確認を含む）。合格条件: 義務と検証結果が過不足なく対応した場合のみ完遂となり、Issue 数の一致のみでは完遂とならないこと\",\n    \"checked\": false\n  },\n  {\n    \"text\": \"AC-06 実行前後の版管理（REQ-114-008、REQ-114-009）: 実行開始時の基準点確定、完遂前のタグ・リリース不在、完遂後のパッチ番号 1 件進行の導出と対象コミットへのタグ付与、差分突合。検証方法: TS-006。合格条件: 事前タグ付与、二つの版番号消費、変更種別による minor ルーティングがいずれも発生しないこと。拘束条件: 版番号導出は DEC-059（正式 SemVer タグのみ基準、祖先到達可能な最大版、SemVer 順序比較、リリース時点の再確認）に従う\",\n    \"checked\": false\n  },\n  {\n    \"text\": \"AC-07 正式リリースの成立と再開（REQ-114-010、REQ-114-011）: 完遂・リリース条件・公開権限の成立時のみリリースが作成され、公開途中の失敗・中断は読み戻し再開でタグ移動・第二番号なしに完了する。検証方法: TS-007（通常成立ケースと 3 種の停止再開の実測）。合格条件: 部分完了が完了として報告されないこと。拘束条件: リリース条件の適用規則（一式由来の活性対象への限定、適用プロジェクトの採用条件確認）と公開操作の経路（DEC-059 承認済み。カタログ外操作は準備と承認後の所定経路）に従う\",\n    \"checked\": false\n  },\n  {\n    \"text\": \"AC-08 対象なし・初期状態・公開不能（REQ-114-012）: RU 0 件、実変更なし、正式バージョン基準なし、公開方式・権限不足の各ケースで不適切なタグ・リリースが作成されず、対象と理由が報告される。検証方法: TS-008（4 ケースの実測）。合格条件: 初期番号の推測や公開不能時の完了報告が行われないこと\",\n    \"checked\": false\n  },\n  {\n    \"text\": \"AC-09 全適用形態検証（REQ-114-013）: ADF本体、GitHub 接続型適用プロジェクト、ローカルIssue適用プロジェクトの各形態で、実際の公開コマンド入口からの共通 E2E 挙動を確認する。検証方法: TS-009（並列実行・中断再開を含む実測。検証環境・権限が用意できない条件は未検証として記録）。合格条件: ADF本体単独の成功をもって合格とせず、各採用形態で共通 E2E 挙動が確認できること（未検証条件は未検証として区別）。on_failure: record-in-findings\",\n    \"checked\": false\n  }\n]"
+  }
+}

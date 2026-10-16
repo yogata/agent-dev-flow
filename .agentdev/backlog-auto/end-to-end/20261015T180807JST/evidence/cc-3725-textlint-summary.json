@@ -1,0 +1,9 @@
+{
+  "summary": "textlint final gate (case-close STEP-3): pass. Full detail retained in worktree .agentdev/tmp during the run; this file is the durable digest.",
+  "exitCode": 0,
+  "purpose": "final",
+  "inspectedFiles": 615,
+  "filesWithMessages": 0,
+  "rejectionTargetViolations": 0,
+  "note": "11MB raw stdout excluded from durable evidence due to size; gate verdict (0 rejection-target violations across all targets) is recorded in the response record comment 6205672847."
+}

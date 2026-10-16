@@ -100,3 +100,35 @@
 - **想定反映先**: agentdev-workflow-case-close references pr-merge-and-conflict.md（取り込み確認手順への追記候補）
 - **関連**: PR #3747（0026aefc）→ PR #3751（29ae287f）、Case #3729
 - **タグ**: `#merge` `#case-close` `#直列化`
+
+## 既存 package に型定義がある場合、ルートの ad-hoc 実行だけで型検証不能と結論しない
+
+- **問題事象**: なし（再発防止の観測記録）。前回委譲（DEL-3725-1）で単独 tsc が Bun/Node 型定義の未解決で成立せず typecheck 未成立と報告された
+- **発生局面**: case-run（DEL-3725-2、Case #3725、PR #3727）
+- **検知方法**: 既存 integrity scripts package の型定義（TypeScript 5.9.3、@types/bun、@types/node）を明示して対象 5 ファイルへ CLI 型検証を実行し exit 0 を実測
+- **根本原因**: 型定義解決先（検証対象が依存する package の node_modules/@types）を指定せずルートから ad-hoc 実行したため
+- **自律対応内容**: 使用入口と型解決先を明示した実行手順を PR 本文へ記録（再実行コマンド全文は del3725-2-verification.json）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 型検証の失敗を「環境不支持」と結論する前に、既存 package 配下の型定義と設定の存在確認を前置する
+- **再発条件**: ルート直下の ad-hoc tsc 実行で型定義未解決を確認した段階で typecheck 不可能と報告した場合
+- **予防策候補**: 型検証の実行手順に、対象が依存する package 配下の型定義明示を必須化
+- **想定反映先**: 検証手順の型検証条項
+- **関連**: PR #3727（45c2b767）、Case #3725
+- **タグ**: `#typecheck` `#検証`
+
+## record-comments の applySection でセクション置換するとセクション後の HTML コメントが消える
+
+- **問題事象**: Case Issue 本文の進行状況セクションを record-comments.ts の applySection で置換した際、セクション境界から次の「## 」見出しが現れない区間（文書末尾に続く工程記録 HTML コメント群）までをセクション内容として消費し、履歴コメント（case-run 停止記録・case-revise・case-ready・再委譲記録）が本文から消失した
+- **発生局面**: case-close（Root Case #3725、STEP-5-2 本文結果セクション更新）
+- **検知方法**: applySection 適用後の本文読み戻しで履歴 HTML コメントの不在を検出
+- **根本原因**: applySection の置換範囲は次の「## 」見出しまで（または文書末尾）であり、見出し無しで後に続く HTML コメント群は前セクションの一部として扱われる
+- **自律対応内容**: 消失した履歴コメントを結果セクション後に復元し、工程記録継続コメント（DEL-3725-3 完了記録・case-close 記録）を新規追記してから issue_update で更新
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: セクション置換型の本文更新では、置換前のセクション内容（見出し無しで後続するコメント・注記を含む）の保全確認を適用前に実施する
+- **再発条件**: 文書末尾のセクション（後続見出しが存在しないセクション）を applySection で置換した場合
+- **予防策候補**: applySection 呼び出し前のセクション後コンテンツ保全確認の手順化、または record-comments.ts の境界検出改善（learning-promote での候補化を想定）
+- **想定反映先**: case-close STEP-5-2 本文更新手順
+- **関連**: Case #3725、agentdev-workflow-case-run scripts/record-comments.ts
+- **タグ**: `#case-close` `#issue-update` `#データ保全`

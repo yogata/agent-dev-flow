@@ -1,0 +1,35 @@
+
+src\common\skills\agentdev-workflow-backlog-auto\tests\end-to-end-contract.test.ts:
+462 |       [
+463 |         { execUnit: "issue-a", kind: "quality-gate", passed: true },
+464 |         { execUnit: "issue-a", kind: "acceptance", passed: false },
+465 |       ],
+466 |     );
+467 |     expect(result.completed).toBe(false);
+                                   ^
+error: expect(received).toBe(expected)
+
+Expected: false
+Received: true
+
+      at <anonymous> (C:\Users\ogatay\work\agent-dev-flow\.worktrees\3725-feature\src\common\skills\agentdev-workflow-backlog-auto\tests\end-to-end-contract.test.ts:467:30)
+(fail) 全体完了突合手続の検証用模擬 > 同一実行単位の別検証が成功しても失敗結果を隠さない
+573 | describe("一気通貫実行の中断再開の検証用模擬（重複実行抑止）", () => {
+574 |   test("再開前の保存状態を変更しない", () => {
+575 |     const first = executeE2e({ progress: {}, invocations: {}, issueCreations: [], completed: false }, "run");
+576 |     const before = JSON.stringify(first);
+577 |     executeE2e(first);
+578 |     expect(JSON.stringify(first)).toBe(before);
+                                        ^
+error: expect(received).toBe(expected)
+
+Expected: "{"progress":{"review":"done","baseline":"done","define":"done","run":"interrupted"},"invocations":{"review":1,"baseline":1,"define":1,"run":1},"issueCreations":["reqdoc-1"],"completed":false}"
+Received: "{"progress":{"review":"done","baseline":"done","define":"done","run":"done","judge":"done","release":"done"},"invocations":{"review":1,"baseline":1,"define":1,"run":2,"judge":1,"release":1},"issueCreations":["reqdoc-1"],"completed":true}"
+
+      at <anonymous> (C:\Users\ogatay\work\agent-dev-flow\.worktrees\3725-feature\src\common\skills\agentdev-workflow-backlog-auto\tests\end-to-end-contract.test.ts:578:35)
+(fail) 一気通貫実行の中断再開の検証用模擬（重複実行抑止） > 再開前の保存状態を変更しない
+
+ 70 pass
+ 2 fail
+ 256 expect() calls
+Ran 72 tests across 2 files. [55.00ms]
