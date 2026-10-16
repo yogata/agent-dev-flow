@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261016T051248Z-382b",
+  "workflow": "backlog-review",
+  "evaluationKind": "dependency-reorderability",
+  "subject": "backlog-review RU構成案9候補のdepends_on並べ替え可能性",
+  "sourceRevision": "1c2e7153b74333a226d025f6ca948eff16d3d3f3",
+  "durationMs": 300,
+  "inputTokens": 1599,
+  "inputs": {
+    "requestDigest": "810d2746d0aca1e9b5a0a198b023de8e39d38034752df1ac66e50a2d01cea6d4"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "dependency-reorderability:R1",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.97,
+        "false": 0.030000000000000027
+      }
+    },
+    {
+      "questionId": "dependency-reorderability:R2",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.98,
+        "false": 0.020000000000000018
+      }
+    },
+    {
+      "questionId": "dependency-reorderability:R3",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.97,
+        "false": 0.030000000000000027
+      }
+    },
+    {
+      "questionId": "dependency-reorderability:R4",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.97,
+        "false": 0.030000000000000027
+      }
+    },
+    {
+      "questionId": "dependency-reorderability:R5",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.97,
+        "false": 0.030000000000000027
+      }
+    },
+    {
+      "questionId": "dependency-reorderability:R6",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.98,
+        "false": 0.020000000000000018
+      }
+    },
+    {
+      "questionId": "dependency-reorderability:R7",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.97,
+        "false": 0.030000000000000027
+      }
+    },
+    {
+      "questionId": "dependency-reorderability:R8",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.98,
+        "false": 0.020000000000000018
+      }
+    },
+    {
+      "questionId": "dependency-reorderability:R9",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.98,
+        "false": 0.020000000000000018
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "dependency-reorderability:R1",
+        "value": true
+      },
+      {
+        "questionId": "dependency-reorderability:R2",
+        "value": true
+      },
+      {
+        "questionId": "dependency-reorderability:R3",
+        "value": true
+      },
+      {
+        "questionId": "dependency-reorderability:R4",
+        "value": true
+      },
+      {
+        "questionId": "dependency-reorderability:R5",
+        "value": true
+      },
+      {
+        "questionId": "dependency-reorderability:R6",
+        "value": true
+      },
+      {
+        "questionId": "dependency-reorderability:R7",
+        "value": true
+      },
+      {
+        "questionId": "dependency-reorderability:R8",
+        "value": true
+      },
+      {
+        "questionId": "dependency-reorderability:R9",
+        "value": true
+      }
+    ]
+  }
+}

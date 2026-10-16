@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261016T051209Z-2134",
+  "workflow": "backlog-review",
+  "evaluationKind": "integration-split",
+  "subject": "backlog-review 採用済み成果物10件の統合・分割判定",
+  "sourceRevision": "1c2e7153b74333a226d025f6ca948eff16d3d3f3",
+  "durationMs": 939,
+  "inputTokens": 2924,
+  "inputs": {
+    "requestDigest": "903a75fdb4ee592229eed29cac2d74aa87062fc371dc231df3d3fc5a7b0cd778"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "integration-split:A1",
+      "questionForm": "choice",
+      "value": "1:1（統合・分割不要）",
+      "probabilityDistribution": {
+        "統合（他の成果物と同一RUへ）": 0,
+        "分割（複数RUへ）": 0,
+        "1:1（統合・分割不要）": 1
+      }
+    },
+    {
+      "questionId": "integration-split:A2",
+      "questionForm": "choice",
+      "value": "1:1（統合・分割不要）",
+      "probabilityDistribution": {
+        "統合（他の成果物と同一RUへ）": 0,
+        "分割（複数RUへ）": 0.01,
+        "1:1（統合・分割不要）": 0.99
+      }
+    },
+    {
+      "questionId": "integration-split:A3",
+      "questionForm": "choice",
+      "value": "統合（他の成果物と同一RUへ）",
+      "probabilityDistribution": {
+        "統合（他の成果物と同一RUへ）": 1,
+        "分割（複数RUへ）": 0,
+        "1:1（統合・分割不要）": 0
+      }
+    },
+    {
+      "questionId": "integration-split:A4",
+      "questionForm": "choice",
+      "value": "1:1（統合・分割不要）",
+      "probabilityDistribution": {
+        "統合（他の成果物と同一RUへ）": 0.02,
+        "分割（複数RUへ）": 0,
+        "1:1（統合・分割不要）": 0.98
+      }
+    },
+    {
+      "questionId": "integration-split:A5",
+      "questionForm": "choice",
+      "value": "1:1（統合・分割不要）",
+      "probabilityDistribution": {
+        "統合（他の成果物と同一RUへ）": 0,
+        "分割（複数RUへ）": 0,
+        "1:1（統合・分割不要）": 1
+      }
+    },
+    {
+      "questionId": "integration-split:A6",
+      "questionForm": "choice",
+      "value": "1:1（統合・分割不要）",
+      "probabilityDistribution": {
+        "統合（他の成果物と同一RUへ）": 0,
+        "分割（複数RUへ）": 0,
+        "1:1（統合・分割不要）": 1
+      }
+    },
+    {
+      "questionId": "integration-split:A7",
+      "questionForm": "choice",
+      "value": "統合（他の成果物と同一RUへ）",
+      "probabilityDistribution": {
+        "統合（他の成果物と同一RUへ）": 1,
+        "分割（複数RUへ）": 0,
+        "1:1（統合・分割不要）": 0
+      }
+    },
+    {
+      "questionId": "integration-split:A8",
+      "questionForm": "choice",
+      "value": "1:1（統合・分割不要）",
+      "probabilityDistribution": {
+        "統合（他の成果物と同一RUへ）": 0,
+        "分割（複数RUへ）": 0,
+        "1:1（統合・分割不要）": 1
+      }
+    },
+    {
+      "questionId": "integration-split:A9",
+      "questionForm": "choice",
+      "value": "1:1（統合・分割不要）",
+      "probabilityDistribution": {
+        "統合（他の成果物と同一RUへ）": 0,
+        "分割（複数RUへ）": 0,
+        "1:1（統合・分割不要）": 1
+      }
+    },
+    {
+      "questionId": "integration-split:A10",
+      "questionForm": "choice",
+      "value": "1:1（統合・分割不要）",
+      "probabilityDistribution": {
+        "統合（他の成果物と同一RUへ）": 0,
+        "分割（複数RUへ）": 0,
+        "1:1（統合・分割不要）": 1
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "integration-split:A1",
+        "value": "1:1（統合・分割不要）"
+      },
+      {
+        "questionId": "integration-split:A2",
+        "value": "1:1（統合・分割不要）"
+      },
+      {
+        "questionId": "integration-split:A3",
+        "value": "統合（他の成果物と同一RUへ）"
+      },
+      {
+        "questionId": "integration-split:A4",
+        "value": "1:1（統合・分割不要）"
+      },
+      {
+        "questionId": "integration-split:A5",
+        "value": "1:1（統合・分割不要）"
+      },
+      {
+        "questionId": "integration-split:A6",
+        "value": "1:1（統合・分割不要）"
+      },
+      {
+        "questionId": "integration-split:A7",
+        "value": "統合（他の成果物と同一RUへ）"
+      },
+      {
+        "questionId": "integration-split:A8",
+        "value": "1:1（統合・分割不要）"
+      },
+      {
+        "questionId": "integration-split:A9",
+        "value": "1:1（統合・分割不要）"
+      },
+      {
+        "questionId": "integration-split:A10",
+        "value": "1:1（統合・分割不要）"
+      }
+    ]
+  }
+}

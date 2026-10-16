@@ -1,0 +1,203 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261016T051247Z-c202",
+  "workflow": "backlog-review",
+  "evaluationKind": "tentative-classification",
+  "subject": "backlog-review 採用済み成果物10件の文書7分類への暫定帰属",
+  "sourceRevision": "1c2e7153b74333a226d025f6ca948eff16d3d3f3",
+  "durationMs": 264,
+  "inputTokens": 2499,
+  "inputs": {
+    "requestDigest": "95bf7f527869582e41e9ce53de5de8d650a350f6417a243758a01563dc907637"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "tentative-classification:A1",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.88,
+        "挙動Design": 0.03,
+        "カタログDesign": 0,
+        "guide": 0.06,
+        "learning維持": 0,
+        "作業記録": 0.03,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tentative-classification:A2",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.89,
+        "挙動Design": 0.09,
+        "カタログDesign": 0.02,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tentative-classification:A3",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 1,
+        "挙動Design": 0,
+        "カタログDesign": 0,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tentative-classification:A4",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.83,
+        "挙動Design": 0.02,
+        "カタログDesign": 0,
+        "guide": 0.01,
+        "learning維持": 0.13,
+        "作業記録": 0.01,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tentative-classification:A5",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.69,
+        "挙動Design": 0.26,
+        "カタログDesign": 0.01,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0.02,
+        "対象外": 0.02
+      }
+    },
+    {
+      "questionId": "tentative-classification:A6",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 1,
+        "挙動Design": 0,
+        "カタログDesign": 0,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tentative-classification:A7",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.98,
+        "挙動Design": 0.02,
+        "カタログDesign": 0,
+        "guide": 0,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tentative-classification:A8",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.53,
+        "挙動Design": 0,
+        "カタログDesign": 0,
+        "guide": 0.08,
+        "learning維持": 0.38,
+        "作業記録": 0.01,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tentative-classification:A9",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.83,
+        "挙動Design": 0,
+        "カタログDesign": 0,
+        "guide": 0.05,
+        "learning維持": 0.12,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "tentative-classification:A10",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.81,
+        "挙動Design": 0,
+        "カタログDesign": 0,
+        "guide": 0.06,
+        "learning維持": 0.13,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    }
+  ],
+  "confidence": 0.86,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "tentative-classification:A1",
+        "value": "REQ"
+      },
+      {
+        "questionId": "tentative-classification:A2",
+        "value": "REQ"
+      },
+      {
+        "questionId": "tentative-classification:A3",
+        "value": "REQ"
+      },
+      {
+        "questionId": "tentative-classification:A4",
+        "value": "REQ"
+      },
+      {
+        "questionId": "tentative-classification:A5",
+        "value": "REQ"
+      },
+      {
+        "questionId": "tentative-classification:A6",
+        "value": "REQ"
+      },
+      {
+        "questionId": "tentative-classification:A7",
+        "value": "REQ"
+      },
+      {
+        "questionId": "tentative-classification:A8",
+        "value": "REQ"
+      },
+      {
+        "questionId": "tentative-classification:A9",
+        "value": "REQ"
+      },
+      {
+        "questionId": "tentative-classification:A10",
+        "value": "REQ"
+      }
+    ]
+  }
+}

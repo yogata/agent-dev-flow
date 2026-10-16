@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261016T051248Z-2f3a",
+  "workflow": "backlog-review",
+  "evaluationKind": "knowledge-disposition",
+  "subject": "backlog-review 採用済み成果物10件のdocs/knowledge処置候補判定",
+  "sourceRevision": "1c2e7153b74333a226d025f6ca948eff16d3d3f3",
+  "durationMs": 371,
+  "inputTokens": 2440,
+  "inputs": {
+    "requestDigest": "b167425d4e97eafc08c5dd069dc90b1b114bc17b0e1de79eda5fe500f7d4bb54"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "knowledge-disposition:A1",
+      "questionForm": "choice",
+      "value": "対象外（知識処置なし・別経路で処理）",
+      "probabilityDistribution": {
+        "保存": 0.29,
+        "削除": 0,
+        "保留": 0.07,
+        "対象外（知識処置なし・別経路で処理）": 0.64
+      }
+    },
+    {
+      "questionId": "knowledge-disposition:A2",
+      "questionForm": "choice",
+      "value": "対象外（知識処置なし・別経路で処理）",
+      "probabilityDistribution": {
+        "保存": 0.03,
+        "削除": 0,
+        "保留": 0.02,
+        "対象外（知識処置なし・別経路で処理）": 0.95
+      }
+    },
+    {
+      "questionId": "knowledge-disposition:A3",
+      "questionForm": "choice",
+      "value": "対象外（知識処置なし・別経路で処理）",
+      "probabilityDistribution": {
+        "保存": 0.04,
+        "削除": 0,
+        "保留": 0.02,
+        "対象外（知識処置なし・別経路で処理）": 0.94
+      }
+    },
+    {
+      "questionId": "knowledge-disposition:A4",
+      "questionForm": "choice",
+      "value": "対象外（知識処置なし・別経路で処理）",
+      "probabilityDistribution": {
+        "保存": 0.08,
+        "削除": 0,
+        "保留": 0.08,
+        "対象外（知識処置なし・別経路で処理）": 0.84
+      }
+    },
+    {
+      "questionId": "knowledge-disposition:A5",
+      "questionForm": "choice",
+      "value": "対象外（知識処置なし・別経路で処理）",
+      "probabilityDistribution": {
+        "保存": 0.06,
+        "削除": 0,
+        "保留": 0.02,
+        "対象外（知識処置なし・別経路で処理）": 0.92
+      }
+    },
+    {
+      "questionId": "knowledge-disposition:A6",
+      "questionForm": "choice",
+      "value": "対象外（知識処置なし・別経路で処理）",
+      "probabilityDistribution": {
+        "保存": 0.03,
+        "削除": 0.01,
+        "保留": 0.02,
+        "対象外（知識処置なし・別経路で処理）": 0.94
+      }
+    },
+    {
+      "questionId": "knowledge-disposition:A7",
+      "questionForm": "choice",
+      "value": "対象外（知識処置なし・別経路で処理）",
+      "probabilityDistribution": {
+        "保存": 0.04,
+        "削除": 0,
+        "保留": 0.01,
+        "対象外（知識処置なし・別経路で処理）": 0.95
+      }
+    },
+    {
+      "questionId": "knowledge-disposition:A8",
+      "questionForm": "choice",
+      "value": "対象外（知識処置なし・別経路で処理）",
+      "probabilityDistribution": {
+        "保存": 0,
+        "削除": 0,
+        "保留": 0,
+        "対象外（知識処置なし・別経路で処理）": 1
+      }
+    },
+    {
+      "questionId": "knowledge-disposition:A9",
+      "questionForm": "choice",
+      "value": "対象外（知識処置なし・別経路で処理）",
+      "probabilityDistribution": {
+        "保存": 0,
+        "削除": 0,
+        "保留": 0,
+        "対象外（知識処置なし・別経路で処理）": 1
+      }
+    },
+    {
+      "questionId": "knowledge-disposition:A10",
+      "questionForm": "choice",
+      "value": "対象外（知識処置なし・別経路で処理）",
+      "probabilityDistribution": {
+        "保存": 0,
+        "削除": 0,
+        "保留": 0,
+        "対象外（知識処置なし・別経路で処理）": 1
+      }
+    }
+  ],
+  "confidence": 0.52,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "knowledge-disposition:A1",
+        "value": "対象外（知識処置なし・別経路で処理）"
+      },
+      {
+        "questionId": "knowledge-disposition:A2",
+        "value": "対象外（知識処置なし・別経路で処理）"
+      },
+      {
+        "questionId": "knowledge-disposition:A3",
+        "value": "対象外（知識処置なし・別経路で処理）"
+      },
+      {
+        "questionId": "knowledge-disposition:A4",
+        "value": "対象外（知識処置なし・別経路で処理）"
+      },
+      {
+        "questionId": "knowledge-disposition:A5",
+        "value": "対象外（知識処置なし・別経路で処理）"
+      },
+      {
+        "questionId": "knowledge-disposition:A6",
+        "value": "対象外（知識処置なし・別経路で処理）"
+      },
+      {
+        "questionId": "knowledge-disposition:A7",
+        "value": "対象外（知識処置なし・別経路で処理）"
+      },
+      {
+        "questionId": "knowledge-disposition:A8",
+        "value": "対象外（知識処置なし・別経路で処理）"
+      },
+      {
+        "questionId": "knowledge-disposition:A9",
+        "value": "対象外（知識処置なし・別経路で処理）"
+      },
+      {
+        "questionId": "knowledge-disposition:A10",
+        "value": "対象外（知識処置なし・別経路で処理）"
+      }
+    ]
+  }
+}
