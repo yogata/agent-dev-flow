@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261017T045317Z-6db3",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0229 工程駆動経路における正規成果物の初回作成と直接採用（既存REQ照合帰属）",
+  "sourceRevision": "working-tree@2026-10-17",
+  "durationMs": 1545,
+  "inputTokens": 2990,
+  "inputs": {
+    "requestDigest": "ba0899f7ed1895e55fb7f4492dc5c9ca53a00511297f1c17cda95676c9eea933"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-primary-operation",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "UPDATE": 0.99,
+        "APPEND": 0.01,
+        "CREATE": 0,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "q2-matching-confidence",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.3,
+        "false": 0.7
+      }
+    }
+  ],
+  "confidence": 0.99,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-primary-operation",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "q2-matching-confidence",
+        "value": false
+      }
+    ]
+  }
+}
