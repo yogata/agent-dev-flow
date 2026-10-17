@@ -116,3 +116,19 @@
 - **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md の機械工程手順（入力 JSON 組立時の行構造検証の注記候補）
 - **関連**: Case Issue #3779、traceability/agentdev-workflow-phase-artifacts-update.yaml、.opencode/skills/agentdev-traceability/scripts/src/check.ts（検出機構）、PR #3780
 - **タグ**: #traceability #definition-edit #fail-closed
+
+## ENTRY_HEADING はラベル付き見出しを要求し、id なしラベルの見出しはエントリ抽出されない（baseline: main @ 8d6787d8・2026-10-17・計測範囲: Case #3779 TS-002 実行）
+
+- **問題事象**: receive.ts の外部戻り入力受理で、id なしラベルの見出し（## タイトル のみ）を入力するとエントリ抽出されない動作を観測した。ENTRY_HEADING はラベル付き見出しを要求する
+- **発生局面**: 検証（Case #3779 case-run TS-002、外部戻り入力経路）
+- **検知方法**: TS-002 実行中の入力様式差による動作差の観測
+- **根本原因**: ENTRY_HEADING の契約がラベル付き見出しを前提とし、id なしラベルの見出しは契約外の入力である
+- **自律対応内容**: 誤入力は fail-closed で非ゼロ終了する既存契約内の動作であることを確認し、実装修正は行わなかった
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存契約内の動作）
+- **横展開観点**: Capability Skill の入力様式案内が id なしラベル見出しを暗に許容する記述になっていないかの確認
+- **再発条件**: 入力様式案内を経由せず、id なしラベル見出しで外部戻り入力を渡した場合
+- **予防策候補**: Capability Skill の入力様式案内に、ラベル付き見出し（id + ラベル）の形式を明示する補足を追加する
+- **想定反映先**: agentdev-phase-theme-collaboration の receive.ts 入力様式案内（補足候補）
+- **関連**: Case Issue #3779、PR #3781（Findings に同一記録）
+- **タグ**: #入力様式 #fail-closed
