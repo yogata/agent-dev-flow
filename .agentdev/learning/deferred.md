@@ -4333,6 +4333,7 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **関連**: PR #3648（Issue #3645）、PR #3649、Epic #3642 Wave 1
 - **タグ**: `#harness` `#delegation`
 - **移動日**: 2026-10-13
+- **統合追記（2026-10-17 learning-promote）**: 同一ハーネスでの再発2回目（Case #3758・backlog-auto stage 5 の case-auto 内 case-run 実装委譲で実行担当サブエージェント起動 API 不在、9 Issue を self-apply で完遂）を inbox から duplicate 受理。恒久契約 REQ-031-033（能力検出→接合形態決定〔self-apply〕→記録の経路）と agentdev-case-run-execution-adapter references harness-delegation.md「委譲起動不能時の事前判定経路」（Case #3086 実証済みと明記）が同一経路を正規規定済みのため新規成果物は生成せず、本エントリへ統合記録。inbox 申告の「REQ-031/034 乖離再評価候補」は現行契約実測読取で不成立（self-apply は正規経路）。出現2件・adversarial-review 独立 stream 2本が duplicate を支持
 
 ---
 
@@ -4977,3 +4978,63 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **タグ**: `#鮮度` `#運用`
 - **処分判定**: deferred（learning-promote 2026-10-16 自律確定〔adversarial-review 反映で duplicate から変更〕。実害なしの正常動作記録。恒久的委譲規律〔REQ-003 の実測条項・AG 条項の恒久性・learning-capture 委譲計画条項〕は実在確認できず、pool 先行記録「backlog 統合バッチの旧スナップショット分析」は根本原因が別のため同クラスに数えない。再評価条件: 同型スイープ Issue の再発時、委譲時実測の恒久化機会発生時）
 - **移動日**: 2026-10-16
+
+---
+
+## 配布依存境界 checker のスキャン集合が実行 cwd で変動し worktree 事前 gate が検出漏れする
+
+- **問題事象**: 配布依存境界 checker（source profile）のスキャン集合が worktree cwd 実行時 434 ファイル・main root 実行時 482 ファイルとなり、worktree 事前 gate が concrete-id 違反（REQ-052）を検出せず、main 最終 gate で検出した（Case #3758 STEP-3 最終 gate 実測。PR #3775 test-fix で修正済み）
+- **発生局面**: 検証（case-close STEP-3 最終 gate。Case #3758）
+- **検知方法**: 最終 gate の failures 1 件と worktree 事前 gate pass の突合
+- **根本原因**: 実行 cwd（junction 伝播状態・スキャン対象解決）により検査対象集合が変動し得る経路の存在
+- **自律対応内容**: test-fix ループで違反文を修正（PR #3775）し最終 gate 通過。検出平面差を実行記録へ記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 配布依存境界 checker を worktree で実行する gate の実行 cwd 規律の確認観点。link profile の zero-targets（無効実行）系の先行記録（2026-10-01・2026-10-11 移動）とは別現象（部分スキャン集合差 vs 完全無効実行）で、adversarial-review の独立 stream も別クラスと確認。docs/knowledge/ の配布依存境界系知識文書（3件実測）には本観点の被覆なし
+- **再発条件**: worktree cwd での checker 実行が main root 実行と異なるスキャン集合に解決される場合
+- **予防策候補**: checker 実行 cwd・scanned 数の gate 記録への必須記載観点
+- **想定反映先**: docs/designs/integrity/distribution-boundary.md 走査契約節・checker 実行記録手順
+- **関連**: Case Issue #3758、PR #3775
+- **タグ**: `#配布依存境界` `#gate` `#e2e` `#実行cwd`
+- **処分判定**: deferred（learning-promote 2026-10-17 自律確定。実害なし・最終 gate が設計どおり検出・test-fix 修正済み。8軸 19/40・出現1件。実行 cwd・scanned 数の記録規定は未確認のため観点保持。再評価条件: 同種事前 gate 検出漏れの再発時、checker 実行記録規律の整備機会発生時）
+- **移動日**: 2026-10-17
+
+---
+
+## 既存 Release の作業前記録を body を含まない正規化一覧で取得し遡及突合不能になる
+
+- **問題事象**: 既存タグ補完の初回記録（release_list の正規化形）は body を含まないため、作業前の既存 4件（v5.1.2 draft、v5.1.0 / v5.0.2 / v5.0.1 published）の body 完全突合は記録上遡及不能だった（Case #3776 既存タグ補完検証）
+- **発生局面**: 検証設計（case-run 既存タグ補完。Case #3776）
+- **検知方法**: 突合項目が title・draft・prerelease・url に限定されざるを得なかった点の記録照合
+- **根本原因**: 作業前記録の取得に body を含まない release_list（正規化一覧）を使った
+- **自律対応内容**: title・draft・prerelease・url の突合（existingReleasesUnchanged 7/7）と、本実行の write 操作が release_create の draft POST に限定される構造的根拠で代替確認し、検証差分へ粒度不足を記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 状態変更前の記録粒度は「後から完全突合できるか」で設計する必要がある全検証に共通
+- **再発条件**: release_list の正規化一覧（body なし）のみで既存 Release の作業前記録を取得した Release 補完・移行系の検証
+- **予防策候補**: Release 補完では作業前記録を release_read（body 含む）で対象タグごとに取得する。end-to-end-execution.md「Release 記録手順」の対応確認条項（release_list 固定）への明記候補
+- **想定反映先**: agentdev-workflow-backlog-auto references end-to-end-execution.md（Release 記録手順。対応確認・読み戻し確認条項）
+- **関連**: Case Issue #3776、PR #3778
+- **タグ**: `#release` `#検証設計` `#記録粒度`
+- **処分判定**: deferred（learning-promote 2026-10-17 自律確定。実害なし・代替根拠で検証完了済み・発火局面〔Release 補完〕が稀・出現1件。8軸 16/40。反映先は end-to-end-execution.md と名指し可能だが手順明記の実施価値は低い。再評価条件: Release 補完・移行系検証の再実行時）
+- **移動日**: 2026-10-17
+
+---
+
+## 外部戻り入力の id なしラベル見出しは ENTRY_HEADING 契約外で抽出されない（入力様式案内の形式明示不足）
+
+- **問題事象**: receive.ts の外部戻り入力受理で、id なしラベルの見出し（## タイトル のみ）を入力するとエントリ抽出されない動作を観測した。ENTRY_HEADING はラベル付き見出し（id + ラベル）を要求する（Case #3779 TS-002）
+- **発生局面**: 検証（case-run TS-002、外部戻り入力経路。Case #3779）
+- **検知方法**: TS-002 実行中の入力様式差による動作差の観測
+- **根本原因**: ENTRY_HEADING の契約がラベル付き見出しを前提とし、id なしラベルの見出しは契約外の入力である
+- **自律対応内容**: 誤入力は fail-closed で非ゼロ終了する既存契約内の動作であることを確認し、実装修正は行わなかった
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存契約内の動作）
+- **横展開観点**: Capability Skill の入力様式案内が契約前提（id 付き見出し）を暗に許容する記述になっていないかの確認観点。agentdev-phase-theme-collaboration SKILL.md の戻り入力受理・fail-closed 記述はあるが id + ラベル形式の明示は不在（実測）
+- **再発条件**: 入力様式案内を経由せず、id なしラベル見出しで外部戻り入力を渡した場合
+- **予防策候補**: agentdev-phase-theme-collaboration の入力様式案内に、ラベル付き見出し（id + ラベル）の形式を明示する補足を追加する
+- **想定反映先**: .opencode/skills/agentdev-phase-theme-collaboration/SKILL.md（入力様式記述）
+- **関連**: Case Issue #3779、PR #3781
+- **タグ**: `#入力様式` `#fail-closed`
+- **処分判定**: deferred（learning-promote 2026-10-17 自律確定。実害なし・fail-closed 契約内・出現1件・軽微。8軸 16/40。案内形式明示の補足追記候補を保持。再評価条件: 同種入力様式誤りの再発時、SKILL.md 入力様式記述の改訂機会発生時）
+- **移動日**: 2026-10-17
