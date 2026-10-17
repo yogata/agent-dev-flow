@@ -100,3 +100,19 @@
 - **想定反映先**: docs/designs/responsibilities/custom-tool-contracts.md「Release 操作」節（物理写像明示追加候補。見送り記録〔Issue #3776 対応記録コメント〕参照）、src/common/tools/agentdev-gh/specs-release.ts・runner-cli.ts の pin テスト
 - **関連**: Case Issue #3776、PR #3778（Findings に同一記録）
 - **タグ**: #github-api #release #verify
+
+## DefinitionEdit の newText 組立での行区切り欠落を traceability check の fail-closed で検出
+
+- **問題事象**: case-open STEP-4 の機械工程入力 JSON 組立で、traceability sidecar 宣言（implementation/verification の REQ 行 ID リスト）の newText を文字列連結で組み立てた際、旧文末尾と追加行の間の改行が欠落し、`REQ-111-008  - REQ-110-016` が同一行に連結された状態で適用・commit された。traceability check が sidecar 解析不能（fail-closed）で missing-design/implementation/verification と malformed-declarations を検出し、PR 作成前に修正した
+- **発生局面**: 実装（case-open 機械工程の Definition 編集。Case #3779）
+- **検知方法**: traceability check（11 checks）の fail と findings の text フィールド（連結行そのものが記録されていた）。check_integrity は sidecar 宣言構造を検査せず検知しなかった
+- **根本原因**: 文字列連結（prefix 文字列 + 追加行リストの join）で行リストを組み立てる際、置換対象の旧文（oldText）の末尾に行末改行が含まれない前提を見落とした。追加行の先頭に改行を明示的に付ける必要があった。連結結果の行構造を検証する事前確認を組み込んでいなかった
+- **自律対応内容**: findings の text フィールドから連結行を特定し、worktree 内の sidecar を行分割修正して補正 commit、traceability check 再実行で 11 checks 全 pass を確認した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（検出・修正済み。traceability check の fail-closed が宣言構造破損を確実に捉えたことの有効性確認）
+- **横展開観点**: DefinitionEdit 系の入力 JSON を文字列連結で組み立てる実装（REQ 行追記、宣言リスト追記等）全般に適用可能。連結後の行構造検証を組立時に組み込む
+- **再発条件**: 旧文の末尾に行末改行を含まない DefinitionEdit に対し、newText を prefix 文字列 + 追加行リストの連結で組み立て、行区切りを明示しない実装
+- **予防策候補**: 入力 JSON 組立後に DefinitionEdit ごとに newText の行数（oldText 行数 + 追加行数）を機械検証する事前確認を組立手順へ追加する
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md の機械工程手順（入力 JSON 組立時の行構造検証の注記候補）
+- **関連**: Case Issue #3779、traceability/agentdev-workflow-phase-artifacts-update.yaml、.opencode/skills/agentdev-traceability/scripts/src/check.ts（検出機構）、PR #3780
+- **タグ**: #traceability #definition-edit #fail-closed
