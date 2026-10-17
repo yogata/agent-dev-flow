@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261011T124353Z-c3b6",
+  "workflow": "req-define",
+  "evaluationKind": "final-classification-design-separation",
+  "subject": "Case #3626 再開再合議の成果物帰属とDesign分離判断",
+  "sourceRevision": "e048488e4940708eea9297a44d116838040eea0c",
+  "durationMs": 1349,
+  "inputTokens": 1093,
+  "inputs": {
+    "requestDigest": "cead4e7acfdcf06843a63be50dda83e72fab9be82d29261be72a1f452fa2808d",
+    "references": [
+      {
+        "label": "distribution-boundary Design",
+        "path": "docs/designs/integrity/distribution-boundary.md",
+        "digest": "ec2ecc88e2759cfc2867b8006ba1d1785a8d992b96e57fd2f8b5b21307a14fac"
+      },
+      {
+        "label": "REQ-029",
+        "path": "docs/requirements/REQ-029.md",
+        "digest": "20de03a9041fd9fda73ca441cb0b47fb0e04e8cd337110605d012e7a94820652"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-artifact-attribution",
+      "questionForm": "choice",
+      "value": "Design 行（docs/designs/** の Design 文書への追記）",
+      "probabilityDistribution": {
+        "REQ 行（docs/requirements/REQ-029.md の要件行として保存）": 0.01,
+        "Design 行（docs/designs/** の Design 文書への追記）": 0.99
+      }
+    },
+    {
+      "questionId": "q2-separation-needed",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.08,
+        "false": 0.92
+      }
+    }
+  ],
+  "confidence": 0.98,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-artifact-attribution",
+        "value": "Design 行（docs/designs/** の Design 文書への追記）"
+      },
+      {
+        "questionId": "q2-separation-needed",
+        "value": false
+      }
+    ]
+  }
+}

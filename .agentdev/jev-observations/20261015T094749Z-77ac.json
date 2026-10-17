@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261015T094749Z-77ac",
+  "workflow": "inspect-promote",
+  "evaluationKind": "finding-disposition-classification",
+  "subject": "inspect-docs finding 20261015T093252Z の 15 検出事項の disposition 分類（promote/defer/reject/HITL）",
+  "sourceRevision": "38bc58c7",
+  "durationMs": 1990,
+  "inputTokens": 4579,
+  "inputs": {
+    "requestDigest": "a8b5144729b6f621759809f80144c3aae252a2113191c0e348dc92a0850b7528",
+    "references": [
+      {
+        "digest": "c795e0bff6446b612d308dd82b57d90607acdde6ae50b265c6f1a25441672f5d",
+        "label": "finding-20261015T093252Z",
+        "path": ".agentdev/inspect/inbox/inspect-docs-finding-20261015T093252Z.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "DB02",
+      "questionForm": "choice",
+      "value": "妥当",
+      "probabilityDistribution": {
+        "妥当": 0.93,
+        "promote へ変更": 0.05,
+        "reject へ変更": 0.01,
+        "判定不能": 0.01
+      }
+    },
+    {
+      "questionId": "DS17",
+      "questionForm": "choice",
+      "value": "妥当",
+      "probabilityDistribution": {
+        "妥当": 0.97,
+        "promote へ変更": 0.01,
+        "reject へ変更": 0.01,
+        "判定不能": 0.01
+      }
+    },
+    {
+      "questionId": "DS18",
+      "questionForm": "choice",
+      "value": "妥当",
+      "probabilityDistribution": {
+        "妥当": 0.46,
+        "defer へ変更": 0.42,
+        "reject へ変更": 0.01,
+        "判定不能": 0.11
+      }
+    },
+    {
+      "questionId": "DS19",
+      "questionForm": "choice",
+      "value": "妥当",
+      "probabilityDistribution": {
+        "妥当": 0.95,
+        "promote へ変更": 0.02,
+        "reject へ変更": 0.01,
+        "判定不能": 0.02
+      }
+    },
+    {
+      "questionId": "DS20",
+      "questionForm": "choice",
+      "value": "妥当",
+      "probabilityDistribution": {
+        "妥当": 0.91,
+        "defer へ変更": 0.03,
+        "reject へ変更": 0.02,
+        "判定不能": 0.04
+      }
+    },
+    {
+      "questionId": "DS21",
+      "questionForm": "choice",
+      "value": "妥当",
+      "probabilityDistribution": {
+        "妥当": 0.89,
+        "defer へ変更": 0.04,
+        "reject へ変更": 0.04,
+        "判定不能": 0.03
+      }
+    },
+    {
+      "questionId": "DS22",
+      "questionForm": "choice",
+      "value": "妥当",
+      "probabilityDistribution": {
+        "妥当": 0.8,
+        "promote へ変更": 0.04,
+        "reject へ変更": 0.15,
+        "判定不能": 0.01
+      }
+    },
+    {
+      "questionId": "DS23",
+      "questionForm": "choice",
+      "value": "妥当",
+      "probabilityDistribution": {
+        "妥当": 0.98,
+        "defer へ変更": 0.01,
+        "reject へ変更": 0,
+        "判定不能": 0.01
+      }
+    },
+    {
+      "questionId": "DS24",
+      "questionForm": "choice",
+      "value": "妥当",
+      "probabilityDistribution": {
+        "妥当": 0.97,
+        "defer へ変更": 0.01,
+        "reject へ変更": 0.01,
+        "判定不能": 0.01
+      }
+    },
+    {
+      "questionId": "DS25",
+      "questionForm": "choice",
+      "value": "妥当",
+      "probabilityDistribution": {
+        "妥当": 0.51,
+        "defer 自律確定へ変更": 0.39,
+        "reject へ変更": 0.04,
+        "判定不能": 0.06
+      }
+    },
+    {
+      "questionId": "RQ15",
+      "questionForm": "choice",
+      "value": "妥当",
+      "probabilityDistribution": {
+        "妥当": 0.6666666666666666,
+        "defer 自律確定へ変更": 0.2828282828282828,
+        "reject へ変更": 0.0101010101010101,
+        "判定不能": 0.0404040404040404
+      }
+    },
+    {
+      "questionId": "RQ16",
+      "questionForm": "choice",
+      "value": "妥当",
+      "probabilityDistribution": {
+        "妥当": 0.95,
+        "defer へ変更": 0.04,
+        "promote へ変更": 0,
+        "判定不能": 0.01
+      }
+    },
+    {
+      "questionId": "RQ17",
+      "questionForm": "choice",
+      "value": "妥当",
+      "probabilityDistribution": {
+        "妥当": 0.84,
+        "promote へ変更": 0.09,
+        "reject へ変更": 0.03,
+        "判定不能": 0.04
+      }
+    },
+    {
+      "questionId": "GR10",
+      "questionForm": "choice",
+      "value": "妥当",
+      "probabilityDistribution": {
+        "妥当": 0.68,
+        "promote へ変更": 0.14,
+        "reject へ変更": 0.14,
+        "判定不能": 0.04
+      }
+    },
+    {
+      "questionId": "GR11",
+      "questionForm": "choice",
+      "value": "妥当",
+      "probabilityDistribution": {
+        "妥当": 0.87,
+        "promote へ変更": 0.03,
+        "reject へ変更": 0.08,
+        "判定不能": 0.02
+      }
+    }
+  ],
+  "confidence": 0.91
+}

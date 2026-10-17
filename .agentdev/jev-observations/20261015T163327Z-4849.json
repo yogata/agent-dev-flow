@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261015T163327Z-4849",
+  "workflow": "case-ready",
+  "evaluationKind": "scope-overlap-detection",
+  "subject": "Case #3729 の 14 OU と既存オープン Issue 群の対象範囲交差",
+  "sourceRevision": "647451be493735fc0f156d41b4f46915bb1ec4a5",
+  "durationMs": 522,
+  "inputTokens": 1293,
+  "inputs": {
+    "requestDigest": "b3172ff5a13899e8a02f6dc8a211ddc2e9014b5c20d1e2d30ba6e162f6251950"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-scope-overlap",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.15,
+        "false": 0.85
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-scope-overlap",
+        "value": false
+      }
+    ]
+  }
+}

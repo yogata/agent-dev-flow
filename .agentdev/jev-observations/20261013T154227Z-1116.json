@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T154227Z-1116",
+  "workflow": "case-ready",
+  "evaluationKind": "scope-overlap-detection",
+  "subject": "Root Case #3682（case-close 委譲指示への Design 状態評価必須項目化）と既存オープン Case 群の対象範囲交差判定",
+  "sourceRevision": "a4150c37f1fdddb78a626cf7f274ef39488df782",
+  "durationMs": 913,
+  "inputTokens": 1348,
+  "inputs": {
+    "requestDigest": "5d2bd8962e1a2160c7262964fe1cd5a5589e048780560b1793da0a566a705a9c"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "scope-overlap",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.24,
+        "false": 0.76
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "scope-overlap",
+        "value": false
+      }
+    ]
+  }
+}

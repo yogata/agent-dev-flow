@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T152032Z-d7a8",
+  "workflow": "case-ready",
+  "evaluationKind": "scope-overlap-detection",
+  "subject": "Root Case #3674（ENGINE_TREE検査のREQ ID誤捕捉をテスト資産の非配布領域移動で解消する）の既存オープン Case とのスコープ重複判定",
+  "sourceRevision": "db78a1c0f764c5a58fa0cb1cb9df318771631c2a",
+  "durationMs": 1932,
+  "inputTokens": 1516,
+  "inputs": {
+    "requestDigest": "543ac9a02ae0071b5e6e8e060ec384fa273c1a476e7367d4883ba4e37889fd45"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "overlap-exists",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.2,
+        "false": 0.8
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "overlap-exists",
+        "value": false
+      }
+    ]
+  }
+}

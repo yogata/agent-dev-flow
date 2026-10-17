@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261015T064519Z-23ad",
+  "workflow": "issue-title-review",
+  "evaluationKind": "title-body-relationship-and-word-choice",
+  "subject": "Issue #3725 タイトルと本文の関係性・タイトル単語選択（改名後）",
+  "sourceRevision": "72cc380e0b74d72f620fed51839d50ab76ab7d9a",
+  "durationMs": 1760,
+  "inputTokens": 3608,
+  "inputs": {
+    "requestDigest": "4ff2f6119576ea2b8643f6dffda64c68707ed56afc72326addae2487f091190b",
+    "snapshot": "GitHub Issue #3725 現行タイトル: Case: backlog-autoの単一起動でRU一式を要件定義からパッチリリースまで連続して実行する"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-title-covers-body",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.9,
+        "false": 0.09999999999999998
+      }
+    },
+    {
+      "questionId": "q2-title-adequacy",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "不適切": 0,
+        "やや不適切": 0.03,
+        "概ね適切": 0.12,
+        "適切": 0.85
+      }
+    },
+    {
+      "questionId": "q3-verb-collocation",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.87,
+        "false": 0.13
+      }
+    },
+    {
+      "questionId": "q4-word-choice-naturalness",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "不自然": 0.02,
+        "やや不自然": 0.23,
+        "概ね自然": 0.43,
+        "自然": 0.32
+      }
+    },
+    {
+      "questionId": "q5-main-issue",
+      "questionForm": "choice",
+      "value": "問題は認められない",
+      "probabilityDistribution": {
+        "問題は認められない": 0.61,
+        "本文の主要目的の一部がタイトルに反映されていない": 0.3,
+        "タイトルが本文の範囲を超えて示している": 0.03,
+        "語彙・共起が不自然である": 0.06
+      }
+    }
+  ],
+  "confidence": 0.82,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-title-covers-body",
+        "value": true
+      },
+      {
+        "questionId": "q2-title-adequacy",
+        "value": 3
+      },
+      {
+        "questionId": "q3-verb-collocation",
+        "value": true
+      },
+      {
+        "questionId": "q4-word-choice-naturalness",
+        "value": 2
+      },
+      {
+        "questionId": "q5-main-issue",
+        "value": "問題は認められない"
+      }
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261017T104032Z-334d",
+  "workflow": "learning-promote",
+  "evaluationKind": "adversarial-review-trigger",
+  "subject": "STEP-4 adversarial-review 発動条件",
+  "sourceRevision": "8d6787d8（inbox capture baseline。run 実行時 HEAD は未検証）",
+  "durationMs": 196,
+  "inputTokens": 624,
+  "inputs": {
+    "requestDigest": "8aca123fbfa32a5c371fda1f388f769acf0e8c66404858993fedd61559880151",
+    "snapshot": "入力: STEP-2/STEP-3 評価結果（分類観測 20261017T103237Z-33a5、8軸観測 20261017T103357Z-5b4d 〜 20261017T103754Z-6aea、処分観測 20261017T103859Z-2b04、昇華観測 20261017T104003Z-dbff）"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "review-trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.75,
+        "false": 0.25
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "review-trigger",
+        "value": true
+      }
+    ]
+  }
+}

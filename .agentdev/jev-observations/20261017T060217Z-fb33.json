@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261017T060217Z-fb33",
+  "workflow": "case-ready",
+  "evaluationKind": "scope-overlap-detection",
+  "subject": "Case #3779（phase-artifacts-update の初回作成・直接採用対応）と既存オープン Issue のスコープ重複判定",
+  "sourceRevision": "482c36577f0292fa68c18447ce67f3478509b7ea",
+  "durationMs": 1170,
+  "inputTokens": 1194,
+  "inputs": {
+    "requestDigest": "3710c6742029ac9da1aa8d19f96e64566e1a073ac4c928779dd96c97c5b9760d"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-overlap",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.04,
+        "false": 0.96
+      }
+    },
+    {
+      "questionId": "q2-sufficient",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.72,
+        "false": 0.28
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-overlap",
+        "value": false
+      },
+      {
+        "questionId": "q2-sufficient",
+        "value": true
+      }
+    ]
+  }
+}

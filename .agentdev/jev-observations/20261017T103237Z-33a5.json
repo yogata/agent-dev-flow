@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261017T103237Z-33a5",
+  "workflow": "learning-promote",
+  "evaluationKind": "problem-classification",
+  "subject": "inbox 8エントリ（Case #3758/#3776/#3779）の問題クラス帰属",
+  "sourceRevision": "8d6787d8（inbox.md タイトル行記載の capture baseline。git 操作禁止のため run 実行時 HEAD は未検証）",
+  "durationMs": 239,
+  "inputTokens": 3021,
+  "inputs": {
+    "requestDigest": "792a8376663e7b2b409de542873774d7618570d6d0bb0c9e3df1ffca55e0171e",
+    "snapshot": "入力: .agentdev/learning/inbox.md（8エントリ）。参照: .agentdev/learning/deferred.md（250エントリの先行プール。C1 同根先行 L4320、C2 junction 系 L2527/L2625/L3932、C3 branch 再利用 L1952、C7 definitionEdits 重複 L4782）"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "cls-e1",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.95,
+        "false": 0.050000000000000044
+      }
+    },
+    {
+      "questionId": "cls-e2",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.92,
+        "false": 0.07999999999999996
+      }
+    },
+    {
+      "questionId": "cls-e3",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.9,
+        "false": 0.09999999999999998
+      }
+    },
+    {
+      "questionId": "cls-e4",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.92,
+        "false": 0.07999999999999996
+      }
+    },
+    {
+      "questionId": "cls-e5",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.88,
+        "false": 0.12
+      }
+    },
+    {
+      "questionId": "cls-e6",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.93,
+        "false": 0.06999999999999995
+      }
+    },
+    {
+      "questionId": "cls-e7",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.93,
+        "false": 0.06999999999999995
+      }
+    },
+    {
+      "questionId": "cls-e8",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.94,
+        "false": 0.06000000000000005
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "cls-e1",
+        "value": true
+      },
+      {
+        "questionId": "cls-e2",
+        "value": true
+      },
+      {
+        "questionId": "cls-e3",
+        "value": true
+      },
+      {
+        "questionId": "cls-e4",
+        "value": true
+      },
+      {
+        "questionId": "cls-e5",
+        "value": true
+      },
+      {
+        "questionId": "cls-e6",
+        "value": true
+      },
+      {
+        "questionId": "cls-e7",
+        "value": true
+      },
+      {
+        "questionId": "cls-e8",
+        "value": true
+      }
+    ]
+  }
+}

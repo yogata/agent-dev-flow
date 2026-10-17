@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261017T104003Z-dbff",
+  "workflow": "learning-promote",
+  "evaluationKind": "sublimation-potential",
+  "subject": "C1〜C8 の恒久契約への昇華可能性",
+  "sourceRevision": "8d6787d8（inbox capture baseline。run 実行時 HEAD は未検証）",
+  "durationMs": 424,
+  "inputTokens": 1727,
+  "inputs": {
+    "requestDigest": "28b0bf69644fe2840c3a5bacabc638158963eb6a7d4be38c8cda41330f9eb22e",
+    "snapshot": "入力: 8クラスの分類・8軸・処分区分評価結果。実測根拠は処分区分評価観測 20261017T103859Z-2b04 と同一"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "subl-c1",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.04,
+        "false": 0.96
+      }
+    },
+    {
+      "questionId": "subl-c2",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.05,
+        "false": 0.95
+      }
+    },
+    {
+      "questionId": "subl-c3",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.05,
+        "false": 0.95
+      }
+    },
+    {
+      "questionId": "subl-c4",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.04,
+        "false": 0.96
+      }
+    },
+    {
+      "questionId": "subl-c5",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.04,
+        "false": 0.96
+      }
+    },
+    {
+      "questionId": "subl-c6",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.05,
+        "false": 0.95
+      }
+    },
+    {
+      "questionId": "subl-c7",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.06,
+        "false": 0.94
+      }
+    },
+    {
+      "questionId": "subl-c8",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.04,
+        "false": 0.96
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "subl-c1",
+        "value": false
+      },
+      {
+        "questionId": "subl-c2",
+        "value": false
+      },
+      {
+        "questionId": "subl-c3",
+        "value": false
+      },
+      {
+        "questionId": "subl-c4",
+        "value": false
+      },
+      {
+        "questionId": "subl-c5",
+        "value": false
+      },
+      {
+        "questionId": "subl-c6",
+        "value": false
+      },
+      {
+        "questionId": "subl-c7",
+        "value": false
+      },
+      {
+        "questionId": "subl-c8",
+        "value": false
+      }
+    ]
+  }
+}

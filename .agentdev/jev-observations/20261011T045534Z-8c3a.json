@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261011T045534Z-8c3a",
+  "workflow": "intake-promote",
+  "evaluationKind": "provisional-classification",
+  "subject": "intake inbox 7件（2026-10-08〜10-11 backlog-auto 実行分）の暫定分類",
+  "sourceRevision": "655dadc95d925ffbba82efd36a50c49ec0b4ebf6",
+  "durationMs": 306,
+  "inputTokens": 1967,
+  "inputs": {
+    "requestDigest": "757ff6c5f1f3722c0d3540f7d80e08727b3ee1e2629928061126229e0f1b2fd3",
+    "references": [
+      {
+        "digest": "8fa6a45ec598b624849368b4389e09378b60e3b85ad4d92e586472405e3646ab",
+        "label": "i1",
+        "path": ".agentdev/intake/inbox/2026-10-08-case-3549-distribution-boundary-baseline-dec003-resolved.md"
+      },
+      {
+        "digest": "daf130d3a627afee5499ff0e755b6ced6040333751e4a84744130bb9e25b8525",
+        "label": "i2",
+        "path": ".agentdev/intake/inbox/2026-10-09-case-3560-parallel-wave-diff-cross-check.md"
+      },
+      {
+        "digest": "4f28f20a76f6c9ba8d246ce6125003fbc047b774d8eedb17b7c794c89f84ff2c",
+        "label": "i3",
+        "path": ".agentdev/intake/inbox/2026-10-09-case-3560-prepare-definition-pr-create-support.md"
+      },
+      {
+        "digest": "1d53a7e187541bb105d4b5896fe22cef98c409322e9fa06b19069f0efd6cc84c",
+        "label": "i4",
+        "path": ".agentdev/intake/inbox/2026-10-09-case-3565-case-open-skill-stale-vocabulary.md"
+      },
+      {
+        "digest": "0bd902110cac0b4658266e04cf910d097c7caa7f3eac1772c5c264cbd9abcae4",
+        "label": "i5",
+        "path": ".agentdev/intake/inbox/2026-10-10-case-3585-write-guard-lint-temp-file.md"
+      },
+      {
+        "digest": "fb06e8bcbb288974636f0996f06afaae7a4dc8597dc267eb2d7b3e01c8394db4",
+        "label": "i6",
+        "path": ".agentdev/intake/inbox/2026-10-10-case-3593-fixture-req-placement-and-verification-policy.md"
+      },
+      {
+        "digest": "26487d6ddda98d47ed48e43d2c4424e1b2e9469ecc4aa633092bb9d28e3960a4",
+        "label": "i7",
+        "path": ".agentdev/intake/inbox/2026-10-11-case-3605-ps1-inline-declaration-scan-scope.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "i1-class",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.62,
+        "保留": 0.03,
+        "却下": 0.35
+      }
+    },
+    {
+      "questionId": "i2-class",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.97,
+        "保留": 0.02,
+        "却下": 0.01
+      }
+    },
+    {
+      "questionId": "i3-class",
+      "questionForm": "choice",
+      "value": "保留",
+      "probabilityDistribution": {
+        "採用": 0.44,
+        "保留": 0.55,
+        "却下": 0.01
+      }
+    },
+    {
+      "questionId": "i4-class",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 1,
+        "保留": 0,
+        "却下": 0
+      }
+    },
+    {
+      "questionId": "i5-class",
+      "questionForm": "choice",
+      "value": "却下",
+      "probabilityDistribution": {
+        "採用": 0,
+        "保留": 0,
+        "却下": 1
+      }
+    },
+    {
+      "questionId": "i6-class",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.65,
+        "保留": 0.34,
+        "却下": 0.01
+      }
+    },
+    {
+      "questionId": "i7-class",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.99,
+        "保留": 0.01,
+        "却下": 0
+      }
+    }
+  ],
+  "confidence": 0.43,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "i1-class",
+        "value": "採用"
+      },
+      {
+        "questionId": "i2-class",
+        "value": "採用"
+      },
+      {
+        "questionId": "i3-class",
+        "differenceReason": "semantic_disagreement",
+        "value": "採用"
+      },
+      {
+        "questionId": "i4-class",
+        "value": "採用"
+      },
+      {
+        "questionId": "i5-class",
+        "value": "却下"
+      },
+      {
+        "questionId": "i6-class",
+        "value": "採用"
+      },
+      {
+        "questionId": "i7-class",
+        "value": "採用"
+      }
+    ]
+  }
+}

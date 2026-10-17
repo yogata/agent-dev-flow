@@ -1,0 +1,249 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261017T103705Z-5069",
+  "workflow": "learning-promote",
+  "evaluationKind": "eight-axis",
+  "subject": "C6（草稿 Release 物理写像差の verify 設計未反映）と C7（DefinitionEdit 連結組立時の行構造検証不在）の7軸×2",
+  "sourceRevision": "8d6787d8（inbox capture baseline。run 実行時 HEAD は未検証）",
+  "durationMs": 533,
+  "inputTokens": 2841,
+  "inputs": {
+    "requestDigest": "86c064f9f45035bad364f69365f04d9b06eee25530c1aac89239cbaa85d9e61e",
+    "snapshot": "入力: .agentdev/learning/inbox.md E6/E7。実測: specs-release.ts L51/L59/L170-171（pin 既存）、custom-tool-contracts.md L43（物理写像明示なし）、definition-pr-and-idempotency.md L76-86（行構造検証の規定不在）、traceability check 11 checks（fail-closed 検出実績）"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "e6-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1": 0.18,
+        "2": 0.8,
+        "3": 0.02,
+        "4": 0,
+        "5": 0
+      }
+    },
+    {
+      "questionId": "e6-generalization",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.26,
+        "3": 0.5,
+        "4": 0.22,
+        "5": 0.01
+      }
+    },
+    {
+      "questionId": "e6-target-clarity",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0.04,
+        "3": 0.16,
+        "4": 0.68,
+        "5": 0.12
+      }
+    },
+    {
+      "questionId": "e6-automation",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0.08,
+        "5": 0.92
+      }
+    },
+    {
+      "questionId": "e6-reusability",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.05,
+        "3": 0.87,
+        "4": 0.06,
+        "5": 0.01
+      }
+    },
+    {
+      "questionId": "e6-recurrence",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1": 0.58,
+        "2": 0.34,
+        "3": 0.02,
+        "4": 0.02,
+        "5": 0.04
+      }
+    },
+    {
+      "questionId": "e6-cost-benefit",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.1,
+        "2": 0.13,
+        "3": 0.2,
+        "4": 0.31,
+        "5": 0.26
+      }
+    },
+    {
+      "questionId": "e7-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1": 0.16,
+        "2": 0.72,
+        "3": 0.11,
+        "4": 0.01,
+        "5": 0
+      }
+    },
+    {
+      "questionId": "e7-generalization",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.02,
+        "3": 0.09,
+        "4": 0.68,
+        "5": 0.2
+      }
+    },
+    {
+      "questionId": "e7-target-clarity",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.04,
+        "3": 0.08,
+        "4": 0.45,
+        "5": 0.42
+      }
+    },
+    {
+      "questionId": "e7-automation",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0.22,
+        "5": 0.78
+      }
+    },
+    {
+      "questionId": "e7-reusability",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1": 0.02,
+        "2": 0.08,
+        "3": 0.85,
+        "4": 0.04,
+        "5": 0.01
+      }
+    },
+    {
+      "questionId": "e7-recurrence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1": 0.02,
+        "2": 0.35,
+        "3": 0.47000000000000003,
+        "4": 0.14,
+        "5": 0.02
+      }
+    },
+    {
+      "questionId": "e7-cost-benefit",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1": 0.07,
+        "2": 0.78,
+        "3": 0.13,
+        "4": 0.02,
+        "5": 0
+      }
+    }
+  ],
+  "confidence": 0.83,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "e6-impact",
+        "value": 1
+      },
+      {
+        "questionId": "e6-generalization",
+        "value": 2
+      },
+      {
+        "questionId": "e6-target-clarity",
+        "value": 3
+      },
+      {
+        "questionId": "e6-automation",
+        "value": 4
+      },
+      {
+        "questionId": "e6-reusability",
+        "value": 2
+      },
+      {
+        "questionId": "e6-recurrence",
+        "value": 1
+      },
+      {
+        "questionId": "e6-cost-benefit",
+        "value": 0,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "e7-impact",
+        "value": 1
+      },
+      {
+        "questionId": "e7-generalization",
+        "value": 3
+      },
+      {
+        "questionId": "e7-target-clarity",
+        "value": 3
+      },
+      {
+        "questionId": "e7-automation",
+        "value": 4
+      },
+      {
+        "questionId": "e7-reusability",
+        "value": 2
+      },
+      {
+        "questionId": "e7-recurrence",
+        "value": 2
+      },
+      {
+        "questionId": "e7-cost-benefit",
+        "value": 1
+      }
+    ]
+  }
+}

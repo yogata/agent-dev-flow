@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261017T105202Z-fb30",
+  "workflow": "learning-promote",
+  "evaluationKind": "post-review-rejudgement",
+  "subject": "adversarial-review 反映後の処分再判定（C7 変更・C3 精密化・他維持）",
+  "sourceRevision": "8d6787d8（inbox capture baseline。run 実行時 HEAD は未検証）",
+  "durationMs": 778,
+  "inputTokens": 1816,
+  "inputs": {
+    "requestDigest": "1c4e91b6c82f46c8381df44a71afd1f1b4c41af31c993611506d130cd1825153",
+    "snapshot": "入力: STEP-2/3 評価結果 + 2 stream の反証（Stream A: C1/C3/C5/C6、Stream B: CL-1/CL-2/CL-3/D-C7）。orchestrator 実測: git-common-procedures.md L521-615、definition-pr-and-idempotency.md L1-104 全文、accept_definition_checks.ts L546-571、docs/knowledge/ grep"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "re-e7",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.91,
+        "false": 0.08999999999999997
+      }
+    },
+    {
+      "questionId": "re-c3",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.93,
+        "false": 0.06999999999999995
+      }
+    },
+    {
+      "questionId": "re-others",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.91,
+        "false": 0.08999999999999997
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "re-e7",
+        "value": true
+      },
+      {
+        "questionId": "re-c3",
+        "value": true
+      },
+      {
+        "questionId": "re-others",
+        "value": true
+      }
+    ]
+  }
+}

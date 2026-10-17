@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261008T085409Z-49b8",
+  "workflow": "case-ready",
+  "evaluationKind": "execution-structure-standard-epic",
+  "subject": "Root Case #3552 のStandard/Epic帰属",
+  "sourceRevision": "7e9c30675f1caa92ae9806e091f4c50f2a4267c1",
+  "durationMs": 1004,
+  "inputTokens": 975,
+  "inputs": {
+    "requestDigest": "a367b60a9b8344e25cb9ec7e00ede9cb916e9c5179c2fbb4cb95db34b94c21ea",
+    "snapshot": "6 operation_units; mandatory dependencies OU-004→OU-005 and OU-006→OU-001/OU-002; connected components {OU-001,OU-002,OU-006}, {OU-004,OU-005}, {OU-003}; epic_needed=false"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "standard-epic-attribution",
+      "questionForm": "choice",
+      "value": "Standard（Root Caseを単一execution unitとし、子Issueを作成しない）",
+      "probabilityDistribution": {
+        "Standard（Root Caseを単一execution unitとし、子Issueを作成しない）": 0.55,
+        "Epic（複数の意味的execution unitを子IssueとWaveに分解する）": 0.45
+      }
+    },
+    {
+      "questionId": "dependency-strength",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "関連：同じ領域だが実行依存なし": 0.06,
+        "弱：順序推奨はあるが並列可能": 0.44,
+        "必須：一方が他方なしでは成立しない": 0.5
+      }
+    },
+    {
+      "questionId": "functional-coherence",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "分散：共通主題がない": 0.29,
+        "部分的：関連するが単一主題ではない": 0.7,
+        "一貫：単一の機能的主題": 0.01
+      }
+    }
+  ],
+  "confidence": 0.1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "standard-epic-attribution",
+        "value": "Standard（Root Caseを単一execution unitとし、子Issueを作成しない）"
+      },
+      {
+        "questionId": "dependency-strength",
+        "value": 1
+      },
+      {
+        "questionId": "functional-coherence",
+        "value": 1
+      }
+    ]
+  }
+}

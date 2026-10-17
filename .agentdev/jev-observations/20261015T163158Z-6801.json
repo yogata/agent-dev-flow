@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261015T163158Z-6801",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-epic-attribution",
+  "subject": "Case #3729 の実行構造帰属（operation_units 14 件・連結成分 13 成分）",
+  "sourceRevision": "647451be493735fc0f156d41b4f46915bb1ec4a5",
+  "durationMs": 1197,
+  "inputTokens": 2241,
+  "inputs": {
+    "requestDigest": "58a5ad04ec2b9706fcc44bf68770ab304f8c98cc8f17119548af969b31a2dfaa"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-attribution",
+      "questionForm": "choice",
+      "value": "Epic",
+      "probabilityDistribution": {
+        "Standard": 0,
+        "Epic": 1
+      }
+    },
+    {
+      "questionId": "q2-dependency-strength",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "関連": 0.12,
+        "弱": 0.62,
+        "必須": 0.26
+      }
+    },
+    {
+      "questionId": "q3-functional-coherence",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "分散": 0.01,
+        "部分的": 0.99,
+        "一貫": 0
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-attribution",
+        "value": "Epic"
+      },
+      {
+        "questionId": "q2-dependency-strength",
+        "value": 1
+      },
+      {
+        "questionId": "q3-functional-coherence",
+        "value": 1
+      }
+    ]
+  }
+}

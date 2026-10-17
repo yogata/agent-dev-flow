@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261008T085504Z-8182",
+  "workflow": "case-ready",
+  "evaluationKind": "execution-structure-standard-epic",
+  "subject": "Root Case #3552 の実行単位帰属",
+  "sourceRevision": "7e9c30675f1caa92ae9806e091f4c50f2a4267c1",
+  "durationMs": 286,
+  "inputTokens": 738,
+  "inputs": {
+    "requestDigest": "cb5aa821b5280517ed9d7da059fba39f8cc2747c0088984741870b7a024da2ce",
+    "references": [
+      {
+        "label": "canonical-root-case-and-definition-pr",
+        "path": ".agentdev/drafts/req-draft-req-structure.md",
+        "digest": "f4eaacd86af699cd2e7f31b90d4998e3a94b318c96effbb00a8e90997e4cf5f8"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "root-case-execution-unit-standard-epic",
+      "questionForm": "choice",
+      "value": "Standard（Root Case 自身を単一 execution unit）",
+      "probabilityDistribution": {
+        "Standard（Root Case 自身を単一 execution unit）": 1,
+        "Epic（Root Case と Child Issue / Wave 構造）": 0
+      }
+    }
+  ],
+  "confidence": 0.99,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "root-case-execution-unit-standard-epic",
+        "value": "Standard（Root Case 自身を単一 execution unit）"
+      }
+    ]
+  }
+}

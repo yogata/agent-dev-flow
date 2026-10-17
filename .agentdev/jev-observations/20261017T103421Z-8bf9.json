@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261017T103421Z-8bf9",
+  "workflow": "inspect-promote",
+  "evaluationKind": "finding-disposition",
+  "subject": "inspect-docs finding 20261017T102200Z の11検出事項の処分区分（DC01・GR12・RQ16・RQ17・RQ18・DS34・DS35・DS36・DS37・DC02・GR13）",
+  "sourceRevision": "main@2026-10-17（finding 生成後。delta commits 112eca7f..8d6787d8 適用済み。HEAD hash は git 実行禁止契約のため未取得）",
+  "durationMs": 222,
+  "inputTokens": 4563,
+  "inputs": {
+    "requestDigest": "872b9e6726f97b7e74bd2f8c65d09e99d7bab34e445646ba9e850e87e0aa57ae",
+    "references": [
+      {
+        "digest": "6438793ed5aa59bc4a7be2e00c9614af6f19178f552ccf9a2ba5dcc0e4a4d4a6",
+        "label": "finding-20261017T102200Z",
+        "path": ".agentdev/inspect/inbox/inspect-docs-finding-20261017T102200Z.md"
+      },
+      {
+        "digest": "fdd3c0fb19a86d9b54a51a38cbbfe55670d9619c6a3f768a281c4b7c7edc0ce4",
+        "label": "REQ-112",
+        "path": "docs/requirements/REQ-112.md"
+      },
+      {
+        "digest": "8709c2f151a6014acdce3b13f08d6ea5a780f9b8635f7a29aadbecc725a8d5a7",
+        "label": "local-case-file",
+        "path": "docs/designs/local/local-case-file.md"
+      },
+      {
+        "digest": "b923fb9412131989236dd72bab8d82f7aca528d560e786c4859fefdfca0edec2",
+        "label": "case-file-schema",
+        "path": "src/common/tools/agentdev-gh/local/case-schema/case-file.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "DC01",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0,
+        "defer": 1,
+        "reject": 0
+      }
+    },
+    {
+      "questionId": "GR12",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0.01,
+        "defer": 0.98,
+        "reject": 0.01
+      }
+    },
+    {
+      "questionId": "RQ16",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0,
+        "defer": 0.95,
+        "reject": 0.05
+      }
+    },
+    {
+      "questionId": "RQ17",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0,
+        "defer": 0.99,
+        "reject": 0.01
+      }
+    },
+    {
+      "questionId": "RQ18",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0.17,
+        "defer": 0.72,
+        "reject": 0.11
+      }
+    },
+    {
+      "questionId": "DS34",
+      "questionForm": "choice",
+      "value": "promote",
+      "probabilityDistribution": {
+        "promote": 0.99,
+        "defer": 0.01,
+        "reject": 0
+      }
+    },
+    {
+      "questionId": "DS35",
+      "questionForm": "choice",
+      "value": "reject",
+      "probabilityDistribution": {
+        "promote": 0,
+        "defer": 0.01,
+        "reject": 0.99
+      }
+    },
+    {
+      "questionId": "DS36",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0.01,
+        "defer": 0.72,
+        "reject": 0.27
+      }
+    },
+    {
+      "questionId": "DS37",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0.01,
+        "defer": 0.98,
+        "reject": 0.01
+      }
+    },
+    {
+      "questionId": "DC02",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0.02,
+        "defer": 0.51,
+        "reject": 0.47
+      }
+    },
+    {
+      "questionId": "GR13",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0,
+        "defer": 0.88,
+        "reject": 0.12
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "DC01",
+        "value": "defer"
+      },
+      {
+        "questionId": "GR12",
+        "value": "defer"
+      },
+      {
+        "questionId": "RQ16",
+        "value": "defer"
+      },
+      {
+        "questionId": "RQ17",
+        "value": "defer"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "RQ18",
+        "value": "promote"
+      },
+      {
+        "questionId": "DS34",
+        "value": "promote"
+      },
+      {
+        "questionId": "DS35",
+        "value": "reject"
+      },
+      {
+        "questionId": "DS36",
+        "value": "defer"
+      },
+      {
+        "questionId": "DS37",
+        "value": "defer"
+      },
+      {
+        "questionId": "DC02",
+        "value": "defer"
+      },
+      {
+        "questionId": "GR13",
+        "value": "defer"
+      }
+    ]
+  }
+}

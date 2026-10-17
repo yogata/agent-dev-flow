@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261017T103158Z-5ce2",
+  "workflow": "intake-promote",
+  "evaluationKind": "adversarial-review-trigger-condition",
+  "subject": "intake-promote 暫定分類（3 item、item3 HITL 待ち）の adversarial-review 発動条件判定",
+  "sourceRevision": "d03c9d6b727747e4076a252ece0a6b3882cf9fbf",
+  "durationMs": 554,
+  "inputTokens": 1057,
+  "inputs": {
+    "requestDigest": "1e5a822c8ff3be47b42cbbbd35afc295ac2719fa2a3cd6dd9ccda76fc4774e51"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "review_trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.94,
+        "false": 0.06000000000000005
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "review_trigger",
+        "value": true
+      }
+    ]
+  }
+}

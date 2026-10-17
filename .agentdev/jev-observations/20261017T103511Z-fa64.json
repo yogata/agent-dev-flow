@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261017T103511Z-fa64",
+  "workflow": "learning-promote",
+  "evaluationKind": "eight-axis",
+  "subject": "C3（case-open draft 永続化 commit 残存による canonical 同期分岐構造）の7軸",
+  "sourceRevision": "8d6787d8（inbox capture baseline。run 実行時 HEAD は未検証）",
+  "durationMs": 413,
+  "inputTokens": 1871,
+  "inputs": {
+    "requestDigest": "08fc9e3c05a2eeacd12878fa560fa1a2ee3f741dfd54f99a889e94ab7ac1a04d",
+    "snapshot": "入力: .agentdev/learning/inbox.md E3。実測: accept_definition_checks.ts L553/L556/L570（ff-only 経路・warning のみ・フォールバック実装なし）、git-common-procedures.md L253（手順8・rebase プロシージャ）、deferred.md L1952 は branch 再利用が原因で別クラス"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "e3-impact",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0.06,
+        "3": 0.37,
+        "4": 0.53,
+        "5": 0.04
+      }
+    },
+    {
+      "questionId": "e3-generalization",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0.04,
+        "3": 0.22,
+        "4": 0.64,
+        "5": 0.1
+      }
+    },
+    {
+      "questionId": "e3-target-clarity",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1": 0.02,
+        "2": 0.02,
+        "3": 0.03,
+        "4": 0.21,
+        "5": 0.72
+      }
+    },
+    {
+      "questionId": "e3-automation",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0.01,
+        "4": 0.52,
+        "5": 0.47
+      }
+    },
+    {
+      "questionId": "e3-reusability",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.08,
+        "3": 0.85,
+        "4": 0.05,
+        "5": 0.01
+      }
+    },
+    {
+      "questionId": "e3-recurrence",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0,
+        "3": 0,
+        "4": 0.02,
+        "5": 0.97
+      }
+    },
+    {
+      "questionId": "e3-cost-benefit",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0.01,
+        "3": 0.04,
+        "4": 0.74,
+        "5": 0.21
+      }
+    }
+  ],
+  "confidence": 0.56
+}

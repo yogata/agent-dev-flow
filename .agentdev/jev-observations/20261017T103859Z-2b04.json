@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261017T103859Z-2b04",
+  "workflow": "learning-promote",
+  "evaluationKind": "disposition",
+  "subject": "C1〜C8 の処分区分（promote/deferred/rejected/duplicate）",
+  "sourceRevision": "8d6787d8（inbox capture baseline。run 実行時 HEAD は未検証）",
+  "durationMs": 393,
+  "inputTokens": 2872,
+  "inputs": {
+    "requestDigest": "fbca18882e32bdc38dfb7a519a786c0615b0a42c05a8bbad223e206ae5054d84",
+    "snapshot": "入力: .agentdev/learning/inbox.md E1〜E8、8軸評価の最終判断。実測: REQ-031.md L51、harness-delegation.md「委譲起動不能時の事前判定経路」、accept_definition_checks.ts L553-570、specs-release.ts L51/L59/L170-171、definition-pr-and-idempotency.md L76-86、end-to-end-execution.md L269/L272、distribution-boundary.md L62、phase-theme-collaboration SKILL.md L58-62、plugin.ts L34/L40/L78、deferred.md L4320（C1 同根先行）"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "disp-c1",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "promote（既存対策の更新）": 0,
+        "deferred": 0,
+        "rejected": 0,
+        "duplicate": 1
+      }
+    },
+    {
+      "questionId": "disp-c2",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "promote（既存対策の更新）": 0.36,
+        "deferred": 0.57,
+        "rejected": 0.01,
+        "duplicate": 0.06
+      }
+    },
+    {
+      "questionId": "disp-c3",
+      "questionForm": "choice",
+      "value": "promote（既存対策の更新）",
+      "probabilityDistribution": {
+        "promote（既存対策の更新）": 0.99,
+        "deferred": 0.01,
+        "rejected": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "disp-c4",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "promote（既存対策の更新）": 0.03,
+        "deferred": 0.95,
+        "rejected": 0.01,
+        "duplicate": 0.01
+      }
+    },
+    {
+      "questionId": "disp-c5",
+      "questionForm": "choice",
+      "value": "rejected",
+      "probabilityDistribution": {
+        "promote（既存対策の更新）": 0,
+        "deferred": 0.03,
+        "rejected": 0.97,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "disp-c6",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "promote（既存対策の更新）": 0,
+        "deferred": 0.07,
+        "rejected": 0.09,
+        "duplicate": 0.84
+      }
+    },
+    {
+      "questionId": "disp-c7",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "promote（既存対策の更新）": 0.41,
+        "deferred": 0.55,
+        "rejected": 0,
+        "duplicate": 0.04
+      }
+    },
+    {
+      "questionId": "disp-c8",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "promote（既存対策の更新）": 0.04,
+        "deferred": 0.9,
+        "rejected": 0.04,
+        "duplicate": 0.02
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "disp-c1",
+        "value": "duplicate"
+      },
+      {
+        "questionId": "disp-c2",
+        "value": "deferred"
+      },
+      {
+        "questionId": "disp-c3",
+        "value": "promote（既存対策の更新）"
+      },
+      {
+        "questionId": "disp-c4",
+        "value": "deferred"
+      },
+      {
+        "questionId": "disp-c5",
+        "value": "rejected"
+      },
+      {
+        "questionId": "disp-c6",
+        "value": "duplicate"
+      },
+      {
+        "questionId": "disp-c7",
+        "value": "deferred"
+      },
+      {
+        "questionId": "disp-c8",
+        "value": "deferred"
+      }
+    ]
+  }
+}

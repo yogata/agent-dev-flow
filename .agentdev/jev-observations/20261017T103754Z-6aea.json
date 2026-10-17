@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261017T103754Z-6aea",
+  "workflow": "learning-promote",
+  "evaluationKind": "eight-axis",
+  "subject": "C8（入力様式案内と ENTRY_HEADING 契約前提の不一致）の7軸",
+  "sourceRevision": "8d6787d8（inbox capture baseline。run 実行時 HEAD は未検証）",
+  "durationMs": 210,
+  "inputTokens": 1595,
+  "inputs": {
+    "requestDigest": "0f9dde61b61ada0c9af7a7fbcc41deeba6c2cce0af00e2c3d852937008e22e7b",
+    "snapshot": "入力: .agentdev/learning/inbox.md E8。実測: .opencode/skills/agentdev-phase-theme-collaboration/SKILL.md L58-62（fail-closed 記述あり・id+ラベル形式明示なし）。先行記録なし"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "e8-impact",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "1": 0.97,
+        "2": 0.03,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      }
+    },
+    {
+      "questionId": "e8-generalization",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1": 0.02,
+        "2": 0.75,
+        "3": 0.21,
+        "4": 0.02,
+        "5": 0
+      }
+    },
+    {
+      "questionId": "e8-target-clarity",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.04,
+        "3": 0.1,
+        "4": 0.46,
+        "5": 0.39
+      }
+    },
+    {
+      "questionId": "e8-automation",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "1": 0.6868686868686869,
+        "2": 0.2222222222222222,
+        "3": 0.0404040404040404,
+        "4": 0.0303030303030303,
+        "5": 0.0202020202020202
+      }
+    },
+    {
+      "questionId": "e8-reusability",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1": 0.060000000000000005,
+        "2": 0.56,
+        "3": 0.30000000000000004,
+        "4": 0.08000000000000002,
+        "5": 0
+      }
+    },
+    {
+      "questionId": "e8-recurrence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.28,
+        "3": 0.43,
+        "4": 0.26,
+        "5": 0.02
+      }
+    },
+    {
+      "questionId": "e8-cost-benefit",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1": 0.33,
+        "2": 0.61,
+        "3": 0.05,
+        "4": 0.01,
+        "5": 0
+      }
+    }
+  ],
+  "confidence": 0.97,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "e8-impact",
+        "value": 0
+      },
+      {
+        "questionId": "e8-generalization",
+        "value": 1
+      },
+      {
+        "questionId": "e8-target-clarity",
+        "value": 3
+      },
+      {
+        "questionId": "e8-automation",
+        "value": 0
+      },
+      {
+        "questionId": "e8-reusability",
+        "value": 1
+      },
+      {
+        "questionId": "e8-recurrence",
+        "value": 2
+      },
+      {
+        "questionId": "e8-cost-benefit",
+        "value": 1
+      }
+    ]
+  }
+}

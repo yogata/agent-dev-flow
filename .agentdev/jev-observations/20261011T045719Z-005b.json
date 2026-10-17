@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261011T045719Z-005b",
+  "workflow": "intake-promote",
+  "evaluationKind": "review-trigger-decision",
+  "subject": "暫定分類確定（採用6・保留0・却下1）後の adversarial-review 発動条件判定",
+  "sourceRevision": "655dadc95d925ffbba82efd36a50c49ec0b4ebf6",
+  "durationMs": 1133,
+  "inputTokens": 991,
+  "inputs": {
+    "requestDigest": "cad19039a95f1489420a79328f0c0785166ca80807bd4740761788770039fe5b",
+    "references": [
+      {
+        "digest": "8fa6a45ec598b624849368b4389e09378b60e3b85ad4d92e586472405e3646ab",
+        "label": "i1",
+        "path": ".agentdev/intake/inbox/2026-10-08-case-3549-distribution-boundary-baseline-dec003-resolved.md"
+      },
+      {
+        "digest": "daf130d3a627afee5499ff0e755b6ced6040333751e4a84744130bb9e25b8525",
+        "label": "i2",
+        "path": ".agentdev/intake/inbox/2026-10-09-case-3560-parallel-wave-diff-cross-check.md"
+      },
+      {
+        "digest": "4f28f20a76f6c9ba8d246ce6125003fbc047b774d8eedb17b7c794c89f84ff2c",
+        "label": "i3",
+        "path": ".agentdev/intake/inbox/2026-10-09-case-3560-prepare-definition-pr-create-support.md"
+      },
+      {
+        "digest": "1d53a7e187541bb105d4b5896fe22cef98c409322e9fa06b19069f0efd6cc84c",
+        "label": "i4",
+        "path": ".agentdev/intake/inbox/2026-10-09-case-3565-case-open-skill-stale-vocabulary.md"
+      },
+      {
+        "digest": "0bd902110cac0b4658266e04cf910d097c7caa7f3eac1772c5c264cbd9abcae4",
+        "label": "i5",
+        "path": ".agentdev/intake/inbox/2026-10-10-case-3585-write-guard-lint-temp-file.md"
+      },
+      {
+        "digest": "fb06e8bcbb288974636f0996f06afaae7a4dc8597dc267eb2d7b3e01c8394db4",
+        "label": "i6",
+        "path": ".agentdev/intake/inbox/2026-10-10-case-3593-fixture-req-placement-and-verification-policy.md"
+      },
+      {
+        "digest": "26487d6ddda98d47ed48e43d2c4424e1b2e9469ecc4aa633092bb9d28e3960a4",
+        "label": "i7",
+        "path": ".agentdev/intake/inbox/2026-10-11-case-3605-ps1-inline-declaration-scan-scope.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "review-trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.95,
+        "false": 0.050000000000000044
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "review-trigger",
+        "value": true
+      }
+    ]
+  }
+}

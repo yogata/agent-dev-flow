@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T152917Z-4a38",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-epic-determination",
+  "subject": "Case #3679 の operation_unit 群（OU-001・OU-002）の Standard/Epic 帰属",
+  "sourceRevision": "775b8dee",
+  "durationMs": 1102,
+  "inputTokens": 1240,
+  "inputs": {
+    "requestDigest": "8fc64fe554c7450d949bcbff7b87acf3505b2d8ce438a80d7bd9b7b43dc5d9af"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-attribution",
+      "questionForm": "choice",
+      "value": "Standard",
+      "probabilityDistribution": {
+        "Standard": 0.99,
+        "Epic": 0.01
+      }
+    },
+    {
+      "questionId": "q2-dependency-strength",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "関連": 0.98,
+        "弱": 0.02,
+        "必須": 0
+      }
+    },
+    {
+      "questionId": "q3-functional-coherence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "分散": 0,
+        "部分的": 0,
+        "一貫": 1
+      }
+    }
+  ],
+  "confidence": 0.98,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-attribution",
+        "value": "Standard"
+      },
+      {
+        "questionId": "q2-dependency-strength",
+        "value": 0
+      },
+      {
+        "questionId": "q3-functional-coherence",
+        "value": 2
+      }
+    ]
+  }
+}

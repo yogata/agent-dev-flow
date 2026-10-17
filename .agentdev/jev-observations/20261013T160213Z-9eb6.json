@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261013T160213Z-9eb6",
+  "workflow": "case-ready",
+  "evaluationKind": "scope-overlap-disposition",
+  "subject": "Case #3686 スコープ重複あり確定後の処置（スキップ・ユーザー確認）",
+  "sourceRevision": "8017770a054572cac64c5bfcb846a522891c9dc6",
+  "durationMs": 259,
+  "inputTokens": 887,
+  "inputs": {
+    "requestDigest": "1288c7e6a5c0b357d3678ece6e5cd0d72f3aba15a8e208c978cef763cef2270e",
+    "references": [
+      {
+        "digest": "2767e222bbafe6f58b213387455a1ead39a66001e3bd7f270fa4da60d9433444",
+        "label": "req_draft",
+        "path": ".agentdev/drafts/req-draft-case-open-step4-verbatim-verification.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q2-disposition",
+      "questionForm": "choice",
+      "value": "スキップ",
+      "probabilityDistribution": {
+        "スキップ": 1,
+        "ユーザー確認": 0
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q2-disposition",
+        "value": "スキップ"
+      }
+    ]
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261015T065006Z-e83d",
+  "workflow": "issue-title-review",
+  "evaluationKind": "title-word-choice-naturalness-candidates",
+  "subject": "Issue #3725 タイトル候補10案（提案C1-C5・追加U1-U5）の単語選択自然さ",
+  "sourceRevision": "72cc380e0b74d72f620fed51839d50ab76ab7d9a",
+  "durationMs": 864,
+  "inputTokens": 2185,
+  "inputs": {
+    "requestDigest": "2cd451cf9af030198e380c5b6ed3c39f7b0764f9d143e0fecac99a896187b362",
+    "snapshot": "候補10案は会話上の提示（改案5＋利用者追加5）。C3 は現行 Issue #3725 タイトルと同一"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "t-c1",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "不自然": 0.01,
+        "やや不自然": 0.14,
+        "概ね自然": 0.32,
+        "自然": 0.53
+      }
+    },
+    {
+      "questionId": "t-c2",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "不自然": 0.02,
+        "やや不自然": 0.33,
+        "概ね自然": 0.4,
+        "自然": 0.25
+      }
+    },
+    {
+      "questionId": "t-c3",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "不自然": 0.01,
+        "やや不自然": 0.21,
+        "概ね自然": 0.38,
+        "自然": 0.4
+      }
+    },
+    {
+      "questionId": "t-c4",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "不自然": 0.02,
+        "やや不自然": 0.39,
+        "概ね自然": 0.39,
+        "自然": 0.2
+      }
+    },
+    {
+      "questionId": "t-c5",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "不自然": 0.02,
+        "やや不自然": 0.28,
+        "概ね自然": 0.38,
+        "自然": 0.32
+      }
+    },
+    {
+      "questionId": "t-u1",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "不自然": 0,
+        "やや不自然": 0.05,
+        "概ね自然": 0.23,
+        "自然": 0.72
+      }
+    },
+    {
+      "questionId": "t-u2",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "不自然": 0.01,
+        "やや不自然": 0.15,
+        "概ね自然": 0.36,
+        "自然": 0.48
+      }
+    },
+    {
+      "questionId": "t-u3",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "不自然": 0.01,
+        "やや不自然": 0.19,
+        "概ね自然": 0.44,
+        "自然": 0.36
+      }
+    },
+    {
+      "questionId": "t-u4",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "不自然": 0,
+        "やや不自然": 0.09,
+        "概ね自然": 0.28,
+        "自然": 0.63
+      }
+    },
+    {
+      "questionId": "t-u5",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "不自然": 0.01,
+        "やや不自然": 0.16,
+        "概ね自然": 0.35,
+        "自然": 0.48
+      }
+    }
+  ],
+  "confidence": 0.37,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "t-c1",
+        "value": 2
+      },
+      {
+        "questionId": "t-c2",
+        "value": 2
+      },
+      {
+        "questionId": "t-c3",
+        "value": 2
+      },
+      {
+        "questionId": "t-c4",
+        "value": 2
+      },
+      {
+        "questionId": "t-c5",
+        "value": 2
+      },
+      {
+        "questionId": "t-u1",
+        "value": 3
+      },
+      {
+        "questionId": "t-u2",
+        "value": 2
+      },
+      {
+        "questionId": "t-u3",
+        "value": 2
+      },
+      {
+        "questionId": "t-u4",
+        "value": 3
+      },
+      {
+        "questionId": "t-u5",
+        "value": 2
+      }
+    ]
+  }
+}

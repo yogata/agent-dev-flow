@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261011T075637Z-3f68",
+  "workflow": "case-ready",
+  "evaluationKind": "execution-structure-scope-overlap",
+  "subject": "Case #3628（parallel-wave-actual-diff-cross-check）の既存オープン Issue とのスコープ重複判定",
+  "sourceRevision": "74613ca4d6293490336c9d4813bb7abd0b2dc61d",
+  "durationMs": 1349,
+  "inputTokens": 1963,
+  "inputs": {
+    "requestDigest": "de1aa392e9194a0b831f554207ac0c923f21b578d2cdd3cfdec163590d187458"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "scope-overlap",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.08,
+        "false": 0.92
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "scope-overlap",
+        "value": false
+      }
+    ]
+  }
+}
