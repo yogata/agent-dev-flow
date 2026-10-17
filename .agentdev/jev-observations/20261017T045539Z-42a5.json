@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261017T045539Z-42a5",
+  "workflow": "req-define",
+  "evaluationKind": "requirement-classification-design-separation",
+  "subject": "RU-0229 記述単位（管理スキル委譲・既存規則適用）の REQ 行・Design 行帰属と分離要否",
+  "sourceRevision": "working-tree@2026-10-17",
+  "durationMs": 667,
+  "inputTokens": 2277,
+  "inputs": {
+    "requestDigest": "b4e4d138dd4e6d754532b07eec7a953739ef4ba18199ff83797063559b5e8ec9"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-artifact-attribution",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.66,
+        "Design行": 0.34
+      }
+    },
+    {
+      "questionId": "q2-separation-needed",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.68,
+        "false": 0.31999999999999995
+      }
+    }
+  ],
+  "confidence": 0.32,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-artifact-attribution",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q2-separation-needed",
+        "value": true
+      }
+    ]
+  }
+}
