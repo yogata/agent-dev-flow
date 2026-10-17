@@ -1,0 +1,261 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261017T151420Z-c0f4",
+  "workflow": "backlog-review",
+  "evaluationKind": "ru-composition",
+  "subject": "backlog-review RU 構成案（promoted 6件: 暫定分類・統合分割判定・depends_on 並べ替え可能性）",
+  "sourceRevision": "583f884547b6db65b9c62ccb3e42d792f3dcbea5",
+  "durationMs": 1155,
+  "inputTokens": 3813,
+  "inputs": {
+    "requestDigest": "24e87e8a021d59b4b246fc32ddf94d9e318e48dd7fb5ad1551b5bfcb98b2b972",
+    "references": [
+      {
+        "digest": "d3827595f59bfe9f31356825db66cd63db325b8f0b680b206bc15c36d3141d7b",
+        "label": "C3 learning promoted",
+        "path": ".agentdev/learning/promoted/case-ready-canonical-acquisition-divergence-fallback.md"
+      },
+      {
+        "digest": "a881066e29ebeb570ad55b325bc257b93d4f93e780f332c3ef480232dbbd98a4",
+        "label": "C7 learning promoted",
+        "path": ".agentdev/learning/promoted/definition-edit-newtext-line-structure-precheck.md"
+      },
+      {
+        "digest": "f3060ae95b52c8e1bceefa61798c94849f5746bf36f676008a7798f6cbbd4195",
+        "label": "intake promoted 1",
+        "path": ".agentdev/intake/promoted/2026-10-16-case-children-title-format.md"
+      },
+      {
+        "digest": "80f215ac1302d2aa6b30303c9556e39fa707da409f77559c30b934013f2f823c",
+        "label": "intake promoted 2",
+        "path": ".agentdev/intake/promoted/2026-10-17-system-phase-artifacts-update-row-output-column.md"
+      },
+      {
+        "digest": "64608ad9636b61bbee89e0ad60ac8e232a09fa91501db9a5e57f1aea9d16bd24",
+        "label": "inspect promoted 1",
+        "path": ".agentdev/inspect/promoted/finding-20261017-req112-template-debris.md"
+      },
+      {
+        "digest": "8c5d1a40f1ff819e07a8fcc922713deaedbba2425832e7aff67b56378514c345",
+        "label": "inspect promoted 2",
+        "path": ".agentdev/inspect/promoted/finding-20261017-local-case-file-tense-fix.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-class-c3",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.7300000000000001,
+        "挙動Design": 0.12000000000000001,
+        "カタログDesign": 0,
+        "guide": 0.060000000000000005,
+        "learning維持": 0.08000000000000002,
+        "作業記録": 0.010000000000000002,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "q-class-c7",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.83,
+        "挙動Design": 0.13,
+        "カタログDesign": 0,
+        "guide": 0.02,
+        "learning維持": 0.02,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "q-class-i1",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.73,
+        "挙動Design": 0.03,
+        "カタログDesign": 0.14,
+        "guide": 0.1,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "q-class-i2",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.45,
+        "挙動Design": 0.37,
+        "カタログDesign": 0.16,
+        "guide": 0.02,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0
+      }
+    },
+    {
+      "questionId": "q-class-s1",
+      "questionForm": "choice",
+      "value": "REQ",
+      "probabilityDistribution": {
+        "REQ": 0.62,
+        "挙動Design": 0.03,
+        "カタログDesign": 0.01,
+        "guide": 0.11,
+        "learning維持": 0,
+        "作業記録": 0,
+        "対象外": 0.23
+      }
+    },
+    {
+      "questionId": "q-class-s2",
+      "questionForm": "choice",
+      "value": "guide",
+      "probabilityDistribution": {
+        "REQ": 0.1,
+        "挙動Design": 0.4,
+        "カタログDesign": 0,
+        "guide": 0.48,
+        "learning維持": 0,
+        "作業記録": 0.01,
+        "対象外": 0.01
+      }
+    },
+    {
+      "questionId": "q-integ-c3",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0.01,
+        "分割": 0.02,
+        "1:1": 0.97
+      }
+    },
+    {
+      "questionId": "q-integ-c7",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0,
+        "分割": 0.02,
+        "1:1": 0.98
+      }
+    },
+    {
+      "questionId": "q-integ-i1",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0,
+        "分割": 0,
+        "1:1": 1
+      }
+    },
+    {
+      "questionId": "q-integ-i2",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0,
+        "分割": 0,
+        "1:1": 1
+      }
+    },
+    {
+      "questionId": "q-integ-s1",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0,
+        "分割": 0.01,
+        "1:1": 0.99
+      }
+    },
+    {
+      "questionId": "q-integ-s2",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0,
+        "分割": 0,
+        "1:1": 1
+      }
+    },
+    {
+      "questionId": "q-depends-reorder",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.96,
+        "false": 0.040000000000000036
+      }
+    }
+  ],
+  "confidence": 0.69,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-class-c3",
+        "value": "REQ"
+      },
+      {
+        "questionId": "q-class-c7",
+        "value": "REQ"
+      },
+      {
+        "questionId": "q-class-i1",
+        "value": "REQ"
+      },
+      {
+        "questionId": "q-class-i2",
+        "value": "REQ"
+      },
+      {
+        "questionId": "q-class-s1",
+        "value": "REQ"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "q-class-s2",
+        "value": "REQ"
+      },
+      {
+        "questionId": "q-integ-c3",
+        "value": "1:1"
+      },
+      {
+        "questionId": "q-integ-c7",
+        "value": "1:1"
+      },
+      {
+        "questionId": "q-integ-i1",
+        "value": "1:1"
+      },
+      {
+        "questionId": "q-integ-i2",
+        "value": "1:1"
+      },
+      {
+        "questionId": "q-integ-s1",
+        "value": "1:1"
+      },
+      {
+        "questionId": "q-integ-s2",
+        "value": "1:1"
+      },
+      {
+        "questionId": "q-depends-reorder",
+        "value": true
+      }
+    ]
+  }
+}
