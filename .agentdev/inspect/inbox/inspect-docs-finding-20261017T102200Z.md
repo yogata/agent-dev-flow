@@ -38,6 +38,7 @@ STEP-2 の意味診断は REQ 体系・Design・Decision/guides/README の3診�
 - STEP-2: 3診断担当へ並列委譲（読取専用・戻り値契約付き）。各担当は delta ファイル全文読解＋残り corpus 構造スキャン。親は fan-in（回収確認・6観点網羅・横断矛盾判定・重複排除・既知 defer 照合）。
 - STEP-3: 配布物整合性検査は機械検査証拠（上表）と delta 配布物（PR #3781 phase-artifacts-update 拡張）の責務整合 spot 確認（command 記述と v51 Design・REQ-110-016〜021 の整合、e2e run 20261016T142343JST stage 6 検証済み）により新規検出なし。docs-check route 判定（候補 4件、後述）。未処理 artifact 確認: 各 promoted/ 空、`.agentdev/backlog/req-units/` 空、drafts なし → 未処理なし（`.agentdev/intake/inbox/` 3件は stage 2 intake 系統の正規処理待ち）。
 - STEP-4: 本ファイル出力・git 永続化・完了報告。
+- 2026-10-17 実施（backlog-auto stage 2 inspect 系統、--auto なし）分類確定: promote 2件（RQ18〔scope: `<!-- 【必須】 -->` 3箇所のテンプレート残骸除去。4列表・ぶら下がり段落は意図的選択の可能性により対象外として promoted 成果物に付随観察記載〕・DS34〔実装反映済みの命令形作業指示の現行化。:173-175・:181〕→ promoted/finding-20261017-req112-template-debris.md、promoted/finding-20261017-local-case-file-tense-fix.md へ保存・本ファイルから削除）/ reject 1件（DS35。2026-10-16 promoted finding-20261016-req114-doc-fix-candidates.md〔REQ-114-013 設計記録節の処遇判断。backlog-review で処理済み・promoted/ は消費後に空〕と同一対象の重複で新規成果物を持たないため即時削除。cleanup モデル REFERENCE/MOVE 候補の増分は commit message の却下理由に記録）/ defer 8件（DC01・GR12・RQ16・RQ17・DS36・DS37・DC02・GR13。本ファイルに残置）。分類は Jev 先行評価（観測 20261017T103421Z-8bf9。RQ18 は evaluator defer 0.72 → 最終判断 promote〔differenceReason: semantic_disagreement。scope 限定と 20261016 DS33 前例により adversarial-review が支持〕）＋ adversarial-review 2 stream（分類妥当性・証拠適合）convergence 後に全件自律確定（HITL 対象なし・破壊的変更なし）。発動条件判定: 手動分類対象は存在するが HITL 確定を要する本質的争点は残存しないため、条件付き化された後続 trigger 評価は生成せず（観測なし=契約どおり）。defer 分の統合・再評価条件: DC01 は 20260926 DC-07・20260927 DC-10・20261011 GR06 と同一 Map・同一論点（Decision Map 掲載基準未文書化）のため同時再評価（Map 一括反映・掲載基準明確化時）。GR12 は 20261008 F-25 と同一対象表のため同時再評価（REQ-099-018 組合せ記録〔phase 系 Senpi 解決可否〕の確認時、または同ガイド次回更新時）。RQ16 は REQ-110 次回更新時・docs-check ルール候補〔TS 表と sidecar/test 実体の鮮度照合〕の実装検討時。RQ17 は REQ-114 次回更新時・第一参照導線 ID 化不足家族（RQ03/RQ10/RQ11）の同時再評価時。DS36 は custom-tool-contracts.md 次回更新時（外部依存値と Tool 契約パラメータの分離表現整理の機会）。DS37 は 20261011 DS04 と同一ファイル・同系移行期宣言のため同時再評価（crosswalk 改訂・DS04 再評価時）。DC02 は DEC-059 関連の次回更新時（文言明確化の低優先改善候補として維持）。GR13 は 20261011 GR02 家族の REQ-114 世代拡大分として同時再評価（導線節の世代更新方針が明文化される時）
 
 ## 検出事項リスト
 
@@ -81,36 +82,6 @@ NG 分類は docs-spec-rebuild-integrity Design の NG 分類表に従う。全�
 - **根拠とした正規情報源**: DEC-060.md:5（`related_reqs: [REQ-114]`）、DEC-060.md:11（supersedes DEC-059 部分）、DEC-060.md:20（`<!-- ADF-COVERS(decision): REQ-114-010, REQ-114-016, REQ-114-017 -->`）、DEC-059.md の `supersede_note`
 - **推奨経路**: intake（REQ-114 本文への DEC-060 参照追記候補。版番号規則の DEC-059 参照は DEC-060 決定(2)により正しいため訂正ではなく追記）
 - **不確実性**: REQ-059 の規律では関連宣言の正は Decision 側 frontmatter であり、宣言網は完全成立（乖離そのものではない）。REQ-114-016/017 はそもそも Decision 参照を持たない行スタイルで、参照必須の規約があるかは未確認
-- **NG 分類**: pre-existing
-
-### RQ18（low）REQ-112 のテンプレート残骸コメント残留と corpus 標準からの形式差
-
-- **対象**: `docs/requirements/REQ-112.md:11,16,25`（`<!-- 【必須】 -->` 3 箇所）、`docs/requirements/REQ-112.md:18-22`（4 列表）、`docs/requirements/REQ-112.md:30`（適用範囲節末尾のぶら下がり段落）
-- **観点**: 文書分類一貫性（テンプレート種別残骸）／構造一貫性
-- **根拠**: 「`<!-- 【必須】 -->`」はテンプレート生成時の案内コメントの残留。corpus 標準の 2 列要件表（`| ID | 要件 |`）に対し REQ-112/113 のみ 4 列（要件ID|要件|受け入れ条件|検証）。行 30 は節見出しのないぶら下がり段落
-- **根拠とした正規情報源**: corpus 慣行（現行 72 件中 70 件が「目的/要件/適用範囲」標準構成＋2 列表。横断 grep で【必須】残骸は REQ-112 のみ）
-- **推奨経路**: intake（コメント除去・表形式の統一検討）＋ docs-check rule candidate（テンプレート残骸コメント検出）
-- **不確実性**: REQ-112 は「方針決定を記録する REQ」という特殊型であり受け入れ条件列は意図的選択の可能性（REQ-112-003 が対象外明記を要件化）。前回診断時点で既存のため known-deferred（RQ03/RQ07-RQ15）に含まれる場合は重複
-- **NG 分類**: pre-existing
-
-### DS34（low）実装済み更新指示の命令形残置（local-case-file Design）
-
-- **対象**: `docs/designs/local/local-case-file.md:173-181`
-- **観点**: STEP-2-5 未来計画の混入（本文と実装状態の意味整合）
-- **根拠**: 「共通メタデータ表へ `comment_seq`…を追加する」「`src/common/tools/agentdev-gh/local/case-schema/` の機械可読定義…を本拡張へ合わせて更新する」が未来形・命令形で本文に残る。実装側は反映済み（`src/common/tools/agentdev-gh/local/case-schema/case-file.md:33` に `comment_seq` 存在を確認）
-- **根拠とした正規情報源**: `docs/designs/foundations/document-model.md:47`（Design の禁じ手: 作業履歴）、`document-model.md:498`（将来案・作業履歴を Design に保持しない）、実装実体 case-file.md:33
-- **推奨経路**: docs-check rule candidate（Design 本文の命令形作業指示検出）または intake（現状形への文意修正）
-- **不確実性**: 低。実装反映済みのため文意乖離は表現面のみ。既知 deferred（DS 系）との重複可能性あり
-- **NG 分類**: pre-existing
-
-### DS35（low）テスト構成の Design 本文規定（backlog-auto skill Design）
-
-- **対象**: `docs/designs/skills/agentdev-workflow-backlog-auto.md:121-123`
-- **観点**: STEP-2-5 実行時依存先としての不適切扱い（実装 specifics）＋非規範情報
-- **根拠**: REQ-114-013 の設計記録節（DS17）が `tests/fixtures/applied-projects/{adf-self,github-connected,local-issue}/manifest.json` と `tests/end-to-end-contract.test.ts` のファイルパス・テスト構成を本文で規定。「Design 本文はその構成と位置づけを記述する」と自己限定しており fixture 定義は tests/ 側が所有する設計だが、テスト構成への直接言及が cleanup モデルの非規範情報カテゴリに該当
-- **根拠とした正規情報源**: document-model Design の cleanup モデル非規範情報（fixture、テスト構成）と 6 処置契約、`foundations/document-model.md:47`（実装コードそのものの禁じ手）
-- **推奨経路**: cleanup モデル処置候補: REFERENCE（実装構成への参照表現へ）または MOVE（実装詳細を references/ へ）。intake 経由で判断
-- **不確実性**: 中。DS17 節自体が位置づけ宣言をしており許容形態に近い。既知 deferred（DS22/DS26-DS33 周辺の実装詳細系）との重複可能性あり
 - **NG 分類**: pre-existing
 
 ### DS36（low）外部サービス観測値・API 具体の Design 固定（custom-tool-contracts Design）

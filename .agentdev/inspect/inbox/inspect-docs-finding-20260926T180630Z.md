@@ -20,6 +20,7 @@
 - 2026-10-13 実施（backlog-auto stage 2 inspect 系統、--auto なし）重複整理: RQ-15 は 20261008T025952Z F-05/F-06 cleanup anchor 成果物への統合済み（上記 2026-10-08 審議記録どおり）のため、本ファイルの重複セクションを削除（却下理由は commit message に記録）。RQ-04/RQ-08/RQ-09/RQ-13/RQ-16/DS-03/DC-02/DC-04/DC-06/DC-07/GD-02/GD-03 は再評価条件未充足のため defer 継続（自律確定）
 - 2026-10-15 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: RQ-04/RQ-08/RQ-09/RQ-13/RQ-16/DS-03/DC-02/DC-04/DC-06/DC-07/GD-02/GD-03 は再評価条件未充足のため defer 継続（自律確定）: delta 窓（2026-10-12 以降）と対象行の交差確認で対象記述不変（GD-02/GD-03 の guides 対象は d89506c8 以降不変、DC-07/DC-10/DC-13 の decisions/README.md は 6b63ba24 で baseline・accepted ビュー・関連 REQ 表のみ更新で Map・欠番節不変、RQ-16 対象行の変化は RQ16 統合注記を当該セクションに追記済み）
 - 2026-10-16 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: RQ-04/RQ-08/RQ-09/RQ-13/RQ-16/DS-03/DC-02/DC-04/DC-06/DC-07/GD-02/GD-03 は再評価条件未充足のため defer 継続（自律確定）: 38bc58c7..636b1e2b の delta に対象ファイルは含まれず（intake-learning-backlog-flow.md のみ :102-103 に一気通貫案内が追加されたが GD-03 対象節 :53-54・:86-87・:109-121 は不変を現物確認）。Jev 観測 20261016T041350Z-3c9e
+- 2026-10-17 実施（backlog-auto stage 2 inspect 系統、--auto なし）相互注記: 20261017T102200Z DC01（Decision Map 部分置換反映漏れ。DEC-055→033・DEC-056→034・DEC-060→059・DEC-046→040 決定2・DEC-047→028・DEC-048→036・DEC-049→036・DEC-050→045 の未掲載増分）は DC-07 と同一 Map・同一論点（現行 DEC 同士の掲載義務が慣行ベースで契約上明文化されず、欠落＝違反と確定できない）のため、次回再評価時に本項・20260927 DC-10・20261011 GR06 と併せて判定すること。docs-check ルール候補（Decision Map 行と frontmatter relations supersedes 宣言の照合）を DC01 側に併記済み
 
 ## 検出事項リスト（defer 残置分）
 

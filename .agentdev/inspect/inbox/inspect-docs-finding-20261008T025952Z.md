@@ -122,3 +122,5 @@ NG 分類: false positive / pre-existing / 今回修正対象（docs-spec-rebuil
 | F-10: authoring/ 将来拡張余地の重複言及 | 変化なし（defer 維持） | designs/README.md:249・command-file-format.md:17 とも文言変更なし。方針決定の条件未発火 |
 | F-11: docs/README.md 要件欠番説明の内容過多 | 変化なし（defer 維持） | numbering-policy.md:64-70 と docs/README.md:23-26 の構図は不変（REQ-087/092/093 は retired 実体ありで欠番ではなく廃止扱い、整合） |
 | GR-05: supervisor-credential-bridge.md:115 実測記録埋め込み | 変化なし（defer 維持） | 実測記録本文は残留（節再構成ありだが本質不変）。MOVE/REFERENCE 候補の性質不変 |
+
+2026-10-17 実施（backlog-auto stage 2 inspect 系統、--auto なし）相互注記: 20261017T102200Z GR12（multi-host-operations.md:93-109 の「全公開 command の対応表（2026-10-02 時点、13件）」が root README 18コマンドに対して stale。medium）は F-25 と同一対象表のため、次回再評価時に併せて判定すること。再評価条件: phase 系5コマンドの Senpi 探索接続での解決可否〔REQ-099-018 組合せ記録〕の確認、または同ガイド次回更新時。GR12 側の表更新採否は当該確認を前提に判断する
