@@ -196,3 +196,35 @@
 - **想定反映先**: src/common/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md（委譲 prompt 構築）
 - **関連**: PR #3802、Issue #3795、Root Case #3793
 - **タグ**: `#配布物` `#IR-055` `#委譲`
+
+## REQ 追加の設計PRでは計測日収束が2段で発生し frontmatter updated 追随は stagePaths に事前包含できない
+
+- **問題事象**: prepare_definition_pr.ts の機械工程で、commit 前配置の generate_indexes は req-metrics 計測日を commit author date より1日前の日付で AUTOGEN 更新し、commit 後の check_integrity が (1) req-health-metrics.md の計測日 AUTOGEN 旧日付 NG（IndexGenerationConsistency）を検出した。計測日 AUTOGEN の補正 commit で収束させた後、2回目の check_integrity は今度は同一ファイルの frontmatter updated 旧日付 NG（req-updated-freshness、IR-072）を検出した
+- **発生局面**: case-open STEP-4 機械工程（Definition branch への REQ 行追加と品質ゲート実行）
+- **検知方法**: check_integrity（worktree HEAD）の NG 検出と「1 new unmanaged NG (delta, exit code driver)」の構造化報告
+- **根本原因**: generate_indexes は commit 前配置で動作するため commit author date を参照できず、req-metrics 計測日が1日遅れで書かれる。さらに派生物 req-health-metrics.md の frontmatter updated は generate_indexes が更新しないため、REQ 行追加と派生物更新が同一 PR の commit になった時点で frontmatter updated が最終内容変更日からずれる。stagePaths への事前包含は派生物確定後になるため構造的に不能
+- **自律対応内容**: reference（definition-pr-and-idempotency.md「計測日収束」「generate_indexes 派生物の事後突合」）の標準 contingency どおり、generate_indexes 再実行 → 明示パス指定補正 commit（計測日 AUTOGEN + REQ 行数更新。diff が計測日と行数のみであることを unified diff で確認）→ frontmatter updated の追随 edit と追加 commit → check_integrity 再実行で NG 0件を確認した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（計測日収束の既定手順が設計どおり機能。手順の実運用例を得た）
+- **横展開観点**: REQ 行追加を伴う Definition PR では計測日収束は2段（AUTOGEN 計測日と frontmatter updated）で必ず発生し得る前提で進め、check_integrity の1回目の失敗を想定内の contingency として扱う。派生物の diff が計測日・行数のみであることを diff --unified=0 で機械確認してから commit する（内容変化を混入させない）
+- **再発条件**: REQ 行追加（frontmatter updated を進行させる編集を含む）を伴う Definition PR で、generate_indexes 派生物（req-health-metrics.md）が自動更新対象に含まれる場合
+- **予防策候補**: prepare_definition_pr へ計測日収束の自動補正（generate_indexes 再実行 + frontmatter updated 追随 + 補正 commit）を組込む拡張の検討
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts、references/definition-pr-and-idempotency.md（実運用例の追記）
+- **関連**: Issue #3803、PR #3804（commit e3d728a83・35083aaa4）、Root Case #3803
+- **タグ**: `#計測日収束` `#IR-072` `#DefinitionPR`
+
+## DefinitionEdit の行構造事前確認は行内連結を拒否するため単一箇条書き行への行内追記は隣接行を含む2行編集で表現する
+
+- **問題事象**: REQ 適用範囲の対象行（単一の長い箇条書き行）の末尾へ文言を追記する DefinitionEdit を「対象行のみを oldText、追記版のみを newText」として組み立てると、newText が oldText を接頭辞として保持する形状となり、行構造事前確認（validateEditLineStructure の連結検出規則。Case #3779 由来）が「追加内容は行頭から始まること」を要求して機械的に拒否される
+- **発生局面**: case-open STEP-4 の入力 JSON 組立（DefinitionEdit の oldText/newText 設計）
+- **検知方法**: reference の行構造事前確認規則の事前読み込み（機械検証に到達する前に組立段階で回避）
+- **根本原因**: 対象行単独を oldText とする行内追記は「追加行の末尾行への連結」と同型になり、行の追加のみを許す規則と衝突する
+- **自律対応内容**: oldText を「対象行 + 改行 + 隣接行（対象外行）」の2行、newText を「追記版対象行 + 改行 + 対象外行」の2行とする編集構成へ変更した。newText が oldText を接頭辞として保持しないため連結検出規則は不適用となり、行数も保全される。置換対象2行の一意性を node script で事前検証してから入力 JSON へ組込み、全17編集の一意性検証と適用を通過させた
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存の機械検証規則の適用範囲内の回避構成）
+- **横展開観点**: 行単位の追記を含まない行内の文言追記（箇条書き行の列挙追加、frontmatter updated の日付変更等）を DefinitionEdit へ表現する場合、oldText に隣接行を含めて newText が oldText の接頭辞にならない形へ組むのが安全。置換対象の一部文字列のみの oldText（TS-008 → TS-010 の語句置換等、接頭辞保持にならない置換）はそのまま利用できる
+- **再発条件**: prepare_definition_pr への DefinitionEdit 入力を組み立てる際に、単一箇条書き行への行内追記を oldText=対象行のみで組み立てた場合
+- **予防策候補**: req-define 側の draft 組立（artifact_actions content の表現）へ、行内追記を含む content が DefinitionEdit へ転記可能な構造である旨の注記を追加する検討
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md（DefinitionEdit 組立の実運用例追記）、req-define の draft-data 契約 reference
+- **関連**: Issue #3803、PR #3804、Root Case #3803
+- **タグ**: `#DefinitionEdit` `#行構造事前確認` `#case-open`
