@@ -41,6 +41,10 @@ GitHub 実装の engine 領域（`src/common/tools/agentdev-gh/`）から本デ�
 
 Comment の本文は見出し直後の `### c{NN} {ISO 8601 日時}` から次のエントリまでを読み取り、本文と区切り空行を保持する。旧形式の日時見出しと case の見出しなし作業ログは、最初のコメント書込時に新形式へ移行する。
 
+## 実装開始境界の情報取得（REQ-111-017）
+
+実装の開始境界で呼び出し側（case 系 workflow）が照合する対象（Issue 本文の確定事項・未決事項・採用判断、blocked/failed の SSoT コメント、PR 本文の検証・Findings・Design確定候補情報）は、GitHub 版と同一の操作契約で取得できる。`issue_read` はローカルIssue全文（frontmatter + 本文）を返し、`comment_list` はコメント相当セクションの時系列エントリを返し、`pr_read` は `## マージ前確認` / `## Design確定候補` / `## Findings / Capture候補` の3論理セクションを定義順で直列化した本文を返す（`case-schema/case-file.md` の GitHub Issue / PR 置換対応表参照）。本 Tool は内容を解釈・選別せず全文と等価な構造を返すため、呼び出し側は版を意識せず GitHub 版と同一の照合を実行できる。機械検証は `tests/runner-local.test.ts`（issue_read 全文返却、pr_read 3セクション直列化、comment_list round-trip）が恒常的な検証手段である。
+
 ## role 条件付きスキーマの機械検証
 
 本実装は role ごとの必須メタデータ、status 値域、labels 値域、closed_at 条件、許可操作

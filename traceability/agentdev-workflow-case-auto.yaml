@@ -26,6 +26,8 @@ implementation:
     - REQ-111-010
     - REQ-111-011
     - REQ-111-012
+    - REQ-111-017
+    - REQ-111-018
   src/common/skills/agentdev-workflow-case-auto/scripts/src/records-report.ts:
     - REQ-034-021
     - REQ-101-008
@@ -78,6 +80,8 @@ verification:
     - REQ-111-010
     - REQ-111-011
     - REQ-111-012
+    - REQ-111-017
+    - REQ-111-018
   src/common/skills/agentdev-workflow-case-auto/scripts/tests/records-report.test.ts:
     - REQ-034-021
     - REQ-101-008
