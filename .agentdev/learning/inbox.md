@@ -164,3 +164,35 @@
 - **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md（verbatim 包含突合の手順補足）
 - **関連**: PR #3794、commit 4624160b、Root Case #3793
 - **タグ**: `#トレーサビリティ` `#Definition編集`
+
+## 実装後に sidecar 追加方針を決めると配布物本文への REQ 行 ID 直書きが checker concrete-id で検出される
+
+- **問題事象**: PR #3799 の実装で、新規 lib/.ts と README に REQ 行 ID を JSDoc・節説明へ直書きした結果、配布依存境界 checker（case-run STEP-S3-5 事前 gate 相当）が concrete-id 違反 23 件・unclassified-entry 1 件を検出し、修正と再実行が発生した
+- **発生局面**: 実装（case-run DELEGATE-3796 委譲内）
+- **検知方法**: check_distribution_boundary.ts（source profile）の事前 gate 実行
+- **根本原因**: 対応関係の正が traceability sidecar である規律に対し、実装者が本文の説明文に要件行 ID を書き込む実装順になった。sidecar 追加方針が本文編集より後に確定した
+- **自律対応内容**: 配布物本文から REQ 行 ID 参照と SHA-256 語を除去し、対応関係は sidecar 正規配置へ集約する修正後、再実行で failures 0 を確認した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既定境界の遵守。checker が設計どおり機能した）
+- **横展開観点**: 実装前に sidecar 追加方針を確定し、配布物本文の説明は意味記述のみにする。同様の concrete-id 直書きはコメント行でも検出対象になる（PR #3790 由来の学びと同根）
+- **再発条件**: 配布対象ファイル（.md/.ts）を新規作成・追記する実装で、sidecar 宣言追加を後回しにして本文へ要件行 ID を書いた場合
+- **予防策候補**: 委譲 prompt の配布物本文記述規約に「要件行 ID は sidecar のみ、本文は意味記述」を明示し、実装着手時の最初の commit で sidecar 宣言を先行させる
+- **想定反映先**: src/common/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md（委譲 prompt 構築）
+- **関連**: PR #3799、Issue #3796、Root Case #3793
+- **タグ**: `#配布境界` `#委譲` `#実装順`
+
+## worktree 配布物 Markdown 編集では IR-055（runtime-unresolved-reference）が新規行の docs/ literal 参照を検出するため抽象表現へ合わせる
+
+- **問題事象**: PR #3802 の実装で、worktree 環境の check_integrity が design-file-manager SKILL.md への追記行の docs/designs/ literal 参照を新規 NG（runtime-unresolved-reference、IR-055 delta）として検出した
+- **発生局面**: 実装（case-run DELEGATE-3795 委譲内）
+- **検知方法**: check_integrity（source profile）の初回実行で新規 NG 検出
+- **根本原因**: 追加した手順書文が「docs/designs/…」の literal パスで参照先を記述した。配布物はプロジェクト相対の runtime 解決を前提とせず、既存の SKILL.md 本体は「Design 管理インデックス（Design README 一覧表）」等の抽象表現で参照していた
+- **自律対応内容**: 追記行を既存 SKILL.md 本体と同一の抽象表現へ修正し、check_integrity 再実行で新規 NG 0 件を確認した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（IR-055 の既定検査が設計どおり機能）
+- **横展開観点**: worktree で配布物 Markdown を編集する PR では、編集前に既存 SKILL.md 本体の参照表現（抽象表現）を確認して合わせる。検知は case-run の事前 gate で機能するが、修正コストは作成後より作成時に低い
+- **再発条件**: 配布物 Markdown への新規行追加で参照先を literal パスで記述した場合
+- **予防策候補**: 配布物編集時の記述規約（既存表現への統一）を委譲 prompt へ引き渡す（同内容の intake 候補として別途保存済み）
+- **想定反映先**: src/common/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md（委譲 prompt 構築）
+- **関連**: PR #3802、Issue #3795、Root Case #3793
+- **タグ**: `#配布物` `#IR-055` `#委譲`
