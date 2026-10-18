@@ -60,6 +60,7 @@ Definition 変更が docs 文言を期待するテスト（リポジトリ固有
   1. 削除対象パスの実在確認: 生成した削除対象パスが実在することを確認してから script を呼び出す（RU 番号の桁数生成誤り等により、実在しないパスを削除対象に含めない）
   2. git rm 失敗時のステージ確認: script が git rm で失敗した場合は、失敗を確認せずに後続操作へ進まず、`git status --short` でステージ汚染の有無を確認してから再試行する
   3. 履歴操作前の状態確認: reset --hard 等の履歴操作を実行する前に tracked / untracked の状態を確認し、削除ステージが capture commit 等の別 commit に混入しないことを確認する
+- **canonical 再取得失敗時の分岐検出接続**: 前置確認の後段として、script の報告 JSON の canonical-reacquisition step detail に分岐検出結果（`divergence`: ahead/behind の件数とコミット一覧、検出不能時は `detectionUnavailable` の理由）が出力された場合は、検出事実の確認に留める。script は分岐を自動解消せず（reset、rebase、merge の自動実行を行わない）、解消は `agentdev-git-worktree` の「Squash merge 後分岐ハンドリング手順」（git-common-procedures.md）に接続して行う。同手順の処理分岐（完全重複・部分重複・独立変更）を変更せず、独立変更に該当する場合は自動 rebase・自動 reset を行わずユーザー判断を要求する。分岐検出の `detectionUnavailable` が理由付きで出力された場合（origin/main の remote-tracking ref 不在等）は、既存手順の手順0（remote-tracking ref 存在確認）と同様に比較不能として扱い、エラーとせず検出不能の記録を含めて呼び出し元の判断へ報告する
 
 ### 設計側 worktree・ローカル設計系ブランチの削除
 

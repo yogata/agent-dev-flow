@@ -107,6 +107,25 @@ export interface AcceptDefinitionReport {
   proposal: Record<string, string>;
 }
 
+/**
+ * canonical 再取得（fetch / ff-only merge）失敗時に検出したローカル main と
+ * origin/main の分岐状況。報告 JSON の canonical-reacquisition step detail の
+ * divergence に出力する。検出は報告のみを目的とし、解消判断はモデルが
+ * agentdev-git-worktree の「Squash merge 後分岐ハンドリング手順」へ接続して行う。
+ */
+export interface DivergenceDetail {
+  /** ローカル main にのみ存在する commit 数（検出不能時は null）。 */
+  ahead: number | null;
+  /** origin/main にのみ存在する commit 数（検出不能時は null）。 */
+  behind: number | null;
+  /** ローカル main のみの commit 一覧（git log --oneline origin/main..main）。 */
+  aheadCommits: readonly string[];
+  /** origin/main のみの commit 一覧（git log --oneline main..origin/main）。 */
+  behindCommits: readonly string[];
+  /** 検出不能の理由（remote-tracking ref 不在、出力解釈失敗等）。検出成功時は空文字。 */
+  detectionUnavailable: string;
+}
+
 /** 受入検査 phase で必須の品質ゲート（省略禁止）。 */
 export const REQUIRED_GATES_ACCEPTANCE_CHECKS = [
   "integrity-checks",
@@ -403,6 +422,59 @@ function runSpec(runner: MechanicalRunner, spec: GateCommandSpec): CommandResult
   return runner.run({ command: spec.command, args: spec.args, cwd: spec.cwd, timeoutMs: spec.timeoutMs });
 }
 
+/**
+ * canonical 再取得の fetch / ff-only merge 失敗時の分岐検出（報告専用）。
+ * ローカル main と origin/main の ahead/behind の件数とコミット一覧を検出する。
+ * 検出は報告への反映のみを目的とし、reset / rebase 等の解消操作は実行しない。
+ * 検出自体の失敗（remote-tracking ref 不在等）はエラーとせず検出不能を記録する
+ * （分岐ハンドリング手順の手順0と同様、比較不能をエラー扱いにしない）。
+ */
+function detectDivergence(runner: MechanicalRunner, repoRoot: string): DivergenceDetail {
+  const count = runner.run({
+    command: "git",
+    args: ["rev-list", "--left-right", "--count", "main...origin/main"],
+    cwd: repoRoot,
+  });
+  if (count.exitCode !== 0) {
+    return {
+      ahead: null,
+      behind: null,
+      aheadCommits: [],
+      behindCommits: [],
+      detectionUnavailable: count.stderr.trim() || `git rev-list exited with ${count.exitCode}`,
+    };
+  }
+  const [aheadRaw, behindRaw] = count.stdout.trim().split(/\s+/);
+  const ahead = Number.parseInt(aheadRaw ?? "", 10);
+  const behind = Number.parseInt(behindRaw ?? "", 10);
+  if (!Number.isFinite(ahead) || !Number.isFinite(behind)) {
+    return {
+      ahead: null,
+      behind: null,
+      aheadCommits: [],
+      behindCommits: [],
+      detectionUnavailable: `unexpected rev-list output: ${count.stdout.trim()}`,
+    };
+  }
+  const aheadLog = runner.run({ command: "git", args: ["log", "--oneline", "origin/main..main"], cwd: repoRoot });
+  const behindLog = runner.run({ command: "git", args: ["log", "--oneline", "main..origin/main"], cwd: repoRoot });
+  const logFailed = aheadLog.exitCode !== 0 || behindLog.exitCode !== 0;
+  return {
+    ahead,
+    behind,
+    aheadCommits: aheadLog.exitCode === 0 ? splitLogLines(aheadLog.stdout) : [],
+    behindCommits: behindLog.exitCode === 0 ? splitLogLines(behindLog.stdout) : [],
+    detectionUnavailable: logFailed ? "commit listing (git log) failed" : "",
+  };
+}
+
+function splitLogLines(stdout: string): readonly string[] {
+  return stdout
+    .split("\n")
+    .map((line) => line.replace(/\r$/, ""))
+    .filter((line) => line.length > 0);
+}
+
 /** 機械工程を実行し、報告 JSON を返す（省略なし。失敗時は途中結果とともに fail を返す）。 */
 export function runAcceptDefinitionChecks(
   input: AcceptDefinitionInput,
@@ -548,7 +620,7 @@ export function runAcceptDefinitionChecks(
     steps.push({
       name: "canonical-reacquisition",
       status: "fail",
-      detail: { stage: "fetch", stderr: fetchResult.stderr.trim() },
+      detail: { stage: "fetch", stderr: fetchResult.stderr.trim(), divergence: detectDivergence(runner, repoRoot) },
     });
     warnings.push("git fetch origin main failed");
     return assembleReport(input.phase, steps, diff, warnings, proposal);
@@ -557,6 +629,9 @@ export function runAcceptDefinitionChecks(
   const head = ffMerge.exitCode === 0
     ? runner.run({ command: "git", args: ["rev-parse", "HEAD"], cwd: repoRoot }).stdout.trim()
     : "";
+  // 分岐検出は失敗時のみ実行する（REQ-061-052 の対象は fetch / ff-only merge の失敗時）。
+  // 検出結果は detail への出力のみで、script は reset / rebase 等の解消操作を実行しない。
+  const divergence = ffMerge.exitCode === 0 ? null : detectDivergence(runner, repoRoot);
   steps.push({
     name: "canonical-reacquisition",
     status: ffMerge.exitCode === 0 ? "pass" : "fail",
@@ -564,6 +639,7 @@ export function runAcceptDefinitionChecks(
       head,
       stderrTail: ffMerge.exitCode === 0 ? "" : ffMerge.stderr.trim().slice(-400),
       stderr: ffMerge.exitCode === 0 ? "" : ffMerge.stderr.trim(),
+      ...(divergence === null ? {} : { divergence }),
     },
   });
   if (ffMerge.exitCode !== 0) {

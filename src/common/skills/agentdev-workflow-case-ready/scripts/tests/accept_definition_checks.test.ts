@@ -65,6 +65,11 @@ function fakeRunner(overrides: {
   autogenDiff?: string;
   integrityFailGate?: string;
   ffMergeFails?: boolean;
+  fetchFails?: boolean;
+  revListCountOutput?: string;
+  revListCountFails?: boolean;
+  aheadLogOutput?: string;
+  behindLogOutput?: string;
   indexedPaths?: readonly string[];
   statusOutput?: string;
 } = {}): MechanicalRunner & { calls: { command: string; args: readonly string[]; cwd: string }[] } {
@@ -92,6 +97,26 @@ function fakeRunner(overrides: {
       if (spec.command === "git" && spec.args[0] === "merge" && overrides.ffMergeFails) {
         result.exitCode = 1;
         result.stderr = "not possible to fast-forward";
+      }
+      if (spec.command === "git" && spec.args[0] === "fetch" && overrides.fetchFails) {
+        result.exitCode = 1;
+        result.stderr = "could not fetch origin";
+      }
+      if (spec.command === "git" && spec.args[0] === "rev-list") {
+        if (overrides.revListCountFails) {
+          result.exitCode = 128;
+          result.stderr = "ambiguous argument 'origin/main'";
+        } else if (overrides.revListCountOutput !== undefined) {
+          result.stdout = overrides.revListCountOutput;
+        }
+      }
+      if (spec.command === "git" && spec.args[0] === "log") {
+        if (spec.args[2] === "origin/main..main") {
+          result.stdout = overrides.aheadLogOutput ?? "";
+        }
+        if (spec.args[2] === "main..origin/main") {
+          result.stdout = overrides.behindLogOutput ?? "";
+        }
       }
       if (spec.command === "git" && spec.args[0] === "rev-parse") {
         result.stdout = "abc123\n";
@@ -280,6 +305,69 @@ describe("canonical 再取得 phase（merge 後 canonical 再取得、draft/RU �
 
     expect(rmCall?.args).toEqual(["rm", "--", ".agentdev/backlog/req-units/RU-0001.md"]);
     expect(cleanupStep?.detail.skippedPaths).toEqual([".agentdev/drafts/req-draft-case-x.md"]);
+  });
+
+  test("ff-only merge 失敗時に分岐検出結果（ahead/behind の件数とコミット一覧）を detail へ報告し、自動解消操作を実行しない（TS-001）", () => {
+    const runner = fakeRunner({
+      ffMergeFails: true,
+      revListCountOutput: "2\t1\n",
+      aheadLogOutput: "abc111 local commit A\nabc222 local commit B\n",
+      behindLogOutput: "def333 origin commit C\n",
+    });
+    const report = runAcceptDefinitionChecks(cleanupInput(), runner);
+    expect(report.result.exitCategory).toBe("failure");
+    const step = report.result.steps.find((s) => s.name === "canonical-reacquisition");
+    expect(step?.status).toBe("fail");
+    const divergence = step?.detail.divergence as {
+      ahead: number;
+      behind: number;
+      aheadCommits: readonly string[];
+      behindCommits: readonly string[];
+      detectionUnavailable: string;
+    };
+    expect(divergence.ahead).toBe(2);
+    expect(divergence.behind).toBe(1);
+    expect(divergence.aheadCommits).toEqual(["abc111 local commit A", "abc222 local commit B"]);
+    expect(divergence.behindCommits).toEqual(["def333 origin commit C"]);
+    expect(divergence.detectionUnavailable).toBe("");
+    // 報告に限る: script は分岐の解消操作（reset / rebase / 非 ff-only merge）を実行しない
+    expect(runner.calls.some((c) => c.command === "git" && c.args[0] === "reset")).toBe(false);
+    expect(runner.calls.some((c) => c.command === "git" && c.args[0] === "rebase")).toBe(false);
+    expect(runner.calls.some((c) => c.command === "git" && c.args[0] === "merge" && c.args[1] !== "--ff-only")).toBe(false);
+  });
+
+  test("fetch 失敗時も分岐検出を試み、検出結果を detail へ報告する（TS-001）", () => {
+    const runner = fakeRunner({
+      fetchFails: true,
+      revListCountOutput: "1\t3\n",
+      aheadLogOutput: "abc111 local only commit\n",
+      behindLogOutput: "def333 origin commit 1\ndef444 origin commit 2\ndef555 origin commit 3\n",
+    });
+    const report = runAcceptDefinitionChecks(cleanupInput(), runner);
+    expect(report.result.exitCategory).toBe("failure");
+    const step = report.result.steps.find((s) => s.name === "canonical-reacquisition");
+    expect(step?.status).toBe("fail");
+    expect(step?.detail.stage).toBe("fetch");
+    const divergence = step?.detail.divergence as { ahead: number; behind: number; detectionUnavailable: string };
+    expect(divergence.ahead).toBe(1);
+    expect(divergence.behind).toBe(3);
+    expect(divergence.detectionUnavailable).toBe("");
+    expect(runner.calls.some((c) => c.command === "git" && c.args[0] === "merge")).toBe(false);
+  });
+
+  test("分岐検出自体の失敗（remote-tracking ref 不在等）はエラーにせず検出不能を detail へ記録する", () => {
+    const runner = fakeRunner({ ffMergeFails: true, revListCountFails: true });
+    const report = runAcceptDefinitionChecks(cleanupInput(), runner);
+    expect(report.result.exitCategory).toBe("failure");
+    const step = report.result.steps.find((s) => s.name === "canonical-reacquisition");
+    expect(step?.status).toBe("fail");
+    const divergence = step?.detail.divergence as { ahead: number | null; behind: number | null; detectionUnavailable: string };
+    expect(divergence.ahead).toBeNull();
+    expect(divergence.behind).toBeNull();
+    expect(divergence.detectionUnavailable).toContain("ambiguous");
+    // 検出不能でも解消操作は実行しない
+    expect(runner.calls.some((c) => c.command === "git" && c.args[0] === "reset")).toBe(false);
+    expect(runner.calls.some((c) => c.command === "git" && c.args[0] === "rebase")).toBe(false);
   });
 });
 
