@@ -35,7 +35,8 @@ try {
     records.push({ file: entry, ...meta });
   }
   const filtered = themeFilter === null ? records : records.filter((record) => record.theme === themeFilter);
-  printJson({ records: filtered, count: filtered.length });
+  const withAdoption = filtered.map((record) => ({ ...record, adopted: record.adoptionBasis !== null }));
+  printJson({ records: withAdoption, count: withAdoption.length });
 } catch (error) {
   fail(`受領記録の照会に失敗した: ${error instanceof Error ? error.message : String(error)}`);
 }

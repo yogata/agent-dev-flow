@@ -11,9 +11,12 @@
  *   エントリ本文を複写せず、採用分は根拠付きレコード、不採用分は id と分類の要約のみを記録する
  */
 
+import { createHash } from "node:crypto";
 import {
   computeCounts,
+  isProvenanceKind,
   parseReceiveResult,
+  type ProvenanceKind,
   type ReceiveEntry,
   type ReceiveResult,
 } from "./schema.ts";
@@ -24,6 +27,68 @@ const SELF_REPORT_PATTERN = /(承認済み|承認された|採用済み|approved
 /** 両経路で同一結果となる正規化。 */
 export function normalizeInput(text: string): string {
   return text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+}
+
+/**
+ * 正規化本文の内容同一性判定用ダイジェスト。
+ * エントリ本文を複写せず（証跡量契約を保ち）、固定長ハッシュで同一性のみを比較する。
+ */
+export function digestBody(normalizedBody: string): string {
+  return createHash("sha256").update(normalizedBody, "utf8").digest("hex");
+}
+
+interface ProvenanceSpec {
+  readonly default: ProvenanceKind | null;
+  readonly byKey: ReadonlyMap<string, ProvenanceKind>;
+}
+
+/**
+ * 由来指定を解析する。様式は `<kind>`（全エントリの既定・1回まで）
+ * または `<id|title>=<kind>`（個別上書き・repeatable）。不正値は例外で拒否する（fail-closed）。
+ */
+function resolveProvenanceSpecs(specs: readonly string[]): ProvenanceSpec {
+  let defaultKind: ProvenanceKind | null = null;
+  const byKey = new Map<string, ProvenanceKind>();
+  for (const spec of specs) {
+    const eq = spec.indexOf("=");
+    if (eq === -1) {
+      if (defaultKind !== null) {
+        throw new Error(`既定の由来が複数指定されている（fail-closed）: ${spec}`);
+      }
+      if (!isProvenanceKind(spec)) {
+        throw new Error(`由来の指定が不正（fail-closed）: ${spec}`);
+      }
+      defaultKind = spec;
+      continue;
+    }
+    const key = spec.slice(0, eq).trim();
+    const kind = spec.slice(eq + 1).trim();
+    if (key.length === 0 || !isProvenanceKind(kind)) {
+      throw new Error(`由来の指定が不正（fail-closed）: ${spec}`);
+    }
+    byKey.set(key, kind);
+  }
+  return { default: defaultKind, byKey };
+}
+
+function resolveEntryProvenance(spec: ProvenanceSpec, id: string, title: string): ProvenanceKind | null {
+  return spec.byKey.get(id) ?? spec.byKey.get(title) ?? spec.default;
+}
+
+/**
+ * prior 記録から重複判定用の本文ダイジェスト表（key → bodyDigest）を構築する（O(n)）。
+ * 判定対象は受理が確定したエントリ（accepted / rejected-invalid）に限る。加えて、
+ * 本文ダイジェストを持たないエントリ（旧様式）は重複判定の対象にしない:
+ * 内容同一性を確認できない入力を同一内容と断定して除外しないためである。
+ */
+function buildPriorBodyDigests(prior: ReceiveResult): ReadonlyMap<string, string> {
+  const digests = new Map<string, string>();
+  for (const entry of prior.entries) {
+    if (entry.disposition !== "accepted" && entry.disposition !== "rejected-invalid") continue;
+    if (entry.bodyDigest === null) continue;
+    digests.set(`${entry.id}\u0000${entry.title}`, entry.bodyDigest);
+  }
+  return digests;
 }
 
 interface RawEntry {
@@ -67,31 +132,29 @@ function joinNonEmpty(lines: readonly string[]): string {
  * @param adoptIds 利用者の明示採用指示（エントリ id または見出しタイトル）
  * @param prior 照合する既存受領記録（再投入時。重複エントリの検出に使う）
  * @param priorLabel 既存受領記録の参照ラベル（証跡用。省略可）
+ * @param provenanceSpecs 由来指定（`<kind>` または `<id|title>=<kind>`。省略可）
  */
 export function receiveReturnInput(
   rawText: string,
   adoptIds: readonly string[],
   prior: ReceiveResult | null,
   priorLabel: string | null = null,
+  provenanceSpecs: readonly string[] = [],
 ): ReceiveResult {
+  const provenance = resolveProvenanceSpecs(provenanceSpecs);
   const text = normalizeInput(rawText);
   const adopted = new Set(adoptIds);
-  // 重複検出の対象は受理が確定したエントリ（accepted / rejected-invalid）のみ。
-  // not-adopted は採否未確定（利用者判断の対象）であるため、再投入時に再採否される
-  // （消失を生まず、確定済み分の重複処理も生まない）。
-  const priorKeys = prior === null
-    ? new Set<string>()
-    : new Set(
-        prior.entries
-          .filter((entry) => entry.disposition === "accepted" || entry.disposition === "rejected-invalid")
-          .map((entry) => `${entry.id}\u0000${entry.title}`),
-      );
+  // 重複判定は「受理が確定したエントリ」かつ「本文ダイジェストで内容同一性を
+  // 確認できるもの」に限る（buildPriorBodyDigests 参照）。同識別子・同表題でも
+  // 本文が相違する入力を同一と断定して除外しない。
+  const priorDigests = prior === null ? new Map<string, string>() : buildPriorBodyDigests(prior);
   const entries: ReceiveEntry[] = [];
   const rawEntries = extractEntries(text);
   for (const raw of rawEntries) {
     const key = `${raw.id}\u0000${raw.title}`;
     const selfReportDetected = SELF_REPORT_PATTERN.test(joinNonEmpty(raw.body));
     const body = joinNonEmpty(raw.body);
+    const entryProvenance = resolveEntryProvenance(provenance, raw.id ?? "", raw.title);
     if (body.length === 0) {
       entries.push({
         id: raw.id ?? "",
@@ -100,20 +163,30 @@ export function receiveReturnInput(
         basis: null,
         selfReportDetected,
         reason: "エントリ本文が空であり曖昧な入力として不採用とする（確定しない）",
+        bodyDigest: null,
+        updatedFromPrior: false,
+        provenance: entryProvenance,
       });
       continue;
     }
-    if (priorKeys.has(key)) {
+    const digest = digestBody(body);
+    const priorDigest = priorDigests.get(key);
+    if (priorDigest !== undefined && priorDigest === digest) {
       entries.push({
         id: raw.id ?? "",
         title: raw.title,
         disposition: "detected-duplicate",
         basis: null,
         selfReportDetected,
-        reason: "既存の受領記録に同一エントリを検出した。重複を生まないため処理対象外とする",
+        reason: "既存の受領記録に同一内容（同識別子・同表題・同本文）を検出した。重複を生まないため処理対象外とする",
+        bodyDigest: digest,
+        updatedFromPrior: false,
+        provenance: entryProvenance,
       });
       continue;
     }
+    // 同識別子・同表題で本文が相違する入力は同一と断定せず、新たな受理・採否の対象とする。
+    const updatedFromPrior = priorDigest !== undefined && priorDigest !== digest;
     if (adopted.has(raw.id ?? "") || adopted.has(raw.title)) {
       entries.push({
         id: raw.id ?? "",
@@ -122,6 +195,9 @@ export function receiveReturnInput(
         basis: "user-explicit",
         selfReportDetected,
         reason: null,
+        bodyDigest: digest,
+        updatedFromPrior,
+        provenance: entryProvenance,
       });
       continue;
     }
@@ -132,6 +208,9 @@ export function receiveReturnInput(
       basis: null,
       selfReportDetected,
       reason: "利用者の明示採用指示がなく不採用として記録する（外部AIの自己申告は採用根拠にならない）",
+      bodyDigest: digest,
+      updatedFromPrior,
+      provenance: entryProvenance,
     });
   }
   if (rawEntries.length === 0) {
@@ -142,6 +221,9 @@ export function receiveReturnInput(
       basis: null,
       selfReportDetected: false,
       reason: "エントリ見出しが検出できないため不採用として残し確定しない（fail-closed）",
+      bodyDigest: null,
+      updatedFromPrior: false,
+      provenance: null,
     });
   }
   const missing = adoptIds.filter(

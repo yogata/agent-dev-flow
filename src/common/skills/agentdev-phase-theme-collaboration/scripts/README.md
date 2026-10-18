@@ -13,7 +13,8 @@ scripts/
 │   ├── schema.ts    # 採否記録・受領記録 frontmatter の型と検証（fail-closed）
 │   ├── sections.ts  # themes.md / pending.md セクション解析、一覧導出、旧新解決、carried 未決抽出
 │   ├── handoff.ts   # 持出し文書の構成検証（必須4要素）と既知機密パターンの混入検出
-│   └── receive.ts   # 戻り入力の受理・採否分類（O(n) 線形走査、fail-closed、証跡量比例）
+│   ├── receive.ts   # 戻り入力の受理・採否分類（O(n) 線形走査、fail-closed、証跡量比例）
+│   └── received-record.ts # 受領記録の生成と区別保存（1受領1ファイル、受領日時の信頼性、由来と採用根拠の区別）
 ├── src/
 │   ├── handoff-check.ts  # CLI: 持出し文書の検証
 │   ├── receive.ts        # CLI: 戻り入力の受理・採否記録生成
@@ -50,13 +51,15 @@ bun src/handoff-check.ts --input <handoff.md | ->
 ### `src/receive.ts` — 戻り入力の受理（戻り受理・部分反映・非機能受け入れ条件の機械的部分）
 
 ```
-bun src/receive.ts --input <return.md | -> [--adopt <id|title>]... [--prior <prior.json>] [--prior-label <label>]
+bun src/receive.ts --input <return.md | -> [--adopt <id|title>]... [--prior <prior.json>] [--prior-label <label>] [--provenance <kind | <id|title>=<kind>>]...
 ```
 
 - `--input -` で stdin（貼付経路）、パスでファイル経路。両経路は同一の正規化（改行統一）で受理し、同一 JSON を返す（両経路の意味上の等価性）
 - エントリ様式: `## <E-{NNN}|任意の見出し>: タイトル` で始まるセクション。見出しが1つもない入力は単一の `rejected-invalid` として記録する（fail-closed、確定しない）
 - 採用根拠は `--adopt`（利用者の明示採用指示）のみ。外部AIの自己申告（本文中の「承認済み」「approved」等）は採用証拠にならず、観測情報（`selfReportDetected`）としてのみ記録する
 - 採否区分: `accepted`（明示採用）/ `not-adopted`（明示指示なし）/ `rejected-invalid`（様式不備・空本文。不採用として残し確定しない）/ `detected-duplicate`（`--prior` との重複検出。再投入時の処理対象外）
+- 再投入の重複判定は識別子・表題の一致に加えて正規化本文の内容同一性（`bodyDigest`）で判定する。同識別子・同表題でも本文が相違する入力は同一と断定せず、`updatedFromPrior: true` として新たな受理・採否の対象にする。実質同一（空白・改行のみの差）は重複として扱う。本文ダイジェストを持たない旧様式の prior は同一断定で除外しない
+- `--provenance` は受領内容の由来（`user-provided` / `delegated-derivation` / `evaluator-finding`）。`<kind>` で全体既定、`<id|title>=<kind>` で個別指定。採用根拠とは別フィールド（`provenance`）で記録し、由来だけで採用済みと扱わない
 - `--adopt` に該当する受理済みエントリが存在しない場合は非ゼロ終了（fail-closed）
 - 証跡量: 出力はエントリ本文を複写しない。採用分は根拠付きレコード、不採用分は id と分類の要約のみ。記録量は明示採用件数に比例する
 - 受理・解釈は入力サイズ n に対する単一の線形走査（O(n)）である
@@ -78,7 +81,7 @@ bun src/themes.ts --themes-file <themes.md> [--pending-file <pending.md>] [--res
 bun src/received.ts --dir <received-dir> [--theme <THEME-NNN>]
 ```
 
-- 受領記録の様式: `received/YYYY-MM-DD-{テーマ識別}.md`。冒頭に YAML frontmatter を持つ
+- 受領記録の様式: `received/YYYY-MM-DD-{テーマ識別}.md`。冒頭に YAML frontmatter を持つ。同日・同一テーマの複数受領は `YYYY-MM-DD-{テーマ識別}-{連番}.md` で区別して保存する（1受領1ファイル契約。生成は lib/received-record.ts の `buildReceivedRecord`）
 
 ```yaml
 ---
@@ -87,10 +90,14 @@ theme: THEME-NNN
 purpose: "持出し時の目的"
 question: "持出し時の問い"
 references: ["docs/designs/..."]
+provenance: user-provided
+adoptionBasis: null
 ---
 ```
 
-- 出力: 受領情報の一覧（`records`、`count`）。`--theme` でテーマ識別の限定照会
+- `provenance`（由来）と `adoptionBasis`（正式な採用根拠。`user-explicit` または `decision`）は区別して記録し、由来だけで採用済みと扱わない。旧様式の記録では両フィールドとも null として読む
+- 受領日時（`receivedAt`）は受領操作時点の時計からのみ取得し、入力ファイルの更新日時・本文中の日付を代用しない。取得できない場合は日時を捏造せず失敗を明示する
+- 出力: 受領情報の一覧（`records`、`count`）。各レコードに採用済み判定（`adopted`。`adoptionBasis` のみから導出）を含める。`--theme` でテーマ識別の限定照会
 - received/ に記録が存在しない内容は返らない（未受領の外部検討内容を復元したと扱わない契約の機械的基盤）
 - frontmatter 不備の受領記録は非ゼロ終了で報告する（破損した記録を受領済み知見として扱わない）
 
