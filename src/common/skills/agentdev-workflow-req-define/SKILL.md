@@ -40,7 +40,7 @@ req-define workflow は次の11 STEP で構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
-| STEP-1 | セッションコンテキスト検知・入力解決 | req-define 起動 | 6項目推論（信頼度付き）、入力ソース確定 | [references/input-and-dialogue.md](references/input-and-dialogue.md) |
+| STEP-1 | セッションコンテキスト検知・入力解決 | req-define 起動 | 6項目推論（信頼度付き）、入力ソース確定、既存の確定事項・未決事項・採用判断の区別を維持した受理（変更駆動入口） | [references/input-and-dialogue.md](references/input-and-dialogue.md) |
 | STEP-2 | 壁打ち対話（引き継ぎ判定含む） | 入力ソース確定 | 壁打ちで確定した要件内容、`agentdev_handoff` 判定、合意反映時の採用根拠照合（作業継続指示・エージェント提案・形式受理を仕様判断の採用根拠としない。未確定部分は未解決質問として保留） | [references/input-and-dialogue.md](references/input-and-dialogue.md) |
 | STEP-3 | 既存REQ照合 | 壁打ち合意内容確定 | 操作分類結果（`artifact_actions` 記録用） | [references/requirement-development.md](references/requirement-development.md) |
 | STEP-4 | 要件展開 | 操作分類確定 | 変更影響候補、分類ゲート、Decision要否確認、変更誘発境界リスク導出（5観点境界）、test strategy 定義 | [references/requirement-development.md](references/requirement-development.md) |
@@ -64,6 +64,7 @@ req-define workflow は次の11 STEP で構成する。
 - 再開点は永続状態から再構成する: 入力ファイル（RU、検出事項）、`.agentdev/drafts/` 配下の draft 下書き（STEP-6 生成後）、`draft-data` の `status` と `auto_gate`
 - 対話ターン間の合意内容は draft-data 下書き（runtime artifact、REQ-{NNNN}）へ逐次反映し、会話コンテキスト喪失後も下書きから再開できる
 - 未解決質問・未解決衝突・停止理由は draft の該当フィールドが正であり、会話履歴を権威情報源としない
+- 採用判断・未決事項の区別も draft の該当フィールドが正である。中断や再実行によって区別を失わず、再開時に未決事項を無断で解決済みにせず、既存の採用判断を未採用へ変化させない（変更駆動入口での受理・中断再開時の状態維持の要件。採用済み所見の受理記録を含む）
 
 ### 終了条件（termination）
 
