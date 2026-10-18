@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261018T123514Z-269a",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-or-epic-attribution",
+  "subject": "Case #3793 実行構成判断（operation_units OU-0001〜0004 の依存グラフと3軸判断）",
+  "sourceRevision": "df026929",
+  "durationMs": 2762,
+  "inputTokens": 1534,
+  "inputs": {
+    "requestDigest": "d4c83a40cc04cded1239ed98f9fa9765510e9177d7e43d38232a747ed7a10e3c",
+    "references": [
+      {
+        "digest": "86d921f5fe6815880ed5ec6a8a20918159e85b7308e5cee3059f98bb0ee6521b",
+        "label": "req_draft",
+        "path": ".agentdev/drafts/req-draft-phase-route-reliability-202610.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-attribution",
+      "questionForm": "choice",
+      "value": "Standard",
+      "probabilityDistribution": {
+        "Standard": 0.9,
+        "Epic": 0.1
+      }
+    },
+    {
+      "questionId": "q2-dependency-strength",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "関連（同じ領域だが実行依存なし）": 0.96,
+        "弱（実行順序の推奨はあるが並列可）": 0.03,
+        "必須（一方が他方なしでは成立しない）": 0.01
+      }
+    },
+    {
+      "questionId": "q3-functional-coherence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "分散（共通主題なし）": 0,
+        "部分的（関連するが単一主題ではない）": 0.17,
+        "一貫（単一の機能的主題）": 0.83
+      }
+    }
+  ],
+  "confidence": 0.8,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-attribution",
+        "value": "Standard"
+      },
+      {
+        "questionId": "q2-dependency-strength",
+        "value": 0
+      },
+      {
+        "questionId": "q3-functional-coherence",
+        "value": 2
+      }
+    ]
+  }
+}
