@@ -14,6 +14,7 @@ implementation:
     - REQ-101-008
     - REQ-101-014
     - REQ-108-001
+    - REQ-108-013
     - REQ-035-021
   src/common/skills/agentdev-workflow-case-run/references/delegation-and-result.md:
     - REQ-014-016
@@ -29,12 +30,14 @@ implementation:
     - REQ-101-006
     - REQ-101-014
     - REQ-031-035
+    - REQ-108-013
   src/common/skills/agentdev-workflow-case-run/references/single.md:
     - REQ-007-014
     - REQ-007-015
     - REQ-017-021
     - REQ-017-022
     - REQ-035-021
+    - REQ-108-013
   src/common/skills/agentdev-workflow-case-run/scripts/record-comments.ts:
     - REQ-006-112
     - REQ-101-006
@@ -50,6 +53,8 @@ verification:
     - REQ-101-014
     - REQ-101-015
     - REQ-101-016
+  src/common/skills/agentdev-workflow-case-run/scripts/tests/open-dependency-and-proto-application.test.ts:
+    - REQ-108-013
   src/common/skills/agentdev-workflow-case-run/references/delegation-and-result.md:
     - REQ-060-007
     - REQ-061-034
