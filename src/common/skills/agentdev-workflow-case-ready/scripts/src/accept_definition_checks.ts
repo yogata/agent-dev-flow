@@ -629,7 +629,7 @@ export function runAcceptDefinitionChecks(
   const head = ffMerge.exitCode === 0
     ? runner.run({ command: "git", args: ["rev-parse", "HEAD"], cwd: repoRoot }).stdout.trim()
     : "";
-  // 分岐検出は失敗時のみ実行する（REQ-061-052 の対象は fetch / ff-only merge の失敗時）。
+  // 分岐検出は失敗時のみ実行する（対象は fetch / ff-only merge の失敗時。要件対応は traceability sidecar 参照）。
   // 検出結果は detail への出力のみで、script は reset / rebase 等の解消操作を実行しない。
   const divergence = ffMerge.exitCode === 0 ? null : detectDivergence(runner, repoRoot);
   steps.push({
