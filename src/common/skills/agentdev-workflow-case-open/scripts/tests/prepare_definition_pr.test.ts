@@ -213,6 +213,36 @@ describe("入力検証（newText の行構造の事前確認）", () => {
     expect(() => validateInput(withoutTrailing as unknown as Record<string, unknown>)).not.toThrow();
     expect(() => validateInput(withTrailing as unknown as Record<string, unknown>)).not.toThrow();
   });
+
+  test("追加行が oldText の末尾行に連結された編集（Case #3779 の組立形状）を拒否する", () => {
+    // oldText を接頭辞として保持しつつ、追加内容が新規行から始まらない連結組立
+    const concatenated = input({
+      definitionEdits: [editWith(MULTI_LINE_OLD, `${MULTI_LINE_OLD}| REQ-NNNN-NNK | 追加行 |`)],
+    });
+    expect(() => validateInput(concatenated as unknown as Record<string, unknown>))
+      .toThrow(/fails the line structure pre-check/);
+  });
+
+  test("単一行 oldText への連結追加も拒否される", () => {
+    const singleLine = "| REQ-NNNN-NNN | 旧文1 |";
+    const concatenated = input({
+      definitionEdits: [editWith(singleLine, `${singleLine}| REQ-NNNN-NNM | 追加行 |`)],
+    });
+    expect(() => validateInput(concatenated as unknown as Record<string, unknown>))
+      .toThrow(/fails the line structure pre-check/);
+  });
+
+  test("oldText を接頭辞として保持する正規の行追加（改行を挟む追加）を受領する", () => {
+    const appended = input({
+      definitionEdits: [editWith(MULTI_LINE_OLD, `${MULTI_LINE_OLD}\n| REQ-NNNN-NNK | 追加行 |`)],
+    });
+    expect(() => validateInput(appended as unknown as Record<string, unknown>)).not.toThrow();
+    // oldText 末尾に行末改行がある場合も同一の追加内容を正規として受領する（改行有無非依存）
+    const appendedAfterTrailing = input({
+      definitionEdits: [editWith(`${MULTI_LINE_OLD}\n`, `${MULTI_LINE_OLD}\n| REQ-NNNN-NNK | 追加行 |`)],
+    });
+    expect(() => validateInput(appendedAfterTrailing as unknown as Record<string, unknown>)).not.toThrow();
+  });
 });
 
 describe("REQ 行編集の適用", () => {

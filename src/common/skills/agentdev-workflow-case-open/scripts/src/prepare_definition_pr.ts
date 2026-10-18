@@ -177,11 +177,15 @@ function toLogicalLines(text: string): readonly string[] {
 
 /**
  * DefinitionEdit の行構造事前確認（入力 JSON 組立後・適用前の機械検証）。
- * newText は oldText の行区切りを保全し、行の追加のみを許す。oldText と
- * newText を末尾の行末改行の有無に依存しない方法で行配列化し、newText の
- * 行数が oldText の行数を下回る編集（行区切りの連結など行構造の欠落）を
- * 拒否する。当該確認は適用後の受入検査（artifact_actions の verbatim 包含
- * 突合）を代替しない。
+ * newText は oldText の行区切りを保全し、行の追加のみを許す。次の2規則を
+ * oldText 末尾の行末改行の有無に依存しない方法で検証する:
+ * - 行数下限: newText の行数が oldText の行数を下回る編集（行の削除・統合による
+ *   行区切りの欠落）を拒否する
+ * - 連結検出: newText が oldText（末尾の行末改行 1 個を除いた接頭辞）を保持し
+ *   追加内容が空でない場合、追加内容は行頭から始まる（"\n" 直後である）ことを
+ *   要求する。追加行が oldText の末尾行に連結された編集（Case #3779 の行区切り
+ *   欠落の組立形状）を拒否する
+ * 当該確認は適用後の受入検査（artifact_actions の verbatim 包含突合）を代替しない。
  */
 function validateEditLineStructure(edit: DefinitionEdit): void {
   const oldLines = toLogicalLines(edit.oldText);
@@ -190,6 +194,15 @@ function validateEditLineStructure(edit: DefinitionEdit): void {
     fail(
       `definition edit fails the line structure pre-check (newText must preserve the line separation of oldText and may only add lines): ${edit.path} (oldText: ${oldLines.length} lines, newText: ${newLines.length} lines)`,
     );
+  }
+  const oldPrefix = edit.oldText.endsWith("\n") ? edit.oldText.slice(0, -1) : edit.oldText;
+  if (oldPrefix.length > 0 && edit.newText.startsWith(oldPrefix) && edit.newText.length > oldPrefix.length) {
+    const appended = edit.newText.slice(oldPrefix.length);
+    if (!appended.startsWith("\n")) {
+      fail(
+        `definition edit fails the line structure pre-check (appended content must start on a new line, not concatenated onto the last line of oldText): ${edit.path}`,
+      );
+    }
   }
 }
 
