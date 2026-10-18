@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261018T035310Z-aacd",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-or-epic-attribution",
+  "subject": "Case #3782 実行構成判断（operation_units OU-0001〜0006 の依存グラフと3軸判断）",
+  "sourceRevision": "6f406175",
+  "durationMs": 1086,
+  "inputTokens": 1201,
+  "inputs": {
+    "requestDigest": "3029b81a5a5f87a08e500d9fe511cf767e94d0f211438dfa6cf4f8113701ad09"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-attribution",
+      "questionForm": "choice",
+      "value": "Standard",
+      "probabilityDistribution": {
+        "Standard": 0.96,
+        "Epic": 0.04
+      }
+    },
+    {
+      "questionId": "q2-dependency-strength",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "関連（同じ領域だが実行依存なし）": 1,
+        "弱（実行順序の推奨はあるが並列可）": 0,
+        "必須（一方が他方なしでは成立しない）": 0
+      }
+    },
+    {
+      "questionId": "q3-functional-coherence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "分散（共通主題なし）": 0,
+        "部分的（関連するが単一主題ではない）": 0,
+        "一貫（単一の機能的主題）": 1
+      }
+    }
+  ],
+  "confidence": 0.92,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-attribution",
+        "value": "Standard"
+      },
+      {
+        "questionId": "q2-dependency-strength",
+        "value": 0
+      },
+      {
+        "questionId": "q3-functional-coherence",
+        "value": 2
+      }
+    ]
+  }
+}
