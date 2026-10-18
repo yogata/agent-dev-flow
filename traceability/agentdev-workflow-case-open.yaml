@@ -48,6 +48,7 @@ implementation:
     - REQ-030-026
     - REQ-030-027
     - REQ-030-029
+    - REQ-030-030
     - REQ-061-046
     - REQ-017-024
   src/common/skills/agentdev-workflow-case-open/references/root-case-and-definition-package.md:
@@ -92,6 +93,7 @@ implementation:
     - REQ-030-025
     - REQ-030-026
     - REQ-030-028
+    - REQ-030-030
     - REQ-061-046
 verification:
   src/common/skills/agentdev-workflow-case-open/references/root-case-and-definition-package.md:
@@ -105,6 +107,7 @@ verification:
     - REQ-030-025
     - REQ-030-026
     - REQ-030-028
+    - REQ-030-030
     - REQ-061-046
   src/common/skills/agentdev-workflow-case-open/scripts/tests/step4-verbatim-match.test.ts:
     - REQ-030-027

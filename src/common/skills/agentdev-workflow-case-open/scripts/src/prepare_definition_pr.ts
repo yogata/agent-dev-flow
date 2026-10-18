@@ -165,7 +165,48 @@ function requireGateSpec(value: unknown, field: string): GateCommandSpec {
   };
 }
 
-/** 入力 JSON を検証する。必須品質ゲートの欠落（省略）とスイープ stage を拒否する。 */
+/**
+ * 末尾の行末改行 1 個を正規化して論理行配列化する。oldText・newText 末尾の
+ * 行末改行の有無に検証結果が依存しないようにするための正規化である。
+ */
+function toLogicalLines(text: string): readonly string[] {
+  const lines = text.split("\n");
+  if (lines.length > 1 && lines[lines.length - 1] === "") lines.pop();
+  return lines;
+}
+
+/**
+ * DefinitionEdit の行構造事前確認（入力 JSON 組立後・適用前の機械検証）。
+ * newText は oldText の行区切りを保全し、行の追加のみを許す。次の2規則を
+ * oldText 末尾の行末改行の有無に依存しない方法で検証する:
+ * - 行数下限: newText の行数が oldText の行数を下回る編集（行の削除・統合による
+ *   行区切りの欠落）を拒否する
+ * - 連結検出: newText が oldText（末尾の行末改行 1 個を除いた接頭辞）を保持し
+ *   追加内容が空でない場合、追加内容は行頭から始まる（"\n" 直後である）ことを
+ *   要求する。追加行が oldText の末尾行に連結された編集（Case #3779 の行区切り
+ *   欠落の組立形状）を拒否する
+ * 当該確認は適用後の受入検査（artifact_actions の verbatim 包含突合）を代替しない。
+ */
+function validateEditLineStructure(edit: DefinitionEdit): void {
+  const oldLines = toLogicalLines(edit.oldText);
+  const newLines = toLogicalLines(edit.newText);
+  if (newLines.length < oldLines.length) {
+    fail(
+      `definition edit fails the line structure pre-check (newText must preserve the line separation of oldText and may only add lines): ${edit.path} (oldText: ${oldLines.length} lines, newText: ${newLines.length} lines)`,
+    );
+  }
+  const oldPrefix = edit.oldText.endsWith("\n") ? edit.oldText.slice(0, -1) : edit.oldText;
+  if (oldPrefix.length > 0 && edit.newText.startsWith(oldPrefix) && edit.newText.length > oldPrefix.length) {
+    const appended = edit.newText.slice(oldPrefix.length);
+    if (!appended.startsWith("\n")) {
+      fail(
+        `definition edit fails the line structure pre-check (appended content must start on a new line, not concatenated onto the last line of oldText): ${edit.path}`,
+      );
+    }
+  }
+}
+
+/** 入力 JSON を検証する。必須品質ゲートの省略、スイープ stage、編集の行構造事前確認不合格を拒否する。 */
 export function validateInput(value: unknown): PrepareDefinitionPrInput {
   if (typeof value !== "object" || value === null) fail("input must be a JSON object");
   const v = value as Record<string, unknown>;
@@ -179,6 +220,7 @@ export function validateInput(value: unknown): PrepareDefinitionPrInput {
     if (typeof edit.path !== "string" || typeof edit.oldText !== "string" || typeof edit.newText !== "string") {
       fail("input.definitionEdits entries must contain path, oldText, newText");
     }
+    validateEditLineStructure(edit);
   }
   if (!Array.isArray(v.stagePaths) || v.stagePaths.length === 0) {
     fail("input.stagePaths must be a non-empty array (explicit path staging)");
