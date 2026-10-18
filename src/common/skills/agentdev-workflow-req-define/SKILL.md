@@ -41,7 +41,7 @@ req-define workflow は次の11 STEP で構成する。
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
 | STEP-1 | セッションコンテキスト検知・入力解決 | req-define 起動 | 6項目推論（信頼度付き）、入力ソース確定 | [references/input-and-dialogue.md](references/input-and-dialogue.md) |
-| STEP-2 | 壁打ち対話（引き継ぎ判定含む） | 入力ソース確定 | 壁打ちで確定した要件内容、`agentdev_handoff` 判定 | [references/input-and-dialogue.md](references/input-and-dialogue.md) |
+| STEP-2 | 壁打ち対話（引き継ぎ判定含む） | 入力ソース確定 | 壁打ちで確定した要件内容、`agentdev_handoff` 判定、合意反映時の採用根拠照合（作業継続指示・エージェント提案・形式受理を仕様判断の採用根拠としない。未確定部分は未解決質問として保留） | [references/input-and-dialogue.md](references/input-and-dialogue.md) |
 | STEP-3 | 既存REQ照合 | 壁打ち合意内容確定 | 操作分類結果（`artifact_actions` 記録用） | [references/requirement-development.md](references/requirement-development.md) |
 | STEP-4 | 要件展開 | 操作分類確定 | 変更影響候補、分類ゲート、Decision要否確認、変更誘発境界リスク導出（5観点境界）、test strategy 定義 | [references/requirement-development.md](references/requirement-development.md) |
 | STEP-5 | Decision判断 | 要件展開完了 | Decision判断記録（`new:{topic-slug}` 形式） | [references/requirement-development.md](references/requirement-development.md) |
