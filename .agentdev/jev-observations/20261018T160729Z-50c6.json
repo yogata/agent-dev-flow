@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261018T160729Z-50c6",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0240（採用判断・未決事項・実装可能性の工程間整合）の編集関心5案のREQ-105/107/108/110/111への照合帰属",
+  "sourceRevision": "af74506dcf9efd95493596467044c26bf4292fc5",
+  "durationMs": 947,
+  "inputTokens": 2845,
+  "inputs": {
+    "requestDigest": "29c640ca9eb3b0b45e88791c9cb2e79d424ee3948eac5492035d1d88bfab99d1"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-req110-adoption",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "APPEND": 0.97,
+        "UPDATE": 0.01,
+        "CREATE": 0,
+        "REQ操作なし": 0.02
+      }
+    },
+    {
+      "questionId": "q2-req108-impl",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "APPEND": 0.96,
+        "UPDATE": 0.01,
+        "CREATE": 0.01,
+        "REQ操作なし": 0.02
+      }
+    },
+    {
+      "questionId": "q3-req111-paths",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "APPEND": 0.93,
+        "UPDATE": 0.01,
+        "CREATE": 0.02,
+        "REQ操作なし": 0.04
+      }
+    },
+    {
+      "questionId": "q4-req111-resume",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "APPEND": 0.9,
+        "UPDATE": 0.04,
+        "CREATE": 0.03,
+        "REQ操作なし": 0.03
+      }
+    },
+    {
+      "questionId": "q5-req107-verify",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "APPEND": 0.3,
+        "UPDATE": 0.04,
+        "CREATE": 0.01,
+        "REQ操作なし": 0.65
+      }
+    },
+    {
+      "questionId": "q6-confirm-needed",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.63,
+        "false": 0.37
+      }
+    }
+  ],
+  "confidence": 0.96,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-req110-adoption",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "q2-req108-impl",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "q3-req111-paths",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "q4-req111-resume",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "q5-req107-verify",
+        "value": "REQ操作なし"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "q6-confirm-needed",
+        "value": false
+      }
+    ]
+  }
+}

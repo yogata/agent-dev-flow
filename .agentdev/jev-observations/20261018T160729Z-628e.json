@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261018T160729Z-628e",
+  "workflow": "req-define",
+  "evaluationKind": "final-classification-design-separation",
+  "subject": "RU-0240 由来新要件行候補4件（REQ-110採用判断適用・REQ-108実装可能性と試作・REQ-111両経路維持・REQ-111中断再開維持）と実現面手続の最終分類・Design分離",
+  "sourceRevision": "af74506dcf9efd95493596467044c26bf4292fc5",
+  "durationMs": 861,
+  "inputTokens": 1909,
+  "inputs": {
+    "requestDigest": "3241dc620225ce486a8c612328ee8430db2696f1c986c1ad57f6ab537bc439b6"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-row-req110",
+      "questionForm": "choice",
+      "value": "Design行",
+      "probabilityDistribution": {
+        "REQ行": 0.46,
+        "Design行": 0.54
+      }
+    },
+    {
+      "questionId": "q2-row-req108",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.92,
+        "Design行": 0.08
+      }
+    },
+    {
+      "questionId": "q3-row-req111-paths",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.89,
+        "Design行": 0.11
+      }
+    },
+    {
+      "questionId": "q4-row-req111-resume",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.71,
+        "Design行": 0.29
+      }
+    },
+    {
+      "questionId": "q5-procedure-design-split",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.19,
+        "false": 0.81
+      }
+    }
+  ],
+  "confidence": 0.08,
+  "finalResult": {
+    "results": [
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "q1-row-req110",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q2-row-req108",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q3-row-req111-paths",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q4-row-req111-resume",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q5-procedure-design-split",
+        "value": false
+      }
+    ]
+  }
+}
