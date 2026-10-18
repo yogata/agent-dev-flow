@@ -11,14 +11,14 @@ scripts/
 ├── lib/
 │   ├── cli.ts       # argv 解析（--flag 値）、JSON 出力、エラー終了
 │   ├── schema.ts    # 採否記録・受領記録 frontmatter の型と検証（fail-closed）
-│   ├── sections.ts  # themes.md / pending.md セクション解析、一覧導出、旧新解決、carried 未決抽出
+│   ├── sections.ts  # themes.md / pending.md セクション解析、一覧導出、旧新解決、carried 未決抽出、採用状態照合
 │   ├── handoff.ts   # 持出し文書の構成検証（必須4要素）と既知機密パターンの混入検出
 │   ├── receive.ts   # 戻り入力の受理・採否分類（O(n) 線形走査、fail-closed、証跡量比例）
 │   └── received-record.ts # 受領記録の生成と区別保存（1受領1ファイル、受領日時の信頼性、由来と採用根拠の区別）
 ├── src/
 │   ├── handoff-check.ts  # CLI: 持出し文書の検証
 │   ├── receive.ts        # CLI: 戻り入力の受理・採否記録生成
-│   ├── themes.ts         # CLI: テーマ一覧の導出、旧新対応の解決、未決の連携参照
+│   ├── themes.ts         # CLI: テーマ一覧の導出、旧新対応の解決、未決の連携参照、採用主張の照合
 │   └── received.ts       # CLI: 受領済み知見の照会
 └── tests/
     ├── handoff.test.ts
@@ -64,15 +64,16 @@ bun src/receive.ts --input <return.md | -> [--adopt <id|title>]... [--prior <pri
 - 証跡量: 出力はエントリ本文を複写しない。採用分は根拠付きレコード、不採用分は id と分類の要約のみ。記録量は明示採用件数に比例する
 - 受理・解釈は入力サイズ n に対する単一の線形走査（O(n)）である
 
-### `src/themes.ts` — テーマ一覧の導出（未決引継ぎ・旧新解決・一覧導出の機械的部分）
+### `src/themes.ts` — テーマ一覧の導出（未決引継ぎ・旧新解決・一覧導出・採用状態照合の機械的部分）
 
 ```
-bun src/themes.ts --themes-file <themes.md> [--pending-file <pending.md>] [--resolve-old <THEME-NNN>]
+bun src/themes.ts --themes-file <themes.md> [--pending-file <pending.md>] [--resolve-old <THEME-NNN>] [--assess-adoption true]
 ```
 
 - テーマ一覧はテーマ正本（themes.md）のセクションから導出する。恒久一覧を作らない
 - `--pending-file` で未決の連携参照（関連テーマ、carried 状態の未決）を併せて出力する
 - `--resolve-old` で旧テーマ識別の後継チェーンを解決する。`resolved`（現行 active に到達）/ `terminal`（後継なし）/ `unknown`（未知識別）/ `cycle`（循環。解決せず報告）を区別する
+- `--assess-adoption true` でテーマ内の採用主張（`- 採用根拠:` フィールド）の分類を出力する。利用者の明示判断・正規決定参照は照合前の採用主張（`adopted-claim-unverified`）、根拠不足は確認不足または候補（`candidate`）、採用主張なしは通常の参考テーマ（`reference-only`）として区別する。機械解析は採用の意味的な認定を行わない。不整合検出・反映状態の導出は `lib/sections.ts` の `assessAdoptionInconsistency` / `assessAdoptionReflection` が担う（正規成果物側の状態は呼出側が判定して渡す）
 - テーマ識別・未決識別の重複は非ゼロ終了で拒否する（silent skip しない）
 
 ### `src/received.ts` — 受領済み知見の照会（別セッション再取得の機械的部分）
