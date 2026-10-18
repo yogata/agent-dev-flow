@@ -2,7 +2,7 @@
 title: case-ready Design
 status: accepted
 created: 2026-09-14
-updated: "2026-10-16"
+updated: "2026-10-18"
 ---
 
 <!-- ADF-COVERS(design): REQ-021-024 -->
