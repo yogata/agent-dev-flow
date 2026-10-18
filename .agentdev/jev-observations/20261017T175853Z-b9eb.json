@@ -1,0 +1,226 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261017T175853Z-b9eb",
+  "workflow": "req-define",
+  "evaluationKind": "step3-existing-req-matching",
+  "subject": "RU-0230〜0235 の既存REQ照合操作分類",
+  "sourceRevision": "d07a3641a5128f1419ac71d65b30c7d7219510df",
+  "durationMs": 1163,
+  "inputTokens": 3129,
+  "inputs": {
+    "requestDigest": "01d12b942786589469ee2d6a31e465a49b4c18b614a4a73cb80435bfca8e5e79",
+    "references": [
+      {
+        "label": "RU-0230",
+        "path": ".agentdev/backlog/req-units/RU-0230.md",
+        "digest": "60e27dfec4ab83b278edf2ebd97d8212dc9d614dea5730f66da6ed05c73732fd"
+      },
+      {
+        "label": "RU-0231",
+        "path": ".agentdev/backlog/req-units/RU-0231.md",
+        "digest": "8cbf6213a826354ff6f1787e99378688b7a52f7884c7297b4a97df649b357a90"
+      },
+      {
+        "label": "RU-0232",
+        "path": ".agentdev/backlog/req-units/RU-0232.md",
+        "digest": "2c704cd9cf84731d3b526d15e38dbae474c7f46d59311ba91da3589fb5ab44a7"
+      },
+      {
+        "label": "RU-0233",
+        "path": ".agentdev/backlog/req-units/RU-0233.md",
+        "digest": "cd8d016c02ee33c6efb664a340b7397702f0fc423d5beb72483b5f263d26adfc"
+      },
+      {
+        "label": "RU-0234",
+        "path": ".agentdev/backlog/req-units/RU-0234.md",
+        "digest": "8fdbf103b692498f98b2f97c88c0c4326ea87f69d34a3bf132959ea5bf30280d"
+      },
+      {
+        "label": "RU-0235",
+        "path": ".agentdev/backlog/req-units/RU-0235.md",
+        "digest": "045c6d6d1e40650558b747fef1f9a4b28023deeeb73c2ab03858d166a9a48299"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "ru0230-operation",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0.10000000000000002,
+        "APPEND": 0.7600000000000001,
+        "UPDATE": 0.060000000000000005,
+        "REQ操作なし": 0.08000000000000002
+      }
+    },
+    {
+      "questionId": "ru0230-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.32,
+        "false": 0.6799999999999999
+      }
+    },
+    {
+      "questionId": "ru0231-operation",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0.32,
+        "APPEND": 0.32,
+        "UPDATE": 0.02,
+        "REQ操作なし": 0.34
+      }
+    },
+    {
+      "questionId": "ru0231-confirm",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.52,
+        "false": 0.48
+      }
+    },
+    {
+      "questionId": "ru0232-operation",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0.01,
+        "APPEND": 0.46,
+        "UPDATE": 0.53,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "ru0232-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.39,
+        "false": 0.61
+      }
+    },
+    {
+      "questionId": "ru0233-operation",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0.03,
+        "UPDATE": 0.42,
+        "REQ操作なし": 0.55
+      }
+    },
+    {
+      "questionId": "ru0233-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.29,
+        "false": 0.71
+      }
+    },
+    {
+      "questionId": "ru0234-operation",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.02,
+        "REQ操作なし": 0.98
+      }
+    },
+    {
+      "questionId": "ru0234-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.16,
+        "false": 0.84
+      }
+    },
+    {
+      "questionId": "ru0235-operation",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1
+      }
+    },
+    {
+      "questionId": "ru0235-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.15,
+        "false": 0.85
+      }
+    }
+  ],
+  "confidence": 0.68,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "ru0230-operation",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "ru0230-confirm",
+        "value": false
+      },
+      {
+        "questionId": "ru0231-operation",
+        "value": "APPEND",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "ru0231-confirm",
+        "value": false,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "ru0232-operation",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "ru0232-confirm",
+        "value": false
+      },
+      {
+        "questionId": "ru0233-operation",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "ru0233-confirm",
+        "value": false
+      },
+      {
+        "questionId": "ru0234-operation",
+        "value": "UPDATE",
+        "differenceReason": "evaluation_input_defect"
+      },
+      {
+        "questionId": "ru0234-confirm",
+        "value": false
+      },
+      {
+        "questionId": "ru0235-operation",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "ru0235-confirm",
+        "value": false
+      }
+    ]
+  }
+}

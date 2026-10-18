@@ -1,0 +1,211 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261017T180329Z-4a5e",
+  "workflow": "req-define",
+  "evaluationKind": "step4-final-classification-design-separation",
+  "subject": "RU-0230〜0235 の最終分類（REQ行/Design行）と Design 分離要否",
+  "sourceRevision": "d07a3641a5128f1419ac71d65b30c7d7219510df",
+  "durationMs": 929,
+  "inputTokens": 2768,
+  "inputs": {
+    "requestDigest": "5db22c145db55ef3965e3693511f9641f8961c0bd47abad238878581e629626f",
+    "references": [
+      {
+        "digest": "60e27dfec4ab83b278edf2ebd97d8212dc9d614dea5730f66da6ed05c73732fd",
+        "label": "RU-0230",
+        "path": ".agentdev/backlog/req-units/RU-0230.md"
+      },
+      {
+        "digest": "8cbf6213a826354ff6f1787e99378688b7a52f7884c7297b4a97df649b357a90",
+        "label": "RU-0231",
+        "path": ".agentdev/backlog/req-units/RU-0231.md"
+      },
+      {
+        "digest": "2c704cd9cf84731d3b526d15e38dbae474c7f46d59311ba91da3589fb5ab44a7",
+        "label": "RU-0232",
+        "path": ".agentdev/backlog/req-units/RU-0232.md"
+      },
+      {
+        "digest": "cd8d016c02ee33c6efb664a340b7397702f0fc423d5beb72483b5f263d26adfc",
+        "label": "RU-0233",
+        "path": ".agentdev/backlog/req-units/RU-0233.md"
+      },
+      {
+        "digest": "8fdbf103b692498f98b2f97c88c0c4326ea87f69d34a3bf132959ea5bf30280d",
+        "label": "RU-0234",
+        "path": ".agentdev/backlog/req-units/RU-0234.md"
+      },
+      {
+        "digest": "045c6d6d1e40650558b747fef1f9a4b28023deeeb73c2ab03858d166a9a48299",
+        "label": "RU-0235",
+        "path": ".agentdev/backlog/req-units/RU-0235.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "ru0230-classification",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 1,
+        "Design行": 0
+      }
+    },
+    {
+      "questionId": "ru0230-separation",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.83,
+        "false": 0.17000000000000004
+      }
+    },
+    {
+      "questionId": "ru0231-classification",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.95,
+        "Design行": 0.05
+      }
+    },
+    {
+      "questionId": "ru0231-separation",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.82,
+        "false": 0.18000000000000005
+      }
+    },
+    {
+      "questionId": "ru0232-classification",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.56,
+        "Design行": 0.44
+      }
+    },
+    {
+      "questionId": "ru0232-separation",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.91,
+        "false": 0.08999999999999997
+      }
+    },
+    {
+      "questionId": "ru0233-classification",
+      "questionForm": "choice",
+      "value": "Design行",
+      "probabilityDistribution": {
+        "REQ行": 0.01,
+        "Design行": 0.99
+      }
+    },
+    {
+      "questionId": "ru0233-separation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.1,
+        "false": 0.9
+      }
+    },
+    {
+      "questionId": "ru0234-classification",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.84,
+        "Design行": 0.16
+      }
+    },
+    {
+      "questionId": "ru0234-separation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.04,
+        "false": 0.96
+      }
+    },
+    {
+      "questionId": "ru0235-classification",
+      "questionForm": "choice",
+      "value": "Design行",
+      "probabilityDistribution": {
+        "REQ行": 0,
+        "Design行": 1
+      }
+    },
+    {
+      "questionId": "ru0235-separation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.05,
+        "false": 0.95
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "ru0230-classification",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "ru0230-separation",
+        "value": true
+      },
+      {
+        "questionId": "ru0231-classification",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "ru0231-separation",
+        "value": true
+      },
+      {
+        "questionId": "ru0232-classification",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "ru0232-separation",
+        "value": true
+      },
+      {
+        "questionId": "ru0233-classification",
+        "value": "Design行"
+      },
+      {
+        "questionId": "ru0233-separation",
+        "value": false
+      },
+      {
+        "questionId": "ru0234-classification",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "ru0234-separation",
+        "value": false
+      },
+      {
+        "questionId": "ru0235-classification",
+        "value": "Design行"
+      },
+      {
+        "questionId": "ru0235-separation",
+        "value": false
+      }
+    ]
+  }
+}
