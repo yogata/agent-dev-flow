@@ -31,6 +31,8 @@ implementation:
     - REQ-111-006
     - REQ-111-009
     - REQ-111-010
+    - REQ-111-017
+    - REQ-111-018
   src/common/skills/agentdev-workflow-req-define/references/draft-generation.md:
     - REQ-008-061
   src/common/skills/agentdev-workflow-req-define/references/requirement-development.md:
@@ -64,6 +66,8 @@ verification:
     - REQ-111-006
     - REQ-111-009
     - REQ-111-010
+    - REQ-111-017
+    - REQ-111-018
   src/common/commands/agentdev/req-define.md:
     - REQ-111-009
     - REQ-111-010

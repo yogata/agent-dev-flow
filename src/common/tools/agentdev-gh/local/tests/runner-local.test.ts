@@ -1,5 +1,6 @@
 // ADF-COVERS(verification): REQ-011-024, REQ-011-025, REQ-011-026, REQ-011-027, REQ-011-030
 // ADF-COVERS(verification): REQ-009-015, REQ-099-008, REQ-099-009
+// ADF-COVERS(verification): REQ-111-017, REQ-111-018
 // Local 実装（LocalRunner）のテスト。
 //
 // 一時ディレクトリでローカルIssue（.agentdev/issues/issue-{NNNN}.md）の読み書きを

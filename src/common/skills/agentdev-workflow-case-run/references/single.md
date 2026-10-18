@@ -57,6 +57,7 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 ### Resume-Idempotency
 
 - 再実行時は同じ durable state（Issue 本文、worktree・PR の存在）から同一のモード分岐・フェーズ判定に到達する。判定に副作用を持たない
+- 採用・未決・試作の状態は、再開時に実際の正規情報（Issue 本文、Issue コメント SSoT、PR 本文、正規成果物）と有効な判断から再構成する。未決事項を無断で解決済みにせず、試作を正式採用へ変化させず、実施済みの独立作業を不当に重複実行せず完了扱いを消失させない（中断・再開時の採用・未決・試作状態維持の要件）
 
 ## STEP-S2: Issue 抽出・確認・判定
 
@@ -79,6 +80,7 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 
 - Issue本文から要件docと受け入れ基準を抽出する（べき等性: worktree とブランチが既に存在する場合、STEP-S3 の作成処理をスキップする）。`agentdev-req-analysis` のチェックボックス品質基準で検証する
 - 関連Decision特定: `docs/decisions/README.md` を読み込み、関連Decisionがあれば個別に読み込み、実装がDecisionの決定事項に矛盾しないことを確認する
+- **実装開始境界の判断照合**: 実装に必要な確定事項（execution contract、関連Decision、確定済み Design）、未決事項（Issue 本文・draft の未解決質問、保留された判断）、採用判断（Issue 本文の Execution Contract セクションに投影された実現面の変更方針〔realization_actions 由来の既確定契約〕、採用済み所見・外部検討の受理記録）を正規情報から照合する。同じ有効な判断・依存条件に基づいて実行を進められる部分と保留すべき部分（未決に依存する部分）を区別し、保留部分を無断で解決しない。工程駆動で形成・反映済みの正規成果物と変更駆動で確定した要件docのいずれの入力でも同一の照合を行い、工程駆動の操作・遷移を前置必須とせず、Issue を全作業へ一律に要求しない。GitHub 版・Local 版のいずれの I/O 経路でも Custom Tool `agentdev_gh` の同一操作契約（issue_read、comment_list、pr_read）で照合対象を読み取るため、同一の要求が成立する。照合結果（継続部分・保留部分の区別）は STEP-S4 の委譲へ引き渡す
 - work_type 判定: `agentdev-workflow-lifecycle` に従い bugfix/feature/maintenance/docs_chore を判定する（scale は全 work_type に standard/large を設定可、workflow_route は Definition 構成から都度導出し保存しない）
 - **作業起点・PR base**: worktree の作成元と PR の base は main を参照する
 - **工程間構造化文脈の初期文脈利用**: 前工程（case-open、case-auto 等）から構造化文脈が引き継がれている場合、前工程で確定した事項を初期文脈として利用し、同じ情報をゼロから探索、再構築することを原則としない。独立検証、鮮度確認、矛盾検出、正規成果物との整合確認を目的とする再確認は維持する。手動起動等で構造化文脈が引き継がれていない場合は、durable state（Issue 本文、要件doc、REQ/Decision/Design）から入力解決を行う（形式と制約は `agentdev-workflow-lifecycle` スキルの工程間構造化文脈引き継ぎ参照）
@@ -92,7 +94,7 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 
 ### Result
 
-- 要件doc・受け入れ基準抽出済み、関連Decision確認済み、work_type metadata 整合確認済み、execution contract 消費境界適用済み
+- 要件doc・受け入れ基準抽出済み、関連Decision確認済み、確定事項・未決事項・採用判断の照合済み（実行進行部分・保留部分の区別）、work_type metadata 整合確認済み、execution contract 消費境界適用済み
 
 ### Evidence
 
