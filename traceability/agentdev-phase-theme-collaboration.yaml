@@ -13,6 +13,12 @@ implementation:
   - REQ-110-007
   - REQ-110-009
   - REQ-110-015
+  - REQ-110-027
+  src/common/skills/agentdev-phase-theme-collaboration/scripts/lib/received-record.ts:
+  - REQ-110-026
+  - REQ-110-027
+  - REQ-110-028
+  - REQ-110-029
   src/common/skills/agentdev-phase-theme-collaboration/scripts/lib/handoff.ts:
   - REQ-110-006
   src/common/skills/agentdev-phase-theme-collaboration/scripts/lib/sections.ts:
@@ -26,6 +32,8 @@ verification:
   - REQ-110-007
   - REQ-110-009
   - REQ-110-015
+  - REQ-110-026
+  - REQ-110-027
   src/common/skills/agentdev-phase-theme-collaboration/scripts/tests/handoff.test.ts:
   - REQ-110-006
   src/common/skills/agentdev-phase-theme-collaboration/scripts/tests/sections.test.ts:
@@ -34,6 +42,8 @@ verification:
   - REQ-110-014
   src/common/skills/agentdev-phase-theme-collaboration/scripts/tests/received.test.ts:
   - REQ-110-013
+  - REQ-110-028
+  - REQ-110-029
 links:
   upstream:
     src/common/skills/agentdev-phase-theme-collaboration/SKILL.md:

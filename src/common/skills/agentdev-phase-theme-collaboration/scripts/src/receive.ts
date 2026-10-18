@@ -2,10 +2,13 @@
  * CLI: 外部AIの戻り入力の受理・採否記録生成（O(n) 線形走査、fail-closed）。
  *
  * bun src/receive.ts --input <path | -> [--adopt <id|title>]... [--prior <path>] [--prior-label <label>]
+ *                    [--provenance <kind | <id|title>=<kind>>]...
  *
  * - --input `-` で stdin（貼付経路）、パスでファイル経路。両経路は同一正規化で同一 JSON
  * - --adopt は利用者の明示採用指示（repeatable）。指定なしだと全エントリ不採用
  * - --prior は既存受領記録 JSON（再投入時の重複検出）
+ * - --provenance は受領内容の由来（repeatable。`<kind>` で全体既定、
+ *   `<id|title>=<kind>` で個別指定。採用根拠とは別記録であり由来だけで採用済みと扱わない）
  * - 明示採用指示に該当エントリがない場合は非ゼロ終了（fail-closed）
  */
 import { readFile } from "node:fs/promises";
@@ -27,18 +30,25 @@ async function readInputText(flag: string): Promise<string> {
   return await readFile(flag, "utf8");
 }
 
-const args = parseArgs(process.argv.slice(2), ["adopt"]);
+const args = parseArgs(process.argv.slice(2), ["adopt", "provenance"]);
 const inputFlag = requireFlag(args, "input");
 const adoptIds = args.repeatFlags.get("adopt") ?? [];
 const priorPath = args.flags.get("prior") ?? null;
 const priorLabel = args.flags.get("prior-label") ?? null;
+const provenanceSpecs = args.repeatFlags.get("provenance") ?? [];
 
 try {
   const rawText = await readInputText(inputFlag);
   const prior = priorPath !== null
     ? loadPriorRecord(JSON.parse(await readFile(priorPath, "utf8")))
     : null;
-  const result = receiveReturnInput(rawText, adoptIds, prior, priorLabel ?? (priorPath !== null ? priorPath : null));
+  const result = receiveReturnInput(
+    rawText,
+    adoptIds,
+    prior,
+    priorLabel ?? (priorPath !== null ? priorPath : null),
+    provenanceSpecs,
+  );
   printJson(result);
 } catch (error) {
   fail(`戻り入力の受理に失敗した: ${error instanceof Error ? error.message : String(error)}`);

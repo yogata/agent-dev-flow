@@ -10,6 +10,38 @@ export type Disposition =
   | "rejected-invalid"
   | "detected-duplicate";
 
+/**
+ * 受領内容の由来。採用根拠ではなく記録上の区分である:
+ * - "user-provided": 利用者の明示した内容
+ * - "delegated-derivation": 委任された範囲から導出された内容
+ * - "evaluator-finding": 評価者の所見
+ * 由来の種別だけで採用済みと扱わない（採用済みの判定は adoptionBasis のみから導出する）。
+ */
+export type ProvenanceKind =
+  | "user-provided"
+  | "delegated-derivation"
+  | "evaluator-finding";
+
+/**
+ * 正式な採用の根拠。既存の正規契約が認める根拠に限定する:
+ * - "user-explicit": 利用者の明示判断
+ * - "decision": 有効な正規決定
+ * 委任導出や評価所見という由来は採用根拠の値域に含めない。
+ */
+export type AdoptionBasisKind = "user-explicit" | "decision";
+
+export function isProvenanceKind(value: unknown): value is ProvenanceKind {
+  return (
+    value === "user-provided" ||
+    value === "delegated-derivation" ||
+    value === "evaluator-finding"
+  );
+}
+
+export function isAdoptionBasisKind(value: unknown): value is AdoptionBasisKind {
+  return value === "user-explicit" || value === "decision";
+}
+
 export interface ReceiveEntry {
   readonly id: string;
   readonly title: string;
@@ -20,6 +52,21 @@ export interface ReceiveEntry {
   readonly selfReportDetected: boolean;
   /** rejected-invalid / detected-duplicate の理由。 */
   readonly reason: string | null;
+  /**
+   * 正規化本文の固定長ハッシュ。エントリ本文を複写せず内容同一性の判定のみに使う。
+   * 旧様式の記録では欠落し null になる。
+   */
+  readonly bodyDigest: string | null;
+  /**
+   * prior 照合で同識別子・同表題かつ本文が相違したことを明示する。
+   * true のエントリは同一内容と断定して除外せず、新たな受理・採否の対象として扱う。
+   */
+  readonly updatedFromPrior: boolean;
+  /**
+   * 受領内容の由来。採用根拠とは別フィールドで記録し、
+   * 由来だけで採用済みと扱わない。未指定の従来入力では null。
+   */
+  readonly provenance: ProvenanceKind | null;
 }
 
 export interface ReceiveCounts {
@@ -91,6 +138,22 @@ export function parseReceiveResult(value: unknown): ReceiveResult {
     if (reason !== null && typeof reason !== "string") {
       throw new Error(`entries[${index}].reason が不正`);
     }
+    const bodyDigest = entry["bodyDigest"];
+    if (
+      bodyDigest !== null &&
+      bodyDigest !== undefined &&
+      (typeof bodyDigest !== "string" || !/^[0-9a-f]{64}$/.test(bodyDigest))
+    ) {
+      throw new Error(`entries[${index}].bodyDigest が不正: ${String(bodyDigest)}`);
+    }
+    const updatedFromPrior = entry["updatedFromPrior"] ?? false;
+    if (typeof updatedFromPrior !== "boolean") {
+      throw new Error(`entries[${index}].updatedFromPrior が不正`);
+    }
+    const provenance = entry["provenance"] ?? null;
+    if (provenance !== null && !isProvenanceKind(provenance)) {
+      throw new Error(`entries[${index}].provenance が不正: ${String(provenance)}`);
+    }
     return {
       id: entry["id"],
       title: entry["title"],
@@ -98,6 +161,9 @@ export function parseReceiveResult(value: unknown): ReceiveResult {
       basis,
       selfReportDetected,
       reason,
+      bodyDigest: typeof bodyDigest === "string" ? bodyDigest : null,
+      updatedFromPrior,
+      provenance,
     };
   });
   return {
@@ -146,6 +212,16 @@ export interface ReceivedRecordMeta {
   readonly purpose: string;
   readonly question: string | null;
   readonly references: readonly string[];
+  /**
+   * 受領内容の由来。採用根拠とは別フィールド。
+   * 旧様式の記録では欠落し null になる（後方互換）。
+   */
+  readonly provenance: ProvenanceKind | null;
+  /**
+   * 正式な採用の根拠。採用済み判定はこのフィールドのみから導出し、
+   * provenance を根拠にしない。旧様式・未採用の記録では null。
+   */
+  readonly adoptionBasis: AdoptionBasisKind | null;
 }
 
 /**
@@ -171,11 +247,21 @@ export function parseReceivedRecordMeta(value: unknown, file: string): ReceivedR
   if (references !== undefined && !Array.isArray(references)) {
     throw new Error(`${file}: 受領記録の references が配列でない`);
   }
+  const provenance = record["provenance"] ?? null;
+  if (provenance !== null && !isProvenanceKind(provenance)) {
+    throw new Error(`${file}: 受領記録の provenance が不正: ${String(provenance)}`);
+  }
+  const adoptionBasis = record["adoptionBasis"] ?? null;
+  if (adoptionBasis !== null && !isAdoptionBasisKind(adoptionBasis)) {
+    throw new Error(`${file}: 受領記録の adoptionBasis が不正: ${String(adoptionBasis)}`);
+  }
   return {
     receivedAt: record["receivedAt"],
     theme: record["theme"],
     purpose: record["purpose"],
     question: typeof question === "string" ? question : null,
     references: Array.isArray(references) ? references.filter((r): r is string => typeof r === "string") : [],
+    provenance,
+    adoptionBasis,
   };
 }
