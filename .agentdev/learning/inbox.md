@@ -228,3 +228,51 @@
 - **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md（DefinitionEdit 組立の実運用例追記）、req-define の draft-data 契約 reference
 - **関連**: Issue #3803、PR #3804、Root Case #3803
 - **タグ**: `#DefinitionEdit` `#行構造事前確認` `#case-open`
+
+## case-run scripts 配下には package 単位の型検査基盤が存在せず新規 .ts の typecheck が定型化されていない
+
+- **問題事象**: src/common/skills/agentdev-workflow-case-run/scripts/ 配下には tsconfig.json と package.json が存在せず、package 単位 typecheck（bun run typecheck）が適用されない。新規 .ts の検証は bun test 実行と bun build --target=bun --no-bundle トランスパイルで実施した（bunx tsc は環境に typescript 未解決のため不可）
+- **発生局面**: case-run 委譲内の実装品質検証（PR #3809、PR #3812 の新規 anchor 型テスト追加時）
+- **検知方法**: typecheck 実行可否の確認（既存テスト record-comments.test.ts、process-conformance.test.ts と同一立地・同一水準であることを確認）
+- **根本原因**: 当該配下のテストは package 構成外で運用されており、型検査を必要とする .ts を追加する場合の検証手段が定型化されていない（本変更で導入した欠陥ではなく既存の領域特性）
+- **自律対応内容**: bun test 実行（終了コード 0）と bun build トランスパイル通過で検証し、領域の現行検査水準として PR 本文の検証差分へ記録した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: package 構成外の scripts 領域へ型検査を必要とする .ts を追加する場合の検証手段（bun test + トランスパイル、または tsconfig 追加）を定型化すると検証記録の粒度が揃う
+- **再発条件**: agentdev-workflow-case-run/scripts/ 配下へ新規 .ts を追加する委譲の場合
+- **予防策候補**: 当該配下への tsconfig 導入または検証手段の定型記載の追加
+- **想定反映先**: src/common/skills/agentdev-workflow-case-run/scripts/（tsconfig 追加の検討）、agentdev-quality-gates（型検査水準の記載）
+- **関連**: PR #3809 Findings、PR #3812 検証差分 #6、Issue #3803
+- **タグ**: `#typecheck` `#case-run` `#検証手段`
+
+## bun test 全件実行で textlint 並列系のみタイミング起因のフレークが観測され再実行で 0 fail になる
+
+- **問題事象**: textlint vendor 生成後の bun test 全件実行で 1 回のみ 4 fail（textlint 並列系のタイミング起因）を観測した。再実行で 0 fail となり、本変更と無関係の環境タイミング起因と判断した
+- **発生局面**: case-run 委譲内の bun test 全件検証（PR #3811 検証差分 #11）
+- **検知方法**: bun test 全件実行の fail 検出と再実行での消失
+- **根本原因**: textlint 並列系テストのタイミング依存（推測。断定せず記録）
+- **自律対応内容**: 再実行で 0 fail を確認し、フレーク分を本変更と無関係の環境タイミング起因として検証差分へ記録した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: bun test 全件の fail はまず再実行で再現性を確認し、タイミング起因と不具合を区別してから対応を決める
+- **再発条件**: bun test 全件（textlint vendor 生成後）を CI 相当の1回実行で判定する場合
+- **予防策候補**: textlint 並列系テストの同期化または再実行手順の恒常化、フレーク分類基準（タイミング起因と不具合の区別）の整備
+- **想定反映先**: src/opencode/plugins/agentdev-textlint-guard/（並列系テストの安定化検討）、agentdev-learning-pipeline（フレーク分類基準）
+- **関連**: PR #3811 Findings 第2項、Issue #3803
+- **タグ**: `#bun test` `#フレーク` `#textlint`
+
+## REQ 採用根拠照合の正規利用経路検証は恒常的 anchor 型テストと一回限りの実操作証跡の二層運用で機能する
+
+- **問題事象・学び**: TS-010 の反例投入スクリプト（LocalRunner 駆動の正規利用経路実操作検証）は試験用一時ディレクトリとともに検証後削除した。実操作検証は一回限りの証跡（PR 本文の検証差分セクションへ記録）であり、恒常性は anchor 型構造照合テスト（adoption-basis-verification-anchors.test.ts、採用根拠照合条文の存在照合）が担う二層構造で機能することを確認した
+- **発生局面**: case-run 委譲内の Epic 横断義務 RA-005 実行（PR #3812 検証差分 #5、#14）
+- **検知方法**: 恒常検証手段（新規テスト 6 test）と実操作検証（17/17 PASS）の結果整合
+- **根本原因**: なし（運用設計どおりの確認。実装の誤りではない）
+- **自律対応内容**: 恒常検証手段を sidecar verification 宣言へ登録し、REQ-110.md の TS-010 行へ具体試験名を記録した。実操作検証スクリプトは破棄運用どおり削除し、証跡は PR 本文へ残した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（REQ-110-033 の検証手段としての二層運用の確認）
+- **横展開観点**: 正規利用経路の実操作検証を要件とする REQ 行では、一回限りの実操作証跡（PR 本文）と恒常的な構造照合テスト（tests 配下）の二層を検証手段として宣言すると、merge 後も要求の検証可能性が維持される
+- **再発条件**: 実操作検証を要件とする REQ 行の新規整備・更新の場合
+- **予防策候補**: なし（現行運用で機能）
+- **想定反映先**: REQ-110（TS-010 行。具体化済み）、agentdev-traceability（verification 宣言の二層記載例）
+- **関連**: PR #3812 learning、Issue #3803
+- **タグ**: `#検証二層運用` `#anchor型テスト` `#REQ-110-033`
