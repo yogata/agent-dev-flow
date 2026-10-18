@@ -4,16 +4,28 @@ implementation:
     - REQ-111-001
     - REQ-111-011
     - REQ-110-010
+    - REQ-111-014
+    - REQ-111-015
+    - REQ-111-016
   src/common/commands/agentdev/phase-review.md:
     - REQ-111-001
     - REQ-111-011
     - REQ-110-010
+    - REQ-111-014
+    - REQ-111-015
+    - REQ-111-016
 verification:
   src/common/skills/agentdev-workflow-phase-review/SKILL.md:
     - REQ-111-001
     - REQ-111-011
     - REQ-110-010
+    - REQ-111-014
+    - REQ-111-015
+    - REQ-111-016
   src/common/commands/agentdev/phase-review.md:
     - REQ-111-001
     - REQ-111-011
     - REQ-110-010
+    - REQ-111-014
+    - REQ-111-015
+    - REQ-111-016
