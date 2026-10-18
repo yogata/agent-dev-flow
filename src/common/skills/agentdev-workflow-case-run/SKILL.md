@@ -53,7 +53,7 @@ Epic Issue 入力時も case-run 自身の Wave 構成の読み取り、現在 W
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
 | STEP-S1 | フェーズ判定・再開ポイント検出 | case-run 起動（Issue番号受領） | 単一 Issue 実行モード確定、再開フェーズ判定、引き継ぎ停止判定 | [references/single.md](references/single.md) |
-| STEP-S2 | Issue 抽出・確認・判定 | 実行モード確定（single） | 要件doc・受け入れ基準抽出、関連Decision 確認、work_type metadata 整合確認、execution contract 消費境界適用 | [references/single.md](references/single.md) |
+| STEP-S2 | Issue 抽出・確認・判定 | 実行モード確定（single） | 要件doc・受け入れ基準抽出、関連Decision 確認、work_type metadata 整合確認、execution contract 消費境界適用、採用根拠照合（依拠する正規成果物の採用根拠を既存の採用基準へ照合） | [references/single.md](references/single.md) |
 | STEP-S3 | Worktree 作成・ブランチ準備・前置 gate 群 | Issue 判定完了 | worktree+ブランチ作成（べき等）、前置 gate 群（precondition / staleness / targeted docs / 配布依存境界 事前 gate / AUTOGEN 索引再生成）合格、L2 計測 | [references/single.md](references/single.md) |
 | STEP-S4 | 実行担当サブエージェント委譲 | STEP-S3 合格（worktree 内検証済み） | 委譲起動、L2 計測、adapter 委譲内 adversarial-review、並列兄弟 branch 実差分交差確認（commit・push 前置） | [references/delegation-and-result.md](references/delegation-and-result.md)（交差確認手順は references/single.md） |
 | STEP-S5 | result 処理・配布依存境界 最終 gate | 委譲 result 受領 | 委譲応答の3点ゲート（4状態 result・commit hash・PR URL 必須検査）、result 4状態処理、配布依存境界 最終 gate 判定、L2 受け渡し | [references/delegation-and-result.md](references/delegation-and-result.md) |

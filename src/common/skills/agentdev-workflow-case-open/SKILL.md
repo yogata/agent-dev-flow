@@ -89,6 +89,7 @@ case-open は、上流工程（req-define）で確定した対象要件を実行
 
 - **内蔵ツール使用規律**: ファイル検索・内容検索・ディレクトリ列挙は実行基盤の内蔵ツール（ファイル検索、内容検索、読み取り）を使用し、bash 内蔵コマンド（grep、ls 等）を標準手順としない。bash 実行が本来必要な処理（script 呼び出し、git 操作等）は本規律の対象外とする（workflow-skill-model Design「workflow skill 本文における内蔵ツール使用規律」節）
 - **draft-data 入力**: 本スキルは構造化 `draft-data` を入力として読み取る。機能要件、非機能要件、制約、対象外、受け入れ条件は新規に作成せず合意済み入力を反映する。`conflict_resolutions` に記録済みの衝突は再確認しない
+- **実行対象構成の採用根拠照合**: 実行対象構成（`operation_units`、`artifact_actions`、`realization_actions` から導出する Root Case・Definition Package・Case 構成）を確定する際も、正式な採用の根拠を、利用者の明示判断または有効な正規決定という既存の採用基準に照合して扱う。作業の継続指示、エージェントによる提案や具体化の存在、形式的に受理された採用指定を、利用者に留保された仕様判断の採用根拠として扱わない。明示採用された範囲を超えて関連する別候補や未決の設計事項を一括して確定せず、採用対象・内容・範囲が一意に解決できない部分は Root Case・Definition Package の確定対象から保留し、確認対象として報告する。根拠照合の不足による保留は、既存の停止終了経路（要件が曖昧で Root Case を確立できない場合）および req-define への差し戻し経路に接続する
 - **Definition Package の非本文化**: Definition Package を独立した Issue 本文物項目として生成しない（Issue Execution Contract REQ「Definition Package を独立した Issue 本文物項目として生成しない」条項。case-open 実行契約 REQ）。Root Case への関連付けと所在は canonical 成果物関係（設計PR、case-ready の canonical 再取得経路）から相関する
 - **Root Case 状態**: Root Case 確立後の状態は open とし、実装開始を許可しない。ready への遷移は case-ready が実行する
 - **設計PR**: canonical Definition に実変更がある場合のみ、Case 単位で 1 件の設計PRを作成する。実変更判定不能時は作成せず停止する。冪等キーは case-open / case-ready Design に従う
