@@ -17,6 +17,7 @@ implementation:
     - REQ-009-015
     - REQ-009-016
     - REQ-009-020
+    - REQ-111-017
   src/common/guards/gh-write/gh-command-detector.ts:
     - REQ-099-013
     - REQ-099-014
