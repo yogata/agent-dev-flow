@@ -61,6 +61,8 @@ verification:
     - REQ-101-016
   src/common/skills/agentdev-workflow-case-run/scripts/tests/open-dependency-and-proto-application.test.ts:
     - REQ-108-013
+  src/common/skills/agentdev-workflow-case-run/scripts/tests/adoption-basis-verification-anchors.test.ts:
+    - REQ-110-033
   src/common/skills/agentdev-workflow-case-run/references/delegation-and-result.md:
     - REQ-060-007
     - REQ-061-034
