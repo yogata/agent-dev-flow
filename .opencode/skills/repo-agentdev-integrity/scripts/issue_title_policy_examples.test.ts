@@ -29,12 +29,13 @@ const REPO_ROOT = findRepoRoot(SCRIPT_DIR);
 const DESIGN_PATH = path.join(REPO_ROOT, "docs", "designs", "workflows", "issue-title-policy.md");
 const REQ_PATH = path.join(REPO_ROOT, "docs", "requirements", "REQ-100.md");
 
-// 判定表の 4 役割書式。形式の正は Design「役割別書式（判定表）」節（REQ-100 は必須条件を所有）。
-// Task: は廃止（子 Issue は [Epic #<親番号>] Wave-N: 主題 に統一）。
+// 判定表の役割書式（4 役割 + Case 直下子 Issue）。形式の正は Design「役割別書式（判定表）」節（REQ-100 は必須条件を所有）。
+// Task: は廃止（子 Issue は Epic 配下は [Epic #<親番号>] Wave-N: 主題、Case 直下は [Case #<親番号>] 主題）。
 const ROLE_PATTERNS: Array<{ role: string; pattern: RegExp }> = [
   { role: "Case", pattern: /^Case: .+/ },
   { role: "Epic", pattern: /^Epic: .+/ },
   { role: "Wave-N", pattern: /^\[Epic #\d+\] Wave-\d+: .+/ },
+  { role: "Case-child", pattern: /^\[Case #\d+\] .+/ },
   { role: "Tracking", pattern: /^Tracking: .+/ },
 ];
 
