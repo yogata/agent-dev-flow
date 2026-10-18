@@ -21,3 +21,34 @@
 - **想定反映先**: issue-operation-recovery.md の劣化サイクル節への定量観測値の追記、agentdev-workflow-case-open references の GitHub I/O 失敗時手順への疎通確認前置の検討
 - **関連**: src/common/skills/agentdev-issue-management/references/issue-operation-recovery.md、docs/designs/responsibilities/custom-tool-contracts.md、.agentdev/tmp/rootcase-payload-phase-route-reliability-202610.json、.agentdev/backlog-auto/end-to-end/（E2E 前例記録）
 - **タグ**:    
+## issue_create の labels 空配列では role に応じた物理ラベルが付与されず issue_list の labels フィルタで検出できない
+
+- **問題事象**: case-open STEP-2 の Root Case 起票（issue_create、labels: []、role: case）後、issue_list（state: open、labels: [adf-case]）で当該 Issue が検出されなかった。issue_read の読み戻しで labels は空配列のままだった
+- **発生局面**: 運用（case-open STEP-2 起票後の冪等検出・横断依存検査の未クローズ Case 群取得時）
+- **検知方法**: labels フィルタ付き issue_list が空を返し、issue_read の読み戻しで labels 空を確認
+- **根本原因**: labels: [] は Tool 契約上の必須フィールド（空配列以上）であり、起票時の既定付与は設けない契約。物理ラベル（adf-case 等）の付与は呼出側が検索・整理用ラベルとして任意選択する必要があり、空配列起票では labels 検索経路が失われる
+- **自律対応内容**: labels フィルタを外した state: open の issue_list で全 open Issue を取得し、タイトル書式（Case: 接頭辞）で Root Case 役割を特定して回避した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（検索・整理用ラベルの任意付与契約の範囲内。運用側の選択改善）
+- **横展開観点**: Root Case・追跡Issue の起票時に検索・整理用ラベルを付与すると後続工程の検出が安定する
+- **再発条件**: labels: [] で起票した後、labels フィルタ付き issue_list で冪等検出・Case 群取得を行う場合
+- **予防策候補**: case-open STEP-2 の起票で検索・整理用ラベルの付与を既定化する検討、issue-operation-safety.md への起票ラベル指針追記
+- **想定反映先**: agentdev-workflow-case-open references/root-case-and-definition-package.md 手順6、agentdev-issue-management references/issue-operation-safety.md
+- **関連**: src/common/tools/agentdev-gh/、Case #3782
+- **タグ**:
+
+## bash ヒアドキュメント約13KB でコマンドが途切れ node stdin script が構文エラーになる
+
+- **問題事象**: DefinitionEdit 24件を組立・検証する node stdin ヒアドキュメント（約15KB）を1回の bash 呼び出しで実行したところ、コマンド文字列が約13KB で途切れ、here-document が end-of-file で終端され node に未完結 script が渡り SyntaxError になった
+- **発生局面**: 運用（case-open STEP-4 機械工程の DefinitionEdit 入力組立時）
+- **検知方法**: bash warning「here-document delimited by end-of-file」と node の SyntaxError（文字列が切れた行の位置）
+- **根本原因**: bash ツールのコマンド文字列に長さ上限があり、長いヒアドキュメントを含む単一コマンドは後半が失われる
+- **自律対応内容**: script を5分割して cat > / cat >> の複数回呼び出しで .agentdev/integrity/reports/build-edits.cjs へ断片追記し、最後に node で一括実行して回復した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（実行環境の制約回避）
+- **横展開観点**: 長い定義・入力 JSON を組み立てる機械工程は、単一 bash コマンドに頼らず断片ファイル追記と一括実行の2段構成にする。断片は project root 内の実行時作業領域（.agentdev/integrity/reports/）へ置き、検査後に削除する
+- **再発条件**: 10KB 超の inline スクリプト・入力 JSON を単一 bash コマンドのヒアドキュメントで渡す場合
+- **予防策候補**: prepare_definition_pr の入力 JSON 組立手順へ分割書込みの標準手順追記
+- **想定反映先**: agentdev-workflow-case-open references/definition-pr-and-idempotency.md（機械工程・入力 JSON 組立条項）、agentdev-git-worktree references/worktree-operations.md（標準手段節への分割書込み補足）
+- **関連**: src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts、Case #3782
+- **タグ**:
