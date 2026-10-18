@@ -12,7 +12,7 @@ updated: "2026-10-16"
 <!-- ADF-COVERS(implementation): REQ-049-005 -->
 <!-- ADF-COVERS(implementation): REQ-083-002 -->
 <!-- ADF-COVERS(design): REQ-030-014, REQ-030-017, REQ-030-018, REQ-030-022 -->
-<!-- ADF-COVERS(design): REQ-030-025, REQ-030-026, REQ-030-028, REQ-030-029 -->
+<!-- ADF-COVERS(design): REQ-030-025, REQ-030-026, REQ-030-028, REQ-030-029, REQ-030-030 -->
 <!-- ADF-COVERS(design): REQ-030-027 -->
 <!-- ADF-COVERS(design): REQ-030-019, REQ-030-020, REQ-030-021, REQ-030-024 -->
 <!-- ADF-COVERS(design): REQ-083-002, REQ-083-003 -->
@@ -86,6 +86,7 @@ case-open STEP-4（実変更判定と設計PR作成）の機械工程（専用 w
 - 意味判断（停止判断、deviation 分類、adversarial review、警告の重要度評価）はモデルが担当し続け、script は機械的に確定した手順のみを実行する
 - workflow skill 参照文面（references/*.md）は、LLM が bash コマンドを逐次実行する指示から script 呼び出しと報告 JSON 解釈へ置き換えて短縮する
 - 本契約は Definition 編集（DefinitionEdit による対象パス + 旧文完全一致置換）の script 適用について規定するものであり、新規 REQ/Decision ファイルの worktree 内前置作成（agentdev-git-worktree 標準手順 type=definition による前置作成、node writeFileSync による UTF-8 明示配置）を排除しない。前置作成済みファイルは script の冪等再利用（branch 確認済み worktree 再利用）と整合して扱う。前置作成の具体的手順は配布 reference（definition-pr-and-idempotency.md）の STEP-4 手順が所有する
+- DefinitionEdit の入力 JSON 組立後、各編集の newText の行構造（oldText から newText への行区切りの保全）を、oldText 末尾の行末改行の有無に依存しない方法で機械検証する事前確認を script 入力検証として経る。行区切りの連結など事前確認に不合格の編集を含む入力は fail-closed で拒否する。当該確認は適用後の verbatim 包含突合（REQ-030-027）を代替しない（REQ-030-030）
 #### artifact_actions 適用後の verbatim 包含突合（REQ-030-027）
 
 script 呼び出しによる Definition 適用の後、設計PR作成の前に、モデル側の受入検査として適用後成果物への突合を実行する。
