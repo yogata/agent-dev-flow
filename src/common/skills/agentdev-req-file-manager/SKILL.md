@@ -133,6 +133,22 @@ REQ間の関連（置き換え、関連、分割元/分割先）もREQ本文内�
 
 ---
 
+## 構造再編（分割・統合・項目移動）
+
+利用者が対象と実施を明示した範囲で、既存 REQ の分割・統合・要件行移動による構造再編を CREATE/APPEND/UPDATE と同じ成果物管理経路で実行する。
+専用の再編モードは設けず、既存の採番・配置・照合の規則を適用し、不足する操作のみを追加する。
+再編を要求しない初回作成・増分更新の利用経路は変更しない。
+
+| 状況 | 再編操作 |
+|------|----------|
+| 1 REQ ファイルの要件行集合を複数 REQ ファイルへ分離 | 分割 |
+| 複数 REQ ファイルを 1 REQ ファイルへ統合 | 統合 |
+| 要件行を別 REQ ファイルへ移動 | 項目移動 |
+
+許可条件、適用前検証（識別子衝突・移動先不明・項目重複）、適用後検証（内容保全・参照整合）、部分失敗からの再開の操作手順は [references/restructure-operations.md](references/restructure-operations.md) 参照。
+
+---
+
 ## テンプレート参照
 
 要件定義テンプレートは以下のパスで参照可能:
@@ -186,4 +202,5 @@ SKILL.md 本文から遅延読み込みされる詳細資料である。
 | [references/numbering-and-validation.md](references/numbering-and-validation.md) | REQ番号採番、要件行ID、REQ-ID 安定ID、ファイル配置、frontmatterバリデーション、分類ゲート、HOW 除去後の acceptance criteria 順位検証、移行・統合時の番号空間衝突チェック（前置） |
 | [references/create-append-update-flow.md](references/create-append-update-flow.md) | CREATE/APPEND/UPDATE 操作モード、状況判定、APPEND/UPDATE判定フロー、廃止宣言 APPEND の precedent 利用、機械置換手順の3段階適用と参照検査観点（参照実在確認、変動値分離） |
 | [references/matching-and-merge.md](references/matching-and-merge.md) | 既存REQ照合方法論、整合性チェック、関連情報管理、マージ競合対応パターン |
+| [references/restructure-operations.md](references/restructure-operations.md) | 構造再編（分割・統合・項目移動）の許可条件、再編操作の種類と既存モード構成、要件行移動の識別子規則、適用前検証（識別子衝突・移動先不明・項目重複）、適用後検証（内容保全・参照整合・インデックス整合）、部分失敗からの再開 |
 | [references/save-procedure.md](references/save-procedure.md) | 保存内部責務の詳細手順（分類ゲート検査、文書分類適合確認、REQファイル操作、Decision ファイル操作と related_reqs 初期保存、インデックス/ハブ更新、リモート同期と hash 検証、RU パス保存禁止） |
