@@ -176,6 +176,45 @@ describe("入力検証（品質ゲートの省略禁止・明示パス stage）"
   });
 });
 
+describe("入力検証（newText の行構造の事前確認）", () => {
+  // 具体参照排除（RA-003、TS-004）: 具体要件行IDのリテラルは書かずプレースホルダで構築する。
+  const MULTI_LINE_OLD = "| REQ-NNNN-NNN | 旧文1 |\n| REQ-NNNN-NNM | 旧文2 |";
+  const MULTI_LINE_NEW = "| REQ-NNNN-NNN | 新文1 |\n| REQ-NNNN-NNM | 新文2 |";
+
+  function editWith(oldText: string, newText: string): DefinitionEdit {
+    return { path: "docs/req-index/REQ-TARGET.md", oldText, newText };
+  }
+
+  test("行区切りが欠落した newText（複数行の旧文が同一行に連結される編集）を拒否する", () => {
+    // oldText 末尾に行末改行を含まない前提で組み立てられた行区切り欠落入力
+    const joined = input({ definitionEdits: [editWith(MULTI_LINE_OLD, "| REQ-NNNN-NNN | 新文1 || REQ-NNNN-NNM | 新文2 |")] });
+    expect(() => validateInput(joined as unknown as Record<string, unknown>))
+      .toThrow(/fails the line structure pre-check/);
+  });
+
+  test("行区切り欠落入力は oldText 末尾に行末改行があっても拒否される（改行有無非依存）", () => {
+    const joined = input({ definitionEdits: [editWith(`${MULTI_LINE_OLD}\n`, "| REQ-NNNN-NNN | 新文1 || REQ-NNNN-NNM | 新文2 |")] });
+    expect(() => validateInput(joined as unknown as Record<string, unknown>))
+      .toThrow(/fails the line structure pre-check/);
+  });
+
+  test("行構造が保全された編集（同数行の置換・行の追加）を受領する", () => {
+    const sameLines = input({ definitionEdits: [editWith(MULTI_LINE_OLD, MULTI_LINE_NEW)] });
+    expect(() => validateInput(sameLines as unknown as Record<string, unknown>)).not.toThrow();
+    const addedLines = input({
+      definitionEdits: [editWith(MULTI_LINE_OLD, `${MULTI_LINE_NEW}\n| REQ-NNNN-NNK | 追加行 |`)],
+    });
+    expect(() => validateInput(addedLines as unknown as Record<string, unknown>)).not.toThrow();
+  });
+
+  test("oldText・newText 末尾の行末改行の有無で正規入力の検証結果が変わらない", () => {
+    const withoutTrailing = input({ definitionEdits: [editWith(MULTI_LINE_OLD, MULTI_LINE_NEW)] });
+    const withTrailing = input({ definitionEdits: [editWith(`${MULTI_LINE_OLD}\n`, `${MULTI_LINE_NEW}\n`)] });
+    expect(() => validateInput(withoutTrailing as unknown as Record<string, unknown>)).not.toThrow();
+    expect(() => validateInput(withTrailing as unknown as Record<string, unknown>)).not.toThrow();
+  });
+});
+
 describe("REQ 行編集の適用", () => {
   test("旧文を一意に特定して置換する", () => {
     const updated = applyDefinitionEdit(REQ_BODY, EDIT);
