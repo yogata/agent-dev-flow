@@ -97,6 +97,7 @@
 ### Procedure
 
 - **委譲応答の3点ゲート（最終ゲート）**: result 4状態処理の前に、委譲応答の4状態 result（completed-pr / blocked / failed / delegation-unavailable）・commit hash・PR URL の3点を必須検査する。不足する委譲応答を「要約で完結した completed-pr」として扱わず、再開（再委譲または継続指示）する。実装・検証の要約は3点検査の通過を代替しない。verify-only closure（PR も carrier commit も存在しない Issue 完了）は SSoT コメント契約の別経路として既存どおり扱い、3点の不足判定を適用しない（詳細は `agentdev-case-run-execution-adapter` 参照）。実行契約を生成した合意の変更が反映と読み戻し確認なしに残る場合、旧実行契約に基づく最終受け入れを行わず、反映と読み戻し確認（STEP-S4「合意変更時の旧実行契約消費防止」参照）を成立させた後に受け入れを判断する
+- **試作の正式採用への昇格防止（最終受け入れ確認）**: 実行契約に利用者が明示的に許可した試作が含まれる場合、最終受け入れの確認対象に、試作の成果物が正式採用・正規成果物の確定・本番適用として扱われていないことを含める。試作の実施、成果物の存在、試験の成功を当該候補の正式採用や未決事項の解決の根拠とせず、未決事項を自動解決しない。未決判断に依存して保留された部分は、試作の成功を根拠に達成済みとして消費しない
 - **result 4状態処理**（`agentdev-case-run-execution-adapter` の result 契約）:
   - **completed-pr**: 実装完了、PR作成済み。PR番号を受け取り最終 gate（後述）へ。成功成果は PR 作成である。verify-only closure（PR も carrier commit も存在しない Issue 完了）ではこの限りではなく、検証証跡は SSoT コメント（Issue コメント）へ記録する（references/single.md「verify-only closure の検証実行と SSoT コメント記録」参照）
   - **blocked**: 回答可能な blocker。詳細本文は Issue コメントに SSoT として記録済み（実行担当サブエージェント責務）。エラー処理に従い停止、ユーザー報告
