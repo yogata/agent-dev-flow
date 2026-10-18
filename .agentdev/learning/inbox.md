@@ -148,3 +148,19 @@
 - **想定反映先**: src/common/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md（委譲プロンプト構築）
 - **関連**: PR #3790、commit 140d7f0b
 - **タグ**: `#配布境界` `#委譲`
+
+## covers コメント連鎖の文字列組立で ID 順序乖離が生じ verbatim 包含突合が捕捉した
+
+- **問題事象**: case-open STEP-4 の Definition 編集組立で、逐次依存する ADF-COVERS コメント連鎖（ACT-DESIGN-001→002→003）を文字列置換（末尾 ` -->` 対象の replace）で生成した結果、REQ-110 covers 宣言の最終形に既存追跡対象識別子（REQ-104-008）が中間に残り、draft 合意文言（REQ-110-032 の後に REQ-104-008 が末尾）と ID 順序が乖離したまま commit された
+- **発生局面**: 実装（case-open STEP-4 の prepare_definition_pr 入力 JSON 組立）
+- **検知方法**: STEP-4 手順 6 の verbatim 包含突合（draft 合意文言の covers 最終形と適用後行の byte 一致照合）で 1 件の MISSING を検出
+- **根本原因**: 置換関数の対象として ` -->`（行末トークン）を選択したため、識別子列挙の挿入点（既存最終 ID の直後）ではなく行末への追記になった。中間段の covers 行が前段との連鎖整合（連鎖 oldText = 前段 newText）は満たすため、行構造事前確認（REQ-030-030）と gate 検査では検出されない
+- **自律対応内容**: 旧文完全一致の訂正 edit（commit 4624160b）で合意形へ復元し、再実行の gate 3 種を通過させてから PR を作成した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存の verbatim 包含突合手順が設計どおり機能）
+- **横展開観点**: 逐次依存する covers コメント連鎖を組立てる場合は、挿入点を識別子列挙内の直前の ID に固定し、組立後は必ず draft 合意文言との byte 一致照合を行う。行構造検査は連鎖整合を検証しないため代替にならない
+- **再発条件**: covers 連鎖の中間段が前段 newText と一致する限り連鎖整合は成立するため、最終段の ID 順序を検査する突合が省略された場合に再発する
+- **予防策候補**: covers 連鎖を組立する場合は最終形を draft から直接抽出した文字列と byte 照合する手順を入力組立の標準に含める
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md（verbatim 包含突合の手順補足）
+- **関連**: PR #3794、commit 4624160b、Root Case #3793
+- **タグ**: `#トレーサビリティ` `#Definition編集`
