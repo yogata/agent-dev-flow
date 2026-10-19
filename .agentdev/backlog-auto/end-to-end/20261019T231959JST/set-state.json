@@ -112,25 +112,65 @@
     }
   },
   "対応表": {
-    "初期登録": "2026-10-20T03:30:00+09:00",
+    "初期登録": "2026-10-20T03:30:00+09:00（stage 7）/ 2026-10-20T04:00:00+09:00（stage 4 完了反映）",
     "RU": {
-      "RU-0001": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
-      "RU-0002": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
-      "RU-0003": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
-      "RU-0004": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
-      "RU-0005": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
-      "RU-0006": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
-      "RU-0007": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
-      "RU-0008": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
-      "RU-0009": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
-      "RU-0010": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" }
+      "RU-0001": {
+        "要件doc": ".agentdev/drafts/req-draft-ru-set-20261019T231959JST.md",
+        "operation_unit": "OU-001",
+        "実行単位": "未確定"
+      },
+      "RU-0002": {
+        "要件doc": ".agentdev/drafts/req-draft-ru-set-20261019T231959JST.md",
+        "operation_unit": "OU-002",
+        "実行単位": "未確定"
+      },
+      "RU-0003": {
+        "要件doc": ".agentdev/drafts/req-draft-ru-set-20261019T231959JST.md",
+        "operation_unit": "OU-003",
+        "実行単位": "未確定"
+      },
+      "RU-0004": {
+        "要件doc": ".agentdev/drafts/req-draft-ru-set-20261019T231959JST.md",
+        "operation_unit": "OU-004",
+        "実行単位": "未確定"
+      },
+      "RU-0005": {
+        "要件doc": ".agentdev/drafts/req-draft-ru-set-20261019T231959JST.md",
+        "operation_unit": "OU-005",
+        "実行単位": "未確定"
+      },
+      "RU-0006": {
+        "要件doc": ".agentdev/drafts/req-draft-ru-set-20261019T231959JST.md",
+        "operation_unit": "OU-006",
+        "実行単位": "未確定"
+      },
+      "RU-0007": {
+        "要件doc": ".agentdev/drafts/req-draft-ru-set-20261019T231959JST.md",
+        "operation_unit": "OU-007",
+        "実行単位": "未確定"
+      },
+      "RU-0008": {
+        "要件doc": ".agentdev/drafts/req-draft-ru-set-20261019T231959JST.md",
+        "operation_unit": "OU-008",
+        "実行単位": "未確定"
+      },
+      "RU-0009": {
+        "要件doc": ".agentdev/drafts/req-draft-ru-set-20261019T231959JST.md",
+        "operation_unit": "OU-009",
+        "実行単位": "未確定"
+      },
+      "RU-0010": {
+        "要件doc": ".agentdev/drafts/req-draft-ru-set-20261019T231959JST.md",
+        "operation_unit": "OU-010",
+        "実行単位": "未確定"
+      }
     },
     "参考（RU 外の本一式帰属変更）": [
       "docs/knowledge/worktree-environment-fail-classification.md 更新（2026-10-20 ユーザー承認 Q2・4変更適用済み。backlog-review 直接保存・RU を経由しない）"
     ]
   },
   "進捗": {
-    "stage4_要件定義": "未着手",
+    "stage4_要件定義": "要件定義済み（2026-10-20T03:53:48+09:00 確定・auto_ready: true・壁打ちHITL 1件〔RU-0010方針A〕解消・commit 56c415ffe）",
     "stage5_実行": "未着手",
     "stage6_完遂判定": "未着手",
     "stage7_リリース状態": "基準点確定済み"
