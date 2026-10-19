@@ -15,6 +15,8 @@ implementation:
     - REQ-004-058
     - REQ-004-059
     - REQ-004-060
+    - REQ-004-064
+    - REQ-004-065
   src/common/skills/agentdev-req-analysis/references/investigation-scope-refinement.md:
     - REQ-004-056
     - REQ-004-057

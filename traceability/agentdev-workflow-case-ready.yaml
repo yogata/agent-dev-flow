@@ -79,6 +79,7 @@ implementation:
     - REQ-061-050
     - REQ-061-051
     - REQ-061-052
+    - REQ-061-053
   src/common/skills/agentdev-workflow-case-ready/references/execution-contract.md:
     - REQ-017-021
     - REQ-017-022
@@ -138,6 +139,7 @@ verification:
     - REQ-061-050
     - REQ-061-051
     - REQ-061-052
+    - REQ-061-053
   src/common/skills/agentdev-workflow-case-ready/references/readiness-and-cleanup.md:
     - REQ-061-034
     - REQ-061-035

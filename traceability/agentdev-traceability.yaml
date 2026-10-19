@@ -17,6 +17,8 @@ implementation:
     - REQ-030-024
   src/common/skills/agentdev-traceability/scripts/lib/check.ts:
     - REQ-012-056
+    - REQ-021-031
+    - REQ-021-032
     - REQ-107-004
     - REQ-107-005
     - REQ-107-006
@@ -48,6 +50,8 @@ implementation:
     - REQ-012-053
   src/common/skills/agentdev-traceability/scripts/lib/verification_scope.ts:
     - REQ-012-056
+    - REQ-021-031
+    - REQ-021-032
   src/common/skills/agentdev-traceability/scripts/src/check.ts:
     - REQ-021-030
   src/common/skills/agentdev-traceability/scripts/src/coverage.ts:
@@ -71,6 +75,8 @@ implementation:
     - REQ-107-008
   traceability/policy.yaml:
     - REQ-002-048
+    - REQ-021-031
+    - REQ-021-032
     - REQ-096-031
 links:
   upstream:
