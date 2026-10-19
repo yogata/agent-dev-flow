@@ -61,6 +61,13 @@ const PROTO_SEPARATION_TOKENS = [
   "試作の実施、成果物の存在、試験の成功を当該候補の正式採用や未決事項の解決として扱わない",
 ];
 
+// 未決の設計候補の試作には明示的な指示・許可が要る（制限形の核心トークン、REQ-108-013）
+const PROTO_RESTRICTION_TOKENS = [
+  "未決の設計候補について試作として実施するには利用者の明示的な指示または許可を要し",
+  "明示的な指示・許可がない試作を開始しない",
+  "明示的な指示・許可がない限り、当該部分は未決判断に依存する実装として保留する",
+];
+
 describe("未決依存の保留と実行継続の区別（実行経路適用）", () => {
   test("case-open は実行契約候補の構成で未決依存の保留と区別記録を保持する", () => {
     expect(caseOpenSkill).toContain("意味的な依存関係に基づいて判断し");
@@ -72,6 +79,9 @@ describe("未決依存の保留と実行継続の区別（実行経路適用）"
   });
 
   test("case-run 共通制約は前置 gate と委譲での保留/実行区別を保持する", () => {
+    for (const token of HOLD_AND_CONTINUE_TOKENS) {
+      expect(caseRunSkill).toContain(token);
+    }
     expect(caseRunSkill).toContain("未決依存の保留と実行継続の区別");
     expect(caseRunSkill).toContain("依存する部分を保留し");
     expect(caseRunSkill).toContain("未決事項の存在だけを理由に依存しない作業を停止しない");
@@ -84,6 +94,9 @@ describe("未決依存の保留と実行継続の区別（実行経路適用）"
   });
 
   test("adapter 委譲先は保留部分を実装対象から分離し依存しない部分を継続する", () => {
+    for (const token of HOLD_AND_CONTINUE_TOKENS) {
+      expect(adapterSkill).toContain(token);
+    }
     expect(adapterSkill).toContain("依存する部分を保留し");
     expect(adapterSkill).toContain("依存しない部分は他の実行条件を満たす限り実装を継続する");
     expect(adapterSkill).toContain("未決事項の存在だけを理由に依存しない作業を停止しない");
@@ -102,10 +115,16 @@ describe("明示許可試作の区別（正式採用への昇格防止）", () =
     for (const token of PROTO_SEPARATION_TOKENS) {
       expect(caseOpenSkill).toContain(token);
     }
+    for (const token of PROTO_RESTRICTION_TOKENS) {
+      expect(caseOpenSkill).toContain(token);
+    }
   });
 
   test("case-run 共通制約は試作の区別と非昇格を保持する", () => {
     for (const token of PROTO_SEPARATION_TOKENS) {
+      expect(caseRunSkill).toContain(token);
+    }
+    for (const token of PROTO_RESTRICTION_TOKENS) {
       expect(caseRunSkill).toContain(token);
     }
   });
@@ -119,6 +138,9 @@ describe("明示許可試作の区別（正式採用への昇格防止）", () =
 
   test("adapter 委譲先は試作の区別と非昇格を保持する", () => {
     for (const token of PROTO_SEPARATION_TOKENS) {
+      expect(adapterSkill).toContain(token);
+    }
+    for (const token of PROTO_RESTRICTION_TOKENS) {
       expect(adapterSkill).toContain(token);
     }
   });
