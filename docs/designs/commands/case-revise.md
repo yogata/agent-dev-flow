@@ -2,10 +2,11 @@
 title: case-revise Design
 status: accepted
 created: 2026-09-14
-updated: "2026-10-09"
+updated: "2026-10-20"
 ---
 
 <!-- ADF-COVERS(design): REQ-062-006, REQ-101-017, REQ-101-018, REQ-101-019 -->
+<!-- ADF-COVERS(design): REQ-062-010（draft tracked 受入確認の設計） -->
 <!-- ADF-COVERS(design): REQ-106-007, REQ-106-008, REQ-106-009 -->
 
 # case-revise Command Design

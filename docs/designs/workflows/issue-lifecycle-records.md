@@ -2,9 +2,10 @@
 title: Case Issue 工程記録モデル（issue-lifecycle-records）
 status: accepted
 created: 2026-10-03
-updated: 2026-10-05
+updated: "2026-10-20"
 ---
 <!-- ADF-COVERS(design): REQ-101-001, REQ-101-002, REQ-101-003, REQ-101-004, REQ-101-006, REQ-101-007, REQ-101-008, REQ-101-009, REQ-101-010, REQ-101-011, REQ-101-012, REQ-101-013, REQ-101-014, REQ-101-015, REQ-101-016 -->
+<!-- ADF-COVERS(design): REQ-101-020 -->
 
 # Case Issue 工程記録モデル（issue-lifecycle-records）Design
 
@@ -42,6 +43,7 @@ updated: 2026-10-05
 - Standard Case と Epic Root の正規状態は open、ready、running、blocked、review、closed、cancelled の7値とし（REQ-006-112）、状態値は v4-lifecycle-state-machine Design が正である。Epic 実行構成が所有する子 Issue の blocked、failed を Root Case の正規状態として重複保持しない（子状態の重複コピー禁止、REQ-035-004）。この規律は Root 自身の継続条件不足を blocked で表すことを禁じるものではない（子状態の重複コピー禁止と Root 固有の blocked は別の規律である）
 - 開始日時は初めて実装または検証に実着手した時刻（委譲要求や Issue 作成時刻ではない。Epic は配下の初回実着手）とし、停止・再開で上書きしない。終了日時は Standard Case と Epic Root は完了または中止確定時、Child は completed 確定時にのみ設定する
 - 実作業時間、試行ごとの日時管理を別に保存しない。日時から得られるのは停止時間を含む経過時間である
+- 日時欄の書式例外（未観測時刻の境界表現）: 開始日時・終了日時は実測値のみを記載する原則（前項）を維持する。実着手または完了確定が未観測の局面では、当該日時欄を実測値として記載せず、観測事実（ブランチ作成、初回 commit、PR 作成等の実測可能な時刻）に基づく既知の上限・下限時刻の併記による境界表現を書式例外として許容する。境界表現は観測事実のみで構成し、未観測時刻の推定生成を正当化する様式としない。実測が確定した時点で実測値へ置換する。本様式の構築・検証は Case Issue 本文の構築・検証関数（`agentdev-workflow-case-run/scripts/record-comments.ts`）を経由する（様式サポートの実装は本様式の採用に伴う後続実装要求）
 
 ### Epic 反映様式の実体参照点
 
