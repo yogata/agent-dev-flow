@@ -171,7 +171,7 @@
   },
   "進捗": {
     "stage4_要件定義": "要件定義済み（2026-10-20T03:53:48+09:00 確定・auto_ready: true・壁打ちHITL 1件〔RU-0010方針A〕解消・commit 56c415ffe）",
-    "stage5_実行": "実行中（2026-10-20T06:43+09:00 ネットワーク回復後再開。設計PR #3817 squash merge 完了（acf86dd5a）→ case-ready 完了（実行構造=Standard単一実行単位 #3816・draft/RU 削除 6f414e5ff・正規状態 ready）→ case-run 実装委譲 DEL-3816-1 完了（実装 PR #3818・head case-3816・commits ed8105009/1ed0714cc/0f181c5fa・3点ゲート親検証 PASS・対象20要件行 covers 解消・検証 190+276+16 pass・textlint/typecheck/配布依存境界/AUTOGEN 全合格。親経由の工程委譲は delegation-unavailable 停止〔#3816 comment-6278277629〕に対する orchestration 引継ぎ措置）→ case-close 実行主体を委譲起動（PR #3818 merge・QG-4・Design確定・Capture回収・完了条件評価・#3816 クローズ）",
+    "stage5_実行": "実行中（2026-10-20T06:43+09:00 再開。#3817 merge acf86dd5a→case-ready 完了（単一実行単位 #3816・draft/RU 削除 6f414e5ff）→DEL-3816-1 完了（実装 PR #3818 squash merge 059f8646d・main 050dc901e・3点ゲート PASS）→case-close 第1回は QG-4 traceability 完全性ゲートで fail-closed 停止（REQ-004-064/065 missing-implementation・sidecar YAML 重複パスキーが構造的原因・重複は 6f414e5ff 以前からの既存負債・停止記録 #3816 comment-6279710115・worktree/branch 削除済み・Capture/Design確定/クローズ繰越し・Issue は open 維持）→修正委譲 DEL-3816-2 実行中（重複ブロック統合・対象20行完全性回復の修正 PR）→完了後に case-close STEP-2 以降再委譲）",
     "stage6_完遂判定": "未着手（stage5 blocked により契約上不開始）",
     "stage7_リリース状態": "基準点確定済み（stage5 blocked により stage7 不開始・タグ/Release 未作成）"
   },
