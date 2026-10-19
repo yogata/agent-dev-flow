@@ -5,6 +5,7 @@ case-revise workflow STEP-1〜STEP-3 の実行詳細（SKILL.md「制御平面�
 ## STEP-1 再合意内容の受入確認
 
 - 入力された Definition 変更が req-define で再合意済みであることを確認する。確認手段は req-define の合意記録（req_draft の合意内容、Root Case 本文の Definition Package / Execution Contract との対比）である
+- 入力された draft が commit 済み（tracked）であることの受入確認を行う（req-define の保存時永続化と case-ready の draft 削除の対に接合する前置確認）。untracked の draft を検出した場合は受入せず、req-define 側の保存時永続化（明示パス指定 commit）を経由した再提出へ差し戻す。本確認は受入確認の追加であり、case-revise が draft を生成・編集する責務を新設するものではない
 - 本 STEP の確認は合意変更の「受領」に該当する。合意内容そのものの「記録」は req-define の合意記録が担い、「実行への適用」は STEP-5 の Case 関連 Issue 本文更新と最新条件の引き渡しが担う（記録・受領・適用を混同しない）
 - 再合意済みでない変更の反映要求は受け付けず、req-define へ差し戻して停止する。case-revise は新しい要求、Decision、対象範囲を生成しない（意味判断は req-define が所有する）
 - 再合意済みの Definition 変更は req_draft を再解釈・再設計せず、合意済み内容をそのまま後続 STEP へ投影する

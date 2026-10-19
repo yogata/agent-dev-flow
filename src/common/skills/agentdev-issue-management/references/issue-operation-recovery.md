@@ -30,6 +30,7 @@
    - 手順 1（bash 直叩き）: bash から同一引数の gh を直接実行する（例: `gh repo view --json nameWithOwner`）。Custom Tool `agentdev_gh` を経由しない単体実行である
    - 手順 2（runner 経路）: bun から runner と同一の spawnSync 経路で実行する（CliRunner 直接実行。`src/common/tools/agentdev-gh` の CliRunner を同一引数で起動し、Custom Tool 本体と同じ経路で gh を呼び出す）
    - 判定基準: bash 成功 + runner 経路失敗 → plugin ホスト環境差（runner の spawnSync 経路・plugin ホスト側の環境依存）。bash も失敗 → 実行環境側の問題（gh CLI・認証・ネットワーク等）。両方成功する場合は当該障害が経路固有の一時事象と判定し、診断手順 1〜3 の要点記録とともに再発観測へ残す
+   - 判定基準（plugin ホストプロセス固有環境差）: bash 直叩きと runner 経路の単体再現がいずれも成功し、Custom Tool 本体のみが恒常的に非ゼロ終了する場合は、plugin ホストプロセス固有の環境差として分類する。恒常性の確認は、再試行と回復手段（harness 再起動）の適用後も再現するかで行い、再現しない一時事象と区別する。本分類の値域は既存の3分類（bash 成功 + runner 失敗、bash 失敗、両方成功 = 経路固有の一時事象）を置き換えない。分類の適用は読み取り系の切り分けに限定し、書込みは引き続き Custom Tool `agentdev_gh` 正規経路に限定する
    - 境界: 本試験は読み取り系の切り分けであり、書込み操作の gh CLI 代替禁止（fail-closed 契約）を変更しない。runner-cli.ts の failFromExec detail 文言拡張は「最小限の detail」契約の維持のため行わない（対応要件行の正は Custom Tool 操作契約 Design と repository top-level の traceability sidecar。失敗分類値域 config-uninterpretable / enforcement-crashed / operation-failed は不変）
 
 ### 回復手段（harness 再起動）
@@ -60,6 +61,7 @@
 - **最小副作用単位分割と durable state 先行**: gh 呼出を伴う処理は副作用 1 件単位へ分割し、各呼出の前に durable state（Issue コメントへの経過記録、worktree 内の commit 等）を先行して残す。障害で中断されても「障害中断時の再開手順」の残骸確認と冪等再実行で再開できる
 - **write-proxy payload の標準配置**: issue_create、issue_update、comment_create、pr_create 等の書込み payload（本文・タイトル）は、呼出に先立って標準配置（worktree root 相対 `.agentdev/tmp/` 配下の payload ファイル）へ保存する。書込み操作が障害で中断された場合も、payload ファイルを送信元として同一内容の再試行（「障害中断時の再開手順」の残骸確認後再実行）が可能になる
 - **gh exit 66 恒常失敗時の bash gh 例外手順**: gh が終了コード 66（gh exit 66）で恒常的に失敗し、再試行と回復手段で解消しない場合は、読み取り系操作に限り bash から gh CLI を直接実行する例外手順で補完する。書込み系は引き続き Custom Tool `agentdev_gh` 正規経路に限定する。証跡様式は次のとおりで検証記録へ残す: 失敗した操作と failure detail の要点（終了コード、stderr の空・非空）、代替実行した gh コマンド、取得結果の要約
+- **tool 内部モジュールの書込み直接起動禁止**: gh exit 66 等の恒常失敗時の bash gh 例外手順を含む障害局面では、tool 内部モジュール（CliRunner 等の tool 内部 API）の直接起動を、診断手順の読み取り切り分けに限定する。書込みを含む操作での tool 内部 API の直接起動は非許容であり、書込み系の正規経路は Custom Tool `agentdev_gh` に限定する。本規律は、bash gh 読取例外・書込みの正規経路限定・2段分離試験（読み取り系の切り分け）・Custom Tool 操作契約が許容する読取 contingency と矛盾しない
 
 ## 観測 known-issues（運用時発見事象の蓄積）
 
