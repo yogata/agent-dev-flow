@@ -2,7 +2,7 @@
 title: case-close Design
 status: accepted
 created: 2026-06-21
-updated: "2026-10-15"
+updated: "2026-10-20"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-018, REQ-021-019, REQ-021-022, REQ-021-025 -->
@@ -18,6 +18,7 @@ updated: "2026-10-15"
 <!-- ADF-COVERS(design): REQ-032-029, REQ-032-030 -->
 <!-- ADF-COVERS(design): REQ-032-031, REQ-032-032, REQ-032-033, REQ-032-034, REQ-032-035, REQ-032-036, REQ-032-037, REQ-032-038, REQ-032-039 -->
 <!-- ADF-COVERS(design): REQ-053-045, REQ-053-046（保存済み検証証跡の解析と再実行条件の適用節が close 最終検査実行義務境界の design 実体） -->
+<!-- ADF-COVERS(design): REQ-032-040, REQ-032-041（QG-4 file-level split 標準化と bun 版更新時再検証の実行構成設計） -->
 
 # case-close Design
 
