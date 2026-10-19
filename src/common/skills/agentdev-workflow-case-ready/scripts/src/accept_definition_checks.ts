@@ -665,6 +665,14 @@ export function runAcceptDefinitionChecks(
       removalSkips.push(path);
     }
   }
+  if (removalSkips.length > 0) {
+    // untracked のため git rm 対象から除外されたパスの報告へ、保存時の git
+    // 永続化が未実施の疑い（永続化漏れの可能性）を明示する。Form Zero 契約と
+    // cleanup の fail-closed 動作は変更しない。
+    warnings.push(
+      "skippedPaths (untracked, excluded from git rm) indicate possible missing persistence at save time (draft/RU files not committed by req-define explicit-path commit)",
+    );
+  }
   if (removalTargets.length > 0) {
     const rm = runner.run({ command: "git", args: ["rm", "--", ...removalTargets], cwd: repoRoot });
     if (rm.exitCode !== 0) {

@@ -307,6 +307,20 @@ describe("canonical 再取得 phase（merge 後 canonical 再取得、draft/RU �
     expect(cleanupStep?.detail.skippedPaths).toEqual([".agentdev/drafts/req-draft-case-x.md"]);
   });
 
+  test("skippedPaths 記録時の報告へ保存時永続化漏れの可能性を明示する", () => {
+    const runner = fakeRunner({ indexedPaths: [] });
+    const report = runAcceptDefinitionChecks(cleanupInput(), runner);
+    const rmCall = runner.calls.find((call) => call.command === "git" && call.args[0] === "rm");
+    expect(rmCall).toBeUndefined();
+    expect(report.warnings.join("\n")).toContain("possible missing persistence at save time");
+  });
+
+  test("skippedPaths が存在しない場合は永続化漏れの可能性を警告しない", () => {
+    const runner = fakeRunner({ indexedPaths: [".agentdev/drafts/req-draft-case-x.md", ".agentdev/backlog/req-units/RU-0001.md"] });
+    const report = runAcceptDefinitionChecks(cleanupInput(), runner);
+    expect(report.warnings.join("\n")).not.toContain("missing persistence");
+  });
+
   test("ff-only merge 失敗時に分岐検出結果（ahead/behind の件数とコミット一覧）を detail へ報告し、自動解消操作を実行しない（TS-001）", () => {
     const runner = fakeRunner({
       ffMergeFails: true,
