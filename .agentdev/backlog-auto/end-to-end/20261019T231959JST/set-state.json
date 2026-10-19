@@ -1,0 +1,143 @@
+{
+  "一式識別子": "20261019T231959JST",
+  "作成日時": "2026-10-20T03:30:00+09:00",
+  "backlog_auto_started_at": "2026-10-19T23:19:59+09:00",
+  "基準点情報": {
+    "最後の正式リリース": {
+      "版番号": "5.1.3",
+      "タグ名": "v5.1.3",
+      "タグ対象コミット": "111868d9022b6d5b6e150240b9b2dd1d116ba554",
+      "確定根拠": "正式 SemVer タグ列挙→HEAD 到達判定（v5.1.3/v5.1.2 到達可能を実測）→SemVer 数値比較で最大版 5.1.3。基準点確認手続 2026-10-20T03:20 JST 実施"
+    },
+    "開始コミットID": "abe519fc74c28cffc975dff33a99c05d099063ae",
+    "開始コミット確定時の HEAD": "512e510d61cc1b5067967a6c2d07dd02c8a9f602",
+    "開始コミット採用根拠": "backlog-auto 実行開始時点（2026-10-19T23:19:59+09:00）の main HEAD。実行開始後の stage1〜3 永続化コミット（09c832627/668c109c1/866c86aaf/6e64c20da/512e510d6）は本一式実行に帰属する bookkeeping 変更として差分突合で本一式に数える"
+  },
+  "義務スナップショット": {
+    "抽出根拠": ".agentdev/backlog/req-units/RU-0001.md〜RU-0010.md（2026-10-20T03:15:55+09:00 backlog-review 生成・ユーザー承認 2026-10-20 Q1〜Q4）の本文（Source Summary・要件化の方向）から抽出。完了突合の正の一つ",
+    "義務": {
+      "RU-0001": {
+        "タイトル": "case-run 委譲の配布物編集における docs 配下パス literal 参照禁止規律（IR-055 事前防止）",
+        "必須要求": "harness-delegation.md 委譲指示規律節へ、配布物（SKILL.md・references・command 本文）への追記・転記で docs 配下パスの literal 参照を書かず既存本体と同一の抽象化参照へ統一する規律を追記する",
+        "受け入れ義務": [
+          "既存 concrete ID 規律（L285-293 構造）に追記し、検出カテゴリの違い（concrete ID 直書きと IR-055 heuristic）を混同しない記述であること",
+          "既存配布物の全面的な文面是正を要求しないこと",
+          "委譲 prompt 構築者への予防観点の引き渡し（MUST NOT DO セクション等経由）を適用範囲に含めること",
+          "IR-055 checker・check_integrity の検査内容変更は対象外とすること"
+        ]
+      },
+      "RU-0002": {
+        "タイトル": "case-run scripts 配下の型検査基盤導入方針の決定",
+        "必須要求": "case-run scripts 配下への型検査基盤導入の是非・方針を REQ として決定・記録する",
+        "受け入れ義務": [
+          "第一の参照先は既存15スキルの package 構成パターン（例: agentdev-workflow-case-ready/scripts/tsconfig.json）であること",
+          "REQ-112 について「tools 領域の二重管理統合方針であり scripts 単独領域と構造が異なる」旨の注記を含めること",
+          "採用時、bun test 正規形（QG-4 3 cwd 分割）の実行経路・検査対象集合が変化しないことを確認すること",
+          "scripts 配下テストの実行形態変更（bun test 正規形）と他 skills scripts 領域の再構成は対象外とすること"
+        ]
+      },
+      "RU-0003": {
+        "タイトル": "Custom Tool 障害時の tool 内部モジュール書込み直接起動禁止の明記",
+        "必須要求": "issue-operation-recovery.md の gh exit 66 例外手順近傍へ、tool 内部モジュール（CliRunner 等）の直接起動は診断手順の読取切り分けに限定され書込みを含む操作では非許容である旨を明記する",
+        "受け入れ義務": [
+          "追記文言は追加のみで既存規定を書き換えないこと",
+          "診断手順の2段分離試験と custom-tool-contracts.md の読取 contingency 許容と矛盾しないこと",
+          "custom-tool-contracts.md の契約変更・機械的 enforcement 導入・他 skill references への横展開は対象外とすること"
+        ]
+      },
+      "RU-0004": {
+        "タイトル": "工程記録の未観測時刻に対する境界表現様式の提供",
+        "必須要求": "未観測時刻を「記載しない」契約（issue-lifecycle-records.md L43）を維持した上で、既知の境界時刻（上限・下限）を併記する境界表現の様式を提供する（設計分岐 (a) Design 契約変更 or (b) 本文補足表現は req-define が判断）",
+        "受け入れ義務": [
+          "境界表現は観測事実（既知の上限・下限時刻）のみで構成し、未観測時刻の推定生成を正当化する様式にしないこと",
+          "様式サポート採用時、record-comments.ts の検証関数が様式どおりの記録を検証できること",
+          "構築・検証関数を経由する本文構築規律と矛盾しないこと",
+          "工程記録契約自体（L43）の変更は対象外とすること"
+        ]
+      },
+      "RU-0005": {
+        "タイトル": "QG-4 実行構成の file-level split 標準化（bun test 終了コード race 対策）",
+        "必須要求": "qg-4-final-acceptance.md 3 cwd 分割実行節へ (1) fail 検出対象ファイルの独立 gate 化（file-level split）の標準化、(2) bun バージョン更新時の終了コード race 再検証規定を追記する",
+        "受け入れ義務": [
+          "3 cwd 分割実行の正規形自体（分割単位・cwd 規律）を変更しないこと",
+          "既存「終了コードの記録」規定（L451-452・版記録を含む）との整合を維持すること",
+          "file-level split の適用条件は fail 検出対象が明確な場合とし、全実行への一律適用を要求しない設計であること",
+          "windows-bun-test-spawn-timeout-classification.md の timeout 値規定は対象外（C7 deferred の管理対象）とすること"
+        ]
+      },
+      "RU-0006": {
+        "タイトル": "req-define draft 保存後の git 永続化手順の明記",
+        "必須要求": "req-define draft-generation.md STEP-9（ドラフト保存）へ保存後の git 永続化（明示パス指定 commit）手順を明記する",
+        "受け入れ義務": [
+          "case-revise 側への追記は「引き継ぐ draft が commit 済み（tracked）であることの受入確認」に限定すること",
+          "REQ-061-040（Form Zero・tracked 前提）の契約と cleanup の fail-closed 動作を維持すること",
+          "commit は明示パス指定とし、一括スコープ・スイープ操作を禁止すること",
+          "case-ready cleanup script の untracked draft 検知時報告文言への永続化漏れ明示は採用判断とすること"
+        ]
+      },
+      "RU-0007": {
+        "タイトル": "gh exit 66（plugin ホストプロセス固有環境差）の診断手順分類行追加",
+        "必須要求": "issue-operation-recovery.md 診断手順（2段分離試験）の判定基準へ「runner 経路単体再現成功・Custom Tool 本体のみ失敗 = plugin ホストプロセス固有の環境差」の分類行追加の採否判断を行う",
+        "受け入れ義務": [
+          "追加規律（分類行）が RU-0003 相当の書込み規律明記と矛盾しない文言であること",
+          "環境要因の調査は Problem 管理であり、Issue 起票の要否判断は req-define 後の利用者判断として本 RU の実現対象から切り離すこと"
+        ]
+      },
+      "RU-0008": {
+        "タイトル": "GitHub 版隔離検証環境の正規構築手段の整備（TS-007/008/010 blocked 解消）",
+        "必須要求": "整備方針（専用検証入口の追加 or 管理者事前準備の隔離検証 repo 常備）と REQ-110/REQ-111 の検証方法・適用範囲の再評価のいずれかを REQ として判断・記録する",
+        "受け入れ義務": [
+          "判断後の処置経路（case-close 再開 or req-define 差し戻し）を併記し、Case #3779 と Epic #3803 の完了条件充足に接続すること",
+          "agentdev_gh 操作カタログ（repo create 相当の操作追加の要否）を関連判断対象とすること",
+          "gh-write guard の fail-closed 拒否自体の緩和は解決手段としないこと"
+        ]
+      },
+      "RU-0009": {
+        "タイトル": "req_draft oldText の行特定書式と置換対象部分文面の区別規約",
+        "必須要求": "artifact_actions oldText の転記規約（行特定のための行頭表記と置換対象部分文面の区別、DefinitionEdit 完全一致契約への転記時の装飾除去）を定義する（帰属先判断は req-define）",
+        "受け入れ義務": [
+          "規約の帰属先（req-define 組立手順、assembly_evidence 検査、両方）の判断を含めること",
+          "req_draft テンプレート（draft-data 契約）・req-define 組立手順・assemble-draft-section 関連検査を参照点とすること"
+        ]
+      },
+      "RU-0010": {
+        "タイトル": "traceability コーパス完全性欠落の棚卸しと policy optional 処置方針",
+        "必須要求": "コーパス全体の完全性欠落（missing-design 669行 / missing-implementation 98行 / missing-verification 13行・旧要件行中心）の棚卸しと、traceability/policy.yaml の optional 列挙への処置方針（optional 明示 or 欠落解消）を REQ として判断・記録する",
+        "受け入れ義務": [
+          "棚卸しの対象範囲・受け入れ条件を方針判断に含めること",
+          "v4-traceability-model の completeness 2 層と整合すること",
+          "欠落行解消選択時も旧要件行の個別解消は後続の別要求として扱うこと（本 RU は方針決定の記録が主目的）"
+        ]
+      }
+    }
+  },
+  "対応表": {
+    "初期登録": "2026-10-20T03:30:00+09:00",
+    "RU": {
+      "RU-0001": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0002": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0003": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0004": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0005": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0006": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0007": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0008": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0009": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0010": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" }
+    },
+    "参考（RU 外の本一式帰属変更）": [
+      "docs/knowledge/worktree-environment-fail-classification.md 更新（2026-10-20 ユーザー承認 Q2・4変更適用済み。backlog-review 直接保存・RU を経由しない）"
+    ]
+  },
+  "進捗": {
+    "stage4_要件定義": "未着手",
+    "stage5_実行": "未着手",
+    "stage6_完遂判定": "未着手",
+    "stage7_リリース状態": "基準点確定済み"
+  },
+  "リリース状態": {
+    "状態": "基準点確定済み",
+    "基準点確定日時": "2026-10-20T03:20:42+09:00"
+  },
+  "単一書き手": "backlog-auto 実行 20261019T231959JST（本 set-state 作成実行）"
+}
