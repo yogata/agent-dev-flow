@@ -20,7 +20,7 @@ docs/knowledge/ はプロジェクト知識（プロジェクト固有の再利�
 
 ## 現在の知識文書
 
-35件。
+36件。
 
 - [windows-powershell-bulk-io-corruption.md](windows-powershell-bulk-io-corruption.md)
 - [checker-cli-stdout-loss-on-windows-bun.md](checker-cli-stdout-loss-on-windows-bun.md)
@@ -57,6 +57,7 @@ docs/knowledge/ はプロジェクト知識（プロジェクト固有の再利�
 - [phase-themes-and-progress-judgment.md](phase-themes-and-progress-judgment.md)
 - [upstream-change-impact-and-evidence-reuse.md](upstream-change-impact-and-evidence-reuse.md)
 - [external-ai-collaboration-and-incremental-artifact-formation.md](external-ai-collaboration-and-incremental-artifact-formation.md)
+- [gh-isolated-verification-repository.md](gh-isolated-verification-repository.md)
 
 知識文書は learning から昇華されて成長する（REQ-056）。
 登録経路と承認条件は REQ-056 を参照する。
