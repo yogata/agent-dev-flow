@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261019T151035Z-e9e1",
+  "workflow": "learning-promote",
+  "evaluationKind": "classification",
+  "subject": "inbox 20エントリの問題クラス帰属（2026-10-19 run・Case #3814/#3803 系 e2e 実行由来中心）",
+  "sourceRevision": "09c832627",
+  "durationMs": 42094,
+  "inputs": {
+    "requestDigest": "fee6b79e514ba3442fe1f8fc9b01d499bd6f5a6bfd4a1c032085a43ebacc63a8",
+    "references": [
+      {
+        "digest": "33cb1791077360c8181cb300147210584981debe3787394208103f8d2a3933b0",
+        "label": "inbox",
+        "path": ".agentdev/learning/inbox.md"
+      },
+      {
+        "digest": "65c945a9f381979d58e5ef7634917cf9b0e771d6437c83bef5828ddb4b64e9ab",
+        "label": "deferred",
+        "path": ".agentdev/learning/deferred.md"
+      }
+    ]
+  },
+  "failure": {
+    "kind": "network_error",
+    "detail": "Error: Unable to connect. Is the computer able to access the url?"
+  }
+}

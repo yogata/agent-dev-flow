@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261019T163136Z-0ace",
+  "workflow": "learning-promote",
+  "evaluationKind": "post-review-recheck",
+  "subject": "learning-promote 2026-10-20 run の C2/C3/C9 処分変更（deferred → duplicate）の再判定",
+  "sourceRevision": "866c86aaf（main HEAD）",
+  "durationMs": 835,
+  "inputTokens": 1591,
+  "inputs": {
+    "requestDigest": "9cbae93c92cc5250ec94120ff26ca8f847c8a7ce81d50570939311553422f679"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "r-c2",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.9,
+        "false": 0.09999999999999998
+      }
+    },
+    {
+      "questionId": "r-c3",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.89,
+        "false": 0.10999999999999999
+      }
+    },
+    {
+      "questionId": "r-c9",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.85,
+        "false": 0.15000000000000002
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "r-c2",
+        "value": true
+      },
+      {
+        "questionId": "r-c3",
+        "value": true
+      },
+      {
+        "questionId": "r-c9",
+        "value": true
+      }
+    ]
+  }
+}

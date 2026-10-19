@@ -1,0 +1,282 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261019T154236Z-dc04",
+  "workflow": "learning-promote",
+  "evaluationKind": "problem-classification",
+  "subject": "inbox 20エントリ（Case #3782/#3793/#3803 系・2026-10-18〜10-19 capture）の問題クラス帰属",
+  "sourceRevision": "866c86aaf（main HEAD。本 run は git 操作禁止のため run 実行時 HEAD の一致検証は未実施）",
+  "durationMs": 877,
+  "inputTokens": 3470,
+  "inputs": {
+    "requestDigest": "1586c40b3e75982a34c891f2074a1d917c651d30f33371320168240b022bb672"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "cls-e1",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.91,
+        "false": 0.08999999999999997
+      }
+    },
+    {
+      "questionId": "cls-e2",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.86,
+        "false": 0.14
+      }
+    },
+    {
+      "questionId": "cls-e3",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.86,
+        "false": 0.14
+      }
+    },
+    {
+      "questionId": "cls-e4",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.85,
+        "false": 0.15000000000000002
+      }
+    },
+    {
+      "questionId": "cls-e5",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.84,
+        "false": 0.16000000000000003
+      }
+    },
+    {
+      "questionId": "cls-e6",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.87,
+        "false": 0.13
+      }
+    },
+    {
+      "questionId": "cls-e7",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.91,
+        "false": 0.08999999999999997
+      }
+    },
+    {
+      "questionId": "cls-e8",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.9,
+        "false": 0.09999999999999998
+      }
+    },
+    {
+      "questionId": "cls-e9",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.84,
+        "false": 0.16000000000000003
+      }
+    },
+    {
+      "questionId": "cls-e10",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.86,
+        "false": 0.14
+      }
+    },
+    {
+      "questionId": "cls-e11",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.86,
+        "false": 0.14
+      }
+    },
+    {
+      "questionId": "cls-e12",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.89,
+        "false": 0.10999999999999999
+      }
+    },
+    {
+      "questionId": "cls-e13",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.82,
+        "false": 0.18000000000000005
+      }
+    },
+    {
+      "questionId": "cls-e14",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.85,
+        "false": 0.15000000000000002
+      }
+    },
+    {
+      "questionId": "cls-e15",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.84,
+        "false": 0.16000000000000003
+      }
+    },
+    {
+      "questionId": "cls-e16",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.84,
+        "false": 0.16000000000000003
+      }
+    },
+    {
+      "questionId": "cls-e17",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.78,
+        "false": 0.21999999999999997
+      }
+    },
+    {
+      "questionId": "cls-e18",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.83,
+        "false": 0.17000000000000004
+      }
+    },
+    {
+      "questionId": "cls-e19",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.89,
+        "false": 0.10999999999999999
+      }
+    },
+    {
+      "questionId": "cls-e20",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.71,
+        "false": 0.29000000000000004
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "cls-e1",
+        "value": true
+      },
+      {
+        "questionId": "cls-e10",
+        "value": true
+      },
+      {
+        "questionId": "cls-e11",
+        "value": true
+      },
+      {
+        "questionId": "cls-e12",
+        "value": true
+      },
+      {
+        "questionId": "cls-e13",
+        "value": true
+      },
+      {
+        "questionId": "cls-e14",
+        "value": true
+      },
+      {
+        "questionId": "cls-e15",
+        "value": true
+      },
+      {
+        "questionId": "cls-e16",
+        "value": true
+      },
+      {
+        "questionId": "cls-e17",
+        "value": true
+      },
+      {
+        "questionId": "cls-e18",
+        "value": true
+      },
+      {
+        "questionId": "cls-e19",
+        "value": true
+      },
+      {
+        "questionId": "cls-e2",
+        "value": true
+      },
+      {
+        "questionId": "cls-e20",
+        "value": true
+      },
+      {
+        "questionId": "cls-e3",
+        "value": true
+      },
+      {
+        "questionId": "cls-e4",
+        "value": true
+      },
+      {
+        "questionId": "cls-e5",
+        "value": true
+      },
+      {
+        "questionId": "cls-e6",
+        "value": true
+      },
+      {
+        "questionId": "cls-e7",
+        "value": true
+      },
+      {
+        "questionId": "cls-e8",
+        "value": true
+      },
+      {
+        "questionId": "cls-e9",
+        "value": true
+      }
+    ]
+  }
+}

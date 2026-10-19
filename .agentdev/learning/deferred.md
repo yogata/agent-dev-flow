@@ -2364,6 +2364,7 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **追記（2026-09-27 amendment・A-2）**: 2026-09-27 に3回目の再発（並行 case-open 2セッションで全操作が gh exited with 66 で持続失敗・Root Case 2件が blocked 停止）。inbox 側2件の観測は本エントリと duplicate 判定で統合（症状・回復経路・予防策が一致）。予防策候補の反映先文書（docs/guides/consumer-project-setup.md 等）への反映は 2026-09-27 時点で未実施
 - **追記（2026-10-07 duplicate 統合・4回目再発）**: 2026-10-06 に4回目の再発（agentdev_gh 全操作が gh exit 66・stderr 空で失敗、RU-0162 の case-open が blocked 停止）。inbox エントリ（2026-10-06 capture）を duplicate 判定で統合（症状・再発条件・予防策候補が一致。ホスト再起動による plugin 再初期化を再開条件として提唱）。予防策候補の反映は未実施のまま。4回再発のため、次回 learning-promote で本エントリ自体の知識文書化（docs/knowledge 候補: agentdev_gh 障害の再開手順・起動時疎通確認）を再評価する
 - **追記（2026-10-16 統合・5回目再発）**: Case #3725 closure capture（backlog-auto run 20261015T180807JST stage5）で5回目の再発（agentdev_gh issue_list 2回・issue_create 4回が gh exit 66・stderr 空で失敗、bash 直叩き gh と bun CliRunner 直接実行は成功）。inbox エントリを本エントリと同現象で統合し、新知見（bash 直叩き + bun CliRunner 直接実行の2段分離試験）は既存対策の更新として昇華済み（promoted: `.agentdev/learning/promoted/existing-measure-update-agentdev-gh-spawn-failure-isolation.md`。learning-promote 2026-10-16。review で REQ-052-014/015 と issue-operation-recovery.md〔2026-10-09 整備、gh exit 66 例外手順・再起動回復・委譲前疎通確認を含む〕が既存恒久対策として実在することを実測。残 gap は診断手順への2段分離試験明記と failFromExec detail 提案）
+- **統合追記（2026-10-20 learning-promote）**: duplicate 受理。case-open STEP-2 での同一事象（plugin ホスト内 gh exit 66・bash 直叩きと CliRunner 直接実行は正常・serve 再起動で回復）が本日 capture され、本クラスは L2364-2366 の再発記録（5 回目まで）に続く再発。既存恒久手順（issue-operation-recovery.md の劣化サイクル・縮退運用節）が知識文書化の実質を担うため duplicate とし、L2365 の再評価約束（「4 回再発のため次回 learning-promote で知識文書化を再評価する」）に対する回答として本追記を記録する。委譲前疎通確認（L59）は既存規定
 
 ---
 
@@ -3464,6 +3465,7 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 
 - **移動日**: 2026-10-08
 - **処分判定**: deferred（2026-10-08 自律確定〔Jev 先行評価・adversarial-review 反映〕。8軸合計 28/40。worktree-operations.md L458-478 に prune→rmSync→消滅確認と Filename too long フォールバックが既存（adversarial-review 実測）。適用事例）
+- **統合追記（2026-10-20 learning-promote）**: duplicate 受理。Windows long path 制限での git worktree remove 失敗の同一事象が本日 capture。既存手順（worktree-operations.md L452-488 の rmSync/robocopy /MIR フォールバック・LongPathsEnabled 条件）が完全被覆。本エントリの処分判定（適用事例）と同一結論
 
 ---
 
@@ -4526,6 +4528,7 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **関連**: PR #3669（Case #3670、Findings/Capture候補 learning セクションの記録）、merge commit 5958fe7e
 - **タグ**: `#distribution-boundary` `#concrete-id`
 - **移動日**: 2026-10-13
+- **統合追記（2026-10-20 learning-promote）**: duplicate 受理。sidecar 追加方針を後決めして配布物本文（JSDoc・節説明）へ REQ 行 ID 直書きし checker が 23 件検出する同一根因の再発（PR #3799）。harness-delegation.md 委譲指示規律節（L285-293）と distribution-concrete-id-placement.md の恒久被覆を再実測で確認
 
 ---
 
@@ -4707,6 +4710,7 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **関連**: .agentdev/learning/inbox.md、Refs: #3678
 - **タグ**: `#case-close` `#bun-test` `#並行実行` `#疑似fail`
 - **移動日**: 2026-10-15
+- **統合追記（2026-10-20 learning-promote）**: deferred 維持。git fixture 系テストの並行負荷 timeout 間欠失敗（solo 再実行と --timeout 15000/30000 延長で解消）が本日 capture され、本クラスは 3 エントリ構成（本件・L4819・新規）。adversarial-review B7 により標準化の方法（実測分布に基づく明示 --timeout）は windows-bun-test-spawn-timeout-classification.md L17 が指示し、60 秒前例（agentdev-textlint-guard tests/parallel.test.ts L145）も実在することが確認されたが、fail は毎回可視で既存手順で解消するため qg-4 reference の timeout 指針整備機会発生時の再評価として保持
 
 
 
@@ -5038,3 +5042,80 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **タグ**: `#入力様式` `#fail-closed`
 - **処分判定**: deferred（learning-promote 2026-10-17 自律確定。実害なし・fail-closed 契約内・出現1件・軽微。8軸 16/40。案内形式明示の補足追記候補を保持。再評価条件: 同種入力様式誤りの再発時、SKILL.md 入力様式記述の改訂機会発生時）
 - **移動日**: 2026-10-17
+
+---
+
+## 並行負荷下で git fixture 系テストが hook timeout により間欠失敗する
+
+- **問題事象**: QG-4 実行中、git 操作の fixture を持つテスト群（IR-072、check_changed_docs TS-001、scripts-behavior 3件）が並行負荷下で 5000ms のデフォルト timeout 超過により間欠失敗した
+- **発生局面**: 実装（case-close QG-4 正規形。複数 worktree の並行実行時）
+- **検知方法**: QG-4 の fail 由来分類（solo 再実行での合格と --timeout 延長時の安定を再実測）
+- **根本原因**: git fixture がディスク I/O を伴い、並行実行の負荷でデフォルト timeout を超過する（コード欠陥ではなく実行形態由来）
+- **自律対応内容**: solo 再実行と bun test --timeout 15000/30000 の規律適合形の再実行で全件合格を確認した（chdocs-wt3784-solo-t15-stderr.log 54 pass、ir072-wt3784-solo-stderr.log 189 pass、3785-scriptsbehavior-solo-stderr.log 19 pass）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 並行実行時の fail は fail 由来分類（変更由来 / pre-existing / 実行形態由来 / 不明）を先行させ、実行形態由来は solo 実行と timeout 延長の規律適合再実行で確定する
+- **再発条件**: 複数 worktree でフル suite を並行実行する場合（baseline: commit e7f5c1fb、2026-10-18、QG-4 正規形実行）
+- **予防策候補**: QG-4 正規形の並行実行時における標準 --timeout 指針の整備
+- **想定反映先**: src/common/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md
+- **関連**: PR #3790、#3792、QG-4 証跡（C:/WINDOWS/TEMP/opencode/*.log）
+- **タグ**: `#flaky` `#QG-4`
+- **移動日**: 2026-10-20
+
+---
+
+## covers コメント連鎖の文字列組立で ID 順序乖離が生じ verbatim 包含突合が捕捉した
+
+- **問題事象**: case-open STEP-4 の Definition 編集組立で、逐次依存する ADF-COVERS コメント連鎖（ACT-DESIGN-001→002→003）を文字列置換（末尾 ` -->` 対象の replace）で生成した結果、REQ-110 covers 宣言の最終形に既存追跡対象識別子（REQ-104-008）が中間に残り、draft 合意文言（REQ-110-032 の後に REQ-104-008 が末尾）と ID 順序が乖離したまま commit された
+- **発生局面**: 実装（case-open STEP-4 の prepare_definition_pr 入力 JSON 組立）
+- **検知方法**: STEP-4 手順 6 の verbatim 包含突合（draft 合意文言の covers 最終形と適用後行の byte 一致照合）で 1 件の MISSING を検出
+- **根本原因**: 置換関数の対象として ` -->`（行末トークン）を選択したため、識別子列挙の挿入点（既存最終 ID の直後）ではなく行末への追記になった。中間段の covers 行が前段との連鎖整合（連鎖 oldText = 前段 newText）は満たすため、行構造事前確認（REQ-030-030）と gate 検査では検出されない
+- **自律対応内容**: 旧文完全一致の訂正 edit（commit 4624160b）で合意形へ復元し、再実行の gate 3 種を通過させてから PR を作成した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存の verbatim 包含突合手順が設計どおり機能）
+- **横展開観点**: 逐次依存する covers コメント連鎖を組立てる場合は、挿入点を識別子列挙内の直前の ID に固定し、組立後は必ず draft 合意文言との byte 一致照合を行う。行構造検査は連鎖整合を検証しないため代替にならない
+- **再発条件**: covers 連鎖の中間段が前段 newText と一致する限り連鎖整合は成立するため、最終段の ID 順序を検査する突合が省略された場合に再発する
+- **予防策候補**: covers 連鎖を組立する場合は最終形を draft から直接抽出した文字列と byte 照合する手順を入力組立の標準に含める
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md（verbatim 包含突合の手順補足）
+- **関連**: PR #3794、commit 4624160b、Root Case #3793
+- **タグ**: `#トレーサビリティ` `#Definition編集`
+- **移動日**: 2026-10-20
+
+---
+
+## DefinitionEdit の行構造事前確認は行内連結を拒否するため単一箇条書き行への行内追記は隣接行を含む2行編集で表現する
+
+- **問題事象**: REQ 適用範囲の対象行（単一の長い箇条書き行）の末尾へ文言を追記する DefinitionEdit を「対象行のみを oldText、追記版のみを newText」として組み立てると、newText が oldText を接頭辞として保持する形状となり、行構造事前確認（validateEditLineStructure の連結検出規則。Case #3779 由来）が「追加内容は行頭から始まること」を要求して機械的に拒否される
+- **発生局面**: case-open STEP-4 の入力 JSON 組立（DefinitionEdit の oldText/newText 設計）
+- **検知方法**: reference の行構造事前確認規則の事前読み込み（機械検証に到達する前に組立段階で回避）
+- **根本原因**: 対象行単独を oldText とする行内追記は「追加行の末尾行への連結」と同型になり、行の追加のみを許す規則と衝突する
+- **自律対応内容**: oldText を「対象行 + 改行 + 隣接行（対象外行）」の2行、newText を「追記版対象行 + 改行 + 対象外行」の2行とする編集構成へ変更した。newText が oldText を接頭辞として保持しないため連結検出規則は不適用となり、行数も保全される。置換対象2行の一意性を node script で事前検証してから入力 JSON へ組込み、全17編集の一意性検証と適用を通過させた
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存の機械検証規則の適用範囲内の回避構成）
+- **横展開観点**: 行単位の追記を含まない行内の文言追記（箇条書き行の列挙追加、frontmatter updated の日付変更等）を DefinitionEdit へ表現する場合、oldText に隣接行を含めて newText が oldText の接頭辞にならない形へ組むのが安全。置換対象の一部文字列のみの oldText（TS-008 → TS-010 の語句置換等、接頭辞保持にならない置換）はそのまま利用できる
+- **再発条件**: prepare_definition_pr への DefinitionEdit 入力を組み立てる際に、単一箇条書き行への行内追記を oldText=対象行のみで組み立てた場合
+- **予防策候補**: req-define 側の draft 組立（artifact_actions content の表現）へ、行内追記を含む content が DefinitionEdit へ転記可能な構造である旨の注記を追加する検討
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md（DefinitionEdit 組立の実運用例追記）、req-define の draft-data 契約 reference
+- **関連**: Issue #3803、PR #3804、Root Case #3803
+- **タグ**: `#DefinitionEdit` `#行構造事前確認` `#case-open`
+- **移動日**: 2026-10-20
+
+---
+
+## bun test 全件実行で textlint 並列系のみタイミング起因のフレークが観測され再実行で 0 fail になる
+
+- **問題事象**: textlint vendor 生成後の bun test 全件実行で 1 回のみ 4 fail（textlint 並列系のタイミング起因）を観測した。再実行で 0 fail となり、本変更と無関係の環境タイミング起因と判断した
+- **発生局面**: case-run 委譲内の bun test 全件検証（PR #3811 検証差分 #11）
+- **検知方法**: bun test 全件実行の fail 検出と再実行での消失
+- **根本原因**: textlint 並列系テストのタイミング依存（推測。断定せず記録）
+- **自律対応内容**: 再実行で 0 fail を確認し、フレーク分を本変更と無関係の環境タイミング起因として検証差分へ記録した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: bun test 全件の fail はまず再実行で再現性を確認し、タイミング起因と不具合を区別してから対応を決める
+- **再発条件**: bun test 全件（textlint vendor 生成後）を CI 相当の1回実行で判定する場合
+- **予防策候補**: textlint 並列系テストの同期化または再実行手順の恒常化、フレーク分類基準（タイミング起因と不具合の区別）の整備
+- **想定反映先**: src/opencode/plugins/agentdev-textlint-guard/（並列系テストの安定化検討）、agentdev-learning-pipeline（フレーク分類基準）
+- **関連**: PR #3811 Findings 第2項、Issue #3803
+- **タグ**: `#bun test` `#フレーク` `#textlint`
+- **移動日**: 2026-10-20
+

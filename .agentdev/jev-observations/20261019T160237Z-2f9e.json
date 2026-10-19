@@ -1,0 +1,408 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261019T160237Z-2f9e",
+  "workflow": "learning-promote",
+  "evaluationKind": "disposal",
+  "subject": "問題クラス C1〜C20 の処分区分（7カテゴリ + duplicate）",
+  "sourceRevision": "866c86aaf（main HEAD）",
+  "durationMs": 920,
+  "inputTokens": 5569,
+  "inputs": {
+    "requestDigest": "5987bec2c5af8bba9b7f23f7b0bdf0a87cb108a7fd96c47a6524cbaf43a85de5"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "d-c1",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0,
+        "2 恒久契約候補（Decision）": 0,
+        "3 恒久契約候補（Design）": 0,
+        "4 project knowledge": 0.01,
+        "5 既存対策の更新（promote）": 0,
+        "6 deferred": 0.04,
+        "7 rejected": 0.09,
+        "duplicate": 0.86
+      }
+    },
+    {
+      "questionId": "d-c2",
+      "questionForm": "choice",
+      "value": "6 deferred",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.02,
+        "2 恒久契約候補（Decision）": 0.03,
+        "3 恒久契約候補（Design）": 0.05,
+        "4 project knowledge": 0.12,
+        "5 既存対策の更新（promote）": 0.22999999999999998,
+        "6 deferred": 0.51,
+        "7 rejected": 0.01,
+        "duplicate": 0.03
+      }
+    },
+    {
+      "questionId": "d-c3",
+      "questionForm": "choice",
+      "value": "6 deferred",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.04,
+        "2 恒久契約候補（Decision）": 0.04,
+        "3 恒久契約候補（Design）": 0.11,
+        "4 project knowledge": 0.06,
+        "5 既存対策の更新（promote）": 0.13,
+        "6 deferred": 0.62,
+        "7 rejected": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "d-c4",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新（promote）",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0,
+        "2 恒久契約候補（Decision）": 0,
+        "3 恒久契約候補（Design）": 0,
+        "4 project knowledge": 0,
+        "5 既存対策の更新（promote）": 0.99,
+        "6 deferred": 0,
+        "7 rejected": 0.01,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "d-c5",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新（promote）",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.01,
+        "2 恒久契約候補（Decision）": 0.01,
+        "3 恒久契約候補（Design）": 0.04,
+        "4 project knowledge": 0.03,
+        "5 既存対策の更新（promote）": 0.88,
+        "6 deferred": 0.02,
+        "7 rejected": 0.01,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "d-c6",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新（promote）",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.01,
+        "2 恒久契約候補（Decision）": 0.01,
+        "3 恒久契約候補（Design）": 0.03,
+        "4 project knowledge": 0.02,
+        "5 既存対策の更新（promote）": 0.9,
+        "6 deferred": 0.01,
+        "7 rejected": 0.01,
+        "duplicate": 0.01
+      }
+    },
+    {
+      "questionId": "d-c7",
+      "questionForm": "choice",
+      "value": "6 deferred",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.01,
+        "2 恒久契約候補（Decision）": 0.02,
+        "3 恒久契約候補（Design）": 0.01,
+        "4 project knowledge": 0.02,
+        "5 既存対策の更新（promote）": 0.34,
+        "6 deferred": 0.59,
+        "7 rejected": 0,
+        "duplicate": 0.01
+      }
+    },
+    {
+      "questionId": "d-c8",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0,
+        "2 恒久契約候補（Decision）": 0,
+        "3 恒久契約候補（Design）": 0,
+        "4 project knowledge": 0.01,
+        "5 既存対策の更新（promote）": 0,
+        "6 deferred": 0.3,
+        "7 rejected": 0.03,
+        "duplicate": 0.66
+      }
+    },
+    {
+      "questionId": "d-c9",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新（promote）",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.02,
+        "2 恒久契約候補（Decision）": 0.02,
+        "3 恒久契約候補（Design）": 0.07,
+        "4 project knowledge": 0.09,
+        "5 既存対策の更新（promote）": 0.35,
+        "6 deferred": 0.35,
+        "7 rejected": 0.07,
+        "duplicate": 0.03
+      }
+    },
+    {
+      "questionId": "d-c10",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新（promote）",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.01,
+        "2 恒久契約候補（Decision）": 0.01,
+        "3 恒久契約候補（Design）": 0.02,
+        "4 project knowledge": 0.06,
+        "5 既存対策の更新（promote）": 0.38,
+        "6 deferred": 0.31,
+        "7 rejected": 0.13,
+        "duplicate": 0.08
+      }
+    },
+    {
+      "questionId": "d-c11",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0,
+        "2 恒久契約候補（Decision）": 0,
+        "3 恒久契約候補（Design）": 0,
+        "4 project knowledge": 0.01,
+        "5 既存対策の更新（promote）": 0.01,
+        "6 deferred": 0.03,
+        "7 rejected": 0.15,
+        "duplicate": 0.8
+      }
+    },
+    {
+      "questionId": "d-c12",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新（promote）",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.01,
+        "2 恒久契約候補（Decision）": 0.01,
+        "3 恒久契約候補（Design）": 0.01,
+        "4 project knowledge": 0.02,
+        "5 既存対策の更新（promote）": 0.87,
+        "6 deferred": 0.07,
+        "7 rejected": 0,
+        "duplicate": 0.01
+      }
+    },
+    {
+      "questionId": "d-c13",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.01,
+        "2 恒久契約候補（Decision）": 0.01,
+        "3 恒久契約候補（Design）": 0.01,
+        "4 project knowledge": 0.03,
+        "5 既存対策の更新（promote）": 0.01,
+        "6 deferred": 0.06,
+        "7 rejected": 0.31,
+        "duplicate": 0.56
+      }
+    },
+    {
+      "questionId": "d-c14",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.01,
+        "2 恒久契約候補（Decision）": 0.01,
+        "3 恒久契約候補（Design）": 0.01,
+        "4 project knowledge": 0.04,
+        "5 既存対策の更新（promote）": 0.03,
+        "6 deferred": 0.19,
+        "7 rejected": 0.33,
+        "duplicate": 0.38
+      }
+    },
+    {
+      "questionId": "d-c15",
+      "questionForm": "choice",
+      "value": "1 恒久契約候補（REQ）",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.53,
+        "2 恒久契約候補（Decision）": 0,
+        "3 恒久契約候補（Design）": 0.01,
+        "4 project knowledge": 0.04,
+        "5 既存対策の更新（promote）": 0.04,
+        "6 deferred": 0.19,
+        "7 rejected": 0.13,
+        "duplicate": 0.06
+      }
+    },
+    {
+      "questionId": "d-c16",
+      "questionForm": "choice",
+      "value": "6 deferred",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.12,
+        "2 恒久契約候補（Decision）": 0.05,
+        "3 恒久契約候補（Design）": 0.02,
+        "4 project knowledge": 0.05,
+        "5 既存対策の更新（promote）": 0.01,
+        "6 deferred": 0.74,
+        "7 rejected": 0.01,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "d-c17",
+      "questionForm": "choice",
+      "value": "7 rejected",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.02,
+        "2 恒久契約候補（Decision）": 0,
+        "3 恒久契約候補（Design）": 0.01,
+        "4 project knowledge": 0.23,
+        "5 既存対策の更新（promote）": 0.01,
+        "6 deferred": 0.05,
+        "7 rejected": 0.54,
+        "duplicate": 0.14
+      }
+    },
+    {
+      "questionId": "d-c18",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新（promote）",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.01,
+        "2 恒久契約候補（Decision）": 0.01,
+        "3 恒久契約候補（Design）": 0.03,
+        "4 project knowledge": 0.05,
+        "5 既存対策の更新（promote）": 0.86,
+        "6 deferred": 0.04,
+        "7 rejected": 0,
+        "duplicate": 0
+      }
+    },
+    {
+      "questionId": "d-c19",
+      "questionForm": "choice",
+      "value": "5 既存対策の更新（promote）",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0,
+        "2 恒久契約候補（Decision）": 0.01,
+        "3 恒久契約候補（Design）": 0.01,
+        "4 project knowledge": 0.02,
+        "5 既存対策の更新（promote）": 0.68,
+        "6 deferred": 0.27,
+        "7 rejected": 0,
+        "duplicate": 0.01
+      }
+    },
+    {
+      "questionId": "d-c20",
+      "questionForm": "choice",
+      "value": "7 rejected",
+      "probabilityDistribution": {
+        "1 恒久契約候補（REQ）": 0.03,
+        "2 恒久契約候補（Decision）": 0.02,
+        "3 恒久契約候補（Design）": 0.05,
+        "4 project knowledge": 0.12,
+        "5 既存対策の更新（promote）": 0.2,
+        "6 deferred": 0.21,
+        "7 rejected": 0.24,
+        "duplicate": 0.13
+      }
+    }
+  ],
+  "confidence": 0.84,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "d-c1",
+        "value": "duplicate"
+      },
+      {
+        "questionId": "d-c10",
+        "value": "6 deferred",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-c11",
+        "value": "duplicate"
+      },
+      {
+        "questionId": "d-c12",
+        "value": "5 既存対策の更新（promote）"
+      },
+      {
+        "questionId": "d-c13",
+        "value": "duplicate"
+      },
+      {
+        "questionId": "d-c14",
+        "value": "6 deferred",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "d-c15",
+        "value": "1 恒久契約候補（REQ）"
+      },
+      {
+        "questionId": "d-c16",
+        "value": "6 deferred"
+      },
+      {
+        "questionId": "d-c17",
+        "value": "7 rejected"
+      },
+      {
+        "questionId": "d-c18",
+        "value": "5 既存対策の更新（promote）"
+      },
+      {
+        "questionId": "d-c19",
+        "value": "5 既存対策の更新（promote）"
+      },
+      {
+        "questionId": "d-c2",
+        "value": "duplicate",
+        "differenceReason": "deterministic_override"
+      },
+      {
+        "questionId": "d-c20",
+        "value": "7 rejected"
+      },
+      {
+        "questionId": "d-c3",
+        "value": "duplicate",
+        "differenceReason": "deterministic_override"
+      },
+      {
+        "questionId": "d-c4",
+        "value": "5 既存対策の更新（promote）"
+      },
+      {
+        "questionId": "d-c5",
+        "value": "5 既存対策の更新（promote）"
+      },
+      {
+        "questionId": "d-c6",
+        "value": "5 既存対策の更新（promote）"
+      },
+      {
+        "questionId": "d-c7",
+        "value": "6 deferred"
+      },
+      {
+        "questionId": "d-c8",
+        "value": "duplicate"
+      },
+      {
+        "questionId": "d-c9",
+        "value": "duplicate",
+        "differenceReason": "deterministic_override"
+      }
+    ]
+  }
+}

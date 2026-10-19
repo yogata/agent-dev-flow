@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261019T161352Z-26d8",
+  "workflow": "learning-promote",
+  "evaluationKind": "review-trigger",
+  "subject": "learning-promote 2026-10-20 run（inbox 20 エントリ・C1〜C20）の adversarial-review 発動条件",
+  "sourceRevision": "866c86aaf（main HEAD）",
+  "durationMs": 862,
+  "inputTokens": 620,
+  "inputs": {
+    "requestDigest": "4ae720ff866e884126a3f7afc7736fdf9bbcd2cb89afa6d3ae8bdaa701316ff7"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-review-trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.94,
+        "false": 0.06000000000000005
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-review-trigger",
+        "value": true
+      }
+    ]
+  }
+}
