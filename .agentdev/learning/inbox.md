@@ -292,3 +292,35 @@
 - **想定反映先**: agentdev-workflow-case-revise / agentdev-workflow-req-define（draft 永続化手順）、agentdev-workflow-case-ready scripts（untracked draft 検知時の報告文言）
 - **関連**: Issue #3803、Issue #3814、PR #3813、case-ready cleanup script 報告（skippedPaths 記録）
 - **タグ**: `#draft永続化` `#case-revise` `#cleanup`
+
+## 2026-10-19: 依存生成未実施 worktree で repo root 全体 bun test が 76 fail となり、変更起因失敗との分類にスイート分解が必要だった
+
+- **問題事象**: worktree 環境では textlint-guard の vendor 依存が未伝播のため、`bun test ./`（repo root 全体）が 76 fail となる。fail の大半が依存生成未実施環境由来（fail-closed 挙動）であり、変更起因の失敗と区別するにはスイート単位実行（case-run scripts スイート等）への分解が必要だった
+- **発生局面**: case-run（TS-001 検証。Epic #3803 是正 Case #3814・PR #3815）
+- **検知方法**: bun test 全体実行の fail 明細が textlint vendor engine bundle・prh 辞書関連に集中することの確認
+- **根本原因**: 依存生成手順（README「開発者セットアップ」の bun install && bun run build:engine）未実施環境での全体実行は fail-closed で依存解決失敗が fail として混入し、fail 一覧から環境差と変更起因が構造的に分かれない
+- **自律対応内容**: 完了条件に合致するスイート単位実行（`bun test ./src/common/skills/agentdev-workflow-case-run/`）への分解で検査範囲を確定し、全体 fail を環境差として PR Findings へ分離記録
+- **ユーザー確認有無**: なし
+- **REQ/Decision/spec影響**: なし
+- **横展開観点**: 依存生成未実施環境での bun test 全体実行結果の解釈には、依存生成前置の案内出力（fail-closed 案内）との突合が有効。worktree 環境差 fail の由来分類（docs/knowledge/worktree-environment-fail-classification.md）の運用と接続する位置にある
+- **再発条件**: worktree または新規 checkout 環境で依存生成を実施せず repo root 全体の bun test を実行する場合
+- **予防策候補**: 依存生成手順未実施環境での全体実行時に、依存由来 fail と検査 fail の判別指針（依存生成前置の案内出力との突合・案内メッセージの明示化）を提示する仕組み
+- **想定反映先**: agentdev-textlint-guard（依存検知時の案内文言）、repo-agentdev-integrity（fail 由来分類の実行案内）、docs/knowledge/worktree-environment-fail-classification.md（接続記載）
+- **関連**: PR #3815 Findings 第1項、Issue #3814、親 Epic #3803
+- **タグ**: `#worktree環境差` `#bun test` `#fail由来分類`
+
+## 2026-10-19: HOLD_AND_CONTINUE_TOKENS の宣言のみの未使用状態が typecheck 枠組み不在下で長期未検出となり、anchor 照合テストの token 定義と本文表現の対応関係が保守観点として残存
+
+- **問題事象**: open-dependency-and-proto-application.test.ts の HOLD_AND_CONTINUE_TOKENS が宣言のみで参照がなく、noUnusedLocals を適用する typecheck で顕在化した。PR #3815 で case-run/adapter test への token 群照合追加により参照化したが、token 群定義と各 SKILL 本文表現（case-open は「…実行契約候補から除外しない」等の表現差）の対応関係は anchor 照合の保守観点として留意対象が残る
+- **発生局面**: case-run（typecheck。Epic #3803 是正 Case #3814・PR #3815）
+- **検知方法**: tsc --noEmit（strict 構成・noUnusedLocals）の未使用定数指摘
+- **根本原因**: テストヘルパ定数の追加が参照結線なしで先行し、case-run scripts は package（tsconfig/package.json）を持たないため型検査枠組みが不在で長期未検出だった
+- **自律対応内容**: 既存 HOLD_AND_CONTINUE_TOKENS 群への anchor 照合追加（case-run/adapter 未決依存 test）で参照化し、期待値としての意味を保持した
+- **ユーザー確認有無**: なし
+- **REQ/Decision/spec影響**: なし
+- **横展開観点**: anchor 型 token 照合テストでは、token 定義群と SKILL 本文表現の対応関係（同型・表現差の区別）を定義側コメント等で明示すると、未使用化の早期検出と表現 drift の検知に繋がる
+- **再発条件**: anchor 照合テストに token 群を追加する際に参照結線を作らず、かつ当該テスト領域の型検査が実行されない場合
+- **予防策候補**: token 群定義への対応関係明示（どの SKILL のどの表現を期待値とするか）、token 群追加時の参照結線確認の手順化
+- **想定反映先**: agentdev-workflow-case-run scripts/tests（token 群対応関係の明示）、型検査枠組み不在の課題は intake（同日別 entry）として分離管理
+- **関連**: PR #3815 Findings 第3項、Issue #3814、親 Epic #3803
+- **タグ**: `#anchor型テスト` `#noUnusedLocals` `#保守観点`
