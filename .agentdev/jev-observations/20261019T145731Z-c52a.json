@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261019T145731Z-c52a",
+  "workflow": "intake-promote",
+  "evaluationKind": "classification-item-evaluation",
+  "subject": "traceability コーパス完全性欠落の棚卸し（inbox item 2026-10-18-traceability-corpus）",
+  "sourceRevision": "09c832627",
+  "durationMs": 1438,
+  "inputTokens": 1499,
+  "inputs": {
+    "requestDigest": "4dc18af0e7518c0aeeec3923462af0c1c357b43a7db708237d70acb202f925f8",
+    "references": [
+      {
+        "digest": "7cce290a1b662cf11b89738936842ceac542d3a9e58bb8dcd854c613e8970768",
+        "label": "inbox-item",
+        "path": ".agentdev/intake/inbox/2026-10-18-traceability-corpus-completeness-inventory.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "validity",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低 = 対応判断に影響しない軽微な観測": 0.02,
+        "中 = 判断材料として有用だが対応の優先度を上げない": 0.5,
+        "高 = 採否・優先度の判断を左右する重要な観測": 0.48
+      }
+    },
+    {
+      "questionId": "impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低 = 影響は限定的で軽微": 0.23,
+        "中 = 特定工程・要件に影響": 0.37,
+        "高 = 複数工程・要件・検証経路に波及する影響": 0.4
+      }
+    },
+    {
+      "questionId": "urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低 = 即応不要": 0.36,
+        "中 = 計画的対応で足りる": 0.64,
+        "高 = 停止中の工程があり早急な対応が望ましい": 0
+      }
+    },
+    {
+      "questionId": "classification",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.87,
+        "保留": 0.09,
+        "却下": 0.04
+      }
+    }
+  ],
+  "confidence": 0.25,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "validity",
+        "value": 1
+      },
+      {
+        "questionId": "impact",
+        "value": 1
+      },
+      {
+        "questionId": "urgency",
+        "value": 1
+      },
+      {
+        "questionId": "classification",
+        "value": "採用"
+      }
+    ]
+  }
+}

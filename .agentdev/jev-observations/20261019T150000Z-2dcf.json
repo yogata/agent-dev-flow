@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261019T150000Z-2dcf",
+  "workflow": "intake-promote",
+  "evaluationKind": "adversarial-review-trigger",
+  "subject": "intake-promote STEP-2 adversarial-review 発動条件判定（暫定分類 7件採用・1+7統合候補）",
+  "sourceRevision": "09c832627",
+  "durationMs": 731,
+  "inputTokens": 1032,
+  "inputs": {
+    "requestDigest": "0b6d177dd38ea65dd885f2eca3df0d46e39a7e9f1dd6f1c31991de2f80275f4d",
+    "references": [
+      {
+        "digest": "2f0cf9c0d8c9f4e326a1aea35f61bf06a977507b5f72ca4e98af5267067a0cce",
+        "label": "inbox-item-ts007",
+        "path": ".agentdev/intake/inbox/2026-10-17-ts007-github-path-verification-environment.md"
+      },
+      {
+        "digest": "56896e610172c86e5802f0f0e21b234d540fd208e8141859df03976f3b460857",
+        "label": "inbox-item-ts008-ts010",
+        "path": ".agentdev/intake/inbox/2026-10-19-ts008-ts010-github-route-verification-env-absence.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.96,
+        "false": 0.040000000000000036
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "trigger",
+        "value": true
+      }
+    ]
+  }
+}

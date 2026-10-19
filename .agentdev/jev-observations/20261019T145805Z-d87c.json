@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261019T145805Z-d87c",
+  "workflow": "intake-promote",
+  "evaluationKind": "classification-item-evaluation",
+  "subject": "case-run scripts テスト領域の型検査枠組み不在（inbox item 2026-10-19-typecheck）",
+  "sourceRevision": "09c832627",
+  "durationMs": 300,
+  "inputTokens": 1625,
+  "inputs": {
+    "requestDigest": "bc67f3a7398f81b56e3e7fc4600827b946e59d618c08c1022a2a30829eb98ac0",
+    "references": [
+      {
+        "digest": "b298a1eb1b40129d11b0aa705f81b9f9e3f30c7f16f766be8a8a93892f848de8",
+        "label": "inbox-item",
+        "path": ".agentdev/intake/inbox/2026-10-19-caserun-scripts-typecheck-framework-absence.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "validity",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低 = 対応判断に影響しない軽微な観測": 0,
+        "中 = 判断材料として有用だが対応の優先度を上げない": 0.13,
+        "高 = 採否・優先度の判断を左右する重要な観測": 0.87
+      }
+    },
+    {
+      "questionId": "impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低 = 影響は限定的で軽微": 0.01,
+        "中 = 特定工程・要件に影響": 0.77,
+        "高 = 複数工程・要件・検証経路に波及する影響": 0.22
+      }
+    },
+    {
+      "questionId": "urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低 = 即応不要": 0.07,
+        "中 = 計画的対応で足りる": 0.91,
+        "高 = 停止中の工程があり早急な対応が望ましい": 0.02
+      }
+    },
+    {
+      "questionId": "classification",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.8,
+        "保留": 0.16,
+        "却下": 0.04
+      }
+    }
+  ],
+  "confidence": 0.8,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "validity",
+        "value": 2
+      },
+      {
+        "questionId": "impact",
+        "value": 1
+      },
+      {
+        "questionId": "urgency",
+        "value": 1
+      },
+      {
+        "questionId": "classification",
+        "value": "採用"
+      }
+    ]
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261019T145732Z-6ab4",
+  "workflow": "intake-promote",
+  "evaluationKind": "classification-item-evaluation",
+  "subject": "TS-007 GitHub 版検証環境の未整備（inbox item 2026-10-17-ts007）",
+  "sourceRevision": "09c832627",
+  "durationMs": 1647,
+  "inputTokens": 1565,
+  "inputs": {
+    "requestDigest": "d5f2a98d61c401aaa7e898e50a280eb0c49390987f22ae6195a8fb8bab7f3e9d",
+    "references": [
+      {
+        "label": "inbox-item",
+        "path": ".agentdev/intake/inbox/2026-10-17-ts007-github-path-verification-environment.md",
+        "digest": "2f0cf9c0d8c9f4e326a1aea35f61bf06a977507b5f72ca4e98af5267067a0cce"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "validity",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低 = 対応判断に影響しない軽微な観測": 0,
+        "中 = 判断材料として有用だが対応の優先度を上げない": 0.01,
+        "高 = 採否・優先度の判断を左右する重要な観測": 0.99
+      }
+    },
+    {
+      "questionId": "impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低 = 影響は限定的で軽微": 0,
+        "中 = 特定工程・要件に影響": 0.86,
+        "高 = 複数工程・要件・検証経路に波及する影響": 0.14
+      }
+    },
+    {
+      "questionId": "urgency",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低 = 即応不要": 0,
+        "中 = 計画的対応で足りる": 0.03,
+        "高 = 停止中の工程があり早急な対応が望ましい": 0.97
+      }
+    },
+    {
+      "questionId": "classification",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.93,
+        "保留": 0.07,
+        "却下": 0
+      }
+    }
+  ],
+  "confidence": 0.98,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "validity",
+        "value": 2
+      },
+      {
+        "questionId": "impact",
+        "value": 1
+      },
+      {
+        "questionId": "urgency",
+        "value": 2
+      },
+      {
+        "questionId": "classification",
+        "value": "採用"
+      }
+    ]
+  }
+}

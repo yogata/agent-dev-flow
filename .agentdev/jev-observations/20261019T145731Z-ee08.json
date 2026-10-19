@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261019T145731Z-ee08",
+  "workflow": "intake-promote",
+  "evaluationKind": "classification-item-evaluation",
+  "subject": "IR-055 予防観点の委譲 prompt 引き渡し（inbox item 2026-10-18-ir055）",
+  "sourceRevision": "09c832627",
+  "durationMs": 1368,
+  "inputTokens": 1504,
+  "inputs": {
+    "requestDigest": "dc5c178aabee152d7943e74d391f81f1f6b231ef64162c575ff20107685f257d",
+    "references": [
+      {
+        "digest": "f982c4c4063c53407061f0e2e0a5c4bc78fd93ccf1d4dcbbb8ee00dc5a9a3db5",
+        "label": "inbox-item",
+        "path": ".agentdev/intake/inbox/2026-10-18-ir055-docs-literal-reference-delegation-prompt.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "validity",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低 = 対応判断に影響しない軽微な観測": 0.02,
+        "中 = 判断材料として有用だが対応の優先度を上げない": 0.5,
+        "高 = 採否・優先度の判断を左右する重要な観測": 0.48
+      }
+    },
+    {
+      "questionId": "impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低 = 影響は限定的で軽微": 0.15,
+        "中 = 特定工程・要件に影響": 0.81,
+        "高 = 複数工程・要件・検証経路に波及する影響": 0.04
+      }
+    },
+    {
+      "questionId": "urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低 = 即応不要": 0.29,
+        "中 = 計画的対応で足りる": 0.71,
+        "高 = 停止中の工程があり早急な対応が望ましい": 0
+      }
+    },
+    {
+      "questionId": "classification",
+      "questionForm": "choice",
+      "value": "採用",
+      "probabilityDistribution": {
+        "採用": 0.95,
+        "保留": 0.01,
+        "却下": 0.04
+      }
+    }
+  ],
+  "confidence": 0.25,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "validity",
+        "value": 1
+      },
+      {
+        "questionId": "impact",
+        "value": 1
+      },
+      {
+        "questionId": "urgency",
+        "value": 1
+      },
+      {
+        "questionId": "classification",
+        "value": "採用"
+      }
+    ]
+  }
+}
