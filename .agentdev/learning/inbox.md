@@ -276,3 +276,19 @@
 - **想定反映先**: REQ-110（TS-010 行。具体化済み）、agentdev-traceability（verification 宣言の二層記載例）
 - **関連**: PR #3812 learning、Issue #3803
 - **タグ**: `#検証二層運用` `#anchor型テスト` `#REQ-110-033`
+
+## 2026-10-19: case-revise 由来の Definition Amendment draft が untracked のまま cleanup へ到達し removal commit が不成立した
+
+- **問題事象**: case-ready の cleanup（canonical-and-cleanup phase、removalPaths に draft 指定）で、対象 draft（PR #3813 由来）が git tracked でないため script の冪等化前置きが git rm 対象から除外（skippedPaths 記録）し、removal commit 対象が空で commit が不成立した。draft は生成後、case-revise / case-ready のどの工程でも git 永続化（commit）されていなかった
+- **発生局面**: case-ready STEP-7（draft 削除。Epic #3803 例外経路の是正 Case #3814 受入）
+- **検知方法**: cleanup script 報告 JSON の draft-ru-removal-commit fail（removedPaths 空・skippedPaths に draft）と git ls-files / git status での untracked 確認
+- **根本原因**: draft 作成後の git 永続化手順が例外経路（case-revise → case-ready）のどの工程でも実行されていなかった（推測を含む。断定せず記録）
+- **自律対応内容**: draft が untracked であることを実確認し、canonical Definition（merge 済み REQ-108-013）への投影済みを確認した上で物理削除し、git 状態を clean にした。removal commit は不要（tracked 変更なし）と判定した
+- **ユーザー確認有無**: なし
+- **REQ/Decision/spec影響**: なし
+- **横展開観点**: draft / RU の lifecycle 管理は「保存時の git 永続化」と「cleanup 時の git rm」が対になる。どちらか一方だけが成立していると cleanup の機械工程が安全に止まる（fail-closed として機能）が、永続化漏れの検知は cleanup 時点まで遅延する。draft 作成工程での永続化実施確認が前置として有効
+- **再発条件**: case-revise が draft を生成・更新する場合、または req-define が draft を永続化 commit なしで次工程へ引き渡す場合
+- **予防策候補**: draft 作成・更新後の git 永続化を case-revise / req-define の手順へ明示、または cleanup 前の untracked draft 検知時の警告メッセージ明確化
+- **想定反映先**: agentdev-workflow-case-revise / agentdev-workflow-req-define（draft 永続化手順）、agentdev-workflow-case-ready scripts（untracked draft 検知時の報告文言）
+- **関連**: Issue #3803、Issue #3814、PR #3813、case-ready cleanup script 報告（skippedPaths 記録）
+- **タグ**: `#draft永続化` `#case-revise` `#cleanup`
