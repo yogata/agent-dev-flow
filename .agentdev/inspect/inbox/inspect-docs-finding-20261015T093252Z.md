@@ -37,6 +37,7 @@ STEP-2 の意味診断は REQ 体系・Design・Decision/guides/README/knowledge
 - defer 分の再評価条件: DB02・DS17・DS19・RQ17・GR10 は Case #3725 完了時（解消未了なら promote 再分類）、DS22・GR11 は docs-check ルール候補の実装検討時
 - 旧 defer 71件は全件 defer 継続（自律確定）: 各 finding ファイルへ再評価記録を追記。delta 窓（2026-10-12 以降）と旧 defer 対象の交差 8件を現物確認し、うち 7件は対象記述不変、RQ-36（20260929T165249Z）は REQ-008 が 97 行（診断時 61 行比増加）のため次回 SPLIT 正式計測時に含める注記を追記
 - 2026-10-16 実施（backlog-auto stage 2 inspect 系統、--auto なし）分類確定: reject 2件（DB02・GR10。解消確認により対応不要・即時削除。ffa59eac で backlog-auto 配布物〔command description・ガードレール・SKILL.md〕と guides/root README の REQ-114 stage 4-7 反映を現物確認）/ promote 3件（DS17・DS19・RQ17。事前宣言の再評価条件「Case #3725 完了時（解消未了なら promote 再分類）」が発火〔GitHub 照会で closed・closedAt 2026-10-16T01:11:40Z〕し gap 未解消のため、promoted/finding-20261016-req114-doc-fix-candidates.md へ保存・本ファイルから削除。修正方向は未決のまま後続検討へ）/ defer 継続 2件（DS22・GR11。docs-check ルール候補の実装検討時が再評価条件で未発火）。分類は Jev 先行評価（観測 20261016T041350Z-3c9e）＋ adversarial-review 2 stream（証拠系・権限系）convergence 後に全件自律確定（HITL 対象なし）
+- 2026-10-19 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: DS22/GR11 は再評価条件未充足のため defer 継続（自律確定）: docs-check ルール候補（同一ファイル内 covers 集合の包含重複検出・AUTOGEN 外件数散文複製の機械照合）の実装検討は未発火
 
 ## 検出事項リスト
 

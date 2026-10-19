@@ -41,6 +41,7 @@ REQ の6観点（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）を fan-in で確認�
 - Jev 乖離の処置: RQ10/RQ11 は promote 暫定から defer へ変更（既知 RQ03 と同 category「第一参照導線の ID 化不足」の処分一貫性）、DS10 は promote 暫定から defer へ変更（REQ-111-011 実体の所有設計判断未了〔本文追加 vs scope 注記〕。Jev defer 0.97 と一致）、DS16 は reject 暫定から defer へ変更（docs-check ルール候補〔検出閾値検討〕の知見として deferred 保持）
 - 2026-10-15 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: RQ08〜RQ14・DS10/DS14/DS16・GR07/GR09 は再評価条件未充足のため defer 継続（自律確定）: 20261015T093252Z の既知 defer 照合と同結果（RQ08 crosswalk :80 は 85680dab で frontmatter のみ変更で不変、DS10 covers と本文欠落状態維持、DS14 REQ-111-013 edge 注記なしのまま、DS16 維持、GR07 は第3例〔DEC-059.md:17、6b63ba24 由来〕をカテゴリ延伸として記録、GR09 の .agentdev/phase/ 列挙は不在のまま）
 - 2026-10-16 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: RQ08〜RQ14・DS10/DS14/DS16・GR07/GR09 は再評価条件未充足のため defer 継続（自律確定）: 対象ファイル（REQ-111/REQ-110/REQ-035/REQ-030・REQ-061 既存行/REQ-041/v51 Design 2件/v4-standard-lifecycle/DEC-057/DEC-058/crosswalk/artifacts-and-state.md）は 38bc58c7..636b1e2b の delta 外で対象記述不変（REQ-061・REQ-030 は新規行追加のみで既存行不変を差分確認）
+- 2026-10-19 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: RQ08〜RQ14・DS10/DS14/DS16・GR07/GR09 は再評価条件未充足のため defer 継続（自律確定）: 本日の delta（REQ-110/REQ-114/DEC-059/060 系）で対象行の意味変化はなく、RQ08 の移行確定条件も未発火（v4-v5-crosswalk は status: draft のまま現物確認）。GR09 の artifacts-and-state.md .agentdev/phase/ 列挙は不在のまま
 
 ## 検出事項リスト
 

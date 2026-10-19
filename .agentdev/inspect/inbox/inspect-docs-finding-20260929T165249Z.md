@@ -9,7 +9,7 @@
 - 主要新規テーマ: ①retired/REQ-013 から現行不存在行 REQ-006-040 への dangling 参照（RQ-31）②REQ-046 廃止判定予約の未消化（v4.0.0 final 通過済み、RQ-32）③case-auto.md:158 が superseded DEC-015 を「現行の責務体制は」と現行権威表記（DS-21）④docs/README.md の DEC-028 行に generator spec 上の superseded 注記が導出されていない（DC-14）⑤REQ-090-007 が REQ-035 と同一内容の重複宣言（RQ-33）⑥custom-tool-contracts.md の REQ-090 行逐語複製と実測観測刻印（DS-23/24）
 - 前回 RU-0136 対象の状態: DS-14（case-run.md:236/240/247/271 の v2:REQ-0158-002 SSoT 宣言）・DS-20（:239/267/269「项」）とも残存（req-define 待ち・解消未確認）。簡体字全走査では docs/ 全域で case-run.md のみヒット
 
-## 検出事項リスト（defer 残置 8件）
+## 検出事項リスト（defer 残置 7件）
 
 ### REQ 体系（defer 残置 2件）
 
@@ -51,17 +51,7 @@
 - **recommended_route**: 方針論点（document-model の許容境界明確化時に統合判断。個別是正不要）
 - **ng_classification**: 判断保留
 
-### Decision / guides / README（defer 残置 3件）
-
-#### DC-13: DEC-018 欠番が decisions README と欠番レジストリに未記録（再検知）
-- **category**: 索引整合（欠番明記）
-- **target**: docs/decisions/README.md baseline-table、docs/designs/foundations/numbering-policy.md:57-66
-- **evidence**: numbering-policy.md:55「欠番は各 README、索引類で『欠番』として明記し」に対し、既知の欠番節は REQ のみ掲載で DEC-018 の記載なし（ファイル全体 grep 0件）。baseline-table は DEC-017→019 を無注記で並べる。記録は v3-v4-crosswalk.md:51 のみ
-- **severity**: low / **confidence**: high（規則文言に対する明確な未充足）
-- **source_of_truth**: numbering-policy.md「欠番の扱い」節
-- **recommended_route**: decisions README（AUTOGEN 節または手動節）と numbering-policy 既知欠番レジストリへ DEC-018 明記。REQ 欠番（docs/README.md 明記済み）との非対称解消
-- **ng_classification**: pre-existing
-- **notes**: 20260925 F-19 と同趣旨の再検知（20260914/20260927 にも言及）
+### Decision / guides / README（defer 残置 2件）
 
 #### GD-05: supervisor-credential-bridge.md:115 に日付付き実測記録（軽度）
 - **category**: guides scope（履歴・監査要素の混入候補）
@@ -131,3 +121,4 @@
 - 2026-10-05 実施（backlog-auto stage 2 inspect 系統、--auto なし、親直列化スロット）再評価: RQ-34（REQ-060-007 の数値帯・20260929T170714Z RQ-05 と統合 defer だった対象）は解消確認により reject・即時削除（自律確定）: REQ-060.md:22 から 300〜600 秒の数値帯は除去され「timeout の標準値・上限値の所有は checker-execution-contracts.md『bun test 実行形態契約』節が所有する」と明記（現物行実読。親診断 20261004T162140Z の解消判定と一致、Jev 分類 reject 意見一致。対側の 170714Z RQ-05 も同日削除）。RQ-35/RQ-36/DS-22/DS-25/DC-13/GD-05/RM-02 は再評価条件未充足のため defer 継続（自律確定）。却下理由の詳細は commit message に記録
 - 2026-10-15 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: RQ-35/RQ-36/DS-22/DS-25/DC-13/GD-05/RM-02 は再評価条件未充足のため defer 継続（自律確定）: 対象記述不変を確認（RM-02 の docs/README.md Report 節はリンクなしのまま不変。RQ-36 の REQ-008 は 0050bd43 で値域追記があり 97 行へ増加〔診断時 61 行比〕— SPLIT 正式計測の再評価条件を次回に強化。DC-13 の decisions/README.md は 6b63ba24 で DEC-059 反映済みだが DEC-018 欠番明記は不在のまま）
 - 2026-10-16 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: RQ-35/RQ-36/DS-22/DS-25/DC-13/GD-05/RM-02 は再評価条件未充足のため defer 継続（自律確定）: 対象ファイル（REQ-003/REQ-008/harness-separation-model/DS-25 対象 4 Design/decisions README・numbering-policy/supervisor-credential-bridge/docs/README.md Report 節）は 38bc58c7..636b1e2b の delta 外で不変（req-health-metrics.md は delta 変更があるが RQ-36 の対象は REQ-008 側で不変）
+- 2026-10-19 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: RQ-35/RQ-36/DS-22/DS-25/GD-05/RM-02 は再評価条件未充足のため defer 継続（自律確定）: RM-02 の docs/README.md Report 節は Markdown リンクなしのまま不変を現物確認。DC-13 は解消確認により reject・セクション削除（自律確定）: docs/decisions/README.md「現行 Decision」節に「DEC-018 は欠番であり、対応する Decision ファイルは存在しない。」の明記を現物確認（2026-10-16 時点の再評価記録では不在、2026-10-16 以降に追加）。numbering-policy.md:56 の「各 README、索引類で明記」義務は充足。Jev 先行評価（観測 20261019T150102Z-f15b、dc13-disposition=reject 0.81）と LLM 最終判断一致。残る numbering-policy 既知欠番節（:58-66）への DEC-018 追記は、同節の自己規定（:62「numbering-policy は欠番の存在宣言のみを担い、交叉参照データの体系的蓄積は req-impact-map/retired/ が担う」・REQ 採番スクリプトの欠番レジストリ）から DEC 側の記載義務に当たらない補完候補であり対応不要と判断。却下理由の詳細は commit message に記録

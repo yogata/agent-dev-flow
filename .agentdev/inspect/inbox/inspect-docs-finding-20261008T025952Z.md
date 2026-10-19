@@ -14,6 +14,7 @@
 - 分類は adversarial-review 2 stream（Stream A 分類妥当性・Stream B 証拠適合/成果物化適性）の convergence 後に自律確定（HITL 対象なし・破壊的変更なし）
 - 2026-10-15 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: F-07〔REQ-030-024〕/F-12/F-14/F-15/F-21/F-23/F-24/F-25 は再評価条件未充足のため defer 継続（自律確定）: F-07 の REQ-030.md:43 は 85680dab 変更後も対象記述存続・文意不変。F-21 の docs/README.md DEC 表は ea3d6e0a で REQ-114/DEC-059 反映済み（DEC-059 行 :177 実在）だが supersede 注記全文埋め込みの構図は不変。F-12/F-14/F-15/F-23/F-24/F-25 は対象ファイル delta 不変
 - 2026-10-16 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: F-07〔REQ-030-024〕/F-12/F-14/F-15/F-21/F-23/F-24/F-25 は再評価条件未充足のため defer 継続（自律確定）: 38bc58c7..636b1e2b の delta で REQ-030 は新規行（028/029）追加のみで REQ-030-024 は不変を差分確認、F-24 対象節（intake-learning-backlog-flow.md :86-87）は :102-103 追記の影響なしで不変を現物確認、他対象ファイルは delta 外
+- 2026-10-19 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: F-07〔REQ-030-024〕/F-12/F-14/F-15/F-21/F-23/F-24/F-25 は再評価条件未充足のため defer 継続（自律確定）: 本日の delta（2026-10-17〜19、REQ-110/REQ-114/DEC-059/060・backlog-auto 関係）は各対象ファイルと交差せず。F-25 は GR12（20261017）との同時再評価条件のまま
 
 ## 残置 defer 検出事項リスト
 

@@ -58,3 +58,8 @@
 - docs/src/README の修正、既存 finding の変更、採否判断、Issue/PR 操作、Git 永続化。
 - 指定されたプール外ファイル、Jev 観測、end-to-end 状態の変更。
 - 全テスト、型検査、正規の機械検査一式、Senpi 実機検証。今回は診断 Markdown の新規生成のみ。
+
+## 処理記録（2026-10-19 inspect-promote、backlog-auto stage 2 inspect 系統、--auto なし）
+
+- 分類確定: **defer**（自律確定）: docs/README.md の DEC-059 行に部分置換注記がない事実は現物確認済み（DEC-059 frontmatter は supersede_note あり・superseded_by なし、DEC-060 側 supersedes 宣言あり、生成器は superseded_by のみ参照）だが、部分置換時に前提側へ superseded_by を置くことを必須とする規範は明文化されておらず、修正経路（frontmatter 追加 vs 生成器が supersede_note／後継側 supersedes を参照する拡張）と正とする情報源が未確定。既知 defer DC01（decisions/README.md Decision Map）・DC-07・DC-10 と同一テーマ族（掲載基準・記録方式が慣行ベースで契約上明文化されず、欠落＝違反と確定できない）であり、処分一貫性から defer とする。Jev 先行評価（観測 20261019T150102Z-f15b、defer 0.94）を受けて暫定 promote から defer へ変更（LLM 最終判断。DC01 族前例との処分一貫性を評価器指摘の規範未文書化論拠と併せて採用）。DC01 側（20261017T102200Z）へ同時再評価の相互注記を追記済み
+- 再評価条件: Decision Map・docs/README Decision 索引の掲載基準が明文化される時（DC01 族の同時再評価時）、または部分置換メタデータ運用（superseded_by の要否）の判断が確定する時。docs-check 候補（後継側部分置換関係・前身側注記・索引生成入力の不一致検出）は DC01 由来候補と併せて backlog-review 経由で検討
