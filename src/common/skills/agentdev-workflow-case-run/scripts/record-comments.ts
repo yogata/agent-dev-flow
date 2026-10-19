@@ -166,10 +166,104 @@ export interface ProgressSectionInput {
   endDate: string;
 }
 
+// 進行状況日時欄の値様式。正は workflows/issue-lifecycle-records Design
+// 「正規状態と日時」節（開始日時上書き禁止・終了日時設定条件・実作業時間
+// 非保存の規律は変更しない）。実測値のみを記載する原則を維持した上で、
+// 観測事実（ブランチ作成、初回 commit、PR 作成等の実測可能な時刻）に基づく
+// 既知の上限・下限時刻の併記による境界表現を書式例外として受理する。
+// 境界表現は観測事実のみで構成され、未観測時刻の推定値を実測値の位置へ
+// 記載した値は受理しない。実測が確定した時点で実測値へ置換する。
+
+export type ProgressDateKind = "measured" | "not-set" | "bounded";
+
+export interface ProgressDateValidation {
+  ok: boolean;
+  kind: ProgressDateKind | null;
+  violations: string[];
+}
+
+// 実測値の前置形式: `YYYY-MM-DD` で始まる日付（`2026-10-04 05:25 JST`、
+// ISO 8601 の `2026-10-04T05:25:00+09:00` 等を含む）。
+const MEASURED_PREFIX_RE = /^\d{4}-\d{2}-\d{2}/;
+// 未観測時刻の境界表現。下限・上限の一方または両方を併記する。
+const BOUNDED_RE = /^未観測（(?:下限: (.+?)(?:、上限: (.+))?|上限: (.+))）$/u;
+// 推定語彙。観測事実のみで構成された境界表現・実測値には含まれない。
+const ESTIMATION_HINT_RE = /推定|頃|あたり|およそ|約\d/;
+
+function dateComponentOk(component: string | undefined): boolean {
+  if (component === undefined) {
+    return false;
+  }
+  const trimmed = component.trim();
+  if (!MEASURED_PREFIX_RE.test(trimmed)) {
+    return false;
+  }
+  return !ESTIMATION_HINT_RE.test(trimmed);
+}
+
+// 進行状況日時欄の1値（開始日時・終了日時のいずれか）を検証する。
+// 受理する値域: 実測値（日付前置の時刻文字列）、`N/A`（未設定。終了日時の
+// 未確定等）、境界表現（`未観測（下限: {時刻}、上限: {時刻}）` 形式。下限・
+// 上限は観測事実に基づく実測時刻のみ。一方のみの片側併記も許容）。
+// 推定語彙を含む値、様式不一致の自由文は拒否する（観測事実のない推定値を
+// 実測値の位置へ記載させない）。
+export function validateProgressDate(value: string): ProgressDateValidation {
+  const trimmed = value.trim();
+  if (trimmed === "N/A") {
+    return { ok: true, kind: "not-set", violations: [] };
+  }
+  if (ESTIMATION_HINT_RE.test(trimmed)) {
+    return {
+      ok: false,
+      kind: null,
+      violations: [`推定語彙を含む値を実測値の位置へ記載している（未観測時刻は境界表現で記載する）: ${trimmed}`],
+    };
+  }
+  const bounded = trimmed.match(BOUNDED_RE);
+  if (bounded !== null) {
+    const lower = bounded[1];
+    const upper = bounded[2] ?? bounded[3];
+    if (lower !== undefined && !dateComponentOk(lower)) {
+      return { ok: false, kind: null, violations: [`境界表現の下限が実測時刻形式でない: ${lower}`] };
+    }
+    if (upper !== undefined && !dateComponentOk(upper)) {
+      return { ok: false, kind: null, violations: [`境界表現の上限が実測時刻形式でない: ${upper}`] };
+    }
+    return { ok: true, kind: "bounded", violations: [] };
+  }
+  if (MEASURED_PREFIX_RE.test(trimmed)) {
+    return { ok: true, kind: "measured", violations: [] };
+  }
+  return {
+    ok: false,
+    kind: null,
+    violations: [`実測値・N/A・境界表現のいずれの様式でもない値: ${trimmed}`],
+  };
+}
+
+export interface ProgressSectionValidation {
+  ok: boolean;
+  violations: string[];
+}
+
+// 進行状況セクションの入力（開始日時・終了日時）を検証する。開始日時の
+// 上書き禁止等の規律の判定は取りまとめの責務であり、本検証は値の様式のみ
+// を扱う（決定的処理）。
+export function validateProgressSection(input: ProgressSectionInput): ProgressSectionValidation {
+  const violations: string[] = [];
+  for (const [label, value] of [["開始日時", input.startDate], ["終了日時", input.endDate]] as const) {
+    for (const violation of validateProgressDate(value).violations) {
+      violations.push(`${label}: ${violation}`);
+    }
+  }
+  return { ok: violations.length === 0, violations };
+}
+
 // Case Issue 本文の進行状況セクションを構築する。
 // Root Case は正規状態と開始・終了日時のみ、Child は開始・終了日時のみを保持する
 // （workflows/issue-lifecycle-records Design「正規状態と日時」節）。case-run は
-// 完了条件チェックボックスを更新しない。
+// 完了条件チェックボックスを更新しない。日時欄の様式は validateProgressSection
+// で検証する（様式どおりでない値の構築を事前検証で抑止する）。
 export function buildProgressSection(input: ProgressSectionInput): string {
   const lines: string[] = ["## 進行状況", ""];
   if (input.canonicalState !== undefined) {

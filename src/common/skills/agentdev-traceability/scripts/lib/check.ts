@@ -141,8 +141,13 @@ export function runChecks(
   const known = new Set(knownReqIds);
   const scope = options.completenessReqIds ?? knownReqIds;
   const policy = options.verificationPolicy;
-  const optionalReqIds = policy?.optionalReqIds ?? new Set<string>();
   const policyUnavailable = policy?.unavailable ?? false;
+  // policy 解決不能時は optional 登録を読めないため、全軸とも登録なし
+  // （= 対応必須）として扱う（安全側既定。missing-verification には要否判定不能
+  // の fail-closed 計上を残す）。
+  const optionalReqIds = policyUnavailable ? new Set<string>() : policy?.optionalReqIds ?? new Set<string>();
+  const designOptionalReqIds = policyUnavailable ? new Set<string>() : policy?.designOptionalReqIds ?? new Set<string>();
+  const implementationOptionalReqIds = policyUnavailable ? new Set<string>() : policy?.implementationOptionalReqIds ?? new Set<string>();
   const sidecarEvaluationBlocked = scan.sidecarIssues.length > 0;
 
   const malformed: CheckFinding[] = scan.issues
@@ -216,10 +221,19 @@ export function runChecks(
   const missingImplementation: CheckFinding[] = [];
   const missingVerification: CheckFinding[] = [];
   for (const reqId of scope) {
-    if (!scan.declarations.some((d) => d.role === "design" && d.reqIds.includes(reqId))) {
+    // design / implementation / verification の各軸とも、policy が任意（optional
+    // 区分）と明示登録した行は欠落を計上しない。区分機構は旧要件行の区分明示の
+    // 用途であり、policy 不在時は対応必須のまま（安全側既定）。
+    if (
+      !designOptionalReqIds.has(reqId) &&
+      !scan.declarations.some((d) => d.role === "design" && d.reqIds.includes(reqId))
+    ) {
       missingDesign.push({ reqId });
     }
-    if (!scan.declarations.some((d) => d.role === "implementation" && d.reqIds.includes(reqId))) {
+    if (
+      !implementationOptionalReqIds.has(reqId) &&
+      !scan.declarations.some((d) => d.role === "implementation" && d.reqIds.includes(reqId))
+    ) {
       missingImplementation.push({ reqId });
     }
     if (
@@ -244,7 +258,7 @@ export function runChecks(
     // 検証対応要否の判定が不能。missing-verification を合格としない（fail-closed）。
     missingVerification.push({
       reason: "policy-evaluation-unavailable",
-      detail: "検証スコープポリシーの解決が実行不能なため検証対応の要否を判定できない（fail-closed）",
+      detail: "スコープポリシーの解決が実行不能なため対応の要否を判定できない（fail-closed）",
     });
   }
 

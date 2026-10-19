@@ -14,6 +14,8 @@ import {
   RECORD_KIND_LABELS,
   RECORD_KINDS,
   recordTemplatePath,
+  validateProgressDate,
+  validateProgressSection,
   validateRecordComment,
   applySection,
 } from "../record-comments.ts";
@@ -293,6 +295,64 @@ describe("記録コメントの必須項目検証（投稿前 fail-closed）", (
     const result = validateRecordComment("completion", noBasis);
     expect(result.ok).toBe(false);
     expect(result.violations.join("\n")).toContain("判定根拠");
+  });
+});
+
+describe("進行状況日時欄の境界表現様式（書式例外）", () => {
+  test("実測値（日付前置の時刻文字列）と N/A を受理する", () => {
+    expect(validateProgressDate("2026-10-04 05:25 JST")).toMatchObject({ ok: true, kind: "measured" });
+    expect(validateProgressDate("2026-10-04T05:25:00+09:00")).toMatchObject({ ok: true, kind: "measured" });
+    expect(validateProgressDate("N/A")).toMatchObject({ ok: true, kind: "not-set" });
+  });
+
+  test("境界表現（観測事実に基づく上限・下限の併記）を受理する", () => {
+    expect(validateProgressDate("未観測（下限: 2026-10-20 05:25 JST、上限: 2026-10-20 09:25 JST）")).toMatchObject({ ok: true, kind: "bounded" });
+    expect(validateProgressDate("未観測（下限: 2026-10-20T05:25:00+09:00、上限: 2026-10-20T09:25:00+09:00）")).toMatchObject({ ok: true, kind: "bounded" });
+    expect(validateProgressDate("未観測（下限: 2026-10-20 05:25 JST）")).toMatchObject({ ok: true, kind: "bounded" });
+    expect(validateProgressDate("未観測（上限: 2026-10-20 09:25 JST）")).toMatchObject({ ok: true, kind: "bounded" });
+  });
+
+  test("観測事実を伴わない推定値を拒否する", () => {
+    const estimated = validateProgressDate("2026-10-20 頃");
+    expect(estimated.ok).toBe(false);
+    expect(estimated.violations.join("\n")).toContain("推定");
+
+    expect(validateProgressDate("着手時刻を初回 commit から推定して記載").ok).toBe(false);
+    expect(validateProgressDate("約2026-10-20 05:25").ok).toBe(false);
+  });
+
+  test("様式不一致の自由文を拒否する", () => {
+    const freeText = validateProgressDate("着手時に設定する");
+    expect(freeText.ok).toBe(false);
+    expect(freeText.violations.join("\n")).toContain("いずれの様式でもない");
+  });
+
+  test("境界表現の下限・上限が実測時刻形式でない場合は拒否する", () => {
+    expect(validateProgressDate("未観測（下限: 未定、上限: 2026-10-20 09:25 JST）").ok).toBe(false);
+    expect(validateProgressDate("未観測（下限: 2026-10-20 05:25 JST、上限: なし）").ok).toBe(false);
+    expect(validateProgressDate("未観測（下限: 過去のどこか）").ok).toBe(false);
+  });
+
+  test("validateProgressSection は開始・終了日時の様式を検証し、違反欄を特定する", () => {
+    expect(validateProgressSection({ startDate: "2026-10-20 05:25 JST", endDate: "N/A" })).toEqual({ ok: true, violations: [] });
+    expect(validateProgressSection({
+      startDate: "未観測（下限: 2026-10-20 05:25 JST、上限: 2026-10-20 09:25 JST）",
+      endDate: "N/A",
+    })).toEqual({ ok: true, violations: [] });
+    const failed = validateProgressSection({ startDate: "2026-10-20 頃", endDate: "着手時に設定" });
+    expect(failed.ok).toBe(false);
+    expect(failed.violations.join("\n")).toContain("開始日時");
+    expect(failed.violations.join("\n")).toContain("終了日時");
+  });
+
+  test("buildProgressSection は境界表現を含む日時欄を様式どおり出力する", () => {
+    const section = buildProgressSection({
+      canonicalState: "ready",
+      startDate: "未観測（下限: 2026-10-20 05:25 JST、上限: 2026-10-20 09:25 JST）",
+      endDate: "N/A",
+    });
+    expect(section).toContain("- 開始日時: 未観測（下限: 2026-10-20 05:25 JST、上限: 2026-10-20 09:25 JST）");
+    expect(section).toContain("- 終了日時: N/A");
   });
 });
 

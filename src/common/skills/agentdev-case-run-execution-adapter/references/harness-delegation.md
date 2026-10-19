@@ -287,6 +287,8 @@ case-run は委譲プロンプト構築時に本テンプレート構造を維�
 委譲 prompt の構築者（case-run へ委譲する全場面）と委譲を受ける実行担当サブエージェントが、配布物本文・委譲 prompt・PR 本文・Issue コメントへ ID を書き込む際に従う指示規律。配布物本文への concrete ID 直書きが配布依存境界 checker の違反（consumer 環境で ID が解決不能となる設計制約）となり、既存違反の新規追加を誘発した実失敗に基づく予防規律である。「委譲プロトコルと category 設計」節の MUST NOT DO 必須化における予防観点の引き渡しを、独立した指示規律として拡充したものである。
 
 - **canonical 参照は節名のみ**: 委譲 prompt、配布物本文（SKILL.md、references、command 本文）、およびその追記では、REQ 行 ID、Decision ID、CR 番号等の concrete ID を本文に直書きしない。正規原本への参照は、対象文書名と節名（例: case-open Design「並行 case-open の作業隔離規律」節）による節名参照で記述する。本文に具体番号を書ける ID ファミリーの範囲（STEP 番号、QG 番号等）は配布依存境界 Design の正規規定に従う
+- **docs 配下パスの literal 参照禁止と抽象化参照への統一**: 委譲 prompt、配布物本文、およびその追記では、docs 配下パス（要件・設計文書等の配置パス）を literal に書かない。正規原本を参照する場合は既存本体と同一の抽象化参照（対象文書名と節名等の記述名による参照）へ統一する。適用範囲は委譲 prompt の MUST NOT DO セクション等を通じた予防観点の引き渡しを含む。既存配布物本文の全面的な文面是正を要求せず、新規追記に適用する。本規律の対象外は既知の検査器の検査内容変更（integrity ルールカタログの検査内容・整合性検査器）であり、検査器の実装を本規律で変更しない
+- **検出カテゴリの区別**: 前項の docs 配下パス literal 参照禁止と既存の concrete ID 直書き禁止は、検出カテゴリが異なる別規律である。concrete ID 直書きは配布依存境界 checker の検出対象であり、docs 配下パス literal 参照は実行時未解決参照を検出する heuristic 検査の対象である。両者を同一カテゴリとして混同して記述せず、検出器の対象違いとして扱わない
 - **対応関係は traceability sidecar への記録**: concrete ID を伴う対応関係（どの配布物がどの要件行・決定事項に対応するか）は、repository top-level の `traceability/` 配下 sidecar へ記録する。配布物本体は対応関係の ID を持たず、sidecar への登録と配布物本文の節名参照の両立で接合する
 - **sidecar 宣言パターン**: sidecar は成果物パス単位に role キー配下へ要件行 ID を列挙する形式である。配布物（producer 側パス）に対する対応関係は implementation 役割で登録する。role の種類（decision / design / implementation / verification の4役割）と形式詳細は traceability の正規契約と配布依存境界 Design を参照する
 - **sidecar 記録手順**: 委譲内で配布物本文を変更した場合、該当する対応関係の sidecar 登録要否を確認する。対応関係が新設・変更される場合は PR 作成前に sidecar へ implementation 宣言を登録し、配布物本文は ID を直書きしない状態のまま merge する。sidecar 登録が REQ 行追加等の正規成果物変更を伴う場合はスコープ外として blocked で報告する
