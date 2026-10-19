@@ -1,7 +1,7 @@
 ---
 title: worktree 環境差 fail の由来分離手順と依存前提の実行形態知見
 created: 2026-10-05
-updated: 2026-10-07
+updated: 2026-10-20
 ---
 
 # worktree 環境差 fail の由来分離手順と依存前提の実行形態知見
@@ -29,6 +29,12 @@ case-run/case-close の worktree 実行では、git 管理外の投影・生成�
 | bun:test + fs/path 標準モジュールのみのテスト | 依存整備不要 |
 | 上記以外（textlint vendor・package 依存の script 等） | bun install・vendor 生成が前置で必要（worktree 再作成後は node_modules が復元されない） |
 
+### 依存生成済み/未生成の判別前置（実行前確認手順）
+
+- worktree・新規 checkout 環境では、bun test・checker 実行の前に textlint vendor（`vendor/textlint-engine.bundle.json`・辞書）の存在を確認する。不在の場合は先に依存生成手順（plugin package 配下での `bun install && bun run build:engine`）を前置実行する
+- fail 発生時は、fail 明細が依存関連（textlint-guard vendor・Module not found 等）に集中しているかを確認する。集中している場合は依存由来の可能性が高く、スイート分解により検査範囲を確定して変更起因の失敗と由来分離する
+- 本節は手順の明記に限定する。vendor 空化の検知導入と根本原因調査は「textlint vendor 空化の検知前提」節の未解決論点のまま維持する（範囲外を変更しない）
+
 ### textlint vendor 空化の検知前提（未解決論点を含む）
 
 - textlint vendor（`vendor/textlint-engine.bundle.json`）は worktree へ伝播しない git 管理外の生成物であり、worktree 内での再生成手順は「依存前提の実行形態別判断」表のとおり前置が必要
@@ -55,6 +61,7 @@ case-run/case-close の worktree 実行では、git 管理外の投影・生成�
 - plugins junction 未伝播による分割③未実施の明示記録（PR #3419）・分割① pre-existing 4+1 の baseline 同一条件分類（Case #3433）
 - repo-agentdev-integrity scripts の node_modules 同梱直接実行（PR #3400）・bun:test + 標準モジュールのみの依存整備不要（PR #3451）
 - main root 側 textlint vendor 空化の観測と再生成による復旧（2026-10-05 worktree split3 運用。intake item 2026-10-05-textlint-vendor-drift-worktree-split3、backlog-review 2026-10-07 で追記）
+- 依存生成未実施環境での大量 fail の3回の再発（deferred L3617〔9-10 fail〕・L4037〔76 fail→依存生成後 184 pass〕・2026-10-19 実行分〔repo root 全体 76 fail〕。backlog-review 2026-10-20 で判別前置を追記）
 
 ## 関連知識
 
@@ -63,3 +70,4 @@ case-run/case-close の worktree 実行では、git 管理外の投影・生成�
 - [windows-bun-test-spawn-timeout-classification.md](windows-bun-test-spawn-timeout-classification.md)（timeout 由来 fail との切り分け・対照実行の標準手順）
 - [temp-file-debug-residue-cleanup-criteria.md](temp-file-debug-residue-cleanup-criteria.md)（temp 領域一時ファイルの削除基準・provenance 記録）
 - checker 実行契約（docs/designs/integrity/checker-execution-contracts.md）worktree fallback 節（Design 側 fallback 節も環境差の由来分離・明示記録の運用として本文書を参照しており、両方向の相互参照が成立している。qg-4-final-acceptance.md「bun test フル suite 正規形（実行形態契約）」節からも本項への参照が接続されている〔Case #3462〕）
+- agentdev-git-worktree worktree-operations.md 依存整備節（vendor 前置の必要性と伝播状態確認の配布skill側手順）

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261019T170139Z-faec",
+  "workflow": "backlog-review",
+  "evaluationKind": "knowledge_disposition",
+  "subject": "dependency-generation-precheck-fail-classification 成果物の docs/knowledge/ 保存操作種別判定（親判断 kd-01=保存 の条件付き後続）",
+  "sourceRevision": "6e64c20da",
+  "durationMs": 502,
+  "inputTokens": 889,
+  "inputs": {
+    "requestDigest": "946bb5001eab65dceda39dba0cdd339b1caed41d8b7316fd3c5fa485cd1fc17b",
+    "references": [
+      {
+        "digest": "169a6f60a0bbdf34f7d4ee37b0226a0fa061e4869db254e5599b7e0aac743a52",
+        "label": "dependency-generation-learning",
+        "path": ".agentdev/learning/promoted/dependency-generation-precheck-fail-classification.md"
+      },
+      {
+        "digest": "6e933936d65192a96bff535be1718f268fdf93d5b2c36fca53baa65ed3383cf6",
+        "label": "existing-knowledge-target",
+        "path": "docs/knowledge/worktree-environment-fail-classification.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "kd-02",
+      "questionForm": "choice",
+      "value": "更新",
+      "probabilityDistribution": {
+        "新規": 0,
+        "更新": 1,
+        "置換": 0,
+        "削除": 0
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "kd-02",
+        "value": "更新"
+      }
+    ]
+  }
+}

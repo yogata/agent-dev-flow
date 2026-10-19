@@ -1,0 +1,258 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261019T170250Z-cedf",
+  "workflow": "backlog-review",
+  "evaluationKind": "integration_split",
+  "subject": "backlog-review 2026-10-20JST 実行の RU 化対象12成果物の統合・分割判定",
+  "sourceRevision": "6e64c20da",
+  "durationMs": 781,
+  "inputTokens": 3006,
+  "inputs": {
+    "requestDigest": "7c026dcb3663b6ee50bba1ae488d7244ba595bef1eb4bfdc99d921f0f353cb3e",
+    "references": [
+      {
+        "digest": "ef3fc904f642e12c17ed14d99923fc439431d7e813f54ccb63958f97d1d1e328",
+        "label": "ir055-intake",
+        "path": ".agentdev/intake/promoted/2026-10-18-ir055-docs-literal-reference-delegation-prompt.md"
+      },
+      {
+        "digest": "a078e73d981f2d3d9919dbad128f1429e63ba0bea27ccd7b341a7768b3a3bcfe",
+        "label": "harness-delegation-learning",
+        "path": ".agentdev/learning/promoted/harness-delegation-docs-literal-reference-prohibition.md"
+      },
+      {
+        "digest": "fe90ca068e1ed568db1038d315f7524a9a4ec0fd8e91d3b7814b3295842a7449",
+        "label": "caserun-scripts-intake",
+        "path": ".agentdev/intake/promoted/2026-10-19-caserun-scripts-typecheck-framework-absence.md"
+      },
+      {
+        "digest": "3b1ec4df4e5405b88ebf4c6ca5c8814f323360a5acf86e8a0f115b5ddbb92221",
+        "label": "typecheck-baseline-learning",
+        "path": ".agentdev/learning/promoted/case-run-scripts-typecheck-baseline.md"
+      },
+      {
+        "digest": "eec453ffb0c81994a2059910d3b291b84d0991721a28aa7fd5c08eab076e8455",
+        "label": "issue-op-recovery-learning",
+        "path": ".agentdev/learning/promoted/issue-operation-recovery-tool-internal-launch-prohibition.md"
+      },
+      {
+        "digest": "7f71f0563384284dfac3bd8838e579c9cd12422523d7e2f8a39bf16a9d3d0a88",
+        "label": "progress-record-learning",
+        "path": ".agentdev/learning/promoted/progress-record-unobserved-time-boundary-notation.md"
+      },
+      {
+        "digest": "9232cf392e0701bdf2d3d7373e3d17b0108c1adb86bb243bf2e6ed76679d620a",
+        "label": "qg4-split-learning",
+        "path": ".agentdev/learning/promoted/qg4-bun-test-exit0-race-file-level-split.md"
+      },
+      {
+        "digest": "ec1dfbf55faf2c0b81bff5f7b4011138614b036591798050e8832828e8200884",
+        "label": "draft-git-learning",
+        "path": ".agentdev/learning/promoted/draft-git-persistence-procedure.md"
+      },
+      {
+        "digest": "b36cef381d56301fc15439f661a8f8b5f07c12fabae0c547e2bd355fa12e7201",
+        "label": "exit66-intake",
+        "path": ".agentdev/intake/promoted/2026-10-19-agentdev-gh-exit66-plugin-host-env.md"
+      },
+      {
+        "digest": "d51afc8d84805345eb3208828ebaa41b5f9841b24f93c05f2b0da8029429127b",
+        "label": "github-route-intake",
+        "path": ".agentdev/intake/promoted/2026-10-19-github-route-verification-repository-provisioning.md"
+      },
+      {
+        "digest": "299a8f203a017d6a3ad4ddb87bced7646903cb74d69e26e6eff97fab9f4b4040",
+        "label": "oldtext-intake",
+        "path": ".agentdev/intake/promoted/2026-10-18-draft-oldtext-row-marker-mismatch.md"
+      },
+      {
+        "digest": "183b2de4ca9c636f7a1ee9a9702048df567db0d5f2966339b5411a78618af785",
+        "label": "traceability-inventory-intake",
+        "path": ".agentdev/intake/promoted/2026-10-18-traceability-corpus-completeness-inventory.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "is-01",
+      "questionForm": "choice",
+      "value": "N:1 統合",
+      "probabilityDistribution": {
+        "N:1 統合": 0.71,
+        "1:N 分割": 0,
+        "1:1": 0.29
+      }
+    },
+    {
+      "questionId": "is-02",
+      "questionForm": "choice",
+      "value": "N:1 統合",
+      "probabilityDistribution": {
+        "N:1 統合": 0.82,
+        "1:N 分割": 0,
+        "1:1": 0.18
+      }
+    },
+    {
+      "questionId": "is-03",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "N:1 統合": 0.28,
+        "1:N 分割": 0,
+        "1:1": 0.72
+      }
+    },
+    {
+      "questionId": "is-04",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "N:1 統合": 0.23,
+        "1:N 分割": 0,
+        "1:1": 0.77
+      }
+    },
+    {
+      "questionId": "is-05",
+      "questionForm": "choice",
+      "value": "1:N 分割",
+      "probabilityDistribution": {
+        "N:1 統合": 0.01,
+        "1:N 分割": 0.67,
+        "1:1": 0.32
+      }
+    },
+    {
+      "questionId": "is-06",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "N:1 統合": 0.01,
+        "1:N 分割": 0.04,
+        "1:1": 0.95
+      }
+    },
+    {
+      "questionId": "is-07",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "N:1 統合": 0.16,
+        "1:N 分割": 0.35,
+        "1:1": 0.49
+      }
+    },
+    {
+      "questionId": "is-08",
+      "questionForm": "choice",
+      "value": "1:N 分割",
+      "probabilityDistribution": {
+        "N:1 統合": 0.2,
+        "1:N 分割": 0.55,
+        "1:1": 0.25
+      }
+    },
+    {
+      "questionId": "is-09",
+      "questionForm": "choice",
+      "value": "1:N 分割",
+      "probabilityDistribution": {
+        "N:1 統合": 0.01,
+        "1:N 分割": 0.51,
+        "1:1": 0.48
+      }
+    },
+    {
+      "questionId": "is-10",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "N:1 統合": 0.14,
+        "1:N 分割": 0,
+        "1:1": 0.86
+      }
+    },
+    {
+      "questionId": "is-11",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "N:1 統合": 0,
+        "1:N 分割": 0,
+        "1:1": 1
+      }
+    },
+    {
+      "questionId": "is-12",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "N:1 統合": 0.0101010101010101,
+        "1:N 分割": 0.1717171717171717,
+        "1:1": 0.8181818181818181
+      }
+    }
+  ],
+  "confidence": 0.56,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "is-01",
+        "value": "N:1 統合"
+      },
+      {
+        "questionId": "is-02",
+        "value": "N:1 統合"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "is-03",
+        "value": "N:1 統合"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "is-04",
+        "value": "N:1 統合"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "is-05",
+        "value": "1:1"
+      },
+      {
+        "questionId": "is-06",
+        "value": "1:1"
+      },
+      {
+        "questionId": "is-07",
+        "value": "1:1"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "is-08",
+        "value": "1:1"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "is-09",
+        "value": "1:1"
+      },
+      {
+        "questionId": "is-10",
+        "value": "1:1"
+      },
+      {
+        "questionId": "is-11",
+        "value": "1:1"
+      },
+      {
+        "questionId": "is-12",
+        "value": "1:1"
+      }
+    ]
+  }
+}

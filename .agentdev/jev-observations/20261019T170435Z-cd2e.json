@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261019T170435Z-cd2e",
+  "workflow": "backlog-review",
+  "evaluationKind": "depends_on_reorderability",
+  "subject": "backlog-review 2026-10-20JST 実行の RU 構成案10件の depends_on 並べ替え可能性検証",
+  "sourceRevision": "6e64c20da",
+  "durationMs": 885,
+  "inputTokens": 1140,
+  "inputs": {
+    "requestDigest": "748e5b16269282c82d1404281f8ace36602592596973050d83f008bc77821193",
+    "references": [
+      {
+        "digest": "ef3fc904f642e12c17ed14d99923fc439431d7e813f54ccb63958f97d1d1e328",
+        "label": "pair-a-artifact-1",
+        "path": ".agentdev/intake/promoted/2026-10-18-ir055-docs-literal-reference-delegation-prompt.md"
+      },
+      {
+        "digest": "a078e73d981f2d3d9919dbad128f1429e63ba0bea27ccd7b341a7768b3a3bcfe",
+        "label": "pair-a-artifact-2",
+        "path": ".agentdev/learning/promoted/harness-delegation-docs-literal-reference-prohibition.md"
+      },
+      {
+        "digest": "fe90ca068e1ed568db1038d315f7524a9a4ec0fd8e91d3b7814b3295842a7449",
+        "label": "pair-b-artifact-1",
+        "path": ".agentdev/intake/promoted/2026-10-19-caserun-scripts-typecheck-framework-absence.md"
+      },
+      {
+        "digest": "3b1ec4df4e5405b88ebf4c6ca5c8814f323360a5acf86e8a0f115b5ddbb92221",
+        "label": "pair-b-artifact-2",
+        "path": ".agentdev/learning/promoted/case-run-scripts-typecheck-baseline.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "dr-01",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.96,
+        "false": 0.040000000000000036
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "dr-01",
+        "value": true
+      }
+    ]
+  }
+}

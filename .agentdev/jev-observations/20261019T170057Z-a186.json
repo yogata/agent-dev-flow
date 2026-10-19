@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261019T170057Z-a186",
+  "workflow": "backlog-review",
+  "evaluationKind": "knowledge_disposition",
+  "subject": "dependency-generation-precheck-fail-classification 成果物の docs/knowledge/ 処置候補判定",
+  "sourceRevision": "6e64c20da",
+  "durationMs": 294,
+  "inputTokens": 1137,
+  "inputs": {
+    "requestDigest": "ceb70d9ac0d534c2236049ed051485be5a77010968f2ac13ba186feecfef22d0",
+    "references": [
+      {
+        "digest": "169a6f60a0bbdf34f7d4ee37b0226a0fa061e4869db254e5599b7e0aac743a52",
+        "label": "dependency-generation-learning",
+        "path": ".agentdev/learning/promoted/dependency-generation-precheck-fail-classification.md"
+      },
+      {
+        "digest": "6e933936d65192a96bff535be1718f268fdf93d5b2c36fca53baa65ed3383cf6",
+        "label": "existing-knowledge-target",
+        "path": "docs/knowledge/worktree-environment-fail-classification.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "kd-01",
+      "questionForm": "choice",
+      "value": "保存",
+      "probabilityDistribution": {
+        "保存": 0.96,
+        "削除": 0,
+        "保留": 0.04
+      }
+    }
+  ],
+  "confidence": 0.94,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "kd-01",
+        "value": "保存"
+      }
+    ]
+  }
+}
