@@ -171,7 +171,7 @@
   },
   "進捗": {
     "stage4_要件定義": "要件定義済み（2026-10-20T03:53:48+09:00 確定・auto_ready: true・壁打ちHITL 1件〔RU-0010方針A〕解消・commit 56c415ffe）",
-    "stage5_実行": "blocked（2026-10-20T04:39:47+09:00 子停止観測・2026-10-20T04:45:29+09:00 親確認。case-ready 設計PR受入において GitHub API 接続障害〔api.github.com connectex timeout、親の再確認 pr_read #3817 も同一失敗〕により merge 判断不能。Root Case #3816 作成済み・設計PR #3817 作成済み merge 未実施・ブランチ definition/issue-3816 push 済み HEAD 35336135cee5f243e817056845dc6ec9639a772e・worktree .worktrees/3816-definition・再開メモ .worktrees/3816-definition/CASE-3816-RESUME.md・子Issue と実行構造は未確定・draft/RU は保持。Definition は既存8 REQ追記+新規REQ-115/116+工程記録Design境界表現追記、実ファイル正の採番 REQ-031-036・REQ-061-053、受入検査は --dry-run 留保で正規再検査必要）",
+    "stage5_実行": "実行中（2026-10-20T06:43+09:00 利用者実測でネットワーク回復→再開。case-ready 受入再検査を正規設定（--dry-run なし）で実施し前回留保を解消、設計PR #3817 を squash merge 完了（merge commit acf86dd5ae0668d8246f7c79594e91268a1dc994・canonical main 更新済み・traceability missing-design 0/policy 不正 0）。その後の再開子は case-ready STEP-3 以降・case-run・case-close の正規工程委譲を本 harness で起動不能として delegation-unavailable 停止（GitHub #3816 停止記録 comment-6278277629 投稿済み・逸脱なし）。親が 2026-10-20T06:59+09:00 に case-auto orchestration を引継ぎ、親経由の工程委譲（残る lifecycle 各工程を当該 workflow skill 読込済みの子エージェントで実行）で継続。draft/RU は保持）",
     "stage6_完遂判定": "未着手（stage5 blocked により契約上不開始）",
     "stage7_リリース状態": "基準点確定済み（stage5 blocked により stage7 不開始・タグ/Release 未作成）"
   },
