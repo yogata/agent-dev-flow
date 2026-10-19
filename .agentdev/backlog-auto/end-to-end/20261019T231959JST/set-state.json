@@ -171,7 +171,7 @@
   },
   "進捗": {
     "stage4_要件定義": "要件定義済み（2026-10-20T03:53:48+09:00 確定・auto_ready: true・壁打ちHITL 1件〔RU-0010方針A〕解消・commit 56c415ffe）",
-    "stage5_実行": "実行中（2026-10-20T06:43+09:00 利用者実測でネットワーク回復→再開。case-ready 受入再検査を正規設定（--dry-run なし）で実施し前回留保を解消、設計PR #3817 を squash merge 完了（merge commit acf86dd5ae0668d8246f7c79594e91268a1dc994・canonical main 更新済み・traceability missing-design 0/policy 不正 0）。その後の再開子は case-ready STEP-3 以降・case-run・case-close の正規工程委譲を本 harness で起動不能として delegation-unavailable 停止（GitHub #3816 停止記録 comment-6278277629 投稿済み・逸脱なし）。親が 2026-10-20T06:59+09:00 に case-auto orchestration を引継ぎ、親経由の工程委譲（残る lifecycle 各工程を当該 workflow skill 読込済みの子エージェントで実行）で継続。draft/RU は保持）",
+    "stage5_実行": "実行中（2026-10-20T06:43+09:00 ネットワーク回復後再開。設計PR #3817 squash merge 完了（acf86dd5a）→ case-ready 完了（実行構造=Standard単一実行単位 #3816・draft/RU 削除 6f414e5ff・正規状態 ready）→ case-run 実装委譲 DEL-3816-1 完了（実装 PR #3818・head case-3816・commits ed8105009/1ed0714cc/0f181c5fa・3点ゲート親検証 PASS・対象20要件行 covers 解消・検証 190+276+16 pass・textlint/typecheck/配布依存境界/AUTOGEN 全合格。親経由の工程委譲は delegation-unavailable 停止〔#3816 comment-6278277629〕に対する orchestration 引継ぎ措置）→ case-close 実行主体を委譲起動（PR #3818 merge・QG-4・Design確定・Capture回収・完了条件評価・#3816 クローズ）",
     "stage6_完遂判定": "未着手（stage5 blocked により契約上不開始）",
     "stage7_リリース状態": "基準点確定済み（stage5 blocked により stage7 不開始・タグ/Release 未作成）"
   },
