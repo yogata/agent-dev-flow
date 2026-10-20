@@ -76,8 +76,8 @@ describe("コマンド定義の公開 interface 拡張 pin", () => {
   test("副作用に set-state とリリース時の git タグ作成・push と追加公開成果物の対応が宣言されている", () => {
     expect(COMMAND).toContain("set-state の作成・更新（`.agentdev/` 配下、req-units と draft の配置外）");
     expect(COMMAND).toContain("git タグ作成・push（リリース時。版番号・リリース条件・公開操作はパッチリリース規則の Decision に従う）");
-    expect(COMMAND).toContain("追加公開成果物の対応（ADF本体では GitHub Release の草稿作成・読み戻しまでを Custom Tool カタログ経路で実行する");
-    expect(COMMAND).toContain("公開は利用者が草稿作成とは別に明確に認めた場合に限る。カタログに含まれない操作の実行は承認後の所定経路）");
+    expect(COMMAND).toContain("追加公開成果物の対応（ADF本体では GitHub Release の草稿作成・読み戻しと、公開権限の確認で利用者が公開を明示承認した場合の公開（カタログ内操作 release_publish。承認根拠必須・draft 解除のみ）までを Custom Tool カタログ経路で実行する");
+    expect(COMMAND).toContain("公開は利用者が草稿作成とは別に明確に認めた場合に限る）");
   });
 
   test("HITL 境界節が既存境界の維持と一気通貫実行の利用者判断境界（基準点・リリース条件・公開権限）を宣言している", () => {
@@ -150,6 +150,7 @@ describe("SKILL.md の一気通貫実行 pin", () => {
     expect(SKILL).toContain("| STEP-9 | stage 5: 実行接続 |");
     expect(SKILL).toContain("| STEP-10 | stage 6: 全体完了判定 |");
     expect(SKILL).toContain("| STEP-11 | stage 7: リリース |");
+    expect(SKILL).toContain("タグ作成、Release 草稿作成・読み戻し確認、承認時の Release 公開（release_publish）、リリース状態記録（公開実行形態を含む）/ 完遂済み・リリース保留");
   });
 
   test("依存と分岐に正常経路（一気通貫）、基準点確定不能経路、一式分割経路、実行停止経路、完遂不成立経路、リリース保留経路、公開途中失敗経路が定義されている", () => {
@@ -175,7 +176,7 @@ describe("SKILL.md の一気通貫実行 pin", () => {
   });
 
   test("set-state 永続化契約が配置・形式要素・単一書き手を宣言している", () => {
-    expect(SKILL).toContain("set-state は一式識別子、必須要求と受け入れ義務のスナップショット、RU・要件doc・operation_unit・実行単位の対応表（統合・分割を含む）、基準点情報（最後の正式リリース、開始コミット ID）、stage 別進捗、リリース状態（未着手／基準点確定済み／保留理由／完了）を記録する");
+    expect(SKILL).toContain("set-state は一式識別子、必須要求と受け入れ義務のスナップショット、RU・要件doc・operation_unit・実行単位の対応表（統合・分割を含む）、基準点情報（最後の正式リリース、開始コミット ID）、stage 別進捗、リリース状態（未着手／基準点確定済み／保留理由／完了。完了には公開実行形態（workflow 実行／代行／利用者手動）と、workflow 実行時は承認根拠の参照を含める）を記録する");
     expect(SKILL).toContain("配置は `.agentdev/` 配下で req-units と draft の配置外とし、ドラフト残存・RU 残存を検証するクリーンアップ検証ゲートの対象外とする。全体完了とリリース完了まで保持する");
     expect(SKILL).toContain("set-state への書込みは同一 backlog-auto 実行に限定する（単一書き手規則）。backlog-auto の二重起動に対しては既存の single-flight 保護に準じて排除する");
   });
@@ -225,6 +226,7 @@ describe("end-to-end-execution reference の手順 pin", () => {
     expect(END_TO_END).toContain("| 義務スナップショット |");
     expect(END_TO_END).toContain("| 対応表 | RU・要件doc・operation_unit・実行単位（Case Issue / Issue / Epic）の対応（統合・分割を含む）");
     expect(END_TO_END).toContain("| 基準点情報 | 実行開始時に確定した最後の正式リリース（版番号、タグ名、タグ対象コミット）と開始コミット ID |");
+    expect(END_TO_END).toContain("公開実行形態は workflow 実行／代行／利用者手動の3区分で区別して記録し、workflow 実行の場合は承認根拠（承認した HITL 質問 ID・回答の記録参照）を含める");
     expect(END_TO_END).toContain("進行中の実行を示す set-state（完了か保留か中断を確定できない状態）を検出した後行起動は、新規実行を開始せず既存実行の状態確認と再開（`/agentdev/backlog-auto` 再実行の案内）へ切り替える");
   });
 
@@ -265,20 +267,31 @@ describe("end-to-end-execution reference の手順 pin", () => {
     expect(END_TO_END).toContain("3. 対象コミット確定と無関係コミット混入検知: リリース対象コミット（一式の全マージ完遂時点の main HEAD）を確定する。開始コミット..対象コミットの差分と、set-state の対応表から導出する一式分の実変更（一式の実行単位が生んだマージ済み変更）を突合し、一式に帰属しない無関係コミットの混入を検出した場合は報告して利用者判断を求める（タグ付与の可否は利用者判断）");
     expect(END_TO_END).toContain("4. タグ作成: リリース対象コミットに導出版のタグを作成する。タグ作成済みを検出した場合は作成を省略し、タグの移動・再作成を行わない");
     expect(END_TO_END).toContain("5. 追加公開物（Release 記録）:");
-    expect(END_TO_END).toContain("次の Release 記録手順を Custom Tool 操作カタログ（release_create、release_list、release_read）経由で実行する");
+    expect(END_TO_END).toContain("次の Release 記録手順を Custom Tool 操作カタログ（release_create、release_list、release_read、release_publish）経由で実行する");
+    expect(END_TO_END).toContain("公開（draft の解除）は公開権限の確認で利用者が草稿作成とは別に明確に承認した場合に限り release_publish（承認根拠必須）で実行する");
     expect(END_TO_END).toContain("1. 版タグ列挙: 対象プロジェクトの版タグ（正式 SemVer タグと RC タグ）を列挙する。非 SemVer のベースラインタグは対応対象から除外する");
     expect(END_TO_END).toContain("2. 対応確認: release_list で全 Release を読み取り、版タグごとの対応（同名 Release の有無、draft・prerelease 状態）を確認する。既存 Release がある版タグは作成を省略する（同一タグへの二つ目の Release を作らない）");
     expect(END_TO_END).toContain("3. 欠落タグの補完（該当時のみ）: リモートに存在しない既存版タグは、注釈付きの元のタグを上書きしない通常 push で送り、git ls-remote --tags でリモートとローカルのタグ識別子が一致することを確認してから草稿を作る。force push による解消を行わない");
     expect(END_TO_END).toContain("4. 草稿作成: 対応のない版タグへ release_create で草稿を作成する。RC 版タグは prerelease: true で作成する。Release タイトルは版タグ名とする。作成に失敗した場合はタグを移動・再作成せず、Release が欠けているため工程を完了できない旨を報告して停止する");
     expect(END_TO_END).toContain("5. 読み戻し確認: release_list（必要に応じて release_read）で全版タグと Release の 1:1 対応を再読取して確認するまで、Release 記録工程を完了としない。同一タグ名の Release が2件検出された場合は削除せずに読み戻し結果を報告して停止する");
-    expect(END_TO_END).toContain("6. 結果記録:");
+    expect(END_TO_END).toContain("6. 承認時公開: 公開権限の確認で利用者が公開を明示承認した場合、release_publish（承認根拠〔承認した HITL 質問 ID・回答の記録参照〕付き）で対象版タグの Release を公開（draft の解除）し、読み戻しで draft=false・published_at が確認された場合のみ公開完了とする。already-published（draft=false）を検出した場合は重複実行せず記録完了扱いとする。未承認の場合は公開を実行せず、Release 草稿が draft 状態のまま保持されていることを確認する");
+    expect(END_TO_END).toContain("6. 結果記録: set-state のリリース状態を完了へ更新し（版番号、タグ名、対象コミット、Release 対応の確認情報、公開実行形態を含める）、結果を報告する。公開実行形態は workflow 実行（承認根拠の参照を含む）／代行／利用者手動の3区分で区別して記録する。未承認であるのに公開済み（draft=false）を検出した場合は不整合として完了とせず報告する");
   });
 
-  test("公開操作の実行経路が非対話認証経路・Release 操作のカタログ経路限定・公開モード非包含・権限不足時のリリース完了としないことを手順化している", () => {
+  test("公開完了検証が set-state の公開実行形態記録を判定鍵とする条件化で手順化されている", () => {
+    expect(END_TO_END).toContain("公開完了検証は set-state の公開実行形態記録を判定鍵とする条件化である。公開実行形態が未記録（未承認）の場合: 公開操作（draft の解除）が実行されておらず、Release 草稿は draft 状態のまま保持されていること。公開実行形態が workflow 実行の場合: 対象 Release の読み戻しで draft=false・published_at が確認され、set-state に承認根拠の参照が記録されていること。公開実行形態が代行・利用者手動の場合: set-state の記録と Release の実状態（draft 状態）が一致していること。未承認であるのに公開済み（draft=false）を検出した場合は不整合として完了とせず報告する");
+  });
+
+  test("公開権限確認の HITL 選択肢文言が実行能力と一致する一元定義を宣言している", () => {
+    expect(END_TO_END).toContain("公開権限確認の HITL 選択肢文言は本節の定義を一元的に使用し、workflow の実行能力と一致させる: 「草稿を作成する（公開はしない）」は workflow が履行できる草稿作成経路（release_create）の存在を前提とし、「草稿を作成して公開する（承認根拠を記録する）」は workflow が履行できる公開経路（release_publish。承認根拠必須の入力契約）の存在を前提とする。workflow が履行できない選択肢（カタログに存在しない操作の実行を約束する文言等）を提示しない");
+  });
+
+  test("公開操作の実行経路が非対話認証経路・Release 操作のカタログ経路限定・公開モード非包含・承認時公開の workflow 実行・権限不足時のリリース完了としないことを手順化している", () => {
     expect(END_TO_END).toContain("リモートへの push は Git 操作の非対話認証経路の契約に従う（対話認証を待機せず、資格情報の値を解析証拠やログへ出力しない）");
-    expect(END_TO_END).toContain("GitHub Release の作成・読み戻しは Custom Tool 操作カタログの Release 操作（release_create、release_list、release_read）経由でのみ行う");
+    expect(END_TO_END).toContain("GitHub Release の作成・読み戻し・公開は Custom Tool 操作カタログの Release 操作（release_create、release_list、release_read、release_publish）経由でのみ行う");
     expect(END_TO_END).toContain("release_create の入力契約に公開モード（draft の解除、publish 相当フィールド）は含まれず、契約外の公開指定フィールドを含む要求は副作用発生前に入力契約違反として拒否される");
-    expect(END_TO_END).toContain("公開は利用者が草稿作成とは別に明確に認めた場合に限る。生 gh コマンドによる Release 書き込み（カタログ外書き込み経路）を迂回しない");
+    expect(END_TO_END).toContain("公開（draft の解除）は release_publish の入力契約（タグ名と公開承認の根拠を必須とする）経由で、利用者が草稿作成とは別に明確に承認した場合に限り実行する。承認根拠を欠く要求は副作用発生前に入力契約違反として拒否される（fail-closed）。生 gh コマンドによる Release 書き込み（カタログ外書き込み経路）を迂回しない");
+    expect(END_TO_END).toContain("公開権限の確認で利用者が公開を明示承認した場合、workflow は release_publish を実行し、読み戻し（draft=false・published_at）で公開状態を確認するまでを workflow 実行として完了する。承認後の公開を利用者側実施へ転嫁しない（代行・利用者手動は例外経路として set-state に区別して記録する）");
     expect(END_TO_END).toContain("公開方式・権限・必要な環境が不足する場合は、対象と理由を報告し、リリース完了としない");
   });
 
@@ -290,6 +303,7 @@ describe("end-to-end-execution reference の手順 pin", () => {
     expect(END_TO_END).toContain("| 公開方式・権限・環境の不足 | 対象と理由を報告し、リリース完了としない。完遂済み・リリース保留（理由記録）として扱う |");
     expect(END_TO_END).toContain("| Release 草稿作成の失敗 | タグを移動・再作成せず、Release が欠けているため工程を完了できない旨を報告して停止する。再開時は既存のタグと Release を使い、同一タグへ二つ目の Release を作らない |");
     expect(END_TO_END).toContain("| 同一タグ名の Release が2件検出 | 削除・変更せずに読み戻し結果を報告して停止する（重複解消は利用者判断） |");
+    expect(END_TO_END).toContain("| 未承認の公開済み検出 | 公開権限の確認で未承認であるのに対象 Release が draft=false（公開済み）を検出した場合は不整合として完了とせず、読み戻し結果（タグ、set-state の公開実行形態記録と実状態の差異）を報告して停止する |");
     expect(END_TO_END).toContain("| 欠落タグの push 失敗または識別子不一致 | force push による解消を行わず、失敗内容と識別子の差異を報告して停止する（草稿は作成しない） |");
   });
 

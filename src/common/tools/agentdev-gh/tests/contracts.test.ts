@@ -1,12 +1,17 @@
 //
 // 操作契約の契約テスト。
 //
-// Design custom-tool-contracts.md が所有する対象操作の境界（19操作カタログ）と、
+// Design custom-tool-contracts.md が所有する対象操作の境界（20操作カタログ）と、
 // 操作カタログの契約整合（副作用分類、継続契約）を完全列挙で固定する。
 // 対象外 GitHub 機能（Issue 削除、PR close/reopen、review、inline review comment、
-// assignee、milestone、Projects、lock/unlock、pin/unpin、Release 公開・更新・削除
-// 等の公開モード系操作）の追加は列挙固定によって検出される。廃止済みの
-// issue_comment（二重モード操作）も禁止対象として固定する。
+// assignee、milestone、Projects、lock/unlock、pin/unpin、Release 公開モード付き作成、
+// Release 更新・削除等）の追加は列挙固定によって検出される。廃止済みの
+// issue_comment（二重モード操作）も禁止対象として固定する。release_publish は
+// カタログ内の正規公開操作であり、禁止対象（forbidden リスト）は
+// release_update・release_delete を固定する。公開モード付き作成（公開相当の
+// 作成要求）はカタログ外の対象外 GitHub 機能として扱われ、20操作完全列挙と
+// release_create の公開相当フィールド拒否テストが非包含を検出する。
+//
 
 
 import { describe, expect, test } from "bun:test";
@@ -24,7 +29,7 @@ import {
 } from "../index.ts";
 
 describe("操作カタログ（Design 対象操作との一致）", () => {
-  test("19操作カタログを完全列挙で固定する", () => {
+  test("20操作カタログを完全列挙で固定する", () => {
     expect([...GH_TOOL_OPERATIONS]).toEqual([
       "issue_create",
       "issue_read",
@@ -45,10 +50,11 @@ describe("操作カタログ（Design 対象操作との一致）", () => {
       "release_create",
       "release_list",
       "release_read",
+      "release_publish",
     ]);
   });
 
-  test("19操作カタログは Comment 4操作と pr_update と Release 3操作を含む", () => {
+  test("20操作カタログは Comment 4操作と pr_update と Release 4操作を含む", () => {
     const catalog = new Set(GH_TOOL_OPERATIONS);
     for (const op of [
       "comment_create",
@@ -59,12 +65,13 @@ describe("操作カタログ（Design 対象操作との一致）", () => {
       "release_create",
       "release_list",
       "release_read",
+      "release_publish",
     ]) {
       expect(catalog.has(op as (typeof GH_TOOL_OPERATIONS)[number])).toBe(true);
     }
   });
 
-  test("対象外操作（削除・review・管理系 GitHub 機能・廃止済み issue_comment・Release 公開モード系）はカタログへ追加されていない", () => {
+  test("対象外操作（削除・review・管理系 GitHub 機能・廃止済み issue_comment・Release 更新・削除・公開モード付き作成）はカタログへ追加されていない", () => {
     const catalog = new Set<string>(GH_TOOL_OPERATIONS);
     const forbidden = [
       "issue_delete",
@@ -83,10 +90,8 @@ describe("操作カタログ（Design 対象操作との一致）", () => {
       "pr_draft_update",
       "pr_base_update",
       "issue_comment",
-      "release_publish",
       "release_update",
       "release_delete",
-      "release_create_published",
     ];
     for (const op of forbidden) {
       expect(catalog.has(op)).toBe(false);
@@ -109,12 +114,13 @@ describe("操作カタログ（Design 対象操作との一致）", () => {
     expect(kindOf("pr_update")).toBe("side-effect");
   });
 
-  test("Release 草稿作成は side-effect、Release 一覧読取・読み戻しは read-only", () => {
+  test("Release 草稿作成は side-effect、Release 一覧読取・読み戻しは read-only、公開は side-effect", () => {
     const kindOf = (op: string) =>
       GH_TOOL_OPERATION_CATALOG.find((e) => e.operation === op)?.kind;
     expect(kindOf("release_create")).toBe("side-effect");
     expect(kindOf("release_list")).toBe("read-only");
     expect(kindOf("release_read")).toBe("read-only");
+    expect(kindOf("release_publish")).toBe("side-effect");
   });
 });
 
@@ -215,6 +221,78 @@ describe("Release 操作の入力契約（公開モード非包含）", () => {
     expect(specOf("release_read").validate({ operation: "release_read", tagName: "v1.2.3" }).ok).toBe(true);
     expect(specOf("release_read").validate({ operation: "release_read" }).ok).toBe(false);
     expect(specOf("release_read").validate({ operation: "release_read", draft: true }).ok).toBe(false);
+  });
+
+  test("release_publish は承認根拠を欠く要求を副作用発生前に拒否する（missing-field / invalid-field / unknown-field）", () => {
+    const spec = specOf("release_publish");
+    const missingTagName = spec.validate({ operation: "release_publish", approvalBasis: "b" });
+    expect(missingTagName.ok).toBe(false);
+    if (!missingTagName.ok) {
+      expect(missingTagName.error.code).toBe("missing-field");
+      expect(missingTagName.error.field).toBe("tagName");
+    }
+    const missingBasis = spec.validate({ operation: "release_publish", tagName: "v1.2.3" });
+    expect(missingBasis.ok).toBe(false);
+    if (!missingBasis.ok) {
+      expect(missingBasis.error.code).toBe("missing-field");
+      expect(missingBasis.error.field).toBe("approvalBasis");
+    }
+    for (const empty of ["", "   "]) {
+      const invalid = spec.validate({ operation: "release_publish", tagName: "v1.2.3", approvalBasis: empty });
+      expect(invalid.ok).toBe(false);
+      if (!invalid.ok) {
+        expect(invalid.error.code).toBe("invalid-field");
+        expect(invalid.error.field).toBe("approvalBasis");
+      }
+    }
+    const nonString = spec.validate({ operation: "release_publish", tagName: "v1.2.3", approvalBasis: 7 });
+    expect(nonString.ok).toBe(false);
+  });
+
+  test("release_publish は契約外フィールド（draft、publish、published 等の公開指定フィールド）を含む要求を副作用発生前に拒否する", () => {
+    const spec = specOf("release_publish");
+    for (const extra of ["draft", "publish", "published", "make_latest", "title", "body", "prerelease"]) {
+      const raw = {
+        operation: "release_publish",
+        tagName: "v1.2.3",
+        approvalBasis: "HITL 質問 ID: Q-1、回答の記録参照: Q-1-answer",
+        [extra]: true,
+      };
+      const validated = spec.validate(raw);
+      expect(validated.ok).toBe(false);
+      if (!validated.ok) {
+        expect(validated.error.code).toBe("unknown-field");
+        expect(validated.error.field).toBe(extra);
+      }
+    }
+  });
+
+  test("release_publish の正常要求（タグ名と承認根拠）は受理する", () => {
+    const spec = specOf("release_publish");
+    const ok = spec.validate({
+      operation: "release_publish",
+      tagName: "v1.2.3",
+      approvalBasis: "HITL 質問 ID: Q-1、回答の記録参照: Q-1-answer",
+    });
+    expect(ok.ok).toBe(true);
+  });
+
+  test("release_publish の approvalBasis は HITL 質問 ID と回答の記録参照のペアを解析可能な形式で要求する（形式検査）", () => {
+    const spec = specOf("release_publish");
+    for (const malformed of [
+      "承認した",
+      "回答の記録参照: ref のみ",
+      "HITL 質問 ID: Q-1 のみ",
+      "HITL 質問 ID: Q-1、回答の記録参照",
+      "HITL 質問 ID: Q-1、回答の記録参照:   ",
+    ]) {
+      const invalid = spec.validate({ operation: "release_publish", tagName: "v1.2.3", approvalBasis: malformed });
+      expect(invalid.ok).toBe(false);
+      if (!invalid.ok) {
+        expect(invalid.error.code).toBe("invalid-field");
+        expect(invalid.error.field).toBe("approvalBasis");
+      }
+    }
   });
 });
 

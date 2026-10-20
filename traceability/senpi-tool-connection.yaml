@@ -14,6 +14,8 @@ implementation:
   src/common/tools/agentdev-gh/public-schema.ts:
     - REQ-009-015
     - REQ-099-005
+    - REQ-114-010
+    - REQ-114-016
   src/common/tools/agentdev-gh/repo-resolution.ts:
     - REQ-099-005
   src/common/tools/agentdev-jev/public-schema.ts:

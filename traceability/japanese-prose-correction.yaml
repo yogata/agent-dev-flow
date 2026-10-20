@@ -54,6 +54,8 @@ implementation:
     - REQ-094-006
     - REQ-094-010
     - REQ-094-011
+    - REQ-114-010
+    - REQ-114-016
   src/common/skills/agentdev-workflow-case-open/references/handoff.md:
     - REQ-094-001
     - REQ-094-002

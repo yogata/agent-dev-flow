@@ -28,7 +28,7 @@ backlog-auto command は公開 interface（入出力契約、ガードレール�
 - 各子ワークフローの既存副作用（`.agentdev/` 配下の成果物作成、削除、git commit / push、ユーザー対話）を子コマンド公開契約どおりに発生させる
 - set-state の作成・更新（`.agentdev/` 配下、req-units と draft の配置外。set-state 永続化契約に従う）
 - git タグ作成・push（リリース時。版番号・リリース条件・公開操作はパッチリリース規則の Decision に従う）
-- 追加公開成果物の対応（ADF本体では GitHub Release の草稿作成・読み戻しまでを Custom Tool カタログ経路で実行する。公開は利用者が草稿作成とは別に明確に認めた場合に限る。カタログに含まれない操作の実行は承認後の所定経路）
+- 追加公開成果物の対応（ADF本体では GitHub Release の草稿作成・読み戻しと、公開権限の確認で利用者が公開を明示承認した場合の公開（カタログ内操作 release_publish。承認根拠必須・draft 解除のみ）までを Custom Tool カタログ経路で実行する。公開は利用者が草稿作成とは別に明確に認めた場合に限る）
 - 当該 Workflow Skill は worktree root 配下以外を編集しない
 
 ## 制御平面（STEP 一覧）
@@ -49,7 +49,7 @@ STEP 番号は既存 STEP（STEP-1〜6）の契約を維持したままの追加
 | STEP-8 | stage 4: 要件定義接続 | set-state 初期化済み | 単一要件doc 確定（単一 req-define 実行、入力は一式 RU の明示列挙） | [references/end-to-end-execution.md](references/end-to-end-execution.md) |
 | STEP-9 | stage 5: 実行接続 | 要件doc 確定 | 単一 case-auto 実行の完了または停止（要件doc 明示指定） | [references/end-to-end-execution.md](references/end-to-end-execution.md) |
 | STEP-10 | stage 6: 全体完了判定 | case-auto 完了、または再開時に set-state 上で実行済みと確定 | 完遂 / 未完遂判定（義務スナップショットと対応表による突合） | [references/end-to-end-execution.md](references/end-to-end-execution.md) |
-| STEP-11 | stage 7: リリース | 完遂、リリース条件・公開権限の成立 | タグ作成、Release 草稿作成・読み戻し確認、リリース状態記録 / 完遂済み・リリース保留 | [references/end-to-end-execution.md](references/end-to-end-execution.md) |
+| STEP-11 | stage 7: リリース | 完遂、リリース条件・公開権限の成立 | タグ作成、Release 草稿作成・読み戻し確認、承認時の Release 公開（release_publish）、リリース状態記録（公開実行形態を含む）/ 完遂済み・リリース保留 | [references/end-to-end-execution.md](references/end-to-end-execution.md) |
 
 ### STEP 間の依存と分岐
 
@@ -106,7 +106,7 @@ STEP 番号は既存 STEP（STEP-1〜6）の契約を維持したままの追加
 
 一式の運搬体となる set-state の契約は次のとおりである。詳細（配置、形式、単一書き手規則、基準点確認手続、全体完了突合手続、リリース手順シーケンスと再開経路、公開操作の実行経路）は [references/end-to-end-execution.md](references/end-to-end-execution.md) を参照する。
 
-- set-state は一式識別子、必須要求と受け入れ義務のスナップショット、RU・要件doc・operation_unit・実行単位の対応表（統合・分割を含む）、基準点情報（最後の正式リリース、開始コミット ID）、stage 別進捗、リリース状態（未着手／基準点確定済み／保留理由／完了）を記録する
+- set-state は一式識別子、必須要求と受け入れ義務のスナップショット、RU・要件doc・operation_unit・実行単位の対応表（統合・分割を含む）、基準点情報（最後の正式リリース、開始コミット ID）、stage 別進捗、リリース状態（未着手／基準点確定済み／保留理由／完了。完了には公開実行形態（workflow 実行／代行／利用者手動）と、workflow 実行時は承認根拠の参照を含める）を記録する
 - 配置は `.agentdev/` 配下で req-units と draft の配置外とし、ドラフト残存・RU 残存を検証するクリーンアップ検証ゲートの対象外とする。全体完了とリリース完了まで保持する
 - set-state への書込みは同一 backlog-auto 実行に限定する（単一書き手規則）。backlog-auto の二重起動に対しては既存の single-flight 保護に準じて排除する
 - 一式全体の完遂判定と最終報告は一気通貫実行の REQ が所有し、backlog 整理サイクルの実行契約 REQ の完了扱い・全体報告（backlog 整理サイクル部分に係る行）と分離する

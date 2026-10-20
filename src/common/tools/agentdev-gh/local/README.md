@@ -1,7 +1,8 @@
 # agentdev-gh Local 実装 Tool（ローカル版）
 
 Custom Tool `agentdev_gh` の Local 実現。同一の操作契約
-（`src/common/tools/agentdev-gh/contracts.ts` の16操作）を、GitHub Issue/PR の代わりに
+（`src/common/tools/agentdev-gh/contracts.ts` の20操作。Release 操作4操作は GitHub 接続専用で
+Local 版は構造化失敗）を、GitHub Issue/PR の代わりに
 ローカルIssue（`.agentdev/issues/issue-{NNNN}.md`、単一採番空間、role 条件付きスキーマ）の
 読み書きへ読み替える `GhRunner` 実現（`runner-local.ts`）を提供する。
 

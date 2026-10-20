@@ -1,0 +1,7 @@
+component: agentdev-backlog-integration
+implementation:
+  src/common/skills/agentdev-backlog-integration/references/integration-judgment.md:
+    - REQ-039-007
+verification:
+  src/common/skills/agentdev-backlog-integration/tests/ru-numbering-history.test.ts:
+    - REQ-039-007
