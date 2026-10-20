@@ -72,9 +72,9 @@ artifact_actions:
     target_area: "## 要件"
     source_items: [AG-001, AG-002, AG-003, AG-004]
     content: |
-      | REQ-004-064 | 局所組立と target_area 検索の決定的処理における見出し検出と節境界判定は、行頭（字下げなし）の ``` で開始するコード囲みの内側の行を見出し候補・節境界として扱わないこと。閉じの ``` を持たないコード囲みはファイル末尾までを内側とみなすこと |
-      | REQ-004-065 | コード囲みの認識は行頭の ``` のみを条件とし、言語指定の有無を受理条件としないこと。~~~ 等の代替となる囲み記法の認識への拡張を行わないこと |
-      | REQ-004-066 | コード囲みの認識規則は、局所組立と target_area 検索の実装および契約文が同一の内容として記述すること。コード囲みの外側の見出し検出、target_area 正規化、完全一致、旧文存在件数検査、組立後一意性検査の各挙動を本規則の導入によって変更しないこと |
+      | REQ-004-066 | 局所組立と target_area 検索の決定的処理における見出し検出と節境界判定は、行頭（字下げなし）の ``` で開始するコード囲みの内側の行を見出し候補・節境界として扱わないこと。閉じの ``` を持たないコード囲みはファイル末尾までを内側とみなすこと |
+      | REQ-004-067 | コード囲みの認識は行頭の ``` のみを条件とし、言語指定の有無を受理条件としないこと。~~~ 等の代替となる囲み記法の認識への拡張を行わないこと |
+      | REQ-004-068 | コード囲みの認識規則は、局所組立と target_area 検索の実装および契約文が同一の内容として記述すること。コード囲みの外側の見出し検出、target_area 正規化、完全一致、旧文存在件数検査、組立後一意性検査の各挙動を本規則の導入によって変更しないこと |
   - id: ACT-REQ-002
     artifact: req
     operation: append
@@ -208,7 +208,7 @@ conflict_resolutions:
       2以上（要件行数 51〜80帯 +1、関心分類複数 +1）のため「APPEND の前にユーザーへ SPLIT 要否を提案」契約により
       提案済み。一時は「SPLIT 検討を残す」（未決）として auto_gate.unresolved_questions に保持していた。
     resolution: >-
-      ユーザーの直接回答（2026-10-20）により REQ-004 は SPLIT せず APPEND で確定。REQ-004-064〜066 の追加のみを
+      ユーザーの直接回答（2026-10-20）により REQ-004 は SPLIT せず APPEND で確定。REQ-004-066〜068 の追加のみを
       行い、REQ-004 の構造分割は本件の対象外とする。同回答により case-auto の起動が承認された（起動は監督側が
       実施する）。後続コマンドは本内容をユーザーへ再確認しない。
 
@@ -357,11 +357,11 @@ assembly_evidence:
       removed: 0
     executed_at: "2026-10-19T15:02:02.471Z"
   - target_file: docs/designs/commands/req-define.md
-    target_content_sha256: 4e22caf5a87390a7ebfe37679e8c9334566a6b6fe43d5a6c3306376057261bf0
+    target_content_sha256: 9ed654a58f7aa9faa321916fe0729180e7ad5c73b7769a314eec9b9b01ff4350
     check_scope:
       heading: "## 調査委譲の全文機械抽出・安全な書込み・独立作業の並列化"
-      start_line: 123
-      end_line: 143
+      start_line: 124
+      end_line: 144
     execution_conditions:
       operation: append
       edit_sha256: c0915658b2723c662851c86fe514a6b3f0cec8c2bc4158bfdfd799b0a84c1d25
@@ -386,7 +386,7 @@ assembly_evidence:
       changed_lines_count: 2
       added: 2
       removed: 0
-    executed_at: "2026-10-19T15:03:17.624Z"
+    executed_at: "2026-10-20T00:49:07.372Z"
   - target_file: docs/designs/foundations/numbering-policy.md
     target_content_sha256: 24826bddf6357bfab87bfa28c97915d9017ad762362b6b7fd84875b9187b2507
     check_scope:
