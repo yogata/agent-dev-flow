@@ -74,6 +74,8 @@ RU を生成し、承認済みの docs/knowledge/ 知識文書保存を実行し
 ### Procedure
 
 1. RU 構成案に基づき `.agentdev/backlog/req-units/RU-*.md` を生成する（frontmatter: `source_type`, `generated_by`, `generated_at`, `status`, `depends_on`, `tentative_classification`, `sources` / 本文: Sources, Source Summary, 統合理由, 要件化の方向）
+   - **採番の git 履歴検査（生成の前置・fail-closed）**: `agentdev-backlog-integration` の RU 生成採番規則に従い、採番の前に git 履歴検査（`git log --all` 相当、消費済み・削除済み RU 番号を含む使用済み集合の収集）を実行する。履歴検査が実行できない環境では採番を確定せず、履歴検査不能の理由（実行した手段と失敗内容）を報告して停止する（履歴検査不能を検査済みとして扱わない）
+   - **履歴検査実施記録**: 履歴検査の実施（実行手段、収集した使用済み番号の範囲、衝突の有無、確定した提案番号）を進捗記録（Evidence）に残す。衝突により採番を進めた場合は代替番号の決定根拠も記録する
 2. session由来RU（`source_type: chat`、`generated_by: session`）の場合は、正規原本（一時成果物ライフサイクル要件、artifact-contracts Design「RU アーティファクト契約（session由来RU）」）へ委譲した要件（二段階承認、frontmatter 必須フィールド、`agreement_confirmed_at`、session 論理URI、RU 本文必須8セクション、永続ID 採番）に従う
 3. depends_on 検証を実行する（RU-ID のみ許容、unresolved、循環の検証）
   4. docs/knowledge/ 知識文書保存処置を実行する。STEP-5 で承認済みの操作種別（新規、更新、置換、削除）に従い、整形済み知識文書（1知識1ファイル、kebab-case slug、必須内容5項目）を docs/knowledge/ へ書き込む。承認なしの docs/knowledge/ 書き込みは行わない（REQ-{NNNN}-{NNN}）。docs/knowledge/ への書き込みは git 永続化対象の副作用である。知識文書の保存が確認できた採用済み成果物を promoted から削除する（REQ-{NNNN}-{NNN}）
@@ -94,11 +96,12 @@ RU 化に失敗した成果物、矛盾により除外された成果物は残�
 
 ### Evidence
 
-- 生成済み RU のファイルパス一覧、docs/knowledge/ 知識文書の保存結果（操作種別と対象ファイル）、削除/ 残置の成果物一覧（削除済み成果物には prune を跨ぐ代替識別子〔RU 番号、learning タイトル、関連 Case 番号〕を含む）、RU 以外の処置別の実行結果
+- 生成済み RU のファイルパス一覧、採番の git 履歴検査の実施記録（実行手段、収集した使用済み番号の範囲、衝突の有無、衝突時は代替番号の決定根拠。履歴検査不能時は実行した手段と失敗内容）、docs/knowledge/ 知識文書の保存結果（操作種別と対象ファイル）、削除/ 残置の成果物一覧（削除済み成果物には prune を跨ぐ代替識別子〔RU 番号、learning タイトル、関連 Case 番号〕を含む）、RU 以外の処置別の実行結果
 
 ### Completion Verification
 
 - RU 構成案の全 RU について RU ファイルが生成されていること（矛盾除外分を除く）
+- 採番の git 履歴検査が実行され、提案番号が履歴上の使用済み番号（消費済み・削除済みを含む）と衝突していないこと。履歴検査の実施が進捗記録（Evidence）に残っていること。履歴検査不能の場合は採番が確定されず理由が報告されていること（履歴検査不能が成功扱いになっていないこと）
 - docs/knowledge/ 知識文書の書き込みが承認済み操作種別に一致していること。承認なしの書き込みが 0件であること
 - RU 生成成功分、知識文書保存成功分の成果物のみが削除されていること
 - docs/knowledge/ 知識の削除処置が明示承認済みのものに限られていること
