@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261020T011511Z-d739",
+  "workflow": "req-define",
+  "evaluationKind": "requirement-development-classification",
+  "subject": "Release公開正規経路・RU採番履歴検査の要件展開（REQ行/Design行の帰属と分離要否）",
+  "sourceRevision": "input-generated-at-2026-10-20T09:55:00+09:00",
+  "durationMs": 315,
+  "inputTokens": 1603,
+  "inputs": {
+    "requestDigest": "e0f7ddc49f58f3eff9ad867383cd02974402e4c3bccd4033e984dc30c3a7ca4a"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-publish-route-req-row",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.99,
+        "Design行": 0.01
+      }
+    },
+    {
+      "questionId": "q1-separation-needed",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.88,
+        "false": 0.12
+      }
+    },
+    {
+      "questionId": "q2-ru-numbering-req-row",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.99,
+        "Design行": 0.01
+      }
+    },
+    {
+      "questionId": "q2-separation-needed",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.88,
+        "false": 0.12
+      }
+    }
+  ],
+  "confidence": 0.98,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-publish-route-req-row",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q1-separation-needed",
+        "value": true
+      },
+      {
+        "questionId": "q2-ru-numbering-req-row",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q2-separation-needed",
+        "value": true
+      }
+    ]
+  }
+}
