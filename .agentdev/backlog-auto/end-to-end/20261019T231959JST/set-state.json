@@ -171,9 +171,9 @@
   },
   "進捗": {
     "stage4_要件定義": "要件定義済み（2026-10-20T03:53:48+09:00 確定・auto_ready: true・壁打ちHITL 1件〔RU-0010方針A〕解消・commit 56c415ffe）",
-    "stage5_実行": "実行中（2026-10-20T06:43+09:00 再開。#3817 merge acf86dd5a→case-ready 完了（単一実行単位 #3816・draft/RU 削除 6f414e5ff）→DEL-3816-1 完了（実装 PR #3818 squash merge 059f8646d・main 050dc901e・3点ゲート PASS）→case-close 第1回は QG-4 traceability 完全性ゲートで fail-closed 停止（REQ-004-064/065 missing-implementation・sidecar YAML 重複パスキーが構造的原因・重複は 6f414e5ff 以前からの既存負債・停止記録 #3816 comment-6279710115・worktree/branch 削除済み・Capture/Design確定/クローズ繰越し・Issue は open 維持）→修正委譲 DEL-3816-2 実行中（重複ブロック統合・対象20行完全性回復の修正 PR）→完了後に case-close STEP-2 以降再委譲）",
-    "stage6_完遂判定": "未着手（stage5 blocked により契約上不開始）",
-    "stage7_リリース状態": "基準点確定済み（stage5 blocked により stage7 不開始・タグ/Release 未作成）"
+    "stage5_実行": "完了（2026-10-20T06:43+09:00 ネットワーク回復後再開。#3817 merge acf86dd5a→case-ready 完了（単一実行単位 #3816・draft/RU 削除 6f414e5ff）→DEL-3816-1 完了（PR #3818 merge 059f8646d）→case-close 第1回 QG-4 fail-closed 停止（comment-6279710115・sidecar 重複キー）→DEL-3816-2 修正完了（PR #3819 merge fe5521ce9）→case-close 再開完了（2026-10-20T09:07:57+09:00 #3816 closed〔completed〕・全チェックボックス 11/11 pass・QG-4 全ゲート成立〔対象20行 check exit 0 pass 11/11・full suite 4410 tests 0 fail〕・Design確定候補 3件見送り記録・Capture 回収 intake 3件+learning 1件 commit fd29e0423・worktree/branch 削除済み）",
+    "stage6_完遂判定": "完遂（2026-10-20 親による突合。義務スナップショット10RU×対応表×検証証跡: 対象20要件行の実在・RU-0001〜0010 実現面成果物の現物確認・親による corpus check 再実行で対象20行 findings 0 件〔残 fail 3 種は範囲外既知行のみ・intake 回収済み〕・#3816 全チェックボックス 11/11 pass〔機械抽出・closeAllowed true〕・QG-4 成立・#3816 closed 確証。義務の過不足なし→全体完遂と判定）",
+    "stage7_リリース状態": "基準点確定済み（stage6 完遂済み・リリース条件・公開権限の確認へ）"
   },
   "リリース状態": {
     "状態": "基準点確定済み",
