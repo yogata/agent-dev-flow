@@ -173,11 +173,17 @@
     "stage4_要件定義": "要件定義済み（2026-10-20T03:53:48+09:00 確定・auto_ready: true・壁打ちHITL 1件〔RU-0010方針A〕解消・commit 56c415ffe）",
     "stage5_実行": "完了（2026-10-20T06:43+09:00 ネットワーク回復後再開。#3817 merge acf86dd5a→case-ready 完了（単一実行単位 #3816・draft/RU 削除 6f414e5ff）→DEL-3816-1 完了（PR #3818 merge 059f8646d）→case-close 第1回 QG-4 fail-closed 停止（comment-6279710115・sidecar 重複キー）→DEL-3816-2 修正完了（PR #3819 merge fe5521ce9）→case-close 再開完了（2026-10-20T09:07:57+09:00 #3816 closed〔completed〕・全チェックボックス 11/11 pass・QG-4 全ゲート成立〔対象20行 check exit 0 pass 11/11・full suite 4410 tests 0 fail〕・Design確定候補 3件見送り記録・Capture 回収 intake 3件+learning 1件 commit fd29e0423・worktree/branch 削除済み）",
     "stage6_完遂判定": "完遂（2026-10-20 親による突合。義務スナップショット10RU×対応表×検証証跡: 対象20要件行の実在・RU-0001〜0010 実現面成果物の現物確認・親による corpus check 再実行で対象20行 findings 0 件〔残 fail 3 種は範囲外既知行のみ・intake 回収済み〕・#3816 全チェックボックス 11/11 pass〔機械抽出・closeAllowed true〕・QG-4 成立・#3816 closed 確証。義務の過不足なし→全体完遂と判定）",
-    "stage7_リリース状態": "基準点確定済み（stage6 完遂済み・リリース条件・公開権限の確認へ）"
+    "stage7_リリース状態": "完了（2026-10-20 利用者承認〔リリース実施=する・公開=まで〕に基づく。版番号 v5.1.4〔パッチ+1〕・対象コミット e99e1bb3b・lightweight タグ作成・push 済み〔local/remote 同一 hash 実測〕・GitHub Release 草稿作成・読み戻し確認済み〔title v5.1.4・本文完全・draft: true〕。範囲 v5.1.3..HEAD 62 commits〔本一式 20 + 前回実行由来未タグ分 42・包含は利用者承認〕。公開〔draft 解除〕は利用者承認済みだがエージェント経路では実行不能〔操作カタログに publish 操作なし・生 gh Release 書き込みは gh-write guard により遮断・迂回禁止〕のため利用者側実施へ引き継ぎ）"
   },
   "リリース状態": {
-    "状態": "基準点確定済み",
-    "基準点確定日時": "2026-10-20T03:20:42+09:00"
+    "状態": "完了",
+    "基準点確定日時": "2026-10-20T03:20:42+09:00",
+    "版番号": "v5.1.4",
+    "タグ種別": "lightweight",
+    "対象コミット": "e99e1bb3b0c3751a791d614ff1d3fa1599916fce",
+    "タグpush確認": "local/remote 同一 hash 実測（2026-10-20）",
+    "Release草稿": "作成・読み戻し確認済み（draft: true・prerelease: false・本文完全）",
+    "公開": "利用者承認済み・利用者側実施待ち（エージェント経路はカタログ外操作のため遮断・迂回禁止）"
   },
   "単一書き手": "backlog-auto 実行 20261019T231959JST（本 set-state 作成実行）"
 }
