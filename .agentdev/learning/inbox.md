@@ -92,3 +92,21 @@
 - **想定反映先**: learning-promote による評価・昇華（req-define draft-generation の検査強化候補）
 - **関連**: .agentdev/drafts/req-draft-release-publish-and-ru-numbering.md（ACT-DESIGN-001・assembly_evidence）、Root Case #3823、設計PR #3824
 - **タグ**: #draft-content #artifact-actions #case-open
+
+---
+
+## deno LSP diagnostics が bun 前提テストファイルの bun 固有 API を誤検知し単一ファイル diagnostics が不採用になる
+
+- **問題事象**: skills 配下の bun 前提テストファイル（`import.meta.dir` 等）に対し deno LSP diagnostics が誤検知し、3 秒タイムアウトも再現するため、単一ファイル diagnostics を検証証拠に使えない
+- **発生局面**: case-run（DEL-3823-2）LSP diagnostics 実行／Root Case #3823
+- **検知方法**: LSP diagnostics 実行で誤検知（bun 固有 API の未解決参照）とタイムアウトの再現を確認
+- **根本原因**: deno LSP は bun 固有 API を解決できない。当該ファイルは skills 配下に tsconfig 不在で tsc 対象外のため LSP 側の補正も入らない
+- **自律対応内容**: 単一ファイル diagnostics を不採用とし、typecheck（tsc --noEmit、package tsconfig で tests/*.ts を include）+ bun test 実行（split2 779 pass）で代替検証。差分がコメント 1 行のみのファイルは実行検証で十分と判断
+- **ユーザー確認有無**: なし（検証手段の代替。観測能力は同等以上: typecheck は当該 API を含む型解決、bun test は実行時検証）
+- **REQ/Decision/Design影響**: なし（検証運用の知見。契約変更なし）
+- **横展開観点**: bun 前提のテストファイルを deno LSP で診断するすべての検証で成立し得る
+- **再発条件**: bun 固有 API を参照するファイルを deno LSP で単一ファイル diagnostics する場合
+- **予防策候補**: bun 前提ファイルの diagnostics は package tsconfig 経由の tsc --noEmit + bun test を正規代替とする運用を検証手順に明記する（learning-promote で評価）
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: PR #3825 本文「Findings / Capture候補」2 件目、src/common/skills/agentdev-workflow-backlog-auto/tests/end-to-end-contract.test.ts
+- **タグ**: #lsp #deno-lsp #bun #verification
