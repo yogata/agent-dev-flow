@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261018T180524Z-9625",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-or-epic-attribution",
+  "subject": "Case #3803 実行構造確定（operation_units OU-001〜003 の依存グラフと3軸判断）",
+  "sourceRevision": "75ee79234dc1a465a560c4b9a1232ab1d08a7764",
+  "durationMs": 869,
+  "inputTokens": 1832,
+  "inputs": {
+    "requestDigest": "52d7c1824b2741b3f2fb88f309e9e84ffc476d7de9da0fbd6a00dbf8be06586e",
+    "references": [
+      {
+        "label": "req-draft",
+        "path": ".agentdev/drafts/req-draft-adoption-implementation-consistency.md",
+        "digest": "c02347e37ff267d9c6fa508b58222e59313ec8ffa42d7e72950ced739b098f9e"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-attribution",
+      "questionForm": "choice",
+      "value": "Epic",
+      "probabilityDistribution": {
+        "Standard": 0.04,
+        "Epic": 0.96
+      }
+    },
+    {
+      "questionId": "q2-dependency-strength",
+      "questionForm": "score",
+      "value": 0,
+      "probabilityDistribution": {
+        "関連": 0.67,
+        "弱": 0.32,
+        "必須": 0.01
+      }
+    },
+    {
+      "questionId": "q3-functional-coherence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "分散": 0,
+        "部分的": 0.01,
+        "一貫": 0.99
+      }
+    }
+  ],
+  "confidence": 0.92,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-attribution",
+        "value": "Epic"
+      },
+      {
+        "questionId": "q2-dependency-strength",
+        "value": 0
+      },
+      {
+        "questionId": "q3-functional-coherence",
+        "value": 2
+      }
+    ]
+  }
+}

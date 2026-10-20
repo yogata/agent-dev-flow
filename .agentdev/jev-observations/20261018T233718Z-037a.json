@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261018T233718Z-037a",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0240 是正（元合意§3 item3 制限形「に限り」の正規投影復元）の編集関心の REQ-108-013 への照合帰属",
+  "sourceRevision": "7673bcbd053ed1ac4aa20a1a50c040abece5bfb9",
+  "durationMs": 852,
+  "inputTokens": 1285,
+  "inputs": {
+    "requestDigest": "6f397c169d1e1eaa9e1d9df5c378625041b66c08919012a4c04493bd870aba0d"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-req108-update",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "UPDATE": 1,
+        "APPEND": 0,
+        "CREATE": 0,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "q2-confirm-needed",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.14,
+        "false": 0.86
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-req108-update",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "q2-confirm-needed",
+        "value": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261018T233718Z-51d2",
+  "workflow": "req-define",
+  "evaluationKind": "final-classification-design-separation",
+  "subject": "REQ-108-013 制限形追記（試作明示指示・許可の要否）と SKILL 同型追記・試験期待値追加の最終分類",
+  "sourceRevision": "7673bcbd053ed1ac4aa20a1a50c040abece5bfb9",
+  "durationMs": 1023,
+  "inputTokens": 962,
+  "inputs": {
+    "requestDigest": "799fbf31a89e4a08a43a1ffc77bd40f127105e24cfed66ccbc4736e07005fa82"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-row-classification",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.99,
+        "Design行": 0.01
+      }
+    },
+    {
+      "questionId": "q2-procedure-design-split",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.14,
+        "false": 0.86
+      }
+    }
+  ],
+  "confidence": 0.98,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-row-classification",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q2-procedure-design-split",
+        "value": false
+      }
+    ]
+  }
+}
