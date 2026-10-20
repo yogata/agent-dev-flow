@@ -35,16 +35,17 @@ export function prNumber(n: number): PrNumber {
 }
 
 /**
- * 操作名。Design「対象操作の境界」が所有する19操作
+ * 操作名。Design「対象操作の境界」が所有する20操作
  * （基本操作10: issue_create、issue_read、issue_update、issue_close、pr_create、
  * pr_read、pr_merge、pr_changed_files、pr_mergeable、pr_update、
  * 追跡Issue操作2: issue_list、issue_reopen、
  * Comment 操作4: comment_create、comment_list、comment_update、comment_delete、
- * Release 操作3: release_create、release_list、release_read）。
+ * Release 操作4: release_create、release_list、release_read、release_publish）。
  * Comment は Issue と Pull Request の会話コメントを同一の論理リソースとして扱い、
  * commentId（公開型は文字列）で対象識別する。
- * Release 操作は GitHub 接続専用（Local 版は構造化失敗）であり、公開モード
- * （draft の解除、publish 相当フィールド）を入力契約に含めない。
+ * Release 操作は GitHub 接続専用（Local 版は構造化失敗）であり、release_create は
+ * 公開モード（draft の解除、publish 相当フィールド）を入力契約に含めない。
+ * 公開は release_publish（タグ名と承認根拠必須の fail-closed 入力契約）が所有する。
  */
 export const GH_TOOL_OPERATIONS = [
   "issue_create",
@@ -66,6 +67,7 @@ export const GH_TOOL_OPERATIONS = [
   "release_create",
   "release_list",
   "release_read",
+  "release_publish",
 ] as const;
 
 export type GhToolOperation = (typeof GH_TOOL_OPERATIONS)[number];
@@ -133,6 +135,7 @@ export const GH_TOOL_OPERATION_CATALOG: readonly OperationCatalogEntry[] = [
   sideEffect("release_create"),
   readOnly("release_list"),
   readOnly("release_read"),
+  sideEffect("release_publish"),
 ];
 
 /** fail-closed 4異常系と運用上の失敗種別。 */
@@ -232,7 +235,21 @@ export type GhToolRequest =
       readonly prerelease: boolean;
     }
   | { readonly operation: "release_list" }
-  | { readonly operation: "release_read"; readonly tagName: string };
+  | { readonly operation: "release_read"; readonly tagName: string }
+  | {
+      /**
+       * Release 公開（GitHub 接続専用）。対象 Release の draft 解除のみを行い
+       * （タイトル・本文・prerelease を変更しない）、タグ名と公開承認の根拠
+       * （承認した HITL 質問 ID・回答の記録参照）を必須とする。承認根拠を欠く
+       * 要求は副作用発生前に入力契約違反として拒否される（fail-closed）。
+       * 承認根拠の検証は Tool 境界では構造検査（必須・非空・形式）までであり、
+       * 参照された承認記録の実在・承認済み確認は呼出元 workflow の責務である。
+       */
+      readonly operation: "release_publish";
+      readonly tagName: string;
+      /** 公開承認の根拠（承認した HITL 質問 ID・回答の記録参照）。必須・非空。 */
+      readonly approvalBasis: string;
+    };
 
 /** 操作成功（出力）。構造化結果（番号、URL 等）のみを公開する。 */
 export type GhToolSuccess =
@@ -345,6 +362,25 @@ export type GhToolSuccess =
       readonly draft: boolean;
       readonly prerelease: boolean;
       readonly url: string;
+      /** 公開日時（GitHub published_at の正規化値）。draft の間は null。 */
+      readonly publishedAt: string | null;
+    }
+  | {
+      /**
+       * Release 公開の成功。対象 Release の draft 解除のみが行われ、
+       * 読み戻し（draft=false・publishedAt）まで確認されている。
+       * alreadyPublished は呼出時に既に draft=false であった旨の報告であり、
+       * true の場合は副操作（PATCH）を実行していない（冪等な記録完了扱いの入力）。
+       */
+      readonly operation: "release_publish";
+      readonly tagName: string;
+      readonly title: string;
+      readonly body: string;
+      readonly draft: false;
+      readonly prerelease: boolean;
+      readonly url: string;
+      readonly publishedAt: string;
+      readonly alreadyPublished: boolean;
     };
 
 /**

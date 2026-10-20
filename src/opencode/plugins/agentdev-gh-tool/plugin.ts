@@ -31,7 +31,6 @@ import {
   defaultResolveRepo,
   REPO_ENV,
   type RepoResolution,
-  type RepoResolveDiagnostics,
 } from "../../../common/tools/agentdev-gh/repo-resolution.ts";
 import type { GhRunner } from "../../../common/tools/agentdev-gh/runner.ts";
 
@@ -73,16 +72,6 @@ export interface AgentdevGhToolDeps {
   readonly createRunner?: (worktree: string, repo: string) => GhRunner | Promise<GhRunner>;
   readonly now?: () => Date;
 }
-
-/** リポジトリ解決失敗時の診断情報（解決手続き導線と併せて failure detail へ転記する）。 */
-export type RepoResolveDiagnostics = {
-  /** 試行した解決手段（環境変数、gh repo view の順）。 */
-  readonly attemptedMeans: readonly string[];
-  /** gh repo view の終了コード（起動不能・シグナル終了時は null）。 */
-  readonly ghExitCode: number | null;
-  /** gh repo view の stderr 要因の要約（最初の非空行・切詰め）。 */
-  readonly ghStderrSummary: string;
-};
 
 const LOCAL_RUNNER_PROJECTION = path.join(".opencode", "tools", "agentdev-gh", "runner-local.ts");
 

@@ -24,7 +24,9 @@ export const AGENTDEV_GH_TOOL_NAME = "agentdev_gh";
 
 /** Tool の説明（利用者への公開契約の要約）。 */
 export const AGENTDEV_GH_TOOL_DESCRIPTION =
-  "Structured GitHub issue/PR operations with a verified operation contract. " +
+  "Structured GitHub issue/PR/release operations with a verified operation contract. " +
+  "Release draft creation and read-back are catalog-only; publishing an approved draft " +
+  "is release_publish with a mandatory approval basis (fail-closed input contract). " +
   "Each side-effect operation is read back and verified before success is returned.";
 
 /** 操作ごとの入力説明（JSON Schema の description 相当の公開メタデータ）。 */

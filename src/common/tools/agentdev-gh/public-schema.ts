@@ -14,14 +14,16 @@ export const AGENTDEV_GH_REQUEST_PROPERTY_SCHEMA = {
     "Structured GitHub issue/PR operation request. See the agentdev_gh operation contract " +
     "(issue_create, issue_read, issue_update, issue_close, pr_create, pr_read, pr_merge, pr_changed_files, " +
     "pr_mergeable, pr_update, issue_list, issue_reopen, comment_create, comment_list, comment_update, " +
-    "comment_delete, release_create, release_list, release_read). " +
+    "comment_delete, release_create, release_list, release_read, release_publish). " +
     "Tracking-issue operations expose the logical role; physical label mapping " +
     "is applied inside the tool. Tracking-issue kind and non-terminal state are held in the issue body " +
     "standard structure, not accepted or derived by the tool. Comments are a shared logical resource " +
     "of issues and pull requests, identified by commentId (public type: string). Side-effect operations " +
     "are verified by read-back before success is returned (fail-closed). Release operations are " +
     "GitHub-connected only; release_create creates a draft Release and has no publish mode in its " +
-    "input contract (publish requires separate explicit user approval).",
+    "input contract (publish requires separate explicit user approval). Publishing an approved draft " +
+    "is release_publish with tagName and approvalBasis required (fail-closed input contract; only the " +
+    "draft flag is changed).",
   properties: {
     operation: {
       type: "string",
@@ -71,7 +73,12 @@ export const AGENTDEV_GH_REQUEST_PROPERTY_SCHEMA = {
     method: { type: "string", enum: ["merge", "squash", "rebase"], description: "Merge method for pr_merge." },
     tagName: {
       type: "string",
-      description: "Existing version tag name for release_create / release_read (tag↔Release correspondence).",
+      description: "Existing version tag name for release_create / release_read / release_publish (tag↔Release correspondence).",
+    },
+    approvalBasis: {
+      type: "string",
+      description:
+        "Required for release_publish. Non-empty basis of the publication approval (reference to the approving HITL question id and its recorded answer). Requests lacking it are rejected before any side effect (fail-closed).",
     },
     prerelease: {
       type: "boolean",

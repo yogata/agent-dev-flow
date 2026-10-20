@@ -171,6 +171,8 @@ export class CliRunner implements GhRunner {
         return this.releaseList(request.args);
       case "release_read":
         return this.releaseRead(request.args);
+      case "release_publish":
+        return this.releasePublish(request.args);
     }
   }
 
@@ -851,8 +853,9 @@ export class CliRunner implements GhRunner {
   }
 
   // ---------------------------------------------------------------------
-  // Release 系（GitHub 接続専用。入力契約に公開モードは存在せず、
-  // 作成は常に草稿（draft）として行う。公開は本 Tool の操作対象外）
+  // Release 系（GitHub 接続専用。release_create は常に草稿（draft）として
+  // 作成し、公開モードは入力契約に存在しない。公開は release_publish
+  // （draft 解除のみ。タイトル・本文・prerelease 不変）が所有する）
   // ---------------------------------------------------------------------
 
   /** GitHub Release API の応答要素を操作契約の正規化形へ写像する。 */
@@ -862,8 +865,18 @@ export class CliRunner implements GhRunner {
     if (typeof rec.draft !== "boolean" || typeof rec.prerelease !== "boolean") return null;
     // Release タイトル（API の name）は省略可能なため、欠落時は空文字へ正規化する。
     const title = str(rec.name) ?? "";
+    // published_at は draft の間は欠落（null）であり、公開後に時刻文字列が入る。
+    const publishedAt = str(rec.published_at);
     if (tagName === null || tagName.length === 0 || url === null) return null;
-    return { tagName, title, body: str(rec.body) ?? "", draft: rec.draft, prerelease: rec.prerelease, url };
+    return {
+      tagName,
+      title,
+      body: str(rec.body) ?? "",
+      draft: rec.draft,
+      prerelease: rec.prerelease,
+      publishedAt,
+      url,
+    };
   }
 
   private releaseCreate(args: Record<string, unknown>): GhRunnerReply {
@@ -921,6 +934,22 @@ export class CliRunner implements GhRunner {
 
   /** 全 Release の一覧取得（ページング）。draft を含む正規化形（正規化配列）で返す。 */
   private fetchAllReleases(): GhRunnerReply {
+    const raw = this.fetchRawReleases();
+    if (!raw.ok) return raw;
+    const entries = raw.payload as Record<string, unknown>[];
+    const releases: Record<string, unknown>[] = [];
+    for (const entry of entries) {
+      const item = this.releaseItemFrom(entry);
+      if (item === null) {
+        return this.fail("release entry missing tag_name/html_url or draft/prerelease flags", 0);
+      }
+      releases.push(item);
+    }
+    return { ok: true, payload: releases };
+  }
+
+  /** 全 Release の raw 要素（release id 等の runner 内部使用フィールドを含む）取得（ページング）。 */
+  private fetchRawReleases(): GhRunnerReply {
     const collected: Record<string, unknown>[] = [];
     for (let page = 1; page <= LIST_MAX_PAGES; page++) {
       const r = this.apiGetAny(
@@ -947,15 +976,64 @@ export class CliRunner implements GhRunner {
         );
       }
     }
-    const releases: Record<string, unknown>[] = [];
-    for (const entry of collected) {
-      const item = this.releaseItemFrom(entry);
-      if (item === null) {
-        return this.fail("release entry missing tag_name/html_url or draft/prerelease flags", 0);
-      }
-      releases.push(item);
+    return { ok: true, payload: collected };
+  }
+
+  /**
+   * Release 公開（draft 解除のみ）。対象 Release の draft 状態を一覧読取で確認し、
+   * 既に draft=false（公開済み）の場合は PATCH を実行せず副操作なしの報告を返す
+   * （alreadyPublished: true。公開承認根拠の検証は engine 側の入力契約が所有し、
+   * 参照された承認記録の実在確認は呼出元 workflow の責務）。draft=true の場合は
+   * PATCH で draft のみ解除し、タイトル・本文・prerelease が変化していないことを
+   * 応答時点で確認する（不変条件違反は operation-failed）。
+   */
+  private releasePublish(args: Record<string, unknown>): GhRunnerReply {
+    const tagName = str(args.tagName);
+    const approvalBasis = str(args.approvalBasis);
+    if (tagName === null || tagName.length === 0 || approvalBasis === null || approvalBasis.length === 0) {
+      return this.fail("release_publish requires tagName and approvalBasis", 0, "invalid-input");
     }
-    return { ok: true, payload: releases };
+    const raw = this.fetchRawReleases();
+    if (!raw.ok) return raw;
+    const entries = raw.payload as Record<string, unknown>[];
+    const target = entries.find((entry) => str(entry.tag_name) === tagName);
+    if (target === undefined) {
+      return this.fail(`no release found for tag ${tagName}`, 0);
+    }
+    const current = this.releaseItemFrom(target);
+    if (current === null) {
+      return this.fail("release entry missing tag_name/html_url or draft/prerelease flags", 0);
+    }
+    const releaseId = typeof target.id === "number" ? target.id : null;
+    if (releaseId === null) {
+      return this.fail("release entry missing numeric id", 0);
+    }
+    if (current.draft === false) {
+      // 公開済み（draft=false）検出: 副操作なしで現状態を報告する（重複実行防止）。
+      const publishedAt = str(target.published_at);
+      if (publishedAt === null || publishedAt.length === 0) {
+        return this.fail("already published release is missing published_at", 0);
+      }
+      return { ok: true, payload: { ...current, publishedAt, alreadyPublished: true } };
+    }
+    return this.apiWithInput("PATCH", `repos/${this.repo}/releases/${releaseId}`, { draft: false }, (rec) => {
+      const item = this.releaseItemFrom(rec);
+      if (item === null) {
+        return this.fail("release publish reply missing tag_name/html_url", 0);
+      }
+      if (item.draft !== false) {
+        return this.fail("release publish reply is still a draft", 0);
+      }
+      // draft 解除のみ: 公開操作はタイトル・本文・prerelease を変更しない。
+      if (item.title !== current.title || item.body !== current.body || item.prerelease !== current.prerelease) {
+        return this.fail("release publish changed an immutable field (title/body/prerelease)", 0);
+      }
+      const publishedAt = str(rec.published_at);
+      if (publishedAt === null || publishedAt.length === 0) {
+        return this.fail("release publish reply is missing published_at", 0);
+      }
+      return { ok: true, payload: { ...item, publishedAt, alreadyPublished: false } };
+    });
   }
 }
 

@@ -49,7 +49,7 @@ describe("登録形状（OpenCode registry が要求する構造）", () => {
     expect(typeof def.execute).toBe("function");
   });
 
-  test("args.request の JSON Schema は19操作を enum で公開する", async () => {
+  test("args.request の JSON Schema は20操作を enum で公開する", async () => {
     const server = createAgentdevGhToolPlugin({
       resolveRepo: () => "owner/repo",
       createRunner: () =>
@@ -60,7 +60,7 @@ describe("登録形状（OpenCode registry が要求する構造）", () => {
       args: { request: { properties: Record<string, { type?: string; enum?: string[] }>; required: string[] } };
     };
     const request = def.args.request;
-    expect(request.properties.operation?.enum).toHaveLength(19);
+    expect(request.properties.operation?.enum).toHaveLength(20);
     expect(request.properties.operation?.enum).toContain("pr_update");
     expect(request.properties.operation?.enum).toContain("comment_create");
     expect(request.properties.operation?.enum).toContain("comment_list");
@@ -69,9 +69,15 @@ describe("登録形状（OpenCode registry が要求する構造）", () => {
     expect(request.properties.operation?.enum).toContain("release_create");
     expect(request.properties.operation?.enum).toContain("release_list");
     expect(request.properties.operation?.enum).toContain("release_read");
+    expect(request.properties.operation?.enum).toContain("release_publish");
     expect(request.properties.operation?.enum).not.toContain("issue_comment");
+    expect(request.properties.operation?.enum).not.toContain("release_update");
+    expect(request.properties.operation?.enum).not.toContain("release_delete");
+    expect(request.properties.operation?.enum).not.toContain("release_create_published");
     expect(request.required).toEqual(["operation"]);
     expect(request.properties.draft).toBeUndefined();
+    expect(request.properties.approvalBasis).toBeDefined();
+    expect(request.properties.approvalBasis?.type).toBe("string");
     expect(request.properties.commentId).toBeDefined();
     expect(request.properties.commentId?.type).toBe("string");
     expect(request.properties.labels).toBeDefined();
@@ -123,6 +129,7 @@ describe("公開スキーマと実行時 validator の一致性（実行時受�
     { operation: "release_create", tagName: "v1.2.3-rc.1", title: "t", body: "b", prerelease: true },
     { operation: "release_list" },
     { operation: "release_read", tagName: "v1.2.3" },
+    { operation: "release_publish", tagName: "v1.2.3", approvalBasis: "HITL 質問 ID: Q-1、回答の記録参照" },
   ];
 
   test("実行時 validator が受理する全操作の要求は公開スキーマの許容集合に含まれる", () => {

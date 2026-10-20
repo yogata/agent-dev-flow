@@ -697,6 +697,8 @@ interface StubRelease {
   body: string;
   draft: boolean;
   prerelease: boolean;
+  /** GitHub API 準拠の published_at。draft の間は欠落（未設定）。 */
+  published_at?: string | null;
 }
 
 interface GithubStub {
@@ -742,6 +744,8 @@ function releaseJson(release: StubRelease): Record<string, unknown> {
     body: release.body,
     draft: release.draft,
     prerelease: release.prerelease,
+    // GitHub API 準拠: draft の間は published_at が null、公開後に時刻が入る。
+    published_at: release.draft ? null : (release.published_at ?? "2026-10-20T00:00:00Z"),
     html_url: `https://example/r/${release.id}`,
   };
 }
@@ -937,6 +941,18 @@ function githubStub(init: {
           prerelease: inputBody.prerelease === true,
         };
         releases.push(release);
+        return { status: 0, stdout: JSON.stringify(releaseJson(release)), stderr: "" };
+      }
+      const releaseByIdMatch = /^repos\/owner\/repo\/releases\/(\d+)$/.exec(path ?? "");
+      if (releaseByIdMatch !== null && method === "PATCH") {
+        const id = Number.parseInt(releaseByIdMatch[1] ?? "", 10);
+        const release = releases.find((r) => r.id === id);
+        if (release === undefined) return NOT_FOUND;
+        // 公開は draft のみ変更する（タイトル・本文・prerelease は不変）。
+        if (typeof inputBody.draft === "boolean" && release.draft && !inputBody.draft) {
+          release.draft = false;
+          release.published_at = "2026-10-20T01:00:00Z";
+        }
         return { status: 0, stdout: JSON.stringify(releaseJson(release)), stderr: "" };
       }
       return { status: 1, stdout: "", stderr: `stub: unhandled ${method} ${rawPath}` };
@@ -1726,6 +1742,145 @@ describe("CliRunner + engine: Release 操作（draft 固定・一覧読取・読
     expect(duplicate.ok).toBe(false);
     if (!duplicate.ok) expect(duplicate.failure.kind).toBe("operation-failed");
     expect(stub.releases).toHaveLength(1);
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("release_publish は draft Release の解除と読み戻し（draft=false・publishedAt）を確認する", async () => {
+    const tempDir = makeTempDir();
+    const stub = githubStub({});
+    const created = await runOp(stub.exec, tempDir, {
+      operation: "release_create",
+      tagName: "v5.1.5",
+      title: "v5.1.5",
+      body: "リリースノート",
+      prerelease: false,
+    });
+    expect(created.ok).toBe(true);
+    const publish = await runOp(stub.exec, tempDir, {
+      operation: "release_publish",
+      tagName: "v5.1.5",
+      approvalBasis: "HITL 質問 ID: Q-1、回答の記録参照",
+    });
+    expect(publish.ok).toBe(true);
+    const patch = stub.patches.find((p) => p.path === "repos/owner/repo/releases/1");
+    expect(patch).toBeDefined();
+    expect(patch?.body.draft).toBe(false);
+    if (publish.ok && publish.success.operation === "release_publish") {
+      expect(publish.success.draft).toBe(false);
+      expect(publish.success.alreadyPublished).toBe(false);
+      expect(publish.success.publishedAt.length).toBeGreaterThan(0);
+      expect(publish.success.prerelease).toBe(false);
+      expect(publish.success.title).toBe("v5.1.5");
+      expect(publish.success.body).toBe("リリースノート");
+    }
+    const read = await runOp(stub.exec, tempDir, { operation: "release_read", tagName: "v5.1.5" });
+    expect(read.ok).toBe(true);
+    if (read.ok && read.success.operation === "release_read") {
+      expect(read.success.draft).toBe(false);
+      expect(read.success.publishedAt).not.toBeNull();
+    }
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("release_publish は already-published（draft=false）検出時に副操作を実行せず alreadyPublished を報告する", async () => {
+    const tempDir = makeTempDir();
+    const stub = githubStub({
+      releases: [
+        { id: 1, tag_name: "v1.0.0", name: "v1.0.0", body: "b", draft: false, prerelease: false, published_at: "2026-10-01T00:00:00Z" },
+      ],
+    });
+    const publish = await runOp(stub.exec, tempDir, {
+      operation: "release_publish",
+      tagName: "v1.0.0",
+      approvalBasis: "HITL 質問 ID: Q-2、回答の記録参照",
+    });
+    expect(publish.ok).toBe(true);
+    const patch = stub.patches.find((p) => p.path === "repos/owner/repo/releases/1");
+    expect(patch).toBeUndefined();
+    if (publish.ok && publish.success.operation === "release_publish") {
+      expect(publish.success.alreadyPublished).toBe(true);
+      expect(publish.success.draft).toBe(false);
+      expect(publish.success.publishedAt).toBe("2026-10-01T00:00:00Z");
+    }
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("release_publish の副作用は対象 Release の draft 解除に限られ、他の Release と RC タグの prerelease は不変", async () => {
+    const tempDir = makeTempDir();
+    const stub = githubStub({});
+    const createRc = await runOp(stub.exec, tempDir, {
+      operation: "release_create",
+      tagName: "v6.0.0-rc.1",
+      title: "v6.0.0-rc.1",
+      body: "rc 本文",
+      prerelease: true,
+    });
+    expect(createRc.ok).toBe(true);
+    const target = await runOp(stub.exec, tempDir, {
+      operation: "release_create",
+      tagName: "v5.1.6",
+      title: "v5.1.6",
+      body: "対象本文",
+      prerelease: false,
+    });
+    expect(target.ok).toBe(true);
+    const before = await runOp(stub.exec, tempDir, { operation: "release_list" });
+    expect(before.ok).toBe(true);
+    const beforeRc = before.ok && before.success.operation === "release_list"
+      ? before.success.releases.find((r) => r.tagName === "v6.0.0-rc.1")
+      : undefined;
+
+    const publish = await runOp(stub.exec, tempDir, {
+      operation: "release_publish",
+      tagName: "v5.1.6",
+      approvalBasis: "HITL 質問 ID: Q-3、回答の記録参照",
+    });
+    expect(publish.ok).toBe(true);
+
+    const after = await runOp(stub.exec, tempDir, { operation: "release_list" });
+    expect(after.ok).toBe(true);
+    if (after.ok && after.success.operation === "release_list") {
+      const rc = after.success.releases.find((r) => r.tagName === "v6.0.0-rc.1");
+      expect(rc).toEqual(beforeRc);
+      const published = after.success.releases.find((r) => r.tagName === "v5.1.6");
+      expect(published?.draft).toBe(false);
+      expect(published?.prerelease).toBe(false);
+      expect(published?.title).toBe("v5.1.6");
+    }
+    const afterTargetRead = await runOp(stub.exec, tempDir, { operation: "release_read", tagName: "v5.1.6" });
+    expect(afterTargetRead.ok).toBe(true);
+    if (afterTargetRead.ok && afterTargetRead.success.operation === "release_read") {
+      expect(afterTargetRead.success.body).toBe("対象本文");
+      expect(afterTargetRead.success.prerelease).toBe(false);
+      expect(afterTargetRead.success.title).toBe("v5.1.6");
+    }
+    const patchPaths = stub.patches.filter((p) => p.path.startsWith("repos/owner/repo/releases/"));
+    expect(patchPaths).toHaveLength(1);
+    expect(patchPaths[0]?.path).toBe("repos/owner/repo/releases/2");
+    expect(patchPaths[0]?.body.draft).toBe(false);
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("release_publish の対象タグ不在と承認根拠欠如は engine 経由で invalid-input または operation-failed", async () => {
+    const tempDir = makeTempDir();
+    const stub = githubStub({});
+    const missingBasis = await runOp(stub.exec, tempDir, {
+      operation: "release_publish",
+      tagName: "v1.0.0",
+    });
+    expect(missingBasis.ok).toBe(false);
+    if (!missingBasis.ok) {
+      expect(missingBasis.failure.kind).toBe("invalid-input");
+    }
+    const missingTarget = await runOp(stub.exec, tempDir, {
+      operation: "release_publish",
+      tagName: "v9.9.9",
+      approvalBasis: "HITL 質問 ID: Q-4、回答の記録参照",
+    });
+    expect(missingTarget.ok).toBe(false);
+    if (!missingTarget.ok) {
+      expect(missingTarget.failure.kind).toBe("operation-failed");
+    }
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 });

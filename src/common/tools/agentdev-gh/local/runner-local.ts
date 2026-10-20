@@ -633,6 +633,7 @@ export class LocalRunner implements GhRunner {
       case "release_create":
       case "release_list":
       case "release_read":
+      case "release_publish":
         return this.releaseUnsupported(request.operation);
     }
   }

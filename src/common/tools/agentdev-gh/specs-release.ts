@@ -1,10 +1,12 @@
-// Release 系操作（3 操作）のスペック実装。
+// Release 系操作（4 操作）のスペック実装。
 //
 // 各スペックは操作ごとの差分（入力検証、runner 要求の組立て、応答解釈、
 // 読み戻し照合）のみを所有する。fail-closed の制御順序は engine.ts が所有する。
-// 入力契約に公開モード（draft の解除、publish 相当フィールド）は存在せず、
-// 契約外の公開指定フィールドを含む要求は副作用発生前に unknown-field として
-// 拒否される（Design custom-tool-contracts.md「Release 操作」）。
+// release_create の入力契約に公開モード（draft の解除、publish 相当フィールド）
+// は存在せず、契約外の公開指定フィールドを含む要求は副作用発生前に unknown-field
+// として拒否される。公開は release_publish（タグ名と承認根拠必須の fail-closed
+// 入力契約。draft 解除のみ・タイトル/本文/prerelease 不変）が所有する
+// （Design custom-tool-contracts.md「Release 操作」）。
 
 
 import type { GhToolRequest, GhToolSuccess, ReleaseListItem } from "./contracts.ts";
@@ -264,6 +266,7 @@ const releaseReadSpec: OperationSpec = {
     const title = str(payload.title);
     const body = str(payload.body);
     const url = str(payload.url);
+    const publishedAt = str(payload.publishedAt);
     if (typeof payload.draft !== "boolean") return null;
     if (typeof payload.prerelease !== "boolean") return null;
     if (tagName === null || tagName.length === 0) return null;
@@ -277,6 +280,7 @@ const releaseReadSpec: OperationSpec = {
       draft: payload.draft,
       prerelease: payload.prerelease,
       url,
+      publishedAt,
     };
   },
   async verify(runner, _request, success) {
@@ -285,7 +289,123 @@ const releaseReadSpec: OperationSpec = {
     if (release === null) return false;
     if (release.title !== read.title) return false;
     if (release.draft !== read.draft) return false;
+    if ((str(release.publishedAt) ?? null) !== read.publishedAt) return false;
     return release.prerelease === read.prerelease;
+  },
+};
+
+// ---------------------------------------------------------------------------
+// release_publish（公開。タグ名と承認根拠必須の fail-closed 入力契約）
+// ---------------------------------------------------------------------------
+
+/**
+ * 公開承認の根拠の構造検査（必須・非空・空白のみ不可）。
+ * 参照された承認記録の実在・承認済み確認は呼出元 workflow の責務であり、
+ * Tool 境界では構造検査までを行う（Design「Release 操作」）。
+ */
+function validApprovalBasis(v: unknown): v is string {
+  if (typeof v !== "string") return false;
+  return v.trim().length > 0;
+}
+
+const releasePublishSpec: OperationSpec = {
+  operation: "release_publish",
+  validate(raw): ValidateOutcome {
+    if (!isRecord(raw)) {
+      return {
+        ok: false,
+        error: { code: "missing-field", field: "tagName", detail: "required field 'tagName' is missing for release_publish" },
+      };
+    }
+    const unknown = checkUnknownFields(raw, ["operation", "tagName", "approvalBasis"]);
+    if (unknown !== null) return unknown;
+    for (const field of ["tagName", "approvalBasis"] as const) {
+      if (raw[field] === undefined) {
+        return {
+          ok: false,
+          error: {
+            code: "missing-field",
+            field,
+            detail: `required field '${field}' is missing for release_publish`,
+          },
+        };
+      }
+    }
+    const tagName = str(raw.tagName);
+    if (tagName === null || tagName.length === 0) {
+      return { ok: false, error: { code: "invalid-field", field: "tagName", detail: "tagName must be a non-empty string" } };
+    }
+    if (!validApprovalBasis(raw.approvalBasis)) {
+      return {
+        ok: false,
+        error: {
+          code: "invalid-field",
+          field: "approvalBasis",
+          detail: "approvalBasis must be a non-empty string recording the approving HITL question id and answer reference",
+        },
+      };
+    }
+    return {
+      ok: true,
+      request: { operation: "release_publish", tagName, approvalBasis: raw.approvalBasis },
+    };
+  },
+  buildRequest(request): GhRunnerRequest {
+    const r = request as Extract<GhToolRequest, { operation: "release_publish" }>;
+    return {
+      operation: "release_publish",
+      args: { tagName: r.tagName, approvalBasis: r.approvalBasis },
+    };
+  },
+  parseSuccess(payload): GhToolSuccess | null {
+    if (!isRecord(payload)) return null;
+    const tagName = str(payload.tagName);
+    const title = str(payload.title);
+    const body = str(payload.body);
+    const url = str(payload.url);
+    const publishedAt = str(payload.publishedAt);
+    if (payload.draft !== false) return null;
+    if (typeof payload.prerelease !== "boolean") return null;
+    if (typeof payload.alreadyPublished !== "boolean") return null;
+    if (tagName === null || tagName.length === 0) return null;
+    if (title === null || body === null) return null;
+    if (publishedAt === null || publishedAt.length === 0) return null;
+    if (url === null || !isHttpUrl(url)) return null;
+    return {
+      operation: "release_publish",
+      tagName,
+      title,
+      body,
+      draft: false,
+      prerelease: payload.prerelease,
+      url,
+      publishedAt,
+      alreadyPublished: payload.alreadyPublished,
+    };
+  },
+  // 公開の VERIFY は読み戻しで draft=false・published_at を確認する。公開反映の
+  // 伝播遅延は release_create と同様に短い待機付き再照合で吸収する。読み戻しの
+  // タイトル・本文・prerelease・URL・published_at が runner 応答と一致しない場合
+  // （公開操作が不変フィールドを変えた場合を含む）は失敗とする。
+  async verify(runner, _request, success) {
+    const published = success as Extract<GhToolSuccess, { operation: "release_publish" }>;
+    for (let attempt = 0; attempt <= VERIFY_READBACK_DELAYS_MS.length; attempt++) {
+      if (attempt > 0) {
+        await delay(VERIFY_READBACK_DELAYS_MS[attempt - 1] ?? 0);
+      }
+      const release = await readRelease(runner, published.tagName);
+      if (release === null) continue;
+      if (release.draft !== false) continue;
+      const publishedAt = str(release.publishedAt);
+      if (publishedAt === null || publishedAt.length === 0) continue;
+      if ((str(release.title) ?? "") !== published.title) return false;
+      if ((str(release.body) ?? "") !== published.body) return false;
+      if (release.prerelease !== published.prerelease) return false;
+      if ((str(release.url) ?? "") !== published.url) return false;
+      if (publishedAt !== published.publishedAt) return false;
+      return true;
+    }
+    return false;
   },
 };
 
@@ -294,4 +414,5 @@ export const RELEASE_OPERATION_SPECS: readonly OperationSpec[] = [
   releaseCreateSpec,
   releaseListSpec,
   releaseReadSpec,
+  releasePublishSpec,
 ];

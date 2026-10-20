@@ -17,8 +17,8 @@ Git / GitHub 等への構造化された副作用操作を担う ADF 汎用 Cust
 
 ## 対象操作
 
-16操作カタログ（Design `custom-tool-contracts.md`「対象操作の境界（初期セット）」）:
-基本操作 `issue_create`、`issue_read`、`issue_update`、`issue_close`、`pr_create`、`pr_read`、`pr_merge`、`pr_changed_files`、`pr_mergeable`、`pr_update`、追跡Issue操作 `issue_list`、`issue_reopen`、Comment 操作 `comment_create`、`comment_list`、`comment_update`、`comment_delete`。
+20操作カタログ（Design `custom-tool-contracts.md`「対象操作の境界（初期セット）」）:
+基本操作 `issue_create`、`issue_read`、`issue_update`、`issue_close`、`pr_create`、`pr_read`、`pr_merge`、`pr_changed_files`、`pr_mergeable`、`pr_update`、追跡Issue操作 `issue_list`、`issue_reopen`、Comment 操作 `comment_create`、`comment_list`、`comment_update`、`comment_delete`、Release 操作（GitHub 接続専用）`release_create`（草稿作成。公開モードは入力契約に存在しない）、`release_list`、`release_read`、`release_publish`（承認根拠必須の公開〔draft 解除のみ〕。タイトル・本文・prerelease は不変）。
 Comment は Issue と Pull Request の会話コメントを同一の論理リソースとして扱い、commentId（公開型は文字列）で対象識別する。
 旧 `issue_comment`（body あり＝追加、body なし＝読取の二重モード）は廃止済みであり、呼出元は Comment 操作（comment_create、comment_list）を利用する。
 
