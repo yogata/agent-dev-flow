@@ -10,7 +10,7 @@
 DEC-018 は欠番であり、対応する Decision ファイルは存在しない。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は50件、提案中の Decision は1件である。
+現行の承認済み Decision は51件、提案中の Decision は0件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -75,7 +75,7 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 | DEC-058 | 工程遷移と双経路併存モデルの採用（REQ-005-001/010/011 改訂を含む） | accepted | 2026-10-12 |
 | DEC-059 | backlog-auto 一気通貫実行のパッチリリース規則 | accepted | 2026-10-15 |
 | DEC-060 | ADF本体の GitHub Release 記録と公開承認境界 | accepted | 2026-10-16 |
-| DEC-061 | Release 公開操作のカタログ正規化（承認後の workflow 実行経路） | proposed | 2026-10-20 |
+| DEC-061 | Release 公開操作のカタログ正規化（承認後の workflow 実行経路） | accepted | 2026-10-20 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -138,12 +138,12 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 - [DEC-058](DEC-058.md)（工程遷移と双経路併存モデルの採用（REQ-005-001/010/011 改訂を含む））
 - [DEC-059](DEC-059.md)（backlog-auto 一気通貫実行のパッチリリース規則）
 - [DEC-060](DEC-060.md)（ADF本体の GitHub Release 記録と公開承認境界）
+- [DEC-061](DEC-061.md)（Release 公開操作のカタログ正規化（承認後の workflow 実行経路））
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
-- [DEC-061](DEC-061.md)（Release 公開操作のカタログ正規化（承認後の workflow 実行経路））
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
