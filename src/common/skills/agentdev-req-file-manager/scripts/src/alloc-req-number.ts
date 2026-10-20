@@ -28,11 +28,31 @@ export function nextReqNumber(existingNumbers: number[]): number {
  * 既知欠番レジストリ（numbering-policy.md「既知の欠番」節本文）から欠番番号を
  * 抽出する（純粋関数）。行頭が `REQ-NNN:` で始まる行を欠番エントリとみなし、
  * その番号のみを採番する（本文 prose 中の言及は採番しない）。
+ * 節範囲特定（開始見出し検出と節境界判定の双方）はコード囲みの内側の行を
+ * 見出し・節境界として扱わない。
+ *
+ * コード囲み認識規則:
+ *   - 見出し検出と節境界判定は、行頭（字下げなし）の ``` で開始するコード囲みの
+ *     内側の行を見出し・節境界として扱わない
+ *   - コード囲みの認識は行頭の ``` のみを条件とし、言語指定の有無は受理条件としない
+ *   - 閉じの ``` がない場合はファイル末尾までを内側とみなす
+ *   - ~~~ 等の代替囲み記法は認識しない
  */
 export function extractKnownGapNumbers(policyContent: string): number[] {
   const sectionLines: string[] = [];
   let inSection = false;
+  let inCodeFence = false;
   for (const line of policyContent.split(/\r?\n/)) {
+    if (/^```/.test(line)) {
+      inCodeFence = !inCodeFence;
+      continue;
+    }
+    if (inCodeFence) {
+      if (inSection) {
+        sectionLines.push(line);
+      }
+      continue;
+    }
     if (/^#{2,6}\s*既知の欠番\s*$/.test(line)) {
       inSection = true;
       continue;

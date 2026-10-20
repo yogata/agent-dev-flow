@@ -70,6 +70,8 @@ STEP-5 の Decision禁止ゲート・STEP-4 の文書分類妥当性検証で分
 
 組立・構造検査を先に完了させ、次に組立差分を確認し、その後に意味レビューを実施する。意味レビューで変更が生じた場合は、組立・差分検査を再実行してから意味を再評価する。STEP 再開時は `scripts/src/evidence-match.ts` の照合ですべて一致した証拠だけを再利用し、同一条件の再検査を繰り返さない。欠損・不一致では影響する検査を再実行して意味判断も再評価する。意味レビューを機械検査の代替にしない。
 
+見出し検出と節境界判定は、行頭（字下げなし）の ``` で開始するコード囲みの内側の行を見出し・節境界として扱わないものとする。閉じの ``` がない場合はファイル末尾までを内側とみなし、言語指定の有無は受理条件とせず、~~~ 等の代替囲み記法は認識しない。この規則は target_area 検索の script 契約（search-target-area.ts）および採番スクリプトの節範囲特定と同一の内容を維持する。コード囲みの外側の見出し検出、正規化、完全一致、旧文存在件数検査の既存挙動は変更しない
+
 ### Result
 
 - 構造化 `draft-data`（`work_type`, `scale`, `summary`, `auto_gate`, `agreed_items`, `artifact_actions`, `conflict_resolutions`, `operation_units`, `test_strategy`, `review_dispositions`, `case_open_hints`）
