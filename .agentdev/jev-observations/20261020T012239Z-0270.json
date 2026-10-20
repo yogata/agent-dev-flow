@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261020T012239Z-0270",
+  "workflow": "case-ready",
+  "evaluationKind": "scope-overlap-detection",
+  "subject": "Root Case #3820（Markdown見出し走査のコード囲み内#行誤検出修正）の既存オープンIssueとのスコープ重複判定",
+  "sourceRevision": "78041ccf4",
+  "durationMs": 717,
+  "inputTokens": 738,
+  "inputs": {
+    "requestDigest": "cc0c082bbfebdeda61302ebcdce4b608b845e54ba12c215ea3181ff6eba56e3f"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-overlap-exists",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.05,
+        "false": 0.95
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-overlap-exists",
+        "value": false
+      }
+    ]
+  }
+}
