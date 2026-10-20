@@ -91,8 +91,8 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 <!-- AUTOGEN:BEGIN:id=req-metrics-measurement-example -->
 | REQ | 要件行数 | 行数シグナル | 備考 |
 |---|---|---|---|
-| REQ-001 | 66 | +1 |  |
-| REQ-004 | 65 | +1 |  |
+| REQ-004 | 68 | +1 |  |
+| REQ-001 | 67 | +1 |  |
 | REQ-008 | 62 | +1 |  |
 | REQ-061 | 53 | +1 |  |
 | REQ-009 | 52 | +1 |  |
