@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261019T145759Z-6455",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "採番側（既知欠番レジストリ読込）のコード囲み除外要件の REQ 帰属",
+  "sourceRevision": "abe519fc74c28cffc975dff33a99c05d099063ae",
+  "durationMs": 301,
+  "inputTokens": 1094,
+  "inputs": {
+    "requestDigest": "58bdf3d814e344ac310366b7006282b50cd7b00b5418bf60ecfa3abb11eff4fc"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-req-matching-numbering-side",
+      "questionForm": "choice",
+      "value": "APPEND（既存REQへの要件行追加）",
+      "probabilityDistribution": {
+        "CREATE（新規REQを作成）": 0.27,
+        "APPEND（既存REQへの要件行追加）": 0.5,
+        "UPDATE（既存要件行の意味変更）": 0.04,
+        "REQ操作なし（REQ化不要・Design等で完結）": 0.19
+      }
+    },
+    {
+      "questionId": "q2-req-matching-numbering-side-confidence",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.44,
+        "false": 0.56
+      }
+    }
+  ],
+  "confidence": 0.33
+}

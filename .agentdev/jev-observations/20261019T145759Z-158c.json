@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261019T145759Z-158c",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "組立・target_area 検索側のコード囲み除外要件の REQ 帰属",
+  "sourceRevision": "abe519fc74c28cffc975dff33a99c05d099063ae",
+  "durationMs": 311,
+  "inputTokens": 1156,
+  "inputs": {
+    "requestDigest": "797d6dfa0b067e1f39343bf52789e4ae8f0ca29fae5e95df1fa49df9e48e6a33"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-req-matching-assembly-side",
+      "questionForm": "choice",
+      "value": "APPEND（既存REQへの要件行追加）",
+      "probabilityDistribution": {
+        "CREATE（新規REQを作成）": 0.05,
+        "APPEND（既存REQへの要件行追加）": 0.89,
+        "UPDATE（既存要件行の意味変更）": 0.05,
+        "REQ操作なし（REQ化不要・Design等で完結）": 0.01
+      }
+    },
+    {
+      "questionId": "q2-req-matching-assembly-side-confidence",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.68,
+        "false": 0.31999999999999995
+      }
+    }
+  ],
+  "confidence": 0.85
+}

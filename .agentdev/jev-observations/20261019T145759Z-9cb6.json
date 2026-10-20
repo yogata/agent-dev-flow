@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261019T145759Z-9cb6",
+  "workflow": "req-define",
+  "evaluationKind": "final-classification-design-separation",
+  "subject": "コード囲み認識規則の詳細の配置先と Design 分離要否",
+  "sourceRevision": "abe519fc74c28cffc975dff33a99c05d099063ae",
+  "durationMs": 306,
+  "inputTokens": 1034,
+  "inputs": {
+    "requestDigest": "b94995fdc256a678c1d944603523f00056a486121b25951d3bd159e087eee673"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-final-classification-fence-rule",
+      "questionForm": "choice",
+      "value": "REQとDesignの両方（REQに一意判定に必要な最小限、Designに詳細）",
+      "probabilityDistribution": {
+        "REQ行（要件行に詳細まで記述）": 0.01,
+        "Design行（Design・契約文のみに記述しREQは振る舞い制約のみ）": 0.35,
+        "REQとDesignの両方（REQに一意判定に必要な最小限、Designに詳細）": 0.64
+      }
+    },
+    {
+      "questionId": "q2-design-separation-needed",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.88,
+        "false": 0.12
+      }
+    }
+  ],
+  "confidence": 0.46
+}
