@@ -1,0 +1,397 @@
+{
+  "一式識別子": "20261015T180807JST",
+  "backlog_auto_started_at": "2026-10-15T18:08:07+09:00",
+  "set_state_created_at": "2026-10-15T22:36:07+09:00",
+  "義務スナップショット": [
+    {
+      "ru_id": "RU-0001",
+      "path": ".agentdev/backlog/req-units/RU-0001.md",
+      "logical_key": "RU-0001",
+      "必須要求": "case-ready 受入検査 script（accept_definition_checks.ts）の overlap-cross-check step の要約生成が、engine 報告 JSON の構造化警告結果（condition_a.warnings、detection_unavailable）を正しく反映するようにする。consumer 側は要約だけでなく保存済み stdout 原証跡から警告を確定する規律を手順として明示する。",
+      "受け入れ義務": [
+        "summary が condition_a.warnings の実件数を反映する。",
+        "unavailable 状態を 0 件と誤表示しない。",
+        "consumer は警告確認時に保存済み stdout 原証跡を検査する手順を持つ。",
+        "Issue #3680 との競合調整が実装計画に記録される。"
+      ],
+      "tentative_classification": "REQ",
+      "sources": [
+        ".agentdev/learning/promoted/existing-measure-update-overlap-warning-summary.md",
+        ".agentdev/intake/promoted/2026-10-13-case-ready-overlap-summary-misreport.md"
+      ]
+    },
+    {
+      "ru_id": "RU-0002",
+      "path": ".agentdev/backlog/req-units/RU-0002.md",
+      "logical_key": "RU-0002",
+      "必須要求": "case-open の prepare_definition_pr で traceability gate を有効にする入力では、判定対象 REQ 集合（traceabilityReqIds）を明示・検証し、gate 実行範囲と判定対象の不整合を実行前に fail-closed で検出できるようにする。",
+      "受け入れ義務": [
+        "traceability gate 有効時に対象 REQ 集合が存在し、有効であることを検証する。",
+        "欠落・空・不整合入力を gate 実行前に fail-closed で報告する。",
+        "gate 対象と判定対象集合の関係が手順で明確である。"
+      ],
+      "tentative_classification": "REQ",
+      "sources": [
+        ".agentdev/learning/promoted/existing-measure-update-traceability-target-ids.md"
+      ]
+    },
+    {
+      "ru_id": "RU-0003",
+      "path": ".agentdev/backlog/req-units/RU-0003.md",
+      "logical_key": "RU-0003",
+      "必須要求": "新規 REQ 行を伴う Definition 変更で case-open STEP-4 の traceability gate が報告する構造的 fail（対象行の missing-implementation / missing-verification）の扱いを、case-open reference 手順（definition-pr-and-idempotency.md）の gate 判定仕様節に明文化する。",
+      "受け入れ義務": [
+        "新規 REQ 行の構造的 fail の扱い（case-open 正規ゲートとの関係）が手順に明文化されている。",
+        "Case #3627 との統合・重複判定の結論が記録されている。",
+        "gate fail を設計PR の作成停止と誤読しない判断根拠が手順から一意に導出できる。"
+      ],
+      "tentative_classification": "REQ",
+      "sources": [
+        ".agentdev/intake/promoted/2026-10-11-traceability-gate-new-req-row.md"
+      ]
+    },
+    {
+      "ru_id": "RU-0004",
+      "path": ".agentdev/backlog/req-units/RU-0004.md",
+      "logical_key": "RU-0004",
+      "必須要求": "frontmatter updated 鮮度起因の check_integrity exit 1 常態（req-updated-freshness / req-range-staleness / IR-072）を解消し、鮮度債務の実施単位・タイミングという運用判断を整理して確定する。",
+      "受け入れ義務": [
+        "鮮度債務対象ファイル（strict 10 件・heuristic 1 件・IR-072 11 件。重複統合後の実一覧）の updated が是正されている（機械是正論点）。",
+        "実施単位・タイミングの運用判断が確定し記録されている（運用設計論点）。",
+        "req-health-metrics.md を含む AUTOGEN 派生物の generate_indexes 再生成手順が明確である。",
+        "check_integrity の鮮度検査が exit 1 常態でなくなる（自 Case 起因分離証明を不要とする水準）。"
+      ],
+      "tentative_classification": "REQ",
+      "sources": [
+        ".agentdev/intake/promoted/2026-10-14-req-frontmatter-freshness-exit1.md",
+        ".agentdev/intake/promoted/2026-10-14-ir072-frontmatter-updated-stale-batch.md"
+      ]
+    },
+    {
+      "ru_id": "RU-0005",
+      "path": ".agentdev/backlog/req-units/RU-0005.md",
+      "logical_key": "RU-0005",
+      "必須要求": "bun test 全件実行における既存失敗 2 件（IR-055 delta 回帰テスト、ローカルIssue role 条件付きスキーマテスト）を解消し、自 Case 起因分離証明（比較 worktree での再現確認）の手間をなくす。",
+      "受け入れ義務": [
+        "bun test 全件実行が既存債務起因の失敗なしで pass する（比較 worktree での分離証明を不要とする）。",
+        "IR-055 baseline 更新の可否・タイミングの結論が記録されている。",
+        "role 条件付きスキーマテストの期待値修正方針の結論が記録されている。",
+        "fixture 対策（LF→CRLF warning）の要否の結論が記録されている。"
+      ],
+      "tentative_classification": "REQ",
+      "sources": [
+        ".agentdev/intake/promoted/2026-10-14-bun-test-existing-regressions-ir055.md"
+      ]
+    },
+    {
+      "ru_id": "RU-0006",
+      "path": ".agentdev/backlog/req-units/RU-0006.md",
+      "logical_key": "RU-0006",
+      "必須要求": "phase 系 skill 6 件（agentdev-phase-theme-collaboration、agentdev-workflow-phase-artifacts-update、agentdev-workflow-phase-review、agentdev-workflow-phase-tasks-create、agentdev-workflow-phase-tasks-update、agentdev-workflow-phase-transition）の src/common/skills 存在に対する .opencode/skills projection 欠落（IR-068 NG 6 件）を解消する。",
+      "受け入れ義務": [
+        "check_integrity（source profile）で IR-068 NG 6 件が解消される。",
+        "投影登録内容と検出条件の乖離所在の結論が記録されている。",
+        "修復方式（junction 再構築 / manifest 是正）の決定が記録されている。"
+      ],
+      "tentative_classification": "REQ",
+      "sources": [
+        ".agentdev/intake/promoted/2026-10-14-ir068-phase-skills-missing-projection-manifest.md"
+      ]
+    },
+    {
+      "ru_id": "RU-0007",
+      "path": ".agentdev/backlog/req-units/RU-0007.md",
+      "logical_key": "RU-0007",
+      "必須要求": "prepare_definition_pr.ts（agentdev-workflow-case-open scripts 配下）の pre-existing 型エラー 4 件（TS18048×2・TS2783×2）を解消する。",
+      "受け入れ義務": [
+        "typecheck で当該 pre-existing 4 件が解消される。",
+        "typecheck gate 組込み要否（REQ-112 / REQ-113 との関連）の結論が記録されている。"
+      ],
+      "tentative_classification": "REQ",
+      "sources": [
+        ".agentdev/intake/promoted/2026-10-14-prepare-definition-pr-type-errors.md"
+      ]
+    },
+    {
+      "ru_id": "RU-0008",
+      "path": ".agentdev/backlog/req-units/RU-0008.md",
+      "logical_key": "RU-0008",
+      "必須要求": "agentdev_gh issue_create の labels 必須契約（custom-tool-contracts.md の操作契約）と、case-open workflow skill reference（root-case-and-definition-package.md 手順6）の任意付与記述との文書間整合を取る。",
+      "受け入れ義務": [
+        "整合先の選択が確定し、当該文書の整合が実施されている。",
+        "labels 省略呼出を許す解釈余地が解消されている。",
+        "labels 未指定による再試行が生じない状態になっている。"
+      ],
+      "tentative_classification": "REQ",
+      "sources": [
+        ".agentdev/intake/promoted/2026-10-13-issue-create-labels-required.md"
+      ]
+    },
+    {
+      "ru_id": "RU-0009",
+      "path": ".agentdev/backlog/req-units/RU-0009.md",
+      "logical_key": "RU-0009",
+      "必須要求": "REQ 追加を伴う Definition 変更で、docs/README.md 手動管理区間の件数記述と REQ 行数由来の派生物が、初回の変更・検証範囲から漏れないようにする。",
+      "受け入れ義務": [
+        "REQ 追加時に手動管理区間の件数記述を照合する手順が明確である。",
+        "派生物が stage paths に事前包含できない場合の検出・補正・証跡が明確である。",
+        "integrity gate の不一致検出が維持されている。"
+      ],
+      "tentative_classification": "REQ",
+      "sources": [
+        ".agentdev/learning/promoted/existing-measure-update-req-count-prose-sync.md"
+      ]
+    },
+    {
+      "ru_id": "RU-0010",
+      "path": ".agentdev/backlog/req-units/RU-0010.md",
+      "logical_key": "RU-0010",
+      "必須要求": "Case / Issue / PR 本文の書込み手順に、適用される workflow extension の rules を書込み前に解決・適用する必須工程を明示する。",
+      "受け入れ義務": [
+        "GitHub 本文更新前に適用対象の extension rules を確認する工程が明確である。",
+        "rules が要求する前処理を書込み前に適用する。",
+        "投稿後検査を前置処理の代替にしない。"
+      ],
+      "tentative_classification": "REQ",
+      "sources": [
+        ".agentdev/learning/promoted/existing-measure-update-extension-rules-before-issue-write.md"
+      ]
+    },
+    {
+      "ru_id": "RU-0011",
+      "path": ".agentdev/backlog/req-units/RU-0011.md",
+      "logical_key": "RU-0011",
+      "必須要求": "lint_skills の aggregate description budget warning の運用の扱いを整理し、description 削減方針・出力の NG/warning 区別・ローカルユーザースキル走査扱いを確定する。",
+      "受け入れ義務": [
+        "集約予算の解消方針が決定し記録されている。",
+        "lint_skills 出力の NG/warning 区別の明示方針が決定し記録されている。",
+        "ローカルユーザースキルの走査扱いが決定し記録されている。"
+      ],
+      "tentative_classification": "REQ",
+      "sources": [
+        ".agentdev/intake/promoted/2026-10-15-lint-skills-aggregate-budget-warning.md"
+      ]
+    },
+    {
+      "ru_id": "RU-0012",
+      "path": ".agentdev/backlog/req-units/RU-0012.md",
+      "logical_key": "RU-0012",
+      "必須要求": "backlog-auto の Design 2 ファイル（agentdev-workflow-backlog-auto.md、backlog-auto.md）の表現是正を行う: DS18（同一ファイル内の契約文逐語二重保持）、DS20（本文への審議参照の裸列挙）、DS21（対象外項目の重複記載）。実行前提は Case #3725 完了・PR #3727 取り込み後の着手であり、REQ-114 本体および AC-01〜AC-09 は一切変更・縮約しない。",
+      "受け入れ義務": [
+        "DS18 の二重保持が是正され、集約先または同期義務の方針が記録されている。",
+        "DS20 の審議参照に所在指示または統合が施されている。",
+        "DS21 の対象外重複が解消されている。",
+        "REQ-114 本体・AC-01〜AC-09 が不変であることを検証している。",
+        "実行前提（Case #3725 完了・PR #3727 取り込み後着手）を遵守している。"
+      ],
+      "tentative_classification": "挙動Design",
+      "sources": [
+        ".agentdev/inspect/promoted/finding-20261015-backlog-auto-design-prose-fixes.md"
+      ]
+    },
+    {
+      "ru_id": "RU-0013",
+      "path": ".agentdev/backlog/req-units/RU-0013.md",
+      "logical_key": "RU-0013",
+      "必須要求": "docs/designs/local/runtime-package-boundary.md の文意品質是正を行う: DS23（異言語文字混入「卡」の修正）、DS24（同一 REQ の三重引用の集約）。",
+      "受け入れ義務": [
+        ":488 の異言語文字「卡」が修正されている（「carve-out 対象」）。",
+        ":51 の三重引用が「REQ-009」1 回へ集約されている。",
+        "異言語文字混入・三重引用の再検出がない。"
+      ],
+      "tentative_classification": "挙動Design",
+      "sources": [
+        ".agentdev/inspect/promoted/finding-20261015-runtime-package-boundary-prose-fixes.md"
+      ]
+    },
+    {
+      "ru_id": "RU-0014",
+      "path": ".agentdev/backlog/req-units/RU-0014.md",
+      "logical_key": "RU-0014",
+      "必須要求": "docs-check に、異言語文字混入（中国語字等の意図しない異言語文字）を検出する Unicode 検査ルールを追加する候補を、既存検出平面（content-corruption checker）との差分化確認を経て育成・確定する。",
+      "受け入れ義務": [
+        "既存 content-corruption checker との差分化確認の結論が記録されている。",
+        "ルールの検出対象・検出方式・対象集合が確定している。",
+        "DS23 同種の異言語文字混入が docs-check で機械検出可能になっている。"
+      ],
+      "tentative_classification": "REQ",
+      "sources": [
+        ".agentdev/inspect/promoted/finding-20261015-runtime-package-boundary-prose-fixes.md"
+      ]
+    }
+  ],
+  "対応表": {
+    "初期状態": [
+      {
+        "ru_id": "RU-0001",
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261015T180807JST.md",
+        "operation_unit": "OU-0001",
+        "実行単位": {
+          "子Issue": "#3733",
+          "Epic": "#3731"
+        }
+      },
+      {
+        "ru_id": "RU-0002",
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261015T180807JST.md",
+        "operation_unit": "OU-0002",
+        "実行単位": {
+          "子Issue": "#3734",
+          "Epic": "#3731"
+        }
+      },
+      {
+        "ru_id": "RU-0003",
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261015T180807JST.md",
+        "operation_unit": "OU-0003",
+        "実行単位": {
+          "子Issue": "#3735",
+          "Epic": "#3731"
+        }
+      },
+      {
+        "ru_id": "RU-0004",
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261015T180807JST.md",
+        "operation_unit": "OU-0004",
+        "実行単位": {
+          "子Issue": "#3740",
+          "Epic": "#3732"
+        }
+      },
+      {
+        "ru_id": "RU-0005",
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261015T180807JST.md",
+        "operation_unit": "OU-0005",
+        "実行単位": {
+          "子Issue": "#3741",
+          "Epic": "#3732"
+        }
+      },
+      {
+        "ru_id": "RU-0006",
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261015T180807JST.md",
+        "operation_unit": "OU-0006",
+        "実行単位": {
+          "子Issue": "#3742",
+          "Epic": "#3732"
+        }
+      },
+      {
+        "ru_id": "RU-0007",
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261015T180807JST.md",
+        "operation_unit": "OU-0007",
+        "実行単位": {
+          "子Issue": "#3736",
+          "Epic": "#3731"
+        }
+      },
+      {
+        "ru_id": "RU-0008",
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261015T180807JST.md",
+        "operation_unit": "OU-0008",
+        "実行単位": {
+          "子Issue": "#3737",
+          "Epic": "#3731"
+        }
+      },
+      {
+        "ru_id": "RU-0009",
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261015T180807JST.md",
+        "operation_unit": "OU-0009",
+        "実行単位": {
+          "子Issue": "#3738",
+          "Epic": "#3731"
+        }
+      },
+      {
+        "ru_id": "RU-0010",
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261015T180807JST.md",
+        "operation_unit": "OU-0010",
+        "実行単位": {
+          "子Issue": "#3739",
+          "Epic": "#3731"
+        }
+      },
+      {
+        "ru_id": "RU-0011",
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261015T180807JST.md",
+        "operation_unit": "OU-0011",
+        "実行単位": {
+          "子Issue": "#3743",
+          "Epic": "#3732"
+        }
+      },
+      {
+        "ru_id": "RU-0012",
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261015T180807JST.md",
+        "operation_unit": "OU-0012",
+        "実行単位": {
+          "子Issue": "#3744",
+          "Epic": "#3732"
+        }
+      },
+      {
+        "ru_id": "RU-0013",
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261015T180807JST.md",
+        "operation_unit": "OU-0013",
+        "実行単位": {
+          "子Issue": "#3745",
+          "Epic": "#3732"
+        }
+      },
+      {
+        "ru_id": "RU-0014",
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261015T180807JST.md",
+        "operation_unit": "OU-0014",
+        "実行単位": {
+          "子Issue": "#3746",
+          "Epic": "#3732"
+        }
+      }
+    ]
+  },
+  "基準点情報": {
+    "最後の正式リリース": {
+      "版番号": "5.1.0",
+      "タグ名": "v5.1.0",
+      "タグ対象コミット": "3d8718cc63171e5f77a455fee31c41402e614f6e"
+    },
+    "開始コミットID": "062eb87473916e006b3abe71476b509849d641e8",
+    "基準点確定手続証跡": "正式SemVer列挙→HEAD祖先到達判定(v5.1.0 reachable exit 0)→数値順序最大版 v5.1.0 (2026-10-15 実測)"
+  },
+  "進捗": {
+    "整理サイクル": "完了(stage1 2026-10-15T18:08-18:37, stage2 3系統 18:38-21:xx 承認・53パス永続化 ed8b2b8f/b2c10192/6704dcea, stage3 backlog-review RU生成承認・062eb874)",
+    "stage4_要件定義": "完了(2026-10-15T23:26:22+09:00, 要件doc確定: .agentdev/drafts/req-draft-backlog-auto-e2e-20261015T180807JST.md, 壁打ち4判断の利用者回答反映, adversarial-review 実施[logical 2-stream, accepted 2], auto_ready=true)",
+    "stage5_実行": "完了(2026-10-16T08:42:59+09:00, case-close pass: 11PR merge 0026aefc〜ee66005e・verify-only受入3件・QG-4全[x]・#3729+#3731+#3732+子14クローズ・Capture 17cce65b・worktree掃除)",
+    "stage6_全体完了判定": "完遂(2026-10-16T08:42:59+09:00, 突合根拠: 対応表14/14・義務46項→子完了条件投影→QG-4全[x]・11PR検証差分+merge実測・verify-only 3件独立受入評価pass・Epic横断最終検証 green[check_integrity exit0・bun test 4681/0・typecheck 0・traceability 11/0]・RU/要件doc削除後もset-stateから突合成立)",
+    "stage7_リリース": "完了(2026-10-16T08:45:27+09:00, 版番号 v5.1.1, タグ名 v5.1.1(lightweight=v5.1.0様式準拠), 対象コミット 17cce65b7ec7b6a92e1cb0cced725044425d2ccd, 手順: タグ作成→[TS-007制御中断: ローカル存在・リモート不在0行・対象一致を実測記録]→push→リモート反映実測(ls-remote 17cce65b一致)→タグ不変確認, 追加公開物: リリースノート草稿 release-notes-draft-v5.1.1.md 準備済み(実行は所定経路), 利用者承認: 2026-10-16 選択式確認「承認(手順どおり)」)"
+  },
+  "リリース状態": {
+    "状態": "完了",
+    "版番号": "5.1.1",
+    "タグ名": "v5.1.1",
+    "対象コミット": "17cce65b7ec7b6a92e1cb0cced725044425d2ccd",
+    "公開成果物": {
+      "gitタグ": "push済み・リモート実測済み",
+      "リリースノート": "草稿準備済み(所定経路での公開は未実施)"
+    },
+    "基準点": "v5.1.0 @3d8718cc",
+    "混入検知": "無関係コミット0(16コミット全数検査)"
+  },
+  "単一書き手": "backlog-auto実行 20261015T180807JST (single-flight: 進行中set-stateは本実行のみ)",
+  "保留": [
+    {
+      "対象": "DS25 case-close リリース手順受け皿",
+      "path": ".agentdev/inspect/promoted/finding-20261015-case-close-release-support-candidate.md",
+      "処置": "利用者判断(2026-10-15)により保留・次回backlog-review再評価対象・本一式に含まない"
+    }
+  ],
+  "判断変更記録": [
+    {
+      "対象": "OU-012 (#3744) 実行前提「Case #3725 完了・PR #3727 取り込み後着手」",
+      "変更": "本一式内で実行する（前提の実質充足を根拠に着手を許可）",
+      "利用者判断日時": "2026-10-16T07:34:34+09:00",
+      "根拠": "利用者選択 (a)。実測: #3744 編集対象 docs/designs/skills/agentdev-workflow-backlog-auto.md は PR #3727 changed files 対象外（src/common 配布物のみ）。前提の実質目的（DS18 処置を #3725 の Definition 確定状態で判断）は Definition 確定 38bc58c7 + amendment 済みで充足。元前提は RU-0012 finding の推奨（DB02 同根の可能性考慮）に由来する soft ordering であり、循環（#3744→#3725完了→E2E完遂→#3744）を解消するため本一式内実行に変更。"
+    }
+  ]
+}
