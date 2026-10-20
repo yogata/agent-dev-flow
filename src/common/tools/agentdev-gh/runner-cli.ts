@@ -996,7 +996,11 @@ export class CliRunner implements GhRunner {
     const raw = this.fetchRawReleases();
     if (!raw.ok) return raw;
     const entries = raw.payload as Record<string, unknown>[];
-    const target = entries.find((entry) => str(entry.tag_name) === tagName);
+    const matches = entries.filter((entry) => str(entry.tag_name) === tagName);
+    if (matches.length > 1) {
+      return this.fail(`duplicate releases found for tag ${tagName}; refusing ambiguous publish`, 0);
+    }
+    const target = matches[0];
     if (target === undefined) {
       return this.fail(`no release found for tag ${tagName}`, 0);
     }

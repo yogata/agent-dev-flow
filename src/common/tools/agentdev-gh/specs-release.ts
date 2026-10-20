@@ -299,13 +299,18 @@ const releaseReadSpec: OperationSpec = {
 // ---------------------------------------------------------------------------
 
 /**
- * 公開承認の根拠の構造検査（必須・非空・空白のみ不可）。
+ * 公開承認の根拠の構造検査（必須・非空・形式）。
+ * 承認した HITL 質問 ID と回答の記録参照の双方が「HITL 質問 ID: <id>、
+ * 回答の記録参照: <reference>」の解析可能な形式で含まれることを要求する。
  * 参照された承認記録の実在・承認済み確認は呼出元 workflow の責務であり、
  * Tool 境界では構造検査までを行う（Design「Release 操作」）。
  */
 function validApprovalBasis(v: unknown): v is string {
   if (typeof v !== "string") return false;
-  return v.trim().length > 0;
+  const question = /HITL 質問 ID[：:]\s*([^\s、,][^、,]*)/.exec(v);
+  if (question === null || (question[1] ?? "").trim().length === 0) return false;
+  const answer = /回答の記録参照[：:]\s*(\S.*)/.exec(v);
+  return answer !== null && (answer[1] ?? "").trim().length > 0;
 }
 
 const releasePublishSpec: OperationSpec = {
@@ -341,7 +346,7 @@ const releasePublishSpec: OperationSpec = {
         error: {
           code: "invalid-field",
           field: "approvalBasis",
-          detail: "approvalBasis must be a non-empty string recording the approving HITL question id and answer reference",
+          detail: "approvalBasis must be a non-empty string recording the approving HITL question id and answer reference (form: 'HITL 質問 ID: <id>、回答の記録参照: <reference>')",
         },
       };
     }

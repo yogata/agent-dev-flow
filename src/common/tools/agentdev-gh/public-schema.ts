@@ -78,7 +78,10 @@ export const AGENTDEV_GH_REQUEST_PROPERTY_SCHEMA = {
     approvalBasis: {
       type: "string",
       description:
-        "Required for release_publish. Non-empty basis of the publication approval (reference to the approving HITL question id and its recorded answer). Requests lacking it are rejected before any side effect (fail-closed).",
+        "Required for release_publish. Non-empty basis of the publication approval recording the approving " +
+        "HITL question id and its recorded answer reference in the structured form " +
+        "'HITL 質問 ID: <id>、回答の記録参照: <reference>'. Requests lacking the required pair are rejected " +
+        "before any side effect (fail-closed).",
     },
     prerelease: {
       type: "boolean",

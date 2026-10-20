@@ -129,7 +129,7 @@ describe("公開スキーマと実行時 validator の一致性（実行時受�
     { operation: "release_create", tagName: "v1.2.3-rc.1", title: "t", body: "b", prerelease: true },
     { operation: "release_list" },
     { operation: "release_read", tagName: "v1.2.3" },
-    { operation: "release_publish", tagName: "v1.2.3", approvalBasis: "HITL 質問 ID: Q-1、回答の記録参照" },
+    { operation: "release_publish", tagName: "v1.2.3", approvalBasis: "HITL 質問 ID: Q-1、回答の記録参照: Q-1-answer" },
   ];
 
   test("実行時 validator が受理する全操作の要求は公開スキーマの許容集合に含まれる", () => {

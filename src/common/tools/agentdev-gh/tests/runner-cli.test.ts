@@ -1759,7 +1759,7 @@ describe("CliRunner + engine: Release 操作（draft 固定・一覧読取・読
     const publish = await runOp(stub.exec, tempDir, {
       operation: "release_publish",
       tagName: "v5.1.5",
-      approvalBasis: "HITL 質問 ID: Q-1、回答の記録参照",
+      approvalBasis: "HITL 質問 ID: Q-1、回答の記録参照: Q-1-answer",
     });
     expect(publish.ok).toBe(true);
     const patch = stub.patches.find((p) => p.path === "repos/owner/repo/releases/1");
@@ -1792,7 +1792,7 @@ describe("CliRunner + engine: Release 操作（draft 固定・一覧読取・読
     const publish = await runOp(stub.exec, tempDir, {
       operation: "release_publish",
       tagName: "v1.0.0",
-      approvalBasis: "HITL 質問 ID: Q-2、回答の記録参照",
+      approvalBasis: "HITL 質問 ID: Q-2、回答の記録参照: Q-2-answer",
     });
     expect(publish.ok).toBe(true);
     const patch = stub.patches.find((p) => p.path === "repos/owner/repo/releases/1");
@@ -1833,7 +1833,7 @@ describe("CliRunner + engine: Release 操作（draft 固定・一覧読取・読
     const publish = await runOp(stub.exec, tempDir, {
       operation: "release_publish",
       tagName: "v5.1.6",
-      approvalBasis: "HITL 質問 ID: Q-3、回答の記録参照",
+      approvalBasis: "HITL 質問 ID: Q-3、回答の記録参照: Q-3-answer",
     });
     expect(publish.ok).toBe(true);
 
@@ -1861,6 +1861,62 @@ describe("CliRunner + engine: Release 操作（draft 固定・一覧読取・読
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
+  test("release_publish は同一タグの重複 Release を検出した場合に副操作を実行せず失敗する", async () => {
+    const tempDir = makeTempDir();
+    const stub = githubStub({
+      releases: [
+        { id: 1, tag_name: "v1.2.3", name: "v1.2.3", body: "a", draft: true, prerelease: false },
+        { id: 2, tag_name: "v1.2.3", name: "v1.2.3", body: "b", draft: false, prerelease: false, published_at: "2026-10-01T00:00:00Z" },
+      ],
+    });
+    const publish = await runOp(stub.exec, tempDir, {
+      operation: "release_publish",
+      tagName: "v1.2.3",
+      approvalBasis: "HITL 質問 ID: Q-5、回答の記録参照: Q-5-answer",
+    });
+    expect(publish.ok).toBe(false);
+    if (!publish.ok) {
+      expect(publish.failure.kind).toBe("operation-failed");
+      expect(publish.failure.detail).toContain("duplicate releases found for tag v1.2.3");
+    }
+    expect(stub.patches).toHaveLength(0);
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("release_publish の対象が RC（prerelease=true）の場合も draft 解除のみで prerelease は維持される", async () => {
+    const tempDir = makeTempDir();
+    const stub = githubStub({});
+    const created = await runOp(stub.exec, tempDir, {
+      operation: "release_create",
+      tagName: "v6.0.0-rc.1",
+      title: "v6.0.0-rc.1",
+      body: "rc 本文",
+      prerelease: true,
+    });
+    expect(created.ok).toBe(true);
+    const publish = await runOp(stub.exec, tempDir, {
+      operation: "release_publish",
+      tagName: "v6.0.0-rc.1",
+      approvalBasis: "HITL 質問 ID: Q-6、回答の記録参照: Q-6-answer",
+    });
+    expect(publish.ok).toBe(true);
+    if (publish.ok && publish.success.operation === "release_publish") {
+      expect(publish.success.draft).toBe(false);
+      expect(publish.success.prerelease).toBe(true);
+      expect(publish.success.title).toBe("v6.0.0-rc.1");
+      expect(publish.success.body).toBe("rc 本文");
+      expect(publish.success.publishedAt.length).toBeGreaterThan(0);
+    }
+    const read = await runOp(stub.exec, tempDir, { operation: "release_read", tagName: "v6.0.0-rc.1" });
+    expect(read.ok).toBe(true);
+    if (read.ok && read.success.operation === "release_read") {
+      expect(read.success.draft).toBe(false);
+      expect(read.success.prerelease).toBe(true);
+      expect(read.success.publishedAt).not.toBeNull();
+    }
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
   test("release_publish の対象タグ不在と承認根拠欠如は engine 経由で invalid-input または operation-failed", async () => {
     const tempDir = makeTempDir();
     const stub = githubStub({});
@@ -1875,7 +1931,7 @@ describe("CliRunner + engine: Release 操作（draft 固定・一覧読取・読
     const missingTarget = await runOp(stub.exec, tempDir, {
       operation: "release_publish",
       tagName: "v9.9.9",
-      approvalBasis: "HITL 質問 ID: Q-4、回答の記録参照",
+      approvalBasis: "HITL 質問 ID: Q-4、回答の記録参照: Q-4-answer",
     });
     expect(missingTarget.ok).toBe(false);
     if (!missingTarget.ok) {

@@ -7,8 +7,10 @@
 // assignee、milestone、Projects、lock/unlock、pin/unpin、Release 公開モード付き作成、
 // Release 更新・削除等）の追加は列挙固定によって検出される。廃止済みの
 // issue_comment（二重モード操作）も禁止対象として固定する。release_publish は
-// カタログ内の正規公開操作であり、release_update・release_delete・
-// release_create_published（公開モード付き作成）は禁止対象のまま固定する。
+// カタログ内の正規公開操作であり、禁止対象（forbidden リスト）は
+// release_update・release_delete を固定する。公開モード付き作成（公開相当の
+// 作成要求）はカタログ外の対象外 GitHub 機能として扱われ、20操作完全列挙と
+// release_create の公開相当フィールド拒否テストが非包含を検出する。
 //
 
 
@@ -90,7 +92,6 @@ describe("操作カタログ（Design 対象操作との一致）", () => {
       "issue_comment",
       "release_update",
       "release_delete",
-      "release_create_published",
     ];
     for (const op of forbidden) {
       expect(catalog.has(op)).toBe(false);
@@ -254,7 +255,7 @@ describe("Release 操作の入力契約（公開モード非包含）", () => {
       const raw = {
         operation: "release_publish",
         tagName: "v1.2.3",
-        approvalBasis: "HITL 質問 ID: Q-1、回答の記録参照",
+        approvalBasis: "HITL 質問 ID: Q-1、回答の記録参照: Q-1-answer",
         [extra]: true,
       };
       const validated = spec.validate(raw);
@@ -271,9 +272,27 @@ describe("Release 操作の入力契約（公開モード非包含）", () => {
     const ok = spec.validate({
       operation: "release_publish",
       tagName: "v1.2.3",
-      approvalBasis: "HITL 質問 ID: Q-1、回答の記録参照",
+      approvalBasis: "HITL 質問 ID: Q-1、回答の記録参照: Q-1-answer",
     });
     expect(ok.ok).toBe(true);
+  });
+
+  test("release_publish の approvalBasis は HITL 質問 ID と回答の記録参照のペアを解析可能な形式で要求する（形式検査）", () => {
+    const spec = specOf("release_publish");
+    for (const malformed of [
+      "承認した",
+      "回答の記録参照: ref のみ",
+      "HITL 質問 ID: Q-1 のみ",
+      "HITL 質問 ID: Q-1、回答の記録参照",
+      "HITL 質問 ID: Q-1、回答の記録参照:   ",
+    ]) {
+      const invalid = spec.validate({ operation: "release_publish", tagName: "v1.2.3", approvalBasis: malformed });
+      expect(invalid.ok).toBe(false);
+      if (!invalid.ok) {
+        expect(invalid.error.code).toBe("invalid-field");
+        expect(invalid.error.field).toBe("approvalBasis");
+      }
+    }
   });
 });
 
