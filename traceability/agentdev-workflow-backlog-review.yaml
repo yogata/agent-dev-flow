@@ -23,6 +23,8 @@ implementation:
     - REQ-103-009
     - REQ-103-010
     - REQ-103-011
+  src/common/skills/agentdev-workflow-backlog-review/references/contradiction-ru-and-persistence.md:
+    - REQ-039-007
 verification:
   src/common/skills/agentdev-workflow-backlog-review/references/analysis-composition-and-review.md:
     - REQ-090-024

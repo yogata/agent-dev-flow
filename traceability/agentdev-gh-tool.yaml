@@ -10,3 +10,4 @@ verification:
   src/opencode/plugins/agentdev-gh-tool/tests/plugin.test.ts:
     - REQ-011-028
     - REQ-052-013
+    - REQ-114-010
