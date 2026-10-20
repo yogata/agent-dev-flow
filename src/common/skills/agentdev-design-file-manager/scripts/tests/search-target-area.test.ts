@@ -110,3 +110,42 @@ describe("searchTargetArea", () => {
     expect(result.matches).toEqual([]);
   });
 });
+
+describe("code fence awareness (見出し走査はコード囲みの内側の # 行を見出しとして扱わない)", () => {
+  test("does not treat a # line inside a code fence as a heading", () => {
+    const content = `# Title
+
+## 目的
+
+\`\`\`bash
+## 目的
+echo example
+\`\`\`
+
+more body`;
+    const matches = findTargetAreaHeadings("目的", content, "design.md");
+    expect(matches).toHaveLength(1);
+    expect(matches[0]!.line).toBe(3);
+  });
+
+  test("treats a language-tagged fence opener as a fence (言語指定の有無は受理条件としない)", () => {
+    const content = "## 目的\n\n```ts\n## 目的\nconst x = 1;\n```\n";
+    const matches = findTargetAreaHeadings("目的", content, "design.md");
+    expect(matches).toHaveLength(1);
+    expect(matches[0]!.line).toBe(1);
+  });
+
+  test("treats an unclosed fence as extending to end of file (閉じの ``` がない場合はファイル末尾まで内側)", () => {
+    const content = "## 目的\n\n```\n## 目的\nbody after unclosed fence";
+    const matches = findTargetAreaHeadings("目的", content, "design.md");
+    expect(matches).toHaveLength(1);
+    expect(matches[0]!.line).toBe(1);
+  });
+
+  test("does not recognize ~~~ alternative fences (~~~ 等の代替囲み記法は認識しない)", () => {
+    const content = "## 目的\n\n~~~\n## 目的\n~~~\n";
+    const matches = findTargetAreaHeadings("目的", content, "design.md");
+    expect(matches).toHaveLength(2);
+    expect(matches[1]!.line).toBe(4);
+  });
+});

@@ -42,8 +42,21 @@ export function normalizeTargetArea(targetArea: string): string {
 }
 
 /**
+ * コード囲み認識規則:
+ *   - 見出し検出と節境界判定は、行頭（字下げなし）の ``` で開始するコード囲みの
+ *     内側の行を見出し・節境界として扱わない
+ *   - コード囲みの認識は行頭の ``` のみを条件とし、言語指定の有無は受理条件としない
+ *   - 閉じの ``` がない場合はファイル末尾までを内側とみなす
+ *   - ~~~ 等の代替囲み記法は認識しない
+ */
+function isCodeFenceDelimiter(line: string): boolean {
+  return /^```/.test(line);
+}
+
+/**
  * 1ファイルの本文から target_area にマッチする見出しを抽出する（純粋関数）。
  * 見出し行（# で始まる行）のみを対象とする。
+ * コード囲み（行頭の ```）の内側の行は見出し候補としない。
  * target_area に見出しプレフィックス（## 等）が含まれる場合は比較前に正規化する。
  */
 export function findTargetAreaHeadings(
@@ -54,8 +67,14 @@ export function findTargetAreaHeadings(
   const normalizedTargetArea = normalizeTargetArea(targetArea);
   const matches: Match[] = [];
   const lines = content.split(/\r?\n/);
+  let inCodeFence = false;
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]!;
+    if (isCodeFenceDelimiter(line)) {
+      inCodeFence = !inCodeFence;
+      continue;
+    }
+    if (inCodeFence) continue;
     const headingMatch = /^(#{1,6})\s+(.*)$/.exec(line);
     if (!headingMatch || headingMatch[2] === undefined) continue;
     const headingText = headingMatch[2].trim();

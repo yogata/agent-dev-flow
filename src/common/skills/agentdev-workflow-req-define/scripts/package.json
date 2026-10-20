@@ -1,6 +1,6 @@
 {
   "name": "agentdev-workflow-req-define-scripts",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Deterministic assembly and inspection scripts for req-define draft composition (local replace/append with pre/post checks). Pure functions, stdin JSON input, stdout JSON output.",
   "type": "module",

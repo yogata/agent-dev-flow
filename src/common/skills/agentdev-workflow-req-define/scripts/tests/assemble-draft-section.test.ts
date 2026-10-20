@@ -160,4 +160,87 @@ describe("assembly evidence", () => {
     expect(JSON.stringify(result.evidence)).not.toContain("old phrase");
     expect(JSON.stringify(result.evidence)).not.toContain("new phrase");
   });
+
+  test("records the code-fence scan rule in result-affecting references", () => {
+    const result = assembleDraftSection({
+      operation: "replace",
+      target_file: "doc.md",
+      target_area: "## Target",
+      old_text: "old phrase",
+      new_text: "new phrase",
+    }, original, "2026-01-01T00:00:00.000Z");
+    if (!result.ok) throw new Error("expected success");
+
+    expect(result.evidence.result_affecting_references.heading_match_rule).toContain("code-fence");
+  });
+});
+
+describe("code fence awareness (見出し検出と節境界判定の双方へ適用)", () => {
+  test("keeps the section scope across a closed fence containing a heading-like line", () => {
+    const original = [
+      "# Doc",
+      "",
+      "## Target",
+      "",
+      "```bash",
+      "## Fake",
+      "echo run",
+      "```",
+      "",
+      "old phrase",
+      "",
+      "## Other",
+      "untouched",
+      "",
+    ].join("\n");
+    const result = assembleDraftSection({
+      operation: "replace",
+      target_file: "doc.md",
+      target_area: "## Target",
+      old_text: "old phrase",
+      new_text: "new phrase",
+    }, original, "2026-01-01T00:00:00.000Z");
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.evidence.check_scope.end_line).toBe(original.split("\n").indexOf("## Other"));
+    expect(result.assembled_content).toBe(original.replace("old phrase", "new phrase"));
+    expect(result.checks.pre.every((check) => check.ok)).toBe(true);
+    expect(result.checks.post.every((check) => check.ok)).toBe(true);
+  });
+
+  test("keeps the section scope when the fence is unclosed (ファイル末尾まで内側)", () => {
+    const original = [
+      "# Doc",
+      "",
+      "## Target",
+      "",
+      "```",
+      "## Fake",
+      "echo run",
+      "",
+      "old phrase",
+      "",
+      "## Other",
+      "untouched",
+      "",
+    ].join("\n");
+    const result = assembleDraftSection({
+      operation: "replace",
+      target_file: "doc.md",
+      target_area: "## Target",
+      old_text: "old phrase",
+      new_text: "new phrase",
+    }, original, "2026-01-01T00:00:00.000Z");
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.evidence.check_scope.end_line).toBe(original.split("\n").length);
+    expect(result.assembled_content).toBe(original.replace("old phrase", "new phrase"));
+  });
+
+  test("does not match a target heading inside a code fence", () => {
+    const content = "## Target\n\n```\n## Target\n```\n";
+    expect(findTargetAreaHeadings("Target", content)).toHaveLength(1);
+  });
 });

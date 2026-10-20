@@ -1,0 +1,7 @@
+component: agentdev-req-file-manager
+implementation:
+  src/common/skills/agentdev-req-file-manager/scripts/src/alloc-req-number.ts:
+    - REQ-001-071
+verification:
+  src/common/skills/agentdev-req-file-manager/scripts/tests/alloc-req-number.test.ts:
+    - REQ-001-071

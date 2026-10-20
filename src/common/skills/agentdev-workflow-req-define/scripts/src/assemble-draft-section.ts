@@ -28,7 +28,7 @@ export type HeadingMatch = { line: number; text: string; level: number; heading:
 /** 組立検査器の識別。evidence-match.ts の再開時照合で版・設定不一致を検査再実行の根拠とする。 */
 export const ASSEMBLY_CHECKER = {
   name: "assemble-draft-section",
-  version: "0.1.0", // scripts/package.json の version と同期（tests で突合）
+  version: "0.2.0", // scripts/package.json の version と同期（tests で突合）
   settings: {
     heading_match: "exact-after-normalization",
     old_text_count_check: true,
@@ -97,12 +97,31 @@ export function headingMatchesTarget(headingText: string, targetArea: string): b
   return headingText === targetArea;
 }
 
+/**
+ * コード囲み認識規則:
+ *   - 見出し検出と節境界判定は、行頭（字下げなし）の ``` で開始するコード囲みの
+ *     内側の行を見出し・節境界として扱わない
+ *   - コード囲みの認識は行頭の ``` のみを条件とし、言語指定の有無は受理条件としない
+ *   - 閉じの ``` がない場合はファイル末尾までを内側とみなす
+ *   - ~~~ 等の代替囲み記法は認識しない
+ */
+function isCodeFenceDelimiter(line: string): boolean {
+  return /^```/.test(line);
+}
+
 export function findTargetAreaHeadings(targetArea: string, content: string): HeadingMatch[] {
   const normalized = normalizeTargetArea(targetArea);
   const matches: HeadingMatch[] = [];
   const lines = content.split(/\r?\n/);
+  let inCodeFence = false;
   for (let index = 0; index < lines.length; index++) {
-    const match = /^(#{1,6})\s+(.*)$/.exec(lines[index]!);
+    const line = lines[index]!;
+    if (isCodeFenceDelimiter(line)) {
+      inCodeFence = !inCodeFence;
+      continue;
+    }
+    if (inCodeFence) continue;
+    const match = /^(#{1,6})\s+(.*)$/.exec(line);
     if (!match || !headingMatchesTarget(match[2]!.trim(), normalized)) continue;
     matches.push({ line: index + 1, text: match[2]!.trim(), level: match[1]!.length, heading: lines[index]! });
   }
@@ -110,8 +129,15 @@ export function findTargetAreaHeadings(targetArea: string, content: string): Hea
 }
 
 function sectionEnd(lines: string[], startIndex: number, level: number): number {
+  let inCodeFence = false;
   for (let index = startIndex + 1; index < lines.length; index++) {
-    const match = /^(#{1,6})\s+/.exec(lines[index]!);
+    const line = lines[index]!;
+    if (isCodeFenceDelimiter(line)) {
+      inCodeFence = !inCodeFence;
+      continue;
+    }
+    if (inCodeFence) continue;
+    const match = /^(#{1,6})\s+/.exec(line);
     if (match && match[1]!.length <= level) return index;
   }
   return lines.length;
@@ -251,7 +277,7 @@ export function assembleDraftSection(
       execution_conditions: { operation: input.operation, edit_sha256: sha256(editMaterial), expected_old_count: input.operation === "replace" ? input.expected_old_count ?? 1 : null },
       checker: ASSEMBLY_CHECKER,
       result_affecting_references: {
-        heading_match_rule: "search-target-area.ts compatible: normalizeTargetArea + exact match only",
+        heading_match_rule: "search-target-area.ts compatible: normalizeTargetArea + exact match only + code-fence-aware scan",
         scan_scope: "target section only",
       },
       checks_summary: {

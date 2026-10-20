@@ -4,6 +4,15 @@ implementation:
     - REQ-021-013
     - REQ-021-026
     - REQ-032-025
+  src/common/skills/agentdev-design-file-manager/scripts/src/search-target-area.ts:
+    - REQ-004-066
+    - REQ-004-067
+    - REQ-004-068
   src/common/skills/agentdev-design-file-manager/references/design-lifecycle-application.md:
     - REQ-021-026
     - REQ-032-025
+verification:
+  src/common/skills/agentdev-design-file-manager/scripts/tests/search-target-area.test.ts:
+    - REQ-004-066
+    - REQ-004-067
+    - REQ-004-068
