@@ -76,3 +76,19 @@
 - **タグ**: #record-comments #applySection #issue-update
 
 ---
+
+## req-draft の全セクション content フィールドが変更なし行で現行本文と漂う差異を含み行レベル適用との突合を阻害し得る
+
+- **問題事象**: case-open STEP-3/STEP-4 で draft（req-draft-release-publish-and-ru-numbering）の ACT-DESIGN-001 content（対象セクション全文形式）を現行本文と突合したところ、変更対象外の行（GitHub版/Local版等価性の pr_merge 行）で現行本文の「…使用しない。:48 の宣言に対応）」に対し content 側は「:48 の宣言に対応」を欠くレンダリングになっており、全文置換すると既存記述が黙示的に削除される形状だった。同一 draft の assembly_evidence（15 実行・各 changed_lines_count 1〜2）は行レベル適用の実績と一致する
+- **発生局面**: case-open STEP-3 artifact_actions 適用前検証（content 完全性検証）／Case #3823
+- **検知方法**: artifact_actions 適用前検証（STEP-3 手順1.5(4)）で content と対象セクション現行全文の差分照合
+- **根本原因**: req-define の draft 生成で、全セクション形式の content フィールドは変更行以外を現行本文から転記するため、変更なし行の文言が現行本文や assembly_evidence の実適用範囲から漂って転記され得る
+- **自律対応内容**: 全文置換を行わず、assembly_evidence の行レベル実行と draft content の変更行のみを DefinitionEdit（oldText 完全一致）に分解して適用し、変更なし行は現行本文を保持した（適用後 verbatim 包含突合 32 項目すべて成立）
+- **ユーザー確認有無**: なし（既存記述の非削除を保証する保守的適用）
+- **Decision/REQ/spec影響**: なし（合意内容・契約文言の変更なし。適用方法の工学的判断）
+- **横展開観点**: 全セクション content 形式の draft/RU を case-open / case-revise / case-ready で適用するすべての Case で成立し得る
+- **再発条件**: draft の artifact_actions content がセクション全文形式で、かつ変更行以外の文言が現行本文と字句的に漂っている場合
+- **予防策候補**: req-define draft 生成時に content を変更行の行レベル差分で表現するか、content 全文と現行セクションの機械 diff（変更行集合と assembly_evidence の一致検査）を draft 保存前検査へ追加する
+- **想定反映先**: learning-promote による評価・昇華（req-define draft-generation の検査強化候補）
+- **関連**: .agentdev/drafts/req-draft-release-publish-and-ru-numbering.md（ACT-DESIGN-001・assembly_evidence）、Root Case #3823、設計PR #3824
+- **タグ**: #draft-content #artifact-actions #case-open
