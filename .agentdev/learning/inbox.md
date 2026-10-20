@@ -40,3 +40,39 @@
 - **タグ**: #case-open #採番衝突 #並行merge #fail-closed
 
 ---
+
+## worktree の .opencode junction 供給が切れると配布依存境界 link profile が zero-targets fail-closed する
+
+- **問題事象**: worktree では main 側で junction 供給される .opencode/skills/agentdev-*・commands/agentdev・tools・plugins が不在となり、配布依存境界 link profile が zero-targets で fail-closed する（checker の警告文もこの確認を促す）。検出が構造的であり、実装問題と誤認しやすい
+- **発生局面**: case-run STEP-S5-1 配布依存境界 最終 gate（Root Case #3820、worktree .worktrees/3820-fix）
+- **検知方法**: link profile checker の zero-targets 事前警告と初回実行の fail-closed
+- **根本原因**: worktree へは git 管理外実体（junction・node_modules）が伝播しない構造的制約
+- **自律対応内容**: worktree 内 src/** 向け junction を再作成してから link profile を再実行し、ok・failures 0・scanned 485 を確認（証跡 .agentdev/tmp/dist-gate-final-link.json 初回分）
+- **ユーザー確認有無**: なし（未追跡の環境整備であり、管理対象ファイルへの変更なし）
+- **REQ/Decision/Design影響**: なし（checker 実行契約 Design の既存 fallback 契約どおりの運用）
+- **横展開観点**: worktree 実行の link profile・checker 依存検査全般に同一前提が成立。junction 再作成→再実行の手順が安定する
+- **再発条件**: worktree 内で .opencode/** junction を前提とする checker を junction 再作成なしに実行した場合
+- **予防策候補**: worktree 作成手順への junction 再作成前置の明示（検証時のみ。削除は worktree remove 前に junction エントリのみ）
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: 実装PR #3822 本文 検証差分（case-run link profile 行）・Root Case #3820
+- **タグ**: #worktree #junction #配布依存境界 #link-profile
+
+---
+
+## record-comments.ts applySection のセクション置換で直前空行が消え見出しが前文に接続する
+
+- **問題事象**: case-close STEP-5-2 の本文結果セクション更新で applySection（agentdev-workflow-case-run scripts/record-comments.ts）を用いたところ、置換対象セクションの直前に空行があっても `before` 末尾の `\n+` が剥ぎ取られ、`## 進行状況`・`## 結果` の見出しが前文行へ直接接続した（GitHub 描画は成立するが Markdown 構造が崩れる）
+- **発生局面**: case-close STEP-5-2 本文更新（Root Case #3820、commit 1968b0ac 済み Case の Issue 本文更新）
+- **検知方法**: issue_update 前の適用後本文の目視確認（glued headings の機械チェックを追加して検出）
+- **根本原因**: applySection の `${before}\n${sectionMarkdown}` 連結が `before` の末尾空行を保持しない
+- **自律対応内容**: 適用後に `\n## 見出し` へ空行を補完する後処理を実施してから GitHub 書込み
+- **ユーザー確認有無**: なし（書込み前の整形後処理）
+- **REQ/Decision/Design影響**: なし（出力の整形問題であり、セクション構築・適用の契約は不変）
+- **横展開観点**: Epic 本文更新（applyEpicChildStatusUpdates は行内置換で影響なし）を除き、applySection 経由の Issue 本文更新全般に成立し得る
+- **再発条件**: applySection で既存セクションを置換した場合（新規追加時は base 末尾に空行が付くため不成立）
+- **予防策候補**: applySection の連結前に before 末尾へ空行 1 行を保証する修正（record-comments.ts 側）
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: agentdev-workflow-case-run/scripts/record-comments.ts applySection・Root Case #3820 対応記録コメント
+- **タグ**: #record-comments #applySection #issue-update
+
+---
