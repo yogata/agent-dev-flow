@@ -2,9 +2,10 @@
 title: `agentdev-backlog-integration` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-10-04
+updated: 2026-10-20
 ---
 <!-- ADF-COVERS(implementation): REQ-004-016, REQ-004-017, REQ-039-001, REQ-039-002, REQ-039-003 -->
+<!-- ADF-COVERS(design): REQ-039-007 -->
 
 # `agentdev-backlog-integration` Design
 
@@ -23,7 +24,7 @@ backlog-review における採用済み成果物の統合、分割判定、矛�
 
 - N:1 統合判定 / 1:N 分割判定
 - 矛盾検出（矛盾する artifact を RU 化せずユーザーに確認、矛盾しない artifact は通常通り RU 化、partial success）
-- RU 生成（frontmatter、構成、採番）
+- RU 生成（frontmatter、構成、採番。採番はディレクトリ現状の最大番号+1に加えて git 履歴上の使用番号〔消費済み・削除済み RU を含む〕を検査し、衝突する番号を採番せず次の未使用番号を採番する。履歴検査の実施を進捗記録に残し、検査が実行できない環境では採番を確定せず理由を報告する）
 - depends_on 依存解決基準（RU-ID のみ許容、採用済み成果物パス指定不可）
 
 ## 参照する references
@@ -47,7 +48,7 @@ backlog-review における採用済み成果物の統合、分割判定、矛�
 
 - 統合/分割ロジックの正確性（N:1 / 1:N）
 - 矛盾検出の網羅性
-- RU スキーマの適合性（frontmatter、構成、採番）
+- RU スキーマの適合性（frontmatter、構成、採番。採番の検証にはディレクトリ現状と git 履歴の使用番号検査を含める）
 - depends_on に RU-ID のみが指定されているか
 
 ## See Also
