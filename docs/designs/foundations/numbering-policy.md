@@ -2,13 +2,14 @@
 title: 採番管理 Design
 status: accepted
 created: 2026-07-19
-updated: 2026-10-07
+updated: 2026-10-20
 ---
 <!-- ADF-COVERS(implementation): REQ-001-008, REQ-001-009, REQ-001-013, REQ-001-042 -->
 <!-- ADF-COVERS(implementation): REQ-004-003 -->
 <!-- ADF-COVERS(implementation): REQ-001-070 -->
 <!-- ADF-COVERS(design): REQ-001-070 -->
 <!-- ADF-COVERS(design): REQ-010-070 -->
+<!-- ADF-COVERS(design): REQ-001-071（採番スクリプトの既知欠番レジストリ読込の節範囲特定設計） -->
 
 # 採番管理 Design
 
@@ -68,6 +69,8 @@ REQ-092: 2026-10 責任境界整理により廃止（保証は REQ-095・REQ-011
 REQ-093: 2026-10 責任境界整理により廃止（種別契約行は REQ-052-014/015 へ統合）
 REQ-087: 2026-10 責任境界整理により廃止（裁定記録義務は REQ-001-070、ギャップ検査・レジストリ単一情報源は REQ-010-070 へ統合）
 決定的採番スクリプト（`alloc-req-number.ts`）は本節の既知欠番を欠番レジストリとして読み込み、現行ファイル群の最大番号が既知欠番を下回る場合も既知欠番を埋めない。
+
+採番スクリプトが本節の既知欠番レジストリを読み込む際の節範囲特定は、行頭（字下げなし）の ``` で開始するコード囲みの内側の行を節境界として扱わない。閉じの ``` がない場合はファイル末尾までを内側とみなし、言語指定の有無は受理条件とせず、~~~ 等の代替囲み記法は認識しない。この認識規則は局所組立（assemble-draft-section.ts）・target_area 検索（search-target-area.ts）と同一とする。
 
 ### 採番ミスの是正
 
