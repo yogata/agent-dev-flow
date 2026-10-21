@@ -1,0 +1,7 @@
+# REQ-094-013（人間運用規定・恒常 checker 非設置）の一回限り検証の記録。
+# 判定記録は恒久台帳ではなく今回限りの記録である（先例: req-103-wave3-verification）。
+# 検証義務の形式は 2026-10-21 の利用者判断で確定（Case #3835）。
+component: req-094-013-verification
+verification:
+  docs/reports/req-094-013-one-time-verification.md:
+    - REQ-094-013
