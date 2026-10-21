@@ -88,7 +88,7 @@ Phase 別集計（除去 Roadmap対応）。
 
 生存 1 件は後段「参照 31」で詳述する。
 生存が 1 件のみにとどまる理由は、DOC-MAP が完全除去（旧REQ-013-001）された結果、DOC-MAP を読む全コードが到達不能になったためである。
-生存 1 件も「参照しないと inventory 出力形式が変わり下遊互換性が壊れる」だけであり、実質的には DOC-MAP を必要としていない。
+生存 1 件も「参照しないと inventory 出力形式が変わり下流互換性が壊れる」だけであり、実質的には DOC-MAP を必要としていない。
 
 ## 個別判定
 
@@ -271,7 +271,7 @@ if (docMapContent !== null) { ... verifyAutogenBlocksInFile ... }
 - ファイル: `check_integrity.ts:8712`
 - 断片: `DocMap: fs.existsSync(path.join(root, "docs", "DOC-MAP.md")) ? 1 : 0,`
 - 分類: `LIVE`
-- 根拠: `scanned` オブジェクトは dry-run 出力および inventory 形式の一部。現状 `0` 固定だが、`scanned` オブジェクトの形状を変えると dry-run 出力を消費する下遊（未確認だが可能性として存在）が壊れる。Phase 2 で `scanned` オブジェクト形状自体の見直し候補。即時除去は避ける
+- 根拠: `scanned` オブジェクトは dry-run 出力および inventory 形式の一部。現状 `0` 固定だが、`scanned` オブジェクトの形状を変えると dry-run 出力を消費する下流（未確認だが可能性として存在）が壊れる。Phase 2 で `scanned` オブジェクト形状自体の見直し候補。即時除去は避ける
 - Phase: 2
 
 ### generate_indexes.ts
@@ -546,7 +546,7 @@ checkDocMap* 関数群、generateDocMapInventory、AG-013 AUTOGEN 検証、docma
 
 - **check_integrity.ts**: 参照 9-17（関数群）、21-22（分類ポリシー）、24-30（呼び出し、AUTOGEN 検証、inventory）を一括削除。参照 21 で `DOCUMENT_CLASSIFICATIONS` を 5 分類へ縮退、参照 70-71 のテスト件数を 6 → 5 へ更新。参照 31（`scanned.DocMap`）は Phase 2 で扱うため Phase 1 では残置。
 - **generate_indexes.ts**: 参照 39-43 の DOC-MAP 更新セクションが `process.exit(EXIT_ERROR)` を呼ぶため、本セクション除去が最優先。現行 repo で `generate_indexes.ts` の全面起動を妨げている。参照 33-38 も併せて削除。
-- **check_changed_docs.ts**: 参照 45-47（ルール）、49-51（結合）、53-54（ロジック）を一括削除。出力 JSON の `docmap_update_required` フィールドも削除。下遊（PR 本文記録等）で当該フィールドを参照する箇所があるか確認が必要（SPEC targeted-docs-guard-implementation.md の JSON schema 定義）。
+- **check_changed_docs.ts**: 参照 45-47（ルール）、49-51（結合）、53-54（ロジック）を一括削除。出力 JSON の `docmap_update_required` フィールドも削除。下流（PR 本文記録等）で当該フィールドを参照する箇所があるか確認が必要（SPEC targeted-docs-guard-implementation.md の JSON schema 定義）。
 - **check_autogen_freshness.ts**: 参照 57-60 を一括削除。
 - **cli_utils.ts**: 参照 62-65 を一括削除。
 - **テストファイル**: 被テストコードと同 PR で削除・更新。

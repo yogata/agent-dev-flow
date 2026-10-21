@@ -699,4 +699,4 @@ req-health-metrics.md と対となる Design 健全性の定量メトリクス�
 ### accepted Decision の意味変更
 
 - accepted Decision の意味変更は後継 Decision を必須とし、直接適用しない
-- 履歴証拠を削除して追跠不能にしない
+- 履歴証拠を削除して追跡不能にしない

@@ -51,7 +51,7 @@ PR #1334 では src/opencode/skills/agentdev-*/SKILL.md の frontmatter `name:` 
 | 一般名詞 | 識別子条件に非合致 | 任意 |
 
 判定は mechanical-replacement-rules.md の相互参照先として組み込まれ、inspect-docs 検出処理が参照する。
-文脈依存の境界ケース（英字複合語の識別子/普通名詞揺らぎ）は機械判定対象外とし、サンプリング查読へ委譲する。
+文脈依存の境界ケース（英字複合語の識別子/普通名詞揺らぎ）は機械判定対象外とし、サンプリング査読へ委譲する。
 
 ## 関連
 

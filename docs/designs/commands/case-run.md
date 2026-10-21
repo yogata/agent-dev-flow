@@ -388,7 +388,7 @@ case-run および実行担当サブエージェントは検証結果と証拠�
 - worktree 未作成時、メインリポジトリでの 実行担当サブエージェント起動（worktree precondition gate）
 - 実行担当サブエージェントへメインリポジトリパスを渡すこと（worktree root 相対パス指定）
 - Epic Wave 実行モードの Wave 処理の引き受け（1 Wave を超える処理、Wave 境界（PR マージ）、Wave 構成の読み取りと fan-out。Wave 実行制御は case-auto stage 3 が単一所有し、Wave 境界（PR マージ）は case-close へ委譲）
-- スコープ拡大、intake 候選の `.agentdev/intake/inbox/` 直接変更、learning 候選と intake 候選の混在、`.agentdev/learning/inbox.md` 直接変更、Design確定候選と Findings の混在
+- スコープ拡大、intake 候補の `.agentdev/intake/inbox/` 直接変更、learning 候補と intake 候補の混在、`.agentdev/learning/inbox.md` 直接変更、Design確定候補と Findings の混在
 
 ## 検証観点
 
