@@ -2,7 +2,7 @@
 title: "IR-002: 現行 REQ 必須 frontmatter fields"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-22
 ---
 
 # IR-002: 現行 REQ 必須 frontmatter fields
@@ -18,7 +18,7 @@ updated: 2026-08-20
 | related_req | [REQ-010-001] |
 | related_design | [integrity-contracts.md] |
 | gate_level | full-audit |
-| false_positive_risk | 低。必須 field 欠落は確実な NG |
+| false_positive_risk | 低。必須項目の欠落は確実な違反として検出される |
 | regression_test | commands_structure.test.ts |
 | finding_route | intake |
 | triage_action | 欠落 field を追加 |

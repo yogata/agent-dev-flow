@@ -2,7 +2,7 @@
 title: "IR-009: 旧 namespace 残存"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-22
 ---
 
 # IR-009: 旧 namespace 残存
@@ -10,7 +10,7 @@ updated: 2026-08-20
 | Field | Value |
 |-------|-------|
 | rule_id | IR-009 |
-| description | 旧コマンド名、旧パス、二重 prefix、bare slash command form が docs/designs/guides に残存しないこと |
+| description | 旧コマンド名、旧パス、二重 prefix、先頭にスラッシュを付けた旧コマンド表記（bare slash command form）が docs/designs/guides に残存しないこと |
 | severity | strict |
 | category | obsolete-structure |
 | detection_method | 正規表現パターンマッチ |

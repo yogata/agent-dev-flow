@@ -2,7 +2,7 @@
 title: agentdev-adversarial-review Design
 status: accepted
 created: 2026-08-09
-updated: "2026-10-07"
+updated: 2026-10-22
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-021 -->
@@ -325,7 +325,7 @@ unresolved は既存の HITL、blocker、case-auto 停止理由分類のいず�
 
 ### 呼出失敗時の取扱い
 
-adversarial-review の呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止する（REQ-014-010）。
+adversarial-review の呼出失敗時（スキル不在、起動異常、タイムアウト等）は silent skip を禁止する（REQ-014-010）。
 呼出元は利用不能を報告した上で従来フローと既存 QG/HITL を維持する。
 呼出失敗を理由に対象案を自動承認、自動棄却、または既存 QG を飛ばしてはならない。
 

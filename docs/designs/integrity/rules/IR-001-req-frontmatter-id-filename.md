@@ -2,7 +2,7 @@
 title: "IR-001: 現行 REQ frontmatter id ↔ ファイル名"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-22
 ---
 
 # IR-001: 現行 REQ frontmatter id ↔ ファイル名
@@ -18,7 +18,7 @@ updated: 2026-08-20
 | related_req | [REQ-010-001, REQ-001] |
 | related_design | [integrity-contracts.md] |
 | gate_level | full-audit |
-| false_positive_risk | 低。id/ファイル名 の不一致は確実な NG |
+| false_positive_risk | 低。id とファイル名が一致しない場合は必ず違反として検出する |
 | regression_test | commands_structure.test.ts |
 | finding_route | intake |
 | triage_action | frontmatter id またはファイル名を修正 |

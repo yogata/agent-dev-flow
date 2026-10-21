@@ -27,7 +27,7 @@ AgentDevFlowの利用でよくある問題と対処法をまとめる。
 
 症状: case-ready完了後もRUファイルが`.agentdev/backlog/req-units/`に残っている。
 
-原因: 現行契約ではcase-open後のRU残置は正常であり、RUを削除する唯一の工程はcase-readyである（REQ-008-010、REQ-030-007）。case-readyのDefinition確定 + VERIFY（読み戻し検証）が失敗した場合、またはblocked / failed / 中断した場合、RUは残置される（REQ-008-011）。
+原因: 現行契約では case-open 後の RU 残置は正常であり、RU を削除する唯一の工程は case-ready である（REQ-008-010、REQ-030-007）。case-ready の Definition 確定 + VERIFY（読み戻し検証）が失敗した場合、またはblocked / failed / 中断した場合、RUは残置される（REQ-008-011）。
 
 対処: case-readyのVERIFY結果と実行状態を確認する。
 Definition保存内容の不備（読み戻し検証の不一致、テンプレート必須セクション欠落等）を解消し、case-readyを再実行する。

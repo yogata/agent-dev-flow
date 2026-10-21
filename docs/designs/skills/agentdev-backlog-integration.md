@@ -2,7 +2,7 @@
 title: `agentdev-backlog-integration` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-10-20
+updated: 2026-10-22
 ---
 <!-- ADF-COVERS(implementation): REQ-004-016, REQ-004-017, REQ-039-001, REQ-039-002, REQ-039-003 -->
 <!-- ADF-COVERS(design): REQ-039-007 -->
@@ -95,7 +95,7 @@ adversarial-review の呼出は、Step 4 完了後、Step 5（矛盾検出）開
 #### 矛盾検出への引き渡し
 
 adversarial-review 審議で採用済み成果物間の矛盾が指摘された場合、当該矛盾は本 Design「提供する判断、操作」節の矛盾検出ロジック、reference `integration-judgment.md`「矛盾検出 + ユーザー承認」節（既存矛盾検出）へ引き渡す。
-adversarial-review 自身は矛盾を自動解決せず（REQ-015-008）、矛盾の判定、partial success 扱い、ユーザー追加判断への委ね（REQ-003-009）は既存矛盾検出ロジックが正である。
+adversarial-review 自身は矛盾を自動解決せず（REQ-015-008）、矛盾の判定、部分成功（partial success）扱い、ユーザー追加判断への委ね（REQ-003-009）は既存矛盾検出ロジックが正である。
 
 ### 副作用境界と委譲契約
 

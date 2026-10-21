@@ -2,7 +2,7 @@
 title: "IR-007: Skill frontmatter name ↔ dir"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-22
 ---
 
 # IR-007: Skill frontmatter name ↔ dir
@@ -13,7 +13,7 @@ updated: 2026-08-20
 | description | .opencode/skills/{dir}/SKILL.md の frontmatter name が {dir} と一致すること |
 | severity | strict |
 | category | document-drift |
-| detection_method | directory 名と frontmatter name の比較 |
+| detection_method | ディレクトリ名と frontmatter の name の比較 |
 | affected_artifacts | [skills] |
 | related_req | [REQ-010] |
 | related_design | [integrity-contracts.md] |

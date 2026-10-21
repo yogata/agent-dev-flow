@@ -2,7 +2,7 @@
 title: Targeted Docs Guard 実装詳細参照
 status: accepted
 created: 2026-08-20
-updated: 2026-10-03
+updated: 2026-10-22
 ---
 
 # Targeted Docs Guard 実装詳細参照
@@ -17,7 +17,7 @@ check_changed_docs.ts 中心の変更文書限定検査契約を Phase 1-6 で�
 
 ### Phase 1: Design 配置
 
-- check_changed_docs.ts の変更文書限定検査契約は、挙動Design（entry/対象解決/profile/validator呼出/report契約/exit code）、カタログDesign（TargetedDocsReport 型定義、workflow profile 定義）、実装詳細Design（validator内部アルゴリズム、分割基準）に配置されること。
+- check_changed_docs.ts の変更文書限定検査契約は、挙動Design（entry/対象解決/profile/validator 呼出/report 契約/exit code）、カタログ Design（TargetedDocsReport 型定義、workflow profile 定義）、実装詳細Design（validator内部アルゴリズム、分割基準）に配置されること。
 - 個別判定条件は IR-*.md に配置されること。
 
 ### Phase 2: report 契約固定
@@ -34,7 +34,7 @@ check_changed_docs.ts 中心の変更文書限定検査契約を Phase 1-6 で�
   例: `--files a.md b.md c.md`（space 区切り推奨）、`--files a.md,b.md,c.md`（comma 区切りも受入）。
 両形式の混在も可。
 usage メッセージ、--help 出力で区切り形式を明示すること。
-後方互換性を担保し space 区切り仕様を変更しないこと。
+後方互換性を担保するため、従来の空白区切り形式を維持し、既存の入力を読み取れるようにすること。
 - --files 指定で files_checked が空の場合は失敗（FAILURE）扱い、--base-ref 指定で files_checked が空の場合は警告（WARNING）扱いとすること。
 
 ### Phase 4: コマンド別最小監査範囲

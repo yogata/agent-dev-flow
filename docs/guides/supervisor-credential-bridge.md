@@ -1,6 +1,6 @@
 # Supervisor 環境向け opencode credential 供給ブリッジ導入ガイド
 
-Supervisor（Hermes 等、spawn する子プロセスから provider 資格情報を削除する実行環境）から dispatch された opencode 実行でも、実行側が自身の起動コンテキストで Windows User スコープ環境変数（CLOUDFLARE_ACCOUNT_ID、CLOUDFLARE_API_TOKEN 等）を取得できるようにするブリッジ道具の導入手順である（REQ-091）。
+Supervisor（Hermes 等、spawn する子プロセスから provider（提供元）資格情報を削除する実行環境）から起動（dispatch）された opencode 実行でも、実行側が自身の起動コンテキストで Windows User スコープ環境変数（CLOUDFLARE_ACCOUNT_ID、CLOUDFLARE_API_TOKEN 等）を取得できるようにするブリッジ道具の導入手順である（REQ-091）。
 
 道具の原本は agent-dev-flow リポジトリの `scripts/self/supervisor-bridge/` 配下（`ocenv` と `opencode` bridge shim）であり、機構の詳細は [知識文書](../knowledge/supervisor-bridge-credential-supply.md) を参照する。
 

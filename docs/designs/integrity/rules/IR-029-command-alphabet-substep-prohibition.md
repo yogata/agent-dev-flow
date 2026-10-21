@@ -2,7 +2,7 @@
 title: "IR-029: Command 英字サブステップ禁止"
 status: accepted
 created: 2026-08-20
-updated: "2026-10-05"
+updated: 2026-10-22
 ---
 
 # IR-029: Command 英字サブステップ禁止
@@ -18,7 +18,7 @@ updated: "2026-10-05"
 | related_req | -（要件行レベルの正規所有者なし。サブステップ様式の正規契約は command-file-format.md が所有） |
 | related_design | [../../authoring/command-file-format.md, artifact-contracts.md, v4-responsibility-boundaries.md] |
 | gate_level | full-audit, delta-guard |
-| false_positive_risk | 中。一般語、旧語検出用文字列、projection 側の確認文は除外が必要 |
+| false_positive_risk | 中。一般語の記述、旧語検出用文字列、projection 側（.opencode 投影物）の確認文は除外が必要 |
 | regression_test | `check_command_format.ts`（ir029-command-alphabet-substep 検出、commands 両ディレクトリ走査） |
 | finding_route | intake |
 | triage_action | 英字サブステップを N-M 形式へ置換 |

@@ -2,7 +2,7 @@
 title: "IR-003: Active/廃止 REQ ID 重複"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-22
 ---
 
 # IR-003: Active/廃止 REQ ID 重複
@@ -13,7 +13,7 @@ updated: 2026-08-20
 | description | 現行 REQ と 廃止 REQ の間で ID 重複がないこと |
 | severity | strict |
 | category | canonical-conflict |
-| detection_method | ID set の intersection 確認 |
+| detection_method | 現行要件と廃止要件のID集合に共通する番号がないか調べる |
 | affected_artifacts | [現行 REQ, 廃止 REQ] |
 | related_req | [REQ-010] |
 | related_design | [integrity-contracts.md] |

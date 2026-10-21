@@ -2,7 +2,7 @@
 title: check_changed_docs.ts validator 内部構成
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-22
 ---
 
 # check_changed_docs.ts validator 内部構成
@@ -17,7 +17,7 @@ check_changed_docs.ts は以下の処理層（validator）で構成する。
 | validator | 責務 |
 |---|---|
 | changed file resolver | --files または --base-ref から files_checked を生成する |
-| workflow profile resolver | --workflow 値に応じた profileFor() 適用と rules 選択を行う |
+| workflow profile resolver | --workflow 値に応じて検査規則（rules）を選ぶ処理（profileFor() の適用）を行う |
 | coupled file resolver | 連動ファイル（README 等）を特定する |
 | targeted check runner | files_checked と coupled_files_checked に対し profile rules を実行する |
 | JSON/text reporter | TargetedDocsReport 形式で JSON/text 出力を生成する |

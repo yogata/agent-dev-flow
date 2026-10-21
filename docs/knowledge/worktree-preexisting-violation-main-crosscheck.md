@@ -6,7 +6,7 @@ updated: 2026-09-29
 
 ## 知識内容
 
-worktree で check_integrity full 走査等を実行する Case では、分岐以降に main 側で解消済みの pre-existing 違反が worktree 側に残留し得る。worktree 側検出を main 側の解消状況（並行 Case のマージ）と突合し、pre-existing（分岐前に由来し main で未解消）と解消済み（main 側で修正済み）を区別する。worktree 側で安易に再生成・修復すると並行マージ済み修正と競合し得るため、帰属判定を経てから処置する。
+worktree で check_integrity full 走査等を実行する Case では、分岐以降に main 側で解消済みの既存違反（pre-existing）が worktree 側に残留し得る。worktree 側検出を main 側の解消状況（並行 Case のマージ）と突合し、pre-existing（分岐前に由来し main で未解消）と解消済み（main 側で修正済み）を区別する。worktree 側で安易に再生成・修復すると並行マージ済み修正と競合し得るため、帰属判定を経てから処置する。
 
 ## 適用条件
 

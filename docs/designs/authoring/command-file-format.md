@@ -2,7 +2,7 @@
 title: "コマンドファイルフォーマット規約"
 status: accepted
 created: 2026-06-22
-updated: 2026-10-08
+updated: 2026-10-22
 ---
 
 # コマンドファイルフォーマット規約
@@ -32,7 +32,7 @@ frontmatter 先頭空行検出の機械検出 route は新設しない（単発�
 
 ## Command 構造
 
-Command は公開interface（入出力契約・ガードレール）と workflow dispatch を中心とする
+Command は公開 interface（入出力契約・ガードレール）と workflow dispatch を中心とする
 （DEC-010）。
 workflow 手順本体は Workflow Skill へ移行し、Command に重複残存しない。
 workflow への参照は Workflow Skill 名レベルとする（REQ-002-017）。
@@ -132,7 +132,7 @@ repo-local command（`/repo/*`）が従来形式の主手順（`### Step N`）�
 
 ## 順序ラベル様式（サブステップ識別子・工程一覧表ラベル・工程参照形式）
 
-工程・サブステップ識別子の様式規約を次のとおり正規契約化する（PR #2153 による16 Skill 横断の運用統一、merge fb0a5ac5、を正規化する）。
+工程・サブステップ識別子の様式規約を次のとおり正規契約化する（PR #2153 による 16 Skill 横断の運用統一、merge fb0a5ac5 を正規化する）。
 
 ### サブステップ階層形式
 

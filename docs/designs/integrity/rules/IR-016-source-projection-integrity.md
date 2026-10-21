@@ -2,7 +2,7 @@
 title: "IR-016: Source/projection 整合性"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-22
 ---
 
 # IR-016: Source/projection 整合性
@@ -10,7 +10,7 @@ updated: 2026-08-20
 | Field | Value |
 |-------|-------|
 | rule_id | IR-016 |
-| description | src/opencode/ と .opencode/ (projection) の間に divergence がないこと |
+| description | src/opencode/ と .opencode/ (projection) の間に内容の不一致がないこと |
 | severity | strict |
 | category | canonical-conflict |
 | detection_method | sync-opencode.ps1 -Mode check 相当の比較 |

@@ -2,7 +2,7 @@
 title: backlog-auto Design
 status: accepted
 created: 2026-08-17
-updated: "2026-10-20"
+updated: 2026-10-22
 ---
 <!-- ADF-COVERS(implementation): REQ-041-001, REQ-041-002, REQ-041-003, REQ-041-004, REQ-041-005, REQ-041-006, REQ-041-007, REQ-041-008, REQ-041-009, REQ-041-010, REQ-041-011, REQ-041-012, REQ-041-013, REQ-041-014, REQ-041-015, REQ-041-016 -->
 <!-- ADF-COVERS(design): REQ-108-011 -->
@@ -13,7 +13,7 @@ updated: "2026-10-20"
 
 ## 目的
 
-`/agentdev/backlog-auto` 公開コマンド。backlog 整理サイクル（inspect-docs → 昇格3系統 → backlog-review）を1回起動で実行する薄いオーケストレータの公開 interface を定義する。workflow 実装本体は `agentdev-workflow-backlog-auto` Workflow Skill が所有する。対象は、backlog 整理サイクルに加えて RU 一式の要件定義・実行・検証・統合・全体完了判定・パッチリリース作成への接続（一気通貫実行）まで拡張する。一気通貫実行の実行契約は REQ-114 が所有する。
+`/agentdev/backlog-auto` 公開コマンド。backlog 整理サイクル（inspect-docs → 昇格3系統 → backlog-review）を1 回起動で実行する薄いオーケストレータの公開 interface を定義する。workflow 実装本体は `agentdev-workflow-backlog-auto` Workflow Skill が所有する。対象は、backlog 整理サイクルに加えて RU 一式の要件定義・実行・検証・統合・全体完了判定・パッチリリース作成への接続（一気通貫実行）まで拡張する。一気通貫実行の実行契約は REQ-114 が所有する。
 
 既存5コマンド（inspect-docs、learning-promote、intake-promote、inspect-promote、backlog-review）は置換しない。backlog-auto は backlog-driven の要求入口であり、整理結果（RU）は req-define → case-auto へ接続する。
 

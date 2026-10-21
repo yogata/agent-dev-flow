@@ -2,14 +2,14 @@
 title: "backticks 識別子/一般名詞 判定閾値"
 status: accepted
 created: 2026-06-25
-updated: 2026-09-09
+updated: 2026-10-22
 ---
 
 # backticks 識別子/一般名詞 判定閾値
 
 ## 目的
 
-docs/** 配下の自然言語記述（Markdown 本文）において、識別子（backticks 必須）と一般名詞（backticks 任意）の判定閾値を機械判定可能な形で定義する（#1118 X-7）。
+docs/** 配下の自然言語記述（Markdown 本文）において、識別子（バッククォートによる囲みが必須）と一般名詞（バッククォートによる囲みは任意）の判定閾値を機械判定可能な形で定義する（#1118 X-7）。
 runtime-package-boundary.md「5 種のリポジトリ種別」表の Type ID 列（識別子は backticks、名称は日本語）を良パターン基準とする。
 
 ### 適用対象外（PR #1334 事例に基づく明示）
@@ -51,7 +51,7 @@ PR #1334 では src/opencode/skills/agentdev-*/SKILL.md の frontmatter `name:` 
 | 一般名詞 | 識別子条件に非合致 | 任意 |
 
 判定は mechanical-replacement-rules.md の相互参照先として組み込まれ、inspect-docs 検出処理が参照する。
-文脈依存の境界ケース（英字複合語の識別子/普通名詞揺らぎ）は機械判定対象外とし、サンプリング查読へ委譲する。
+文脈依存の境界ケース（英字複合語の識別子/普通名詞揺らぎ）は機械判定対象外とし、サンプリング査読へ委譲する。
 
 ## 関連
 

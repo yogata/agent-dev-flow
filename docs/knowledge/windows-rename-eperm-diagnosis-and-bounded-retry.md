@@ -10,7 +10,7 @@ Windows における原子的書込み（tmp ファイル → 既存ファイル
 
 1. **対照プローブ手法**: 疑いのある新旧構成を同頻度（例: 20 ラウンド）で対照実行し、発生頻度の同水性から環境起因を実証する（Case #3314 PR #3325 で実証済み）。
 2. **並行模倣再現**: Promise.all で複数テスト相当の並行実行を模倣し、単体では再現しない競合を再現特定する（Case #3316 PR #3329 で特定済み）。
-3. **bounded retry パターン**: rename ベース原子的書込みに指数バックオフ（最大約 150ms）の bounded retry を適用する（`src/common/tools/agentdev-gh/local/runner-local.ts` に実装済み）。retry は上限付きとし、retry 後も失敗する場合は本来のエラーとして扱う。
+3. **bounded retry パターン**: rename ベース原子的書込みに指数バックオフ（最大約 150ms）の bounded retry を適用する（`src/common/tools/agentdev-gh/local/runner-local.ts` に実装済み）。retry は上限付きとし、再試行後も失敗する場合は本来のエラーとして扱う。
 
 ## 適用条件
 

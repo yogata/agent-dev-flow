@@ -77,7 +77,7 @@ AgentDevFlow は必要能力と標準方針を定義できる。
 
 ## 利用者の読み方
 
-個別の REQ/Decision/Design/command/skill/template/script は、本 charter の原則へ照らして位置づく。
+個別の REQ/Decision/Design/command/skill/template/script は、本 charter の原則に照らして位置づける。
 「この統制は本当に必要か」を判断する際は、まず hard governance の8点に該当するか、次に新規統制追加の7条件を立証できるかを検討する。
 該当しない場合は guidance・finding・reference へ降格する候補とする。
 

@@ -2,7 +2,7 @@
 title: learning-promote Design
 status: accepted
 created: 2026-06-21
-updated: "2026-10-05"
+updated: 2026-10-22
 ---
 <!-- ADF-COVERS(implementation): REQ-015-007 -->
 <!-- ADF-COVERS(implementation): REQ-038-001, REQ-038-002, REQ-038-004, REQ-038-005 -->
@@ -16,7 +16,7 @@ inbox.md から正規化、分類、8軸評価、廃棄判定、既存対策確�
 `.opencode/` 直接反映は禁止。
 backlog-review 経由で RU 化する。
 
-**昇華可能性評価、無条件自動REQ化禁止（学習昇格契約は REQ-038 系）**: 各問題クラスについて恒久契約（REQ/Decision/Design）への昇華可能性を評価し、昇華可能な知見のみ `promoted/` へ出力する。
+**昇華可能性評価、無条件の自動 REQ 化禁止（学習昇格契約は REQ-038 系）**: 各問題クラスについて恒久契約（REQ/Decision/Design）への昇華可能性を評価し、昇華可能な知見のみ `promoted/` へ出力する。
 無条件の自動REQ化は禁止し、学びは backlog-review → req-define → case-auto（内部 lifecycle の case-open / case-ready 段階）の昇華経路を経て初めて REQ 化される。
 昇華不能な知見は `deferred.md` の living pool で維持する。
 `deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である。
@@ -87,7 +87,7 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
   - 問題クラス分類
   - 8軸評価
   - evaluation-report 生成
-  - 廃棄判定（11カテゴリ + duplicate）+ 昇華可能性評価（現行は REQ-038 系）。無条件の自動REQ化を禁止し、昇華不能な知見は `deferred.md` の living pool で維持する
+  - 廃棄判定（11カテゴリ + duplicate）+ 昇華可能性評価（現行は REQ-038 系）。無条件の自動 REQ 化を禁止し、昇華不能な知見は `deferred.md` の living pool で維持する
   - 既存対策確認（既存対策優先、新規 X 化より既存 X へ反映）
   - 結果提示
   - ユーザー承認（判定、prune にユーザー承認必須）
