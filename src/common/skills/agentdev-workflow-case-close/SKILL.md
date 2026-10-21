@@ -71,7 +71,7 @@ gate 違反時は両ルートとも PR マージを停止する。
 
 ### 機械工程の script 呼び出しと内蔵ツール使用規律
 
-- **機械工程の script 呼び出し**: mergeable ポーリング、squash merge 前後のローカル状態検査、Epic 実行構成表の解析と状態更新（解析・現在 Wave 特定・状態更新適用の決定的部分。Epic 本文書込みはモデルが agentdev_gh 経由で行う）、完了条件チェックボックス評価の機械的抽出（評価はモデルが担当）、契約状態記録の commit 済み検証と未追跡残存検査（REQ-032-042、contract-state-residue-check step。決定的判定 `evaluateContractStateResidue`）、AUTOGEN 再生成差分検出、full integrity suite の起動と結果集約、textlint 最終検査、worktree/branch クリーンアップは、工程別 script `scripts/src/close_mechanical_steps.ts`（phase: pre-merge / post-merge）の呼び出しで実行する。PR merge 本体（pr_merge）、Issue 本文更新、issue_close は Custom Tool `agentdev_gh` の境界を維持する（case-close Design「機械工程の script 呼び出し契約」節）。報告 JSON（実行結果・差分・警告・提案本文）の意味レビュー（警告の重要度評価、Design 確定判断、未達判定の確定）はモデルが担当する
+- **機械工程の script 呼び出し**: mergeable ポーリング、squash merge 前後のローカル状態検査、Epic 実行構成表の解析と状態更新（解析・現在 Wave 特定・状態更新適用の決定的部分。Epic 本文書込みはモデルが agentdev_gh 経由で行う）、完了条件チェックボックス評価の機械的抽出（評価はモデルが担当）、契約状態記録の commit 済み検証と未追跡残存検査（contract-state-residue-check step。決定的判定 `evaluateContractStateResidue`。対応関係は repository top-level `traceability/` 配下 sidecar を参照）、AUTOGEN 再生成差分検出、full integrity suite の起動と結果集約、textlint 最終検査、worktree/branch クリーンアップは、工程別 script `scripts/src/close_mechanical_steps.ts`（phase: pre-merge / post-merge）の呼び出しで実行する。PR merge 本体（pr_merge）、Issue 本文更新、issue_close は Custom Tool `agentdev_gh` の境界を維持する（case-close Design「機械工程の script 呼び出し契約」節）。報告 JSON（実行結果・差分・警告・提案本文）の意味レビュー（警告の重要度評価、Design 確定判断、未達判定の確定）はモデルが担当する
 - **内蔵ツール使用規律**: ファイル検索・内容検索・ディレクトリ列挙は実行基盤の内蔵ツール（ファイル検索、内容検索、読み取り）を使用し、bash 内蔵コマンド（grep、ls 等）を標準手順としない。bash 実行が本来必要な処理（script 呼び出し、git 操作等）は本規律の対象外とする（workflow-skill-model Design「workflow skill 本文における内蔵ツール使用規律」節）
 
 ### 終了条件（termination）
@@ -79,15 +79,15 @@ gate 違反時は両ルートとも PR マージを停止する。
 - 正常終了: 単一 Issue ルートはクリーンアップ・Capture 回収・永続化 STEP の完了報告まで。Epic Wave ルートは最終 Wave 判定（Epic クローズ または 残 Wave 通知）まで
 - 一時ファイル残存: 単一 Issue ルートの正常終了の前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（STEP-6-6 で確認。一時ファイル cleanup 規定（workflow 側で生成した `.agentdev/tmp/` 一時ファイルは当該実行内で削除する。Custom Tool 内部の一時ファイルは Tool が操作ごとに自動削除する））
 - 一時成果物残留（Epic Wave ルート）: Epic Wave クローズの正常終了の前提として、当該 Wave スコープの一時成果物（draft、RU、検出事項等のドメイン状態）残留と当該実行で `.agentdev/tmp/` に作成した一時ファイルの残存がないこと（E6-1 で確認。残留時は当該 Wave を完了扱いにしない）
-- 停止終了: 未達チェックボックス残存（構造化エラー）、QG-4 不合格、SSoT コメント不在の verify-only closure または SSoT コメントに検証結果の記載が欠落している verify-only closure（verify-only closure の QG-4 完了抑止）、対象要件行の Design 対応・implementation 対応・required 行 verification 対応の欠落（QG-4 完全性検査の完了阻止条件）、契約状態記録の未コミット・未追跡残存（承認一覧対象外・帰属不能残存を含む）の検出（REQ-032-042、contract-state-residue-check step の失敗。帰属不能検出は人間確認事項として完了判定の前に報告し確認なしに完了判定へ進めない）、配布依存境界 最終 gate 違反、mergeable ポーリング上限超過、Level 1 rebase 失敗（case-auto エスカレーション）
+- 停止終了: 未達チェックボックス残存（構造化エラー）、QG-4 不合格、SSoT コメント不在の verify-only closure または SSoT コメントに検証結果の記載が欠落している verify-only closure（verify-only closure の QG-4 完了抑止）、対象要件行の Design 対応・implementation 対応・required 行 verification 対応の欠落（QG-4 完全性検査の完了阻止条件）、契約状態記録の未コミット・未追跡残存（承認一覧対象外・帰属不能残存を含む）の検出（contract-state-residue-check step の失敗。帰属不能検出は人間確認事項として完了判定の前に報告し確認なしに完了判定へ進めない）、配布依存境界 最終 gate 違反、mergeable ポーリング上限超過、Level 1 rebase 失敗（case-auto エスカレーション）
 
-### 完了判定の契約状態記録・未追跡残存検証（REQ-032-042）
+### 完了判定の契約状態記録・未追跡残存検証（トレーサビリティ sidecar 参照）
 
 完了判定工程で、機械工程（`scripts/src/close_mechanical_steps.ts` の contract-state-residue-check step、決定的判定 `evaluateContractStateResidue`）により次を検証する（pre-merge phase で必須、省略禁止）。
 
 - **(a) 契約状態記録の commit 済み検証**: 当該 Case 実行に関連して生成・更新された git 管理契約の状態記録（jev 観測、ローカル issues、capture 成果物等の正規契約で git 管理対象と宣言される記録）がコミット済みであることを検証する。状態記録パスの範囲導出（正規契約から導出した全状態記録パス）は意味判断としてモデルが担当し、入力契約 `contractStateCheck.contractStatePaths` として script へ渡す。検証は repoRoot での `git status --porcelain -- <状態記録パス群>` により行い、未コミット検出時は完了扱いとしない
 - **(b) 未追跡残存検査**: リポジトリの未追跡かつ gitignore 管理対象外のファイル・ディレクトリが承認一覧対象外に残存しないことを検証する。検証は repoRoot での `git ls-files --others --exclude-standard`（リポジトリ全体）により行い、承認一覧エントリ（既存の ng-baseline 系承認一覧機構と同一の物理実体から取得した category/check/file/evidence/count/provenance/reason の恒久承認記録）と突合する。承認済み検出は承認記録として報告にとどめ、承認一覧対象外の残存検出時は完了扱いとしない。検査実行が承認を自動追加することはない
-- **評価範囲**: 正規契約から導出した全状態記録パスとリポジトリ全体の未追跡対象であり（REQ-032-034）、変更ファイルのみの確認で達成としない
+- **評価範囲**: 正規契約から導出した全状態記録パスとリポジトリ全体の未追跡対象であり、変更ファイルのみの確認で達成としない
 - **帰属不能検出の人間確認（完了阻止）**: 状態記録パス配下でも承認一覧対象でもない検出は帰属が機械判定できないため、人間確認事項として完了判定の前に報告する。報告された確認事項の確認（`contractStateCheck.humanConfirmedPaths` の path と確認根拠 basis の実体）なしに完了判定へ進めない（fail-closed）。検出時は当該 step を失敗とし、`isCloseOperationPermitted` が終了操作（issue_close、Epic 終了・Wave クローズ）を抑止する
 - 検証対象 git コマンドの実行不能は検査不能として fail-closed で扱い、完了判定へ進まない
 

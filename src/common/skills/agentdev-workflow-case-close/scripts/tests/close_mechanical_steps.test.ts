@@ -174,7 +174,7 @@ describe("件数突合 gate の報告保持", () => {
   });
 });
 
-describe("契約状態記録・未追跡残存検査（REQ-032-042、完了判定工程）", () => {
+describe("契約状態記録・未追跡残存検査（完了判定工程）", () => {
   test("決定的判定: 状態記録配下・承認一覧・人間確認済み・帰属不能の4分類", () => {
     const evaluation = evaluateContractStateResidue(
       {

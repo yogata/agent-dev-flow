@@ -5,7 +5,7 @@
 // mergeable ポーリング、squash merge 前後のローカル状態検査、Epic 実行構成表の
 // 解析と状態更新、完了条件チェックボックス評価の機械的抽出（受入評価の母集団
 // 導出と final-acceptance.ts の evaluateFinalAcceptance への接続を兼ねる）、
-// 契約状態記録の commit 済み検証と未追跡残存検査（REQ-032-042）、
+// 契約状態記録の commit 済み検証と未追跡残存検査、
 // AUTOGEN 再生成差分検出、full integrity suite の起動と結果集約（fail 全件の
 // 由来分類と機械受理基準の記録完備の検証を含む）、worktree/branch
 // クリーンアップを1 script の呼び出しに束ねる。受入評価の拒否・未確定と機械
@@ -156,7 +156,7 @@ export interface IntegrityGateResult {
 }
 
 /**
- * 契約状態記録・未追跡残存検査の入力契約（REQ-032-042）。
+ * 契約状態記録・未追跡残存検査の入力契約。
  * 正規契約から導出した状態記録パスの範囲導出は意味判断としてモデルが担当し、
  * 本 script は与えられた範囲の commit 済み検証と、リポジトリ全体の未追跡残存の
  * 承認一覧突合を決定的に実行する。承認一覧は既存の ng-baseline 系承認一覧機構
@@ -209,7 +209,7 @@ export interface CloseMechanicalInput {
   acceptanceVerdicts?: readonly ConditionVerdict[];
   acceptanceCrossObligations?: readonly CrossObligation[];
   acceptanceEmptyBasis?: string;
-  /** pre-merge（完了判定工程）で必須の契約状態記録・未追跡残存検査の入力（REQ-032-042）。 */
+  /** pre-merge（完了判定工程）で必須の契約状態記録・未追跡残存検査の入力。 */
   contractStateCheck?: ContractStateCheck;
 }
 
@@ -392,7 +392,7 @@ function isUnderPath(candidate: string, base: string): boolean {
 }
 
 /**
- * 契約状態記録・未追跡残存検査の決定的判定（REQ-032-042）。
+ * 契約状態記録・未追跡残存検査の決定的判定。
  * stateRecordStatus は `git status --porcelain -- <状態記録パス群>`（repoRoot 実行）の
  * stdout、untrackedListing は `git ls-files --others --exclude-standard`（repoRoot 実行）の
  * stdout である。検出は (1) 状態記録パス配下＝当該 Case 由来の未コミット記録、
@@ -937,7 +937,7 @@ export function runCloseMechanicalSteps(
       steps,
     );
 
-    // 契約状態記録・未追跡残存検査（REQ-032-042、完了判定工程）。検証範囲は
+    // 契約状態記録・未追跡残存検査（完了判定工程）。検証範囲は
     // 正規契約から導出した全状態記録パスとリポジトリ全体の未追跡対象であり、
     // 変更ファイルのみの確認では代替しない。未コミット・帰属不能残存の検出時は
     // 完了扱いとせず、帰属不能検出は完了判定の前に人間確認事項として報告する
