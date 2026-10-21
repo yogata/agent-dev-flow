@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261020T223648Z-6acc",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0241・RU-0242 の工程駆動経路契約変更の既存REQ照合（REQ-110 帰属）",
+  "sourceRevision": "89acf2ef",
+  "durationMs": 1823,
+  "inputTokens": 2582,
+  "inputs": {
+    "requestDigest": "c7861f8fdbc1806d581d8081acb9b53c13705956534d27f71bce7ea5b91ed83e",
+    "references": [
+      {
+        "digest": "abaadfb971995790835a53866343221da0fd7388479227d767be2865565387a3",
+        "label": "RU-0241",
+        "path": ".agentdev/backlog/req-units/RU-0241.md"
+      },
+      {
+        "digest": "a2e820ad7dbb0498b83d6517ad5c0065a72e3dc98debae00a66d4a59680930ab",
+        "label": "RU-0242",
+        "path": ".agentdev/backlog/req-units/RU-0242.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-ru0241-operation",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 1,
+        "UPDATE": 0,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "q1-ru0241-confidence",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.07,
+        "false": 0.9299999999999999
+      }
+    },
+    {
+      "questionId": "q2-ru0242-operation",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 1,
+        "UPDATE": 0,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "q2-ru0242-confidence",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.13,
+        "false": 0.87
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-ru0241-operation",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "q1-ru0241-confidence",
+        "value": false
+      },
+      {
+        "questionId": "q2-ru0242-operation",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "q2-ru0242-confidence",
+        "value": false
+      }
+    ]
+  }
+}

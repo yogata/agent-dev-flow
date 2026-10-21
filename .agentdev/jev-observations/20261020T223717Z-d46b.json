@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261020T223717Z-d46b",
+  "workflow": "req-define",
+  "evaluationKind": "final-classification-design-separation",
+  "subject": "RU-0241・RU-0242 由来要件行候補の最終分類（REQ行/Design行）と Design 分離要否",
+  "sourceRevision": "89acf2ef",
+  "durationMs": 219,
+  "inputTokens": 2023,
+  "inputs": {
+    "requestDigest": "1b68812177f4df3a26929a3745d87fce46d065d5060d3ca2984fd4a4a56da32e",
+    "references": [
+      {
+        "digest": "abaadfb971995790835a53866343221da0fd7388479227d767be2865565387a3",
+        "label": "RU-0241",
+        "path": ".agentdev/backlog/req-units/RU-0241.md"
+      },
+      {
+        "digest": "a2e820ad7dbb0498b83d6517ad5c0065a72e3dc98debae00a66d4a59680930ab",
+        "label": "RU-0242",
+        "path": ".agentdev/backlog/req-units/RU-0242.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-ru0241-classification",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 1,
+        "Design行": 0
+      }
+    },
+    {
+      "questionId": "q1-ru0241-separation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.15,
+        "false": 0.85
+      }
+    },
+    {
+      "questionId": "q2-ru0242-classification",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 1,
+        "Design行": 0
+      }
+    },
+    {
+      "questionId": "q2-ru0242-separation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.18,
+        "false": 0.8200000000000001
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-ru0241-classification",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q1-ru0241-separation",
+        "value": false
+      },
+      {
+        "questionId": "q2-ru0242-classification",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q2-ru0242-separation",
+        "value": false
+      }
+    ]
+  }
+}
