@@ -308,3 +308,36 @@
 - **タグ**: #traceability #design宣言 #sidecar #case-open機械工程
 
 ---
+## 配布物本文への concrete REQ-ID 直書きは配布依存境界 最終 gate で新規違反になる
+
+- **問題事象**: 実装 PR が配布物（workflow skill 契約文書・機械工程 script の comment/docstring）に concrete REQ-ID（REQ-032-042 等）を 17 箇所直書きし、case-close 正規形の配布依存_boundary 最終 gate（check_distribution_boundary.ts --profile source）で concrete-id 違反 17 件・exit 1 を検出。case-run 側は別形式 CLI（check_distribution_boundary_cli.ts <worktree>）で violations 0 と申告しており申告と正規形実測が乖離した
+- **発生局面**: case-close STEP-3 配布依存境界 最終 gate（Root Case #3841、PR #3843）
+- **検知方法**: case-close 正規形 gate の自検証 + main root 対照実行（failures 0）による delta 判定
+- **根本原因**: 出典情報の正規保持先が traceability/ 配下 sidecar である規約（distribution-boundary.md「配布物本文の記述規則」）を理解せず、REQ 行と契約文書の対応を示すために本文へ REQ-ID を書いた。既存配布物の直書きは 0 件（placeholder 表記のみ）という慣行を確認しなかった
+- **自律対応内容**: 是正 commit 2ac7e59ed で一般化表現へ置換（テキストのみ・挙動不変、pin/describe assertion も整合更新）。case-close は再開条件に正規形 gate failures 0 / delta 0 を要求して差し戻し
+- **ユーザー確認の有無**: なし（fail-closed gate の停止と case-run 差し戻しで完結）
+- **REQ/Decision/Design影響**: なし（是正は配布物本文の表現のみ）
+- **横展開観点**: REQ-ID を伴う実現面記述は配布物本文ではなく sidecar へ宣言する規律が、配布物を編集する全工程（case-open/case-run/case-revise）で適用対象。検証に使う checker CLI 形式が case-run と case-close で分岐している点も注意（正規形は reference 指定のコマンド）
+- **再発条件**: 配布物本文に REQ 行への対応を明示したい動機で concrete ID を書いた場合
+- **予防策候補**: 配布物編集時の concrete-id 事前自查（正規形 gate の実行）を case-run STEP-S5 の実行形態に明記する価値（learning-promote で評価）
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: Issue #3841・PR #3843（是正 commit 2ac7e59ed）・停止記録 comment 6325035485・docs/designs/integrity/distribution-boundary.md（表現是正区分）
+- **タグ**: #配布依存境界 #concrete-id #case-close gate #是正
+
+## bun test の cwd 依存で tests/ 配下テストが scripts/ cwd 実行で失敗する
+
+- **問題事象**: traceability_relied_diff 等10件、issue_tracking_list 関連4件のテストは repo root を cwd とした正規形では pass するが、scripts/ ディレクトリを cwd とした実行で失敗する。機械工程 script から部分実行を意図した際に cwd 選択を誤ると非決定的な fail に見える
+- **発生局面**: case-run 検証・case-close QG-4 checker 実測（Root Case #3841、PR #3843 検証差分記録）
+- **検知方法**: 実行 cwd を変えた bun test の結果比較（正規形 repo root cwd では不発生）
+- **根本原因**: テスト内の相対パス解決が repo root cwd を前提とし、cwd 変更で期待パスが崩れる。bun test 実行形態契約（3 cwd 分割実行）は正規形を規定しているが、部分実行時の cwd 選択誤りは検出に素通りする
+- **自律対応内容**: 正規形（repo root cwd）での実行を採用し、cwd 依存の挙動として PR 本文 Findings に記録
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（既存 bun test 実行形態契約どおりの運用）
+- **横展開観点**: 機械工程から bun test を部分実行する経路（gate 指定・再実行・個別調査）で成立し得る
+- **再発条件**: repo root 以外の cwd で bun test を実行し、その結果を合格証拠として扱った場合
+- **予防策候補**: bun test 実行時の cwd を実行記録に必ず付記する（件数突合の根拠と同じ位置）。cwd 依存テストの解消（process.cwd 依存の除去）は学習 promote で要否評価
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: PR #3843 本文 Findings・Issue #3841
+- **タグ**: #buntest #cwd依存 #実行形態契約 #非決定的
+
+---
