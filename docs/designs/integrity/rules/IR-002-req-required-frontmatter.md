@@ -2,7 +2,7 @@
 title: "IR-002: 現行 REQ 必須 frontmatter fields"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-22
 ---
 
 # IR-002: 現行 REQ 必須 frontmatter fields

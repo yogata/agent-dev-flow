@@ -2,7 +2,7 @@
 title: "IR-001: 現行 REQ frontmatter id ↔ ファイル名"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-22
 ---
 
 # IR-001: 現行 REQ frontmatter id ↔ ファイル名

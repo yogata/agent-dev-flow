@@ -2,7 +2,7 @@
 title: "IR-020: 基準既知（baseline-known）と新規 finding の区別"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-22
 ---
 
 # IR-020: 基準既知（baseline-known）と新規 finding の区別

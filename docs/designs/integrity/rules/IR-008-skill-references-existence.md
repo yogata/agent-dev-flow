@@ -2,7 +2,7 @@
 title: "IR-008: Skill references/ 存在"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-22
 ---
 
 # IR-008: Skill references/ 存在

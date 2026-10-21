@@ -2,7 +2,7 @@
 title: "IR-046: consumer-generated リポジトリ種別誤検知防止"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-22
 ---
 
 # IR-046: consumer-generated リポジトリ種別誤検知防止

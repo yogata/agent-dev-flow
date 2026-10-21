@@ -2,7 +2,7 @@
 title: check_changed_docs.ts validator 内部構成
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-22
 ---
 
 # check_changed_docs.ts validator 内部構成

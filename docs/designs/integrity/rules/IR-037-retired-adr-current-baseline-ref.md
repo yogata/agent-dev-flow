@@ -2,7 +2,7 @@
 title: "IR-037: retired-ADR-current-baseline-ref"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-22
 ---
 
 # IR-037: retired-ADR-current-baseline-ref

@@ -2,7 +2,7 @@
 title: "IR-003: Active/廃止 REQ ID 重複"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-22
 ---
 
 # IR-003: Active/廃止 REQ ID 重複

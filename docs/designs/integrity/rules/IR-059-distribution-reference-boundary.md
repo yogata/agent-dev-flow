@@ -2,7 +2,7 @@
 title: "IR-059: distribution-reference-boundary"
 status: accepted
 created: 2026-08-20
-updated: 2026-10-05
+updated: 2026-10-22
 ---
 
 # IR-059: distribution-reference-boundary

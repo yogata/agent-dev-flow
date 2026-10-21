@@ -55,7 +55,7 @@
 | [REQ-056](REQ-056.md) | Project Knowledge の所有と workflow 利用 |
 | [REQ-058](REQ-058.md) | ADF 管理投影物の廃止時クリーンアップ契約 |
 | [REQ-059](REQ-059.md) | Decision と REQ の関連宣言管理 |
-| [REQ-060](REQ-060.md) | bun test 実行形態の統一（repo root 起 cwd・`./` 付きパス指定） |
+| [REQ-060](REQ-060.md) | bun test 実行形態の統一（リポジトリルートを cwd にして実行・`./` 付きパス指定） |
 | [REQ-061](REQ-061.md) | case-ready 実行契約 |
 | [REQ-062](REQ-062.md) | case-revise 実行契約 |
 | [REQ-082](REQ-082.md) | 対論型レビュー審議契約 |

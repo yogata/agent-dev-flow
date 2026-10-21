@@ -2,7 +2,7 @@
 title: "IR-029: Command 英字サブステップ禁止"
 status: accepted
 created: 2026-08-20
-updated: "2026-10-05"
+updated: 2026-10-22
 ---
 
 # IR-029: Command 英字サブステップ禁止

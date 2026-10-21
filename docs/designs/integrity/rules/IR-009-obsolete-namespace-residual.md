@@ -2,7 +2,7 @@
 title: "IR-009: 旧 namespace 残存"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-22
 ---
 
 # IR-009: 旧 namespace 残存

@@ -2,7 +2,7 @@
 title: "IR-013: 完了報告種別実在"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-22
 ---
 
 # IR-013: 完了報告種別実在

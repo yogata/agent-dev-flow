@@ -2,7 +2,7 @@
 title: "IR-016: Source/projection 整合性"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-22
 ---
 
 # IR-016: Source/projection 整合性

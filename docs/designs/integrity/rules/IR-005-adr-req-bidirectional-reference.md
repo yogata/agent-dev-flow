@@ -2,7 +2,7 @@
 title: "IR-005: Decision ↔ REQ 相互参照存在"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-22
 ---
 
 # IR-005: Decision ↔ REQ 相互参照存在

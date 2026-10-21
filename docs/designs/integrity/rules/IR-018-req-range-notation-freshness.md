@@ -2,7 +2,7 @@
 title: "IR-018: REQ 範囲表記鮮度"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-22
 ---
 
 # IR-018: REQ 範囲表記鮮度

@@ -2,7 +2,7 @@
 title: "IR-064: unresolved-placeholder"
 status: accepted
 created: 2026-08-22
-updated: 2026-10-05
+updated: 2026-10-22
 ---
 
 # IR-064: unresolved-placeholder

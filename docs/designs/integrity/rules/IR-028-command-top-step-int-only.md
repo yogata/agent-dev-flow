@@ -2,7 +2,7 @@
 title: "IR-028: Command 最上位 Step 整数化"
 status: accepted
 created: 2026-08-20
-updated: "2026-10-05"
+updated: 2026-10-22
 ---
 
 # IR-028: Command 最上位 Step 整数化

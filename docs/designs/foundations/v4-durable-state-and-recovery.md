@@ -2,7 +2,7 @@
 title: ADF v4 durable state と再構成・恢復（配置表・権威移行・部分失敗調整）
 status: accepted
 created: 2026-09-19
-updated: 2026-10-08
+updated: 2026-10-22
 ---
 <!-- ADF-COVERS(design): REQ-090-006 -->
 <!-- ADF-COVERS(design): REQ-103-011（REQ-103 の評価再実行・再開経路の設計対応面） -->

@@ -2,7 +2,7 @@
 title: "IR-007: Skill frontmatter name ↔ dir"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-10-22
 ---
 
 # IR-007: Skill frontmatter name ↔ dir
