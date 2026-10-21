@@ -8,7 +8,7 @@ updated: 2026-09-27
 
 ## 知識内容
 
-Supervisor（Hermes 等、spawn する子プロセスから provider 資格情報を削除する実行環境）から dispatch された opencode 実行では、CLOUDFLARE_ACCOUNT_ID、CLOUDFLARE_API_TOKEN 等の provider 資格情報が子プロセスへ供給されず、`agentdev_jev evaluate` が構造化失敗（not_configured 区分）を返すようになる。この問題への対処原則は「Supervisor から env で配る」ではなく「実行側が自身の起動コンテキストで取得する」（2026-09-23 ユーザー合意）であり、その橋が実行環境ブリッジ道具である（REQ-091）。原本は `scripts/self/supervisor-bridge/` 配下の `ocenv`（merge wrapper）と `opencode`（bridge shim）である。Supervisor 側の scrub 設計は credential を env で配らない正しいセキュリティ境界であり、変更しない。
+Supervisor（Hermes 等、spawn する子プロセスから provider 資格情報を削除する実行環境）から dispatch された opencode 実行では、CLOUDFLARE_ACCOUNT_ID、CLOUDFLARE_API_TOKEN 等の provider（提供元）資格情報が子プロセスへ供給されず、`agentdev_jev evaluate` が構造化失敗（not_configured 区分）を返すようになる。この問題への対処原則は「Supervisor から env で配る」ではなく「実行側が自身の起動コンテキストで取得する」（2026-09-23 ユーザー合意）であり、その橋が実行環境ブリッジ道具である（REQ-091）。原本は `scripts/self/supervisor-bridge/` 配下の `ocenv`（merge wrapper）と `opencode`（bridge shim）である。Supervisor 側の scrub 設計は credential を env で配らない正しいセキュリティ境界であり、変更しない。
 
 機構は次のとおりである。
 

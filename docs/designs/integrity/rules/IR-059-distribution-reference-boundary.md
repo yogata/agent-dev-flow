@@ -47,5 +47,5 @@ updated: 2026-10-05
 
 IR-056はProject Extensions構造と配置を検査し、IR-059は配布テキスト成果物の具体参照を検査する。
 両者は独立した検出対象である。
-DEC-006が確立したinspect 3-command正規化とIR-056のProject Extensions検査分離を維持しつつ、DEC-014がIR-059の affected_artifact 範囲と source/save/complete/release の各 enforcement 経路を変更する後続決定である。
+DEC-006 が確立した inspect 3-command 正規化と IR-056 の Project Extensions 検査分離を維持しつつ、DEC-014がIR-059の affected_artifact 範囲と source/save/complete/release の各 enforcement 経路を変更する後続決定である。
 DEC-006全体を置換せず、IR-059をIR-056へ統合しない。

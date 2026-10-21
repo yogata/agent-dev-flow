@@ -29,7 +29,7 @@ timeout 延長・単独再実行で確定できない環境起因が疑われる
 3. **実測時間と検証内容本体の分離**: テストの実測実行時間（既定 timeout・単独再実行・対照実行の各値）と、テストが検証する性質（検証内容本体）を分けて記録する。timeout 由来 fail の由来分類は実測時間の分布を根拠とし、検証内容本体の合否判定と混同しない。
 4. **実行条件の記録**: 双方の HEAD hash、working tree 状態、負荷状況、実測時間を由来分類記録へ含める。記録した結果は前項の判定原則（再現 → 環境起因、非再現 → 変更起因再評価）と PR head 結果併記の入力になる。
 
-対照実行の前提確認として、baseline（main root）は mid-Epic で次子 Issue の manifest 未反映・stale junction 状態により stale になり得るため絶対視しない。対照実行で再現した fail については PR HEAD（worktree）での同一テスト結果を併記し、「main 環境固有で PR HEAD では pass」の環境起因（無効分類）と「baseline で再現する pre-existing」を区別する（前提確認は由来分類の追加条件であり、既存の安全側規定の免除ではない）。
+対照実行の前提確認として、baseline（main root）は mid-Epic で次子 Issue の manifest 未反映・stale junction 状態により陳腐化し得るため絶対視しない。対照実行で再現した fail については PR HEAD（worktree）での同一テスト結果を併記し、「main 環境固有で PR HEAD では pass」の環境起因（無効分類）と「baseline で再現する既存違反（pre-existing）」を区別する（前提確認は由来分類の追加条件であり、既存の安全側規定の免除ではない）。
 
 検査対象が別 OU 専属成果物（`.agentdev/extensions/**` 等）を横断検査する構成（配布物削除 Case 等）では、fail の由来分類前に Epic Wave の専属割当を確認し、後続 OU 専属の計画的依存として分類する。QG-4 の fail 由来分類記録に PR HEAD 結果の根拠併記を反映する候補は、要件化経路（req-define）で確定する。
 

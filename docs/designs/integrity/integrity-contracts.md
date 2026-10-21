@@ -16,7 +16,7 @@ updated: 2026-10-16
 
 ## 目的
 
-整合性検査の分類フレームワークを定義し、検査結果の深刻度と対応フローを規定する（REQ-010）。
+整合性検査で用いる分類方法を定義し、検査結果の深刻度と対応フローを規定する（REQ-010）。
 
 ## 深刻度分類（Severity Classification）
 
@@ -106,7 +106,7 @@ check_changed_docs.ts の JSON 出力型である TargetedDocsReport の型定�
 
 ### check_changed_docs.ts 挙動Design 契約（targeted-docs-guard-implementation.md Phase 1, 3）
 
-check_changed_docs.ts は以下の挙動Design 契約に従う: entry（引数解析、対象確定）、対象解決（--files または --base-ref から files_checked を生成）、profile 呼出（--workflow に応じた profileFor 適用）、validator 呼出（profile rules の実行）、report 契約（TargetedDocsReport 形式での JSON/text 出力）、exit code（FAILURE/WARNING/OK の 3 値）。
+check_changed_docs.ts は以下の挙動 Design 契約に従う。まず引数を解析して対象を確定し（entry）、--files または --base-ref から files_checked を生成し（対象解決）、--workflow に応じた profileFor を適用し（profile 呼出）、profile rules を実行し（validator 呼出）、TargetedDocsReport 形式で JSON/text を出力し（report 契約）、終了コードを FAILURE/WARNING/OK の 3 値で返す（exit code）。
 
 対象確定はコマンド側が行い、check_changed_docs.ts は対象選定の十分性を判定しない。
 --files 指定で files_checked が空の場合は FAILURE、--base-ref 指定で files_checked が空の場合は WARNING とする。

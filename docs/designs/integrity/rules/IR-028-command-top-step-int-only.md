@@ -13,7 +13,7 @@ updated: "2026-10-05"
 | description | Command の最上位 Step 見出し、参照が整数のみであり、`Step N.M` 形式の小数 Step が残存していないこと |
 | severity | strict |
 | category | obsolete-structure |
-| detection_method | `src/common/commands/agentdev/*.md` を対象に `Step \d+\.\d+` を検出。projection 側または integrity rule 内の旧語検出用文字列は除外が必要 |
+| detection_method | `src/common/commands/agentdev/*.md` を対象に `Step \d+\.\d+` を検出。projection 側（.opencode 投影物）または integrity rule 内の旧語検出用文字列は除外が必要 |
 | affected_artifacts | [commands, command projection, integrity rules] |
 | related_req | -（要件行レベルの正規所有者なし。サブステップ様式の正規契約は command-file-format.md が所有） |
 | related_design | [../../authoring/command-file-format.md, artifact-contracts.md, v4-responsibility-boundaries.md] |

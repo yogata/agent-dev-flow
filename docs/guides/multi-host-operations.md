@@ -67,7 +67,7 @@ AgentDevFlow は共通原本とホスト別接続領域に分かれる。
 | `.agentdev/` のドメイン状態（drafts、intake/learning、検出事項等） | repo 内正規状態（git 管理対象） | git status で未 commit の変更がないことを確認。残っていれば切替元ホスト側で commit と push を完了させる |
 | worktree、ブランチ、junction 等のローカル環境 | 保存しない（正規状態から再構成） | 確認不要。切替先ホストで再構成される |
 
-現在 stage や workflow route といった cursor 的状態はどこにも保存されない。再開時に最も早い未収束 stage から自動で再構成されるため、切替時に手作業で引き継ぐ項目ではない。
+現在の stage や workflow route といった進行位置を指す状態（cursor）はどこにも保存されない。再開時に最も早い未収束 stage から自動で再構成されるため、切替時に手作業で引き継ぐ項目ではない。
 
 ### 3. 切替先ホストでの再開
 

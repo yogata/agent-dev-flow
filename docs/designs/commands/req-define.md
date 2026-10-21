@@ -18,7 +18,7 @@ updated: "2026-10-20"
 
 # req-define Design
 
-本 command は requirements-driven entry point である（要求入口 2 つの一方）。
+本 command は要求から開始する入口（requirements-driven entry point）である（要求入口 2 つの一方）。
 
 自然言語による機能要求、バグレポート、エラー・ログ・障害事象、外部課題、RU、設計・調査メモ、診断由来 finding を入力として、要件を壁打ちにより整理、定義し、構造化 `draft-data` 形式の要件 doc（`.agentdev/drafts/req-draft-{topic-slug}.md`）を生成する。標準経路の次段は case-auto である。
 壁打ちフェーズで使用。
@@ -220,7 +220,7 @@ backlog-review が付与する `tentative_classification`（現行の暫定分�
 #### agentdev-req-analysis SKILL 連携
 
 上記手順の詳細（質問運用ルール、分析フレーム選択基準）は `agentdev-req-analysis` SKILL（共通原本 `src/common/skills/agentdev-req-analysis/SKILL.md`。実行時投影先は `.opencode/skills/agentdev-req-analysis/`）の「質問運用ルール」「要件分析観点」セクションに反映する。
-本 Design は手順の要件を定義し、SKILL は実装詳細を定義する（原本src→配置先.opencode の文書間投影規則に準拠）。
+本 Design は手順の要件を定義し、SKILL は実装詳細を定義する（原本 src → 配置先 .opencode の文書間投影規則に準拠）。
 
 ### 記述単位・寿命の判定項目追加
 

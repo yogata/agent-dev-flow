@@ -18,7 +18,7 @@ updated: "2026-10-14"
 
 ## 目的
 
-配布依存境界の検証モデルを確立し、producer 内部依存と consumer 解決可能依存の区別、配布テキスト成果物の対象定義、決定的判定と未分類扱い、generic と template 許容、ベースラインと個別承認例外の区別、誤検出抑制、検査エラー意味、各 projection の検査契約、事前書き込み gate と最終 gate の契約、archive 公開前検査、安定実装契約を正規所有する（REQ-029、REQ-010-060、DEC-014）。
+配布依存境界の検証モデルを確立する。正規所有する内容は、producer 内部依存と consumer 解決可能依存の区別、配布テキスト成果物の対象定義、決定的判定と未分類扱い、generic と template の許容、ベースラインと個別承認例外の区別、誤検出の抑制、検査エラーの意味、各 projection の検査契約、事前書き込み gate と最終 gate の契約、archive 公開前検査、安定実装契約である（REQ-029、REQ-010-060、DEC-014）。
 
 ## producer と distribution の意味モデル
 
@@ -59,7 +59,7 @@ distribution purity check は、distribution-bound artifact 内の producer 側�
 
 ## 候補抽出から決定までのパイプライン
 
-走査契約: checker の走査判定は isDirectory() に加えて isSymbolicLink() を併用し、link profile (.opencode/** 配下) の junction (directory symlink) をディレクトリとして走査対象に含める。走査の意味論: (1) junction 経由の走査は link projection の検査であり、参照先 source projection (src 側原本) との重複検出は link profile / source profile の区別表示により回避する、(2) junction 参照先の配布対象外ファイル (テスト・開発用 scripts 等) は link projection の検査対象外とする、(3) 循環参照防止のため走査済み実パスの追跡を行う。
+走査契約: checker の走査判定は isDirectory() に加えて isSymbolicLink() を併用し、link profile (.opencode/** 配下) の junction (directory symlink) をディレクトリとして走査対象に含める。走査の意味論は次の3点である。(1) junction 経由の走査は link projection の検査であり、参照先 source projection (src 側原本) との重複検出は link profile / source profile の区別表示により回避する。(2) junction 参照先の配布対象外ファイル (テスト・開発用 scripts 等) は link projection の検査対象外とする。(3) 循環参照防止のため走査済み実パスの追跡を行う。
 
 検出パイプラインは次の 4 段階で構成する。
 各段階で副作用を発生させない。

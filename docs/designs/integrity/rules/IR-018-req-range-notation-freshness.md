@@ -13,7 +13,7 @@ updated: 2026-08-20
 | description | AGENTS.md、Design、guides の REQ 範囲表記が実際の 現行 REQ 数と一致すること |
 | severity | heuristic |
 | category | document-drift |
-| detection_method | N件、through 等の表記と glob 結果の照合 |
+| detection_method | 「N件」「〜まで（through）」等の範囲表記と glob 結果の照合 |
 | affected_artifacts | [AGENTS.md, Design, guides] |
 | related_req | [REQ-010] |
 | related_design | [integrity-contracts.md] |

@@ -32,7 +32,7 @@ frontmatter 先頭空行検出の機械検出 route は新設しない（単発�
 
 ## Command 構造
 
-Command は公開interface（入出力契約・ガードレール）と workflow dispatch を中心とする
+Command は公開 interface（入出力契約・ガードレール）と workflow dispatch を中心とする
 （DEC-010）。
 workflow 手順本体は Workflow Skill へ移行し、Command に重複残存しない。
 workflow への参照は Workflow Skill 名レベルとする（REQ-002-017）。

@@ -14,7 +14,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 - 判断方法と確定権限の分離、人間判断境界: [REQ-096](requirements/REQ-096.md)、[DEC-048](decisions/DEC-048.md)
 - REQ / Decision / Design / Knowledge / Report / Guide の文書責務: [REQ-001](requirements/REQ-001.md)、[プロジェクトドキュメントと Design](guides/project-docs-and-specs.md)
 
-accepted な v5 基盤と v5.1 の正規文書への導線は次のとおりである。
+採用済み（`status: accepted`）の v5 基盤と v5.1 の正規文書への導線は次のとおりである。
 
 - v5 基盤（工程・成果物モデル、追跡・品質検証、有限実行、移行境界）: [REQ-104](requirements/REQ-104.md)〜[REQ-109](requirements/REQ-109.md)、[DEC-053](decisions/DEC-053.md)〜[DEC-056](decisions/DEC-056.md)
 - v5.1（工程駆動コラボレーション、工程遷移・双経路併存）: [REQ-110](requirements/REQ-110.md)、[REQ-111](requirements/REQ-111.md)、[DEC-057](decisions/DEC-057.md)、[DEC-058](decisions/DEC-058.md)

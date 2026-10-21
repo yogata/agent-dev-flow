@@ -87,7 +87,7 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
   - 問題クラス分類
   - 8軸評価
   - evaluation-report 生成
-  - 廃棄判定（11カテゴリ + duplicate）+ 昇華可能性評価（現行は REQ-038 系）。無条件の自動REQ化を禁止し、昇華不能な知見は `deferred.md` の living pool で維持する
+  - 廃棄判定（11カテゴリ + duplicate）+ 昇華可能性評価（現行は REQ-038 系）。無条件の自動 REQ 化を禁止し、昇華不能な知見は `deferred.md` の living pool で維持する
   - 既存対策確認（既存対策優先、新規 X 化より既存 X へ反映）
   - 結果提示
   - ユーザー承認（判定、prune にユーザー承認必須）

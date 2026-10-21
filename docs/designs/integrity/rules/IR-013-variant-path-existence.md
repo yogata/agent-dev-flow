@@ -18,7 +18,7 @@ updated: 2026-08-20
 | related_req | [REQ-036-008] |
 | related_design | [integrity-contracts.md] |
 | gate_level | full-audit, delta-guard |
-| false_positive_risk | 低。backtick 囲みパス成分は code formatting として扱いパス解決前に除去するため、backtick 起因の偽陽性は発生しない（REQ-036-008） |
+| false_positive_risk | 低。backtick で囲まれたパス成分はコード書式として扱い、パス解決の前に除去するため、backtick 起因の偽陽性は発生しない（REQ-036-008） |
 | regression_test | commands_structure.test.ts |
 | finding_route | intake |
 | triage_action | 種別（variant）を作成または参照を修正 |

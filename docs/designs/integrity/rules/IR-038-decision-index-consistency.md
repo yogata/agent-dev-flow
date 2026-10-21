@@ -10,7 +10,7 @@ updated: 2026-08-22
 | Field | Value |
 |-------|-------|
 | rule_id | IR-038 |
-| description | 承認済み Decision（`docs/decisions/DEC-*.md`）と 廃止 Decision（`docs/decisions/retired/DEC-*.md`）の index（`docs/decisions/README.md`）整合性を検査すること。Current Baseline View に承認済み Decision が過不足なく記載され、Retired View に 廃止 Decision が過不足なく記載されていること |
+| description | 承認済み Decision（`docs/decisions/DEC-*.md`）と 廃止 Decision（`docs/decisions/retired/DEC-*.md`）と索引（`docs/decisions/README.md`）の整合性を検査すること。Current Baseline View に承認済み Decision が過不足なく記載され、Retired View に 廃止 Decision が過不足なく記載されていること |
 | severity | strict |
 | category | document-drift |
 | detection_method | `docs/decisions/README.md` の Current Baseline View / Retired View と実 Decision ファイル一覧の双方向差分を検出 |

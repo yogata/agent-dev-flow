@@ -10,7 +10,7 @@ updated: 2026-08-20
 | Field | Value |
 |-------|-------|
 | rule_id | IR-020 |
-| description | 基準（`.agentdev/integrity/baseline.json`）に記録された known finding と新規 finding が区別されていること |
+| description | 基準（`.agentdev/integrity/baseline.json`）に記録された既知の指摘事項（known finding）と新規の指摘事項（finding）が区別されていること |
 | severity | heuristic |
 | category | integrity-rule-gap |
 | detection_method | baseline.json の known_findings と現行 finding の比較 |

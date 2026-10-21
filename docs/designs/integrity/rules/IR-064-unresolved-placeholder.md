@@ -44,7 +44,7 @@ updated: 2026-10-05
 
 ## baseline 運用
 
-導入時点（Issue #2372、2026-08-22）の既知違反は ID プレースホルダー裸出力 48 件（TODO 系は 0 件）。裸出力は委譲注記様式として一貫使用されているが、様式の正規契約（backtick 包囲等）が未確定のため heuristic とし、NG baseline additions manifest（provenance `issue-2372-ir064-initial-baseline`）で管理する。様式の正規化は Design 確定候補・intake 経由で判断する。
+導入時点（Issue #2372、2026-08-22）の既知違反は ID プレースホルダー裸出力 48 件（TODO 系は 0 件）。裸出力は委譲注記様式として一貫使用されているが、様式の正規契約（backtick 包囲等）が未確定のためヒューリスティック（heuristic）とし、NG baseline additions manifest（provenance `issue-2372-ir064-initial-baseline`）で管理する。様式の正規化は Design 確定候補・intake 経由で判断する。
 
 ## See Also
 

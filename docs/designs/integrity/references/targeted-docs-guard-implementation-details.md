@@ -34,7 +34,7 @@ check_changed_docs.ts 中心の変更文書限定検査契約を Phase 1-6 で�
   例: `--files a.md b.md c.md`（space 区切り推奨）、`--files a.md,b.md,c.md`（comma 区切りも受入）。
 両形式の混在も可。
 usage メッセージ、--help 出力で区切り形式を明示すること。
-後方互換性を担保し space 区切り仕様を変更しないこと。
+後方互換性を担保するため、従来の空白区切り形式を維持し、既存の入力を読み取れるようにすること。
 - --files 指定で files_checked が空の場合は失敗（FAILURE）扱い、--base-ref 指定で files_checked が空の場合は警告（WARNING）扱いとすること。
 
 ### Phase 4: コマンド別最小監査範囲

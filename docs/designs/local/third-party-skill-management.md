@@ -64,7 +64,7 @@ third-party 成果物 = ADF が製作していないが、配布成果物が依�
 
 環境ツール（bun、git、gh、OpenCode 自身）は対象外。利用者マシンのグローバル環境に存在する動作環境であって、ADF は配布先へ届ける責任も配置先も持たないため。
 
-統一宣言ファイルは作らない。package 形式の正は lockfile であり、skills.yaml への二重管理は drift 発生源になる。包括定義の正は本 Design と用語集（glossary）が担い、README-INSTALL は consumer 向け案内としてこれを引用する。通知文書（THIRD-PARTY-NOTICES、REQ-029-013）の通知対象は版固定情報解決する package 形式の依存と解釈する。Skill 形式の本体は配布物へ含めない（REQ-002-043）のため、Skill 形式の依存への通知文書追記を要しない。
+統一宣言ファイルは作らない。package 形式の正は lockfile であり、skills.yaml への二重管理は乖離（drift）の発生源になる。包括定義の正は本 Design と用語集（glossary）が担い、README-INSTALL は consumer 向け案内としてこれを引用する。通知文書（THIRD-PARTY-NOTICES、REQ-029-013）の通知対象は版固定情報解決する package 形式の依存と解釈する。Skill 形式の本体は配布物へ含めない（REQ-002-043）のため、Skill 形式の依存への通知文書追記を要しない。
 
 ## 宣言ファイルの配置と解決（2候補）
 
