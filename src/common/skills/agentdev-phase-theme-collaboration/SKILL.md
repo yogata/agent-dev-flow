@@ -114,6 +114,7 @@ Workflow Skill 群（テーマ形成・テーマ更新・成果物反映）か�
 
 - 判断の代理確定をしない。採用・不採用・対象解決の最終判断は利用者または Workflow Skill の実行契約が担う
 - 正規成果物（Decision、REQ、Design 等）を直接更新しない
+- decision 成果物は、工程をまたぐ意思決定・未解決課題の管理・方式選択を記録する成果物である。正本の優先度（source-of-truth priority）は `inspect-docs` コマンド定義「不変条件」を、decision の記録内容の規定は document-model Design「責務マトリックス」を参照する（定義本文は複製しない）
 - themes.md / pending.md / identity.yaml の書込みは本スキルの操作に含めない（様式の解析・導出・検証を担う）
 - GitHub 版・Local 版のいずれの正規利用経路からも同一の JSON を返す
 

@@ -187,6 +187,7 @@ resume point / export / import を持たない。各反映操作が1完結単位
 
 - 採用根拠のない書込みを行わない。外部AIの自己申告を採用証拠にしない
 - 技術的な書込失敗を成功として報告しない
+- decision 成果物は、工程をまたぐ意思決定・未解決課題の管理・方式選択を記録する成果物である。正本の優先度（source-of-truth priority）は `inspect-docs` コマンド定義「不変条件」を、decision の記録内容の規定は document-model Design「責務マトリックス」を参照する（定義本文は複製しない）
 - テーマ正本（themes.md）の更新は本スキルの操作に含めない（テーマ更新は phase-tasks-update の責務）
 - GitHub 版・Local 版のいずれの正規利用経路から起動された場合も、同じ契約で実行する
 

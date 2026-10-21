@@ -142,6 +142,7 @@ Local 版で遷移後の作業が実装作業を伴う場合は、既存実行�
 
 - 遷移判断の代理確定をしない。ユーザー合意が必要な設計判断を本スキルで確定しない
 - 正規成果物（Decision、REQ、Design 等）を直接更新しない
+- decision 成果物は、工程をまたぐ意思決定・未解決課題の管理・方式選択を記録する成果物である。正本の優先度（source-of-truth priority）は `inspect-docs` コマンド定義「不変条件」を、decision の記録内容の規定は document-model Design「責務マトリックス」を参照する（定義本文は複製しない）
 - 遷移記録は最小情報に限る。進行度・完了率・残作業を記録する恒久台帳を設けない
 - project extension（`.agentdev/extensions/skills/agentdev-workflow-phase-transition.yaml`）が存在する場合は読み込み、破損していれば無視して標準動作で続行する（fail-open）
 
