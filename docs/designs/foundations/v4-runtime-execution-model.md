@@ -20,7 +20,7 @@ updated: 2026-10-07
 | repo 内ファイル | docs/、src/**、.agentdev/、索引 | 対象パス（正規領域/一時領域）× 操作（作成/更新/削除）× 寿命 |
 | GitHub | Issue/PR/comment の作成・更新・クローズ、ラベル | 対象種別 × 操作 × 寿命 |
 | remote branch・tag | push、branch 削除、tag 作成 | lifecycle role × 操作 × 寿命 |
-| repo 外 | DB migration、deploy、クラウド、外部SaaS、課金、権限、認証、repo 外実データ、通知 | 原則自走対象外（ Fence ） |
+| repo 外 | DB migration、deploy、クラウド、外部SaaS、課金、権限、認証、repo 外実データ、通知 | 原則自走対象外（Fence） |
 
 tag・branch の lifecycle role 別サブ表:
 

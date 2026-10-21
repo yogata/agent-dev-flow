@@ -35,3 +35,15 @@ rules:
     # ハイフンを含む語は plain pattern の自動エスケープ（\-）が Unicode 正規表現で
     # 不正になるため、regex 形式で指定する
     pattern: /source-of-trought/
+  # 確定誤字・別字形・中国語簡体字混入（docs 日本語品質是正 Case #3839 で残存 0 を実測確認）
+  # 查読（→ 査読）は既知不備センチネル S-05 の検出対象語定義として docs 内に恒常残存するため未登録
+  - expected: 候補
+    pattern: 候選
+  - expected: 追跡
+    pattern: 追跠
+  - expected: 下流
+    pattern: 下遊
+  - expected: 括弧
+    pattern: 括号
+  - expected: 移行
+    pattern: 迁移

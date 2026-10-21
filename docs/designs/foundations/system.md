@@ -221,7 +221,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **分岐**: Epic Wave クローズ vs 単一Issue、mergeable UNKNOWN ポーリング、squash merge コンフリクト（Level 1 rebase → case-auto Level 2/3 エスカレーション）、QG-4 観点8（PR対象範囲 vs 全体）、Design確定候補処理3パターン（昇格/Design 保存提案（case-revise 経由）/見送り）、Epic自動クローズ判定（全子Issue CLOSED）、auto-close 回避（commit message フォーマット）。
 - **副作用**: PR squash merge（`--delete-branch` 禁止、STEP-6 で独立削除）、Issue close、worktree+ローカルブランチ削除（remote は GitHub の deleteBranchOnMerge 自動削除に委譲。当該設定は ADF 適用リポジトリの必須前提、case-open preflight で検証）、Epic Issue 本文ステータステーブル更新（case-close 単一書き手）、Design `status` draft→accepted 昇格、`.agentdev/` commit/push、完了条件チェックボックス評価・更新（case-close 専任責務、`POL-completion-checkbox-single-writer`）。
 - **HITL**: docs/ 更新なし警告、targeted docs guard strict 違反停止、IR-056 違反停止、QG-4 未達チェックボックス停止（完了条件評価専任責務）、Design確定候補の見送り判断、Capture回収の分離。
-- **並列性**: Epic Wave クローズ STEP-E4 で各子Issue の PRマージ・クローズ・完了条件評価・Capture回収・コンフリクト解消準備を「準並列化」（REQ）。
+- **並列性**: Epic Wave クローズ STEP-E4 で各子 Issue の PR マージ・クローズ・完了条件評価・Capture回収・コンフリクト解消準備を「準並列化」（REQ）。
 - **resume**: HEAD commit hash（squash merge 後）、PR mergeable 状態、Issue OPEN/CLOSED 状態、Epic ステータステーブル、Design status、学びinbox/intake inbox。
 - **durable state**: マージコミット、クローズ済みIssue、削除済みローカルブランチ/worktree、`.agentdev/learning/inbox.md`、`.agentdev/intake/inbox/`、Design status（draft→accepted）、Epic Issue ステータステーブル。
 - **Harness依存**: GitHub I/O（Custom Tool `agentdev_gh` 経由。merge、mergeable ポーリング、close、ラベル）、git（pull --ff-only / rebase / reset / checkout 隔離worktreeのみ）、worktree 操作、subagent 起動（learning-capture）、タイムスタンプ、bash による check_changed_docs.ts / check_extensions.ts、拡張読込。

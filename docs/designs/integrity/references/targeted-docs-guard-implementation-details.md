@@ -17,7 +17,7 @@ check_changed_docs.ts 中心の変更文書限定検査契約を Phase 1-6 で�
 
 ### Phase 1: Design 配置
 
-- check_changed_docs.ts の変更文書限定検査契約は、挙動Design（entry/対象解決/profile/validator呼出/report契約/exit code）、カタログDesign（TargetedDocsReport 型定義、workflow profile 定義）、実装詳細Design（validator内部アルゴリズム、分割基準）に配置されること。
+- check_changed_docs.ts の変更文書限定検査契約は、挙動Design（entry/対象解決/profile/validator 呼出/report 契約/exit code）、カタログ Design（TargetedDocsReport 型定義、workflow profile 定義）、実装詳細Design（validator内部アルゴリズム、分割基準）に配置されること。
 - 個別判定条件は IR-*.md に配置されること。
 
 ### Phase 2: report 契約固定
