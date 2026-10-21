@@ -182,3 +182,57 @@
 - **想定反映先**: learning-promote による評価・昇華
 - **関連**: PR #3834 本文「Findings / Capture候補」learning 1 件、Issue #3832 対応記録コメント検証差分 #3
 - **タグ**: #bun-test #並行実行 #timeout-flake #case-run #品質統制
+
+---
+
+## node spawnSync（shell: true）で大量 stdout の checker をラップすると exit が null で返却される
+
+- **問題事象**: node `child_process.spawnSync`（`shell: true`）で stdout 約 811KB の textlint gate 実行をラップした際、プロセス自体は完了するが `exit` が `null` で返却される例を観測した。同等コマンドの直接実行は EXIT=0 を確認済み
+- **発生局面**: case-run STEP-S5 textlint gate の証跡退避自動化（Root Case #3835、PR #3837 本文「Findings / Capture候補」learning 候補の回収）
+- **検知方法**: ラッパー経由の終了コードと同等コマンド直接実行の終了コードの比較（exit null と EXIT=0 の乖離）
+- **根本原因**: 大量 stdout を出力する子プロセスの spawnSync（shell: true 経由）の終了コード取得が、標準出力の扱い（maxBuffer・シェル経由の終了伝播）に依存して信頼できない
+- **自律対応内容**: 証拠としては直接実行の終了コードを採用。case-close STEP-3 では textlint gate を直接実行（spawnSync に shell: false の配列引数）し、終了コード 0 を機械工程 script 経由で再取得して整合を確認
+- **ユーザー確認の有無**: なし（証跡採用判断は検証差分記録規律どおり）
+- **REQ/Decision/spec影響**: なし（checker 実行契約 Design の stdout 証跡退避形式は現行契約のまま。実装経路の選択知見）
+- **横展開観点**: 大量 stdout を出力する checker（textlint、full suite 等）の証跡退避を spawnSync で自動化する場合、終了コードをラッパー経由で信用せず直接実行での確認、または maxBuffer / 標準出力の扱いの検証を前置する
+- **再発条件**: spawnSync（shell: true）で大量 stdout の checker をラップして終了コードを取得した場合
+- **予防策候補**: checker 実行の自動化ラッパーは shell: false の配列引数で起動し、大量 stdout の場合は終了コードの直接実行でのクロス確認を運用に組み込む
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: PR #3837 本文「Findings / Capture候補」learning、Issue #3835
+- **タグ**: #spawnSync #textlint #証跡退避 #case-run
+
+---
+
+## close_mechanical_steps.ts の integrityGates 必須入力と full suite 再実行禁止の両立は保存済み証跡の読み戻し検証コマンドを gate として接続する
+
+- **問題事象**: case-close STEP-3 の機械工程 script（close_mechanical_steps.ts）は入力検証で integrityGates（full-integrity-suite）の省略を拒否する一方、bun test 実行形態契約の「同一情報の取得だけを目的とした full suite 再実行をしない」と、3 cwd 分割の直接実行（分離退避・件数突合）が STEP-3 の正規形として並存する。script 経路の integrityGates に分割コマンドをそのまま渡すと suite 再実行（約10分）が発生する
+- **発生局面**: case-close STEP-2/STEP-3 機械工程の pre-merge 呼び出し（Root Case #3835、merge 直前 HEAD 4360754c6）
+- **検知方法**: 入力契約（REQUIRED_GATES_PRE_MERGE・evaluateIntegrityMachineAcceptance）と STEP-3 再実行禁止規定の突合
+- **根本原因**: 2つの契約の射程差（script は gate の exitCode 実体を必要とするが、証跡はすでに保存済み）
+- **自律対応内容**: 3 分割を直接実行（stdout/stderr 分離退避・timeout 600 秒明示・件数突合）した上で、integrityGates には保存済み証跡の読み戻し検証コマンド（bun -e で 4 退避ログの fail 件数 0・件数サマリー存在を検証、exit 0/1）を「full-integrity-suite-evidence-replay」として接続し、IntegrityMachineAcceptanceRecord の suiteRunRecords・環境ラベル・runner 版・baseline 記録を実体として渡した。報告 JSON で machineAcceptance accepted と warnings 0 を取得
+- **ユーザー確認の有無**: なし（既存契約の適用実践であり、契約変更なし）
+- **REQ/Decision/spec影響**: なし（checker 実行契約 Design「保存済み検証証跡からの解析と再実行条件」の適用。新たな品質ゲート・証跡基盤は不設置）
+- **横展開観点**: 機械工程 script が gate 実行体を要求する場合でも、gate には「実行コマンド」ではなく「証跡の読み戻し検証コマンド」を渡せる。再実行禁止と機械受理判定の両立パターンとして traceability・textlint 等、証跡保存済みの gate 全般に適用可能
+- **再発条件**: 保存済み証跡を持つ検証を、gate 実行体を必須とする機械工程 script に接続する場合
+- **予防策候補**: 証跡退避ファイル名の採番規則を stdout/stderr 対応が判別できる形に統一しておく（evidence-replay コマンドの検証対象として機械参照可能にする）
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: close_mechanical_steps.ts 報告 JSON（.worktrees/3835-chore、削除済み退避を含む）、Issue #3835
+- **タグ**: #case-close #機械工程 #証跡 #bun-test
+
+---
+
+## merge 直後の main worktree が未 pull の場合、merge 後重複行実検査は git show origin/main: でツリー内容を直接読む
+
+- **問題事象**: STEP-4-6 の merge 後重複行実検査の対象は「merge 後 main HEAD 上」だが、main worktree の working tree は STEP-6-3 の `git pull --ff-only` 前では旧 main のままであり、worktree のファイルを grep すると旧状態を検査してしまう（実際、policy.yaml の REQ-094-013 が 0 件に見える誤観測が発生）
+- **発生局面**: case-close STEP-4-6 merge 後重複行実検査（Root Case #3835、squash merge 2f7e1a14c 直後）
+- **検知方法**: grep カウント 0 と PR 変更内容の矛盾（policy 登録行が merge HEAD に存在するはず）の突合
+- **根本原因**: 検査対象（git ツリー）と検査手段（worktree の作業ディレクトリ）の状態ずれ。main worktree の pull は STEP-6-3 の正規手順であり前倒ししない
+- **自律対応内容**: `git show origin/main:<path>` と `git ls-tree origin/main` で merge HEAD のツリー内容を直接読み取り、REQ-094-013 テーブル行・宣言・policy 登録・sidecar・report の重複混入なしを確認（squash commit の single parent も確認）
+- **ユーザー確認の有無**: なし（読取系の検査対象解決のみ）
+- **REQ/Decision/spec影響**: なし（STEP-6-3 の正規手順を変更しない対応）
+- **横展開観点**: merge 直後に実施する main HEAD 基準の検査（重複行実検査、merge 内容確認等）は、main worktree の pull 前後に関係なく `git show origin/main:` / `git ls-tree` でツリー内容を読む方が状態ずれに強い
+- **再発条件**: main worktree が merge 前 HEAD に留まったまま（pull 前）、merge 後 main HEAD の内容検査を worktree ファイルに対して実行した場合
+- **予防策候補**: STEP-4-6 の検査手順に「main worktree 未 pull 時は git show origin/main: で merge HEAD ツリーを検査する」の前置を明記する（learning-promote で評価）
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: Issue #3835、merge commit 2f7e1a14cb56b7a910c721ea101088109a468169
+- **タグ**: #case-close #merge検査 #git-show #重複行実検査
