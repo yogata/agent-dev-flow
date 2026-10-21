@@ -122,6 +122,7 @@ resume point / export / import を持たない。工程一覧のラベルは順�
 ## 共通制約
 
 - 正規成果物（Decision、REQ、Design 等）を直接更新しない
+- decision 成果物は、工程をまたぐ意思決定・未解決課題の管理・方式選択を記録する成果物である。正本の優先度（source-of-truth priority）は `inspect-docs` コマンド定義「不変条件」を、decision の記録内容の規定は document-model Design「責務マトリックス」を参照する（定義本文は複製しない）
 - レビューを工程完了の必須ゲートとせず、レビューの深さの必須基準を設けない
 - 閲覧像を第二の正本として保存しない
 - ユーザー合意が必要な設計判断を代理確定しない

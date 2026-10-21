@@ -117,6 +117,7 @@ resume point / export / import を持たない。各形成操作が1完結単位
 ## 共通制約
 
 - 正規成果物（Decision、REQ、Design 等）を直接更新しない（テーマ正本は `.agentdev/phase/` 配下の domain state である）
+- decision 成果物は、工程をまたぐ意思決定・未解決課題の管理・方式選択を記録する成果物である。正本の優先度（source-of-truth priority）は `inspect-docs` コマンド定義「不変条件」を、decision の記録内容の規定は document-model Design「責務マトリックス」を参照する（定義本文は複製しない）
 - 参考候補を必須要求・工程完了判断へ自動昇格しない
 - テーマと Issue・成果物の一対一対応を強制しない
 - GitHub 版・Local 版のいずれの正規利用経路から起動された場合も、同じ契約で実行する（テーマ正本は両版共通の domain state 配置に保存する）

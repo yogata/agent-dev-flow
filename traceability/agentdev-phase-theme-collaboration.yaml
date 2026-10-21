@@ -14,6 +14,8 @@ implementation:
   - REQ-110-035
   - REQ-110-036
   - REQ-110-037
+  - REQ-110-038
+  - REQ-110-039
   src/common/skills/agentdev-phase-theme-collaboration/scripts/lib/receive.ts:
   - REQ-110-007
   - REQ-110-009
@@ -45,6 +47,8 @@ verification:
   - REQ-110-035
   - REQ-110-036
   - REQ-110-037
+  - REQ-110-038
+  - REQ-110-039
   src/common/skills/agentdev-phase-theme-collaboration/scripts/tests/receive.test.ts:
   - REQ-110-007
   - REQ-110-009

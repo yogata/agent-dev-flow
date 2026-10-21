@@ -9,6 +9,8 @@ implementation:
   - REQ-110-035
   - REQ-110-036
   - REQ-110-037
+  - REQ-110-038
+  - REQ-110-039
   src/common/commands/agentdev/phase-tasks-update.md:
   - REQ-110-003
   - REQ-110-004
@@ -18,6 +20,8 @@ implementation:
   - REQ-110-035
   - REQ-110-036
   - REQ-110-037
+  - REQ-110-038
+  - REQ-110-039
 verification:
   src/common/skills/agentdev-workflow-phase-tasks-update/SKILL.md:
   - REQ-110-003
@@ -28,6 +32,8 @@ verification:
   - REQ-110-035
   - REQ-110-036
   - REQ-110-037
+  - REQ-110-038
+  - REQ-110-039
   src/common/commands/agentdev/phase-tasks-update.md:
   - REQ-110-003
   - REQ-110-004
@@ -37,6 +43,8 @@ verification:
   - REQ-110-035
   - REQ-110-036
   - REQ-110-037
+  - REQ-110-038
+  - REQ-110-039
 links:
   upstream:
     src/common/skills/agentdev-workflow-phase-tasks-update/SKILL.md:
