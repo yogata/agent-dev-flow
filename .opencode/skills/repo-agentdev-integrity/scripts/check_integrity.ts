@@ -5,7 +5,7 @@
 // ADF-COVERS(verification): REQ-006-105, REQ-006-106, REQ-006-107, REQ-006-109, REQ-006-111
 // ADF-COVERS(verification): REQ-008-050
 // ADF-COVERS(verification): REQ-009-018, REQ-009-019, REQ-009-020
-// ADF-COVERS(implementation): REQ-010-002, REQ-010-003, REQ-010-005, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-064, REQ-010-066, REQ-010-070, REQ-010-080, REQ-010-081, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008, REQ-051-009
+// ADF-COVERS(implementation): REQ-010-002, REQ-010-003, REQ-010-005, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-064, REQ-010-066, REQ-010-070, REQ-010-080, REQ-010-081, REQ-010-084, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008, REQ-051-009
 // ADF-COVERS(verification): REQ-010-009
 // ADF-COVERS(verification): REQ-010-068, REQ-010-072, REQ-010-073, REQ-010-079
 // ADF-COVERS(implementation): REQ-010-072, REQ-010-073
@@ -11296,6 +11296,72 @@ function checkReqUpdatedFreshness(root: string): CheckResult[] {
   return results;
 }
 
+// ===== IR-073: 未追跡かつ gitignore 管理対象外のファイル・ディレクトリ検出（REQ-010-084）=====
+// 検出は `git ls-files --others --exclude-standard`（gitignore 管理対象外の未追跡
+// ファイルを再帰列挙。ディレクトリ残存は配下ファイルの検出として扱う。--directory は
+// 無視対象のみを含むディレクトリまで列挙するため使用しない）。許容は gitignore
+// （正規の非追跡領域宣言）と承認一覧（ng-baseline.json。既存の ng-baseline 機構と
+// 同一の物理実体で管理する category/check/file/evidence/count/provenance/reason の
+// 恒久承認記録）で行う。承認一覧対象外の検出は NG として終了コードを駆動し、承認済み
+// 検出は main の applyNgBaseline により承認記録（[baseline-known provenance=...] 付き
+// info）として報告にとどめる。本検査が承認を自動追加することはなく、承認の追加は
+// 検出契機ごとに人間の運用判断による明示承認（provenance 付き baseline 登録）として
+// 行われる。
+
+function checkUntrackedResidue(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const { execFileSync } = require("child_process") as typeof import("child_process");
+  let listings: string[];
+  try {
+    const out = execFileSync(
+      "git",
+      ["ls-files", "--others", "--exclude-standard"],
+      { cwd: root, encoding: "utf-8", maxBuffer: 64 * 1024 * 1024 },
+    ) as string;
+    listings = out
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
+  } catch {
+    results.push(
+      info(
+        "UntrackedResidue",
+        "untracked-residue",
+        "git listing unavailable (not a git working tree); IR-073 skipped",
+      ),
+    );
+    return results;
+  }
+  for (const rel of listings) {
+    results.push(
+      ng(
+        "UntrackedResidue",
+        "untracked-residue",
+        `untracked file/directory not managed by gitignore remains: ${rel}: 正規の非追跡領域であれば .gitignore への追加を提案し、恒久的な許容であれば provenance 付きで承認一覧（baselines/ng-baseline.json、category=UntrackedResidue / check=untracked-residue / file=<対象パス>）へ人間の運用判断で明示登録すること。本検査が承認を自動追加することはない（IR-073、REQ-010-084）`,
+        resolveRelative(path.join(root, rel), root),
+        undefined,
+        {
+          expected:
+            "no untracked non-ignored files/directories outside the approval list (commit, gitignore, or approval-list registration by explicit human decision)",
+          route: "intake",
+          finding_category: "repository-state-drift",
+          finding_level: "strict",
+        },
+      ),
+    );
+  }
+  if (listings.length === 0) {
+    results.push(
+      ok(
+        "UntrackedResidue",
+        "untracked-residue",
+        "IR-073 untracked-residue: 0 untracked non-ignored files/directories outside the approval list",
+      ),
+    );
+  }
+  return results;
+}
+
 // ─── repo-local Plugin 自己ホスト投影対称性検査（runtime-package-boundary.md） ───
 
 // depth-1 loader shim の固定内容テンプレート。scripts/self-sync.ps1 の
@@ -11807,6 +11873,7 @@ async function main(): Promise<void> {
     ...checkReqNumberGapRecorded(root), // IR-069 (REQ-010-070, Case #2917)
     ...checkIntegrityRuleRelatedReqExistence(root), // IR-071 (REQ-051-009)
     ...checkReqUpdatedFreshness(root), // IR-072 (REQ-010-068 準拠、patterns.md REQ frontmatter 規約)
+    ...checkUntrackedResidue(root), // IR-073 (REQ-010-084、未追跡かつ gitignore 管理対象外の検出)
     ...checkRepoLocalPluginProjectionSymmetry(root), // repo-local Plugin 投影対称性検査（runtime-package-boundary.md、Issue #2787）
   ];
 

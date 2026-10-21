@@ -8,6 +8,7 @@ import {
   decideExitCode,
   deriveAcceptancePopulation,
   deriveCurrentWave,
+  evaluateContractStateResidue,
   evaluateIntegrityMachineAcceptance,
   extractCompletionCheckboxes,
   isCloseOperationPermitted,
@@ -51,6 +52,10 @@ function preMergeInput(overrides: Partial<CloseMechanicalInput> = {}): CloseMech
     traceabilityGate: gate("traceability-check"),
     integrityGates: [gate("check_integrity"), gate("check_autogen_freshness")],
     textlintGate: gate("textlint-final-check"),
+    contractStateCheck: {
+      contractStatePaths: [".agentdev/jev-observations", ".agentdev/learning/inbox.md"],
+      approvalEntries: [],
+    },
     ...overrides,
   };
 }
@@ -58,6 +63,10 @@ function preMergeInput(overrides: Partial<CloseMechanicalInput> = {}): CloseMech
 function fakeRunner(overrides: {
   ghMergeable?: string;
   worktreeStatus?: string;
+  contractStateStatus?: string;
+  contractStateStatusExit?: number;
+  untrackedOutput?: string;
+  untrackedExit?: number;
   currentBranch?: string;
   issueBody?: string;
   epicBody?: string;
@@ -73,7 +82,14 @@ function fakeRunner(overrides: {
         result.stdout = JSON.stringify({ mergeable: overrides.ghMergeable ?? "MERGEABLE" });
       }
       if (spec.command === "git" && spec.args[0] === "status") {
-        result.stdout = overrides.worktreeStatus ?? "";
+        result.stdout = spec.args.includes("--")
+          ? (overrides.contractStateStatus ?? "")
+          : (overrides.worktreeStatus ?? "");
+        if (spec.args.includes("--")) result.exitCode = overrides.contractStateStatusExit ?? 0;
+      }
+      if (spec.command === "git" && spec.args[0] === "ls-files") {
+        result.stdout = overrides.untrackedOutput ?? "";
+        result.exitCode = overrides.untrackedExit ?? 0;
       }
       if (spec.command === "git" && spec.args[0] === "branch" && spec.args[1] === "--show-current") {
         result.stdout = overrides.currentBranch ?? "case-100";
@@ -112,6 +128,34 @@ describe("入力検証（品質ゲートの省略禁止）", () => {
     expect(() => validateInput(noIntegrity)).toThrow(/omission forbidden/);
     const noIssueBody = { ...base, issueBodyPath: undefined };
     expect(() => validateInput(noIssueBody)).toThrow(/omission forbidden/);
+    const noContractStateCheck = { ...base, contractStateCheck: undefined };
+    expect(() => validateInput(noContractStateCheck)).toThrow(/omission forbidden/);
+  });
+
+  test("契約状態記録検査の入力形式違反を拒否する", () => {
+    const base = preMergeInput() as unknown as Record<string, unknown>;
+    const badPaths = {
+      ...base,
+      contractStateCheck: { contractStatePaths: [""], approvalEntries: [] },
+    };
+    expect(() => validateInput(badPaths)).toThrow(/contractStatePaths/);
+    const badEntries = {
+      ...base,
+      contractStateCheck: {
+        contractStatePaths: [".agentdev/jev-observations"],
+        approvalEntries: [null],
+      },
+    };
+    expect(() => validateInput(badEntries)).toThrow(/approvalEntries/);
+    const badConfirmed = {
+      ...base,
+      contractStateCheck: {
+        contractStatePaths: [".agentdev/jev-observations"],
+        approvalEntries: [],
+        humanConfirmedPaths: [{ path: "stray.txt" }],
+      },
+    };
+    expect(() => validateInput(badConfirmed)).toThrow(/humanConfirmedPaths/);
   });
 
   test("必須品質ゲートが揃った入力を受領する", () => {
@@ -127,6 +171,186 @@ describe("件数突合 gate の報告保持", () => {
     expect(integrity?.detail).toMatchObject({
       check_autogen_freshness: { exitCode: 0, stdout: JSON.stringify({ compared: 4, changed: 0 }) },
     });
+  });
+});
+
+describe("契約状態記録・未追跡残存検査（REQ-032-042、完了判定工程）", () => {
+  test("決定的判定: 状態記録配下・承認一覧・人間確認済み・帰属不能の4分類", () => {
+    const evaluation = evaluateContractStateResidue(
+      {
+        contractStatePaths: [".agentdev/jev-observations"],
+        approvalEntries: [".agentdev/intake/inbox"],
+        humanConfirmedPaths: [
+          { path: "notes/stray.txt", basis: "Issue #100 コメントで本 Case 無関係と確認" },
+        ],
+      },
+      "?? .agentdev/jev-observations/obs-1.json\n",
+      [
+        ".agentdev/jev-observations/obs-1.json",
+        ".agentdev/intake/inbox/item-a.md",
+        "notes/stray.txt",
+        "notes/unattributed.txt",
+      ].join("\n"),
+    );
+    expect(evaluation.committed).toBe(false);
+    expect(evaluation.uncommittedStateRecords).toEqual([".agentdev/jev-observations/obs-1.json"]);
+    expect(evaluation.approvedAllowances).toEqual([
+      { path: ".agentdev/intake/inbox/item-a.md", entry: ".agentdev/intake/inbox" },
+    ]);
+    expect(evaluation.humanConfirmed).toEqual([
+      { path: "notes/stray.txt", basis: "Issue #100 コメントで本 Case 無関係と確認" },
+    ]);
+    expect(evaluation.humanConfirmationItems).toEqual(["notes/unattributed.txt"]);
+    expect(evaluation.untrackedTotal).toBe(4);
+  });
+
+  test("決定的判定: 状態記録パスが空の場合は commit 済み判定を空振りさせない（導出範囲は入力側の意味判断）", () => {
+    const evaluation = evaluateContractStateResidue(
+      { contractStatePaths: [], approvalEntries: [] },
+      "",
+      "notes/unattributed.txt\n",
+    );
+    expect(evaluation.committed).toBe(true);
+    expect(evaluation.humanConfirmationItems).toEqual(["notes/unattributed.txt"]);
+  });
+
+  test("実経路: リポジトリ全体の未追跡対象と状態記録パスを repoRoot で検査し、クリーンな場合は完了操作を許可する", () => {
+    const runner = fakeRunner({ issueBody: "- [x] 条件1\n" });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const step = report.result.steps.find((s) => s.name === "contract-state-residue-check");
+    expect(step?.status).toBe("pass");
+    const statusCall = runner.calls.find(
+      (c) => c.command === "git" && c.args[0] === "status" && c.args.includes("--"),
+    );
+    expect(statusCall?.cwd).toBe("<repo>");
+    expect(statusCall?.args).toEqual([
+      "status",
+      "--porcelain",
+      "--",
+      ".agentdev/jev-observations",
+      ".agentdev/learning/inbox.md",
+    ]);
+    const untrackedCall = runner.calls.find(
+      (c) => c.command === "git" && c.args[0] === "ls-files",
+    );
+    expect(untrackedCall?.cwd).toBe("<repo>");
+    expect(untrackedCall?.args).toEqual(["ls-files", "--others", "--exclude-standard"]);
+    expect(report.result.exitCategory).toBe("success");
+    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+  });
+
+  test("実経路: 未コミット契約状態記録の検出時は失敗で完了扱いにしない", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      contractStateStatus: "?? .agentdev/jev-observations/obs-1.json\n",
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const step = report.result.steps.find((s) => s.name === "contract-state-residue-check");
+    expect(step?.status).toBe("fail");
+    expect(report.result.exitCategory).toBe("failure");
+    expect(decideExitCode(report)).toBe(1);
+    expect(isCloseOperationPermitted(report)).toEqual({
+      permitted: false,
+      reason: "mechanical-failure",
+    });
+    const residue = report.diff.contractStateResidue as { uncommittedStateRecords: string[] };
+    expect(residue.uncommittedStateRecords).toEqual([".agentdev/jev-observations/obs-1.json"]);
+  });
+
+  test("実経路: 帰属不能の未追跡残存は人間確認事項として報告し、確認なしに完了判定へ進めない", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      untrackedOutput: "stray.txt\n",
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const step = report.result.steps.find((s) => s.name === "contract-state-residue-check");
+    expect(step?.status).toBe("fail");
+    const residue = report.diff.contractStateResidue as { humanConfirmationItems: string[] };
+    expect(residue.humanConfirmationItems).toEqual(["stray.txt"]);
+    expect(
+      report.warnings.some((w) => w.includes("requires human confirmation")),
+    ).toBe(true);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: 人間確認済み記録が揃った再実行では同一実経路の再検証で通過する", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      untrackedOutput: "stray.txt\n",
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        contractStateCheck: {
+          contractStatePaths: [".agentdev/jev-observations", ".agentdev/learning/inbox.md"],
+          approvalEntries: [],
+          humanConfirmedPaths: [
+            { path: "stray.txt", basis: "対応記録コメントで本 Case 由来・起票済みと確認" },
+          ],
+        },
+      }),
+      runner,
+    );
+    const step = report.result.steps.find((s) => s.name === "contract-state-residue-check");
+    expect(step?.status).toBe("pass");
+    const residue = report.diff.contractStateResidue as {
+      humanConfirmed: { path: string; basis: string }[];
+      humanConfirmationItems: string[];
+    };
+    expect(residue.humanConfirmed).toEqual([
+      { path: "stray.txt", basis: "対応記録コメントで本 Case 由来・起票済みと確認" },
+    ]);
+    expect(residue.humanConfirmationItems).toEqual([]);
+    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+  });
+
+  test("実経路: 承認一覧対象の未追跡検出は承認記録として報告し、対象外残存とは分離する", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      untrackedOutput: "sandbox/keep.txt\nnotes.txt\n",
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        contractStateCheck: {
+          contractStatePaths: [".agentdev/jev-observations", ".agentdev/learning/inbox.md"],
+          approvalEntries: ["sandbox"],
+        },
+      }),
+      runner,
+    );
+    const step = report.result.steps.find((s) => s.name === "contract-state-residue-check");
+    expect(step?.status).toBe("fail");
+    const residue = report.diff.contractStateResidue as {
+      approvedAllowances: { path: string; entry: string }[];
+      humanConfirmationItems: string[];
+    };
+    expect(residue.approvedAllowances).toEqual([{ path: "sandbox/keep.txt", entry: "sandbox" }]);
+    expect(residue.humanConfirmationItems).toEqual(["notes.txt"]);
+  });
+
+  test("実経路: 検査対象 git コマンドの失敗は fail-closed で完了操作を抑止する", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      untrackedExit: 128,
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const step = report.result.steps.find((s) => s.name === "contract-state-residue-check");
+    expect(step?.status).toBe("fail");
+    expect((step?.detail as { gitCheckOk: boolean }).gitCheckOk).toBe(false);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
   });
 });
 

@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-031-036, REQ-052-016, REQ-052-017, REQ-032-040, REQ-032-041, REQ-004-064, REQ-004-065, REQ-062-010, REQ-115-001, REQ-115-002, REQ-115-003, REQ-116-001, REQ-116-002, REQ-116-003, REQ-116-004, REQ-116-005
+// ADF-COVERS(verification): REQ-031-036, REQ-052-016, REQ-052-017, REQ-032-040, REQ-032-041, REQ-004-064, REQ-004-065, REQ-062-010, REQ-115-001, REQ-115-002, REQ-115-003, REQ-116-001, REQ-116-002, REQ-116-003, REQ-116-004, REQ-116-005, REQ-030-031, REQ-034-048
 //
 // backlog 一式 20261019T231959JST（Case #3816）で確定した実現面契約の pin 検査。
 // 配布物本文・references・REQ 本文の追記文言が恒久的に保持されることを、
@@ -135,5 +135,59 @@ describe("方針決定 REQ の記録 pin（REQ-115、REQ-116）", () => {
     expect(knowledge).toContain("運用手順と責務");
     expect(knowledge).toContain("クリーンアップ手順と責務");
     expect(knowledge).toContain("検証再開先");
+  });
+});
+
+describe("case-open 前提整備の commit（REQ-030-031）", () => {
+  const skill = read("src", "common", "skills", "agentdev-workflow-case-open", "SKILL.md");
+  const reference = read(
+    "src",
+    "common",
+    "skills",
+    "agentdev-workflow-case-open",
+    "references",
+    "root-case-and-definition-package.md",
+  );
+
+  test("SKILL の前提整備 commit（Root Case 作成前・明示パス指定・スイープ禁止）を規定する", () => {
+    expect(skill).toContain("前提整備の commit（Root Case 作成前）");
+    expect(skill).toContain("明示パス指定で commit し git 管理状態へ置く");
+    expect(skill).toContain("スイープ操作");
+    expect(skill).toContain("jev 観測等");
+  });
+
+  test("reference の前提整備手順（未追跡分確認・明示パス commit・空 commit 不作成）を保持する", () => {
+    expect(reference).toContain("前提整備の commit（Root Case 作成前）");
+    expect(reference).toContain("REQ-030-031");
+    expect(reference).toContain("対象パスを明示指定して commit する");
+    expect(reference).toContain("スイープ操作（`.agentdev/` 全体の一括 add 等の無差別取り込み）を行わない");
+    expect(reference).toContain("空 commit を作成しない");
+  });
+});
+
+describe("case-auto クリーンアップ検証ゲートの未追跡残存検査（REQ-034-048）", () => {
+  const skill = read("src", "common", "skills", "agentdev-workflow-case-auto", "SKILL.md");
+  const reference = read(
+    "src",
+    "common",
+    "skills",
+    "agentdev-workflow-case-auto",
+    "references",
+    "input-resolution-and-orchestration.md",
+  );
+
+  test("SKILL の未追跡残存検査（fail-closed・リポジトリ全体検証・一時ファイル混同禁止・承認自動追加禁止）を規定する", () => {
+    expect(skill).toContain("未追跡残存検査（クリーンアップ検証ゲートの検証対象）");
+    expect(skill).toContain("承認一覧対象外に残存しないこと");
+    expect(skill).toContain("fail-closed で停止して残存対象と対応を報告する");
+    expect(skill).toContain("対象リポジトリ全体の状態を検証対象として");
+    expect(skill).toContain("case-close の既存一時ファイル検査の管轄");
+    expect(skill).toContain("ゲート実行が承認を自動追加しない");
+  });
+
+  test("reference の未追跡残存検査手順（検証範囲・gitignore と承認一覧の許容管理）を保持する", () => {
+    expect(reference).toContain("あわせてゲートは未追跡残存検査を行う");
+    expect(reference).toContain("許容は gitignore（正規の非追跡領域宣言）と承認一覧で管理し");
+    expect(reference).toContain("本検査の検出対象と混同しない");
   });
 });

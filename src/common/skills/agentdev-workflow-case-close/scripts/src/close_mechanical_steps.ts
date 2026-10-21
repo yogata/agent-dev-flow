@@ -5,6 +5,7 @@
 // mergeable ポーリング、squash merge 前後のローカル状態検査、Epic 実行構成表の
 // 解析と状態更新、完了条件チェックボックス評価の機械的抽出（受入評価の母集団
 // 導出と final-acceptance.ts の evaluateFinalAcceptance への接続を兼ねる）、
+// 契約状態記録の commit 済み検証と未追跡残存検査（REQ-032-042）、
 // AUTOGEN 再生成差分検出、full integrity suite の起動と結果集約（fail 全件の
 // 由来分類と機械受理基準の記録完備の検証を含む）、worktree/branch
 // クリーンアップを1 script の呼び出しに束ねる。受入評価の拒否・未確定と機械
@@ -154,6 +155,39 @@ export interface IntegrityGateResult {
   exitCode: number;
 }
 
+/**
+ * 契約状態記録・未追跡残存検査の入力契約（REQ-032-042）。
+ * 正規契約から導出した状態記録パスの範囲導出は意味判断としてモデルが担当し、
+ * 本 script は与えられた範囲の commit 済み検証と、リポジトリ全体の未追跡残存の
+ * 承認一覧突合を決定的に実行する。承認一覧は既存の ng-baseline 系承認一覧機構
+ * （category/check/file/evidence/count/provenance/reason の恒久承認記録）と同一の
+ * 物理実体から、当該実行の対象エントリが渡される。script が承認を自動追加することはない。
+ */
+export interface ContractStateCheck {
+  /** 正規契約から導出した、当該 Case 実行に関連する git 管理契約の状態記録パス（repoRoot 相対）。 */
+  contractStatePaths: readonly string[];
+  /** 未追跡残存の承認一覧エントリ（repoRoot 相対のパスまたはディレクトリ接頭辞）。 */
+  approvalEntries: readonly string[];
+  /** 帰属が機械判定できない検出の人間確認済み記録（path と確認根拠 basis の実体）。 */
+  humanConfirmedPaths?: readonly { path: string; basis: string }[];
+}
+
+/** 契約状態記録・未追跡残存検査の判定結果（報告 JSON の diff.contractStateResidue 実体）。 */
+export interface ContractStateResidueEvaluation {
+  /** 導出済み状態記録パスすべてが commit 済み（porcelain 出力なし）であること。 */
+  committed: boolean;
+  /** 未コミットの契約状態記録（porcelain 出力のパス。検出時は完了扱いにしない）。 */
+  uncommittedStateRecords: readonly string[];
+  /** 承認一覧に基づく承認済み検出（承認記録として報告にとどめる）。 */
+  approvedAllowances: readonly { path: string; entry: string }[];
+  /** 人間確認済みの検出（確認根拠 basis 付きで記録）。 */
+  humanConfirmed: readonly { path: string; basis: string }[];
+  /** 帰属が機械判定できない検出（人間確認事項。確認なしに完了判定へ進めない）。 */
+  humanConfirmationItems: readonly string[];
+  /** リポジトリ全体の未追跡かつ gitignore 管理対象外の検出総数。 */
+  untrackedTotal: number;
+}
+
 export interface CloseMechanicalInput {
   phase: "pre-merge" | "post-merge";
   worktreeRoot: string;
@@ -175,6 +209,8 @@ export interface CloseMechanicalInput {
   acceptanceVerdicts?: readonly ConditionVerdict[];
   acceptanceCrossObligations?: readonly CrossObligation[];
   acceptanceEmptyBasis?: string;
+  /** pre-merge（完了判定工程）で必須の契約状態記録・未追跡残存検査の入力（REQ-032-042）。 */
+  contractStateCheck?: ContractStateCheck;
 }
 
 export interface StepRecord {
@@ -257,10 +293,42 @@ export function validateInput(value: unknown): CloseMechanicalInput {
     if (typeof v.issueBodyPath !== "string" || (v.issueBodyPath as string).length === 0) {
       missing.push("issue-body-extraction");
     }
+    if (v.contractStateCheck == null) {
+      missing.push("contract-state-residue-check");
+    }
     if (missing.length > 0) {
       fail(
         `required quality gates are missing from input (omission forbidden): ${missing.join(", ")}`,
       );
+    }
+  }
+  const residue = v.contractStateCheck;
+  if (residue != null) {
+    if (typeof residue !== "object" || Array.isArray(residue)) {
+      fail("input.contractStateCheck must be an object");
+    }
+    const check = residue as ContractStateCheck;
+    const isPathList = (value: unknown) =>
+      Array.isArray(value) && value.every((p) => typeof p === "string" && p.trim().length > 0);
+    if (!isPathList(check.contractStatePaths)) {
+      fail("input.contractStateCheck.contractStatePaths must be an array of non-empty strings");
+    }
+    if (!isPathList(check.approvalEntries)) {
+      fail("input.contractStateCheck.approvalEntries must be an array of non-empty strings");
+    }
+    if (check.humanConfirmedPaths !== undefined) {
+      const isConfirmedEntry = (entry: unknown) =>
+        typeof entry === "object" &&
+        entry !== null &&
+        typeof (entry as { path?: unknown }).path === "string" &&
+        ((entry as { path: string }).path).trim().length > 0 &&
+        typeof (entry as { basis?: unknown }).basis === "string" &&
+        ((entry as { basis: string }).basis).trim().length > 0;
+      if (!Array.isArray(check.humanConfirmedPaths) || !check.humanConfirmedPaths.every(isConfirmedEntry)) {
+        fail(
+          "input.contractStateCheck.humanConfirmedPaths must be an array of { path, basis } entries",
+        );
+      }
     }
   }
   return input;
@@ -307,6 +375,75 @@ export function deriveAcceptancePopulation(
     contractConditionCount: extraction.total,
     contractRequiredCount: extraction.total,
     emptyBasis: extraction.total === 0 ? emptyBasis : undefined,
+  };
+}
+
+/** repoRoot 相対パスの正規化（区切り統一・先頭 ./ と末尾 / の除去）。 */
+function normalizeRelPath(value: string): string {
+  return value
+    .trim()
+    .replace(/\\/g, "/")
+    .replace(/^\.\//, "")
+    .replace(/\/+$/, "");
+}
+
+function isUnderPath(candidate: string, base: string): boolean {
+  return candidate === base || candidate.startsWith(`${base}/`);
+}
+
+/**
+ * 契約状態記録・未追跡残存検査の決定的判定（REQ-032-042）。
+ * stateRecordStatus は `git status --porcelain -- <状態記録パス群>`（repoRoot 実行）の
+ * stdout、untrackedListing は `git ls-files --others --exclude-standard`（repoRoot 実行）の
+ * stdout である。検出は (1) 状態記録パス配下＝当該 Case 由来の未コミット記録、
+ * (2) 承認一覧一致＝承認済み、(3) 人間確認済み記録一致、(4) それ以外＝帰属が機械判定
+ * できない検出（人間確認事項）に分類する。検査の承認を自動追加しない。
+ */
+export function evaluateContractStateResidue(
+  check: ContractStateCheck,
+  stateRecordStatus: string,
+  untrackedListing: string,
+): ContractStateResidueEvaluation {
+  const statePaths = check.contractStatePaths.map(normalizeRelPath).filter((p) => p.length > 0);
+  const approvalEntries = check.approvalEntries.map(normalizeRelPath).filter((p) => p.length > 0);
+  const confirmedBasis = new Map<string, string>();
+  for (const entry of check.humanConfirmedPaths ?? []) {
+    confirmedBasis.set(normalizeRelPath(entry.path), entry.basis);
+  }
+  const uncommittedStateRecords: string[] = [];
+  for (const line of stateRecordStatus.split("\n")) {
+    if (line.trim().length === 0) continue;
+    const recordPath = normalizeRelPath(line.trim().slice(3));
+    if (recordPath.length > 0) uncommittedStateRecords.push(recordPath);
+  }
+  const approvedAllowances: { path: string; entry: string }[] = [];
+  const humanConfirmed: { path: string; basis: string }[] = [];
+  const humanConfirmationItems: string[] = [];
+  let untrackedTotal = 0;
+  for (const line of untrackedListing.split("\n")) {
+    const detection = normalizeRelPath(line);
+    if (detection.length === 0) continue;
+    untrackedTotal += 1;
+    if (statePaths.some((p) => isUnderPath(detection, p))) continue;
+    const approval = approvalEntries.find((entry) => isUnderPath(detection, entry));
+    if (approval !== undefined) {
+      approvedAllowances.push({ path: detection, entry: approval });
+      continue;
+    }
+    const basis = confirmedBasis.get(detection);
+    if (basis !== undefined) {
+      humanConfirmed.push({ path: detection, basis });
+      continue;
+    }
+    humanConfirmationItems.push(detection);
+  }
+  return {
+    committed: uncommittedStateRecords.length === 0,
+    uncommittedStateRecords,
+    approvedAllowances,
+    humanConfirmed,
+    humanConfirmationItems,
+    untrackedTotal,
   };
 }
 
@@ -799,6 +936,59 @@ export function runCloseMechanicalSteps(
       acceptancePopulation,
       steps,
     );
+
+    // 契約状態記録・未追跡残存検査（REQ-032-042、完了判定工程）。検証範囲は
+    // 正規契約から導出した全状態記録パスとリポジトリ全体の未追跡対象であり、
+    // 変更ファイルのみの確認では代替しない。未コミット・帰属不能残存の検出時は
+    // 完了扱いとせず、帰属不能検出は完了判定の前に人間確認事項として報告する
+    // （確認なしに完了判定へ進めない。fail-closed）。
+    const residueInput = input.contractStateCheck
+      ?? fail("input.contractStateCheck is required for pre-merge completion determination");
+    const stateRecordStatus = residueInput.contractStatePaths.length > 0
+      ? runner.run({
+        command: "git",
+        args: ["status", "--porcelain", "--", ...residueInput.contractStatePaths],
+        cwd: input.repoRoot,
+      })
+      : { exitCode: 0, stdout: "", stderr: "" };
+    const untrackedListing = runner.run({
+      command: "git",
+      args: ["ls-files", "--others", "--exclude-standard"],
+      cwd: input.repoRoot,
+    });
+    const gitCheckOk = stateRecordStatus.exitCode === 0 && untrackedListing.exitCode === 0;
+    const residue = evaluateContractStateResidue(
+      residueInput,
+      stateRecordStatus.stdout,
+      untrackedListing.stdout,
+    );
+    const residueFailed = !gitCheckOk || !residue.committed || residue.humanConfirmationItems.length > 0;
+    steps.push({
+      name: "contract-state-residue-check",
+      status: residueFailed ? "fail" : "pass",
+      detail: {
+        repoRoot: input.repoRoot,
+        gitCheckOk,
+        evaluatedStateRecordPathCount: residueInput.contractStatePaths.length,
+        committed: residue.committed,
+        uncommittedStateRecords: residue.uncommittedStateRecords,
+        untrackedTotal: residue.untrackedTotal,
+        approvedAllowances: residue.approvedAllowances,
+        humanConfirmed: residue.humanConfirmed,
+        humanConfirmationItems: residue.humanConfirmationItems,
+      },
+    });
+    diff.contractStateResidue = { ...residue };
+    if (!residue.committed) {
+      warnings.push(
+        `contract state records have uncommitted changes before completion judgment: ${residue.uncommittedStateRecords.join(", ")}`,
+      );
+    }
+    if (residue.humanConfirmationItems.length > 0) {
+      warnings.push(
+        `untracked residue with undeterminable attribution requires human confirmation before completion judgment: ${residue.humanConfirmationItems.join(", ")}`,
+      );
+    }
 
     if (input.generateIndexesGate) {
       const gen = runSpec(runner, input.generateIndexesGate);
