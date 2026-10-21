@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261021T004622Z-566d",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-or-epic-attribution",
+  "subject": "Case #3829 実行構造確定（operation_units OU-001・OU-002 の依存グラフと3軸判断）",
+  "sourceRevision": "7df1ffba6",
+  "durationMs": 1165,
+  "inputTokens": 1353,
+  "inputs": {
+    "requestDigest": "675677f14bf2735cfab70591ab377912198dc54d0999ca9992c139b75414e3ce"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-attribution",
+      "questionForm": "choice",
+      "value": "Standard",
+      "probabilityDistribution": {
+        "Standard": 1,
+        "Epic": 0
+      }
+    },
+    {
+      "questionId": "q2-dependency-strength",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "関連": 0.34,
+        "弱": 0.66,
+        "必須": 0
+      }
+    },
+    {
+      "questionId": "q3-functional-coherence",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "分散": 0.42,
+        "部分的": 0.58,
+        "一貫": 0
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-attribution",
+        "value": "Standard"
+      },
+      {
+        "questionId": "q2-dependency-strength",
+        "value": 1
+      },
+      {
+        "questionId": "q3-functional-coherence",
+        "value": 1
+      }
+    ]
+  }
+}
