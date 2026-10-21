@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261021T063839Z-2a01",
+  "workflow": "req-define",
+  "evaluationKind": "requirement-development-classification",
+  "subject": "第二次訂正版 RU-0244（docs日本語文章品質是正・歴史確定誤記追加検出後）の要件展開における最終分類・Design分離判断",
+  "sourceRevision": "1d33fbc87188e0931eca21180211b944e0ec28ff",
+  "durationMs": 873,
+  "inputTokens": 2267,
+  "inputs": {
+    "requestDigest": "1d7e3e6cf49f85cd0bb083631067ab3003029ad37246aff271d5687da89fca97",
+    "references": [
+      {
+        "digest": "5ebc45112594dbe38651314dabad6dba090846d3cd2ff27801a2616879f0cfe1",
+        "label": "RU-0244-revised2",
+        "path": ".agentdev/backlog/req-units/RU-0244.md"
+      },
+      {
+        "digest": "de65b8f35ecccbb39880dae40d1bb4d778b5b13774eccbc7a280b09862bbb473",
+        "label": "worklist-csv-revised2",
+        "path": ".agentdev/tmp/docs-japanese-quality-worklist-2026-10-21.csv"
+      },
+      {
+        "digest": "f5fbdfae0997d775d123e1df2e0799d0f763d3818ab4fac1aa33a3eff1a256da",
+        "label": "REQ-094",
+        "path": "docs/requirements/REQ-094.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-classification",
+      "questionForm": "choice",
+      "value": "反映作業（REQ行・Design行いずれにも非帰属。既存要件の適用実行として扱う）",
+      "probabilityDistribution": {
+        "REQ行帰属（新規または変更される要件行として保存される）": 0,
+        "Design行帰属（Design として保存すべき内部構造・規則・判定表である）": 0,
+        "反映作業（REQ行・Design行いずれにも非帰属。既存要件の適用実行として扱う）": 1
+      }
+    },
+    {
+      "questionId": "q2-design-separation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.12,
+        "false": 0.88
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-classification",
+        "value": "反映作業（REQ行・Design行いずれにも非帰属。既存要件の適用実行として扱う）"
+      },
+      {
+        "questionId": "q2-design-separation",
+        "value": false
+      }
+    ]
+  }
+}

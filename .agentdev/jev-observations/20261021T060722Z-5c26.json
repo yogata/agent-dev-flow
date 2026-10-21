@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261021T060722Z-5c26",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "修正版 RU-0244（docs日本語文章品質是正の実行・仕分け計数訂正後）の既存REQ照合判断",
+  "sourceRevision": "1d33fbc87188e0931eca21180211b944e0ec28ff",
+  "durationMs": 23277,
+  "inputTokens": 1622,
+  "inputs": {
+    "requestDigest": "b788e70c8b77cbd0765343effa4bf32e547894a2fb6a3cb49f8e37421703b0ed",
+    "references": [
+      {
+        "digest": "2281eb581fdaf45ff0f32dcbc8d44af9950693cb56f64ed711d93e28a697495c",
+        "label": "RU-0244-revised",
+        "path": ".agentdev/backlog/req-units/RU-0244.md"
+      },
+      {
+        "digest": "f5fbdfae0997d775d123e1df2e0799d0f763d3818ab4fac1aa33a3eff1a256da",
+        "label": "REQ-094",
+        "path": "docs/requirements/REQ-094.md"
+      },
+      {
+        "digest": "41c7e2afd5e0600f1c88a45e8487b332c93278f03d1dd922590e149057de73b9",
+        "label": "worklist-csv-revised",
+        "path": ".agentdev/tmp/docs-japanese-quality-worklist-2026-10-21.csv"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-req-operation",
+      "questionForm": "choice",
+      "value": "REQ操作なし（REQファイル変更なし・既存要件の適用実行）",
+      "probabilityDistribution": {
+        "CREATE（新規REQファイル作成）": 0,
+        "APPEND（既存REQへの要件行追加）": 0,
+        "UPDATE（既存REQ行の意味変更）": 0,
+        "REQ操作なし（REQファイル変更なし・既存要件の適用実行）": 1
+      }
+    },
+    {
+      "questionId": "q2-match-confidence",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.21,
+        "false": 0.79
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-req-operation",
+        "value": "REQ操作なし（REQファイル変更なし・既存要件の適用実行）"
+      },
+      {
+        "questionId": "q2-match-confidence",
+        "value": false
+      }
+    ]
+  }
+}

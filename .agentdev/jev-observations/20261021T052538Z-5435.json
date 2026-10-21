@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261021T052538Z-5435",
+  "workflow": "req-define",
+  "evaluationKind": "requirement-development-classification",
+  "subject": "RU-0244（docs日本語文章品質是正の実行）の要件展開における最終分類・Design分離判断",
+  "sourceRevision": "1d33fbc87188e0931eca21180211b944e0ec28ff",
+  "durationMs": 689,
+  "inputTokens": 2024,
+  "inputs": {
+    "requestDigest": "ee5bf587c475c2e40cfc6f55b17351603e640edaf2f3b841788692887e70db5c",
+    "references": [
+      {
+        "digest": "e0c93e78eed5c44cf27934fd49ab7940d6b4917fa3d0ed75f5df43ffb7e04015",
+        "label": "RU-0244",
+        "path": ".agentdev/backlog/req-units/RU-0244.md"
+      },
+      {
+        "digest": "525d013e737b978ff71d9696eebb1871383607018e70df98921e7db6367b7f69",
+        "label": "fix-plan",
+        "path": ".agentdev/tmp/docs-japanese-quality-fix-plan-2026-10-21.md"
+      },
+      {
+        "digest": "f5fbdfae0997d775d123e1df2e0799d0f763d3818ab4fac1aa33a3eff1a256da",
+        "label": "REQ-094",
+        "path": "docs/requirements/REQ-094.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-classification",
+      "questionForm": "choice",
+      "value": "反映作業（REQ行・Design行いずれにも非帰属。既存要件の適用実行として扱う）",
+      "probabilityDistribution": {
+        "REQ行帰属（新規または変更される要件行として保存される）": 0,
+        "Design行帰属（Design として保存すべき内部構造・規則・判定表である）": 0,
+        "反映作業（REQ行・Design行いずれにも非帰属。既存要件の適用実行として扱う）": 1
+      }
+    },
+    {
+      "questionId": "q2-design-separation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.14,
+        "false": 0.86
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-classification",
+        "value": "反映作業（REQ行・Design行いずれにも非帰属。既存要件の適用実行として扱う）"
+      },
+      {
+        "questionId": "q2-design-separation",
+        "value": false
+      }
+    ]
+  }
+}

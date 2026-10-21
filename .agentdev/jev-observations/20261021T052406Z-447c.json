@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261021T052406Z-447c",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0244（docs日本語文章品質是正の実行）の既存REQ照合判断",
+  "sourceRevision": "1d33fbc87188e0931eca21180211b944e0ec28ff",
+  "durationMs": 1052,
+  "inputTokens": 1459,
+  "inputs": {
+    "requestDigest": "24aeb2042984508e192949374b31adc25f6a4983ab81d23670b3850100ad7cc6",
+    "references": [
+      {
+        "label": "RU-0244",
+        "path": ".agentdev/backlog/req-units/RU-0244.md",
+        "digest": "e0c93e78eed5c44cf27934fd49ab7940d6b4917fa3d0ed75f5df43ffb7e04015"
+      },
+      {
+        "label": "REQ-094",
+        "path": "docs/requirements/REQ-094.md",
+        "digest": "f5fbdfae0997d775d123e1df2e0799d0f763d3818ab4fac1aa33a3eff1a256da"
+      },
+      {
+        "label": "REQ-001",
+        "path": "docs/requirements/REQ-001.md",
+        "digest": "bb6b1dc16c9b2a99c29826262d04058976cb0cde0f5b8238c8e24cece85c8d11"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-req-operation",
+      "questionForm": "choice",
+      "value": "REQ操作なし（REQファイル変更なし・既存要件の適用実行）",
+      "probabilityDistribution": {
+        "CREATE（新規REQファイル作成）": 0,
+        "APPEND（既存REQへの要件行追加）": 0,
+        "UPDATE（既存REQ行の意味変更）": 0,
+        "REQ操作なし（REQファイル変更なし・既存要件の適用実行）": 1
+      }
+    },
+    {
+      "questionId": "q2-match-confidence",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.23,
+        "false": 0.77
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-req-operation",
+        "value": "REQ操作なし（REQファイル変更なし・既存要件の適用実行）"
+      },
+      {
+        "questionId": "q2-match-confidence",
+        "value": false
+      }
+    ]
+  }
+}
