@@ -5,6 +5,7 @@ implementation:
     - REQ-032-007
     - REQ-032-027
     - REQ-032-029
+    - REQ-032-042
     - REQ-101-006
     - REQ-101-007
     - REQ-101-014
@@ -30,6 +31,7 @@ implementation:
     - REQ-032-036
     - REQ-032-037
     - REQ-032-038
+    - REQ-032-042
     - REQ-096-001
     - REQ-096-002
     - REQ-096-017
@@ -54,9 +56,11 @@ implementation:
     - REQ-032-031
     - REQ-032-038
     - REQ-032-039
+    - REQ-032-042
   src/common/skills/agentdev-workflow-case-close/SKILL.md:
     - REQ-108-009
     - REQ-108-010
+    - REQ-032-042
 verification:
   src/common/skills/agentdev-workflow-case-close/scripts/tests/close_mechanical_steps.test.ts:
     - REQ-032-019
@@ -64,6 +68,7 @@ verification:
     - REQ-032-031
     - REQ-032-038
     - REQ-032-039
+    - REQ-032-042
   src/common/skills/agentdev-workflow-case-close/scripts/tests/final-acceptance.test.ts:
     - REQ-032-031
     - REQ-032-032

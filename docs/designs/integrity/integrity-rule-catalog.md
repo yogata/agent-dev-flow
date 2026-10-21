@@ -2,7 +2,7 @@
 title: 整合性ルールカタログ
 status: accepted
 created: 2026-08-20
-updated: 2026-10-05
+updated: 2026-10-22
 ---
 <!-- ADF-COVERS(implementation): REQ-010-009 -->
 <!-- ADF-COVERS(design): REQ-051-009 -->
@@ -171,6 +171,7 @@ IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生�
 - [IR-070: design-frontmatter-required-keys](rules/IR-070-design-frontmatter-required-keys.md)
 - [IR-071: integrity-rule-related-req-existence](rules/IR-071-integrity-rule-related-req-existence.md)
 - [IR-072: req-updated-freshness](rules/IR-072-req-updated-freshness.md)
+- [IR-073: untracked-residue](rules/IR-073-untracked-residue.md)
 <!-- AUTOGEN:END -->
 
 ### 新規 IR 候補（candidate state、新規 IR 登録 gate 前）

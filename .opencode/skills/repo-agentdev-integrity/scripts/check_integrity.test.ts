@@ -1,7 +1,7 @@
-// ADF-COVERS(verification): REQ-010-002, REQ-010-003, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-066, REQ-010-068, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008, REQ-099-001
+// ADF-COVERS(verification): REQ-010-002, REQ-010-003, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-066, REQ-010-068, REQ-010-084, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008, REQ-099-001
 // ADF-COVERS(verification): REQ-010-070
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
-import { mkdirSync, writeFileSync, copyFileSync, rmSync, existsSync, readFileSync, readdirSync, cpSync, symlinkSync } from "fs";
+import { mkdirSync, writeFileSync, copyFileSync, renameSync, rmSync, existsSync, readFileSync, readdirSync, cpSync, symlinkSync } from "fs";
 import { basename, dirname, join } from "path";
 import { checkRepoLocalPluginProjectionSymmetry, extractKnownGapNumbers, loadKnownGapReqIds } from "./check_integrity.ts";
 import { generateDocsReadmeDecisionTable } from "./generate_indexes.ts";
@@ -6673,5 +6673,155 @@ describe("check_integrity 共有結果の起動回数記録（同一入力条件
     }
     const duplicated = [...counts.entries()].filter(([, n]) => n > 1);
     expect(duplicated).toEqual([]);
+  });
+});
+
+// ─── IR-073 untracked-residue (REQ-010-084) ────────────────────────────────
+// Fixture kinds: 陽性例（未追跡かつ gitignore 管理対象外の repo root 直下と
+// .agentdev 配下非契約パス）、許容例（gitignore 管理対象の .agentdev/tmp/ は
+// 検出しない）、承認例（ng-baseline.json 承認一覧登録分は承認記録として報告し
+// NG にしない）、案内例（検出報告に gitignore 追加提案と承認登録手順の案内を含む）。
+
+const IR073_ROOT = join(TEMP_ROOT, "ir073");
+
+function ir073Git(root: string, args: string[]): void {
+  const proc = Bun.spawnSync(["git", ...args], {
+    cwd: root,
+    env: process.env,
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  if (proc.exitCode !== 0) {
+    throw new Error(
+      `git ${args.join(" ")} failed: ${proc.stderr?.toString("utf-8") ?? ""}`,
+    );
+  }
+}
+
+function buildIr073Fixture(root: string): void {
+  mkdirp(join(root, "docs", "requirements"));
+  writeFileSync(join(root, "docs", "requirements", "README.md"), "# Requirements\n", "utf-8");
+  mkdirp(join(root, "docs", "adr"));
+  writeFileSync(join(root, "docs", "adr", "README.md"), "# ADR\n", "utf-8");
+  mkdirp(join(root, "docs", "designs"));
+  writeFileSync(join(root, "docs", "designs", "README.md"), "# Design\n", "utf-8");
+  writeFileSync(join(root, ".gitignore"), ".agentdev/tmp/\n.agentdev/integrity/reports/\n", "utf-8");
+  // checker 実体を copy の上で base commit に含め、検出対象を汚染させない。
+  copyScriptsComplete(root);
+  ir073Git(root, ["init"]);
+  ir073Git(root, ["config", "user.name", "ir073-fixture"]);
+  ir073Git(root, ["config", "user.email", "ir073-fixture@example.invalid"]);
+  ir073Git(root, ["add", "-A"]);
+  ir073Git(root, ["commit", "-m", "ir073 fixture base"]);
+
+  // 許容例: gitignore 管理対象の未追跡ファイル（検出しない）。
+  mkdirp(join(root, ".agentdev", "tmp"));
+  writeFileSync(join(root, ".agentdev", "tmp", "scratch.txt"), "ignored scratch\n", "utf-8");
+
+  // 陽性例: 未追跡かつ gitignore 管理対象外（repo root 直下と .agentdev 配下非契約パス）。
+  writeFileSync(join(root, "stray-root.txt"), "residue at repo root\n", "utf-8");
+  mkdirp(join(root, ".agentdev", "notes"));
+  writeFileSync(join(root, ".agentdev", "notes", "memo.txt"), "residue under non-contract path\n", "utf-8");
+}
+
+function ir073Run(): { exitCode: number; stdout: string } {
+  return runScript(IR073_ROOT, ["--json"]);
+}
+
+interface Ir073ResidueRow {
+  level: string;
+  message: string;
+  file?: string;
+}
+
+function ir073ResidueRows(stdout: string): Ir073ResidueRow[] {
+  const parsed = JSON.parse(stdout) as { results: Ir073ResidueRow[] };
+  return parsed.results.filter((res) => res.message?.includes("IR-073"));
+}
+
+describe("IR-073 untracked-residue (REQ-010-084)", () => {
+  beforeAll(() => {
+    rmSync(IR073_ROOT, { recursive: true, force: true });
+    buildIr073Fixture(IR073_ROOT);
+  });
+
+  afterAll(() => {
+    rmSync(IR073_ROOT, { recursive: true, force: true });
+  });
+
+  it("陽性検出: repo root 直下と .agentdev 配下非契約パスの未追跡残存を NG として検出する", () => {
+    const r = ir073Run();
+    expect(r.exitCode).not.toBe(0);
+    const rows = ir073ResidueRows(r.stdout);
+    const stray = rows.find((row) => row.file === "stray-root.txt");
+    expect(stray).toBeDefined();
+    expect(stray?.level).toBe("ng");
+    expect(stray?.message).toContain("untracked file/directory not managed by gitignore remains: stray-root.txt");
+    const memo = rows.find((row) => row.file?.includes("memo.txt"));
+    expect(memo).toBeDefined();
+    expect(memo?.level).toBe("ng");
+    expect(memo?.file).toContain(".agentdev/notes/memo.txt");
+  });
+
+  it("許容例: gitignore 管理対象の .agentdev/tmp/ は検出しない", () => {
+    const r = ir073Run();
+    const rows = ir073ResidueRows(r.stdout);
+    expect(rows.some((row) => row.file?.includes("scratch.txt"))).toBe(false);
+    expect(rows.some((row) => row.file?.includes(".agentdev/tmp/"))).toBe(false);
+  });
+
+  it("案内例: 検出報告に gitignore 追加提案と承認一覧登録手順の案内を含む", () => {
+    const r = ir073Run();
+    const stray = ir073ResidueRows(r.stdout).find((row) => row.file === "stray-root.txt");
+    expect(stray?.message).toContain(".gitignore");
+    expect(stray?.message).toContain("ng-baseline.json");
+    expect(stray?.message).toContain("provenance");
+  });
+
+  it("承認例: 承認一覧（ng-baseline.json）登録分は承認記録として報告し NG にしない", () => {
+    writeNgBaselineFile(IR073_ROOT, [
+      {
+        category: "UntrackedResidue",
+        check: "untracked-residue",
+        file: ".agentdev/notes/memo.txt",
+        evidence: null,
+        count: 1,
+        provenance: "approved-ir073-fixture",
+        reason: "approved allowance (IR-073 fixture)",
+      },
+    ]);
+    try {
+      const r = ir073Run();
+      expect(r.exitCode).not.toBe(0);
+      const rows = ir073ResidueRows(r.stdout);
+      // 承認済み検出は承認記録（baseline-known provenance 付き info）として報告にとどまる。
+      const memo = rows.find((row) => row.file?.includes("memo.txt"));
+      expect(memo).toBeDefined();
+      expect(memo?.level).toBe("info");
+      expect(memo?.message).toContain("[baseline-known provenance=approved-ir073-fixture]");
+      // 未承認の残存は NG のまま終了コードを駆動する。
+      const stray = rows.find((row) => row.file === "stray-root.txt");
+      expect(stray).toBeDefined();
+      expect(stray?.level).toBe("ng");
+    } finally {
+      rmSync(join(IR073_ROOT, ".opencode", "skills", "repo-agentdev-integrity", "baselines"), {
+        recursive: true,
+        force: true,
+      });
+    }
+  });
+
+  it("クリーン状態: 未追跡残存が 0 件の場合は ok を報告する", () => {
+    try {
+      renameSync(join(IR073_ROOT, "stray-root.txt"), join(IR073_ROOT, ".agentdev", "tmp", "moved.txt"));
+      renameSync(join(IR073_ROOT, ".agentdev", "notes"), join(IR073_ROOT, ".agentdev", "tmp", "notes"));
+      const r = ir073Run();
+      const rows = ir073ResidueRows(r.stdout);
+      expect(rows.some((row) => row.level === "ng")).toBe(false);
+      expect(rows.some((row) => row.level === "ok")).toBe(true);
+    } finally {
+      renameSync(join(IR073_ROOT, ".agentdev", "tmp", "notes"), join(IR073_ROOT, ".agentdev", "notes"));
+      renameSync(join(IR073_ROOT, ".agentdev", "tmp", "moved.txt"), join(IR073_ROOT, "stray-root.txt"));
+    }
   });
 });

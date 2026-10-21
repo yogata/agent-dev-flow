@@ -28,6 +28,14 @@
 
 Root Case 本文候補の生成を含む最初の docs 編集・GitHub 書込みに先立って、project extension（`.agentdev/extensions/skills/agentdev-workflow-case-open.yaml`）の rules を読み込む（不在・破損時は `agentdev-project-extensions` の契約に従い標準動作を継続する）。rules の読込を最初の書込みの後段に配置し、投稿後の遡及適用になる配置順序違反を発生させない。extension rules の適用（yomiyasu rule に基づく推敲・lint 等）は各 rule の when 条件に従い、本 STEP 以降の最初の該当書込みの前に適用済みとする。
 
+#### 前提整備の commit（Root Case 作成前）
+
+Root Case の作成に先立って、入力 RU・要件doc draft・および当該要件定義に伴い生成された git 管理契約の状態記録（jev 観測等、正規契約で git 管理対象と宣言される記録）に未追跡分がある場合は、これらを commit して git 管理状態へ置く（対応関係は repository top-level `traceability/` 配下 sidecar を参照）。
+
+1. 未追跡分の確認: 対象とする入力 RU・要件doc draft・状態記録パスについて未追跡の有無を確認する。確認範囲は当該要件定義に伴い生成された前提整備対象全体であり（全称条件は正規契約から導出した評価範囲で確認する）、実装担当が選択した一部のみの確認では代替しない
+2. 明示パス指定の commit: 未追跡分がある場合は、対象パスを明示指定して commit する。前提整備の commit は明示パス指定とし、スイープ操作（`.agentdev/` 全体の一括 add 等の無差別取り込み）を行わない。commit 手順は `agentdev-git-worktree` の並列実行安全ステージングプロシージャ（明示パスでステージ）に従う
+3. 未追跡分がない場合は確認結果を記録するのみとし、空 commit を作成しない
+
 #### preflight 設定検証（Root Case 確立の preflight）
 
 GitHub Issue/PR を使用するリポジトリ種別のみ実施する。GitHub Issue/PR を使用しないローカル版では本検証をスキップする。
@@ -97,6 +105,7 @@ Root Case 本文候補の生成は preflight 設定検証の警告報告後に�
 ## Completion Verification
 
 - GitHub Issue/PR を使用するリポジトリ種別では、preflight 設定検証が実施済みであり（設定無効・設定照会不能時は区別した警告が報告済みであり、設定理由だけでは後続処理を停止していないこと。実操作の安全性確認不能時は既存の安全契約に従って停止済みであること）、ローカル版ではスキップされていること
+- Root Case 作成前に前提整備の commit（入力 RU・要件doc draft・当該要件定義に伴い生成された git 管理契約の状態記録の未追跡分の明示パス指定 commit。未追跡分がない場合は確認結果の記録）が実施されており、スイープ操作を行っていないこと
 - 最初の docs 編集・GitHub 書込み（Root Case 本文候補の生成を含む）の前に extension rules の前置読込が実施されていること
 - Definition Package の docs 適用前に artifact_actions 適用前検証（採番衝突検査・target 系パス実在検証・可変メタデータ再実測・content 完全性検証・対応宣言集合一致検証）が実施され、差異検出時は適用中止と要件doc・RU への差し戻しが行われていること
 - REQ 行変更・対応宣言の追加・更新・移行を伴う場合は、STEP-3 の対応宣言集合一致前置確認（手順 4.6）が実施され、inline/sidecar 片側逸脱検出時の適用中断と報告が行われていること
@@ -118,6 +127,7 @@ Root Case 本文候補の生成は preflight 設定検証の警告報告後に�
 ## resume point
 
 - preflight 設定検証の実施状態（GitHub Issue/PR 使用リポジトリ種別。警告報告済みの再確認時は再照会する）
+- 前提整備の commit 実施状態（未追跡分の確認結果と commit 済みパス。再実行時は commit 済み分を再 commit しない）
 - Root Case Issue 番号と作成状態、Definition Package の生成・関連付け状態
 
 ## 関連 STEP
