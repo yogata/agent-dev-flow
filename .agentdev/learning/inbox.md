@@ -236,3 +236,57 @@
 - **想定反映先**: learning-promote による評価・昇華
 - **関連**: Issue #3835、merge commit 2f7e1a14cb56b7a910c721ea101088109a468169
 - **タグ**: #case-close #merge検査 #git-show #重複行実検査
+
+---
+
+## GitHub squash merge の author date 置換により IR-072（frontmatter updated）が case-run 時の整合から drift する
+
+- **問題事象**: case-run 時に frontmatter updated を最終内容変更 commit 日へ同期済みでも、squash merge が commit の author date を merge 実行日時へ置換するため、main HEAD 上では全変更ファイルの「最終内容変更 commit 日」が merge 日になる。case-run と merge が日付を跨ぐ場合（深夜 0 時超えを含む）、updated が旧日のままのファイルで IR-072（req-updated-freshness）が new unmanaged NG として顕在化する。Case #3839 では merge 直前 HEAD 実測で 1 件、merge 後 main HEAD でさらに 4 件が新規検出された（case-run 時は commit の author date が深夜 0 時超えで 2026-10-22 にずれ、実行担当の updated 同期の前提が変わった二重機構）
+- **発生局面**: case-close STEP-4 PR マージ直後の check_integrity 実測（Root Case #3839）
+- **検知方法**: merge 直前 HEAD の check_integrity で IR-072 new unmanaged NG 1 件、merge 後 main HEAD での再実行でさらに 4 件（変更が最初の commit〔2026-10-21〕のみで入ったファイル群）
+- **根本原因**: IR-072 の基準値（last content-change commit の author date）が squash merge の author date 置換（AUTOGEN 鮮度 gate の「計測日 drift 発生機構」3 種と同系の機構）で変化する。case-run 側の updated 同期は merge 前の commit 日付を前提とするため、merge 日との差分で構造的に drift が残る
+- **自律対応内容**: STEP-3-1 対象範囲内の metadata 修正として 6 ファイルの updated を merge 日へ進行（commit d2c5c6d7、conventional commits + (Refs #3839) 形式で main 直接 push）、check_integrity 再実行で NG 0 を確認
+- **ユーザー確認の有無**: なし（frontmatter metadata 1 行 × 6 ファイルの決定的修正、内容不変）
+- **REQ/Decision/Design影響**: なし（patterns.md の updated 進行規約の機械的適用）
+- **横展開観点**: docs 内容変更を含む PR の squash merge では IR-072 drift が構造的に発生し得る。merge 後 main HEAD での check_integrity 確認（IR-072 群）を case-close の前置に含める運用が drift の取りこぼしを防ぐ
+- **再発条件**: case-run の最終 commit 日と case-close の merge 実行日が異なる docs 変更 PR の squash merge
+- **予防策候補**: case-close STEP-4/STEP-5 で merge 後 main HEAD の check_integrity（IR-072 系）を確認し、drift 検出時は metadata 修正 1 commit で整合させる手順の明文化（learning-promote で評価）
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: Issue #3839・PR #3840・merge commit a0eaefba2・修正 commit d2c5c6d74・対応記録コメント検証差分（case-close check_integrity 行）
+- **タグ**: #case-close #squash-merge #IR-072 #frontmatter-updated
+
+---
+
+## 作業一覧型 docs 是正では「該当箇所」列の意味（原文引用か要点ラベルか）を明示しないと行単位の機械突合が不正確になる
+
+- **問題事象**: 作業一覧 CSV（959 行）の「該当箇所」列は原文の逐語引用ではなく指摘型の要点ラベルであり、行番号起点の行本文が作業対象となる。列の意味を明示せずに機械突合すると、該当箇所列と実文の不一致が大量の誤差異として検出される
+- **発生局面**: case-run 着手前差分確認（Root Case #3839、worklist 959 行の全行機械照合）
+- **検知方法**: worklist 全行のファイル存在と行番号内容の機械照合（該当箇所列と行本文の乖離を確認）
+- **根本原因**: 作業一覧生成側（検査系）と作業一覧消費側（是正系）で「該当箇所」列の意味契約が未定義
+- **自律対応内容**: 該当箇所列を指摘型の要点ラベルとして扱い、行番号起点の行本文を作業対象として処理。着手前差分確認の記録に本方針を明記
+- **ユーザー確認の有無**: なし（読取方針の確定のみ）
+- **REQ/Decision/Design影響**: なし
+- **横展開観点**: 検査系が生成する行一覧 CSV を入力とする全ての横断是正 Case で同一の突合精度問題が成立し得る
+- **再発条件**: 「該当箇所=原文引用」か「要点ラベル」かが明示されない作業一覧を機械突合した場合
+- **予防策候補**: 次回の同種作業一覧では列意味の明示フィールドを設ける（検査系の出力 schema 拡張候補。learning-promote で評価）
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: PR #3840 完了報告コメント（Capture候補 learning 記載分）・Issue #3839
+- **タグ**: #docs是正 #作業一覧 #機械突合 #schema
+
+---
+
+## frontmatter updated（IR-072）の進行は docs 内容変更 PR での必発の整備事項であり PR 手順への記載候補がある
+
+- **問題事象**: docs 内容変更 PR では内容変更ファイルの frontmatter updated を最終内容変更 commit 日へ進行する整備（IR-072）が必発だが、case-run 手順・PR テンプレートに整備漏れ防止の明示がなく、case-run 実行中に check_integrity 検出 → 修正 → 再実行の反復が発生した（Case #3839 では 43 ファイル）
+- **発生局面**: case-run 実装・検証（Root Case #3839、check_integrity の IR-072 検出過程）
+- **検知方法**: check_integrity の req-updated-freshness 検出（43 件）→ updated 進行 → 再実行で残 4 件（author date 整合分）を解消
+- **根本原因**: 内容変更と updated 進行の手順結合が実行側の注意事項として暗黙化されている
+- **自律対応内容**: 検出 → 修正 → 再実行で解消（metadata のみの変更として処理）
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（patterns.md・IR-072 の既存規約どおりの運用）
+- **横展開観点**: docs 内容変更を含む全 PR で成立する定型整備
+- **再発条件**: docs 内容変更 PR で updated 進行を忘れた場合
+- **予防策候補**: 内容変更と同時に updated を進める手順の PR テンプレート（case-run / docs 変更系）への記載を検討する価値（PR #3840 完了報告コメントの Capture候補 learning 記載分。learning-promote で評価）
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: PR #3840 完了報告コメント（Capture候補 learning 記載分）・Issue #3839・IR-072
+- **タグ**: #docs是正 #IR-072 #PR手順 #テンプレート
