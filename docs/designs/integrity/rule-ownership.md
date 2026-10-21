@@ -2,7 +2,7 @@
 title: ルール所有権マトリックス
 status: accepted
 created: 2026-08-20
-updated: "2026-10-05"
+updated: "2026-10-22"
 ---
 
 # ルール所有権マトリックス
