@@ -110,3 +110,21 @@
 - **想定反映先**: learning-promote による評価・昇華
 - **関連**: PR #3825 本文「Findings / Capture候補」2 件目、src/common/skills/agentdev-workflow-backlog-auto/tests/end-to-end-contract.test.ts
 - **タグ**: #lsp #deno-lsp #bun #verification
+
+---
+
+## generate_indexes 派生物自身の frontmatter updated 追随が case-open 計測日収束手順の明示対象外で補正 commit が増加した
+
+- **問題事象**: REQ 行追加を伴う Definition Package の prepare_definition_pr 実行で、check_integrity の req-updated-freshness（IR-072）が generate_indexes 派生物 req-health-metrics.md 自身の frontmatter updated 未追随を検出し、計測日収束のための補正 commit が 3 回の script 呼び出しに増えた
+- **発生局面**: case-open STEP-4（Definition PR 作成の機械工程）／Root Case #3829
+- **検知方法**: prepare_definition_pr script 内の check_integrity gate が exit 1（NG 2件 → 補正後 1件）で検知
+- **根本原因**: reference の計測日収束手順（2段検出）は (a) req-metrics 計測日 AUTOGEN 更新と (b) req-updated-freshness による frontmatter updated 追随を REQ・Design 側の追随として記述するが、generate_indexes 派生物（req-health-metrics.md）自身の frontmatter updated は AUTOGEN 再生成対象外であり、派生物の内容変更が発生した場合の frontmatter 追随が手順上明示されていなかった
+- **自律対応内容**: 派生物 req-health-metrics.md の frontmatter updated（2026-10-20 → 2026-10-21）を DefinitionEdit で追随させ、明示パス指定補正 commit（52de5c241e）で収束させ、check_integrity pass を確認した
+- **ユーザー確認有無**: なし（既存 integrity rule IR-072 の機械検査に従った追随）
+- **Decision/REQ/spec影響**: なし（契約変更なし。機械検査の検出に従った追随作業）
+- **横展開観点**: REQ 行追加を伴う Definition Package を生成するすべての Case で、generate_indexes が派生物の内容を変更した場合に派生物自身の frontmatter updated 追随が残作業として生じ得る
+- **再発条件**: REQ 行追加等で generate_indexes 派生物（req-health-metrics.md 等）の内容が変化し、派生物の frontmatter updated が最終内容変更日より旧い場合
+- **予防策候補**: case-open STEP-4 reference「計測日収束」節に、generate_indexes 派生物自身の frontmatter updated 追随（IR-072）を補正 commit 対象として明記する（learning-promote で評価）
+- **想定反映先**: learning-promote による評価・昇華（case-open reference の手順強化候補）
+- **関連**: docs/designs/quality/req-health-metrics.md、.worktrees/3829-definition、設計PR #3830、Root Case #3829
+- **タグ**: #case-open #generate_indexes #frontmatter #計測日収束
