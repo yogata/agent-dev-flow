@@ -17,6 +17,10 @@ implementation:
   - REQ-110-024
   - REQ-110-025
   - REQ-110-033
+  - REQ-110-034
+  - REQ-110-035
+  - REQ-110-036
+  - REQ-110-037
   src/common/commands/agentdev/phase-artifacts-update.md:
   - REQ-110-007
   - REQ-110-008
@@ -32,6 +36,10 @@ implementation:
   - REQ-110-023
   - REQ-110-024
   - REQ-110-025
+  - REQ-110-034
+  - REQ-110-035
+  - REQ-110-036
+  - REQ-110-037
 verification:
   src/common/skills/agentdev-workflow-phase-artifacts-update/SKILL.md:
   - REQ-110-007
@@ -49,6 +57,10 @@ verification:
   - REQ-110-023
   - REQ-110-024
   - REQ-110-025
+  - REQ-110-034
+  - REQ-110-035
+  - REQ-110-036
+  - REQ-110-037
   src/common/commands/agentdev/phase-artifacts-update.md:
   - REQ-110-007
   - REQ-110-008
@@ -64,6 +76,10 @@ verification:
   - REQ-110-023
   - REQ-110-024
   - REQ-110-025
+  - REQ-110-034
+  - REQ-110-035
+  - REQ-110-036
+  - REQ-110-037
 links:
   upstream:
     src/common/skills/agentdev-workflow-phase-artifacts-update/SKILL.md:
