@@ -164,3 +164,21 @@
 - **想定反映先**: learning-promote による評価・昇華
 - **関連**: close_mechanical_steps.ts post-merge 報告 JSON、`.worktrees/3831-feature`、Issue #3831
 - **タグ**: #worktree #cleanup #windows #case-close
+
+---
+
+## bun test の並行分割起動がテストレベル timeout の flake を誘発し得る（case-run 品質統制6の 3 分割実行運用）
+
+- **問題事象**: bun test 3 分割を並行起動した際、5 秒のテストレベル timeout を持つテスト（check_changed_docs.test.ts の fixture git 操作を含むテスト等）が CPU 競合で timeout fail した（初回 2940 pass / 1 fail → 単独再実行で 2941 pass / 0 fail）
+- **発生局面**: case-run STEP-S5 品質統制6（full integrity suite 3 分割実行）／Root Case #3829、Issue #3832
+- **検知方法**: split1 初回実行のテストタイムアウト 1 件（bun test のタイムアウト表示と fail 行）を観測し、単独再実行（fix-and-reverify）で解消
+- **根本原因**: 3 分割の並行起動による CPU 競合で、固定 timeout を持つテストの実行時間が timeout 値を超過した（環境要因。テスト自体の欠陥ではない）
+- **自律対応内容**: split1 を単独再実行し、2941 pass / 0 fail・終了コード 0 を確認してから検証を続行した。case-close の close_mechanical_steps.ts による 3 分割実行は分割ごとの逐次起動であるため、この flake は起きた構造上発生しない
+- **ユーザー確認の有無**: なし（flake 分類と再実行解消は既存の検証差分記録規律どおり）
+- **REQ/Decision/spec影響**: なし（正規形どおりの逐次起動では影響しない運用上の知見）
+- **横展開観点**: 並行起動する場合は timeout 系テスト（fixture git 操作・外部プロセス起動を含むテスト）の存在を考慮し、再実行での確認を前提にする。品質統制の実行運用を並行化する場合は flake 分類の記録経路を同一 PR 内に用意する
+- **再発条件**: bun test 3 分割を並行起動し、かつ固定 timeout テストが CPU 競合下で timeout 値を超過した場合
+- **予防策候補**: 3 分割実行は正規形どおり分割ごとに逐次起動する。並行起動する場合は timeout 系テストの存在確認と再実行前提の運用を品質統制定義に明記する（learning-promote で評価）
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: PR #3834 本文「Findings / Capture候補」learning 1 件、Issue #3832 対応記録コメント検証差分 #3
+- **タグ**: #bun-test #並行実行 #timeout-flake #case-run #品質統制
