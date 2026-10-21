@@ -128,3 +128,39 @@
 - **想定反映先**: learning-promote による評価・昇華（case-open reference の手順強化候補）
 - **関連**: docs/designs/quality/req-health-metrics.md、.worktrees/3829-definition、設計PR #3830、Root Case #3829
 - **タグ**: #case-open #generate_indexes #frontmatter #計測日収束
+
+---
+
+## worktree 環境の配布依存境界 link profile は zero-targets fail-closed となり junction 構成 root での読み取り専用実行が正
+
+- **問題事象**: worktree 環境では `.opencode` 側の junction 投影が構成されず、配布依存境界 link profile は zero-targets fail-closed（検査不能=不合格）になる。link profile の実行は junction 構成 root（host main root）での読み取り専用実行が正しい環境分離である
+- **発生局面**: case-run STEP-S5 品質統制8（配布依存境界 checker 実行）／Root Case #3829、Issue #3831
+- **検知方法**: worktree 内で link profile を実行すると zero-targets:link failure（fail-closed、EXIT=1、scanned_files 0）を観測
+- **根本原因**: worktree には `.opencode/skills/agentdev-*` の junction が伝播せず、link projection 走査対象が 0 件になる構造的制約
+- **自律対応内容**: worktree 内 link 実行を無効実行（検査対象外）として扱い、host main root（junction 構成 root）での読み取り専用実行を正規経路として採用した。checker 実行記録表に fail-closed 実測（3行目）と main root 合格根拠（2行目）を併記した
+- **ユーザー確認の有無**: なし（checker 実行契約 Design「link profile 実効実行要件」節の既存契約に従った環境分離）
+- **REQ/Decision/spec影響**: なし（既存契約どおりの動作の実証）
+- **横展開観点**: junction 系 skill scripts・plugins 系 gate を用いる検査はすべて同一の構造的制約を持つ（main root 実体 + --root 指定の汎用手順）。worktree 内で source / link 両 profile 実行を品質統制に組み込む場合はこの環境差を事前に織り込む必要がある
+- **再発条件**: worktree 内で link profile（`.opencode/**` の link projection 走査）を実行した場合
+- **予防策候補**: 品質統制定義時に link profile の実行環境を junction 構成 root へ明示指定する。worktree 実行時は無効分類として記録し、zero-targets を clean 扱いや暗黙の検査省略にしない
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: PR #3833 本文「Findings / Capture候補」learning 1 件、checker 実行記録表、checker 実行契約 Design「link profile 実効実行要件」節
+- **タグ**: #worktree #junction #link-profile #配布依存境界 #環境分離
+
+---
+
+## Windows 環境の git worktree remove がメタデータ削除済み・物理ディレクトリ残存の半失敗状態を返すことがある
+
+- **問題事象**: `git worktree remove`（--force なし）が Windows 環境で exit 255 を返し、`git worktree list` からは登録消滅している一方で物理ディレクトリ（`.worktrees/3831-feature`）が残存する半失敗状態になった
+- **発生局面**: case-close STEP-6-1 worktree 削除（Issue #3831、post-merge 機械工程 script の cleanup-worktree-branch step）
+- **検知方法**: post-merge script 報告 JSON の worktreeRemoveExitCode 255 と cleanup-worktree-branch step の warn（needs-judgment）
+- **根本原因**: worktree remove 処理の途中でメタデータ削除とディレクトリ削除の間に失敗（ファイルロック等の Windows 特有要因と推定。根本は未特定）
+- **自律対応内容**: `git worktree list` と物理ディレクトリの実在確認で半失敗を特定し、`git worktree prune` 後に残骸ディレクトリを明示削除（EXIT=0）して worktree と branch のクリーンアップ完了を確認した
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/spec影響**: なし（cleanup 結果の実体確認は既存の完了検証規律どおり）
+- **横展開観点**: worktree cleanup の自動化経路では、remove の非ゼロ終了を直ちに失敗と断定せず、worktree list・物理ディレクトリの実在確認で実体状態を判定する必要がある。branch 削除（-d）は同一実行で成功しており、worktree と branch の状態を別々に確認する
+- **再発条件**: Windows 環境で worktree 内のファイルがロックされたまま worktree remove が実行された場合
+- **予防策候補**: cleanup 自動化に remove 失敗時の worktree list + 物理残骸確認と残骸削除の再試行経路を補う（learning-promote で評価）
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: close_mechanical_steps.ts post-merge 報告 JSON、`.worktrees/3831-feature`、Issue #3831
+- **タグ**: #worktree #cleanup #windows #case-close
