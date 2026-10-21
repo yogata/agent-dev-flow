@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261021T033603Z-c90e",
+  "workflow": "req-define",
+  "evaluationKind": "final-classification-design-separation",
+  "subject": "RU-0243 反映規定（REQ-094 追加案）の最終分類・Design 分離判断",
+  "sourceRevision": "working-tree@2026-10-21",
+  "durationMs": 1084,
+  "inputTokens": 1313,
+  "inputs": {
+    "requestDigest": "4ad15d970d77bc0a526e7885f5371da9a187239b530f7c38edb8f74a42fe427f",
+    "references": [
+      {
+        "label": "RU-0243 本文",
+        "path": ".agentdev/backlog/req-units/RU-0243.md",
+        "digest": "7d52ae60d78eba7b630a0d8311cee28ec423716d71b29c32972eb4ba1f5498d1"
+      },
+      {
+        "label": "REQ-094 本文（追記対象）",
+        "path": "docs/requirements/REQ-094.md",
+        "digest": "fd77974470033fd6d4b592ee593f2b50256f835d8f4d36862af3f29e0bc36b8f"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-ru0243-target",
+      "questionForm": "choice",
+      "value": "REQ 行（成果定義・適用範囲の要件行として REQ-094 へ追加）",
+      "probabilityDistribution": {
+        "REQ 行（成果定義・適用範囲の要件行として REQ-094 へ追加）": 0.94,
+        "Design 行（内部構造・判定規則として Design へ分離）": 0.06
+      }
+    },
+    {
+      "questionId": "q2-ru0243-separation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.43,
+        "false": 0.5700000000000001
+      }
+    }
+  ],
+  "confidence": 0.88,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-ru0243-target",
+        "value": "REQ 行（成果定義・適用範囲の要件行として REQ-094 へ追加）"
+      },
+      {
+        "questionId": "q2-ru0243-separation",
+        "value": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261021T033603Z-0428",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0243（歴史文書是正範囲の確定）の REQ 帰属判断",
+  "sourceRevision": "working-tree@2026-10-21",
+  "durationMs": 1224,
+  "inputTokens": 1511,
+  "inputs": {
+    "requestDigest": "4d73958228b61ff345c992841e6c2807a29bf691b4de0c8764c00199d3ce87a3",
+    "references": [
+      {
+        "label": "RU-0243 本文",
+        "path": ".agentdev/backlog/req-units/RU-0243.md",
+        "digest": "7d52ae60d78eba7b630a0d8311cee28ec423716d71b29c32972eb4ba1f5498d1"
+      },
+      {
+        "label": "REQ-094 本文（追記対象候補）",
+        "path": "docs/requirements/REQ-094.md",
+        "digest": "fd77974470033fd6d4b592ee593f2b50256f835d8f4d36862af3f29e0bc36b8f"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-ru0243-operation",
+      "questionForm": "choice",
+      "value": "APPEND（既存 REQ-094 への要件行追加）",
+      "probabilityDistribution": {
+        "CREATE（新規 REQ ファイルの作成）": 0,
+        "APPEND（既存 REQ-094 への要件行追加）": 1,
+        "UPDATE（既存要件行の意味変更）": 0,
+        "REQ操作なし（REQ 変更を伴わない他成果物操作のみ）": 0
+      }
+    },
+    {
+      "questionId": "q2-ru0243-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.09,
+        "false": 0.91
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-ru0243-operation",
+        "value": "APPEND（既存 REQ-094 への要件行追加）"
+      },
+      {
+        "questionId": "q2-ru0243-confirm",
+        "value": false
+      }
+    ]
+  }
+}
