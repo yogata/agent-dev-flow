@@ -290,3 +290,21 @@
 - **想定反映先**: learning-promote による評価・昇華
 - **関連**: PR #3840 完了報告コメント（Capture候補 learning 記載分）・Issue #3839・IR-072
 - **タグ**: #docs是正 #IR-072 #PR手順 #テンプレート
+
+## case-auto sidecar に design セクションが無い component の design 宣言先は Design 文書本体の inline 宣言
+
+- **問題事象**: case-open 機械工程（prepare_definition_pr）で新規 REQ 行 REQ-034-048 の design 宣言を traceability/agentdev-workflow-case-auto.yaml の input-resolution-and-orchestration.md 配下へ追加したが、当該 sidecar の role セクションは implementation と verification のみで design セクションが存在せず、追加した宣言は implementation 宣言として解釈され missing-design が解消されなかった
+- **発生局面**: case-open STEP-4 機械工程の DefinitionEdit 組立（Root Case #3841、traceability check 初回実行で fail 検出）
+- **検知方法**: traceability check（--req 対象行）の missing-design findings（REQ-034-048）と coverage --req の実測帰着（REQ-034-048 が implementation に帰着、design 0件）
+- **根本原因**: 宣言先を「先行行 REQ-034-046/047 が sidecar に列挙されている」という表面観察から決め、artifact 種別ごとの管理経路（workflow skill ファイル側は sidecar、Design 文書側は inline 宣言、同一論理関係が両情報源に存在する場合は集合一致）を確認せずに sidecar の該当 artifact 配下へ追加した
+- **自律対応内容**: 補正 commit d5a18c5c で sidecar implementation セクションから REQ-034-048 を撤去し、docs/designs/commands/case-auto.md の inline design 宣言へ再配置。併せて case-open.md inline 宣言と sidecar design セクションの集合一致（REQ-030-031 追加漏れによる duplicate-inconsistencies）を解消
+- **ユーザー確認の有無**: なし（機械検査の fail 検出と補正 commit で完結）
+- **REQ/Decision/Design影響**: なし（宣言は正しい位置へ再配置済み）
+- **横展開観点**: design/implementation/verification の宣言追加を行う全 Case（case-open / case-run / case-revise）で、sidecar の role セクション有無を確認せず先行行の列挙位置へ追加する誤りが成立し得る
+- **再発条件**: 対象 component の sidecar に design セクションが存在しない状態で、先行行が implementation セクションに列挙されているのを根拠に design 宣言を同位置へ追加した場合
+- **予防策候補**: design 宣言追加前に対象 sidecar の role セクション実在を確認し、design セクション不在なら Design 文書本体 inline 宣言へ宣言先を切替する手順を learning-promote で評価
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: PR #3842 検証差分と Findings セクション、Issue #3841
+- **タグ**: #traceability #design宣言 #sidecar #case-open機械工程
+
+---
