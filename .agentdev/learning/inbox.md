@@ -359,3 +359,39 @@
 - **タグ**: #prepare_definition_pr #DefinitionEdit #行削除 #case-openSTEP4 #docs-chore
 
 ---
+
+## learning: bun test フル suite を一発実行（対象指定なし）すると 3 cwd 分割正規形と網羅集合が異なる
+
+- **問題クラス**: workflow deviation（検証実行形態の逸脱の検知・修正）
+- **発生局面**: case-close STEP-3 full integrity suite（Root Case #3845、verify-only closure・HEAD d0c257337）
+- **検知方法**: case-run の SSoT 検証（bun test 一発実行・1980 pass / 119 files）と QG-4 正規形（3 cwd 分割・`./` prefix 付き明示指定必須・「単一のカレントディレクトリトリビアな実行で代替しない」）の突合で、分割実行合計（4449 pass / 208 files）が一発実行より大幅に多いことを確認
+- **根本原因**: bun test 一発実行（cwd: repo root・対象指定なし）のデフォルト走査は、明示指定分割が拾う一部領域（.opencode/skills の repo-* scripts 配下等）を実行対象に含めない
+- **自律対応内容**: case-close として正規形（3 cwd 分割・stdout/stderr 分離退避付き）を再実行し、4449 pass / 0 fail / 208 files（対象領域の物理 test ファイル数 116 + 48 + 23 + 21 = 208 と完全突合）で確認した。fail 0 で case-run 実績との矛盾はなし
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（正規形は agentdev-quality-gates references qg-4-final-acceptance.md「bun test フル suite 正規形（実行形態契約）」の3 cwd 分割として既に確立済み。case-run 側の実行を正規形へ揃えるかは learning-promote で扱う）
+- **横展開観点**: bun test を検証に使う全工程（case-run STEP-S5、case-close STEP-3、QG-4 checker 実測）。SSoT コメント等の検証記録を再利用する際、件数突合の対象集合（N/M）が実行形態で変わる点に注意
+- **再発条件**: bun test を対象指定なしで実行し、その結果を full integrity suite 合格の証拠として記録・再利用する場合
+- **予防策候補**: case-run 側検証の正規形（3 cwd 分割）への統一、または SSoT 検証記録に実行形態（対象指定の有無）の明記を必須化
+- **想定反映先**: learning-promote による評価・昇華（case-run / case-close の検証実行形態契約の参照明確化）
+- **関連**: Root Case #3845・SSoT コメント 6332228740（検証 10）・agentdev-quality-gates references qg-4-final-acceptance.md
+- **タグ**: #bun-test #full-integrity-suite #3cwd分割 #case-closeSTEP3 #件数突合
+
+---
+
+## learning: bun test の件数突合で Windows junction 経由の対象は find が数えられない
+
+- **問題クラス**: 検証証跡の解釈（件数突合の基準実体の選択）
+- **発生局面**: case-close STEP-3 full integrity suite の件数突合（Root Case #3845）
+- **検知方法**: 分割③（`bun test ./.opencode/plugins/ ./scripts/`）の実行 44 files に対し、find による物理 test ファイル数が .opencode/plugins 0 + scripts 21 = 21 で不一致を検知
+- **根本原因**: MSYS find は Windows junction（reparse point）を辿らないため、.opencode/plugins 配下の junction（src/opencode/plugins への鏡像）配下の test ファイルを 0 件として数える。bun は junction を辿って実行する
+- **自律対応内容**: junction 解決後の正本パス（src/opencode/plugins）で数え直し 23 files を確認。21 + 23 = 44 で実行 44 files と完全突合できた。件数突合の基準実体は bun の「Ran N tests across M files」の M 値とし、物理突合が必要な場合は junction を解決して数える
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（link profile の worktree 無効実行性・junction 伝播状態の環境ラベル記録は既存契約どおり維持）
+- **横展開観点**: bun test / checker の検査対象数を物理列挙で突合する場合全般。junction・symlink を含む対象領域の列挙は follow しないツールだと過少計上する
+- **再発条件**: .opencode/plugins 等の junction 領域を含む対象の test ファイル数を find（follow なし）で数えて突合する場合
+- **予防策候補**: 件数突合手順に junction 解決後の正本パスでの数え直し（または bun 実行 M 値基準）の明記
+- **想定反映先**: learning-promote による評価・昇華（checker 実行契約・件数突合手順の補足）
+- **関連**: Root Case #3845・.opencode/plugins の junction（src/opencode/plugins 鏡像）・qg-4-final-acceptance.md 件数突合条項
+- **タグ**: #bun-test #件数突合 #junction #Windows #case-closeSTEP3
+
+---
