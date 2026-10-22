@@ -341,3 +341,21 @@
 - **タグ**: #buntest #cwd依存 #実行形態契約 #非決定的
 
 ---
+
+## prepare_definition_pr の definitionEdits が行削除・ファイル削除編集を表現できず REQ 行廃止 Case は前段手動適用で機械工程を構成する
+
+- **問題事象**: case-open STEP-4 の機械工程 script（prepare_definition_pr.ts）で、REQ 行の完全削除を伴う docs-chore Case（Root Case #3845、PR #3846）の Definition 編集（REQ-094.md 表行・ADF-COVERS 宣言行の削除、policy.yaml 登録 4 行削除、2 ファイル削除）が DefinitionEdit の行構造事前確認（newText 行数は oldText 行数以上）に抵触し、definitionEdits 入力で表現できなかった
+- **発生局面**: case-open STEP-4 機械工程（Root Case #3845、PR #3846）
+- **検知方法**: definition-pr-and-idempotency.md の入力契約（行の追加のみ許す事前確認）と prepare_definition_pr.ts validateEditLineStructure の実装照合。script 呼び出し前の入力 JSON 組立段階で契約不整合を確認した
+- **根本原因**: DefinitionEdit 契約は行追加型編集のみを機械適用対象とし、行削除・ファイル削除を表現する remove 系操作を持たない（learning deferred の既存エントリ「definitionEdits は既存ファイル置換のみ」〔2026-10-08・2026-10-11 移動〕の系統的制約）
+- **自律対応内容**: agentdev-git-worktree 標準手順（type=definition）による worktree 前置作成の後、行削除・ファイル削除編集を node fs（UTF-8 明示）で前段手動適用し、definitionEdits = [] で script を冪等再利用呼び出し（worktree 既存・branch 一致確認経路）に通して generate_indexes → stage → commit → check_integrity → traceability check を機械実行した。前段適用には完全一致・一意の事前確認を組み込み、適用後に 3 パス残留検索 0 件で削除完了を検証した
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（既存回避構成〔learning deferred で処分済みの前置作成 + 冪等整合確認〕の適用。script 契約の拡張判断は別途 learning-promote で扱う）
+- **横展開観点**: REQ 行廃止・移管・ファイル削除を含む docs-chore 系 Definition 変更の case-open 全般。definitionEdits で表現できない編集形態は同構成（前置作成 + 前段適用 + 冪等再利用）に統合できる
+- **再発条件**: 行削除（表行削除・宣言行削除・登録行削除）またはファイル削除を含む artifact_action を prepare_definition_pr.ts へ definitionEdits 主体で渡す場合
+- **予防策候補**: remove 系編集の入力表現追加、または reference（definition-pr-and-idempotency.md）への廃止 Case の前段手動適用手順明文化
+- **想定反映先**: learning-promote による評価・昇華（既存同主題 deferred エントリとの統合再評価）
+- **関連**: Root Case #3845・PR #3846・src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts・.agentdev/learning/deferred.md（同主題 deferred エントリ）
+- **タグ**: #prepare_definition_pr #DefinitionEdit #行削除 #case-openSTEP4 #docs-chore
+
+---
