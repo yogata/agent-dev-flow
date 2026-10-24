@@ -2,12 +2,13 @@
 title: req-define Design
 status: accepted
 created: 2026-06-21
-updated: 2026-10-22
+updated: 2026-10-24
 ---
 <!-- ADF-COVERS(implementation): REQ-008-018, REQ-008-019, REQ-008-020, REQ-008-021, REQ-008-023, REQ-008-024, REQ-008-025, REQ-008-026, REQ-008-027, REQ-008-028, REQ-008-029, REQ-008-030, REQ-008-031, REQ-008-034, REQ-008-035, REQ-008-038, REQ-008-039, REQ-008-040, REQ-008-042, REQ-008-043, REQ-008-044, REQ-008-045, REQ-008-046, REQ-008-050, REQ-008-051, REQ-008-054, REQ-008-058, REQ-008-059 -->
 <!-- ADF-COVERS(design): REQ-008-059, REQ-008-061, REQ-008-062, REQ-004-056, REQ-004-057, REQ-004-058, REQ-004-059, REQ-004-060, REQ-004-062, REQ-004-063 -->
 <!-- ADF-COVERS(design): REQ-004-064, REQ-004-065（draft 保存後 git 永続化手順と oldText 転記規約の組立手順設計） -->
 <!-- ADF-COVERS(design): REQ-004-066, REQ-004-067, REQ-004-068（コード囲み認識規則の組立・検査規律と target_area 検索・採番の同一記述設計） -->
+<!-- ADF-COVERS(design): REQ-108-014, REQ-108-015, REQ-108-016, REQ-108-017（重要変更の通知と結果説明節。AG-001〜003 に対応） -->
 
 <!-- ADF-COVERS(implementation): REQ-021-011, REQ-021-022 -->
 <!-- ADF-COVERS(design): REQ-021-011 -->
@@ -625,3 +626,5 @@ review の finding は Decision判断、要件doc生成の成果物へ反映可�
 review はドラフト保存より前に実行する。
 ドラフト保存が req-define の最初の副作用（`.agentdev/drafts/req-draft-{topic-slug}.md` のファイル作成）であるため、review は最初の副作用の前に挿入される。
 review の結果、要件候補が変更された場合は、ドラフト保存で保存されるドラフトへ反映する。
+
+## 重要変更の通知と結果説明
