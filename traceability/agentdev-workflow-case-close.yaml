@@ -61,6 +61,7 @@ implementation:
     - REQ-108-009
     - REQ-108-010
     - REQ-032-042
+    - REQ-108-020
 verification:
   src/common/skills/agentdev-workflow-case-close/scripts/tests/close_mechanical_steps.test.ts:
     - REQ-032-019

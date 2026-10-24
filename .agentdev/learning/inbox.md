@@ -411,3 +411,39 @@
 - **想定反映先**: learning-promote による評価・昇華（case-open 適用後検証の強化候補）
 - **関連**: Root Case #3847・設計PR #3848・commit eec6797c5・.agentdev/drafts/req-draft-important-change-prenotification-and-result-explanation.md（ACT-DESIGN-001〜006）
 - **タグ**: #case-ready #忠実性確認 #merge抑止 #case-open #verbatim突合 #target_area
+
+---
+
+## learning: worktree 環境の integrity suite のみで fail する検証は main root 同一 tree 再実行と検査対象構成要素比較で環境依存と判別できる
+
+- **問題事象**: worktree（.worktrees/3847-feature、HEAD c3c74e3d3、2026-10-24 計測、bun test 3分割正規形・timeout 600秒指定）で full integrity suite 分割①（`bun test ./.opencode/skills/repo-agentdev-integrity/scripts/`）が 2949 pass / 1 fail（IR-055 runtime-unresolved-reference delta、check_integrity.test.ts:3184）となり、当該変更（src/common/skills/**・traceability/**・pin テスト）起因か環境起因かの判別が必要になった
+- **発生局面**: 実装（case-run 実装検証・Root Case #3847。case-close STEP-3 の QG-4 checker 実測で由来分類を引き継ぎ確認）
+- **検知方法**: bun test 分割①の fail 1 件の検出。fail テスト名（IR-055 delta）と当該変更対象パスの突合
+- **根本原因**: worktree の `.opencode/` 投影は junction 未伝播のため IR-055 検査対象（配布物投影の runtime reference 解決）が成立せず、baseline との delta 検査が不成立になる環境事象。既知欠陥でも当該変更起因でもない
+- **自律対応内容**: ①main root（worktree base と同一 tree 01a60604b）で同一 suite（check_integrity.test.ts）を実行し 194 pass / 0 fail を確認、②当該変更の対象パスが fail テストの検査対象構成要素に含まれないことを比較して環境依存と判別。検証弱化にあたる置換は行わず、main root 実行 0 fail を補完証拠として PR 本文検証差分へ記録した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（fail 由来分類の既存規約〔既知欠陥・環境依存・当該変更起因の3分類と evidence 記録〕の適用実績）
+- **横展開観点**: worktree で full integrity suite 等を実行する全工程（case-run STEP-S5、case-close STEP-3、QG-4 checker 実測）。fail 出力の由来分類では、main root 同一 tree 再実行と fail テストの検査対象構成要素比較の2点をセットで確認する
+- **再発条件**: junction 未伝播の worktree で配布物投影依存テスト（IR-055 等）を含む suite を実行し、fail の由来分類が必要になる場合
+- **予防策候補**: 由来判別の再実行条件（main root 同一 suite 0 fail かつ fail テストの検査対象構成要素に当該変更対象パスが含まれないこと）を検証記録の標準様式へ明記
+- **想定反映先**: learning-promote による評価・昇華（case-close QG-4 checker 実測・fail 由来分類手順の参照明確化）
+- **関連**: Root Case #3847・PR #3849 検証差分セクション「IR-055 delta fail の由来判別」行・docs/designs/integrity/rules 配下 IR-055
+- **タグ**: #bun-test #full-integrity-suite #IR-055 #環境依存 #由来分類 #worktree #case-closeSTEP3
+
+---
+
+## learning: 配布物本文への concrete ID 直書きは配布依存境界 checker（source profile）が作成時に有効検知する
+
+- **問題事象**: Design 節本文の REQ ID（REQ-106、REQ-111-008）を引用して phase-artifacts-update SKILL.md（配布物本文）へ書き込んだ実装（Root Case #3847、HEAD c3c74e3d3、2026-10-24 計測）に対し、配布依存境界 checker source profile が concrete-id 違反 2 件を検出した
+- **発生局面**: 実装（case-run 実装中の配布物本文編集）
+- **検知方法**: `check_distribution_boundary_cli.ts --profile source --json .`（cwd: worktree root、exit=0 へ復帰済み）の違反検出
+- **根本原因**: 配布物本文へ正規成果物の concrete ID を直書きすると配布依存境界（配布物が正規成果物 ID へ依存する構造）違反になるが、Design 節を引用する際の自然な書き方が ID 直書きに流れやすい
+- **自律対応内容**: REQ ID 直書きを除去した表現へ書き直して再検証合格（source profile、base ベースライン〔scanned 484・violations 0〕と同一の合格状態を確認）。検知機構が作動した実例として作成時予防（委譲 prompt の記述規約引き渡し）と事後検知の両面が機能したことを記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（配布依存境界 Design の既存契約どおりの検知）
+- **横展開観点**: 配布物本文（src/common/**）へ Design 節や REQ を引用して書き込む全実装。引用時は ID を除去した表現へ書き直す
+- **再発条件**: Design 節本文の REQ ID を配布物本文へそのまま転記する場合
+- **予防策候補**: 委譲 prompt への記述規約引き渡し（ID 直書き禁止と除去表現の例示）を継続し、違反検出時は表現修正して再検証する運用を明記
+- **想定反映先**: learning-promote による評価・昇華（配布依存境界の記述規約に関する参照明確化）
+- **関連**: Root Case #3847・PR #3849 検証差分セクション「配布依存境界 checker source profile（最終 gate）」行・src/common/guards/distribution-boundary/
+- **タグ**: #配布依存境界 #concrete-id #checker検知 #配布物本文 #case-run
