@@ -2,10 +2,11 @@
 title: case-ready Design
 status: accepted
 created: 2026-09-14
-updated: "2026-10-20"
+updated: "2026-10-24"
 ---
 
 <!-- ADF-COVERS(design): REQ-021-024 -->
+<!-- ADF-COVERS(design): REQ-108-016, REQ-108-017（重要変更の通知と結果説明節。AG-002・003 に対応） -->
 <!-- ADF-COVERS(design): REQ-012-031（保存実体節が Definition 保存時点での設計根拠対応の未成立は保存を阻害しないことの design 対応） -->
 <!-- ADF-COVERS(design): REQ-004-061 -->
 <!-- ADF-COVERS(design): REQ-061-003 -->
@@ -95,3 +96,9 @@ case-ready の機械工程（設計PRの忠実性・整合性・品質検査の�
 ## 受入検査入力と実行証拠の接続
 
 REQ-061-049/050の受入検査は、case-open Design「検査入力と実行証拠の接続」と同じ保存・生成・事前検証の規律に従う。既存の報告が終了コードだけ、または要約だけとなる箇所でも、stdout/stderr全文・終了コード・対象版・実行条件を一回の検査から保持し結果消費へ渡す。既存受入判断と必須ゲートを置換しない。epic_ref設定とsidecar/inline和集合の既存入力構成規律は維持し重複追加しない。索引生成や版変更後の必要再検証は省かない。要約生成（REQ-061-051）は engine 報告 JSON の構造化警告結果（condition_a.warnings、detection_unavailable）を実件数どおり反映し、報告に存在しないフィールドの参照と unavailable の 0 件誤表示を行わない。
+
+## 重要変更の通知と結果説明
+
+Definition 保存（REQ・Decision・Design の正規反映）に重要変更が含まれる場合、当該変更の理由・内容・想定影響を、保存の実行より前に利用者への実行出力へ通知する。実行時の記録から、通知の提示が正規反映より先に成立したことを確認できる形で出力する。
+
+Decision 受理、execution contract と実行構造の確定、lifecycle gate の各判断は維持し、通知によって代替しない。通知と承認は区別し、既存の合意と委任された裁量の範囲内の反映は通知後に追加承認なしで継続する。

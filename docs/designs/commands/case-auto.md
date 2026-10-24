@@ -2,13 +2,14 @@
 title: case-auto Design
 status: accepted
 created: 2026-06-21
-updated: "2026-10-22"
+updated: "2026-10-24"
 ---
 <!-- ADF-COVERS(implementation): REQ-015-012 -->
 <!-- ADF-COVERS(implementation): REQ-100-004 -->
 <!-- ADF-COVERS(implementation): REQ-034-001, REQ-034-002, REQ-034-003, REQ-034-004, REQ-034-005, REQ-034-006, REQ-034-007, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-017, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-033, REQ-034-034, REQ-034-035, REQ-034-036, REQ-034-037, REQ-034-038, REQ-034-039, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-034-044, REQ-034-045, REQ-035-016, REQ-035-017 -->
 <!-- ADF-COVERS(design): REQ-034-002, REQ-034-003, REQ-034-004, REQ-034-005, REQ-034-006, REQ-034-007, REQ-034-010, REQ-034-011, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-017, REQ-034-018, REQ-034-020, REQ-034-021, REQ-034-023, REQ-034-024, REQ-034-026, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-033, REQ-034-034, REQ-034-035, REQ-034-036, REQ-034-037, REQ-034-038 -->
 <!-- ADF-COVERS(design): REQ-034-012, REQ-034-022, REQ-034-025, REQ-034-027, REQ-034-028, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-034-044, REQ-034-045, REQ-034-046, REQ-034-047, REQ-034-048, REQ-035-016, REQ-035-017 -->
+<!-- ADF-COVERS(design): REQ-108-018, REQ-108-019, REQ-108-020, REQ-108-021, REQ-108-023（重要変更の通知と結果説明節。AG-001・004〜006 に対応） -->
 <!-- ADF-COVERS(design): REQ-031-029, REQ-031-030 -->
 <!-- ADF-COVERS(verification): REQ-034-037, REQ-034-038 -->
 <!-- ADF-COVERS(implementation): REQ-003-017, REQ-003-018, REQ-006-108, REQ-034-002, REQ-034-003, REQ-034-007, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-034, REQ-034-035, REQ-034-036 -->
@@ -596,3 +597,9 @@ v3 epic-wave-model Design が所有していた orchestration stage モデル、
 - orchestration stage: case-auto 内部工程を stage として構成し、ドラフト間並列実行は stage 3 で共有 active Issue task 枠（REQ-034-027、起動間隔 10 秒。Epic・Wave・Standard を横断する単一所有枠、DEC-041）とする
 - ドラフト間並列実行モデル: 複数 draft（OU 群）を依存グラフから解析し、並列実行可能性に基づいて同時起動する。直列化の単位は v4-runtime-execution-model「直列化単位表」に従う
 - 停止理由分類: 停止条件の発生時に停止理由を分類して報告する。user-decision-required は result enum の状態ではなく停止理由分類として維持する（v4-lifecycle-state-machine 異常・例外状態と回復経路）
+
+## 重要変更の通知と結果説明
+
+子ワークフロー・委譲実行からの重要変更の通知を、結果集約と実行報告で失わずに利用者へ提示する。同一の意味を持つ重要変更が複数の成果物・工程・委譲先に波及する場合は、利用者が理解する変更単位へ通知を集約し、ファイルごと・工程ごと・委譲先ごとの実質的な重複通知を繰り返さない。新たな重要な影響の判明は、重複通知と区別して追加説明する。
+
+case-auto 自身は全変更の意味判断を行わず（判断の局所所有は維持）、各子ワークフロー・委譲先が判断した重要性と想定影響の評価を前提に、通知の伝達と集約だけを担う。通知と承認は区別し、通知のみを理由とする一律停止を設けない。

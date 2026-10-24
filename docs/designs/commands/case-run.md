@@ -2,12 +2,13 @@
 title: case-run Design
 status: accepted
 created: 2026-06-21
-updated: 2026-10-22
+updated: 2026-10-24
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-015, REQ-021-016, REQ-021-017, REQ-021-019, REQ-021-020, REQ-021-022, REQ-035-002 -->
 <!-- ADF-COVERS(design): REQ-021-015, REQ-021-016, REQ-031-006, REQ-031-015, REQ-031-016, REQ-031-027, REQ-031-033, REQ-031-034, REQ-031-035, REQ-035-012, REQ-035-021 -->
 <!-- ADF-COVERS(design): REQ-031-036（委譲指示規律の docs 配下パス抽象化参照設計） -->
+<!-- ADF-COVERS(design): REQ-108-017, REQ-108-018, REQ-108-019, REQ-108-020（重要変更の通知と結果説明節。AG-001・003〜005 に対応） -->
 <!-- ADF-COVERS(design): REQ-031-001, REQ-031-002, REQ-031-003, REQ-031-004, REQ-031-005, REQ-031-007, REQ-031-008, REQ-031-009, REQ-031-010, REQ-031-011, REQ-031-013, REQ-031-014, REQ-031-017, REQ-031-018, REQ-031-019, REQ-031-020, REQ-031-021, REQ-031-022, REQ-031-023, REQ-031-024, REQ-031-025, REQ-031-026, REQ-031-028 -->
 <!-- ADF-COVERS(implementation): REQ-015-010, REQ-015-011 -->
 <!-- ADF-COVERS(implementation): REQ-017-007, REQ-017-008, REQ-017-010, REQ-017-011, REQ-017-013, REQ-017-016 -->
@@ -580,3 +581,9 @@ v3 epic-wave-model Design が所有していた case-run Epic Wave 実行モデ�
 
 - Epic 検出ルール: Epic 入力の受理は case-auto 経由の正規呼出へ限定され、case-run 自身は常に単一 Issue を処理する。Epic は複数 execution unit の協調管理が必要な変更であり、規模（scale）から独立した概念である
 - Wave 解析プロトコル: Wave 構成の読み取りと現在 Wave の子 Issue 状態判定（pending/completed/blocked/failed/delegation-unavailable から実行可能な Wave を判定）は case-auto の orchestration stage 3 が所有する。Wave 状態は永続化せず子 Issue 状態から導出する（REQ-035-005、v4-lifecycle-state-machine 階層合成）。case-run は委譲された単一 Issue の重複解消方針の参照と検出不能報告の責務を維持する（REQ-031-027）
+
+## 重要変更の通知と結果説明
+
+実行担当サブエージェントへの委譲契約に、重要変更の識別と報告を含める。委譲先が実行中に重要変更を判明した場合は、その内容と影響を親側へ報告させ、その時点で未反映の重要変更は正規反映前に、判明時点ですでに反映済みの内容は反映済みである事実を区別して、利用者へ追加通知する。
+
+完了報告には、実際に変更した重要事項、事前の見込みと実績の違い、残る影響、未完了事項を含める。事前通知したが実施しなかった変更を実施済みと報告せず、一部成功・一部失敗・未確認・中断を区別して報告する。通知と承認は区別し、委譲された裁量の範囲内の実行は通知後に追加承認なしで継続する。既存の合意内容との照合、差分・影響評価、必要な更新・再検証を通知で代替しない。
