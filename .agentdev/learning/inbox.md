@@ -395,3 +395,19 @@
 - **タグ**: #bun-test #件数突合 #junction #Windows #case-closeSTEP3
 
 ---
+
+## learning: target_area append 適用で節本文が欠落したまま節見出しだけが保存され verbatim 包含突合が見出し単位では欠落を検出できない
+
+- **問題クラス**: workflow deviation（Definition 保存の適用漏れと突合精度の不足）
+- **発生局面**: case-ready STEP-1 忠実性確認（Root Case #3847、設計PR #3848、worktree HEAD 13cfb2d7・2026-10-24 計測。draft は .agentdev/drafts/req-draft-important-change-prenotification-and-result-explanation.md）
+- **検知方法**: case-ready 忠実性確認の draft content → worktree ファイルへの逐語包含突合（REQ 11 行 + 適用範囲 2 行 = 13 件 pass、Design 節全文 6 件 fail）。Design 節の節見出し後の本文行数確認で 6 ファイルすべて nonEmptyLinesInBody=0（本文 0 行）を機械確認
+- **根本原因**: case-open 側の artifact_actions（ACT-DESIGN-001〜006、operation: append、target_area「重要変更の通知と結果説明」）適用で節本文の挿入が行われず、節見出し・ADF-COVERS(design) 宣言行・frontmatter updated のみが commit eec6797c5 で追加された。PR 本文は「verbatim 包含突合 19/19 pass」と申告しており、突合の対象選定が節見出し単位では本文欠落を検出できなかった（case-open 側手順・script のどの段で本文挿入が失敗したかは未特定。本学びは case-ready 側からの実観測記録）
+- **自律対応内容**: case-ready STEP-1 忠実性確認で必須受け入れ義務の「欠落」を検出し、merge 抑止（検出を warning 化して merge を継続する経路は存在しない契約）。設計PR・draft・RU を保持して ready 遷移せず停止。復帰経路として Definition 側修正（case-open）後の case-ready 再実行（既存 PR 再利用）を要求
+- **ユーザー確認の有無**: なし（case-ready スキル契約「必須受け入れ義務の照合と merge 抑止」の機械的適用）
+- **REQ/Decision/Design影響**: なし（契約どおりの動作。合意済み REQ 11 行・適用範囲 2 行・design 宣言は正しく保存済みであり、欠落は Design 6 節本文のみ）
+- **横展開観点**: target_area 指定の artifact_actions append 適用と「verbatim 包含突合」申告を含む全 Definition Package 生成 Case（case-open / case-revise）で同一構造が成立し得る。突合は節見出しではなく節本文（heading 後の本文行集合）を対象にすべき
+- **再発条件**: target_area append 適用で本文挿入が失敗した場合、かつ適用後の突合が節見出しの包含のみを検査した場合
+- **予防策候補**: verbatim 包含突合の対象を節本文全体へ拡張（節見出し後の非空行集合の包含検査）。artifact_actions 適用後の行数検証（diff の changed_lines_count と合意 content 行数の一致検査）を draft 保存前・適用後検査へ追加
+- **想定反映先**: learning-promote による評価・昇華（case-open 適用後検証の強化候補）
+- **関連**: Root Case #3847・設計PR #3848・commit eec6797c5・.agentdev/drafts/req-draft-important-change-prenotification-and-result-explanation.md（ACT-DESIGN-001〜006）
+- **タグ**: #case-ready #忠実性確認 #merge抑止 #case-open #verbatim突合 #target_area
