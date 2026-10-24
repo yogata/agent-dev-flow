@@ -40,6 +40,10 @@ implementation:
     - REQ-021-028
     - REQ-021-029
     - REQ-098-010
+    - REQ-108-014
+    - REQ-108-015
+    - REQ-108-016
+    - REQ-108-017
     - REQ-111-006
     - REQ-111-009
     - REQ-111-010
@@ -72,6 +76,8 @@ implementation:
     - REQ-103-011
   src/common/skills/agentdev-workflow-req-define/references/input-and-dialogue.md:
     - REQ-110-033
+  src/common/skills/agentdev-workflow-req-define/scripts/tests/important-change-notification-pins.test.ts:
+    - REQ-108-024
 verification:
   docs/designs/commands/req-define.md:
     - REQ-021-029
@@ -101,3 +107,15 @@ verification:
   src/common/skills/agentdev-workflow-req-define/scripts/tests/real-path-assembly.test.ts:
     - REQ-004-058
     - REQ-004-060
+
+  src/common/skills/agentdev-workflow-req-define/scripts/tests/important-change-notification-pins.test.ts:
+    - REQ-108-014
+    - REQ-108-015
+    - REQ-108-016
+    - REQ-108-017
+    - REQ-108-018
+    - REQ-108-019
+    - REQ-108-020
+    - REQ-108-021
+    - REQ-108-022
+    - REQ-108-023

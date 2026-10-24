@@ -1,6 +1,10 @@
 component: agentdev-workflow-phase-artifacts-update
 implementation:
   src/common/skills/agentdev-workflow-phase-artifacts-update/SKILL.md:
+  - REQ-108-015
+  - REQ-108-016
+  - REQ-108-022
+  - REQ-108-023
   - REQ-110-007
   - REQ-110-008
   - REQ-110-009

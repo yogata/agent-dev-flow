@@ -9,6 +9,10 @@ implementation:
     - REQ-101-006
     - REQ-101-008
     - REQ-108-013
+    - REQ-108-014
+    - REQ-108-017
+    - REQ-108-018
+    - REQ-108-023
     - REQ-110-033
   src/common/skills/agentdev-case-run-execution-adapter/references/adversarial-review-integration.md:
     - REQ-014-016

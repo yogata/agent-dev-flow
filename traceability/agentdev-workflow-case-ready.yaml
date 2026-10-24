@@ -54,6 +54,10 @@ implementation:
     - REQ-108-002
     - REQ-108-003
     - REQ-108-008
+    - REQ-108-014
+    - REQ-108-015
+    - REQ-108-016
+    - REQ-108-017
   src/common/skills/agentdev-workflow-case-ready/references/decision-acceptance.md:
     - REQ-096-003
     - REQ-096-004
