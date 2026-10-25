@@ -60,6 +60,18 @@ bun src/apply.ts --dir <transitions-dir> --input <record.json | ->
 }
 ```
 
+- 終端の遷移（採用済みの工程関係に後続工程が存在しない遷移）は、toPhase に `null` を記録する。架空の後続工程を作らず、保存された記録から終端であることを再構成できる:
+
+```json
+{
+  "key": "transition-20261013-002",
+  "scope": "work-scope-id",
+  "fromPhase": "requirements",
+  "toPhase": null,
+  "recordedAt": "2026-10-13T10:00:00Z"
+}
+```
+
 - 出力:
   - `{"result":"recorded","record":{...},"path":"..."}` — 新規記録の保存成功
   - `{"result":"duplicate","record":{...},"path":"..."}` — 既存記録の検出（二重記録なし。記録から復元）
