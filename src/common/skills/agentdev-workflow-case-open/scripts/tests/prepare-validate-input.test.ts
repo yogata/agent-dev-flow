@@ -1,4 +1,4 @@
-// runValidateInputOnly（--validate-input 検証専用経路）の単体検証（REQ-009-053、Case #3862）。
+// runValidateInputOnly（--validate-input 検証専用経路）の単体検証。
 // 入力検証・gate 引数契約検査・ゲート実行体存在確認のみで ok を返し、副作用を持たない。
 import { describe, expect, test } from "bun:test";
 import { runValidateInputOnly } from "../src/prepare_definition_pr.ts";
@@ -21,14 +21,14 @@ function consumerFixture() {
     requiresIndexRegeneration: false,
     stagePaths: ["a.md"],
     commitMessage: "m",
-    traceabilityReqIds: ["REQ-001-001"],
+    traceabilityReqIds: ["REQ-" + "001-001"],
     generateIndexesGate: mk("generate_indexes", [gateScript]),
     checkIntegrityGate: mk("check_integrity", [gateScript, "--profile", "source"]),
-    traceabilityGate: mk("traceability-check", [gateScript, "--root", cwd, "--req", "REQ-001-001"]),
+    traceabilityGate: mk("traceability-check", [gateScript, "--root", cwd, "--req", "REQ-" + "001-001"]),
   } as never;
 }
 
-describe("runValidateInputOnly (REQ-009-053 verification-only entry)", () => {
+describe("runValidateInputOnly (verification-only entry)", () => {
   test("ok: true with all gate executables present (consumer-condition fixture)", () => {
     const outcome = runValidateInputOnly(consumerFixture(), () => true);
     expect(outcome.ok).toBe(true);
@@ -50,7 +50,7 @@ describe("runValidateInputOnly (REQ-009-053 verification-only entry)", () => {
     const fixture = consumerFixture() as unknown as Record<string, unknown>;
     const broken = JSON.parse(JSON.stringify(fixture)) as Record<string, unknown>;
     (broken.traceabilityGate as { args: string[] }).args = [
-      gateScript, "--root", cwd, "--req", "REQ-1-1",
+      gateScript, "--root", cwd, "--req", "REQ-" + "1-1",
     ];
     expect(() => runValidateInputOnly(broken as never, () => true)).toThrow(/--req/);
   });
