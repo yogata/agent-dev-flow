@@ -5,6 +5,132 @@
 
 ---
 
+## close scripts package の typecheck が base commit で pre-existing エラー2件を抱え exit 2 で終了し typecheck gate が機能していない
+
+- **問題事象**: agentdev-workflow-case-close scripts package の `bun run typecheck` が base（9b6e39329）で既に 2件の pre-existing エラー（`FinalAcceptanceResult` unused〔TS6133〕、`extractionSucceeded` overload 不一致〔TS2769〕）を抱え、exit 2 で終了する。恒久的に typecheck gate がこの package で機能していない状態が継続している
+- **発生局面**: case-run 検証（DEL-3852-1、PR #3858 本文検証差分 typecheck〔case-close〕行）
+- **検知方法**: case-run typecheck 実行の終了コード 2 と base との同一起源確認（base ではテスト行番号 L1105、変更後 L1159 で同一エラー）
+- **根本原因**: 未使用 import の残存と `deriveAcceptancePopulation` 期待値の型不整合が先行して混入したまま未修正
+- **自律対応内容**: 本変更では退行を追加していないことを base 同一起源確認と証跡で記録。恒久対応（未使用 import 除去と型整合）は未実施
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（base 既存問題。新規の契約変更なし）
+- **横展開観点**: 他 scripts package の typecheck gate も exit 2 を暗黙許容していないかの棚卸しが有効
+- **再発条件**: pre-existing エラーを baseline 化せず放置した package で typecheck gate を要求する場合
+- **予防策候補**: 恒久対応（未使用 import の除去と `deriveAcceptancePopulation` 期待値の型整合）を別途実施する
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: PR #3858 本文検証差分 typecheck（case-close）行・退避先 `.agentdev/integrity/reports/ts004-typecheck-agentdev-workflow-case-close.stderr.txt`
+- **タグ**: #typecheck #pre-existing #case-close-scripts
+
+---
+
+## bun test の結果サマリ（pass/fail 件数行）は stderr へ出力され、stdout のみの退避および execSync stdio pipe では欠落する
+
+- **問題事象**: bun test の「Ran N tests across M files」等の結果サマリは stdout ではなく stderr へ出力される。stdout のみの証跡退避ではサマリが欠落する。さらに `child_process.execSync`（stdio pipe）ではサマリが欠落し、bash pipe 経由なら取得できる
+- **発生局面**: case-run 検証（DEL-3852-1 PR #3858、DEL-3855-1 PR #3859 の bun test 証跡退避）
+- **検知方法**: 退避ファイルの読み戻しで pass/fail 件数行の不在を確認
+- **根本原因**: bun test は件数サマリを stderr へ書くランナーであり、退避経路（stdout 単独・execSync 単独）が stderr を捕捉しない
+- **自律対応内容**: stdout・stderr の分離退避を常時付与し、検証証跡の退避実装では bash pipe + node writeFileSync を使用（pass/fail 件数が記録される経路）
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（既存の「stdout・stderr 分離退避の常時付与」規約の実運用確認）
+- **横展開観点**: bun test を検証ランナーに使う全 Case の証跡退避に同一前提が成立
+- **再発条件**: bun test の証跡を stdout 単独または execSync 単独で退避した場合
+- **予防策候補**: 件数突合の受理根拠を stderr 退避ファイルに置く既存規約（機械工程の gate 証跡保持要件）を踏襲する
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: PR #3858・PR #3859 本文検証差分セクション（bun test 行の stdout/stderr 退避先記録）
+- **タグ**: #bun-test #証跡退避 #stderr
+
+---
+
+## 配布 script 本文（コメント含む）の様式例示で「数字3桁 + NNN」形式が concrete-id 検出に掛かる
+
+- **問題事象**: 配布 script 本文の様式例示に `REQ-010-NNN` のような「実在 REQ 番号と一致する数字部 + NNN」形式を書くと、配布依存境界 checker の concrete-id 検出に掛かる
+- **発生局面**: case-run 検証（DEL-3854-1、PR #3857 の配布依存境界 checker 初回実行）
+- **検知方法**: checker 初回実行で concrete-id 1件を検出（数字部が実在 REQ 番号と一致）
+- **根本原因**: 検出器は数字3桁部の実在性で判定するため、実在番号を含む例示が誤検出対象になる
+- **自律対応内容**: 様式例示を `REQ-0NN-NNN` 等の非数字形式へ修正し再実行で failures 0 を確認
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（既存の排除規定どおりの修正）
+- **横展開観点**: 既存3 script が `REQ-{NNNN}-{NNN}` 形式のみを使用していたのはこの制約の実績と解釈できる。配布物本文の例示は非数字形式へ統一する
+- **再発条件**: 配布物本文へ実在番号を含む様式例示を書き込んだ場合
+- **予防策候補**: 配布物本文の様式例示は `REQ-0NN-NNN`・`REQ-{NNNN}-{NNN}` 等の非数字形式へ統一する
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: PR #3857 本文検証差分 checker 実行記録行（修正済み 2件）
+- **タグ**: #配布依存境界 #concrete-id #様式例示
+
+---
+
+## traceability check の duplicate-inconsistencies は 1つの repo-local 検証テストを宣言できる sidecar を 1 component に限る
+
+- **問題事象**: 同一 artifact パス × role（verification）の対応宣言を複数 component sidecar から行うと、traceability check の duplicate-inconsistencies が矛盾判定になる
+- **発生局面**: case-run 検証（DEL-3855-1 PR #3859 の traceability check 初回実行、DEL-3854-1 PR #3857 の初回実行も同種）
+- **検知方法**: traceability check 初回実行の duplicate-inconsistencies 検出（#3859 で 1件、#3857 で 2件）
+- **根本原因**: REQ 行の集合が宣言先 sidecar ごとに異なると同一論理関係を一意に解決できないため、機械検査が矛盾として扱う
+- **自律対応内容**: 宣言を1 component sidecar へ一元化（複数 REQ 行を単一 REQ 行追加で解消する形式）して再検証し合格。変更成果物が複数 component に跨る場合、同一論理関係（artifact パス × role）は所属 component の既存 sidecar へ統合する運用を確認
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（check の既存判定規則どおりの運用）
+- **横展開観点**: repo-local pin テスト等の横断的に利用される検証資産の verification 宣言全般に同一規則が成立
+- **再発条件**: 同一検証資産への verification 宣言を複数 sidecar から行った場合
+- **予防策候補**: 帰属 sidecar を1 component に決めてから verification 宣言を書く（重複宣言の事前回避）
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: PR #3857・PR #3859 本文検証差分 traceability check 行
+- **タグ**: #traceability #sidecar #duplicate-inconsistencies
+
+---
+
+## 検証用の node_modules junction が配布依存境界 checker の adapter-failure（read-failure）を起こす
+
+- **問題事象**: 検証環境で作った node_modules junction が残存したまま配布依存境界 checker を実行すると、adapter-failure（read-failure）が発生する
+- **発生局面**: case-run 検証（DEL-3855-1、PR #3859 の checker 初回実行）
+- **検知方法**: checker 初回実行の adapter-failure 1件検出（実装違反ではなく検証環境起因と分類）
+- **根本原因**: checker の走査が junction 経由の read 失敗に達する構造（worktree の構造的制約と同系）
+- **自律対応内容**: junction 撤去後に再実行し failures 0 を確認（検証後の撤去が final gate の前提）
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（検査エラーは gate-not-passed として扱う既存契約どおり）
+- **横展開観点**: checker 実行前の環境整備（junction 撤去・実体 node_modules のみ残す）を final gate の前提とする運用が安定
+- **再発条件**: node_modules junction を残したまま checker を実行した場合
+- **予防策候補**: checker 実行前に junction を撤去するか、実体 node_modules のみ残して実行する
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: PR #3859 本文検証差分 checker 実行記録行（無効分類 1件）
+- **タグ**: #配布依存境界 #junction #checker
+
+---
+
+## Epic Wave ルートの pre-merge 機械検証で close_mechanical_steps pre-merge 必須入力と Epic ルート規定の範囲がずれ、residue check を決定的部品直接消費で実行した
+
+- **問題事象**: close_mechanical_steps.ts の phase=pre-merge 入力は STEP-3 系の必須品質ゲート（generate_indexes、traceability-check、full-integrity-suite、textlint-final-check）を validateInput で要求するが、Epic Wave クローズルート（epic-wave-close.md）は E4-1 配布依存境界 最終 gate と residue check を規定するのみで STEP-3 系ゲートを経由しない。pre-merge 必須の contract-state-residue-check（REQ-032-042）を Epic Wave ルートで実行する正規の単独経路が入力契約上にない
+- **発生局面**: case-close Epic Wave 1 クローズ pre-merge（DEL-3850-CLOSE-W1）
+- **検知方法**: close_mechanical_steps.ts の validateInput 契約と epic-wave-close.md E4 規定の突合
+- **根本原因**: close_mechanical_steps の pre-merge 入力契約が単一 Issue ルート（STEP-2〜4）の検証束ねを前提に設計され、Epic Wave ルート用の軽量実行モードを持たない
+- **自律対応内容**: contract-state-residue-check を決定的部品 evaluateContractStateResidue の直接消費（一時 script、実行後削除）で実行し、判定の意味は契約と同一のまま REQ-032-042 の pre-merge 必須検証を両立させた（証跡 .agentdev/tmp/contract-state-residue-check.json）
+- **ユーザー確認の有無**: なし（決定的部品の直接消費であり、検査の省略・迂回なし）
+- **REQ/Decision/Design影響**: なし（REQ-032-042 の検証実行を満たす。判定部品と判定入力は契約どおり）
+- **横展開観点**: Epic Wave クローズ全般で同一のずれが成立し得る（residue check の省略誘導リスク）
+- **再発条件**: Epic Wave クローズルートで close_mechanical_steps pre-merge の完全入力を組まずに residue check を省略した場合
+- **予防策候補**: close_mechanical_steps に residue-check 単独実行モード（Epic Wave ルート向け軽量 phase）を提供する
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts（validateInput、evaluateContractStateResidue）・`<workflows/epic-wave-close>` reference（E4-1、E4-2）
+- **タグ**: #case-close #epic-wave #residue-check #機械工程
+
+---
+
+## Issue 完了条件の TS 番号参照が REQ 本文の正規検証戦略採番とズレる場合がある
+
+- **問題事象**: Issue 完了条件に付された検証戦略番号（TS-004/TS-005）が、REQ 本文の正規検証戦略採番（REQ-110 は TS-013/TS-014）と一致しない場合がある。QG-4 判定時に Issue 側番号を REQ 正規採番と誤認するリスク
+- **発生局面**: case-close QG-4 完了条件評価（DEL-3850-CLOSE-W1、Issue #3855）
+- **検知方法**: REQ-110.md 本文の検証戦略テーブル（TS-013/TS-014、検証義務の所有構造）との突合
+- **根本原因**: Issue 起票時点で REQ 検証戦略の正規採番を参照せず、起票時の暫定番号がそのまま残る
+- **自律対応内容**: REQ 行の正規検証戦略（検証義務は手順契約、対応関係は sidecar verification 宣言が所有）を根拠正規契約として照合し、合格条件の意味命題（発見可能性、実体化内容一致、非破壊）の機械立証を確認して判定
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（REQ 行が正であり、本件は Issue 本文の軽微な番号ズレ。REQ 側の修正は不要と判断）
+- **横展開観点**: Epic/Child Issue 起票時の TS 番号引用全般に同一のずれが成立し得る
+- **再発条件**: REQ 検証戦略の正規採番を確認せずに Issue 完了条件へ TS 番号を引用した場合
+- **予防策候補**: Issue 起票時の TS 番号引用は REQ 本文の正規検証戦略採番確認を前置する
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: docs/requirements/REQ-110.md（TS-013/TS-014）・Issue #3855 本文完了条件（TS-004/TS-005 表記）・完了記録コメント（判定根拠）
+- **タグ**: #qg4 #検証戦略 #req行 #issue起票
+
+---
+
 ## 2026-10-20: Bun.YAML 重複パスキーの last-wins shadow により sidecar 追記が無効化される
 
 - **問題事象**: traceability/agentdev-workflow-req-define.yaml の implementation ロール配下に同一パスキーの重複ブロックが2組存在し（6f414e5ff 時点からの構造的負債）、Bun.YAML の last-wins 解釈で先行ブロックが実効無効化されていた。DEL-3816-1 が shadow される側（先行）ブロックへ REQ-004-064/065 宣言を追記したため、追記が実効読み取りされず、PR 本文の検証差分申告「対象20行の欠落が全件解消」と case-close QG-4 の missing 検出（REQ-004-064/065 missing-implementation）が乖離した
