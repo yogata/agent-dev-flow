@@ -465,3 +465,39 @@
 - **想定反映先**: learning-promote による評価・昇華（case-open STEP-4 / case-run の PR 作成手順における操作契約確認の参照明確化）
 - **関連**: Root Case #3850・設計PR #3851・Custom Tool agentdev_gh pr_create 操作契約（docs/designs/responsibilities/custom-tool-contracts.md）
 - **タグ**: #agentdev_gh #pr_create #入力契約 #fail-closed #case-openSTEP4
+
+---
+
+## learning: 機械工程 script の gate spec パス引数は実行 cwd で解決されるため worktree 対象検査の --input は相対パスでは通らない
+
+- **問題事象**: accept_definition_checks.ts（acceptance-checks phase）の overlapGate spec で、検査入力 JSON を main root 基準の相対パス（.agentdev/integrity/reports/...）で渡したところ、gate 実行 cwd が worktree（.worktrees/3850-definition）のため ENOENT で overlap-cross-check が fail した（2026-10-25、Root Case #3850 受入検査。報告 JSON の detail に stderr 原証跡が保存され、入力不備の検出は fail-closed に作動）
+- **発生局面**: 設計PR受入検査の機械工程（case-ready STEP-1 の acceptance-checks script 呼び出し）
+- **検知方法**: script の報告 JSON overlap-cross-check step detail の stderr（error: cannot read input file ... ENOENT）。終了コード 1
+- **根本原因**: spawnSync の cwd が gate spec の cwd（worktree root）で解決されるため、--input 等のパス引数の相対解決基準は gate の cwd であり repo root ではない。呼び出し側が検査入力 JSON を main root 基準の相対パスで渡した
+- **自律対応内容**: overlapGate の --input を絶対パスへ修正した入力 JSON で再実行し、4 gate 全 pass（check_integrity pass、overlap warnings=0・detection_unavailable=0、AUTOGEN 再生成差分なし、traceability check missing-design 0 件）を確認
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（gate spec の既知 flag 契約どおりの動作。--input は非空検査のみで解決基準は呼出側責任）
+- **横展開観点**: accept_definition_checks.ts、prepare_definition_pr.ts、close_mechanical_steps.ts、inspect_cross_dependencies.ts 等の全機械工程 script で gate spec を構成する呼び出し。gate cwd と input 置き場所（.agentdev/integrity/reports/ は main root 基準）の組み合わせで発生し得る
+- **再発条件**: gate 実行 cwd（worktree root 等）と検査入力 JSON の置き場所（main root 基準）が異なる状態で、--input を相対パスで渡す場合
+- **予防策候補**: gate spec のパス引数は絶対パスで構成する（または gate cwd からの相対解決を意図したパスに統一する）。報告 JSON の stderr 原証跡による fail-closed 検出を維持する
+- **想定反映先**: learning-promote による評価・昇華（機械工程 script 呼び出し手順におけるパス引数構成の参照明確化）
+- **関連**: Root Case #3850・src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts・scripts/README.md「検査入力 JSON の置き場所指針」
+- **タグ**: #機械工程 #acceptance-checks #パス引数 #fail-closed #case-readySTEP1
+
+---
+
+## learning: jev evaluate の observationMetadata.references は sha256 digest 必須であり digest を用意しないなら references を省略する
+
+- **問題事象**: Standard / Epic 確定判断の agentdev_jev evaluate で observationMetadata.references に req_draft のパスのみを指定し sha256 digest を指定しなかったため、観測書込みが warning（input reference digest must be a sha256 hex digest）で失敗し、成功観測の JSON が保存されず最終判断の observation_write も不可になった（2026-10-25、Root Case #3850 STEP-5）。references を省略した後続2件の評価（Wave 構成判断・スコープ重複判定）は観測書込みに成功
+- **発生局面**: 実行構造確定の Jev 先行評価（case-ready STEP-5）
+- **検知方法**: evaluate 応答の observation.warning（invalid_input: input reference digest must be a sha256 hex digest (64 lowercase hex chars)）。観測 JSON 未保存と observationId 未返却
+- **根本原因**: references は label/path/digest の3要素が必須（digest は sha256 hex 64文字）。digest を事前計算していない状態で references を付けた。省略は許容される field であることを確認せずに path だけを渡した
+- **自律対応内容**: 再評価・擬似再生成は行わず（観測書込み失敗時は本 STEP の success を維持する契約どおり）、該当判断の最終判断内容と観測未反映を Epic Issue 本文（Root Case #3850 実行構成章）へ記録して完了報告へ warning を明示。後続の2件の評価は references を省略した構成で観測書込みに成功（20261025T085642Z-c4bf、20261025T085659Z-9b75）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（Custom Tool agentdev_jev 操作契約の既存 fail-closed 動作の確認実績）
+- **横展開観点**: 6系統 Workflow（case-ready、req-define、learning-promote、intake-promote、inspect-promote、backlog-review）の jev evaluate 呼び出し全般。reconstructable input を参照で保持する構成では digest が必須
+- **再発条件**: observationMetadata.references に path を指定しつつ sha256 digest を計算せずに evaluate を呼ぶ場合
+- **予防策候補**: references を渡す場合は事前に sha256 digest を計算して3要素を揃える。digest を用意しない判断の場合は references を明示的に省略する（入力は state への閉じ込めで自足させる）
+- **想定反映先**: learning-promote による評価・昇華（jev 評価入力構成における references 構成の参照明確化）
+- **関連**: Root Case #3850・Custom Tool agentdev_jev evaluate 操作契約（docs/designs/responsibilities/custom-tool-contracts.md「Jev 先行評価」節）・.agentdev/jev-observations/
+- **タグ**: #agentdev_jev #観測永続化 #references #fail-closed #case-readySTEP5
