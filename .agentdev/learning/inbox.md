@@ -627,3 +627,75 @@
 - **想定反映先**: learning-promote による評価・昇華（jev 評価入力構成における references 構成の参照明確化）
 - **関連**: Root Case #3850・Custom Tool agentdev_jev evaluate 操作契約（docs/designs/responsibilities/custom-tool-contracts.md「Jev 先行評価」節）・.agentdev/jev-observations/
 - **タグ**: #agentdev_jev #観測永続化 #references #fail-closed #case-readySTEP5
+
+---
+
+## PowerShell の Parser::ParseFile は BOM なし UTF-8 を既定エンコーディング（cp932）で読み日本語コメントでパース崩壊風エラーを出す
+
+- **問題事象**: [System.Management.Automation.Language.Parser]::ParseFile は BOM なし UTF-8 ファイルを既定エンコーディング（cp932）で読むため、日本語コメントを含むファイルで実在しない構文エラー（パース崩壊風の大量エラー）を報告する。本検証で parse_errors=0 と 27 エラーの差として実証
+- **発生局面**: case-run 検証（DEL-3853-1、PR #3861 本文検証差分 PowerShell 構文検査行）および case-close 独立検証（Epic #3850 Wave 2 クローズ）
+- **検知方法**: 同一ファイルで ParseFile と ParseInput の結果が不一致（ReadAllText UTF-8 経由では 0 エラー）
+- **根本原因**: ParseFile の既定エンコーディング解釈が BOM なし UTF-8 に対し cp932 に落ちる
+- **自律対応内容**: 正しい検査経路は [System.IO.File]::ReadAllText(path, UTF8) で読んだ文字列を ParseInput へ渡す方式に統一（PR #3861 で採用・恒常的テストにも組み込み済み）
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（検証実装の方式選定の教訓。REQ-050-005 非破壊契約は影響なし）
+- **横展開観点**: PowerShell で日本語コメントを含む UTF-8（BOM なし）ファイルを静的解析する全検証に同一前提が成立（本リポジトリ既存規約「PowerShell 標準 cmdlet 経由の UTF-8 読み書き回避」と同根）
+- **再発条件**: BOM なし UTF-8 の .ps1/.psm1 を ParseFile で検査した場合
+- **予防策候補**: PowerShell 構文検査は ReadAllText(path, UTF8) + ParseInput 方式を標準とする
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: PR #3861 本文検証差分セクション・scripts/self/release/install-check-mechanical-prerequisites.Tests.ps1
+- **タグ**: #powershell #encoding #utf8 #cp932 #構文検査
+
+---
+
+## .NET の RedirectStandardOutput/RedirectStandardError の読取エンコーディングは親コンソールの OutputEncoding 依存であり UTF-8 出力の子プロセスは明示指定が必須
+
+- **問題事象**: ProcessStartInfo.RedirectStandardOutput/RedirectStandardError の読取エンコーディングは既定で親コンソールの OutputEncoding に依存する。UTF-8 出力の子プロセス（日本語を含む報告 JSON 等）は環境により破損し、後段の JSON パースが失敗する。本 PR の正常系プローブが一部環境で失敗する形で検出（修正済み）
+- **発生局面**: case-run 実装（DEL-3853-1、PR #3861 install.ps1 プローブ実装）
+- **検知方法**: 環境依存の JSON パース失敗（報告 JSON の日本語破損）
+- **根本原因**: 子プロセス標準出力/標準エラーの読取デコードが親コンソールエンコーディング依存
+- **自律対応内容**: 子プロセス起動時に StandardOutputEncoding / StandardErrorEncoding を UTF-8 に明示（install.ps1 側の実装前提として PR 本文 Design確定候補に記録。機械工程 script の報告 JSON は UTF-8 出力であることの契約）
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（実装前提の記録）
+- **横展開観点**: Windows 上で子プロセス stdout/stderr を取り込みパースする全機械工程・検証実装に同一前提が成立
+- **再発条件**: UTF-8 出力の子プロセスを ProcessStartInfo で起動しエンコーディング未指定で読む場合
+- **予防策候補**: StandardOutputEncoding/StandardErrorEncoding の UTF-8 明示を子プロセス取り込みの標準手順とする
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: PR #3861 本文「## Design確定候補」セクション 3 項目目・scripts/install.ps1
+- **タグ**: #dotnet #process #encoding #utf8 #子プロセス
+
+---
+
+## Windows の junction は bash の rmdir では削除できず cmd /c rmdir または Directory.Delete(link, false) が必要
+
+- **問題事象**: Windows の junction を bash の rmdir で削除しようとすると「Not a directory」エラーで失敗する
+- **発生局面**: case-run 検証（DEL-3853-1、PR #3861 TS-002 ケース C の入口契約破綻テストでの junction 張替え手順）
+- **検知方法**: テスト手順実行時の rmdir 失敗
+- **根本原因**: junction はディレクトリエントリではなく reparse point であり bash rmdir の想定と異なる
+- **自律対応内容**: cmd /c rmdir または [System.IO.Directory]::Delete(link, false) での削除に統一（テスト検証の junction 張替え手順で確認）
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（テスト手順の実装教訓）
+- **横展開観点**: junction を操作する検証・テスト手順全般（本リポジトリの .opencode/skills 配下 junction 構造の検証手順に適用可能）
+- **再発条件**: bash（Git Bash）から junction を削除しようとする場合
+- **予防策候補**: junction 削除は cmd /c rmdir または .NET Directory.Delete(link, false) を標準とする
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: PR #3861 本文 Findings learning 項・agentdev-git-worktree（worktree 構造的制約）
+- **タグ**: #windows #junction #rmdir #テスト手順
+
+---
+
+## traceability check の --root に相対パスを渡すと呼び出し位置（scripts ディレクトリ）からの相対で解決される
+
+- **問題事象**: トレーサビリティ check の --root に相対パス（例: ../../..）を渡すと、呼び出し位置（scripts ディレクトリ）からの相対で解決される。誤って渡すと src/common スコープの走査になり、実在要件行が unknown-req-refs として多量検出される（本実行では root 誤指定時に REQ-032-038 等が検出された。root 正指定で解消）
+- **発生局面**: case-run 検証（DEL-3856-1、PR #3860 本文検証差分トレーサビリティ check 行）
+- **検知方法**: unknown-req-refs の多量検出（実在要件行が unknown と判定）
+- **根本原因**: --root の相対パス解決基点が checker 起動 cwd（scripts ディレクトリ）であり、リポジトリルートではない
+- **自律対応内容**: --root に正しい絶対パス（リポジトリルート）を指定して再実行し解消。検証証跡の検査範囲記録時に root 解決先の明記を推奨
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（checker 実行手順の注意事項。checker 実行契約の「安定実行経路」に付随する運用上の注意）
+- **横展開観点**: --root 引数を持つ全 checker（check_autogen_freshness、generate_indexes、check_changed_docs、check_knowledge_docs 等）の実行記録に同一前提が成立
+- **再発条件**: checker を node_modules/bin や scripts 配下から起動しつつ --root に相対パスを渡す場合
+- **予防策候補**: --root は絶対パスを標準とし、検証証跡には root 解決先（実測絶対パス）を明記する
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: PR #3860 本文 Findings learning 項・agentdev-traceability check 契約・checker 実行契約（検査範囲記録の必須要素）
+- **タグ**: #traceability #checker #root指定 #相対パス #証跡記録
