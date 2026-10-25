@@ -18,12 +18,11 @@ summary: |
   置換するDesign節追記計画と、install.ps1改修・検証専用経路の切断点確定を含む実現面変更方針、
   正負対照と副作用なし契約・既存契約保持の検証戦略（TS-001〜006）を保持する。
 auto_gate:
-  auto_ready: false
+  auto_ready: true
   unresolved_questions: []
   unresolved_conflicts: []
   out_of_repo_operations: []
-  stop_reasons:
-    - "本訂正の対象となる受入不足（機械工程検査の前提検証欠如）は後続 Case の実現と検証（TS-001〜006）が完了するまで残存する。ドラフト内容自体の確定は完了済みだが、訂正対象の実現確認前に自走接続の前提を成立させない。"
+  stop_reasons: []
 
 input_resolution:
   authoritative_input: C:/Users/ogatay/work/hermes-vault/project-list/req-input-adf-install-prerequisite-acceptance-20261025.md
@@ -268,6 +267,7 @@ test_strategy:
     on_failure: |
       fix-and-reverify。検査入力の配置を契約指針へ修正して再検証する。
 case_open_hints:
+  future_obligations_nonblocking: "実装と検証義務（TS-001〜006、RA-001〜002）は本ドラフトが後続 Case へ定義する未来の義務である。Definition 完全性（auto_gate）は確定済みであり、義務の未実施を理由に case-auto の実装開始を妨げない（REQ-004-047 の抑止対象は未決・欠落・プレースホルダーのみ）。"
   known_preexisting_defects:
     - "prepare_definition_pr.ts は dryRun:true でも worktree 作成（627〜646）と generateIndexesGate 実行（707〜722）へ到達し得る既存欠陥。本訂正では修正しない。本訂正の検証実行中に観測した場合は Findings へ記録する。"
   input_placement_reconciliation: "機械工程検査の検査入力配置と横断依存検査 script 契約の置き場所指針の整合判断は TS-006 が担う。"
@@ -352,7 +352,7 @@ gate_results:
   step_6_qg1: "completed: 必須fields到達、execution_groups 不含、artifact_actions 統合済み（Design append 1件、content 完全確定・決定的マーカーなし）、test_strategy 3要素完全（TS-001〜006）、5観点→test_strategy 投影完全。組立は決定的組立スクリプト（assemble-draft-section.ts、append no-write）で実行し検査済み。QG-1 合格。"
   step_7: "completed: work_type=bugfix（既存契約の受入不足訂正。Decision不要のためfeature昇格なし）。scale=standard（単一Design節update と installer 検査節改修。実装スコープシグナルでlarge昇格要件なし）。"
   step_8: "completed: adversarial-review 発動（default-on）。2系統独立 challenge stream（契約整合系・検証実効系）による対称的相互反証、Reviewee counter-challenge、戦略メタ反証（両系統とも正負対照戦略の根幹に異議なし・実現可能性の具体化を要求）、convergence、反映後 convergence audit を実施。essential 4件・disagreement 5件・nonessential 3件を検出し全て反映または記録。反映内容: 検証専用経路の切断点明示、TS-001〜004 修正とTS-006 追加、検査入力配置規律の Design 追加、節別報告文言の統一集約整合修正、script契約反映の RA-002 明記、正例環境の最低構成明示、残存 dryRun 欠陥の Findings 記録義務、最小応答述語の明記、冒頭段落保持の明示、対象外既存不整合の未採用記録。unresolved なユーザー判断事項なし。追加 delta review（親指示欠陥修正に対する独立レビュー。bg_3b536d02 / ses_e8c3bd2c7ffeZluaGqCP6SYLbz、12m49s）は REQUEST-CHANGES で essential 1件（resume_candidates の update 語残存）のみを指摘し反映済み。他は clean または nonessential（未変更 historical 記録内の generic 用語用法 2件は reviewer 判断で遡及修正せず現状保持）。reviewer 側の独立機械検証: Design sha256 一致、節 8行→組立 13行の導出整合、diff added 5/removed 0、append 空行挿入の実装整合、replace 拒否の正当性、prepare_definition_pr.ts dryRun 無視の worktree/gate 到達（627〜646・707〜722）、置き場所指針と TS-006 の整合。"
-  step_9: "completed: 重要変更通知を保存前に出力済み。第一回保存は明示パス指定 commit ff835755d で永続化（1ファイル、スイープstageなし）。親指示欠陥修正（機械組立・TS修正・append正規化・旧矛盾除去・auto_ready:false）と delta review 指摘反映の後、改めて読み戻し完結性確認（fenced YAML 閉包・全fields到達・決定的マーカーなし・文字化けなし）と YAML 構造機械検証（pyyaml 6.0.3）を実施し、明示パス指定の NEW commit（amend 不使用、スイープstageなし、ステージ済み他者変更を含まない）で永続化する。観測 JSON 3件は commit 対象外（明示パス許可はドラフトのみ）として残置。"
+  step_9: "completed: 重要変更通知を保存前に出力済み。第一回保存は明示パス指定 commit ff835755d、第二回保存は delta review 指摘反映と親指示欠陥修正（機械組立・TS修正・append正規化・旧矛盾除去・auto_ready:false）後に明示パス指定 commit 3cff31280 で永続化（ともに1ファイル、amend 不使用、スイープstageなし）。第3修正（親指示ゲート意味訂正: 合成ブロッカー除去と auto_ready:true 復元）の後、読み戻し完結性確認（fenced YAML 閉包・全fields到達・決定的マーカーなし・文字化けなし）と YAML 構造機械検証（pyyaml 6.0.3）を実施し、明示パス指定の NEW commit（amend 不使用、スイープstageなし、ステージ済み他者変更を含まない）で永続化する。観測 JSON 3件は commit 対象外（明示パス許可はドラフトのみ）として残置。"
   step_10_11: "completed: 要件doc提示と完了報告（bugfix → lightweight 種別）を出力。"
   jev:
     invoked: true
@@ -378,7 +378,7 @@ gate_results:
 
 important_change_notice:
   emitted_before_this_write: true
-  reference: "本実行のドラフト全面更新直前の利用者向け実行出力通知。REQ操作なし・accepted Design機械工程節へのappend計画（既存記述は一切変更せず箇条書き4点を節末尾へ追記）・実現面変更方針・確定事項と未決なしを説明。追加通知（親指示欠陥修正）: TS-002正例を完全provisions環境でのinstaller全体exit0受入へ復元、TS-003を実行時shim証明必須化、TS-006と配置文言から免除検討を除去してscript契約の既存合法配置へ一本化、auto_ready:false化、updateからappend操作への正規化と機械組立実施、旧事実矛盾3件の除去。"
+  reference: "本実行のドラフト全面更新直前の利用者向け実行出力通知。REQ操作なし・accepted Design機械工程節へのappend計画（既存記述は一切変更せず箇条書き4点を節末尾へ追記）・実現面変更方針・確定事項と未決なしを説明。追加通知（親指示欠陥修正）: TS-002正例を完全provisions環境でのinstaller全体exit0受入へ復元、TS-003を実行時shim証明必須化、TS-006と配置文言から免除検討を除去してscript契約の既存合法配置へ一本化、updateからappend操作への正規化と機械組立実施、旧事実矛盾3件の除去。第3修正（親指示ゲート意味訂正）: 前版の stop_reasons に含めていた「実現と検証（TS-001〜006）の完了まで自走接続を抑止」の文言は、Definition完全性を判定する auto_gate の契約外の合成ブロッカーであったため除去し auto_ready:true へ復元。実装検証義務は test_strategy が未来の義務として正確に定義しており、義務の未実施は自らの開始を妨げない（case_open_hints.future_obligations_nonblocking）。"
   canonical_changes_applied: false
   actual_difference_from_intent: "正規成果物（REQ/Decision/Design）への変更は本次では実施しない。Design節追記はartifact_actionsの計画であり、適用はcase-ready/case-reviseのDefinition保存内部責務。"
 
