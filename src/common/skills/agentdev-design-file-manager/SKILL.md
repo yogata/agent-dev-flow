@@ -112,7 +112,7 @@ LLM 推論で実行していた決定的処理をスクリプトへ委譲する�
 配置先: 本スキル配下の `scripts/`（Design 固有）。
 実装は TypeScript、決定的（純粋関数）、テスト付き（`tests/*.test.ts`）である。
 
-共通検証 script（`check-frontmatter-consistency.ts`、`check-entry-existence.ts`、`check-change-impact.ts`）は `agentdev-artifact-validation` が所有し、本スキルは公開検証契約経由で委譲する。
+共通検証 script（`check-frontmatter-consistency.ts`、`check-entry-existence.ts`、`check-change-impact.ts`）と書込み時引用識別子実在検証（`check-req-row-existence.ts`）は `agentdev-artifact-validation` が所有し、本スキルは公開検証契約経由で委譲する。
 本スキル配下には Design 固有 script のみを配置する。
 
 ### I/O 契約（REQ）
@@ -147,6 +147,13 @@ cd src/common/skills/agentdev-design-file-manager/scripts && bun test
 
 Design 保存内部責務は本スクリプト群を bash 経由で呼び出し、JSON 結果を parse して意味判断（複数マッチ時の warning、未検出時のスキップ判定等）を行う。
 これにより target_area 見出し検索を LLM 推論ではなく機械的に実行する（design-principles.md 第5節「決定的処理の Script 委譲原則」）。
+
+Design の初回作成・増分更新の保存では、書込み直前の適用後本文に対して、`agentdev-artifact-validation` の公開検証契約（書込み時引用識別子実在検証、`check-req-row-existence`）を実行する。
+
+- 検証対象は書込み本文（適用後の Design 本文）である。本文・表中に引用する要件行 ID（桁数を固定しない許容書式）が docs/requirements の要件行テーブルに実在することを検査する
+- 同じ変更で REQ の要件行テーブルを作成・更新する場合は、その REQ ファイルの適用後本文を `files` に併せて渡す。検査は同じ変更で作成される参照先を含む適用後状態で評価され、参照先の保存順序だけを理由に不合格にならない
+- `ok: false` の場合は保存を完了扱いにしない。`missing` の内容（実在しない要件行 ID と箇所）を修正対象として報告し、修正後に再検証する
+- 検証の実行結果は保存操作の報告に含める
 
 ---
 
