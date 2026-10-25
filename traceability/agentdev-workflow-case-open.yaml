@@ -94,6 +94,8 @@ implementation:
     - REQ-029-014
   src/common/skills/agentdev-workflow-case-open/scripts/lib/shared_area_registration.ts:
     - REQ-061-030
+  src/common/skills/agentdev-workflow-case-open/scripts/README.md:
+    - REQ-009-053
   src/common/skills/agentdev-workflow-case-open/scripts/src/inspect_cross_dependencies.ts:
     - REQ-029-016
     - REQ-030-012
@@ -102,6 +104,7 @@ implementation:
     - REQ-061-031
   src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts:
     - REQ-029-014
+    - REQ-009-053
     - REQ-029-015
     - REQ-030-017
     - REQ-030-021
@@ -118,6 +121,8 @@ verification:
     - REQ-100-006
   src/common/skills/agentdev-workflow-case-open/scripts/tests/inspect-cross-dependencies-path.test.ts:
     - REQ-029-016
+  src/common/skills/agentdev-workflow-case-open/scripts/tests/prepare-validate-input.test.ts:
+    - REQ-009-053
   src/common/skills/agentdev-workflow-case-open/scripts/tests/prepare_definition_pr.test.ts:
     - REQ-029-014
     - REQ-029-015
