@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtemp, rm, writeFile, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { parseTransitionRecord } from "../lib/schema.ts";
+import { isTerminalRecord, parseTransitionRecord } from "../lib/schema.ts";
 import { applyRecord, lookupRecord } from "../lib/store.ts";
 import { parseSuccessorInput, resolveSuccessor } from "../lib/successor.ts";
 
@@ -41,6 +41,62 @@ describe("schema parse", () => {
   test("rejects unknown extra fields (progress ledger fields are forbidden)", () => {
     const parsed = parseTransitionRecord({ ...baseRecord, progress: "50%" });
     expect(parsed.ok).toBe(false);
+  });
+
+  test("rejects an empty-string toPhase even for a terminal intent", () => {
+    const parsed = parseTransitionRecord({ ...baseRecord, toPhase: "" });
+    expect(parsed.ok).toBe(false);
+  });
+});
+
+describe("terminal transition records", () => {
+  const terminalRecord = { ...baseRecord, toPhase: null };
+
+  test("parses a terminal record and reconstructs terminal from it", () => {
+    const parsed = parseTransitionRecord(terminalRecord);
+    expect(parsed.ok).toBe(true);
+    if (parsed.ok) {
+      expect(isTerminalRecord(parsed.record)).toBe(true);
+    }
+  });
+
+  test("reconstructs a normal record as non-terminal", () => {
+    const parsed = parseTransitionRecord(baseRecord);
+    expect(parsed.ok).toBe(true);
+    if (parsed.ok) {
+      expect(isTerminalRecord(parsed.record)).toBe(false);
+    }
+  });
+
+  test("still rejects unknown fields on a terminal record", () => {
+    const parsed = parseTransitionRecord({ ...terminalRecord, progress: "100%" });
+    expect(parsed.ok).toBe(false);
+  });
+
+  test("records a terminal transition once and restores it from the record", async () => {
+    const first = await applyRecord(dir, terminalRecord);
+    expect(first.result).toBe("recorded");
+    const second = await applyRecord(dir, terminalRecord);
+    expect(second.result).toBe("duplicate");
+    const lookup = await lookupRecord(dir, "transition-20261013-001");
+    expect(lookup.result).toBe("existing");
+    if (lookup.result === "existing") {
+      expect(lookup.record.toPhase).toBeNull();
+      expect(isTerminalRecord(lookup.record)).toBe(true);
+    }
+  });
+
+  test("keeps normal and terminal records distinguishable in the same directory", async () => {
+    await applyRecord(dir, baseRecord);
+    await applyRecord(dir, { ...terminalRecord, key: "transition-20261013-002" });
+    const normal = await lookupRecord(dir, "transition-20261013-001");
+    const terminal = await lookupRecord(dir, "transition-20261013-002");
+    expect(normal.result).toBe("existing");
+    expect(terminal.result).toBe("existing");
+    if (normal.result === "existing" && terminal.result === "existing") {
+      expect(isTerminalRecord(normal.record)).toBe(false);
+      expect(isTerminalRecord(terminal.record)).toBe(true);
+    }
   });
 });
 

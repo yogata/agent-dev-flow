@@ -104,6 +104,7 @@ verification:
   .opencode/skills/repo-agentdev-integrity/scripts/tests/phase_adoption_record_contract.test.ts:
   - REQ-110-040
   - REQ-110-041
+  - REQ-111-020
 links:
   upstream:
     src/common/skills/agentdev-workflow-phase-artifacts-update/SKILL.md:

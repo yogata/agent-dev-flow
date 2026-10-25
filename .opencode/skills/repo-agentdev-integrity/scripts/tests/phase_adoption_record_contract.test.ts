@@ -1,8 +1,9 @@
-// ADF-COVERS(verification): REQ-110-040, REQ-110-041
+// ADF-COVERS(verification): REQ-110-040, REQ-110-041, REQ-111-020
 //
 // 直接採用の採否記録の保存先契約（REQ-110-040）と領域契約文書の配布テンプレート
-// 非破壊実体化（REQ-110-041）の pin 検査。配布物本文の追記文言が恒久的に保持される
-// ことを、内容検索（pin 型）で検証する。pin の文言変更は期待値追随を同一 PR で行う。
+// 非破壊実体化（REQ-110-041）、終端遷移後の保存状態の参照専用保持（REQ-111-020）
+// の pin 検査。配布物本文の追記文言が恒久的に保持されることを、内容検索（pin 型）
+// で検証する。pin の文言変更は期待値追随を同一 PR で行う。
 // 配布テンプレート（正本）と dogfood 実体（.agentdev/phase/README.md）の内容一致も
 // pin する（初回保存経路での実体化内容がテンプレートと一致する契約の構造的基盤）。
 
@@ -142,5 +143,30 @@ describe("領域契約文書の配布テンプレート非破壊実体化（REQ-
     expect(sec).toContain("`templates/phase-readme.md`");
     expect(sec).toContain("上書きしない");
     expect(sec).toContain("検査失敗として扱わない");
+  });
+});
+
+describe("終端遷移後の保存状態の参照専用保持（REQ-111-020）", () => {
+  test("領域契約 README テンプレートが参照専用保持の契約を規定する", () => {
+    const template = read(...TEMPLATE_PATH);
+    const sec = sectionBetween(template, "## 終端遷移後の保存状態の保持");
+    expect(sec.length).toBeGreaterThan(0);
+    expect(sec).toContain("架空の後続工程を作らない記録形式で遷移記録へ保存される");
+    expect(sec).toContain("保存された記録から終端であることを再構成できる");
+    expect(sec).toContain("テーマ正本、識別状態、遷移記録");
+    expect(sec).toContain("参照専用として保持する");
+  });
+
+  test("参照専用の保持が完了済み過去工程の正規改訂と変更駆動経路を妨げないことを規定する", () => {
+    const template = read(...TEMPLATE_PATH);
+    const sec = sectionBetween(template, "## 終端遷移後の保存状態の保持");
+    expect(sec).toContain("完了済み過去工程の正規改訂と変更駆動経路による作業を妨げない");
+    expect(sec).toContain("テーマ状態（active、merged、deprecated）に完了状態を追加せず");
+  });
+
+  test("dogfood 実体がテンプレートと同じ節を保持する", () => {
+    const readme = read(".agentdev", "phase", "README.md");
+    const sec = sectionBetween(readme, "## 終端遷移後の保存状態の保持");
+    expect(sec).toContain("参照専用として保持する");
   });
 });

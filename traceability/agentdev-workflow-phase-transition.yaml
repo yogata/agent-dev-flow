@@ -25,8 +25,11 @@ implementation:
     - REQ-110-037
     - REQ-110-038
     - REQ-110-039
+  src/common/skills/agentdev-workflow-phase-transition/scripts/lib/schema.ts:
+    - REQ-111-019
   src/common/skills/agentdev-workflow-phase-transition/scripts/lib/store.ts:
     - REQ-111-003
+    - REQ-111-019
   src/common/skills/agentdev-workflow-phase-transition/scripts/lib/successor.ts:
     - REQ-111-004
 verification:
@@ -36,6 +39,7 @@ verification:
     - REQ-111-004
     - REQ-111-005
     - REQ-111-011
+    - REQ-111-019
     - REQ-110-034
     - REQ-110-035
     - REQ-110-036
@@ -54,3 +58,4 @@ verification:
     - REQ-111-003
     - REQ-111-004
     - REQ-111-005
+    - REQ-111-019
