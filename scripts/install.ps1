@@ -804,6 +804,90 @@ function Invoke-ThirdPartyDriftCheck {
     }
 }
 
+# --- Mechanical-step script prerequisite check (REQ-009-053) ---
+
+# 配布物の主要な機械工程 script（定義PR準備、定義PR受入検査、クローズ機械工程、
+# 横断依存検査）の実行時前提の不一致を導入時に検出する検証。
+# 本入口は機械工程 script 側の入力検証 dry-run 入口（入力 JSON の検証のみを行い、
+# worktree 作成・ファイル変更・ゲート実行を行わない入口）を呼び出すプローブであり、
+# install.ps1 は入口の呼出しと前提不一致の divergence 報告のみを担う（入口の実体は
+# 配布 script 実装が所有する）。検証方法（install-script-usability Design
+# 「機械工程 script の実行時前提の導入時検証」節、REQ-009-053）:
+#   - 依存ツールの存在確認: 機械工程 script の実行環境（bun）
+#   - 入力 JSON の契約検証: 各 script への入力検証 dry-run プローブ
+#     - input-error プローブ: 契約不成立の最小入力を与え、入口契約どおり
+#       （stderr が error: 行で始まり、終了コード 1）に拒否されることを確認する。
+#       入力検証で失敗するため worktree 作成・ファイル変更・ゲート実行には到達しない
+#     - valid-input プローブ（横断依存検査）: 共有領域定義（shared_areas）を空にした
+#       最小入力（検査入力ファイルの読取を発生させない read-only 検査）を与え、
+#       報告 JSON と終了コード 0 を確認する
+# 検証自体の実行失敗（script の不在、入口契約の不整合）は検証不能として divergence
+# 報告し、成功扱いとしない（check の終了コードに反映する）。検証は管理対象ファイルを
+# 変更しない（REQ-050-005）。プローブの入力 JSON は OS 一時領域に作成し、検証後に
+# 削除する（consumer repo 配下へ書込まない）。
+$MechanicalStepProbeContract = @(
+    @{ Skill = 'agentdev-workflow-case-open';  ScriptRel = 'scripts\src\prepare_definition_pr.ts';      Probe = 'input-error' }
+    @{ Skill = 'agentdev-workflow-case-ready'; ScriptRel = 'scripts\src\accept_definition_checks.ts';   Probe = 'input-error' }
+    @{ Skill = 'agentdev-workflow-case-close'; ScriptRel = 'scripts\src\close_mechanical_steps.ts';     Probe = 'input-error' }
+    @{ Skill = 'agentdev-workflow-case-open';  ScriptRel = 'scripts\src\inspect_cross_dependencies.ts'; Probe = 'valid-input' }
+)
+
+# valid-input プローブの最小入力（横断依存検査の検査入力 JSON 契約に従う。
+# unclosed_cases を空にして比較 population を検査対象 Case のみにし、
+# shared_areas を空にして検査入力ファイルの読取を発生させない）。
+$MechanicalStepValidInputJson = '{"mode":"case-open","current_case":{"case_ref":"install-check-probe","epic_ref":null,"artifact_paths":[],"target_rows":[],"is_epic_intake":false},"unclosed_cases":[],"shared_areas":[]}'
+$MechanicalStepProbeInputErrorJson = '{}'
+$MechanicalStepProbeTimeoutMs = 60000
+
+function Invoke-MechanicalScriptProbe {
+    <#
+    .SYNOPSIS
+        機械工程 script への入力検証 dry-run プローブを実行し、終了コードと
+        stdout/stderr を分離取得する。プローブは検証のみであり、script 側の
+        実行ステップ（worktree 作成・ファイル変更・ゲート実行）には到達しない入力を
+        与える（REQ-050-005 非破壊契約）。
+    #>
+    param(
+        [string]$BunPath,
+        [string]$ScriptPath,
+        [string]$InputPath,
+        [string]$RootArg
+    )
+    $psi = [System.Diagnostics.ProcessStartInfo]::new()
+    $psi.FileName = $BunPath
+    $psi.ArgumentList.Add($ScriptPath)
+    $psi.ArgumentList.Add('--input')
+    $psi.ArgumentList.Add($InputPath)
+    if ($RootArg) {
+        $psi.ArgumentList.Add('--root')
+        $psi.ArgumentList.Add($RootArg)
+    }
+    $psi.RedirectStandardOutput = $true
+    $psi.RedirectStandardError = $true
+    # 機械工程 script の報告 JSON は UTF-8 で出力されるため、リダイレクト読取の
+    # エンコーディングを明示する（既定は親コンソールの OutputEncoding に依存し、
+    # 日本語を含む報告 JSON が環境によって壊れる）。
+    $psi.StandardOutputEncoding = [System.Text.Encoding]::UTF8
+    $psi.StandardErrorEncoding = [System.Text.Encoding]::UTF8
+    $psi.UseShellExecute = $false
+    $psi.CreateNoWindow = $true
+    $process = [System.Diagnostics.Process]::new()
+    $process.StartInfo = $psi
+    $null = $process.Start()
+    $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+    $stderrTask = $process.StandardError.ReadToEndAsync()
+    if (-not $process.WaitForExit($MechanicalStepProbeTimeoutMs)) {
+        try { $process.Kill($true) } catch { $process.Kill() }
+        return @{ TimedOut = $true; ExitCode = $null; StdOut = ''; StdErr = '' }
+    }
+    return @{
+        TimedOut = $false
+        ExitCode = $process.ExitCode
+        StdOut   = $stdoutTask.GetAwaiter().GetResult()
+        StdErr   = $stderrTask.GetAwaiter().GetResult()
+    }
+}
+
 # --- Checkout Guidance (AG-002/REQ-009-047) ---
 
 # 案内文言・既定 URL 定数は consumer-opencode-common.ps1 の共有定義を使用する（RU-0014、AG-020）。
@@ -1174,6 +1258,70 @@ if ($Mode -eq 'check') {
         $assetPath = Join-Path $RepoRoot $asset.Rel
         if (Test-Path -LiteralPath $assetPath) {
             Write-Host "[INFO] Protected asset present (never modified by this script): $($asset.Label)"
+        }
+    }
+
+    # 10. 機械工程 script の実行時前提検証（REQ-009-053）。静的構成検査と実行環境診断の
+    # 間で、配布物の主要機械工程 script の実行時前提の不一致を導入時に検出する。
+    # 検証は副作用なしの入力検証 dry-run 相当（入力 JSON の契約検証、依存ツールの
+    # 存在確認）であり、管理対象ファイルを変更しない（REQ-050-005）。検出した前提の
+    # 不一致は既存の divergence 報告形式で報告し、check の終了コードに反映する。
+    # 検証自体の実行失敗は検証不能として報告し、成功扱いとしない。
+    Write-Host ''
+    Write-Host '--- Mechanical-step script prerequisites ---'
+    $mechanicalBun = Get-Command -Name 'bun' -ErrorAction SilentlyContinue
+    if (-not $mechanicalBun) {
+        Write-Host '[DIVERGENCE] Mechanical-step script runtime prerequisite (bun) not found in PATH; mechanical-step script prerequisite verification is unavailable (not treated as success)'
+        $divergences++
+    } else {
+        $probeTempDir = Join-Path ([System.IO.Path]::GetTempPath()) "adf-install-check-$([guid]::NewGuid().ToString('N')).tmp"
+        try {
+            New-Item -ItemType Directory -Path $probeTempDir -Force | Out-Null
+            foreach ($probeSpec in $MechanicalStepProbeContract) {
+                $scriptPath = Join-Path $SkillsDir (Join-Path $probeSpec.Skill $probeSpec.ScriptRel)
+                $scriptDisplay = "$($probeSpec.Skill)/$($probeSpec.ScriptRel -replace '\\', '/')"
+                if (-not (Test-Path -LiteralPath $scriptPath)) {
+                    Write-Host "[DIVERGENCE] Mechanical-step script missing: $scriptDisplay"
+                    $divergences++
+                    continue
+                }
+                $inputPath = Join-Path $probeTempDir ($probeSpec.Skill + '.json')
+                if ($probeSpec.Probe -eq 'input-error') {
+                    $expectedDetail = 'exit 1 with a stderr error: line (input-validation contract)'
+                    [System.IO.File]::WriteAllText($inputPath, $MechanicalStepProbeInputErrorJson, (New-Object System.Text.UTF8Encoding($false)))
+                    $probe = Invoke-MechanicalScriptProbe -BunPath $mechanicalBun.Source -ScriptPath $scriptPath -InputPath $inputPath
+                } else {
+                    $expectedDetail = 'exit 0 with a JSON report (ok: true) on stdout'
+                    [System.IO.File]::WriteAllText($inputPath, $MechanicalStepValidInputJson, (New-Object System.Text.UTF8Encoding($false)))
+                    $probe = Invoke-MechanicalScriptProbe -BunPath $mechanicalBun.Source -ScriptPath $scriptPath -InputPath $inputPath -RootArg $RepoRoot
+                }
+                if ($probe.TimedOut) {
+                    Write-Host "[DIVERGENCE] Mechanical-step script prerequisite verification timed out: $scriptDisplay (expected: $expectedDetail)"
+                    $divergences++
+                    continue
+                }
+                $probeContractOk = $false
+                if ($probeSpec.Probe -eq 'input-error') {
+                    $probeContractOk = ($probe.ExitCode -eq 1) -and ($probe.StdErr.TrimStart() -match '^error:') -and ($probe.StdOut.Length -eq 0)
+                } else {
+                    $probeReport = $null
+                    try { $probeReport = $probe.StdOut | ConvertFrom-Json } catch { $probeReport = $null }
+                    $probeContractOk = ($probe.ExitCode -eq 0) -and ($null -ne $probeReport) -and ($probeReport.ok -eq $true)
+                }
+                if ($probeContractOk) {
+                    Write-Host "[OK] Mechanical-step script prerequisite (input-validation dry-run): $scriptDisplay"
+                } else {
+                    $probeResponse = if ($probe.StdErr.Length -gt 0) { $probe.StdErr.Trim() } else { $probe.StdOut.Trim() }
+                    $probeResponseHead = ($probeResponse -split "`n")[0]
+                    Write-Host "[DIVERGENCE] Mechanical-step script entry contract mismatch: $scriptDisplay (expected: $expectedDetail, actual: exit=$($probe.ExitCode), response: $probeResponseHead)"
+                    $divergences++
+                }
+            }
+        }
+        finally {
+            if (Test-Path -LiteralPath $probeTempDir) {
+                Remove-Item -LiteralPath $probeTempDir -Recurse -Force -ErrorAction SilentlyContinue
+            }
         }
     }
 
