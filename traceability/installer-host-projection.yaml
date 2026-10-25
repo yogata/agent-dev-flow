@@ -6,6 +6,7 @@ implementation:
     - REQ-099-012
     - REQ-009-040
     - REQ-009-042
+    - REQ-009-053
     - REQ-029-012
     - REQ-097-002
     - REQ-050-015
@@ -40,3 +41,5 @@ verification:
     - REQ-099-012
   scripts/self/release/package-release-archive.test.ts:
     - REQ-099-020
+  scripts/self/release/install-check-mechanical-prerequisites.Tests.ps1:
+    - REQ-009-053
