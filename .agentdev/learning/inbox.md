@@ -699,3 +699,22 @@
 - **想定反映先**: learning-promote による評価・昇華
 - **関連**: PR #3860 本文 Findings learning 項・agentdev-traceability check 契約・checker 実行契約（検査範囲記録の必須要素）
 - **タグ**: #traceability #checker #root指定 #相対パス #証跡記録
+
+---
+
+## agentdev_gh が host プロセス内で gh exit 66・出力空で一貫失敗し、ocenv からの opencode 再起動で回復した
+
+- **問題事象**: opencode host プロセス（bun）から spawnSync される gh が agentdev_gh の全操作で終了コード 66・stdout/stderr 空の一貫失敗となった。同一サーバーの bash からは同一バイナリ・同一引数（gh api repos/<repo>/issues/N、gh repo view）が全て成功。agentdev_gh 内の repo 解決（gh repo view）は成功していたため、起動自体は可能で操作 spawn のみ失敗する非対称な失敗形状だった
+- **発生局面**: case-open 実行（Case #3862 起票前。Root Case 本文候補確定後の issue_create）
+- **検知方法**: agentdev_gh failure.detail の gh exited with code 66; stderr is empty（5回・2操作種で一貫）。bash・node・bun 各経路の同引数実行が全て成功することによる環境起因の切り分け
+- **根本原因**: 確定不能（opencode host プロセス世代依存の起動失敗候補。bun on Windows の spawnSync 系既知障害クラス〔oven-sh/bun#27482、#33932〕の類似だが本件は一貫失敗）。host プロセスの再起動でのみ解消
+- **自律対応内容**: 診断後に冪等検出の読取のみ規定の gh CLI 読取切替（記録付き）で継続し、GitHub 書込みは agentdev_gh 回復まで実施しなかった（カタログ外書込代替不使用）。未追跡の Jev 観測3件の前提整備 commit（明示パス）と Root Case 本文候補・スキップ判断記録を durable state として保持し、環境復旧後に同じ状態から再開して完了
+- **ユーザー確認の有無**: あり（監督がサーバーを ocenv から再起動し、agentdev_gh issue_read の実回復を probe で確認後に再開指示）
+- **REQ/Decision/Design影響**: なし（実行環境起因。Custom Tool 契約・失敗分類は変更不要。fail-closed 挙動は契約どおり）
+- **横展開観点**: agentdev_gh の一貫失敗と bash gh の成功が並存した場合、認証・GitHub 障害と断定せず host プロセス起因の候補として切り分ける。重試行の反復や長大なファイル探索をせず、durable state を保全して環境復旧待ち報告に切り替える判断材料になる
+- **再発条件**: 同一 host プロセスで agentdev_gh 操作が空出力の非ゼロ終了で一貫失敗し、repo 解決のみ成功する場合
+- **予防策候補**: 失敗形状（終了コード・出力空・操作種別・解決のみ成功）を報告に含め、環境復旧後の再開点（未作成 Issue・未開始工程の明記）を1回の報告に完結させる
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: Case #3862 実行記録・docs/knowledge/supervisor-bridge-credential-supply.md・agentdev-gh runner-cli.ts failFromExec
+- **タグ**: #agentdev_gh #gh #windows #bun #spawnSync #環境障害 #再開
+
