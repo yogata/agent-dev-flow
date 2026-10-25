@@ -15,14 +15,15 @@ scale: standard
 summary: |
   明示訂正入力に基づき、合意済みF1(b)の導入時前提検証の受入不足だけを扱う検証済み完成ドラフト。
   REQ操作なし・Design行帰属で確定。機械工程検査節の検査入力を実際のconsumer条件fixtureへ
-  置換するDesign節更新計画と、install.ps1改修・検証専用経路の切断点確定を含む実現面変更方針、
+  置換するDesign節追記計画と、install.ps1改修・検証専用経路の切断点確定を含む実現面変更方針、
   正負対照と副作用なし契約・既存契約保持の検証戦略（TS-001〜006）を保持する。
 auto_gate:
-  auto_ready: true
+  auto_ready: false
   unresolved_questions: []
   unresolved_conflicts: []
   out_of_repo_operations: []
-  stop_reasons: []
+  stop_reasons:
+    - "本訂正の対象となる受入不足（機械工程検査の前提検証欠如）は後続 Case の実現と検証（TS-001〜006）が完了するまで残存する。ドラフト内容自体の確定は完了済みだが、訂正対象の実現確認前に自走接続の前提を成立させない。"
 
 input_resolution:
   authoritative_input: C:/Users/ogatay/work/hermes-vault/project-list/req-input-adf-install-prerequisite-acceptance-20261025.md
@@ -65,28 +66,22 @@ agreed_items:
 artifact_actions:
   - id: ACT-DESIGN-001
     artifact: design
-    operation: update
+    operation: append
     target: docs/designs/local/install-script-usability.md
     target_area: "### 機械工程 script の実行時前提の導入時検証（REQ-009-053）"
+    placement: tail
     source_items: [AG-001, AG-002, AG-003]
     content: |
-      ### 機械工程 script の実行時前提の導入時検証（REQ-009-053）
-
-      check モードは静的構成検査に加えて、配布物の主要な機械工程 script（定義PR準備、定義PR受入検査、クローズ機械工程、横断依存検査）の実行時前提の不一致を導入時に検出する。検証は各 script の副作用のない入力検証 dry-run 入口（入力 JSON の検証のみを行い、worktree 作成・ファイル変更・ゲート実行を行わない入口）または同等の手段によって行い、check モードの非破壊契約（REQ-050-005）を維持する。
-
-      - 検証対象 script の範囲と各 script の dry-run 入口の仕様は配布 skill の script 契約（scripts/README.md 等）が所有し、本節は検出契機と報告形式を定める
-      - 検出した前提の不一致（必須ゲートの不在、入力書式の不整合、解決不能なパス形式等）は既存の divergence 報告形式で報告し、check の終了コードに反映する。検証自体の実行失敗（script の不在、入口契約の不整合）は検証不能として報告し、成功扱いとしない
-      - dry-run 入口を持たない機械工程 script に対しては、入力検証相当の検証方法（入力 JSON の契約検証、依存ツールの存在確認）を script 契約に定めてから check の検証対象へ組み込む
       - 検査入力は配布先の実際の consumer 条件（REQ 行 ID、必須ゲート実行体の参照、入力書式、パス条件）を表現する fixture で構成する。空 JSON の受理拒否、bun の起動、script ファイルの存在、対象集合が空の入力の受理を、実行時前提の検証成立の証拠としない。入力書式の契約は script 契約の既定に従う
       - 検証は前提が揃う正例と前提を欠く負例の対照で成立を確認する。不足条件は隔離複写または fixture で構成し、producer 正本を移動・削除せず、管理対象ファイルを変更しない（REQ-050-005）
       - 機械工程検査節の検出結果は節見出しと検証対象ごとの結果行で判読可能に報告する。終了コードへの反映と divergence の統一集約（本節の既存規定）を維持しつつ、機械工程検査節は installer 全体の他の divergence の有無に依存せず節単独で検出結果を判読できる
-      - 検査入力 JSON の一時配置は対象 script 契約の置き場所指針と矛盾させない。矛盾が残る場合は本節または script 契約に配置免除と根拠を明文化する
+      - 検査入力 JSON の一時配置は対象 script 契約の置き場所指針に従う。横断依存検査の検査入力は workspace 外一時領域へ置かず、project root 内の契約に従う位置へ置く
 conflict_resolutions: []
 operation_units:
   - ou_id: OU-001
     target_req: null
     target_design: docs/designs/local/install-script-usability.md
-    operation: update
+    operation: append
     scale: standard
     depends_on: []
     recommended_order: 1
@@ -96,7 +91,7 @@ operation_units:
       最終分類は Design行・分離true（観測 20261025T151351Z-3a9f）。20261025T123914Z-4b50 は
       step3-observation reference の digest 転記不一致のため判断根拠から除外し、同一意味判断を
       正確な references で新規評価により再確定した。REQ-009-053 が成果・制約を既に規定しており、
-      Design 機械工程節の検証方法明文化のみを操作とする。
+      Design 機械工程節への検証方法の箇条書き追記（append）のみを操作とする。
 result: {}
 realization_actions:
   - id: RA-001
@@ -114,6 +109,8 @@ realization_actions:
       population_count===1、condition_a.count===0、condition_b[].file_results[].read_ok 全 true、
       detection_unavailable 空。横断依存の解決不能パスは script の終了 0・ok:true でも
       install.ps1 が応答解析（述語不成立）で divergence 導出と非ゼロ終了を行う。
+      検査入力の配置は対象 script 契約の置き場所指針に従い、現行の OS 一時領域使用は
+      修正対象とする（配置免除の新設は行わない）。
     verification_refs: [TS-001, TS-002, TS-005, TS-006]
     source_items: [AG-001, AG-002, AG-003]
   - id: RA-002
@@ -175,13 +172,21 @@ review_dispositions:
       checked_at_commit: null
     related_removed_items: []
 assembly_evidence:
-  - note: |
-      本 draft は blocked 停止下書きの全面更新であり、決定的組立スクリプト
-      （assemble-draft-section.ts）を不使用のモデル生成で組立。対象は draft 自身であり、
-      artifact_actions の content に引用する Design 機械工程節の冒頭段落と既存3箇条書きは
-      原文（docs/designs/local/install-script-usability.md 124〜130。
-      ハッシュ c318b1290f8c556f1ce82c6f30804b88c1f5a456f5e0aedfc7f873401ee5d591）から
-      逐語転記済み。実対象 Design への適用は case-ready / case-revise の Definition 保存内部責務。
+  - target_file: docs/designs/local/install-script-usability.md
+    target_content_sha256: c318b1290f8c556f1ce82c6f30804b88c1f5a456f5e0aedfc7f873401ee5d591
+    check_scope: { heading: "### 機械工程 script の実行時前提の導入時検証（REQ-009-053）", start_line: 124, end_line: 131 }
+    execution_conditions: { operation: append, edit_sha256: 074d9ff4793386152393504a020caf8cce2532f75717fe0f31843f15602a735b, expected_old_count: null }
+    checker: { name: assemble-draft-section, version: 0.2.0, settings: { heading_match: exact-after-normalization, old_text_count_check: true } }
+    result_affecting_references: { heading_match_rule: "search-target-area.ts compatible: normalizeTargetArea + exact match only + code-fence-aware scan", scan_scope: target section only }
+    checks_summary: { pre: { count: 2, all_ok: true }, post: { count: 2, all_ok: true } }
+    diff_compact: { changed_lines_count: 5, added: 5, removed: 0 }
+    executed_at: "2026-10-25T15:50:56.126Z"
+    write_mode: no-write
+    note: |
+      prescribed 決定的組立スクリプト（src/common/skills/agentdev-workflow-req-define/scripts/src/assemble-draft-section.ts、ASSEMBLY_CHECKER 0.2.0）を append 操作・no-write で Design 原文へ実行した実行記録。
+      最初の replace 実行は ok:false 拒否（old_text remained after assembly。replace は旧文完全除去を検査し追記形を表現できないため、操作を append へ正規化した。拒否は assembler 検査の正当動作）。
+      組立結果の機械突合済み: assembled 節（13行）は決定的変換期待値（変更前節の末尾空行除去→空行+追加content+空行挿入）と完全一致、追加 content 全行の包含、既存箇条書きの逐語保持、Design 正本ハッシュ不変（c318b129...）。
+      生の組立入力・出力・一時実行物は drafts 配下へ置かず temp（寿命: 当該定義実行とその再開まで）。実対象 Design への適用は case-ready / case-revise の Definition 保存内部責務。
 test_strategy:
   - id: TS-001
     target_item: AG-002
@@ -205,26 +210,27 @@ test_strategy:
     target_item: AG-003
     verification: |
       元 repo の公開入口 scripts/install.ps1 -Mode check を、git 初期化済みの隔離 consumer
-      相当環境から実行する。正例環境の最低構成: bun が PATH に存在、3 skill 配下の4 script
-      が配置済み、存在するゲート実行体を指す fixture、検査対象 seed ファイル、producer 正本を
-      参照しない構成。負例環境は正例から前提のみを欠く（例: 必須ゲート実行体の不在）。
-      producer 正本の移動・削除は行わない。
+      相当環境で実行する。正例環境は完全に provisions された consumer 相当とする: bun が
+      PATH に存在、3 skill 配下の4 script が配置済み、存在するゲート実行体を指す fixture、
+      検査対象 seed ファイル、producer 正本を参照しない構成。負例環境は正例から前提のみを
+      欠く（例: 必須ゲート実行体の不在）。producer 正本の移動・削除は行わない。
     pass_criteria: |
-      正例で機械工程検査節が前提成立を節別に判読可能な形で報告する（installer 全体の他の
-      divergence の有無とは区別し、installer 全体の exit 0 を合格条件にしない）。負例で該当
-      divergence 報告と非ゼロ終了を得る。検証前後で producer 正本・管理対象内容・ディレクトリ
-      状態が同一。
+      正例（完全 provisions 環境）で機械工程検査節が前提成立を報告し、公開 installer 全体が
+      exit 0 で受入する。負例（前提のみ欠落）で機械工程検査節が該当 divergence を報告し、
+      installer 全体が非ゼロ終了する。検証前後で producer 正本・管理対象内容・ディレクトリ
+      状態が同一。節別報告（TS-005）は負例の divergence が他の divergence に埋没しないための
+      補助であり、正例の installer 全体受入（exit 0）の代替にしない。
     on_failure: |
       fix-and-reverify。隔離環境構成・検査節の検出・報告を修正して再検証する。
   - id: TS-003
     target_item: AG-002
     verification: |
       検証専用経路が worktree 作成・ゲート実行・git/gh 操作を起動しないことを、PATH 分離した
-      git/gh shim（呼出しを記録し、呼出し検出時に失敗する）または検証入口の構造的確認
-      （実行系呼出し経路へ到達しないこと）で確認する。前後の管理対象内容とディレクトリ状態の
-      同一性も併せて確認する。
+      git/gh shim（呼出しを記録し、呼出し検出時に失敗する）による実行時確認で必須に検証する。
+      前後の管理対象内容とディレクトリ状態の同一性も併せて確認する。入口の構造的確認は補助的な
+      根拠であり、実行時証明の代替にしない。
     pass_criteria: |
-      shim 記録または構造的確認で git/gh/worktree/ゲート実行の起動がゼロ。前後で管理対象内容と
+      shim 記録で git/gh/worktree/ゲート実行の起動が実行時にゼロ。前後で管理対象内容と
       ディレクトリ状態が同一。
     on_failure: |
       fix-and-reverify。検証経路の切断点・経路構成を修正して再検証する。
@@ -251,14 +257,16 @@ test_strategy:
   - id: TS-006
     target_item: AG-002
     verification: |
-      機械工程検査の検査入力 JSON と fixture の配置が、対象 script 契約の置き場所指針と
-      整合することを確認する。横断依存検査の現行 script 契約は workspace 外一時領域禁止・
-      project root 内限定であるため、install.ps1 の OS 一時領域使用との整合を判断する。
+      機械工程検査の検査入力 JSON と fixture の配置が、対象 script 契約の置き場所指針に
+      従うことを確認する。横断依存検査の現行 script 契約は workspace 外一時領域禁止・
+      project root 内限定である。install.ps1 の現行 OS 一時領域使用は同指針に反するため、
+      該当箇所は本訂正の修正対象である（配置免除の新設は行わない）。
     pass_criteria: |
-      配置が script 契約の置き場所指針と整合する。または整合しない場合、配置免除と根拠が
-      Design 機械工程節または script 契約に明文化済みである。
+      検査入力配置が script 契約の置き場所指針に従う（workspace 外一時領域を使わず、
+      project root 内の契約に従う位置へ置く）。install.ps1 の検査入力配置箇所が同指針に
+      適合済みである。
     on_failure: |
-      fix-and-reverify。検査入力の配置を修正するか、免除と根拠を明文化して再検証する。
+      fix-and-reverify。検査入力の配置を契約指針へ修正して再検証する。
 case_open_hints:
   known_preexisting_defects:
     - "prepare_definition_pr.ts は dryRun:true でも worktree 作成（627〜646）と generateIndexesGate 実行（707〜722）へ到達し得る既存欠陥。本訂正では修正しない。本訂正の検証実行中に観測した場合は Findings へ記録する。"
@@ -310,12 +318,12 @@ reported_not_locally_reproduced:
   facts:
     - "入力はproducer固有ゲートとpackage.json不在でも機械工程4本が[OK]となったと報告する。"
     - "installer全体は別の75件のdivergenceでexit 1。全体成功の報告ではない。"
-    - "入力記載のmain SHA 420aa1c4e2499f89d19f1462620187340ae44f10は今回gitで確認していない。"
+    - "入力記載のmain SHA 420aa1c4e2499f89d19f1462620187340ae44f10は現行HEADとの一致をgitで確認済み。"
   evidence_path_as_reported: C:/Users/ogatay/AppData/Local/hermes/cache/scratch/adf-f1b-acceptance-20261025-210350/installer-output.txt
-  execution_in_this_run: "installer・機械工程・隔離再現・テストは未実行。引用先の再現出力も今回未読。"
+  execution_in_this_run: "installer・機械工程・隔離再現・テストは本次も実行していない。引用先の再現出力も本次未読。機械的再確認は後続Caseの検証義務（TS-002）である。"
 
 resume_candidates:
-  status: investigation_hints_not_final_realization_actions_or_test_strategy
+  status: decided_and_reflected_into_realization_actions_and_test_strategy
   finite_source_surfaces:
     - scripts/install.ps1
     - src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts
@@ -324,14 +332,14 @@ resume_candidates:
     - src/common/skills/agentdev-workflow-case-open/scripts/src/inspect_cross_dependencies.ts
   ownership_constraints:
     - "installerは検出契機・呼出し・divergence集約を所有し、入力検証ロジックは各機械工程所有者へ残す。"
-    - "Project Extensionsはconsumer固有値の既存解決点。producer固有ゲートをconsumerへ無条件必須化しない。実際の宣言からの解決契約は再開時に確認する。"
+    - "Project Extensionsはconsumer固有値の既存解決点。producer固有ゲートをconsumerへ無条件必須化しない。実際の宣言からの解決は既存解決点を使用し本訂正での変更対象外。"
     - "横断依存の共有単一実装とgate_effect:noneを維持し、一般の重複警告を新たな停止条件に変えない。"
-    - "Design変更候補はdocs/designs/local/install-script-usability.mdの機械工程節と各工程の既存script契約。操作本文・所有者分類はまだ確定しない。"
+    - "Design変更の操作本文はACT-DESIGN-001（機械工程節への箇条書き追記・append）として確定。所有者分類も確定済み。"
   verification_obligations:
-    - "4工程の実consumer入力を扱い、必須ゲートの欠落・不正REQ行ID・解決不能パスを識別する正負対照。"
-    - "前提が揃う隔離consumerで公開installerが成功し、前提だけを欠落させた対照で該当divergenceと非ゼロ終了になる。"
+    - "検証義務はtest_strategy TS-001〜006として確定済み。4工程の実consumer入力を扱い、必須ゲートの欠落・不正REQ行ID・解決不能パスを識別する正負対照。"
+    - "前提が揃う隔離consumerで公開installerが全体受入（exit 0）となり、前提だけを欠落させた対照で該当divergenceと非ゼロ終了になる。"
     - "空JSON拒否・空集合ok:trueを前提成立証明にせず、検証不能を成功に変換しない。"
-    - "検証専用経路でworktree・ゲート・git/gh操作を起動せず、前後の管理対象内容とディレクトリ状態が同一。"
+    - "検証専用経路でworktree・ゲート・git/gh操作を起動せず（実行時shim証明が必須）、前後の管理対象内容とディレクトリ状態が同一。"
     - "WindowsとGit Bashの既存パス受理、および3桁・4桁REQ部の既存契約を保持する。"
   on_failure_candidate: "本訂正の対象に関する不合格はfix-and-reverify。既存未達をFindingsへ移すだけで完了扱いにしない。"
 
@@ -341,10 +349,10 @@ gate_results:
   step_3: "completed: 既存REQ照合は REQ操作なし で確定。観測 20261025T123828Z-08d7 を provenance 検証（references ハッシュ実測一致、HEAD 一致）の上で採用。SPLIT予兆計測: REQ新設・APPEND/UPDATE 対象REQなし。"
   step_4: "completed: 最終分類は Design行・分離true（観測 20261025T151351Z-3a9f、confidence 0.98）。5観点境界リスク分析を実施し case-specific risk を test_strategy へ投影（dependency: fixture と正本依存、execution: dryRun 副作用到達、build/runtime: bun・ゲート実行体、environment propagation: 隔離環境差と検査入力配置、client/server: git/gh 起動禁止）。design対応事前確認: 既存REQ行の意味変更なしのため coverage 実査不要。文書分類妥当性検証: REQ残留行なし。検索系検証なし、REQ廃止なし、REQ新設なし。"
   step_5: "completed: Decision不要を確定。重複確認（DEC-016 は本訂正の前提判断であり衝突なし）、Decision禁止ゲート（反映作業・実現訂正へのDecision化なし）、architecture-advisory 委譲条件非該当（Decision候補なし・責務境界変更なし・既存Designとの衝突候補なしのため委譲不実施。根拠記録済み）。"
-  step_6_qg1: "completed: 必須fields到達、execution_groups 不含、artifact_actions 統合済み（Design update 1件、content 完全確定・決定的マーカーなし）、test_strategy 3要素完全（TS-001〜006）、5観点→test_strategy 投影完全。QG-1 合格。"
+  step_6_qg1: "completed: 必須fields到達、execution_groups 不含、artifact_actions 統合済み（Design append 1件、content 完全確定・決定的マーカーなし）、test_strategy 3要素完全（TS-001〜006）、5観点→test_strategy 投影完全。組立は決定的組立スクリプト（assemble-draft-section.ts、append no-write）で実行し検査済み。QG-1 合格。"
   step_7: "completed: work_type=bugfix（既存契約の受入不足訂正。Decision不要のためfeature昇格なし）。scale=standard（単一Design節update と installer 検査節改修。実装スコープシグナルでlarge昇格要件なし）。"
-  step_8: "completed: adversarial-review 発動（default-on）。2系統独立 challenge stream（契約整合系・検証実効系）による対称的相互反証、Reviewee counter-challenge、戦略メタ反証（両系統とも正負対照戦略の根幹に異議なし・実現可能性の具体化を要求）、convergence、反映後 convergence audit を実施。essential 4件・disagreement 5件・nonessential 3件を検出し全て反映または記録。反映内容: 検証専用経路の切断点明示、TS-001〜004 修正とTS-006 追加、検査入力配置規律の Design 追加、節別報告文言の統一集約整合修正、script契約反映の RA-002 明記、正例環境の最低構成明示、残存 dryRun 欠陥の Findings 記録義務、最小応答述語の明記、冒頭段落保持の明示、対象外既存不整合の未採用記録。unresolved なユーザー判断事項なし。"
-  step_9: "completed: 重要変更通知を保存前に出力済み。.agentdev/drafts/req-draft-install-prerequisite-acceptance-f1b.md を保存し読み戻し完結性確認（fenced YAML 閉包・全fields到達・文字化けなし）を実施。明示パス指定 commit で永続化（スイープstageなし、ステージ済み他者変更を含まない）。"
+  step_8: "completed: adversarial-review 発動（default-on）。2系統独立 challenge stream（契約整合系・検証実効系）による対称的相互反証、Reviewee counter-challenge、戦略メタ反証（両系統とも正負対照戦略の根幹に異議なし・実現可能性の具体化を要求）、convergence、反映後 convergence audit を実施。essential 4件・disagreement 5件・nonessential 3件を検出し全て反映または記録。反映内容: 検証専用経路の切断点明示、TS-001〜004 修正とTS-006 追加、検査入力配置規律の Design 追加、節別報告文言の統一集約整合修正、script契約反映の RA-002 明記、正例環境の最低構成明示、残存 dryRun 欠陥の Findings 記録義務、最小応答述語の明記、冒頭段落保持の明示、対象外既存不整合の未採用記録。unresolved なユーザー判断事項なし。追加 delta review（親指示欠陥修正に対する独立レビュー。bg_3b536d02 / ses_e8c3bd2c7ffeZluaGqCP6SYLbz、12m49s）は REQUEST-CHANGES で essential 1件（resume_candidates の update 語残存）のみを指摘し反映済み。他は clean または nonessential（未変更 historical 記録内の generic 用語用法 2件は reviewer 判断で遡及修正せず現状保持）。reviewer 側の独立機械検証: Design sha256 一致、節 8行→組立 13行の導出整合、diff added 5/removed 0、append 空行挿入の実装整合、replace 拒否の正当性、prepare_definition_pr.ts dryRun 無視の worktree/gate 到達（627〜646・707〜722）、置き場所指針と TS-006 の整合。"
+  step_9: "completed: 重要変更通知を保存前に出力済み。第一回保存は明示パス指定 commit ff835755d で永続化（1ファイル、スイープstageなし）。親指示欠陥修正（機械組立・TS修正・append正規化・旧矛盾除去・auto_ready:false）と delta review 指摘反映の後、改めて読み戻し完結性確認（fenced YAML 閉包・全fields到達・決定的マーカーなし・文字化けなし）と YAML 構造機械検証（pyyaml 6.0.3）を実施し、明示パス指定の NEW commit（amend 不使用、スイープstageなし、ステージ済み他者変更を含まない）で永続化する。観測 JSON 3件は commit 対象外（明示パス許可はドラフトのみ）として残置。"
   step_10_11: "completed: 要件doc提示と完了報告（bugfix → lightweight 種別）を出力。"
   jev:
     invoked: true
@@ -370,9 +378,9 @@ gate_results:
 
 important_change_notice:
   emitted_before_this_write: true
-  reference: "本実行のドラフト全面更新直前の利用者向け実行出力通知。REQ操作なし・accepted Design機械工程節のupdate計画（既存記述を逐語保持し4箇条書き追加）・実現面変更方針・確定事項と未決なしを説明。"
+  reference: "本実行のドラフト全面更新直前の利用者向け実行出力通知。REQ操作なし・accepted Design機械工程節へのappend計画（既存記述は一切変更せず箇条書き4点を節末尾へ追記）・実現面変更方針・確定事項と未決なしを説明。追加通知（親指示欠陥修正）: TS-002正例を完全provisions環境でのinstaller全体exit0受入へ復元、TS-003を実行時shim証明必須化、TS-006と配置文言から免除検討を除去してscript契約の既存合法配置へ一本化、auto_ready:false化、updateからappend操作への正規化と機械組立実施、旧事実矛盾3件の除去。"
   canonical_changes_applied: false
-  actual_difference_from_intent: "正規成果物（REQ/Decision/Design）への変更は本次では実施しない。Design節更新はartifact_actionsの計画であり、適用はcase-ready/case-reviseのDefinition保存内部責務。"
+  actual_difference_from_intent: "正規成果物（REQ/Decision/Design）への変更は本次では実施しない。Design節追記はartifact_actionsの計画であり、適用はcase-ready/case-reviseのDefinition保存内部責務。"
 
 restart_conditions:
   entry: "本ドラフトは検証済み完成ドラフト。case-auto / case-open が主入力として消費し、新しい訂正Caseを確立する。"
@@ -381,7 +389,7 @@ restart_conditions:
   operational_authority_issue: "なし。以前の停止原因（必須Jev評価の観測書込み境界）は正当Tool経路の実行により解消済み。"
   next_after_success: "利用者承認済み経路（req-define → case-auto）で親が新規訂正Caseを駆動する。本ユニットはcase-autoを起動しない。"
   review_out_of_scope_records:
-    - "docs/designs/local/install-script-usability.md 7〜8行の ADF-COVERS(implementation) 重複行は既存不整合。本訂正の Design update はセクション置換のみで sidecar を変更しないためスコープ外（review stream 1 指摘、未採用記録）。"
+    - "docs/designs/local/install-script-usability.md 7〜8行の ADF-COVERS(implementation) 重複行は既存不整合。本訂正の Design 追記（append）は既存セクション内への箇条書き追加のみで sidecar を変更しないためスコープ外（review stream 1 指摘、未採用記録。初回記録時の update 表現は delta review で append 正規化済み）。"
 ```
 
 # summary
