@@ -169,6 +169,65 @@ describe("入力検証（品質ゲートの省略禁止・明示パス stage）"
     expect(() => validateInput(broken as unknown as Record<string, unknown>)).toThrow(/invalid requirement row id/);
   });
 
+  test("4桁帯 REQ 行 ID を含む入力を許容書式として受領する（桁数を固定しない許容書式）", () => {
+    const fourDigitReqId = ["REQ", "1024", "001"].join("-");
+    const traceabilityGate: GateCommandSpec = {
+      ...gate("traceability-check"),
+      args: ["./checker.ts", "--gate", "traceability-check", "--req", fourDigitReqId],
+    };
+    const accepted = input({ traceabilityReqIds: [fourDigitReqId], traceabilityGate });
+    expect(() => validateInput(accepted as unknown as Record<string, unknown>)).not.toThrow();
+  });
+
+  test("行番号 2桁の REQ 行 ID は許容書式から外れるため拒否する", () => {
+    const broken = input({ traceabilityReqIds: ["REQ-1024-49"] });
+    expect(() => validateInput(broken as unknown as Record<string, unknown>)).toThrow(/invalid requirement row id/);
+  });
+
+  test("reqRowIdPattern の設定値は許容書式の範囲内の追加照合として適用される", () => {
+    const fourDigitReqId = ["REQ", "1024", "001"].join("-");
+    const accepted = input({
+      traceabilityReqIds: [fourDigitReqId],
+      traceabilityGate: {
+        ...gate("traceability-check"),
+        args: ["./checker.ts", "--gate", "traceability-check", "--req", fourDigitReqId],
+      },
+      reqRowIdPattern: "REQ-\\d{4}-\\d{3}",
+    });
+    expect(() => validateInput(accepted as unknown as Record<string, unknown>)).not.toThrow();
+    const rejected = input({
+      traceabilityReqIds: [["REQ", "1024", "001"].join("-")],
+      traceabilityGate: {
+        ...gate("traceability-check"),
+        args: ["./checker.ts", "--gate", "traceability-check", "--req", ["REQ", "1024", "001"].join("-")],
+      },
+      reqRowIdPattern: "REQ-\\d{3}-\\d{3}",
+    });
+    expect(() => validateInput(rejected as unknown as Record<string, unknown>))
+      .toThrow(/violates the configured producer requirement row id pattern/);
+  });
+
+  test("許容書式を緩める reqRowIdPattern の設定値でも実効範囲は緩まない（許容書式検証が先行）", () => {
+    const broken = input({
+      traceabilityReqIds: ["REQ-1024-1"],
+      traceabilityGate: {
+        ...gate("traceability-check"),
+        args: ["./checker.ts", "--gate", "traceability-check", "--req", "REQ-1024-1"],
+      },
+      reqRowIdPattern: "REQ-\\d{3,4}-\\d{1,3}",
+    });
+    expect(() => validateInput(broken as unknown as Record<string, unknown>))
+      .toThrow(/invalid requirement row id/);
+  });
+
+  test("不正な正規表現の reqRowIdPattern を拒否する", () => {
+    const broken = input({
+      reqRowIdPattern: "REQ-[",
+    });
+    expect(() => validateInput(broken as unknown as Record<string, unknown>))
+      .toThrow(/not a valid regular expression/);
+  });
+
   test("正規入力を受領する", () => {
     const validated = validateInput(input() as unknown as Record<string, unknown>);
     expect(validated.branch).toBe("definition/issue-10");
@@ -269,6 +328,7 @@ describe("機械工程の実行（worktree・編集・品質ゲート・明示�
     const report = runPrepareDefinitionPr(input(), runner);
     const stepNames = report.result.steps.map((s) => s.name);
     expect(stepNames).toEqual([
+      "gate-availability",
       "worktree-create",
       "definition-edit",
       "generate_indexes",
@@ -295,8 +355,8 @@ describe("機械工程の実行（worktree・編集・品質ゲート・明示�
       currentBranch: "definition/issue-10",
     });
     const report = runPrepareDefinitionPr(input(), runner);
-    expect(report.result.steps[0]?.name).toBe("worktree-create");
-    expect(report.result.steps[0]?.detail).toMatchObject({ reused: true });
+    expect(report.result.steps[1]?.name).toBe("worktree-create");
+    expect(report.result.steps[1]?.detail).toMatchObject({ reused: true });
     expect(decideExitCode(report)).toBe(0);
     expect(runner.calls.some((c) => c.args[0] === "add" && c.command === "git" && c.args[1] === "worktree")).toBe(false);
   });
@@ -370,6 +430,62 @@ describe("機械工程の実行（worktree・編集・品質ゲート・明示�
     expect(runner.calls.some((c) => c.command === "git" && c.args[0] === "commit")).toBe(false);
     expect(decideExitCode(report)).toBe(0);
     expect(report.warnings.join("\n")).toContain("dry-run");
+  });
+
+  test("必須ゲート実行体の存在検査を起動前に実行し、報告 JSON に記録する", () => {
+    const runner = fakeRunner();
+    const report = runPrepareDefinitionPr(input(), runner);
+    const availability = report.result.steps.find((step) => step.name === "gate-availability");
+    expect(availability?.status).toBe("pass");
+    const gates = availability?.detail.gates as { gate: string; available: boolean; alternativeRoutes: readonly string[] }[];
+    expect(gates).toHaveLength(3);
+    for (const record of gates) {
+      expect(record.available).toBe(true);
+      expect(record.alternativeRoutes).toEqual([]);
+    }
+  });
+
+  test("必須ゲート実行体の欠落を検出した場合は正規の代替経路を案内して失敗を返す（省略して成功扱いにしない）", () => {
+    const runner = fakeRunner();
+    const originalExists = runner.exists.bind(runner);
+    runner.exists = (absolutePath: string) =>
+      originalExists(absolutePath) && !absolutePath.endsWith("checker.ts");
+    const report = runPrepareDefinitionPr(input(), runner);
+    const availability = report.result.steps.find((step) => step.name === "gate-availability");
+    expect(availability?.status).toBe("fail");
+    const gates = availability?.detail.gates as { gate: string; available: boolean; alternativeRoutes: readonly string[] }[];
+    const missing = gates.filter((record) => !record.available);
+    expect(missing.length).toBe(3);
+    for (const record of missing) {
+      expect(record.alternativeRoutes.join("\n")).toContain("evidence-preservation（証跡化）");
+      expect(record.alternativeRoutes.join("\n")).toContain("manual-equivalent-procedure（手動相当手順）");
+      expect(record.alternativeRoutes.join("\n")).toContain("contrastive-no-worse-proof（対照実行による悪化ゼロ件の機械証明）");
+    }
+    // 欠落時は worktree 操作以降の副作用を開始しない
+    expect(runner.calls.some((c) => c.command === "git" && c.args[0] === "worktree")).toBe(false);
+    expect(runner.calls.some((c) => c.command === "git" && c.args[0] === "add")).toBe(false);
+    expect(report.result.exitCategory).toBe("failure");
+    expect(decideExitCode(report)).toBe(1);
+    expect(report.warnings.join("\n")).toContain("required gate executable is missing");
+  });
+
+  test("実行体を特定できないゲートは存在検査対象外として記録する（command 解決は実行基盤の責務）", () => {
+    const runner = fakeRunner();
+    const noPathGate = (name: string): GateCommandSpec => ({
+      ...gate(name),
+      args: [name],
+    });
+    const report = runPrepareDefinitionPr(input({
+      generateIndexesGate: noPathGate("generate_indexes"),
+      checkIntegrityGate: noPathGate("check_integrity"),
+      traceabilityGate: { ...noPathGate("traceability-check"), args: ["traceability-check", "--req", DEFAULT_TRACEABILITY_REQ_ID] },
+    }), runner);
+    const availability = report.result.steps.find((step) => step.name === "gate-availability");
+    expect(availability?.status).toBe("pass");
+    const gates = availability?.detail.gates as { resolvedExecutable: string | null }[];
+    for (const record of gates) {
+      expect(record.resolvedExecutable).toBeNull();
+    }
   });
 });
 

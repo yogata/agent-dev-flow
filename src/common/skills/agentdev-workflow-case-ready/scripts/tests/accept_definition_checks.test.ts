@@ -76,6 +76,9 @@ function fakeRunner(overrides: {
   const calls: { command: string; args: readonly string[]; cwd: string }[] = [];
   return {
     calls,
+    exists() {
+      return true;
+    },
     run(spec) {
       calls.push({ command: spec.command, args: spec.args, cwd: spec.cwd });
       const result: CommandResult = { exitCode: 0, stdout: "", stderr: "" };
@@ -158,6 +161,7 @@ describe("受入検査 phase（忠実性・整合性・品質検査、overlap �
     const report = runAcceptDefinitionChecks(acceptanceInput(), runner);
     const stepNames = report.result.steps.map((s) => s.name);
     expect(stepNames).toEqual([
+      "gate-availability",
       "definition-acceptance-checks",
       "overlap-cross-check",
       "autogen-regeneration-diff",
@@ -242,6 +246,43 @@ describe("受入検査 phase（忠実性・整合性・品質検査、overlap �
     expect(decideExitCode(report)).toBe(1);
     const overlapCall = runner.calls.find((c) => c.args.includes("overlap-cross-dependencies"));
     expect(overlapCall).toBeUndefined();
+  });
+
+  test("必須ゲート実行体の欠落を検出した場合は正規の代替経路を案内して失敗を返す（省略して成功扱いにしない）", () => {
+    const runner = fakeRunner();
+    const originalExists = runner.exists.bind(runner);
+    runner.exists = (absolutePath: string) =>
+      originalExists(absolutePath) && !absolutePath.endsWith("checker.ts");
+    const report = runAcceptDefinitionChecks(acceptanceInput(), runner);
+    const availability = report.result.steps.find((step) => step.name === "gate-availability");
+    expect(availability?.status).toBe("fail");
+    const gates = availability?.detail.gates as { gate: string; available: boolean; alternativeRoutes: readonly string[] }[];
+    const missing = gates.filter((record) => !record.available);
+    expect(missing.length).toBeGreaterThan(0);
+    for (const record of missing) {
+      expect(record.alternativeRoutes.join("\n")).toContain("evidence-preservation（証跡化）");
+      expect(record.alternativeRoutes.join("\n")).toContain("manual-equivalent-procedure（手動相当手順）");
+      expect(record.alternativeRoutes.join("\n")).toContain("contrastive-no-worse-proof（対照実行による悪化ゼロ件の機械証明）");
+    }
+    // 欠落時は検査ゲートを起動せず失敗で停止する
+    expect(runner.calls.some((c) => c.args.includes("overlap-cross-dependencies"))).toBe(false);
+    expect(runner.calls.some((c) => c.args.includes("traceability-check"))).toBe(false);
+    expect(decideExitCode(report)).toBe(1);
+    expect(report.warnings.join("\n")).toContain("required gate executable is missing");
+  });
+
+  test("4桁帯 REQ 行 ID を含む --req の traceability gate を許容書式として実行する", () => {
+    const fourDigitReqId = ["REQ", "1024", "001"].join("-");
+    const runner = fakeRunner();
+    const traceabilityGate: GateCommandSpec = {
+      ...gate("traceability-check"),
+      args: ["./checker.ts", "--root", "C:/repo", "--req", fourDigitReqId],
+    };
+    const report = runAcceptDefinitionChecks(acceptanceInput({ traceabilityGate }), runner);
+    const step = report.result.steps.find((s) => s.name === "traceability-check");
+    expect(step?.detail.summary).toBe("pass=11 fail=0");
+    expect(step?.status).toBe("pass");
+    expect(runner.calls.some((c) => c.args.includes(fourDigitReqId))).toBe(true);
   });
 });
 
@@ -441,7 +482,8 @@ describe("検査証拠の一括保存と結果消費（標準出力・標準エ�
   test("非ゼロ終了の整合性検査は証拠を保存し、後続ゲートを実行しない（後続抑止の維持）", () => {
     const runner = fakeRunner({ integrityFailGate: "check_integrity" });
     const report = runAcceptDefinitionChecks(acceptanceInput(), runner);
-    const saved = report.result.steps[0]?.detail["check_integrity"] as GateExecutionEvidence;
+    const saved = report.result.steps.find((step) => step.name === "definition-acceptance-checks")
+      ?.detail["check_integrity"] as GateExecutionEvidence;
     expect(saved.exitCode).toBe(3);
     expect(saved.stderr).toBe("integrity NG");
     expect(runner.calls.filter((c) => c.args.includes("overlap-cross-dependencies"))).toHaveLength(0);
@@ -516,8 +558,9 @@ describe("既知検査入力の事前検証と固定生成（不正入力は検�
       reqIds: ["REQ-061-049", "REQ-061-050"],
     });
     const report = runAcceptDefinitionChecks(acceptanceInput({ traceabilityGate }), runner);
-    expect(report.result.steps[3]?.detail.stdout).toBe(traceabilityReportFromArgs(traceabilityGate.args));
+    expect(report.result.steps[4]?.detail.stdout).toBe(traceabilityReportFromArgs(traceabilityGate.args));
     expect(report.result.steps.map((step) => [step.name, step.status])).toEqual([
+      ["gate-availability", "pass"],
       ["definition-acceptance-checks", "pass"],
       ["overlap-cross-check", "pass"],
       ["autogen-regeneration-diff", "pass"],

@@ -20,7 +20,9 @@
 // （実行結果・差分・警告・提案本文の4要素）。終了コード: 成功 0、要判断 2、
 // 失敗 1。script は処理を省略せず、失敗時は途中結果とともに非 0 で終了する。
 // 対象品質ゲート（traceability check、full integrity suite、AUTOGEN 再生成差分
-// 検出、textlint 最終検査）の省略は入力検証で拒否する。
+// 検出、textlint 最終検査）の省略は入力検証で拒否し、ゲート実行体は起動前に
+// 配布先での存在検査を行う（欠落時は正規の代替経路の案内を報告へ含めて
+// fail-closed で停止する）。
 //
 
 import * as fs from "node:fs";
@@ -63,6 +65,7 @@ export interface MechanicalRunner {
   run(spec: CommandSpec): CommandResult;
   readTextFile(absolutePath: string): string;
   sleep(ms: number): void;
+  exists(absolutePath: string): boolean;
 }
 
 export interface GateCommandSpec {
@@ -243,6 +246,131 @@ export const REQUIRED_STEPS_POST_MERGE = [
   "post-merge-local-state-check",
   "cleanup-worktree-branch",
 ] as const;
+
+/**
+ * 欠落時に報告 JSON で案内する正規の代替経路（REQ 行の語彙）。
+ * 代替経路の履行なしに検査を省略して成功扱いとしないため、欠落時は fail-closed
+ * で停止し案内のみを行う。
+ */
+export const GATE_ALTERNATIVE_ROUTES: readonly string[] = [
+  "evidence-preservation（証跡化）: ゲート実行体の欠落を検出事項として証跡化する（本報告 JSON の step detail と warnings、呼出側の検証差分記録への記録）",
+  "manual-equivalent-procedure（手動相当手順）: 手動相当の手順で同等の検査を実施し、実行証跡（終了コード、標準出力・標準エラー）を記録する",
+  "contrastive-no-worse-proof（対照実行による悪化ゼロ件の機械証明）: baseline 対照の対照実行で既知 fail の悪化ゼロ件を機械証明する",
+];
+
+/**
+ * 既知 flag の値契約（配布下位検査の契約由来）。未知 flag は検証対象外とする。
+ * case-open・case-ready の機械工程 script と同一前提の入力検証（--req の許容書式は
+ * traceability checker 契約と同じ REQ-{NNNN}-{MMM} 形式、桁数を固定しない）。
+ */
+export interface KnownArgContract {
+  flag: string;
+  values?: readonly string[];
+  pattern?: RegExp;
+  nonEmpty?: boolean;
+}
+
+export const KNOWN_GATE_ARG_CONTRACTS: readonly KnownArgContract[] = [
+  { flag: "--req", pattern: /^(REQ-\d{3,4}-\d{3})(,REQ-\d{3,4}-\d{3})*$/ },
+  { flag: "--profile", values: ["source", "link"] },
+  { flag: "--fail-level", values: ["strict", "warning"] },
+  { flag: "--workflow", pattern: /^[a-z][a-z0-9-]*$/ },
+  { flag: "--root", nonEmpty: true },
+  { flag: "--input", nonEmpty: true },
+  { flag: "--artifact", nonEmpty: true },
+  { flag: "--evidence", nonEmpty: true },
+  { flag: "--revision", nonEmpty: true },
+  { flag: "--files", nonEmpty: true },
+  { flag: "--base-ref", nonEmpty: true },
+];
+
+/** 報告 JSON に記録する意味のある flag の値を抽出する（--flag value / --flag=value の両形式）。 */
+export function extractFlagValue(args: readonly string[], flag: string): string | null {
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === undefined) continue;
+    if (arg === flag && args[i + 1] !== undefined) {
+      return args[i + 1] ?? null;
+    }
+    if (arg.startsWith(`${flag}=`)) {
+      return arg.slice(flag.length + 1);
+    }
+  }
+  return null;
+}
+
+/**
+ * 既知 gate 入力の事前検証。高価な検査の開始前に必須引数・対象・パス・許容値を
+ * 検証し、不正値は検査を開始せず MechanicalInputError で拒否する。未知 flag は
+ * 検証対象外とし、任意コマンドの汎用解釈器を作らない。
+ */
+export function preValidateGateSpec(spec: GateCommandSpec): void {
+  for (const contract of KNOWN_GATE_ARG_CONTRACTS) {
+    const value = extractFlagValue(spec.args, contract.flag);
+    if (value === null) continue;
+    if (contract.nonEmpty === true && value.trim().length === 0) {
+      fail(`${contract.flag} requires a non-empty value`);
+    }
+    if (contract.values && !contract.values.includes(value)) {
+      fail(`${contract.flag} must be one of: ${contract.values.join(", ")} (got: ${value})`);
+    }
+    if (contract.pattern && !contract.pattern.test(value)) {
+      fail(`${contract.flag} value does not match the subordinate command contract: ${value}`);
+    }
+  }
+}
+
+const GATE_SCRIPT_EXTENSIONS = [".ts", ".mts", ".mjs", ".js", ".cjs"];
+
+/**
+ * ゲート実行体ファイル（スクリプトパス）の解決。command と args[0] のうち
+ * パス区切りまたはスクリプト拡張子をもつ最初の要素を gate cwd 基準で解決する。
+ * 実行体ファイルを特定できない場合は null（存在検査対象なし。command 自体の
+ * 解決は実行基盤の責務で、ENOENT 等の実行時失敗は既存の実行経路が扱う）。
+ */
+export function resolveGateExecutablePath(spec: GateCommandSpec): string | null {
+  const candidates = [spec.command, spec.args[0]];
+  for (const candidate of candidates) {
+    if (typeof candidate !== "string" || candidate.length === 0) continue;
+    const hasSeparator = /[\\/]/.test(candidate);
+    const hasScriptExtension = GATE_SCRIPT_EXTENSIONS.some((ext) => candidate.toLowerCase().endsWith(ext));
+    if (hasSeparator || hasScriptExtension) {
+      return path.resolve(spec.cwd, candidate);
+    }
+  }
+  return null;
+}
+
+export interface GateAvailabilityRecord {
+  gate: string;
+  available: boolean;
+  resolvedExecutable: string | null;
+  alternativeRoutes: readonly string[];
+}
+
+/**
+ * 必須ゲート実行体の配布先での存在検査。欠落時は fail-closed の対象として
+ * 検出し、正規の代替経路の案内を報告へ含める。
+ */
+export function evaluateGateAvailability(
+  gates: readonly GateCommandSpec[],
+  exists: (absolutePath: string) => boolean,
+): { records: readonly GateAvailabilityRecord[]; missing: readonly string[] } {
+  const records = gates.map((gate) => {
+    const executable = resolveGateExecutablePath(gate);
+    const available = executable === null || exists(executable);
+    return {
+      gate: gate.name,
+      available,
+      resolvedExecutable: executable,
+      alternativeRoutes: available ? [] : GATE_ALTERNATIVE_ROUTES,
+    };
+  });
+  return {
+    records,
+    missing: records.filter((record) => !record.available).map((record) => record.gate),
+  };
+}
 
 /** 入力・契約違反。CLI 入口はこのエラーを標準エラー出力と終了コード 1 へ変換する。 */
 export class MechanicalInputError extends Error {}
@@ -863,6 +991,26 @@ export function runCloseMechanicalSteps(
   const worktreeCwd = path.resolve(input.repoRoot, input.worktreeRoot);
 
   if (input.phase === "pre-merge") {
+    for (const spec of [...(input.integrityGates ?? []), input.generateIndexesGate, input.traceabilityGate, input.textlintGate]) {
+      if (spec != null) preValidateGateSpec(spec);
+    }
+    const availability = evaluateGateAvailability(
+      [...(input.integrityGates ?? []), input.generateIndexesGate, input.traceabilityGate, input.textlintGate].filter(
+        (spec): spec is GateCommandSpec => spec != null,
+      ),
+      (absolutePath) => runner.exists(absolutePath),
+    );
+    steps.push({
+      name: "gate-availability",
+      status: availability.missing.length > 0 ? "fail" : "pass",
+      detail: { gates: availability.records },
+    });
+    if (availability.missing.length > 0) {
+      warnings.push(
+        `required gate executable is missing in the deployment environment (omission and success are not allowed): ${availability.missing.join(", ")}. alternative routes: ${GATE_ALTERNATIVE_ROUTES.join(" / ")}`,
+      );
+      return assembleReport(input.phase, steps, diff, warnings, proposal);
+    }
     const polling = input.mergeablePolling ?? { intervalSeconds: 10, maxAttempts: 30 };
     let mergeable = "UNKNOWN";
     let attempts = 0;
@@ -1160,6 +1308,9 @@ function main(): void {
     const repoRootAbsolute = path.resolve(validated.repoRoot);
     const normalized: CloseMechanicalInput = { ...validated, repoRoot: repoRootAbsolute };
     const runner: MechanicalRunner = {
+      exists(absolutePath) {
+        return fs.existsSync(absolutePath);
+      },
       run(spec) {
         const result = spawnSync(spec.command, [...spec.args], {
           cwd: spec.cwd,

@@ -15,6 +15,7 @@ import type {
   CrossDependencyInspectionInput,
   CrossDependencyInspectionReport,
 } from "../lib/cross_dependency_types.ts";
+import { resolvePathArgument } from "../lib/cross_dependency_types.ts";
 import { inspectCrossDependencies } from "../lib/cross_dependency_engine.ts";
 
 const USAGE = `usage: bun .opencode/skills/agentdev-workflow-case-open/scripts/src/inspect_cross_dependencies.ts --input <input.json> [--root <dir>]
@@ -61,6 +62,9 @@ function validateInput(value: unknown): CrossDependencyInspectionInput {
 
 function main(): void {
   const { input, root } = parseArgs(process.argv.slice(2));
+  // 環境形式の検出・正規化。正規化不能な形式は形式エラーで報告し検査不能のまま通過させない。
+  const resolvedRoot = resolvePathArgument(root, process.platform);
+  if (!resolvedRoot.ok) fail(`--root ${resolvedRoot.reason}`);
   let raw: string;
   try {
     raw = fs.readFileSync(input, "utf-8");
@@ -74,7 +78,7 @@ function main(): void {
     fail(`input is not valid JSON: ${String(error)}`);
   }
   const inspected = inspectCrossDependencies(validateInput(parsed), (relative) =>
-    fs.readFileSync(path.resolve(root, relative), "utf-8"),
+    fs.readFileSync(path.resolve(resolvedRoot.value, relative), "utf-8"),
   );
   const report: CrossDependencyInspectionReport = inspected;
   process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);

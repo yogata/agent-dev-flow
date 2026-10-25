@@ -10,7 +10,9 @@
 //
 // 入力: `--input` に機械工程入力 JSON ファイル。出力: stdout に報告 JSON
 // （実行結果・差分・警告・提案本文の4要素）。終了コード: 成功 0、要判断 2、
-// 失敗 1。対象品質ゲートの省略は入力検証で拒否する。意味判断（検査結果の意味
+// 失敗 1。対象品質ゲートの省略は入力検証で拒否し、ゲート実行体は起動前に
+// 配布先での存在検査を行う（欠落時は正規の代替経路の案内を報告へ含めて
+// fail-closed で停止する）。意味判断（検査結果の意味
 // レビュー、受理判断）はモデルが agentdev_gh による I/O とともに担当する。
 // 実装は inspect_cross_dependencies.ts と同じ作り（工程別個別 script、共通基盤
 // なし）。overlap 突合は case-open スキル配下の共有単一実装
@@ -21,7 +23,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { spawnSync } from "node:child_process";
-import { consumeDefinitionTraceability, type DeferredObligation } from "../../../agentdev-workflow-case-open/scripts/lib/definition-traceability-gate.ts";
+import { consumeDefinitionTraceability, isReqRowId, type DeferredObligation } from "../../../agentdev-workflow-case-open/scripts/lib/definition-traceability-gate.ts";
 
 const USAGE = `usage: bun ./src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts --input <input.json>
   --input  機械工程入力 JSON（phase、品質ゲート実行仕様、削除対象パス等）`;
@@ -63,6 +65,7 @@ export interface GateExecutionEvidence {
 /** script が外部処理を呼び出す経路。単体テストでは偽 runner を注入する。 */
 export interface MechanicalRunner {
   run(spec: CommandSpec): CommandResult;
+  exists(absolutePath: string): boolean;
 }
 
 export interface GateCommandSpec {
@@ -134,6 +137,69 @@ export const REQUIRED_GATES_ACCEPTANCE_CHECKS = [
   "generate_indexes",
 ] as const;
 
+/**
+ * 欠落時に報告 JSON で案内する正規の代替経路（REQ 行の語彙）。
+ * 代替経路の履行なしに検査を省略して成功扱いとしないため、欠落時は fail-closed
+ * で停止し案内のみを行う。
+ */
+export const GATE_ALTERNATIVE_ROUTES: readonly string[] = [
+  "evidence-preservation（証跡化）: ゲート実行体の欠落を検出事項として証跡化する（本報告 JSON の step detail と warnings、呼出側の検証差分記録への記録）",
+  "manual-equivalent-procedure（手動相当手順）: 手動相当の手順で同等の検査を実施し、実行証跡（終了コード、標準出力・標準エラー）を記録する",
+  "contrastive-no-worse-proof（対照実行による悪化ゼロ件の機械証明）: baseline 対照の対照実行で既知 fail の悪化ゼロ件を機械証明する",
+];
+
+const GATE_SCRIPT_EXTENSIONS = [".ts", ".mts", ".mjs", ".js", ".cjs"];
+
+/**
+ * ゲート実行体ファイル（スクリプトパス）の解決。command と args[0] のうち
+ * パス区切りまたはスクリプト拡張子をもつ最初の要素を gate cwd 基準で解決する。
+ * 実行体ファイルを特定できない場合は null（存在検査対象なし。command 自体の
+ * 解決は実行基盤の責務で、ENOENT 等の実行時失敗は既存の実行経路が扱う）。
+ */
+export function resolveGateExecutablePath(spec: GateCommandSpec): string | null {
+  const candidates = [spec.command, spec.args[0]];
+  for (const candidate of candidates) {
+    if (typeof candidate !== "string" || candidate.length === 0) continue;
+    const hasSeparator = /[\\/]/.test(candidate);
+    const hasScriptExtension = GATE_SCRIPT_EXTENSIONS.some((ext) => candidate.toLowerCase().endsWith(ext));
+    if (hasSeparator || hasScriptExtension) {
+      return path.resolve(spec.cwd, candidate);
+    }
+  }
+  return null;
+}
+
+export interface GateAvailabilityRecord {
+  gate: string;
+  available: boolean;
+  resolvedExecutable: string | null;
+  alternativeRoutes: readonly string[];
+}
+
+/**
+ * 必須ゲート実行体の配布先での存在検査。欠落時は fail-closed の対象として
+ * 検出し、正規の代替経路の案内を報告へ含める。
+ */
+export function evaluateGateAvailability(
+  gates: readonly GateCommandSpec[],
+  exists: (absolutePath: string) => boolean,
+): { records: readonly GateAvailabilityRecord[]; missing: readonly string[] } {
+  const records = gates.map((gate) => {
+    const executable = resolveGateExecutablePath(gate);
+    const available = executable === null || exists(executable);
+    return {
+      gate: gate.name,
+      available,
+      resolvedExecutable: executable,
+      alternativeRoutes: available ? [] : GATE_ALTERNATIVE_ROUTES,
+    };
+  });
+  return {
+    records,
+    missing: records.filter((record) => !record.available).map((record) => record.gate),
+  };
+}
+
 export class MechanicalInputError extends Error {}
 
 function fail(message: string): never {
@@ -185,7 +251,7 @@ export interface KnownArgContract {
 }
 
 export const KNOWN_GATE_ARG_CONTRACTS: readonly KnownArgContract[] = [
-  { flag: "--req", pattern: /^(REQ-\d{3}-\d{3})(,REQ-\d{3}-\d{3})*$/ },
+  { flag: "--req", pattern: /^(REQ-\d{3,4}-\d{3})(,REQ-\d{3,4}-\d{3})*$/ },
   { flag: "--profile", values: ["source", "link"] },
   { flag: "--fail-level", values: ["strict", "warning"] },
   { flag: "--workflow", pattern: /^[a-z][a-z0-9-]*$/ },
@@ -279,7 +345,7 @@ function toGateSpec(
 
 function requireReqIdList(reqIds: readonly string[]): string {
   for (const id of reqIds) {
-    if (!/^REQ-\d{3}-\d{3}$/.test(id)) {
+    if (!isReqRowId(id)) {
       fail(`invalid requirement row id: ${id}`);
     }
   }
@@ -490,6 +556,23 @@ export function runAcceptDefinitionChecks(
   if (input.phase === "acceptance-checks") {
     for (const spec of [...(input.integrityGates ?? []), input.overlapGate, input.generateIndexesGate, input.traceabilityGate]) {
       if (spec != null) preValidateGateSpec(spec);
+    }
+    const availability = evaluateGateAvailability(
+      [...(input.integrityGates ?? []), input.overlapGate, input.generateIndexesGate, input.traceabilityGate].filter(
+        (spec): spec is GateCommandSpec => spec != null,
+      ),
+      (absolutePath) => runner.exists(absolutePath),
+    );
+    steps.push({
+      name: "gate-availability",
+      status: availability.missing.length > 0 ? "fail" : "pass",
+      detail: { gates: availability.records },
+    });
+    if (availability.missing.length > 0) {
+      warnings.push(
+        `required gate executable is missing in the deployment environment (omission and success are not allowed): ${availability.missing.join(", ")}. alternative routes: ${GATE_ALTERNATIVE_ROUTES.join(" / ")}`,
+      );
+      return assembleReport(input.phase, steps, diff, warnings, proposal);
     }
     const targetRevision = runner
       .run({ command: "git", args: ["rev-parse", "HEAD"], cwd: repoRoot })
@@ -751,6 +834,9 @@ function main(): void {
       repoRoot: path.resolve(validated.repoRoot),
     };
     const runner: MechanicalRunner = {
+      exists(absolutePath) {
+        return fs.existsSync(absolutePath);
+      },
       run(spec) {
         const result = spawnSync(spec.command, [...spec.args], {
           cwd: spec.cwd,

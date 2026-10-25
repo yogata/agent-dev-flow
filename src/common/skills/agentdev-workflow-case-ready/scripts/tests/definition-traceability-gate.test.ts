@@ -64,6 +64,9 @@ function input(): AcceptDefinitionInput {
 
 function runner(traceabilityReport: object): MechanicalRunner {
   return {
+    exists() {
+      return true;
+    },
     run(spec): CommandResult {
       const isTraceability = spec.args.includes("--req");
       return {

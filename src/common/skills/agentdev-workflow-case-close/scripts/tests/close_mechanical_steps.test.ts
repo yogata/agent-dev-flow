@@ -75,6 +75,9 @@ function fakeRunner(overrides: {
   const calls: { command: string; args: readonly string[]; cwd: string }[] = [];
   return {
     calls,
+    exists() {
+      return true;
+    },
     run(spec) {
       calls.push({ command: spec.command, args: spec.args, cwd: spec.cwd });
       const result: CommandResult = { exitCode: 0, stdout: "", stderr: "" };
@@ -906,6 +909,7 @@ describe("pre-merge 機械工程の実行（品質ゲート省略なし・報告
     const report = runCloseMechanicalSteps(input, runner);
     const stepNames = report.result.steps.map((s) => s.name);
     for (const required of [
+      "gate-availability",
       "mergeable-polling",
       "pre-merge-local-state-check",
       "completion-checkbox-extraction",
@@ -932,6 +936,56 @@ describe("pre-merge 機械工程の実行（品質ゲート省略なし・報告
     expect(report.result.exitCategory).toBe("needs-judgment");
     expect(decideExitCode(report)).toBe(2);
     expect(report.warnings.join("\n")).toContain("CONFLICTING");
+  });
+
+  test("既知ゲート契約（--req の許容書式）と同一前提の入力検証で不正値を検査開始前に拒否する", () => {
+    const runner = fakeRunner({ issueBody: "- [x] A\n" });
+    const broken = preMergeInput({
+      traceabilityGate: {
+        name: "traceability-check",
+        command: "bun",
+        args: ["./checker.ts", "traceability-check", "--req", "REQ-1024-1"],
+        cwd: "<repo>/.worktrees/100-case",
+      },
+    });
+    expect(() => runCloseMechanicalSteps(broken, runner)).toThrow(/--req/);
+    expect(runner.calls).toHaveLength(0);
+  });
+
+  test("4桁帯 REQ 行 ID を含む --req を許容書式として受け付ける", () => {
+    const fourDigitReqId = ["REQ", "1024", "001"].join("-");
+    const runner = fakeRunner({ issueBody: "- [x] A\n" });
+    const report = runCloseMechanicalSteps(preMergeInput({
+      traceabilityGate: {
+        name: "traceability-check",
+        command: "bun",
+        args: ["./checker.ts", "traceability-check", "--req", fourDigitReqId],
+        cwd: "<repo>/.worktrees/100-case",
+      },
+    }), runner);
+    expect(report.result.steps.find((s) => s.name === "traceability-check")?.status).toBe("pass");
+  });
+
+  test("必須ゲート実行体の欠落を検出した場合は正規の代替経路を案内して失敗を返す（省略して成功扱いにしない）", () => {
+    const runner = fakeRunner({ issueBody: "- [x] A\n" });
+    const originalExists = runner.exists.bind(runner);
+    runner.exists = (absolutePath: string) =>
+      originalExists(absolutePath) && !absolutePath.endsWith("checker.ts");
+    const report = runCloseMechanicalSteps(preMergeInput(), runner);
+    const availability = report.result.steps.find((step) => step.name === "gate-availability");
+    expect(availability?.status).toBe("fail");
+    const gates = availability?.detail.gates as { gate: string; available: boolean; alternativeRoutes: readonly string[] }[];
+    const missing = gates.filter((record) => !record.available);
+    expect(missing.length).toBeGreaterThan(0);
+    for (const record of missing) {
+      expect(record.alternativeRoutes.join("\n")).toContain("evidence-preservation（証跡化）");
+      expect(record.alternativeRoutes.join("\n")).toContain("manual-equivalent-procedure（手動相当手順）");
+      expect(record.alternativeRoutes.join("\n")).toContain("contrastive-no-worse-proof（対照実行による悪化ゼロ件の機械証明）");
+    }
+    // 欠落時は mergeable ポーリング以降の工程を開始しない
+    expect(runner.calls.some((c) => c.command === "gh")).toBe(false);
+    expect(decideExitCode(report)).toBe(1);
+    expect(report.warnings.join("\n")).toContain("required gate executable is missing");
   });
 
   test("worktree が未コミット変更を持つ場合は失敗（終了コード 1 相当）で非 0 を返す", () => {

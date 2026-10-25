@@ -127,3 +127,44 @@ export function normalizeArtifactPath(raw: string): string {
   while (p.startsWith("./")) p = p.slice(2);
   return p;
 }
+
+/** パス引数の環境形式の検出と正規化の結果。正規化不能な形式は形式エラーとして報告する。 */
+export type PathArgumentResolution =
+  | { readonly ok: true; readonly value: string; readonly detectedFormat: "windows" | "git-bash" | "posix" | "relative" }
+  | { readonly ok: false; readonly reason: string };
+
+/**
+ * パス引数の環境形式（Windows 形式、Git Bash の `/c/...` 形式等）の検出と正規化。
+ * 形式の違いだけで検査不能とならないことが要件であり、正規化可能な形式は
+ * 実行環境で意味が変わらない値へ変換して返す。正規化不能な形式（Windows 実行
+ * 環境での Git Bash 形式以外の絶対パス等）は ok: false として形式エラーを報告し、
+ * 検査不能のまま通過させない。
+ */
+export function resolvePathArgument(raw: string, platform: NodeJS.Platform): PathArgumentResolution {
+  const value = raw.trim();
+  if (value.length === 0) {
+    return { ok: false, reason: "path argument is empty" };
+  }
+  if (/^[a-zA-Z]:[\\/]/.test(value)) {
+    return { ok: true, value, detectedFormat: "windows" };
+  }
+  if (value.startsWith("/")) {
+    if (platform === "win32") {
+      const gitBash = value.match(/^\/([a-zA-Z])(\/.*)?$/);
+      const drive = gitBash?.[1];
+      if (drive !== undefined) {
+        return {
+          ok: true,
+          value: `${drive.toUpperCase()}:${gitBash?.[2] ?? "/"}`,
+          detectedFormat: "git-bash",
+        };
+      }
+      return {
+        ok: false,
+        reason: `unrecognized absolute path format for the Windows environment: ${value}`,
+      };
+    }
+    return { ok: true, value, detectedFormat: "posix" };
+  }
+  return { ok: true, value, detectedFormat: "relative" };
+}
