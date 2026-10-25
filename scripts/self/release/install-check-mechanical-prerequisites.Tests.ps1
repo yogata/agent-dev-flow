@@ -1,31 +1,44 @@
 <#
 .SYNOPSIS
     REQ-009-053 導入時整合検査（check モード）の機械工程 script 実行時前提検証の
-    実スクリプト挙動テスト（Issue #3853 テスト戦略 TS-002）。
+    実スクリプト挙動テスト（Case #3862 テスト戦略 TS-002/TS-003/TS-006 の
+    installer 面検証）。
 
 .DESCRIPTION
-    一時 consumer 型リポジトリ上で scripts/install.ps1 -Mode check を実行し、
-    配布物の主要な機械工程 script（定義PR準備、定義PR受入検査、クローズ機械工程、
-    横断依存検査）の実行時前提の不一致が divergence 報告で検出されること、および
-    検証が管理対象ファイルを変更しないこと（REQ-050-005 非破壊契約）を検証する。
+    一時 consumer 型リポジトリ上で scripts/install.ps1 -Mode apply により完全
+    provisions 環境を構築した上で -Mode check を実行し、配布物の主要機械工程 script
+    （定義PR準備、定義PR受入検査、クローズ機械工程、横断依存検査）の実行時前提検証が
+    実 consumer 条件 fixture により成立すること、前提欠落が divergence 報告と非ゼロ終了
+    で検出されること、および検証が管理対象ファイルとディレクトリ状態を変更しないこと
+    （REQ-050-005 非破壊契約）を検証する。
 
-    検証観点（TS-002）:
-    - (1) check モードに機械工程 script 前提検証セクションが含まれる（構造検査）
-    - (2) 前提が揃った環境: 4 script の入力検証 dry-run プローブが [OK] で通過し、
-          検証実行前後で git status が同一、git diff --quiet が終了コード 0
+    検証観点（TS-002/TS-003/TS-006）:
+    - (1) 構造検査: check モードに機械工程前提検証セクション・検証専用経路
+          （--validate-input）呼出し・project root 内検査入力配置・横断依存の
+          応答解析述語が実装されている
+    - (2) 完全 provisions 正例: 4 script の検証が [OK] で通過し、installer 全体が
+          exit 0 で受入する。検証実行前後で git status が同一、git diff --quiet が
+          終了コード 0、検査入力の一時領域（.agentdev/integrity/reports）に残留なし
     - (3) script 不在環境: 不在 script が [DIVERGENCE] で報告され、他 script の
           検証は継続する（1本の不在で他の検証を止めない）
     - (4) 依存ツール（bun）不在環境: 検証不能として [DIVERGENCE] 報告され、
           検証実行失敗が成功扱いにならない
-    - (5) 入口契約の破綻（script が入力検証契約どおりに応答しない）:
+    - (5) 入口契約の破綻（script が検証専用経路の応答契約どおりに応答しない）:
           [DIVERGENCE] で報告され、検証実行失敗が成功扱いにならない
+    - (6) 必須ゲート実行体不在環境（正例から前提のみ欠落）: 実 consumer 条件 fixture が
+          参照するゲート実行体（agentdev-traceability の checker）が不在の場合、
+          検証専用経路の [DIVERGENCE] と非ゼロ終了で検出される
+    - (7) TS-003 runtime 副作用なし証明（git/gh shim）: PATH 分離した git/gh
+          記録 shim の下で check を実行し、shim 呼出し記録ゼロ・前提検証 [OK]・
+          管理対象内容とディレクトリ状態の同一性を確認する
 
     実行方法:
         pwsh -NoProfile -File scripts/self/release/install-check-mechanical-prerequisites.Tests.ps1
     終了コード: 0 = 全合格、1 = 不合格あり（不合格アサーションを標準出力へ報告する）。
 
     前提: Windows（junction 使用）、pwsh 7、git と bun コマンドが利用可能なこと。
-    メインリポジトリ・実ユーザー環境には一切書き込まない（一時ディレクトリのみ）。
+    メインリポジトリの管理対象ファイルは変更しない（変異は一時リポジトリの実
+    ディレクトリコピー側へ適用する。一時ディレクトリのみ使用）。
 #>
 
 # ADF-COVERS(verification): REQ-009-053
@@ -65,11 +78,33 @@ function Invoke-Check {
         consumer 型一時リポジトリ上で install.ps1 -Mode check を子 pwsh プロセスで
         実行し、終了コードと出力を返す。
     #>
+    param([string]$Cwd, [string]$PathPrefix = '')
+    $prev = $PWD.Path
+    Push-Location -LiteralPath $Cwd
+    try {
+        if ($PathPrefix) {
+            $output = & $PwshExe -NoProfile -NonInteractive -Command "`$env:PATH = '$PathPrefix' + `$env:PATH; & '$InstallScript' -Mode check" 2>&1 | Out-String
+        } else {
+            $output = & $PwshExe -NoProfile -NonInteractive -File $InstallScript -Mode 'check' 2>&1 | Out-String
+        }
+        $code = $LASTEXITCODE
+    } finally {
+        Pop-Location
+    }
+    [PSCustomObject]@{ ExitCode = $code; Output = $output }
+}
+
+function Invoke-Apply {
+    <#
+    .SYNOPSIS
+        consumer 型一時リポジトリ上で install.ps1 -Mode apply を実行し、完全 provisions
+        環境（全 skill・tools・plugins 投影）を構築する（TS-002 正例環境）。
+    #>
     param([string]$Cwd)
     $prev = $PWD.Path
     Push-Location -LiteralPath $Cwd
     try {
-        $output = & $PwshExe -NoProfile -NonInteractive -File $InstallScript -Mode 'check' 2>&1 | Out-String
+        $output = & $PwshExe -NoProfile -NonInteractive -File $InstallScript -Mode 'apply' 2>&1 | Out-String
         $code = $LASTEXITCODE
     } finally {
         Pop-Location
@@ -103,19 +138,31 @@ function New-TestJunction {
     }
 }
 
+function Convert-PlacedSkillToRealCopy {
+    <#
+    .SYNOPSIS
+        apply が配置した skill の junction を実ディレクトリコピーへ置き換える。
+        以降の変異（script の移動・破壊）が正本側へ波及しないようにする（producer
+        正本非破壊、TS-002 不足条件構成の前提）。
+    #>
+    param([string]$Root, [string]$SkillName)
+    $link = Join-Path $Root ".opencode\skills\$SkillName"
+    $target = (Get-Item -LiteralPath $link).Target
+    [System.IO.Directory]::Delete($link, $false)
+    robocopy $target $link /E /XD node_modules /NFL /NDL /NJH /NJS /NP | Out-Null
+    if ($LASTEXITCODE -ge 8) { throw "robocopy failed for $SkillName (exit=$LASTEXITCODE)" }
+}
+
 function New-MechanicalProbeConsumerRepo {
     <#
     .SYNOPSIS
         機械工程前提検証の検証用 consumer 型一時リポジトリを構築する。
-        機械工程 script を参照できる最小構成（.agentdev-plugin 正本への junction +
-        機械工程 3 skill の投影 junction + scripts コピー + git init）とする。
+        チェックアウト（.agentdev-plugin 正本への junction）と scripts コピーと
+        git init を用意し、完全 provisions は install.ps1 -Mode apply で構築する。
     #>
     param([string]$Prefix = 'adf-mech-prereq')
     $root = New-TempRepo $Prefix
     New-TestJunction -LinkPath (Join-Path $root '.agentdev-plugin\src') -TargetPath (Join-Path $RepoRoot 'src')
-    foreach ($skill in @('agentdev-workflow-case-open', 'agentdev-workflow-case-ready', 'agentdev-workflow-case-close')) {
-        New-TestJunction -LinkPath (Join-Path $root ".opencode\skills\$skill") -TargetPath (Join-Path $RepoRoot "src\common\skills\$skill")
-    }
     New-Item -ItemType Directory -Path (Join-Path $root 'scripts\consumer') -Force | Out-Null
     Copy-Item -LiteralPath $InstallScript -Destination (Join-Path $root 'scripts\install.ps1')
     Copy-Item -LiteralPath (Join-Path $RepoRoot 'scripts\consumer\common.ps1') -Destination (Join-Path $root 'scripts\consumer\common.ps1')
@@ -156,14 +203,26 @@ function Test-GitTreeUnchanged {
     }
 }
 
+function Get-DirectorySnapshot {
+    <#
+    .SYNOPSIS
+        ディレクトリ状態の同一性比較用のスナップショット（実ファイル相対パスの
+        ソート済み一覧）を返す（TS-003 の合格条件）。
+    #>
+    param([string]$Root)
+    return ((Get-ChildItem -LiteralPath $Root -Recurse -File -Force |
+            ForEach-Object { $_.FullName.Substring($Root.Length) } |
+            Sort-Object) -join "`n")
+}
+
 # ============================================================
-# TS-002 機械工程 script 実行時前提検証（REQ-009-053）
+# TS-002 / TS-003 / TS-006 機械工程 script 実行時前提検証（REQ-009-053）
 # ============================================================
 
 function Invoke-Ts002MechanicalPrerequisites {
     Write-Host '=== TS-002 mechanical-step script prerequisite check (REQ-009-053) ==='
 
-    # (1) 構造検査: check モードに機械工程前提検証が実装されている
+    # (1) 構造検査: check モードに機械工程前提検証と検証専用経路・配置指針・応答解析が実装されている
     $scriptText = [System.IO.File]::ReadAllText($InstallScript, [System.Text.Encoding]::UTF8)
     Assert-True 'TS-002 (1) check mode contains the mechanical-step prerequisites section' `
         ($scriptText -match '--- Mechanical-step script prerequisites ---') $InstallScript
@@ -172,42 +231,69 @@ function Invoke-Ts002MechanicalPrerequisites {
          ($scriptText -match 'accept_definition_checks\.ts') -and
          ($scriptText -match 'close_mechanical_steps\.ts') -and
          ($scriptText -match 'inspect_cross_dependencies\.ts')) $InstallScript
+    Assert-True 'TS-002 (1) probes invoke the verification-only entry (--validate-input)' `
+        ($scriptText -match '--validate-input') $InstallScript
+    Assert-True 'TS-006 (1) probe inputs are placed under the project root (.agentdev/integrity/reports), not the OS temp area' `
+        (($scriptText -match '\.agentdev\\integrity\\reports') -and
+         ($scriptText -notmatch 'GetTempPath\(\)\s*\)\s*"adf-install-check')) $InstallScript
+    Assert-True 'TS-001 (1) cross-dependency response analysis predicates are implemented' `
+        (($scriptText -match 'population_count') -and
+         ($scriptText -match 'detection_unavailable') -and
+         ($scriptText -match 'read_ok')) $InstallScript
+    Assert-True 'TS-005 (1) section summary line reports per-section results independently' `
+        ($scriptText -match 'Mechanical-step prerequisites: .* target\(s\), .* divergence\(s\)') $InstallScript
 
-    # (2) 正常系: 前提が揃った環境で 4 script のプローブが [OK] で通過し、非破壊である
+    # (2) 完全 provisions 正例: apply 後に 4 script の検証が [OK] で通過し、installer 全体が exit 0、非破壊である
     $root = New-MechanicalProbeConsumerRepo
     try {
+        $prov = Invoke-Apply -Cwd $root
+        if ($prov.ExitCode -ne 0) {
+            throw "apply provisioning failed (exit=$($prov.ExitCode)): $($prov.Output.Substring(0, [Math]::Min(300, $prov.Output.Length)))"
+        }
         $statusBefore = Get-GitStatusText -Root $root
+        $dirBefore = Get-DirectorySnapshot -Root $root
         $r = Invoke-Check -Cwd $root
-        Assert-True 'TS-002 (2) all four mechanical-step scripts pass the input-validation dry-run probes' `
-            (($r.Output -split "`n" | Where-Object { $_ -match '\[OK\] Mechanical-step script prerequisite \(input-validation dry-run\):' }).Count -eq 4) $r.Output
-        Assert-True 'TS-002 (2) no mechanical-step divergence is reported in the prepared environment' `
+        Assert-True 'TS-002 (2) all three validate-input scripts pass with consumer-condition fixtures' `
+            (($r.Output -split "`n" | Where-Object { $_ -match '\[OK\] Mechanical-step script prerequisite \(validate-input\):' }).Count -eq 3) $r.Output
+        Assert-True 'TS-002 (2) cross-dependency passes the response-analysis predicates' `
+            (($r.Output -split "`n" | Where-Object { $_ -match '\[OK\] Mechanical-step script prerequisite \(cross-dependency\):' }).Count -eq 1) $r.Output
+        Assert-True 'TS-002 (2) no mechanical-step divergence is reported in the fully provisioned environment' `
             ($r.Output -notmatch '\[DIVERGENCE\] Mechanical-step') $r.Output
+        Assert-True 'TS-002 (2) installer overall accepts the fully provisioned environment with exit 0' `
+            ($r.ExitCode -eq 0) "exit=$($r.ExitCode) output=$($r.Output.Substring(0, [Math]::Min(400, $r.Output.Length)))"
+        Assert-True 'TS-005 (2) section summary reports 4 targets with 0 divergences' `
+            ($r.Output -match 'Mechanical-step prerequisites: 4 target\(s\), 0 divergence\(s\)') $r.Output
         $statusAfter = Get-GitStatusText -Root $root
         Assert-True 'TS-002 (2) git status is unchanged by the check run' `
             ($statusAfter -eq $statusBefore) ($statusAfter -replace [regex]::Escape($statusBefore), '(diff)')
         Assert-True 'TS-002 (2) git diff --quiet exits 0 after the check run (no managed-file change)' `
             (Test-GitTreeUnchanged -Root $root) $r.Output
+        Assert-True 'TS-006 (2) probe input temp area leaves no residue under .agentdev' `
+            (-not (Test-Path -LiteralPath (Join-Path $root '.agentdev'))) (Join-Path $root '.agentdev')
+        Assert-True 'TS-003 (2) directory state is identical before and after the check run' `
+            ((Get-DirectorySnapshot -Root $root) -eq $dirBefore) 'directory snapshot differs'
     } finally {
         Remove-TempRepo $root
     }
 
     # (3) script 不在: 不在 script が [DIVERGENCE] で報告され、他の検証は継続する
+    #     （変異は実ディレクトリコピー側へ適用し、producer 正本へ波及させない）
     $root = New-MechanicalProbeConsumerRepo
     try {
-        $missingScript = Join-Path $RepoRoot 'src\common\skills\agentdev-workflow-case-close\scripts\src\close_mechanical_steps.ts'
-        $backup = Join-Path $root 'close_mechanical_steps.ts.bak'
-        Move-Item -LiteralPath $missingScript -Destination $backup
-        try {
-            $r = Invoke-Check -Cwd $root
-            Assert-True 'TS-002 (3) missing mechanical-step script is reported as divergence' `
-                ($r.Output -match '\[DIVERGENCE\] Mechanical-step script missing: agentdev-workflow-case-close/scripts/src/close_mechanical_steps\.ts') $r.Output
-            Assert-True 'TS-002 (3) remaining scripts are still verified after one missing script' `
-                (($r.Output -split "`n" | Where-Object { $_ -match '\[OK\] Mechanical-step script prerequisite \(input-validation dry-run\):' }).Count -eq 3) $r.Output
-            Assert-True 'TS-002 (3) check exits non-zero when a mechanical-step script is missing' `
-                ($r.ExitCode -ne 0) "exit=$($r.ExitCode)"
-        } finally {
-            Move-Item -LiteralPath $backup -Destination $missingScript
+        $prov = Invoke-Apply -Cwd $root
+        if ($prov.ExitCode -ne 0) {
+            throw "apply provisioning failed (exit=$($prov.ExitCode))"
         }
+        Convert-PlacedSkillToRealCopy -Root $root -SkillName 'agentdev-workflow-case-close'
+        $missingScript = Join-Path $root '.opencode\skills\agentdev-workflow-case-close\scripts\src\close_mechanical_steps.ts'
+        Move-Item -LiteralPath $missingScript -Destination (Join-Path $root 'close_mechanical_steps.ts.bak')
+        $r = Invoke-Check -Cwd $root
+        Assert-True 'TS-002 (3) missing mechanical-step script is reported as divergence' `
+            ($r.Output -match '\[DIVERGENCE\] Mechanical-step script missing: agentdev-workflow-case-close/scripts/src/close_mechanical_steps\.ts') $r.Output
+        Assert-True 'TS-002 (3) remaining scripts are still verified after one missing script' `
+            (($r.Output -split "`n" | Where-Object { $_ -match '\[OK\] Mechanical-step script prerequisite \((validate-input|cross-dependency)\):' }).Count -eq 3) $r.Output
+        Assert-True 'TS-002 (3) check exits non-zero when a mechanical-step script is missing' `
+            ($r.ExitCode -ne 0) "exit=$($r.ExitCode)"
     } finally {
         Remove-TempRepo $root
     }
@@ -215,6 +301,10 @@ function Invoke-Ts002MechanicalPrerequisites {
     # (4) 依存ツール（bun）不在: 検証不能として [DIVERGENCE] 報告され、成功扱いにならない
     $root = New-MechanicalProbeConsumerRepo
     try {
+        $prov = Invoke-Apply -Cwd $root
+        if ($prov.ExitCode -ne 0) {
+            throw "apply provisioning failed (exit=$($prov.ExitCode))"
+        }
         $minimalPath = "$env:SystemRoot\System32"
         $prev = $PWD.Path
         Push-Location -LiteralPath $root
@@ -232,28 +322,77 @@ function Invoke-Ts002MechanicalPrerequisites {
         Remove-TempRepo $root
     }
 
-    # (5) 入口契約の破綻: script が入力検証契約どおりに応答しない場合、
-    #     [DIVERGENCE] 報告され、成功扱いにならない
+    # (5) 入口契約の破綻: script が検証専用経路の応答契約どおりに応答しない場合、
+    #     [DIVERGENCE] 報告され、成功扱いにならない（変異は実ディレクトリコピー側へ適用）
     $root = New-MechanicalProbeConsumerRepo
     try {
-        $brokenDir = Join-Path $root '.broken-case-close\scripts\src'
-        New-Item -ItemType Directory -Path $brokenDir -Force | Out-Null
-        [System.IO.File]::WriteAllText((Join-Path $brokenDir 'close_mechanical_steps.ts'),
+        $prov = Invoke-Apply -Cwd $root
+        if ($prov.ExitCode -ne 0) {
+            throw "apply provisioning failed (exit=$($prov.ExitCode))"
+        }
+        Convert-PlacedSkillToRealCopy -Root $root -SkillName 'agentdev-workflow-case-close'
+        $brokenScript = Join-Path $root '.opencode\skills\agentdev-workflow-case-close\scripts\src\close_mechanical_steps.ts'
+        [System.IO.File]::WriteAllText($brokenScript,
             "process.stderr.write(`"fatal: simulated entry-contract breakage`n`");process.exit(3);`n",
             [System.Text.Encoding]::UTF8)
-        $link = Join-Path $root '.opencode\skills\agentdev-workflow-case-close'
-        [System.IO.Directory]::Delete($link, $false)
-        New-TestJunction -LinkPath $link -TargetPath (Join-Path $root '.broken-case-close')
-        try {
-            $r = Invoke-Check -Cwd $root
-            Assert-True 'TS-002 (5) entry-contract breakage is reported as divergence (not success)' `
-                ($r.Output -match '\[DIVERGENCE\] Mechanical-step script entry contract mismatch: agentdev-workflow-case-close/scripts/src/close_mechanical_steps\.ts') $r.Output
-            Assert-True 'TS-002 (5) check exits non-zero on entry-contract breakage' `
-                ($r.ExitCode -ne 0) "exit=$($r.ExitCode)"
-        } finally {
-            [System.IO.Directory]::Delete($link, $false)
-            New-TestJunction -LinkPath $link -TargetPath (Join-Path $RepoRoot 'src\common\skills\agentdev-workflow-case-close')
+        $r = Invoke-Check -Cwd $root
+        Assert-True 'TS-002 (5) verification-entry contract breakage is reported as divergence (not success)' `
+            ($r.Output -match '\[DIVERGENCE\] Mechanical-step script prerequisite contract mismatch: agentdev-workflow-case-close/scripts/src/close_mechanical_steps\.ts') $r.Output
+        Assert-True 'TS-002 (5) check exits non-zero on entry-contract breakage' `
+            ($r.ExitCode -ne 0) "exit=$($r.ExitCode)"
+    } finally {
+        Remove-TempRepo $root
+    }
+
+    # (6) 必須ゲート実行体不在（正例から前提のみ欠落）: fixture が参照するゲート実行体
+    #     （agentdev-traceability の checker）が配置に存在しない場合、検証専用経路の
+    #     [DIVERGENCE] と非ゼロ終了で検出される
+    $root = New-MechanicalProbeConsumerRepo
+    try {
+        $prov = Invoke-Apply -Cwd $root
+        if ($prov.ExitCode -ne 0) {
+            throw "apply provisioning failed (exit=$($prov.ExitCode))"
         }
+        Remove-Item -LiteralPath (Join-Path $root '.opencode\skills\agentdev-traceability') -Recurse -Force
+        $r = Invoke-Check -Cwd $root
+        Assert-True 'TS-002 (6) missing gate executable is detected as prerequisite divergence via validate-input' `
+            (($r.Output -split "`n" | Where-Object { $_ -match '\[DIVERGENCE\] Mechanical-step script prerequisite contract mismatch: .*expected: exit 0 with a validation report' }).Count -eq 3) $r.Output
+        Assert-True 'TS-002 (6) cross-dependency probe itself still passes (its fixture does not reference the missing gate)' `
+            (($r.Output -split "`n" | Where-Object { $_ -match '\[OK\] Mechanical-step script prerequisite \(cross-dependency\):' }).Count -eq 1) $r.Output
+        Assert-True 'TS-002 (6) check exits non-zero when a required gate executable is missing' `
+            ($r.ExitCode -ne 0) "exit=$($r.ExitCode)"
+    } finally {
+        Remove-TempRepo $root
+    }
+
+    # (7) TS-003 runtime 副作用なし証明（PATH 分離した git/gh shim）: 呼出しを記録し
+    #     呼出し検出時に失敗する shim を PATH 先頭へ配置して check を実行し、shim 記録
+    #     ゼロ・前提検証 [OK]・前後同一性を確認する
+    $root = New-MechanicalProbeConsumerRepo
+    try {
+        $prov = Invoke-Apply -Cwd $root
+        if ($prov.ExitCode -ne 0) {
+            throw "apply provisioning failed (exit=$($prov.ExitCode))"
+        }
+        $shimDir = Join-Path $root 'shim-bin'
+        $shimLog = Join-Path $shimDir 'shim-invocations.log'
+        New-Item -ItemType Directory -Path $shimDir -Force | Out-Null
+        foreach ($tool in @('git', 'gh')) {
+            [System.IO.File]::WriteAllText((Join-Path $shimDir "$tool.cmd"),
+                "@echo $tool-shim-invocation >> `"$shimLog`"`r`nexit 1`r`n",
+                [System.Text.Encoding]::ASCII)
+        }
+        $statusBefore = Get-GitStatusText -Root $root
+        $r = Invoke-Check -Cwd $root -PathPrefix "$shimDir;"
+        $shimRecords = if (Test-Path -LiteralPath $shimLog) { (Get-Content -LiteralPath $shimLog | Measure-Object).Count } else { 0 }
+        Assert-True 'TS-003 (7) git/gh shim records zero invocations during the whole check run' `
+            ($shimRecords -eq 0) "shim log: $shimLog records=$shimRecords"
+        Assert-True 'TS-003 (7) mechanical-step prerequisites still pass under the shimmed PATH' `
+            (($r.Output -split "`n" | Where-Object { $_ -match '\[OK\] Mechanical-step script prerequisite \((validate-input|cross-dependency)\):' }).Count -eq 4) $r.Output
+        Assert-True 'TS-003 (7) installer overall still accepts the environment (exit 0) under the shimmed PATH' `
+            ($r.ExitCode -eq 0) "exit=$($r.ExitCode)"
+        Assert-True 'TS-003 (7) git status is unchanged by the shimmed check run' `
+            ((Get-GitStatusText -Root $root) -eq $statusBefore) 'git status differs'
     } finally {
         Remove-TempRepo $root
     }
