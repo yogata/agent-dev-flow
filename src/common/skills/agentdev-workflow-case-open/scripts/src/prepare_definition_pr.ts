@@ -9,15 +9,16 @@
 // 入力: `--input` に機械工程入力 JSON ファイル。出力: stdout に報告 JSON
 // （実行結果・差分・警告・提案本文の4要素）。終了コード: 成功 0、要判断 2、失敗 1。
 // 対象品質ゲート（generate_indexes、check_integrity、traceability check）の省略は
-// 入力検証で拒否する。意味判断（実変更判定の確定、警告の重要度評価）はモデルが
-// 担当する。実装は inspect_cross_dependencies.ts と同じ作り（工程別個別 script、
-// 共通基盤なし）。
+// 入力検証で拒否し、ゲート実行体は起動前に配布先での存在検査を行う（欠落時は
+// 正規の代替経路の案内を報告へ含めて fail-closed で停止する）。意味判断（実変更
+// 判定の確定、警告の重要度評価）はモデルが担当する。実装は
+// inspect_cross_dependencies.ts と同じ作り（工程別個別 script、共通基盤なし）。
 //
 
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { spawnSync } from "node:child_process";
-import { consumeDefinitionTraceability, type DeferredObligation } from "../lib/definition-traceability-gate.ts";
+import { consumeDefinitionTraceability, isReqRowId, type DeferredObligation } from "../lib/definition-traceability-gate.ts";
 
 const USAGE = `usage: bun ./src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts --input <input.json>
   --input  機械工程入力 JSON（worktree、branch、Definition 編集内容、品質ゲート実行仕様等）`;
@@ -94,6 +95,15 @@ export interface PrepareDefinitionPrInput {
   stagePaths: readonly string[];
   commitMessage: string;
   traceabilityReqIds?: readonly string[];
+  /**
+   * REQ 行ID 書式の producer 固有制約（任意の設定値。正規表現ソース文字列）。
+   * 実行前提は workflow 側で Project Extensions（`.agentdev/extensions/`）等の
+   * プロジェクト固有値から解決し、明示入力として渡す。script 側の既定は
+   * 桁数を固定しない許容書式（traceability checker 契約）であり、producer の
+   * 採番桁数の前提を既定値として保持しない。与えられた制約は許容書式の範囲内の
+   * 追加照合として適用する。
+   */
+  reqRowIdPattern?: string;
   generateIndexesGate?: GateCommandSpec;
   checkIntegrityGate?: GateCommandSpec;
   traceabilityGate?: GateCommandSpec;
@@ -124,6 +134,69 @@ export const REQUIRED_GATES = [
   "check_integrity",
   "traceability-check",
 ] as const;
+
+/**
+ * 欠落時に報告 JSON で案内する正規の代替経路（REQ 行の語彙）。
+ * 代替経路の履行なしに検査を省略して成功扱いとしないため、欠落時は fail-closed
+ * で停止し案内のみを行う。
+ */
+export const GATE_ALTERNATIVE_ROUTES: readonly string[] = [
+  "evidence-preservation（証跡化）: ゲート実行体の欠落を検出事項として証跡化する（本報告 JSON の step detail と warnings、呼出側の検証差分記録への記録）",
+  "manual-equivalent-procedure（手動相当手順）: 手動相当の手順で同等の検査を実施し、実行証跡（終了コード、標準出力・標準エラー）を記録する",
+  "contrastive-no-worse-proof（対照実行による悪化ゼロ件の機械証明）: baseline 対照の対照実行で既知 fail の悪化ゼロ件を機械証明する",
+];
+
+const GATE_SCRIPT_EXTENSIONS = [".ts", ".mts", ".mjs", ".js", ".cjs"];
+
+/**
+ * ゲート実行体ファイル（スクリプトパス）の解決。command と args[0] のうち
+ * パス区切りまたはスクリプト拡張子をもつ最初の要素を gate cwd 基準で解決する。
+ * 実行体ファイルを特定できない場合は null（存在検査対象なし。command 自体の
+ * 解決は実行基盤の責務で、ENOENT 等の実行時失敗は既存の実行経路が扱う）。
+ */
+export function resolveGateExecutablePath(spec: GateCommandSpec): string | null {
+  const candidates: readonly (string | undefined)[] = [spec.command, spec.args[0]];
+  for (const candidate of candidates) {
+    if (typeof candidate !== "string" || candidate.length === 0) continue;
+    const hasSeparator = /[\\/]/.test(candidate);
+    const hasScriptExtension = GATE_SCRIPT_EXTENSIONS.some((ext) => candidate.toLowerCase().endsWith(ext));
+    if (hasSeparator || hasScriptExtension) {
+      return path.resolve(spec.cwd, candidate);
+    }
+  }
+  return null;
+}
+
+export interface GateAvailabilityRecord {
+  gate: string;
+  available: boolean;
+  resolvedExecutable: string | null;
+  alternativeRoutes: readonly string[];
+}
+
+/**
+ * 必須ゲート実行体の配布先での存在検査。欠落時は fail-closed の対象として
+ * 検出し、正規の代替経路の案内を報告へ含める。
+ */
+export function evaluateGateAvailability(
+  gates: readonly GateCommandSpec[],
+  exists: (absolutePath: string) => boolean,
+): { records: readonly GateAvailabilityRecord[]; missing: readonly string[] } {
+  const records = gates.map((gate) => {
+    const executable = resolveGateExecutablePath(gate);
+    const available = executable === null || exists(executable);
+    return {
+      gate: gate.name,
+      available,
+      resolvedExecutable: executable,
+      alternativeRoutes: available ? [] : GATE_ALTERNATIVE_ROUTES,
+    };
+  });
+  return {
+    records,
+    missing: records.filter((record) => !record.available).map((record) => record.gate),
+  };
+}
 
 export class MechanicalInputError extends Error {}
 
@@ -233,7 +306,11 @@ export function validateInput(value: unknown): PrepareDefinitionPrInput {
     fail(`required quality gates are missing from input (omission forbidden): ${missing.join(", ")}`);
   }
   const traceabilityGate = requireGateSpec(v.traceabilityGate, "traceabilityGate");
-  validateTraceabilityReqIds(v.traceabilityReqIds, traceabilityGate);
+  validateTraceabilityReqIds(
+    v.traceabilityReqIds,
+    traceabilityGate,
+    typeof v.reqRowIdPattern === "string" ? v.reqRowIdPattern : undefined,
+  );
   return {
     repoRoot: v.repoRoot as string,
     worktreeRoot: v.worktreeRoot as string,
@@ -245,6 +322,7 @@ export function validateInput(value: unknown): PrepareDefinitionPrInput {
     stagePaths: v.stagePaths as readonly string[],
     commitMessage: v.commitMessage as string,
     traceabilityReqIds: v.traceabilityReqIds as readonly string[],
+    reqRowIdPattern: typeof v.reqRowIdPattern === "string" ? v.reqRowIdPattern : undefined,
     generateIndexesGate: requireGateSpec(v.generateIndexesGate, "generateIndexesGate"),
     checkIntegrityGate: requireGateSpec(v.checkIntegrityGate, "checkIntegrityGate"),
     traceabilityGate,
@@ -252,16 +330,18 @@ export function validateInput(value: unknown): PrepareDefinitionPrInput {
   };
 }
 
-const REQ_ROW_ID_PATTERN = /^REQ-\d{3}-\d{3}$/;
-
 /**
  * 判定対象 REQ 集合（traceabilityReqIds）の存在・有効性を実行前に検証する（fail-closed）。
- * 欠落・空・形式不正・gate 実行範囲（--req 指定）との不整合は、検査や worktree 操作を
- * 開始せず MechanicalInputError で拒否する。空配列への暗黙正規化は行わない。
+ * 書式検証は桁数を固定しない許容書式（traceability checker 契約と同じ REQ-{NNNN}-{MMM}
+ * 形式）で行い、producer 固有の追加制約（reqRowIdPattern の設定値）が与えられた場合は
+ * 許容書式の範囲内の追加照合として適用する。欠落・空・形式不正・gate 実行範囲
+ * （--req 指定）との不整合は、検査や worktree 操作を開始せず MechanicalInputError で
+ * 拒否する。空配列への暗黙正規化は行わない。
  */
 function validateTraceabilityReqIds(
   value: unknown,
   traceabilityGate: GateCommandSpec,
+  reqRowIdPattern?: string,
 ): void {
   if (!Array.isArray(value)) {
     fail("input.traceabilityReqIds is required when the traceability gate is enabled (implicit normalization to an empty array is not allowed)");
@@ -270,14 +350,28 @@ function validateTraceabilityReqIds(
   if (reqIds.length === 0) {
     fail("input.traceabilityReqIds must be a non-empty array");
   }
+  const producerPattern = compileProducerReqRowIdPattern(reqRowIdPattern);
   for (const id of reqIds) {
-    if (typeof id !== "string" || !REQ_ROW_ID_PATTERN.test(id)) {
+    if (typeof id !== "string" || !isReqRowId(id)) {
       fail(`input.traceabilityReqIds contains an invalid requirement row id: ${String(id)}`);
+    }
+    if (producerPattern !== null && !producerPattern.test(id)) {
+      fail(`input.traceabilityReqIds violates the configured producer requirement row id pattern: ${String(id)}`);
     }
   }
   const gateReqScope = extractFlagValue(traceabilityGate.args, "--req");
   if (gateReqScope !== reqIds.join(",")) {
     fail(`input.traceabilityReqIds does not match the traceability gate execution scope (--req): declared=[${reqIds.join(", ")}], gate=${gateReqScope ?? "(absent)"}`);
+  }
+}
+
+/** producer 固有の REQ 行ID 制約（設定値）を追加照合として編成する（構文検証のみ。実効範囲は許容書式との共通部分）。 */
+function compileProducerReqRowIdPattern(patternSource?: string): RegExp | null {
+  if (typeof patternSource !== "string" || patternSource.length === 0) return null;
+  try {
+    return new RegExp(`^(?:${patternSource})$`);
+  } catch (error) {
+    fail(`input.reqRowIdPattern is not a valid regular expression: ${String(error)}`);
   }
 }
 
@@ -292,7 +386,7 @@ export interface KnownArgContract {
 }
 
 export const KNOWN_GATE_ARG_CONTRACTS: readonly KnownArgContract[] = [
-  { flag: "--req", pattern: /^(REQ-\d{3}-\d{3})(,REQ-\d{3}-\d{3})*$/ },
+  { flag: "--req", pattern: /^(REQ-\d{3,4}-\d{3})(,REQ-\d{3,4}-\d{3})*$/ },
   { flag: "--profile", values: ["source", "link"] },
   { flag: "--fail-level", values: ["strict", "warning"] },
   { flag: "--workflow", pattern: /^[a-z][a-z0-9-]*$/ },
@@ -379,10 +473,13 @@ function toGateSpec(
   };
 }
 
-function requireReqIdList(reqIds: readonly string[]): string {
+function requireReqIdList(reqIds: readonly string[], producerPattern?: RegExp | null): string {
   for (const id of reqIds) {
-    if (!/^REQ-\d{3}-\d{3}$/.test(id)) {
+    if (!isReqRowId(id)) {
       fail(`invalid requirement row id: ${id}`);
+    }
+    if (producerPattern != null && !producerPattern.test(id)) {
+      fail(`requirement row id violates the configured producer pattern: ${id}`);
     }
   }
   return reqIds.join(",");
@@ -397,8 +494,11 @@ export function buildKnownWorkflowIntegrityGateSpec(input: KnownWorkflowGateInpu
 }
 
 /** traceability check の gate spec を既知入力型と下位契約から固定生成する。 */
-export function buildKnownTraceabilityCheckSpec(input: KnownTraceabilityGateInput): GateCommandSpec {
-  return toGateSpec("traceability-check", input, ["--root", input.root, "--req", requireReqIdList(input.reqIds)]);
+export function buildKnownTraceabilityCheckSpec(
+  input: KnownTraceabilityGateInput,
+  producerPattern?: RegExp | null,
+): GateCommandSpec {
+  return toGateSpec("traceability-check", input, ["--root", input.root, "--req", requireReqIdList(input.reqIds, producerPattern)]);
 }
 
 /** generate_indexes の gate spec を既知入力型から固定生成する。 */
@@ -504,6 +604,24 @@ export function runPrepareDefinitionPr(
 
   for (const spec of [input.generateIndexesGate, input.checkIntegrityGate, input.traceabilityGate]) {
     if (spec != null) preValidateGateSpec(spec);
+  }
+
+  const availability = evaluateGateAvailability(
+    [input.generateIndexesGate, input.checkIntegrityGate, input.traceabilityGate].filter(
+      (spec): spec is GateCommandSpec => spec != null,
+    ),
+    (absolutePath) => runner.exists(absolutePath),
+  );
+  steps.push({
+    name: "gate-availability",
+    status: availability.missing.length > 0 ? "fail" : "pass",
+    detail: { gates: availability.records },
+  });
+  if (availability.missing.length > 0) {
+    warnings.push(
+      `required gate executable is missing in the deployment environment (omission and success are not allowed): ${availability.missing.join(", ")}. alternative routes: ${GATE_ALTERNATIVE_ROUTES.join(" / ")}`,
+    );
+    return assembleReport(input.dryRun === true, steps, diff, warnings, proposal);
   }
 
   const worktreeList = runner.run({ command: "git", args: ["worktree", "list", "--porcelain"], cwd: repoRoot });

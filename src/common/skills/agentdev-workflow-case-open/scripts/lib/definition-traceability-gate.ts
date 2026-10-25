@@ -63,8 +63,13 @@ function isCheckKind(value: string): value is CheckKind {
   return CHECK_KINDS.some((kind) => kind === value);
 }
 
-function isReqRowId(value: string): boolean {
-  return /^REQ-\d{3}-\d{3}$/.test(value);
+/**
+ * REQ 行ID の許容書式（traceability checker 契約と同じ REQ-{NNNN}-{MMM} 形式）。
+ * REQ 部の桁数を固定しない（producer 側の採番桁数の前提を埋め込まない）。
+ * 機械工程 script は本関数を共有して検証する（工程別 script 側で書式を再定義しない）。
+ */
+export function isReqRowId(value: string): boolean {
+  return /^REQ-\d{3,4}-\d{3}$/.test(value);
 }
 
 function parseReport(value: unknown): ParsedReport | null {
