@@ -1,6 +1,9 @@
 component: agentdev-workflow-case-open
 design:
   docs/designs/commands/case-open.md:
+    - REQ-029-014
+    - REQ-029-015
+    - REQ-029-016
     - REQ-030-014
     - REQ-030-017
     - REQ-030-018
