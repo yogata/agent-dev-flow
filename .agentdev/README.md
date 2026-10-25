@@ -23,7 +23,7 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-001�
 | `inspect/promoted/auto-promote-log.md` | `--auto` 実行ログ（append-only） | `inspect-promote`(--auto) | ユーザー参照・revoke 手順 | 永続（トレーサビリティ） |
 | `issues/issue-*.md` | ローカルIssue（追跡Issue / Case Issue。ローカル版のみ） | `/agentdev/issue`、case-open/run/close（Tool 操作契約経由） | `/agentdev/issue`、`/agentdev/req-define`（実行確定時の要件化経路） | なし（永続。Issue/PR 相当の永続情報として git 管理対象、REQ-009-026） |
 | `jev-observations/*.json` | Jev 先行評価の観測（1 semantic evaluation = 1 observation）。書込先 root は Custom Tool `agentdev_jev` が内部解決し呼出側から指定できず、worktree コンテキストの委譲実行からも main リポジトリ側 `.agentdev/jev-observations/` に帰着する（実測 20260923T133911Z-6859） | 6系統 Workflow（learning-promote、req-define、case-ready〔Epic/Wave 構成判断〕、intake-promote、inspect-promote、backlog-review。Custom Tool `agentdev_jev` の evaluate による観測永続化と observation_write による最終判断反映経由）。適用対象は閉じた意味評価として適格な判断に限り（REQ-090-004、REQ-090-024）、親判断の最終確定結果が発動条件を満たさない後続評価の観測は生成しない（REQ-090-025） | Jev 有効性評価（Issue B）、DEC-027 観測ループ、将来の置換判断（Issue C）の根拠 | 永続（git 管理対象の観測 domain state。正規状態と混在しない。削除条件は設定しない。REQ-090-006） |
-| `phase/identity.yaml`、`phase/themes.md`、`phase/pending.md`、`phase/received/*.md` | 工程駆動の保存状態（取組・対象版・現在工程の最小識別、検討テーマ正本、未決事項と判断根拠、受領済み途中検討知見の受領記録） | 工程駆動の4操作（phase-tasks-create、phase-tasks-update、phase-artifacts-update、phase-review）と利用者判断による工程遷移（phase-transition） | 同4操作と工程遷移、別セッション再開 | 永続。テーマ一覧と工程全体像は正本と正規成果物群から導出し、一覧・閲覧像を恒久保存するファイルを作らない（各ファイルの様式と導出規律は `phase/README.md`） |
+| `phase/identity.yaml`、`phase/themes.md`、`phase/pending.md`、`phase/received/*.md`、`phase/adoptions/*.json`、`phase/transitions/*` | 工程駆動の保存状態（取組・対象版・現在工程の最小識別、検討テーマ正本、未決事項と判断根拠、受領済み途中検討知見の受領記録、直接採用の採否記録、工程遷移の遷移記録） | 工程駆動の4操作（phase-tasks-create、phase-tasks-update、phase-artifacts-update、phase-review）と利用者判断による工程遷移（phase-transition） | 同4操作と工程遷移、別セッション再開 | 永続。テーマ一覧と工程全体像は正本と正規成果物群から導出し、一覧・閲覧像を恒久保存するファイルを作らない（各ファイルの様式と導出規律は `phase/README.md`） |
 
 <!-- ADF-COVERS(implementation): REQ-090-004, REQ-090-006, REQ-090-025 -->
 
@@ -58,11 +58,13 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-001�
 │   └── issue-{NNNN}.md
 ├── jev-observations/    ← 6系統 Workflow が Jev 先行評価の観測 JSON を保存（1評価1 observation）
 │   └── *.json
-├── phase/               ← 工程駆動の保存領域（テーマ正本、最小識別状態、未決事項、受領済み知見。様式は phase/README.md）
+├── phase/               ← 工程駆動の保存領域（テーマ正本、最小識別状態、未決事項、受領済み知見、採否記録、遷移記録。様式は phase/README.md）
 │   ├── identity.yaml    ← 取組・対象版・現在工程の最小識別状態
 │   ├── themes.md        ← 検討テーマ正本（テーマ一覧はこのファイルから導出）
 │   ├── pending.md       ← 未決事項と判断根拠
-│   └── received/        ← 受領済み途中検討知見（1受領1ファイル）
+│   ├── received/        ← 受領済み途中検討知見（1受領1ファイル）
+│   ├── adoptions/       ← 直接採用の採否記録（1採用1ファイル）
+│   └── transitions/     ← 工程遷移の遷移記録（1遷移1ファイル）
 └── integrity/
     └── reports/         ← docs-check が検証結果を保存（非永続・git管理対象外）
 ```

@@ -16,7 +16,11 @@ const PHASE_README = join(PHASE_DIR, "README.md");
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const TEMP_ROOT = join(TEMP_BASE, `phase-domain-state-${crypto.randomUUID().slice(0, 8)}`);
 
-const ALLOWED_PHASE_ENTRIES = new Set(["README.md", "identity.yaml", "themes.md", "pending.md", "received"]);
+// 必須存在エントリと許可エントリ集合を分離する。adoptions/（直接採用の採否記録。
+// 1採用1ファイル）と transitions/（工程遷移の遷移記録）は初回保存時に実体化する
+// domain state であり、不在を失敗にせず、実在する場合の許可集合に含める。
+const REQUIRED_PHASE_ENTRIES = new Set(["README.md", "identity.yaml", "themes.md", "pending.md", "received"]);
+const ALLOWED_PHASE_ENTRIES = new Set([...REQUIRED_PHASE_ENTRIES, "adoptions", "transitions"]);
 const IDENTITY_FIELDS = ["undertaking", "target_version", "current_phase"] as const;
 
 interface ThemeEntry {
@@ -84,7 +88,7 @@ describe("phase domain state 領域の保存契約", () => {
 
   it("実領域が許可ファイル集合のみで構成される（一覧・閲覧像の恒久保存ファイルが存在しない）", () => {
     expect(existsSync(PHASE_DIR)).toBe(true);
-    for (const required of ALLOWED_PHASE_ENTRIES) {
+    for (const required of REQUIRED_PHASE_ENTRIES) {
       expect(existsSync(join(PHASE_DIR, required))).toBe(true);
     }
     const entries = readdirSync(PHASE_DIR).filter((entry) => entry !== "received");

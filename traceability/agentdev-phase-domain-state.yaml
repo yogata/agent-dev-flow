@@ -4,6 +4,7 @@ implementation:
     - REQ-110-010
     - REQ-110-013
     - REQ-110-014
+    - REQ-110-040
   .agentdev/phase/identity.yaml:
     - REQ-110-001
   .agentdev/phase/themes.md:

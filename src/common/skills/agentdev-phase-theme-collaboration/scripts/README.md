@@ -61,6 +61,7 @@ bun src/receive.ts --input <return.md | -> [--adopt <id|title>]... [--prior <pri
 - 再投入の重複判定は識別子・表題の一致に加えて正規化本文の内容同一性（`bodyDigest`）で判定する。同識別子・同表題でも本文が相違する入力は同一と断定せず、`updatedFromPrior: true` として新たな受理・採否の対象にする。実質同一（空白・改行のみの差）は重複として扱う。本文ダイジェストを持たない旧様式の prior は同一断定で除外しない
 - `--provenance` は受領内容の由来（`user-provided` / `delegated-derivation` / `evaluator-finding`）。`<kind>` で全体既定、`<id|title>=<kind>` で個別指定。採用根拠とは別フィールド（`provenance`）で記録し、由来だけで採用済みと扱わない
 - `--adopt` に該当する受理済みエントリが存在しない場合は非ゼロ終了（fail-closed）
+- 本 CLI は採否記録の保存を行わない（stdout への JSON 出力のみ。様式と機械生成の正規所有者）。採否記録の保存先は `.agentdev/phase/adoptions/`（1採用1ファイル）であり、保存先への書込みは保存する操作（成果物反映）の責務である。保存先と様式は領域契約文書（`.agentdev/phase/README.md`）の「adoptions/ の様式」を正とする
 - 証跡量: 出力はエントリ本文を複写しない。採用分は根拠付きレコード、不採用分は id と分類の要約のみ。記録量は明示採用件数に比例する
 - 受理・解釈は入力サイズ n に対する単一の線形走査（O(n)）である
 
