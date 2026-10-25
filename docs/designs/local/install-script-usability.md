@@ -2,10 +2,11 @@
 title: 導入スクリプトの使いやすさ詳細
 status: accepted
 created: 2026-08-02
-updated: 2026-10-03
+updated: 2026-10-25
 ---
 <!-- ADF-COVERS(implementation): REQ-009-001, REQ-009-003, REQ-009-004, REQ-009-005, REQ-009-040, REQ-009-041, REQ-009-042, REQ-009-043, REQ-009-044, REQ-009-046, REQ-009-047, REQ-009-048, REQ-009-049 -->
 <!-- ADF-COVERS(implementation): REQ-009-040, REQ-009-041, REQ-009-042, REQ-009-043, REQ-009-044 -->
+<!-- ADF-COVERS(design): REQ-009-053 -->
 
 # 導入スクリプトの使いやすさ詳細
 
@@ -119,6 +120,14 @@ install.ps1 -Mode check は旧来の install における check が含めなか�
 check は管理対象ファイルを変更しない（REQ-050-005）。
 
 管理物判定不能物（reparse data 不参照・ターゲット解決不能の junction 等）は [INFO] で報告し、乖離（DRIFT / UNMANAGED）には数えない。check の終了コードには反映しない（非破壊報告）。
+
+### 機械工程 script の実行時前提の導入時検証（REQ-009-053）
+
+check モードは静的構成検査に加えて、配布物の主要な機械工程 script（定義PR準備、定義PR受入検査、クローズ機械工程、横断依存検査）の実行時前提の不一致を導入時に検出する。検証は各 script の副作用のない入力検証 dry-run 入口（入力 JSON の検証のみを行い、worktree 作成・ファイル変更・ゲート実行を行わない入口）または同等の手段によって行い、check モードの非破壊契約（REQ-050-005）を維持する。
+
+- 検証対象 script の範囲と各 script の dry-run 入口の仕様は配布 skill の script 契約（scripts/README.md 等）が所有し、本節は検出契機と報告形式を定める
+- 検出した前提の不一致（必須ゲートの不在、入力書式の不整合、解決不能なパス形式等）は既存の divergence 報告形式で報告し、check の終了コードに反映する。検証自体の実行失敗（script の不在、入口契約の不整合）は検証不能として報告し、成功扱いとしない
+- dry-run 入口を持たない機械工程 script に対しては、入力検証相当の検証方法（入力 JSON の契約検証、依存ツールの存在確認）を script 契約に定めてから check の検証対象へ組み込む
 
 ## cwd 安全化
 

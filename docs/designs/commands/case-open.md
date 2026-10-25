@@ -2,7 +2,7 @@
 title: case-open Design
 status: accepted
 created: 2026-06-21
-updated: "2026-10-22"
+updated: "2026-10-25"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-004, REQ-030-005, REQ-030-006, REQ-030-007, REQ-030-008, REQ-030-009, REQ-030-010, REQ-030-011, REQ-030-015 -->
@@ -16,6 +16,7 @@ updated: "2026-10-22"
 <!-- ADF-COVERS(design): REQ-030-027 -->
 <!-- ADF-COVERS(design): REQ-030-019, REQ-030-020, REQ-030-021, REQ-030-024 -->
 <!-- ADF-COVERS(design): REQ-083-002, REQ-083-003 -->
+<!-- ADF-COVERS(design): REQ-029-014, REQ-029-015, REQ-029-016 -->
 
 # case-open Design
 
@@ -96,6 +97,15 @@ script 呼び出しによる Definition 適用の後、設計PR作成の前に�
 - 突合不成立が判明した場合は設計PRを作成せず停止する（fail-closed）。欠落の再適用は DefinitionEdit の旧文完全一致契約の範囲で行い、冪等再実行の手順（適用済み工程の確認と不足分のみの再適用）と非競合とする
 - 突合成立後の PR 本文の検証記録は、適用後成果物への突合結果を根拠として記録する。適用予定内容の記述を適用済みの証拠として記録しない
 - verbatim 適用を主張する検証記録には、適用後成果物への包含突合（または edit 単位の再現確認）を伴う規律を、同型の適用系操作全般へ適用する
+
+#### 機械工程 script の実行前提の解決（REQ-029-014〜016）
+
+機械工程 script は producer 側の採番・構成の前提（REQ 行IDの桁数・書式、producer 固有ツールの存在、パス引数の環境形式）を埋め込み値として要求しない。実行前提は workflow 側で Project Extensions（`.agentdev/extensions/`）等のプロジェクト固有値から解決し、script へは明示入力として渡す。script 側の既定値に producer 前提を保持しない。
+
+- REQ 行IDの書式検証は桁数を固定しない許容書式（traceability checker 契約と同じ REQ-{NNNN}-{MMM} 形式）で行い、存在と有効性の検証（REQ-030-028 の規律）と組み合わせる
+- producer 固有のゲート（generate_indexes、check_integrity、traceability-check 等）を必須とする場合、script は当該ゲート実行体の配布先での存在を検査してから起動する。欠落時は fail-closed で報告し、正規の代替経路（証跡化、手動相当手順、対照実行による悪化ゼロ件の機械証明）への切替を報告 JSON に含める。代替経路の履行なしに検査を省略して成功扱いとしない
+- 横断依存検査（inspect_cross_dependencies.ts）の `--root` 等のパス引数は、Windows と Unix 系 shell のパス形式の違い（Git Bash の `/c/...` 形式等）を検出または正規化して受け付ける。正規化不能な形式は検査不能（detection_unavailable）として通過させず、形式エラーとして報告し、形式の違いだけで検出不能とならない
+- 本節の規律は case-ready、case-close の機械工程 script 呼び出しにも同一に適用される（各 Design の既有の同一規律参照を維持する）
 
 ### 検査入力と実行証拠の接続
 

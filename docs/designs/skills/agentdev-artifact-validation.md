@@ -2,9 +2,10 @@
 title: agentdev-artifact-validation Design
 status: accepted
 created: 2026-07-22
-updated: "2026-10-03"
+updated: "2026-10-25"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-042 -->
+<!-- ADF-COVERS(design): REQ-107-009 -->
 
 # agentdev-artifact-validation Design
 
@@ -44,6 +45,9 @@ REQ、Decision、Design 固有の内容判断を行わず、決定的検証の�
 - 対応 test（`tests/*.test.ts`）の所有
 - 利用側 skill、command へ内部パスを公開しない検証操作契約
 - 入力、JSON 結果、エラー、副作用なしの共通契約
+- 第4共通検証（書込み時引用識別子実在検証）の所有: 正規成果物（REQ、Design、Decision）の初回作成・増分更新の書込み時に、文書本文・表中に引用する要件行ID（桁数を固定しない許容書式。traceability checker 契約と同じ形式）が docs/requirements の要件行テーブルに実在することを検査する。検査は IR-067 の突合規則を書込み時に適用した版とし、検出対象の形式幅は script 契約がプロジェクトの採番に従って解決する（IR-067 の旧4桁帯除外は producer コーパス固有の免除であり、書込み時版の既定としない）。免除規則（code span、テンプレート、AUTOGEN、プレースホルダー形式等）の書込み時版を併せて定義する
+- 書込み時検証は同じ変更で作成される参照先を含む適用後状態で評価し、参照先の保存順序だけを理由に不合格としない
+- 書込み時検証の呼出しは保存経路（agentdev-req-file-manager、agentdev-design-file-manager、agentdev-workflow-phase-artifacts-update 経由の保存）側の保存手順に組み込まれ、検証の実行結果は保存操作の報告に含まれる
 
 ## 参照する references
 
