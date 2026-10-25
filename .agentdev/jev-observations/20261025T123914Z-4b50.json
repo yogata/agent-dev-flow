@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261025T123914Z-4b50",
+  "workflow": "req-define",
+  "evaluationKind": "expansion-final-classification",
+  "subject": "req-draft-install-prerequisite-acceptance-f1b: 訂正の記述単位1〜3の最終分類・Design分離",
+  "sourceRevision": "420aa1c4e2499f89d19f1462620187340ae44f10",
+  "durationMs": 337,
+  "inputTokens": 1776,
+  "inputs": {
+    "requestDigest": "378d1b15ed955953c68f912b572c107d473983611df0314b06db6eb6f7c84f0c",
+    "references": [
+      {
+        "label": "install-script-usability",
+        "path": "docs/designs/local/install-script-usability.md",
+        "digest": "c318b1290f8c556f1ce82c6f30804b88c1f5a456f5e0aedfc7f873401ee5d591"
+      },
+      {
+        "label": "step3-observation",
+        "path": ".agentdev/jev-observations/20261025T123828Z-08d7.json",
+        "digest": "7a83564eef00be06f0355f2f8475b7d978a902f0d0c19fcd734c922dbd75cda3"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-row-class",
+      "questionForm": "choice",
+      "value": "Design行",
+      "probabilityDistribution": {
+        "REQ行": 0,
+        "Design行": 1
+      }
+    },
+    {
+      "questionId": "q2-separate",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.95,
+        "false": 0.050000000000000044
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-row-class",
+        "value": "Design行"
+      },
+      {
+        "questionId": "q2-separate",
+        "value": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261025T123828Z-08d7",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "req-draft-install-prerequisite-acceptance-f1b: F1(b)訂正の既存REQ照合（REQ-009-053候補・REQ操作帰属）",
+  "sourceRevision": "420aa1c4e2499f89d19f1462620187340ae44f10",
+  "durationMs": 1869,
+  "inputTokens": 1837,
+  "inputs": {
+    "requestDigest": "bbc72e39ce29d448e0badb8a858baebe7a3ca545ba2462c50d197f0f78e82251",
+    "references": [
+      {
+        "label": "REQ-009",
+        "path": "docs/requirements/REQ-009.md",
+        "digest": "8d6cdc233bae0abc1dc3469f58733b5dfe3ec880af740fee7295b7838584278e"
+      },
+      {
+        "label": "install-script-usability",
+        "path": "docs/designs/local/install-script-usability.md",
+        "digest": "c318b1290f8c556f1ce82c6f30804b88c1f5a456f5e0aedfc7f873401ee5d591"
+      },
+      {
+        "label": "blocked-draft",
+        "path": ".agentdev/drafts/req-draft-install-prerequisite-acceptance-f1b.md",
+        "digest": "7a83564eef00be06f0355f2f8475b7d978a902f0d0c19fcd734c922dbd75cda3"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-operation",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1
+      }
+    },
+    {
+      "questionId": "q2-confirm-needed",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.09,
+        "false": 0.91
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-operation",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q2-confirm-needed",
+        "value": false
+      }
+    ]
+  }
+}
