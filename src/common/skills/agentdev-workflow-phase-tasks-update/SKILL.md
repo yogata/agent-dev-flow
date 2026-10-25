@@ -36,6 +36,7 @@ phase-tasks-update command は公開 interface（入出力契約・ガードレ�
 ## 副作用
 
 - テーマ正本（`.agentdev/phase/themes.md`）と未決記録（`.agentdev/phase/pending.md`）への更新
+- 領域契約文書（`.agentdev/phase/README.md`）の非破壊実体化（下記「領域契約文書の非破壊実体化」）
 - identity（`.agentdev/phase/identity.yaml`）の値の確定（操作実行時に正規状態から解決して確定する）
 
 ## workflow model（STEP model 対象外）
@@ -98,6 +99,16 @@ resume point / export / import を持たない。各更新操作が1完結単位
 
 - 実質的な変更がない同一入力の再実行では、セクションを不当に再編せず、変更報告を増やさない
 - 導出結果の決定性（同一正本から同一 JSON）を基盤とし、変更報告は実際の差分に限定する
+
+## 領域契約文書の非破壊実体化
+
+保存（テーマ正本・未決記録への更新の書込み）を実行する操作では、保存の前に領域契約文書（`.agentdev/phase/README.md`）の有無を確認し、存在しない場合のみ Capability Skill `agentdev-phase-theme-collaboration` の配布テンプレート（`templates/phase-readme.md`）から実体化する。
+
+- 実体化は既存の領域契約文書を上書きしない。既存の場合は現行内容を維持し、再編や値の追加を行わない
+- 実体化の内容はテンプレートと一致させる。テンプレート更新を既存の実体へさかのぼって適用しない
+- 領域契約文書が不在であることを、操作の検査失敗として扱わない。実体化は保存を伴う操作に限定され、保存前に別経路での作成を要求しない
+- 対象の取組・対象版・現在工程が一意に解決できない場合は従来どおり更新を実行せず、候補と不足を報告する。実体化を理由に対象解決の規律を緩めない
+- 実体化した場合は完了報告の保存先の一覧に含める
 
 ## Capability Skill 連携
 

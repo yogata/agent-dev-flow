@@ -16,6 +16,12 @@ implementation:
   - REQ-110-037
   - REQ-110-038
   - REQ-110-039
+  - REQ-110-040
+  - REQ-110-041
+  src/common/skills/agentdev-phase-theme-collaboration/templates/phase-readme.md:
+  - REQ-110-041
+  src/common/skills/agentdev-phase-theme-collaboration/scripts/README.md:
+  - REQ-110-040
   src/common/skills/agentdev-phase-theme-collaboration/scripts/lib/receive.ts:
   - REQ-110-007
   - REQ-110-009

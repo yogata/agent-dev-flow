@@ -56,6 +56,7 @@ description: テーマの追加・具体化・分割・統合・廃止を初回�
 否定規則は破壊的操作・state 破壊等の硬い境界に限定する:
 
 - Decision、REQ、Design 等の正規成果物を直接更新しない（テーマ正本は `.agentdev/phase/` 配下の domain state である）
+- 領域契約文書（`.agentdev/phase/README.md`）を既存の場合は上書きしない（不在時の初回保存での配布テンプレート実体化を含め、非破壊に維持する）
 - decision 成果物は、工程をまたぐ意思決定・未解決課題の管理・方式選択を記録する成果物である。正本の優先度（source-of-truth priority）は `inspect-docs` コマンド定義「不変条件」を、decision の記録内容の規定は document-model Design「責務マトリックス」を参照する（定義本文は複製しない）
 - テーマ識別を再利用しない（廃止・統合された識別を新規テーマに付け替えない）
 - 未決事項を自動解消済みとして扱わない
