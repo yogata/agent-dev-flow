@@ -447,3 +447,21 @@
 - **想定反映先**: learning-promote による評価・昇華（配布依存境界の記述規約に関する参照明確化）
 - **関連**: Root Case #3847・PR #3849 検証差分セクション「配布依存境界 checker source profile（最終 gate）」行・src/common/guards/distribution-boundary/
 - **タグ**: #配布依存境界 #concrete-id #checker検知 #配布物本文 #case-run
+
+---
+
+## learning: pr_create の入力契約は labels を受け付けず issue_create との契約差異は fail-closed invalid-input で検出できる
+
+- **問題事象**: 設計PR作成時に issue_create と同じ操作引数の組み立てで pr_create へ labels フィールドを渡したところ、invalid-input（unknown-field [labels]）で拒否された（2026-10-25、Root Case #3850 設計PR作成）
+- **発生局面**: 定義PR作成（case-open STEP-4 の agentdev_gh pr_create 呼び出し）
+- **検知方法**: agentdev_gh の fail-closed 入力検証による invalid-input 応答（kind: invalid-input、detail: unknown-field [labels]: field 'labels' is not part of the pr_create input contract）
+- **根本原因**: issue_create（labels は Tool 契約上の必須フィールド）と pr_create（labels は契約外）で、同一 Custom Tool 内の操作ごとに入力契約が異なることを呼び出し側で確認せずに引数を横流しした
+- **自律対応内容**: labels を外した入力へ組み替えて再試行し、pr_create を成功させた（PR #3851）。Tool の契約検査が fail-closed に作動したため、誤入力が GitHub 側へ到達しないことを確認した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（Custom Tool 操作契約の既存 fail-closed 動作の確認実績）
+- **横展開観点**: agentdev_gh の操作ごとの入力契約を個別に確認する全呼び出し（issue_create、pr_create、comment_create 等）。issue 作成直後の PR 作成で引数の流用が起きやすい
+- **再発条件**: issue_create の入力を基に pr_create の入力を組み立てる場合
+- **予防策候補**: 操作切替時に Tool 契約の入力フィールド一覧を確認してから入力を組み立てる。PR へのラベル付与が契約外である場合の付与手段は Issue 側へ集約する
+- **想定反映先**: learning-promote による評価・昇華（case-open STEP-4 / case-run の PR 作成手順における操作契約確認の参照明確化）
+- **関連**: Root Case #3850・設計PR #3851・Custom Tool agentdev_gh pr_create 操作契約（docs/designs/responsibilities/custom-tool-contracts.md）
+- **タグ**: #agentdev_gh #pr_create #入力契約 #fail-closed #case-openSTEP4
