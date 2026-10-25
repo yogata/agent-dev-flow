@@ -53,6 +53,7 @@ description: Owns document-type-crosscutting deterministic verification scripts,
 | `check-frontmatter-consistency.ts` | frontmatter id ↔ ファイル名整合性（REQ/Decision 横断） | argv[2]=dir, argv[3]=kind(req\|decision、adr はレガシー互換) | `{ ok, errors[], warnings[] }` |
 | `check-entry-existence.ts` | README エントリ存在 | argv[2]=id, argv[3..]=files、または stdin JSON | `{ ok, errors[], warnings[], found[] }` |
 | `check-change-impact.ts` | 変更範囲検証（許可パスリストとの積集合） | argv[2]=changed-list-file, argv[3]=allowed-list-file、または stdin JSON | `{ ok, errors[], warnings[], violations[] }` |
+| `check-req-row-existence.ts` | 書込み時引用識別子実在検証（第4共通検証）。REQ/Decision/Design の本文・表中に引用する要件行 ID（桁数を固定しない許容書式）が docs/requirements の要件行テーブルに実在することを、同一変更で作成される参照先を含む適用後状態で検査する | argv: `--root <repo-root> --file <repo-relative-path> [--file ...] [--id-pattern <regex>]`、または stdin JSON `{ root, files: [{ path, content? }], idPattern? }`（content ありは未ディスクの適用後本文） | `{ ok, errors[], warnings[], checkedFiles, missing: [{id, file, line}] }` |
 
 利用側 command、skill は内部 lib パスを直接参照せず、上記公開検証契約（script の argv/stdin → stdout JSON）へ委譲する（AG-{NNN}、AG-{NNN}）。
 同一 script または共有 lib を複数 skill へ複製しない（AG-{NNN}）。
@@ -74,6 +75,13 @@ cd .opencode/skills/agentdev-artifact-validation/scripts && bun test
 
 Definition 保存内部責務と Design 保存内部責務は本スキルの公開検証契約を bash 経由で呼び出し、JSON 結果を解析して意味判断（NG 時の対応等）を行う。
 これにより frontmatter id↔ファイル名整合性確認、エントリ存在確認、変更範囲検証を LLM 推論ではなく機械的に実行する（design-principles.md 第5節「決定的処理の Script 委譲原則」）。
+
+`check-req-row-existence.ts`（書込み時引用識別子実在検証）は、REQ、Decision、Design の初回作成・増分更新の保存経路（req-file-manager、design-file-manager、decision-file-manager、phase-artifacts-update 経由の保存）で、書込み直前の適用後本文に対して実行する。
+
+- 検証対象は書込み本文であり、`files` には書込み対象の適用後本文を渡す。同じ変更で REQ の要件行テーブルを作成・更新する場合は、その REQ ファイルの適用後本文を `files` に併せて渡す（検査は同じ変更で作成される参照先を含む適用後状態で評価され、参照先の保存順序だけを理由に不合格にならない）
+- `content` を省略したエントリは root 配下のディスク上の現行本文で評価する（既にディスクへ適用済みの状態での検証に使う）
+- 免除規則（code span、code block、AUTOGEN ブロック、テンプレート領域、整合性ルール説明文、履歴領域、v2: 歴史識別子プレフィックス、プレースホルダー様式例示）は script 側で適用される。検出対象の形式幅は既定では接頭番号 3〜4 桁を許容し、プロジェクトの採番に従って `idPattern` で上書きできる
+- `ok: false` の場合は保存を完了扱いにせず、`missing` の内容（実在しない要件行 ID と箇所）を修正対象として報告する。検証の実行結果は保存操作の報告に含める
 
 REQ/Decision 番号採番、要件行 ID 採番、target_area 検索は本スキルの対象外（それぞれ `agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-design-file-manager` の責務）。
 

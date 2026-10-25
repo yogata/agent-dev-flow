@@ -4,6 +4,7 @@ implementation:
     - REQ-021-013
     - REQ-021-026
     - REQ-032-025
+    - REQ-107-009
   src/common/skills/agentdev-design-file-manager/scripts/src/search-target-area.ts:
     - REQ-004-066
     - REQ-004-067

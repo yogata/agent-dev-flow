@@ -1,0 +1,11 @@
+component: agentdev-artifact-validation
+implementation:
+  src/common/skills/agentdev-artifact-validation/scripts/src/check-req-row-existence.ts:
+  - REQ-107-009
+  src/common/skills/agentdev-artifact-validation/SKILL.md:
+  - REQ-107-009
+  src/common/skills/agentdev-req-file-manager/references/save-procedure.md:
+  - REQ-107-009
+verification:
+  src/common/skills/agentdev-artifact-validation/scripts/tests/check-req-row-existence.test.ts:
+  - REQ-107-009

@@ -47,6 +47,15 @@ Definition 保存内部責務が Decision を CREATE する場合、frontmatter 
 - 検証: REQ 識別子形式（`REQ-{NNNN}`）、実在 REQ の指先確認（`docs/requirements/` または `docs/requirements/retired/`）、空宣言と未宣言の区別。
 - accepted 遷移時は「## 承認記録」セクションを本文末尾へ追記する（形式の正規所有は patterns.md Design「承認記録セクション形式」）。
 
+## 書込み時引用識別子実在検証
+
+REQ / Decision の初回作成・増分更新の保存では、書込み直前の適用後本文に対して、`agentdev-artifact-validation` の公開検証契約（書込み時引用識別子実在検証、`check-req-row-existence`）を実行する。
+
+- 検証対象は書込み本文（適用後の REQ / Decision 本文）である。本文・表中に引用する要件行 ID（桁数を固定しない許容書式）が docs/requirements の要件行テーブルに実在することを検査する
+- 同じ変更で REQ の要件行テーブルを作成・更新する場合は、その REQ ファイルの適用後本文を `files` に併せて渡す。検査は同じ変更で作成される参照先を含む適用後状態で評価され、参照先の保存順序だけを理由に不合格にならない
+- `ok: false` の場合は保存を完了扱いにしない。`missing` の内容（実在しない要件行 ID と箇所）を修正対象として報告し、修正後に再検証する
+- 検証の実行結果は保存操作の報告に含める
+
 ## 局所矛盾防止
 
 保存完了後、draft-meta を使って、保存後に残る既知の矛盾を検出可能な範囲で防止する。

@@ -15,7 +15,8 @@ scripts/
 ├── src/
 │   ├── check-frontmatter-consistency.ts  # frontmatter id ↔ ファイル名整合性（REQ/ADR 横断）
 │   ├── check-entry-existence.ts     # README エントリ存在
-│   └── check-change-impact.ts       # 変更範囲検証（許可パスリストとの積集合）
+│   ├── check-change-impact.ts       # 変更範囲検証（許可パスリストとの積集合）
+│   └── check-req-row-existence.ts   # 書込み時引用識別子実在検証（第4共通検証、適用後状態評価）
 └── tests/
     └── *.test.ts                    # 各スクリプトの core 純粋関数テスト
 ```
@@ -43,6 +44,11 @@ bun run tsc --noEmit   # または npm run typecheck
 
 # 個別スクリプト実行
 bun src/check-frontmatter-consistency.ts ../../../docs/requirements req
+
+# 書込み時引用識別子実在検証（第4共通検証）
+bun src/check-req-row-existence.ts --root <repo-root> --file <repo-relative-path>
+# 同一変更で作成される参照先（REQ テーブル）の適用後本文を併せて渡す場合（stdin JSON）
+echo '{"root":"<repo-root>","files":[{"path":"<written-artifact-path>","content":"<適用後本文>"},{"path":"docs/requirements<REQ-NNNN>.md","content":"<適用後本文>"}]}' | bun src/check-req-row-existence.ts
 ```
 
 各スクリプトの詳細な I/O は親 SKILL.md の「Scripts（決定的検証）」セクション参照。
