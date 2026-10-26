@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261026T212337Z-a9de",
+  "workflow": "req-define",
+  "evaluationKind": "final-classification-design-separation",
+  "subject": "req-draft-backlog-auto-e2e-20261027T034727JST: RU一式15件（RU-0254除外後）の最終分類・Design分離判断",
+  "sourceRevision": "ebd825a63",
+  "durationMs": 884,
+  "inputTokens": 1788,
+  "inputs": {
+    "requestDigest": "739b58385ae2df49b5cee9dc20e9e1f21fcede8cc36ff41513cb02918d3ae619",
+    "references": [
+      {
+        "digest": "a99ac950a9db8402dbc852d6d9e2376461c5278913c9888ac0d74a8f46cee2ec",
+        "label": "RU-0247",
+        "path": ".agentdev/backlog/req-units/RU-0247.md"
+      },
+      {
+        "digest": "851b0f37429ab65cf80710007ba6e39939e180e222f2a1ad292a2ecd5d47f755",
+        "label": "RU-0248",
+        "path": ".agentdev/backlog/req-units/RU-0248.md"
+      },
+      {
+        "digest": "95eab619ee8306d7768e16760df56a057e9a3d762804e542b43a5c6dbf0b2b50",
+        "label": "RU-0249",
+        "path": ".agentdev/backlog/req-units/RU-0249.md"
+      },
+      {
+        "digest": "5afa6f2a1e3ff34c8ccef4fb8a93c3295626fa9563fa1a3c740d149b77ae77c2",
+        "label": "RU-0250",
+        "path": ".agentdev/backlog/req-units/RU-0250.md"
+      },
+      {
+        "digest": "12049d118bb7e7ac38880928966ad8a5cecf0810f032d4fc7871507564bbeb87",
+        "label": "RU-0251",
+        "path": ".agentdev/backlog/req-units/RU-0251.md"
+      },
+      {
+        "digest": "cb5edc58ac25554c9f58fa72c79e306cef6d929c9aff85f89c2bf9064f30217b",
+        "label": "RU-0252",
+        "path": ".agentdev/backlog/req-units/RU-0252.md"
+      },
+      {
+        "digest": "d565d0b93df1d13c644860d67a35cb9cd06eace69565a87129b7e4f4174bd23c",
+        "label": "RU-0253",
+        "path": ".agentdev/backlog/req-units/RU-0253.md"
+      },
+      {
+        "digest": "91044d893efae647d39eeee07568c5364010557a5bdccba94a359f1b4a86a4dd",
+        "label": "RU-0255",
+        "path": ".agentdev/backlog/req-units/RU-0255.md"
+      },
+      {
+        "digest": "266355072de792b9a2ee583fd9efed72a88700d4b6d1b3ae5d1c2e9174cda115",
+        "label": "RU-0256",
+        "path": ".agentdev/backlog/req-units/RU-0256.md"
+      },
+      {
+        "digest": "cd59348df89a0f503cefe67572cb7761eabc37dc1851ba2ca1827d3a4ec130c9",
+        "label": "RU-0257",
+        "path": ".agentdev/backlog/req-units/RU-0257.md"
+      },
+      {
+        "digest": "85ebbeec053706f2ef94c5520916acb39fc065b65fe65532d6959f4ff53260e4",
+        "label": "RU-0258",
+        "path": ".agentdev/backlog/req-units/RU-0258.md"
+      },
+      {
+        "digest": "0b32944f43b52ba89acc77e17d9012151b3aacf0a44e470e2959f11dc057d0aa",
+        "label": "RU-0259",
+        "path": ".agentdev/backlog/req-units/RU-0259.md"
+      },
+      {
+        "digest": "1a6826070df6b1e8794e1e29d6649666b2b5f0fb92d2559313f038ba719f9cec",
+        "label": "RU-0260",
+        "path": ".agentdev/backlog/req-units/RU-0260.md"
+      },
+      {
+        "digest": "40e4d99c89d2280557644ffef8f88ce9b578c802e0dd18cfc2b321ad407cda81",
+        "label": "RU-0261",
+        "path": ".agentdev/backlog/req-units/RU-0261.md"
+      },
+      {
+        "digest": "2ea67dc5a15344b4cbfa806fd7207c7c887c271392757247779967c5b55bdad4",
+        "label": "RU-0262",
+        "path": ".agentdev/backlog/req-units/RU-0262.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-final-classification-20261027",
+      "questionForm": "choice",
+      "value": "REQ行（新規REQへの保存が適正・Design詳細はartifact_actionsのdesign操作へ分離済み）",
+      "probabilityDistribution": {
+        "REQ行（新規REQへの保存が適正・Design詳細はartifact_actionsのdesign操作へ分離済み）": 1,
+        "Design行（Designに記載すべき内部構造・規則・判定表が保存対象行群に混在しており帰属はDesign）": 0
+      }
+    },
+    {
+      "questionId": "q2-separation-20261027",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.3,
+        "false": 0.7
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-final-classification-20261027",
+        "value": "REQ行（新規REQへの保存が適正・Design詳細はartifact_actionsのdesign操作へ分離済み）"
+      },
+      {
+        "questionId": "q2-separation-20261027",
+        "value": false
+      }
+    ]
+  }
+}
