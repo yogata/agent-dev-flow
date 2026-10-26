@@ -43,6 +43,7 @@ STEP-4 の機械工程（専用 worktree 作成、Definition branch 作成、REQ
 
 品質ゲート実行仕様（GateCommandSpec）の入力 JSON は、既知入力型と下位検査の契約から固定生成する。
 
+- パス引数の絶対パス構成前置規律（REQ-117-012・AG-012）: checker・機械工程 script のパス引数（--root、gate spec の --input 等の入力パス）の解決基点は checker・script 起動時の作業ディレクトリ（cwd）であり repo root ではない。gate spec のパス引数は絶対パスで構成する標準とし、絶対パスで構成しない場合は gate spec の cwd からの相対解決を意図したパスであることを呼出側が明示的に管理する（repo root 基準の相対パスを渡さない）。gate spec の --input は非空検査のみ・解決基準は呼出側責任の現行 flag 契約を変更しない（規律の明示のみ）。checker 実行記録（検証差分・証跡）には root 等のパス引数の解決先（実測絶対パス）を明記する。恒久契約の正は checker-execution-contracts.md「link profile 実効実行要件」節の一般化規定
 - **固定生成**: traceability check、workflow 値付き integrity gate 等の既知ゲートは、script 配下の固定生成関数（`buildKnownTraceabilityCheckSpec`、`buildKnownWorkflowIntegrityGateSpec`、`buildKnownCheckIntegritySpec`、`buildKnownGenerateIndexesSpec`）で既知入力型の値（root、REQ 行 ID、workflow 値とその下位契約の許容集合）から組み立てる。workflow 値は下位 checker 契約の許容集合から選択し、許容集合外の値は spec の生成時に拒否される。REQ 行 ID は生成時に形式検証される
 - **事前検証**: script は高価な検査と worktree 操作の開始前に、既知 flag 契約（--req は REQ 行 ID の個別カンマ列挙のみで範囲構文は非対応、--profile は source と link、--workflow は形式妥当性、--root と --input 等のパス引数は非空）に従い各 gate spec を検証する。不正な値は検査を開始せず終了コード 1 で拒否する。正当な入力では必要検査が実行される。未知 flag は検証対象外であり、任意コマンドの汎用解釈器は作らない
 - **検査証拠の保存**: 報告 JSON の各 step detail には、標準出力・標準エラーの全文、終了コード、対象版（実行時点の HEAD を targetRevision）、実行条件（実行コマンド・引数・作業ディレクトリ・実行上限を executedCommand）を同じ検査実行から保存する。末尾切り捨て（stderrTail）と要約（summary）は既存 field として併存するが、原結果の全文は detail で確認できる。終了コードや証拠の再取得を目的とした同一条件の再実行を行わない。非ゼロ終了の整合性検査は証拠を保存した上で後続ゲートを実行しない（後続抑止の維持）
