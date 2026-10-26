@@ -55,6 +55,46 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+/**
+ * sidecar 本文の重複キーを raw parse（行ベースの単純走査）で検出する
+ * （REQ-117-006・AG-006 (a)。Bun.YAML の last-wins 解釈による shadow 義務黙失を
+ * 機械検出で事前防止する）。保証サブセット内の block style マッピングキー行を
+ * 対象とし、comment 行・空行は対象外とする。重複キーは Bun.YAML.parse の結果と
+ * しては shadow された状態で現れるため、parse 前に本検出を実行して issues として
+ * 報告する。
+ */
+export function detectDuplicateSidecarKeys(
+  content: string,
+): { key: string; line: number }[] {
+  const duplicates: { key: string; line: number }[] = [];
+  const levels: { indent: number; keys: Set<string> }[] = [];
+  const lines = content.split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line === undefined || /^\s*(#|$)/.test(line)) continue;
+    const m = line.match(/^([ \t]*)([^:#\s][^:]*):\s*(.*)$/);
+    if (!m || m[1] === undefined || m[2] === undefined) continue;
+    const indent = m[1].length;
+    const key = m[2].trim();
+    while (levels.length > 0 && (levels[levels.length - 1]?.indent ?? -1) > indent) {
+      levels.pop();
+    }
+    const top = levels[levels.length - 1];
+    if (top === undefined || top.indent < indent) {
+      const next: { indent: number; keys: Set<string> } = { indent, keys: new Set() };
+      levels.push(next);
+    }
+    const level = levels[levels.length - 1];
+    if (level === undefined) continue;
+    if (level.keys.has(key)) {
+      duplicates.push({ key, line: i + 1 });
+    } else {
+      level.keys.add(key);
+    }
+  }
+  return duplicates;
+}
+
 function isCoverRole(value: string): value is CoverRole {
   return (COVER_ROLES as readonly string[]).includes(value);
 }
@@ -150,6 +190,7 @@ function parseSidecarObject(file: string, value: Record<string, unknown>): Sidec
  * （silent skip 禁止）。issue とならない範囲の対応関係は引き続き返す。
  */
 export function parseSidecar(file: string, content: string): SidecarParseResult {
+  const duplicates = detectDuplicateSidecarKeys(content);
   let parsed: unknown;
   try {
     parsed = Bun.YAML.parse(content);
@@ -166,6 +207,11 @@ export function parseSidecar(file: string, content: string): SidecarParseResult 
           text: content.slice(0, 200),
           detail: `YAML 解析に失敗した（${error instanceof Error ? error.message : "unknown error"}）`,
         },
+        ...duplicates.map((d) => ({
+          reason: "invalid-schema" as const,
+          file,
+          detail: `YAML の重複キー「${d.key}」（${d.line} 行目。last-wins 解釈で shadow され得る。sidecar 更新手順の重複キー事前統合ルールに従い統合すること）`,
+        })),
       ],
     };
   }
@@ -184,5 +230,16 @@ export function parseSidecar(file: string, content: string): SidecarParseResult 
       ],
     };
   }
-  return parseSidecarObject(file, parsed);
+  const base = parseSidecarObject(file, parsed as Record<string, unknown>);
+  return {
+    ...base,
+    issues: [
+      ...duplicates.map((d) => ({
+        reason: "invalid-schema" as const,
+        file,
+        detail: `YAML の重複キー「${d.key}」（${d.line} 行目。last-wins 解釈で shadow され得る。sidecar 更新手順の重複キー事前統合ルールに従い統合すること）`,
+      })),
+      ...base.issues,
+    ],
+  };
 }

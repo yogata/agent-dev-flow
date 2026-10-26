@@ -55,6 +55,14 @@ sidecar へ対応宣言（artifact パス × role × 要件行 ID）を追加す
 - 統合時の component 名整合: 統合により component の命名と内容が乖離した場合、sidecar ファイル名と component キーを一貫して改名して解消する。sidecar は配布対象外（project 側の開発管理成果物）であるため配布互換性の拘束を受けず、恒常的な乖離は残さない
 - checker との関係: 本規則は適用前の予防規則であり、事後検出は既存の `duplicate-inconsistencies` 検出器が維持する。検出器・検査契約は変更しない
 
+### 重複キーの事前統合ルール（REQ-117-006）
+
+sidecar の YAML を更新する場合は、同一インデントレベルに同一キー（component、role キー、artifact キー）を重複して書かない。既存内容への追記は、該当 role 配下または該当 artifact 配下の既存箇所へ追加統合する方式で行い、同名キーの新規ブロックを末尾へ追記する方式を取らない。
+
+- 予防の背景: YAML の last-wins 解釈では、同名キーの後方ブロックが前方ブロックを shadow し、前方ブロックに含まれる対応関係（shadow 義務）が黙って読み飛ばされる
+- 機械検出: 重複キーを含む sidecar は `check`（sidecar 解析の issues・`malformed-declarations` 系報告）が `invalid-schema` として検出する（Bun.YAML の parse 前に行ベースの raw parse で検出する重複キー検出。`agentdev-traceability` scripts の sidecar lib 実装）
+- 更新時の手順: 追記前に既存 sidecar 全文の同レベルキーを確認し、既存 role 配下へ統合する。統合の対象行が既存箇所と重複する場合は要件行 ID の重複も排除する
+
 ## sidecar の links セクション（隣接工程間対応）の書式
 
 sidecar は covers 対応関係に加え、プロジェクトの採用した隣接工程間の対応関係（links）をトップレベルキー `links` で保持できる。
