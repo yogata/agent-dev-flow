@@ -66,7 +66,8 @@ export function extractKnownGapNumbers(policyContent: string): number[] {
   }
   const gaps: number[] = [];
   for (const line of sectionLines) {
-    const m = /^REQ-(\d{3,4})\s*:/.exec(line.trim());
+    // 既知欠番エントリの受理は桁数上限なし（各セグメント最小1桁）。
+    const m = /^REQ-(\d+)\s*:/.exec(line.trim());
     if (m && m[1] !== undefined) {
       gaps.push(Number(m[1]));
     }

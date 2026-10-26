@@ -7,11 +7,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-/** ファイル名 `REQ-NNNN.md` から番号を取り出す。 */
-export function reqNumberFromFilename(filename: string): number | null {
-  const m = /^REQ-(\d{3,4})\.md$/.exec(filename);
-  return m && m[1] ? parseInt(m[1], 10) : null;
-}
+export { reqNumberFromFilename } from "../../../agentdev-artifact-validation/scripts/lib/fs-helpers.ts";
 
 /** ファイル名 `ADR-NNNN.md` から番号を取り出す。 */
 export function adrNumberFromFilename(filename: string): number | null {
@@ -41,12 +37,12 @@ export function joinPath(...segments: string[]): string {
   return join(...segments);
 }
 
-/** 4桁ゼロ埋め。 */
+/** 最小幅4桁のゼロ埋め表示。切詰めなし。 */
 export function pad4(n: number): string {
   return n.toString().padStart(4, "0");
 }
 
-/** 3桁ゼロ埋め。 */
+/** 最小幅3桁のゼロ埋め表示。切詰めなし。 */
 export function pad3(n: number): string {
   return n.toString().padStart(3, "0");
 }

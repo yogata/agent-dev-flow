@@ -4,8 +4,10 @@
  * 指定 REQ ファイル本文から既存の要件行IDを抽出し、
  * その最大行番号 + 1 を採番する。欠番埋め禁止。
  *
- * 入力は REQ 番号3桁（REQ-{NNNN}-{NNN}）と4桁（REQ-{NNNN}-{NNN}）の両形式を一貫して認識する
- * （REQ-ID 形式契約の一律性、他関数と同一）。採番結果の正規化出力は4桁ゼロ埋めとする。
+ * 既存IDの抽出は形式妥当性のみで受理する（REQ- 接頭辞・ハイフン区切り・数値
+ * セグメント2つ・各セグメント最小1桁。桁数上限なし）。採番結果の出力は
+ * pad3/pad4 の最小幅ゼロ埋め表示（切詰めなし）とする。表示規則は受理上限として
+ * 機能させない。
  *
  * I/O:
  *   入力: argv[2] = 対象 REQ ファイルパス、argv[3] = 親 REQ 番号（例: 0103、オプション・ファイル名から推定）
@@ -30,13 +32,14 @@ export function formatCompositeId(req: number, row: number): string {
 }
 
 /**
- * 本文から `REQ-NNN-MMM` / `REQ-NNNN-MMM` 形式のIDを全て抽出する（純粋関数）。
- * REQ 番号は3桁（REQ-{NNNN}-{NNN}）と4桁（REQ-{NNNN}-{NNN}）の両方を許容する
- * （`extractCompositeIdNumbers` 等の REQ-ID 形式契約と同一）。
+ * 本文から複合ID（REQ-{NNN}-{NNN} 形式。桁数上限なし）を全て抽出する（純粋関数）。
+ * 受理は形式妥当性のみ（REQ- 接頭辞・ハイフン区切り・数値セグメント2つ・各セグメント
+ * 最小1桁）。前置一致と後続数字の非消費（lookaround）により長い行番号の
+ * 部分一致を防ぐ（非曖昧抽出）。
  * 重複除去は行わない（重複は整合性チェックの対象）。
  */
 export function extractAllCompositeIds(content: string): string[] {
-  const re = /REQ-(\d{3,4})-(\d{3})/g;
+  const re = /(?<![\w-])REQ-\d+-\d+(?![\w-])/g;
   const ids: string[] = [];
   let m: RegExpExecArray | null;
   while ((m = re.exec(content)) !== null) {
