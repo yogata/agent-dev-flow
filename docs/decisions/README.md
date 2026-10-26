@@ -10,7 +10,7 @@
 DEC-018 は欠番であり、対応する Decision ファイルは存在しない。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は51件、提案中の Decision は0件である。
+現行の承認済み Decision は51件、提案中の Decision は1件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -76,6 +76,7 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 | DEC-059 | backlog-auto 一気通貫実行のパッチリリース規則 | accepted | 2026-10-15 |
 | DEC-060 | ADF本体の GitHub Release 記録と公開承認境界 | accepted | 2026-10-16 |
 | DEC-061 | Release 公開操作のカタログ正規化（承認後の workflow 実行経路） | accepted | 2026-10-20 |
+| DEC-062 | 要件ID桁数の受理上限撤廃と表示ゼロ埋め・受理検証の分離 | proposed | 2026-10-26 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -144,6 +145,7 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
+- [DEC-062](DEC-062.md)（要件ID桁数の受理上限撤廃と表示ゼロ埋め・受理検証の分離）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -263,6 +265,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-044 | supersedes | DEC-040 | 観測契約の一次事実中心再設計による決定4 の置換（決定2 は DEC-046 が置換、決定1・3は維持） |
 | DEC-051 | supersedes | DEC-041 | case-auto stage 3 のスロット型キュー移行による決定5（Wave 収束前提）の置換（決定1〜4は維持） |
 | DEC-052 | supersedes | DEC-044 | Jev 評価器障害時の判定未確定と依存後続抑止への移行による決定3（evaluator 失敗時の reasoning model 経由継続）の部分置換（決定1・2・4〜8は維持。status: accepted 維持） |
+| DEC-062 | relates-to | DEC-001, DEC-009 | 現行 corpus の ID 形式記述（意味的不変）を参照する受理上限撤廃の新規決定。既存 ID・参照の改番は行わない |
 
 ## 関連 REQ
 
@@ -329,6 +332,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-059 | [REQ-114](../requirements/REQ-114.md) | - |
 | DEC-060 | [REQ-114](../requirements/REQ-114.md) | - |
 | DEC-061 | [REQ-114](../requirements/REQ-114.md) | - |
+| DEC-062 | [REQ-004](../requirements/REQ-004.md), [REQ-009](../requirements/REQ-009.md), [REQ-012](../requirements/REQ-012.md), [REQ-051](../requirements/REQ-051.md) | - |
 <!-- AUTOGEN:END -->
 
 ## 過去版の履歴基盤
