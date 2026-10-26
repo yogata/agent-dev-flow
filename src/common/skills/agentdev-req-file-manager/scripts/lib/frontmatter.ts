@@ -44,23 +44,10 @@ function stripQuotes(value: string): string {
   return value;
 }
 
-/** `REQ-NNNN` 形式から数値を取り出す。未整形式は null。 */
-export function extractReqNumber(id: string): number | null {
-  const m = /^REQ-(\d{3,4})$/.exec(id);
-  return m && m[1] ? parseInt(m[1], 10) : null;
-}
+export { extractReqNumber, extractCompositeIdNumbers } from "../../../agentdev-artifact-validation/scripts/lib/frontmatter.ts";
 
 /** `ADR-NNNN` 形式から数値を取り出す。未整形式は null。 */
 export function extractAdrNumber(id: string): number | null {
   const m = /^ADR-(\d{3,4})$/.exec(id);
   return m && m[1] ? parseInt(m[1], 10) : null;
-}
-
-/** `REQ-NNNN-MMM` 形式から { req, row } を取り出す。未整形式は null。 */
-export function extractCompositeIdNumbers(
-  id: string,
-): { req: number; row: number } | null {
-  const m = /^REQ-(\d{3,4})-(\d{3})$/.exec(id);
-  if (!m || !m[1] || !m[2]) return null;
-  return { req: parseInt(m[1], 10), row: parseInt(m[2], 10) };
 }

@@ -530,9 +530,10 @@ describe("既知検査入力の事前検証と固定生成（不正入力は検�
 
   test("--req の不正形式を検査を開始せず拒否する", () => {
     const runner = fakeRunner();
+    // 空セグメント（REQ-061-）は桁数上限なしの許容書式でも不正値。
     const traceabilityGate: GateCommandSpec = {
       ...gate("traceability-check"),
-      args: ["./checker.ts", "--req", "REQ-061-1"],
+      args: ["./checker.ts", "--req", "REQ-061-"],
     };
     expect(() => runAcceptDefinitionChecks(acceptanceInput({ traceabilityGate }), runner)).toThrow(/--req/);
     expect(runner.calls).toHaveLength(0);
@@ -608,7 +609,7 @@ describe("既知検査入力の事前検証と固定生成（不正入力は検�
         scriptArgs: ["./checker.ts"],
         cwd: "C:/repo",
         root: "C:/repo",
-        reqIds: ["REQ-061-49"],
+        reqIds: ["REQ-061-"],
       }),
     ).toThrow(/invalid requirement row id/);
   });

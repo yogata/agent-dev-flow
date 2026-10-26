@@ -18,10 +18,13 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { spawnSync } from "node:child_process";
-import { consumeDefinitionTraceability, isReqRowId, type DeferredObligation } from "../lib/definition-traceability-gate.ts";
+import { consumeDefinitionTraceability, isReqRowId, REQ_ROW_ID_LIST_PATTERN, type DeferredObligation } from "../lib/definition-traceability-gate.ts";
 
-const USAGE = `usage: bun ./src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts --input <input.json>
-  --input  機械工程入力 JSON（worktree、branch、Definition 編集内容、品質ゲート実行仕様等）`;
+const USAGE = `usage: bun ./src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts --input <input.json> [--validate-input]
+  --input           機械工程入力 JSON（worktree、branch、Definition 編集内容、品質ゲート実行仕様等）
+  --validate-input  検証専用経路。入力 JSON の契約検証・既知 gate 引数契約検査・ゲート実行体の
+                    存在確認のみを行い（worktree 作成・ゲート実行・git/gh 操作・管理対象ファイル
+                    変更なし）、報告 JSON を stdout へ出力する（合格 0 / 不合格 1）`;
 
 export interface CommandSpec {
   command: string;
@@ -204,12 +207,15 @@ function fail(message: string): never {
   throw new MechanicalInputError(message);
 }
 
-function parseArgs(argv: readonly string[]): { input: string } {
+function parseArgs(argv: readonly string[]): { input: string; validateOnly: boolean } {
   let input: string | null = null;
+  let validateOnly = false;
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === "--input" && argv[i + 1] !== undefined) {
       input = argv[++i] ?? null;
+    } else if (arg === "--validate-input") {
+      validateOnly = true;
     } else if (arg === "--help" || arg === "-h") {
       process.stdout.write(`${USAGE}\n`);
       process.exit(0);
@@ -218,7 +224,41 @@ function parseArgs(argv: readonly string[]): { input: string } {
     }
   }
   if (input === null) fail(`--input is required\n${USAGE}`);
-  return { input };
+  return { input, validateOnly };
+}
+
+/**
+ * 検証専用経路（--validate-input）の実行。入力検証（validateInput）と既知 gate
+ * 引数契約の事前検査（preValidateGateSpec）とゲート実行体の存在確認
+ * （evaluateGateAvailability の exists 確認）のみを行い、worktree 作成・
+ * ゲート実行・git/gh 操作・管理対象ファイルの変更を行わない（check モードの
+ * 非破壊契約）。検証不合格（入力検証・引数契約の失敗を含む）は既存の
+ * error: stderr + 終了コード 1 契約で失敗する。検証合格時は報告 JSON
+ * （ok: true）を stdout へ出力して終了コード 0 を返す。
+ */
+export function runValidateInputOnly(
+  validated: PrepareDefinitionPrInput,
+  exists: (absolutePath: string) => boolean,
+): { ok: boolean; report: Record<string, unknown> } {
+  const gates = [
+    validated.generateIndexesGate,
+    validated.checkIntegrityGate,
+    validated.traceabilityGate,
+  ].filter((gate): gate is GateCommandSpec => gate != null);
+  for (const gate of gates) {
+    preValidateGateSpec(gate);
+  }
+  const availability = evaluateGateAvailability(gates, exists);
+  const report = {
+    ok: availability.missing.length === 0,
+    mode: "validate-input",
+    script: "prepare_definition_pr",
+    inputValidation: "pass",
+    gatePreValidation: "pass",
+    gateAvailability: availability,
+    sideEffects: "none",
+  };
+  return { ok: availability.missing.length === 0, report };
 }
 
 function requireGateSpec(value: unknown, field: string): GateCommandSpec {
@@ -386,7 +426,7 @@ export interface KnownArgContract {
 }
 
 export const KNOWN_GATE_ARG_CONTRACTS: readonly KnownArgContract[] = [
-  { flag: "--req", pattern: /^(REQ-\d{3,4}-\d{3})(,REQ-\d{3,4}-\d{3})*$/ },
+  { flag: "--req", pattern: REQ_ROW_ID_LIST_PATTERN },
   { flag: "--profile", values: ["source", "link"] },
   { flag: "--fail-level", values: ["strict", "warning"] },
   { flag: "--workflow", pattern: /^[a-z][a-z0-9-]*$/ },
@@ -838,7 +878,7 @@ export function runPrepareDefinitionPr(
 
 function main(): void {
   try {
-    const { input } = parseArgs(process.argv.slice(2));
+    const { input, validateOnly } = parseArgs(process.argv.slice(2));
     let raw: string;
     try {
       raw = fs.readFileSync(input, "utf-8");
@@ -852,6 +892,11 @@ function main(): void {
       fail(`input is not valid JSON: ${String(error)}`);
     }
     const validated = validateInput(parsed);
+    if (validateOnly) {
+      const outcome = runValidateInputOnly(validated, (absolutePath) => fs.existsSync(absolutePath));
+      process.stdout.write(`${JSON.stringify(outcome.report, null, 2)}\n`);
+      process.exit(outcome.ok ? 0 : 1);
+    }
     const normalized: PrepareDefinitionPrInput = {
       ...validated,
       repoRoot: path.resolve(validated.repoRoot),

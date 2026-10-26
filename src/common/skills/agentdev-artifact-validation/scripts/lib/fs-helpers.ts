@@ -7,9 +7,9 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-/** ファイル名 `REQ-NNNN.md` から番号を取り出す。 */
+/** ファイル名 `REQ-NNN.md`（桁数上限なし）から番号を取り出す。 */
 export function reqNumberFromFilename(filename: string): number | null {
-  const m = /^REQ-(\d{4})\.md$/.exec(filename);
+  const m = /^REQ-(\d+)\.md$/.exec(filename);
   return m && m[1] ? parseInt(m[1], 10) : null;
 }
 

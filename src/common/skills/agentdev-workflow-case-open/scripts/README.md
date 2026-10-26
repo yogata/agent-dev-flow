@@ -1,6 +1,6 @@
-# `agentdev-workflow-case-open` scripts（横断依存検査エンジン）
+# `agentdev-workflow-case-open` scripts（横断依存検査エンジン・定義PR準備機械工程）
 
-Case 投入時の横断依存検査の決定的エンジン。case-open（STEP-5 冪等確認）と case-ready（トレーサビリティ完全性ゲート）の両 workflow skill が共有する単一実装であり、両スキル間で比較手続きを重複実装しない。
+本ディレクトリは case-open の機械工程 script 群（`scripts/src/prepare_definition_pr.ts`〔定義PR準備〕と `scripts/src/inspect_cross_dependencies.ts`〔横断依存検査エンジン〕）の script 契約を定める。横断依存検査エンジンは case-open（STEP-5 冪等確認）と case-ready（トレーサビリティ完全性ゲート）の両 workflow skill が共有する単一実装である。
 
 ## 構成
 
@@ -54,6 +54,22 @@ scripts/
 置き場所の具体候補は `.agentdev/integrity/reports/` である。project root 内の実行時作業領域（git 管理対象外・.gitignore 除外領域）であり、上記4方針（workspace 外 temp 禁止、project root 内限定、commit 対象外、検査後削除）を満たす。検査入力 JSON は commit に含まれず、検査完了後に入力ファイルを削除する（削除の実施を検証記録へ残す）。
 
 書込み手段は worktree 操作の書込み guard 運用指針（`agentdev-git-worktree` reference「書込み guard 運用指針」）の標準手段（node の `fs.writeFileSync` 等のエンコーディング明示）に従う。workspace 外への書込みが guard によりブロックされた場合は、ブロックの解除・別 API 経路への迂回を行わず、置き場所を project root 内へ変更して切替する（fail-closed 維持）。
+
+## 検証専用経路（導入時整合検査の機械工程前提検証）
+
+機械工程 script の実行時前提を副作用なしで検証する入口を次のとおり定める。
+
+### prepare_definition_pr.ts（--validate-input フラグ）
+
+- 呼出し: `bun scripts/src/prepare_definition_pr.ts --input <input.json> --validate-input`
+- 実行内容: 入力 JSON の契約検証（validateInput）、既知 gate 引数契約の事前検査（preValidateGateSpec 相当）、ゲート実行体の存在確認（exists 確認）のみ
+- 副作用: なし。worktree 作成・ゲート実行・git/gh 操作・管理対象ファイルの変更を行わない（check モードの非破壊契約）
+- 出力: 合格時は stdout へ報告 JSON（ok: true、gateAvailability を含む）を出力して終了コード 0。不合格（入力検証失敗・引数契約違反・ゲート実行体不在）は stderr へ error: 行を出力して終了コード 1（fail-closed）
+- 検査入力は配布先の実際の consumer 条件（実在する repoRoot と branch、実在するゲート実行体を指す品質ゲート実行仕様、有効な REQ 行 ID）を表現する fixture で構成する。空 JSON の受理拒否や bun の起動だけを前提成立の証拠としない
+
+### inspect_cross_dependencies.ts（通常実行が検証専用経路）
+
+本 CLI は読取と純粋比較のみで副作用を持たない（gate_effect: none）。検証専用経路は当該 CLI の通常実行そのものであり、別入口を設けない。検証専用の実行前提確認は、実 consumer 条件を表現した検査入力 JSON（非空の unclosed_cases〔population_count 1〕と解決可能な shared_areas を含む構成）で実行し、報告 JSON の応答解析（ok、scan.population_count、condition_a.count、condition_b[].file_results[].read_ok、detection_unavailable）で行う。対象集合が空の入力や shared_areas が空の入力の受理だけを前提成立の証拠としない。
 
 ## 実行方法
 

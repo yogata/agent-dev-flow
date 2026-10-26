@@ -78,8 +78,11 @@ implementation:
     - REQ-096-001
     - REQ-096-002
     - REQ-096-026
+  src/common/skills/agentdev-workflow-case-ready/scripts/README.md:
+    - REQ-009-053
   src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts:
     - REQ-029-014
+    - REQ-009-053
     - REQ-029-015
     - REQ-061-049
     - REQ-061-050
@@ -133,6 +136,8 @@ implementation:
     - REQ-061-043
     - REQ-061-052
 verification:
+  src/common/skills/agentdev-workflow-case-ready/scripts/tests/accept-validate-input.test.ts:
+    - REQ-009-053
   src/common/skills/agentdev-workflow-case-ready/references/execution-structure.md:
     - REQ-090-024
     - REQ-090-027

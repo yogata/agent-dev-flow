@@ -1,0 +1,50 @@
+// runValidateInputOnly（--validate-input 検証専用経路）の単体検証（REQ-009-053、Case #3862）。
+// 入力検証・gate 引数契約検査・ゲート実行体存在確認のみで ok を返し、副作用を持たない。
+import { describe, expect, test } from "bun:test";
+import { runValidateInputOnly, type CloseMechanicalInput } from "../src/close_mechanical_steps.ts";
+
+const cwd = process.cwd().replaceAll("\\", "/");
+const gateScript = import.meta.dir + "/../package.json";
+
+function mk(name: string, args: string[]) {
+  return { name, command: "bun", args, cwd };
+}
+
+function consumerFixture(): CloseMechanicalInput {
+  return {
+  phase: "pre-merge", worktreeRoot: ".worktrees/x", repoRoot: cwd, branch: "fix/issue-9", prNumber: 9,
+  issueBodyPath: "body.md",
+  generateIndexesGate: mk("generate_indexes", [gateScript]),
+  traceabilityGate: mk("traceability-check", [gateScript, "--root", cwd, "--req", "REQ-001-001"]),
+  integrityGates: [mk("full-integrity-suite", [gateScript])],
+  textlintGate: mk("textlint-final-check", [gateScript]),
+  contractStateCheck: { contractStatePaths: [".agentdev/learning/inbox.md"], approvalEntries: [] },
+};
+}
+
+describe("runValidateInputOnly (REQ-009-053 verification-only entry)", () => {
+  test("ok: true with all gate executables present (consumer-condition fixture)", () => {
+    const outcome = runValidateInputOnly(consumerFixture(), () => true);
+    expect(outcome.ok).toBe(true);
+    const report = outcome.report as { ok: boolean; mode: string; script: string; sideEffects: string; gateAvailability: { missing: unknown[] } };
+    expect(report.mode).toBe("validate-input");
+    expect(report.script).toBe("close_mechanical_steps");
+    expect(report.sideEffects).toBe("none");
+    expect(report.gateAvailability.missing).toHaveLength(0);
+  });
+
+  test("ok: false and missing gate names when a gate executable is absent", () => {
+    const outcome = runValidateInputOnly(consumerFixture(), () => false);
+    expect(outcome.ok).toBe(false);
+    const report = outcome.report as { gateAvailability: { missing: string[] } };
+    expect(report.gateAvailability.missing.length).toBeGreaterThan(0);
+  });
+
+  test("rejects an invalid gate flag contract before availability checks (fail-closed)", () => {
+    // 正常 fixture から --req 値のみを不正値（空セグメント）へ置換した不正入力を注入する
+    // （意図的な契約違反注入のため、入力型への再適合はさせない）。
+    const broken = structuredClone(consumerFixture()) as CloseMechanicalInput;
+    broken.traceabilityGate!.args = [...broken.traceabilityGate!.args.slice(0, -1), "REQ-1-"];
+    expect(() => runValidateInputOnly(broken, () => true)).toThrow(/--req/);
+  });
+});

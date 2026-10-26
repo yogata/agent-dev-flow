@@ -5222,7 +5222,7 @@ describe("IR-069 req-number-gap-recorded (REQ-010-070, Case #2917)", () => {
     expect(evidence.filter((e) => e.includes("REQ-010")).length).toBe(0);
   });
 
-  it("scopes the band to 3-digit REQ ids and ignores the 4-digit legacy band (境界例: 番号帯)", () => {
+  it("includes increased-width current REQ numbers in gap checking (境界例: 番号帯)", () => {
     const root = join(IR069_ROOT, "four-digit");
     mkdirp(root);
     const annotation =
@@ -5233,8 +5233,9 @@ describe("IR-069 req-number-gap-recorded (REQ-010-070, Case #2917)", () => {
       docsReadmeLines: ["# ドキュメント入口", "", annotation],
     });
     const { ng, ok } = ir069Results(root);
-    expect(ng.length).toBe(0);
-    expect(ok[0].message).toContain("band 001-013");
+    expect(ng.length).toBe(2);
+    expect(ng.every((r) => r.evidence === "unrecorded-gap:REQ-010〜REQ-012")).toBe(true);
+    expect(ok).toEqual([]);
   });
 
   it("treats retired REQ numbers as existing and tolerates context mentions (許容例)", () => {

@@ -808,56 +808,159 @@ function Invoke-ThirdPartyDriftCheck {
 
 # 配布物の主要な機械工程 script（定義PR準備、定義PR受入検査、クローズ機械工程、
 # 横断依存検査）の実行時前提の不一致を導入時に検出する検証。
-# 本入口は機械工程 script 側の入力検証 dry-run 入口（入力 JSON の検証のみを行い、
-# worktree 作成・ファイル変更・ゲート実行を行わない入口）を呼び出すプローブであり、
+# 本入口は各 script の検証専用経路（副作用なし入口）を呼び出すプローブであり、
 # install.ps1 は入口の呼出しと前提不一致の divergence 報告のみを担う（入口の実体は
 # 配布 script 実装が所有する）。検証方法（install-script-usability Design
 # 「機械工程 script の実行時前提の導入時検証」節、REQ-009-053）:
 #   - 依存ツールの存在確認: 機械工程 script の実行環境（bun）
-#   - 入力 JSON の契約検証: 各 script への入力検証 dry-run プローブ
-#     - input-error プローブ: 契約不成立の最小入力を与え、入口契約どおり
-#       （stderr が error: 行で始まり、終了コード 1）に拒否されることを確認する。
-#       入力検証で失敗するため worktree 作成・ファイル変更・ゲート実行には到達しない
-#     - valid-input プローブ（横断依存検査）: 共有領域定義（shared_areas）を空にした
-#       最小入力（検査入力ファイルの読取を発生させない read-only 検査）を与え、
-#       報告 JSON と終了コード 0 を確認する
+#   - 検査入力: 配布先の実際の consumer 条件（REQ 行 ID、必須ゲート実行体の参照、
+#     入力書式、パス条件）を表現する fixture で構成する。空 JSON の受理拒否、bun の
+#     起動、script ファイルの存在、対象集合が空の入力の受理だけを実行時前提の検証
+#     成立の証拠としない
+#   - 定義PR準備・定義PR受入検査・クローズ機械工程: 各 script の --validate-input
+#     検証専用経路（入力 JSON の契約検証・既知 gate 引数契約検査・ゲート実行体の
+#     存在確認のみ。worktree 作成・ゲート実行・git/gh 操作・管理対象ファイル変更なし）
+#     で正例を検証する。応答は終了コード 0 かつ報告 JSON の ok===true を要求する
+#   - 横断依存検査: 通常実行（読取と純粋比較のみで gate_effect:none）で実 consumer
+#     条件 fixture（非空の unclosed_cases と解決可能な shared_areas を含む構成）を
+#     検証し、応答解析（ok、population_count===1、condition_a.count===0、
+#     condition_b[].file_results[].read_ok 全 true、detection_unavailable 空）で判定する。
+#     script が終了コード 0・ok:true を返しても応答解析が不成立なら divergence とする
+#     （検証不能・読取不能を成功扱いしない）
 # 検証自体の実行失敗（script の不在、入口契約の不整合）は検証不能として divergence
 # 報告し、成功扱いとしない（check の終了コードに反映する）。検証は管理対象ファイルを
-# 変更しない（REQ-050-005）。プローブの入力 JSON は OS 一時領域に作成し、検証後に
-# 削除する（consumer repo 配下へ書込まない）。
+# 変更しない（REQ-050-005）。プローブの検査入力 JSON は対象 script 契約の置き場所指針
+# （workspace 外一時領域不使用・project root 内限定・commit 対象外・検査後削除）に従い、
+# consumer の .agentdev/integrity/reports/ 配下の一時領域に作成し、検証後に削除する。
 $MechanicalStepProbeContract = @(
-    @{ Skill = 'agentdev-workflow-case-open';  ScriptRel = 'scripts\src\prepare_definition_pr.ts';      Probe = 'input-error' }
-    @{ Skill = 'agentdev-workflow-case-ready'; ScriptRel = 'scripts\src\accept_definition_checks.ts';   Probe = 'input-error' }
-    @{ Skill = 'agentdev-workflow-case-close'; ScriptRel = 'scripts\src\close_mechanical_steps.ts';     Probe = 'input-error' }
-    @{ Skill = 'agentdev-workflow-case-open';  ScriptRel = 'scripts\src\inspect_cross_dependencies.ts'; Probe = 'valid-input' }
+    @{ Skill = 'agentdev-workflow-case-open';  ScriptRel = 'scripts\src\prepare_definition_pr.ts';      Entry = 'validate-input'; Kind = 'prepare_definition_pr' }
+    @{ Skill = 'agentdev-workflow-case-ready'; ScriptRel = 'scripts\src\accept_definition_checks.ts';   Entry = 'validate-input'; Kind = 'accept_definition_checks' }
+    @{ Skill = 'agentdev-workflow-case-close'; ScriptRel = 'scripts\src\close_mechanical_steps.ts';     Entry = 'validate-input'; Kind = 'close_mechanical_steps' }
+    @{ Skill = 'agentdev-workflow-case-open';  ScriptRel = 'scripts\src\inspect_cross_dependencies.ts'; Entry = 'cross-dependency'; Kind = 'cross-dependency' }
 )
 
-# valid-input プローブの最小入力（横断依存検査の検査入力 JSON 契約に従う。
-# unclosed_cases を空にして比較 population を検査対象 Case のみにし、
-# shared_areas を空にして検査入力ファイルの読取を発生させない）。
-$MechanicalStepValidInputJson = '{"mode":"case-open","current_case":{"case_ref":"install-check-probe","epic_ref":null,"artifact_paths":[],"target_rows":[],"is_epic_intake":false},"unclosed_cases":[],"shared_areas":[]}'
-$MechanicalStepProbeInputErrorJson = '{}'
 $MechanicalStepProbeTimeoutMs = 60000
+
+function Assert-MechanicalProbeContainedPath {
+    param([string]$Path, [string]$Root)
+    $full = [System.IO.Path]::GetFullPath($Path)
+    $rootFull = [System.IO.Path]::GetFullPath($Root).TrimEnd('\', '/')
+    $rootPrefix = $rootFull + [System.IO.Path]::DirectorySeparatorChar
+    if (-not $full.StartsWith($rootPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "Mechanical-step probe path is outside the workspace: $Path"
+    }
+    # 封じ込め検査は probe path から workspace root の直下まで。root 自体とその上位は
+    # consumer 環境の正当な配置（OneDrive、symlinked home 等）であり、probe の書込み
+    # 閉包の外として検査しない（恒常的な誤 divergence の防止）。
+    $current = $full
+    while ($current -and $current.Length -gt $rootFull.Length) {
+        $item = if (Test-Path -LiteralPath $current -ErrorAction Stop) { Get-Item -LiteralPath $current -Force -ErrorAction Stop } else { $null }
+        if ($null -ne $item -and ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint)) {
+            throw "Mechanical-step probe ancestor is a junction/reparse point: $current"
+        }
+        $parent = Split-Path -Path $current -Parent
+        if (-not $parent -or $parent -eq $current -or $parent.Length -le $rootFull.Length) { break }
+        $current = $parent
+    }
+}
+
+# 検査入力 fixture の組み立て（配布先の実際の consumer 条件を表現する）。
+# ゲート実行体の参照は配置済み skill の実在 script（agentdev-traceability の checker）
+# を指し、REQ 行 ID は入力書式契約（REQ- 接頭辞・ハイフン区切り・数値セグメント2つ・
+# 各セグメント最小1桁。桁数上限なし。受理上限撤廃 Decision）に従う有効書式サンプルを
+# 使う（Case 非依存の値で機械 probe として自己完結する）。
+# 横断依存検査の shared_areas は consumer チェックアウト内の実在ファイルを指す。
+function New-MechanicalStepProbeInput {
+    param(
+        [string]$Kind,
+        [string]$RepoRoot,
+        [string]$SkillsDir,
+        [string]$ProbeDir
+    )
+    $traceChecker = Join-Path $SkillsDir 'agentdev-traceability\scripts\src\check.ts'
+    $crossDepScript = Join-Path $SkillsDir 'agentdev-workflow-case-open\scripts\src\inspect_cross_dependencies.ts'
+    $probeReqId = 'REQ-001-001'
+    $sharedAreaRel = ($PluginDir -replace '\\', '/') + '/src/common/skills/agentdev-workflow-case-open/scripts/README.md'
+    switch ($Kind) {
+        'prepare_definition_pr' {
+            return @{
+                repoRoot = $RepoRoot
+                worktreeRoot = '.worktrees/probe-definition'
+                branch = 'definition/issue-0'
+                baseRef = 'origin/main'
+                rootCaseId = '#0'
+                definitionEdits = @(@{ path = 'docs/designs/local/probe.md'; oldText = 'old'; newText = 'new' })
+                requiresIndexRegeneration = $false
+                stagePaths = @('docs/designs/local/probe.md')
+                commitMessage = 'probe'
+                traceabilityReqIds = @($probeReqId)
+                generateIndexesGate = @{ name = 'generate_indexes'; command = 'bun'; args = @($traceChecker); cwd = $RepoRoot }
+                checkIntegrityGate = @{ name = 'check_integrity'; command = 'bun'; args = @($traceChecker, '--profile', 'source'); cwd = $RepoRoot }
+                traceabilityGate = @{ name = 'traceability-check'; command = 'bun'; args = @($traceChecker, '--root', $RepoRoot, '--req', $probeReqId); cwd = $RepoRoot }
+            }
+        }
+        'accept_definition_checks' {
+            return @{
+                phase = 'acceptance-checks'
+                repoRoot = $RepoRoot
+                branch = 'definition/issue-0'
+                prNumber = 1
+                integrityGates = @(@{ name = 'integrity-check'; command = 'bun'; args = @($traceChecker, '--workflow', 'design-save', '--root', $RepoRoot); cwd = $RepoRoot })
+                traceabilityGate = @{ name = 'traceability-check'; command = 'bun'; args = @($traceChecker, '--root', $RepoRoot, '--req', $probeReqId); cwd = $RepoRoot }
+                overlapGate = @{ name = 'overlap-cross-check'; command = 'bun'; args = @($crossDepScript, '--input', (Join-Path $ProbeDir 'cross-dependency.json'), '--root', $RepoRoot); cwd = $RepoRoot }
+                generateIndexesGate = @{ name = 'generate_indexes'; command = 'bun'; args = @($traceChecker); cwd = $RepoRoot }
+            }
+        }
+        'close_mechanical_steps' {
+            return @{
+                phase = 'pre-merge'
+                worktreeRoot = '.worktrees/probe-fix'
+                repoRoot = $RepoRoot
+                branch = 'fix/issue-0'
+                prNumber = 1
+                issueBodyPath = (Join-Path $ProbeDir 'issue-body.md')
+                generateIndexesGate = @{ name = 'generate_indexes'; command = 'bun'; args = @($traceChecker); cwd = $RepoRoot }
+                traceabilityGate = @{ name = 'traceability-check'; command = 'bun'; args = @($traceChecker, '--root', $RepoRoot, '--req', $probeReqId); cwd = $RepoRoot }
+                integrityGates = @(@{ name = 'full-integrity-suite'; command = 'bun'; args = @($traceChecker); cwd = $RepoRoot })
+                textlintGate = @{ name = 'textlint-final-check'; command = 'bun'; args = @($traceChecker); cwd = $RepoRoot }
+                contractStateCheck = @{ contractStatePaths = @('.agentdev/learning/inbox.md'); approvalEntries = @() }
+            }
+        }
+        'cross-dependency' {
+            return @{
+                mode = 'case-open'
+                current_case = @{ case_ref = 'install-check-probe'; epic_ref = $null; artifact_paths = @('README.md'); target_rows = @($probeReqId); is_epic_intake = $false }
+                unclosed_cases = @(@{ case_ref = 'install-check-probe'; epic_ref = $null; artifact_paths = @('README.md'); target_rows = @($probeReqId) })
+                shared_areas = @(@{ area_id = 'probe-shared-area'; display_name = 'install check probe shared area'; kind = 'req-row-mentions'; file_paths = @($sharedAreaRel) })
+            }
+        }
+    }
+    throw "unknown mechanical-step probe input kind: $Kind"
+}
 
 function Invoke-MechanicalScriptProbe {
     <#
     .SYNOPSIS
-        機械工程 script への入力検証 dry-run プローブを実行し、終了コードと
-        stdout/stderr を分離取得する。プローブは検証のみであり、script 側の
-        実行ステップ（worktree 作成・ファイル変更・ゲート実行）には到達しない入力を
-        与える（REQ-050-005 非破壊契約）。
+        機械工程 script の検証専用経路（--validate-input）または横断依存検査の通常実行
+        （読取・純粋比較のみ）を呼び出し、終了コードと stdout/stderr を分離取得する。
+        プローブは検証のみであり、script 側の実行ステップ（worktree 作成・ファイル変更・
+        ゲート実行）には到達しない（REQ-050-005 非破壊契約）。
     #>
     param(
         [string]$BunPath,
         [string]$ScriptPath,
         [string]$InputPath,
-        [string]$RootArg
+        [string]$RootArg,
+        [switch]$ValidateOnly
     )
     $psi = [System.Diagnostics.ProcessStartInfo]::new()
     $psi.FileName = $BunPath
     $psi.ArgumentList.Add($ScriptPath)
     $psi.ArgumentList.Add('--input')
     $psi.ArgumentList.Add($InputPath)
+    if ($ValidateOnly) {
+        $psi.ArgumentList.Add('--validate-input')
+    }
     if ($RootArg) {
         $psi.ArgumentList.Add('--root')
         $psi.ArgumentList.Add($RootArg)
@@ -1263,10 +1366,11 @@ if ($Mode -eq 'check') {
 
     # 10. 機械工程 script の実行時前提検証（REQ-009-053）。静的構成検査と実行環境診断の
     # 間で、配布物の主要機械工程 script の実行時前提の不一致を導入時に検出する。
-    # 検証は副作用なしの入力検証 dry-run 相当（入力 JSON の契約検証、依存ツールの
-    # 存在確認）であり、管理対象ファイルを変更しない（REQ-050-005）。検出した前提の
-    # 不一致は既存の divergence 報告形式で報告し、check の終了コードに反映する。
-    # 検証自体の実行失敗は検証不能として報告し、成功扱いとしない。
+    # 検証は各 script の検証専用経路（副作用なし入口）で実 consumer 条件 fixture により
+    # 行い、管理対象ファイルを変更しない（REQ-050-005）。検出した前提の不一致は既存の
+    # divergence 報告形式で報告し、check の終了コードに反映する。検証自体の実行失敗は
+    # 検証不能として報告し、成功扱いとしない。本節は節見出しと検証対象ごとの結果行で
+    # 報告し、installer 全体の divergence 統一集約と終了コード反映は既存契約を維持する。
     Write-Host ''
     Write-Host '--- Mechanical-step script prerequisites ---'
     $mechanicalBun = Get-Command -Name 'bun' -ErrorAction SilentlyContinue
@@ -1274,53 +1378,155 @@ if ($Mode -eq 'check') {
         Write-Host '[DIVERGENCE] Mechanical-step script runtime prerequisite (bun) not found in PATH; mechanical-step script prerequisite verification is unavailable (not treated as success)'
         $divergences++
     } else {
-        $probeTempDir = Join-Path ([System.IO.Path]::GetTempPath()) "adf-install-check-$([guid]::NewGuid().ToString('N')).tmp"
+        # 検査入力の一時領域。対象 script 契約の置き場所指針（workspace 外一時領域不使用・
+        # project root 内限定・commit 対象外・検査後削除）に従い、consumer の
+        # .agentdev/integrity/reports/ 配下へ置く。本節で作成した祖先ディレクトリは
+        # 検証後に空である限り削除し、ディレクトリ状態を検証前と同一に保つ。
+        $probeReportsDir = Join-Path $RepoRoot '.agentdev\integrity\reports'
+        $probeTempDir = Join-Path $probeReportsDir "adf-install-check-$([guid]::NewGuid().ToString('N')).tmp"
+        $createdAncestors = [System.Collections.Generic.List[string]]::new()
+        $probeCreated = $false
         try {
+            Assert-MechanicalProbeContainedPath -Path $probeTempDir -Root $RepoRoot
+            $missingAncestors = [System.Collections.Generic.List[string]]::new()
+            $ensureDir = $probeReportsDir
+            while (-not (Test-Path -LiteralPath $ensureDir)) {
+                $missingAncestors.Insert(0, $ensureDir)
+                $parentDir = Split-Path -Path $ensureDir -Parent
+                if (-not $parentDir -or $parentDir -eq $ensureDir) { break }
+                $ensureDir = $parentDir
+            }
+            foreach ($dirPath in $missingAncestors) {
+                Assert-MechanicalProbeContainedPath -Path $dirPath -Root $RepoRoot
+                New-Item -ItemType Directory -Path $dirPath -Force | Out-Null
+                $createdAncestors.Add($dirPath)
+            }
             New-Item -ItemType Directory -Path $probeTempDir -Force | Out-Null
+            $probeCreated = $true
+
+            # 横断依存検査 fixture は定義PR受入検査 fixture の overlapGate 参照（--input）
+            # からも使われるため、最初に書き込む。クローズ機械工程 fixture の
+            # issueBodyPath 参照（完了条件本文抽出対象）も同様に先に書き込む。
+            $crossDepFixture = New-MechanicalStepProbeInput -Kind 'cross-dependency' -RepoRoot $RepoRoot -SkillsDir $SkillsDir -ProbeDir $probeTempDir
+            Assert-MechanicalProbeContainedPath -Path $probeTempDir -Root $RepoRoot
+            [System.IO.File]::WriteAllText(
+                (Join-Path $probeTempDir 'cross-dependency.json'),
+                ($crossDepFixture | ConvertTo-Json -Depth 10),
+                (New-Object System.Text.UTF8Encoding($false)))
+            [System.IO.File]::WriteAllText(
+                (Join-Path $probeTempDir 'issue-body.md'),
+                "## 完了条件`n`n- [ ] プローブ用本文（機械工程前提検証の fixture）`n",
+                (New-Object System.Text.UTF8Encoding($false)))
+
+            $mechanicalTargets = 0
+            $mechanicalDivergences = 0
             foreach ($probeSpec in $MechanicalStepProbeContract) {
+                $mechanicalTargets++
                 $scriptPath = Join-Path $SkillsDir (Join-Path $probeSpec.Skill $probeSpec.ScriptRel)
                 $scriptDisplay = "$($probeSpec.Skill)/$($probeSpec.ScriptRel -replace '\\', '/')"
                 if (-not (Test-Path -LiteralPath $scriptPath)) {
                     Write-Host "[DIVERGENCE] Mechanical-step script missing: $scriptDisplay"
                     $divergences++
+                    $mechanicalDivergences++
                     continue
                 }
-                $inputPath = Join-Path $probeTempDir ($probeSpec.Skill + '.json')
-                if ($probeSpec.Probe -eq 'input-error') {
-                    $expectedDetail = 'exit 1 with a stderr error: line (input-validation contract)'
-                    [System.IO.File]::WriteAllText($inputPath, $MechanicalStepProbeInputErrorJson, (New-Object System.Text.UTF8Encoding($false)))
-                    $probe = Invoke-MechanicalScriptProbe -BunPath $mechanicalBun.Source -ScriptPath $scriptPath -InputPath $inputPath
+                $inputPath = Join-Path $probeTempDir ($probeSpec.Kind + '.json')
+                $fixture = New-MechanicalStepProbeInput -Kind $probeSpec.Kind -RepoRoot $RepoRoot -SkillsDir $SkillsDir -ProbeDir $probeTempDir
+                Assert-MechanicalProbeContainedPath -Path $probeTempDir -Root $RepoRoot
+                [System.IO.File]::WriteAllText($inputPath, ($fixture | ConvertTo-Json -Depth 10), (New-Object System.Text.UTF8Encoding($false)))
+                if ($probeSpec.Entry -eq 'validate-input') {
+                    $expectedDetail = 'exit 0 with a validation report (ok: true) on stdout via --validate-input (consumer-condition fixture)'
+                    $probe = Invoke-MechanicalScriptProbe -BunPath $mechanicalBun.Source -ScriptPath $scriptPath -InputPath $inputPath -ValidateOnly
                 } else {
-                    $expectedDetail = 'exit 0 with a JSON report (ok: true) on stdout'
-                    [System.IO.File]::WriteAllText($inputPath, $MechanicalStepValidInputJson, (New-Object System.Text.UTF8Encoding($false)))
+                    $expectedDetail = 'exit 0 with ok: true, population_count 1, condition_a.count 0, all shared-area file_results read_ok true, detection_unavailable empty'
                     $probe = Invoke-MechanicalScriptProbe -BunPath $mechanicalBun.Source -ScriptPath $scriptPath -InputPath $inputPath -RootArg $RepoRoot
                 }
                 if ($probe.TimedOut) {
                     Write-Host "[DIVERGENCE] Mechanical-step script prerequisite verification timed out: $scriptDisplay (expected: $expectedDetail)"
                     $divergences++
+                    $mechanicalDivergences++
                     continue
                 }
-                $probeContractOk = $false
-                if ($probeSpec.Probe -eq 'input-error') {
-                    $probeContractOk = ($probe.ExitCode -eq 1) -and ($probe.StdErr.TrimStart() -match '^error:') -and ($probe.StdOut.Length -eq 0)
-                } else {
-                    $probeReport = $null
+                $probeReport = $null
+                if ($probe.StdOut.Length -gt 0) {
                     try { $probeReport = $probe.StdOut | ConvertFrom-Json } catch { $probeReport = $null }
-                    $probeContractOk = ($probe.ExitCode -eq 0) -and ($null -ne $probeReport) -and ($probeReport.ok -eq $true)
+                }
+                $probeContractOk = $false
+                if ($probeSpec.Entry -eq 'validate-input') {
+                    $probeContractOk = ($probe.ExitCode -eq 0) -and ($null -ne $probeReport) -and ($probeReport.ok -is [bool]) -and ($probeReport.ok -eq $true)
+                } else {
+                    # 応答述語は fail-closed: condition_b と detection_unavailable は
+                    # 配列として存在しなければならない（欠落を空と同等に受理しない）。
+                    # file_results は shared_areas の file_paths 非空を前提とするため、
+                    # 欠落・空の file_results は読取証拠不在として不成立とする。
+                    $conditionBPresent = ($null -ne $probeReport) -and ($probeReport.condition_b -is [array]) -and ($probeReport.condition_b.Count -eq 1)
+                    $readOkAll = $conditionBPresent
+                    if ($conditionBPresent) {
+                        foreach ($area in @($probeReport.condition_b)) {
+                            if ($area.file_results -isnot [array]) { $readOkAll = $false; continue }
+                            $areaResults = @($area.file_results)
+                            if ($areaResults.Count -ne 1) { $readOkAll = $false; continue }
+                            foreach ($fileResult in $areaResults) {
+                                if (($fileResult.read_ok -isnot [bool]) -or ($fileResult.read_ok -ne $true)) { $readOkAll = $false }
+                            }
+                        }
+                    }
+                    $detectionUnavailableEmpty = $false
+                    if ($null -ne $probeReport -and $probeReport.detection_unavailable -is [array]) {
+                        $detectionUnavailableEmpty = (@($probeReport.detection_unavailable).Count -eq 0)
+                    }
+                    $probeContractOk = ($probe.ExitCode -eq 0) -and
+                        ($null -ne $probeReport) -and
+                        ($probeReport.ok -is [bool]) -and ($probeReport.ok -eq $true) -and
+                        ($null -ne $probeReport.scan) -and
+                        (($probeReport.scan.population_count -is [int]) -or ($probeReport.scan.population_count -is [long])) -and ($probeReport.scan.population_count -eq 1) -and
+                        ($null -ne $probeReport.condition_a) -and
+                        (($probeReport.condition_a.count -is [int]) -or ($probeReport.condition_a.count -is [long])) -and ($probeReport.condition_a.count -eq 0) -and
+                        $conditionBPresent -and
+                        $readOkAll -and
+                        $detectionUnavailableEmpty
                 }
                 if ($probeContractOk) {
-                    Write-Host "[OK] Mechanical-step script prerequisite (input-validation dry-run): $scriptDisplay"
+                    Write-Host "[OK] Mechanical-step script prerequisite ($($probeSpec.Entry)): $scriptDisplay"
                 } else {
                     $probeResponse = if ($probe.StdErr.Length -gt 0) { $probe.StdErr.Trim() } else { $probe.StdOut.Trim() }
                     $probeResponseHead = ($probeResponse -split "`n")[0]
-                    Write-Host "[DIVERGENCE] Mechanical-step script entry contract mismatch: $scriptDisplay (expected: $expectedDetail, actual: exit=$($probe.ExitCode), response: $probeResponseHead)"
+                    Write-Host "[DIVERGENCE] Mechanical-step script prerequisite contract mismatch: $scriptDisplay (expected: $expectedDetail, actual: exit=$($probe.ExitCode), response: $probeResponseHead)"
                     $divergences++
+                    $mechanicalDivergences++
                 }
             }
+            Write-Host "Mechanical-step prerequisites: $mechanicalTargets target(s), $mechanicalDivergences divergence(s) (section summary; unified divergence aggregation and exit code are maintained by check mode)"
+        }
+        catch {
+            Write-Host "[DIVERGENCE] Mechanical-step prerequisite verification failed: $($_.Exception.Message)"
+            $divergences++
         }
         finally {
-            if (Test-Path -LiteralPath $probeTempDir) {
-                Remove-Item -LiteralPath $probeTempDir -Recurse -Force -ErrorAction SilentlyContinue
+            # 後片付けの失敗は黙殺しない（検証前後のディレクトリ状態同一の契約）。
+            # 削除失敗は divergence として検出し、installer の非ゼロ終了へ反映する。
+            $cleanupDiverged = $false
+            if ($probeCreated -and (Test-Path -LiteralPath $probeTempDir)) {
+                try {
+                    Assert-MechanicalProbeContainedPath -Path $probeTempDir -Root $RepoRoot
+                    Remove-Item -LiteralPath $probeTempDir -Recurse -Force -ErrorAction Stop
+                } catch {
+                    Write-Host "[DIVERGENCE] Mechanical-step probe input cleanup failed; probe inputs must not remain after check: $probeTempDir"
+                    $divergences++
+                    $cleanupDiverged = $true
+                }
+            }
+            for ($i = $createdAncestors.Count - 1; $i -ge 0; $i--) {
+                $dirPath = $createdAncestors[$i]
+                try {
+                    Assert-MechanicalProbeContainedPath -Path $dirPath -Root $RepoRoot
+                    if ((Test-Path -LiteralPath $dirPath) -and -not (Get-ChildItem -LiteralPath $dirPath -Force -ErrorAction Stop)) {
+                        Remove-Item -LiteralPath $dirPath -Force -ErrorAction Stop
+                    }
+                } catch {
+                    Write-Host "[DIVERGENCE] Mechanical-step probe ancestor cleanup failed; created ancestors must be removed after check: $dirPath"
+                    if (-not $cleanupDiverged) { $divergences++; $cleanupDiverged = $true }
+                }
             }
         }
     }

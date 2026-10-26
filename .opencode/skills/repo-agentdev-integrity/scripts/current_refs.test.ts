@@ -6,6 +6,9 @@ import {
 } from "./current_refs.ts";
 
 describe("extractCurrentReqRefs", () => {
+  it("does not misread hierarchical IDs as standalone file references", () => {
+    expect(extractCurrentReqRefs("REQ-0063-0123 REQ-12345-001 REQ-12345 REQ-1")).toEqual(["REQ-12345", "REQ-1"]);
+  });
   it("returns plain 3-digit REQ ref as current", () => {
     expect(extractCurrentReqRefs("See REQ-001 for context.")).toEqual([
       "REQ-001",

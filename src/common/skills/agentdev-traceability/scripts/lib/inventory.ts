@@ -76,7 +76,7 @@ export function buildInventory(root: string): InventoryResult {
   // 要件テーブル（docs/requirements/REQ-*.md）は対応関係の中心軸であり、
   // covers 宣言の対象から常に構造的に外れるため発見候補の対象外とする
   const discoveredCandidates = corpusArtifacts.filter(
-    (rel) => !known.has(rel) && !(rel.startsWith(requirementsPrefix) && /^REQ-\d{3,4}\.md$/.test(rel.slice(requirementsPrefix.length))),
+    (rel) => !known.has(rel) && !(rel.startsWith(requirementsPrefix) && /^REQ-\d+\.md$/.test(rel.slice(requirementsPrefix.length))),
   );
   return {
     corpusArtifacts,

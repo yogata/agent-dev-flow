@@ -14,7 +14,8 @@ description: Manages REQ numbering and requirement file operations (CREATE/APPEN
 
 ## REQ番号採番と要件行記述
 
-REQ番号は `REQ-{NNNN}`（4桁ゼロ埋め、欠番埋め禁止、max+1）である。
+REQ番号は `REQ-{NNNN}` 形式で採番する。ゼロ埋めは最小幅の表示規則であり、増桁しても切り詰めない。欠番は埋めず、最大番号に1を加える。
+REQ番号と要件行IDの受理検査は、接頭辞、ハイフン区切り、数値セグメントを検査する。各セグメントは最小1桁とし、桁数上限を設けない。既存IDと参照は改番・正規化しない。
 要件行は `REQ-{NNNN}-{MMM}` 形式で、要件の振る舞い・制約・状態のみを記述し、実装指示（ファイル編集、コード断片、ステップ手順）は含めない。
 REQ-ID 安定ID 規約、要件行ID定義、REQ本文内メタデータ規約、移行・統合時の番号空間衝突チェック（前置）の詳細は [references/numbering-and-validation.md](references/numbering-and-validation.md) 参照。
 

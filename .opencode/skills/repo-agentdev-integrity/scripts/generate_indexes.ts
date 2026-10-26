@@ -1035,13 +1035,14 @@ function computeReqLineSignal(lineCount: number): string {
 
 /**
  * REQ ファイル本文内の要件テーブル行数を計測する。
- * 形式: `| REQ-NNNN-MMM | ... |` に一致する行数（req-health-metrics.md L19 準拠）。
+ * 形式: `| REQ-NNN-MMM | ... |` に一致する行数（req-health-metrics.md L19 準拠）。
+ * 行番号部は桁数上限なし（各セグメント最小1桁。受理上限撤廃 Decision）。
  */
 export function countReqRequirementLines(
   content: string,
   reqId: string,
 ): number {
-  const pattern = new RegExp(`^\\| ${reqId}-\\d{3} \\|`);
+  const pattern = new RegExp(`^\\| ${reqId}-\\d+ \\|`);
   let count = 0;
   for (const line of content.split("\n")) {
     if (pattern.test(line)) count++;
