@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-backlog-auto
-description: "backlog-auto command の workflow 実装本体。orchestration stage 構成（stage 1: inspect-docs 単独直列、stage 2: 昇格3系統の並行実行と競合直列化、stage 3: backlog-review、stage 4: 要件定義接続、stage 5: 実行接続、stage 6: 全体完了判定、stage 7: リリース）、fan-in 判定、set-state 永続化、基準点確認手続、全体完了突合手続、リリース手順と再開経路、停止伝播、resume 契約を所有する。USE FOR: backlog-auto 実行時の workflow 制御（工程間順序制御、昇格3系統の並行実行と競合処理の直列化、fan-in 判定、一気通貫実行の接続、停止伝播、再開）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）、子ワークフロー内部の分類、評価、昇格、RU 生成ロジックの所有（各子 Workflow Skill が正規の処理主体）、Epic/Wave 構成規則・共有並列上限・依存判断・並列実行アルゴリズムの再定義。"
+description: "backlog-auto command の workflow 実装本体。orchestration stage 構成（7 stage）、fan-in 判定、set-state 永続化、基準点確認手続、全体完了突合手続、リリース手順と再開経路、停止伝播、resume 契約を所有する。USE FOR: backlog-auto 実行時の workflow 制御（工程間順序制御、昇格3系統の並行実行と競合処理の直列化、fan-in 判定、一気通貫実行の接続、停止伝播、再開）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）、子ワークフロー内部の分類、評価、昇格、RU 生成ロジックの所有（各子 Workflow Skill が正規の処理主体）、Epic/Wave 構成規則・共有並列上限・依存判断・並列実行アルゴリズムの再定義。"
 ---
 
 # backlog-auto workflow スキル

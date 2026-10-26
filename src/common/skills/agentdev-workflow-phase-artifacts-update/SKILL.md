@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-phase-artifacts-update
-description: "phase-artifacts-update command workflow。採用済みの内容を、現在の正規成果物との照合により、既存の有効な正規成果物への増分反映または正規成果物の新規作成として反映する実装本体。入力は外部検討の戻り入力（貼付と指定ファイル）と利用者が直接採用した内容の双方を受理し（O(n) 線形走査・fail-closed・採用件数比例の証跡量）、採用根拠は利用者の明示判断に限定し、独立反映可能な項目と衝突・未確認・保存失敗を区別して報告する。利用者が対象と実施を明示した正規成果物の構造再編（分割・統合・項目移動）を受理し、各成果物管理スキルの再編操作へ委譲して統括する。REQ・Decision・Design の作成・更新処理は既存の成果物管理スキルへ委譲する。USE FOR: phase-artifacts-update 実行時の入力受理、採用根拠の受領、反映先の照合、正規成果物への増分反映と新規作成、構造再編の受理と統括、部分反映と再投入、記録の保存。DO NOT USE FOR: テーマ形成（agentdev-workflow-phase-tasks-create）、テーマ更新（agentdev-workflow-phase-tasks-update）、独立レビューの実行（agentdev-workflow-phase-review。独立レビュー所見の採用分の反映受理は本スキルの対象）、単独起動（対応する /agentdev/phase-artifacts-update コマンド経由で利用すること）。"
+description: "phase-artifacts-update command workflow。採用済みの内容を、現在の正規成果物との照合により、既存の有効な正規成果物への増分反映または正規成果物の新規作成として反映する実装本体。入力は外部検討の戻り入力（貼付と指定ファイル）と利用者が直接採用した内容の双方を受理し、採用根拠は利用者の明示判断に限定し、独立反映可能な項目と衝突・未確認・保存失敗を区別して報告する。正規成果物の構造再編を受理し、REQ・Decision・Design の作成・更新処理は既存の成果物管理スキルへ委譲する。USE FOR: phase-artifacts-update 実行時の入力受理、採用根拠の受領、反映先の照合、正規成果物への増分反映と新規作成、構造再編の受理と統括、部分反映と再投入、記録の保存。DO NOT USE FOR: テーマ形成（agentdev-workflow-phase-tasks-create）、テーマ更新（agentdev-workflow-phase-tasks-update）、独立レビューの実行（agentdev-workflow-phase-review。独立レビュー所見の採用分の反映受理は本スキルの対象）、単独起動（対応する /agentdev/phase-artifacts-update コマンド経由で利用すること）。"
 ---
 
 # phase-artifacts-update workflow スキル

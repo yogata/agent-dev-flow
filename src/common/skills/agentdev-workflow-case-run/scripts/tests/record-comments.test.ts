@@ -51,8 +51,9 @@ describe("記録契機3種と記録コメントテンプレートの対応", () 
   });
 
   test("廃止記録契機のテンプレート実体は存在しない", () => {
-    for (const kind of ["start", "handoff", "resume"] as const) {
-      expect(() => templateBody(kind)).toThrow();
+    const templateBodyLoose = templateBody as unknown as (kind: string) => string;
+    for (const kind of ["start", "handoff", "resume"]) {
+      expect(() => templateBodyLoose(kind)).toThrow();
     }
   });
 
