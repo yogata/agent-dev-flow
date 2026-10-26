@@ -83,8 +83,8 @@ const BASENAME_STOPLIST = new Set([
   "tsconfig.json",
 ]);
 
-// REQ/ADR ID 抽出用正規表現。
-const REQ_ID_PATTERN = /\b(REQ-\d{3})\b/g;
+// REQ/ADR ID 抽出用正規表現。REQ は桁数上限なし（受理上限撤廃 Decision）。
+const REQ_ID_PATTERN = /\b(REQ-\d+)\b/g;
 const ADR_ID_PATTERN = /\b(ADR-\d{3})\b/g;
 
 type SpecLifecycle = "added" | "deleted" | "renamed" | "modified" | "unknown";
