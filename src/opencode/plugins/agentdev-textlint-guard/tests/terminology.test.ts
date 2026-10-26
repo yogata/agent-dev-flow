@@ -117,7 +117,7 @@ describe("プロジェクト用語の検出と構造除外（TS-002）", () => {
     if (r.ok) expect(r.result.findings.filter((f) => f.ruleId === "prh")).toHaveLength(0);
   });
 
-  test("要件行では置換を抑止し、散文では同じ語を検出する", async () => {
+  test.each(["REQ-083-001", "REQ-0063-0123", "REQ-12345-001", "REQ-12345-12345"])("要件行 %s では置換を抑止し、散文では同じ語を検出する", async (id) => {
     const root = makeProject();
     writeTermDict(root, [
       "version: 1",
@@ -129,7 +129,7 @@ describe("プロジェクト用語の検出と構造除外（TS-002）", () => {
     expect(prepared.ok).toBe(true);
     if (!prepared.ok) return;
 
-    const requirement = await inspectText(prepared, root, "docs/REQ-083.md", "| REQ-083-001 | Definition PR を作成する。 |\n");
+    const requirement = await inspectText(prepared, root, "docs/REQ-083.md", `| ${id} | Definition PR を作成する。 |\n`);
     expect(requirement.ok).toBe(true);
     if (requirement.ok) expect(requirement.result.findings.filter((f) => f.ruleId === "prh")).toHaveLength(0);
 

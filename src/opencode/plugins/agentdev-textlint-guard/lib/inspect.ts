@@ -122,10 +122,12 @@ export async function inspectText(
     // （例: preset-ai-writing/ai-tech-writing-guideline）、数値だけでは
     // 助言対象の規則が拒否対象へ昇格してしまう。
     const hardRuleIds = new Set(prepared.composition.hardRuleIds);
+    // 要件テーブル行（行ID形式。桁数上限なし）の prh suppress。
+    // 4 桁以上の REQ 行ID表も suppress 対象に含める。
     const requirementRowLines = new Set(
       text
         .split(/\r?\n/)
-        .flatMap((line, index) => (/^\s*\|\s*REQ-\d{3}-\d{3}\s*\|/.test(line) ? [index + 1] : [])),
+        .flatMap((line, index) => (/^\s*\|\s*REQ-\d+-\d+\s*\|/.test(line) ? [index + 1] : [])),
     );
     const findings = lintResult.messages
       .filter((message) => !(message.ruleId === "prh" && requirementRowLines.has(message.line ?? 0)))
