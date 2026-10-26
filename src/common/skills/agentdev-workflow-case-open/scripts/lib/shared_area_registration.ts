@@ -8,7 +8,9 @@
 import type { SharedAreaKind } from "./cross_dependency_types.ts";
 
 // 単一ID または `REQ-{NNN}-{MMM}..REQ-{NNN}-{MMM}` 形式の範囲を 1 トークンとして抽出する。
-const REQ_ROW_SPAN_RE = /REQ-\d{3,4}-\d{3}(?:\.\.REQ-\d{3,4}-\d{3})?/g;
+// 桁数上限なし（各セグメント最小1桁）。前置一致と後続数字の非消費（lookaround）により
+// 長い行番号の途中までを別の行IDとして抽出しない。
+const REQ_ROW_SPAN_RE = /(?<![\w-])REQ-\d+-\d+(?![\w-])(?:\.\.REQ-\d+-\d+(?![\w-]))?/g;
 
 export function readSharedAreaRegistration(
   kind: SharedAreaKind,
@@ -49,7 +51,7 @@ function collectDeclarationReqRows(content: string): Set<string> {
   const declarationLineRe =
     /^\s*(?:<!--|\/\/)\s*ADF-COVERS\((?:decision|design|implementation|verification)\):\s*([^>]*?)(?:-->\s*)?$/;
   const sidecarEntryLineRe =
-    /^\s*[-*]\s+(REQ-\d{3,4}-\d{3}(?:\.\.REQ-\d{3,4}-\d{3})?)\s*$/;
+    /^\s*[-*]\s+(REQ-\d+-\d+(?:\.\.REQ-\d+-\d+)?)\s*$/;
   for (const line of content.split(/\r?\n/)) {
     const m = line.match(declarationLineRe);
     if (m && m[1] !== undefined) {
@@ -79,7 +81,8 @@ function collectSpans(registered: Set<string>, text: string): void {
   }
 }
 
-// 範囲は同一 REQ 番号内でのみ展開する。組不出来な範囲は両端の ID のみ登録する。
+// 範囲は同一 REQ 番号内でのみ展開する。組不出来な範囲と、行番号空間を跨いだ
+// 非現実的な巨大範囲（展開爆発の防止。受理上限ではない）は両端の ID のみ登録する。
 function expandSpan(span: string): string[] {
   const ids = span.split("..");
   const first = ids[0];
@@ -90,7 +93,7 @@ function expandSpan(span: string): string[] {
   if (prefix === null || prefix !== reqPrefixOf(second)) return [first, second];
   const start = rowNumberOf(first);
   const end = rowNumberOf(second);
-  if (start === null || end === null || start > end || end - start > 999) {
+  if (start === null || end === null || start > end || end - start > 99999) {
     return [first, second];
   }
   const out: string[] = [];
@@ -101,13 +104,13 @@ function expandSpan(span: string): string[] {
 }
 
 function reqPrefixOf(id: string): string | null {
-  const m = id.match(/^(REQ-\d{3,4}-)/);
+  const m = id.match(/^(REQ-\d+-)/);
   return m?.[1] ?? null;
 }
 
 function rowNumberOf(id: string): number | null {
-  const m = id.match(/-(\d{3})$/);
+  const m = id.match(/-(\d+)$/);
   if (!m || m[1] === undefined) return null;
   const parsed = Number.parseInt(m[1], 10);
-  return Number.isNaN(parsed) ? null : parsed;
+  return Number.isSafeInteger(parsed) ? parsed : null;
 }
