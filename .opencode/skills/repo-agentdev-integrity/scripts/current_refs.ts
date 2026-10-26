@@ -1,6 +1,7 @@
 // ADF-COVERS(verification): REQ-001-014
 const V2_PREFIX = "v2:";
-const CURRENT_REQ_REF_RE = /\bREQ-\d{3,4}\b/g;
+// 階層行IDの実在検査は IR-067 が所有する。単体番号として接頭部を誤抽出しない。
+const CURRENT_REQ_REF_RE = /(?<![\w-])REQ-\d+(?![\w-])/g;
 const CURRENT_ADR_REF_RE = /\bADR-\d{3,4}\b/g;
 const CURRENT_ADR_INVENTORY_REF_RE = /\bADR-\d{3}\b/g;
 const CURRENT_DEC_REF_RE = /\bDEC-\d{3}\b/g;
