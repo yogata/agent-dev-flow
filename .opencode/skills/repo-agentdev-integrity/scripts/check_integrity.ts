@@ -583,12 +583,23 @@ export function extractKnownGapNumbers(policyContent: string): number[] {
   }
   const gaps: number[] = [];
   for (const line of sectionLines) {
-    const m = /^REQ-(\d{3,4})\s*:/.exec(line.trim());
+    // 既知欠番エントリの受理は桁数上限なし（各セグメント最小1桁）。
+    const m = /^REQ-(\d+)\s*:/.exec(line.trim());
     if (m && m[1] !== undefined) {
       gaps.push(Number(m[1]));
     }
   }
   return gaps;
+}
+
+/**
+ * 階層 REQ 行ID が旧4桁番号帯（v2 歴史帯。REQ 部 4 桁かつ 0141 未満）かを判定する。
+ * IR-067 の検出対象外帯規則（設計要件4、受理上限撤廃 Decision により維持）。
+ */
+export function isV2HistoricalReqRowId(id: string): boolean {
+  const m = /^REQ-(\d+)-\d+$/.exec(id);
+  if (!m || m[1] === undefined) return false;
+  return m[1].length === 4 && Number(m[1]) < 141;
 }
 
 export function loadKnownGapReqIds(root: string): Set<string> {
@@ -698,7 +709,6 @@ function checkAdrReqCrossReference(
     for (const ref of uniqueRefs) {
       // REQ-010-070: skip known REQ gap references
       if (knownGapReqIds.has(ref)) continue;
-      // v2:REQ-0108-074: active or retired existence check
       if (!allReqIds.has(ref)) {
         results.push(
           ng(
@@ -1919,7 +1929,8 @@ export function checkDecisionReadmeRetiredReqLink(root: string): CheckResult[] {
 
   const lines = content.split("\n");
   let inRelatedReqSection = false;
-  const linkPattern = /\[REQ-(\d{3})\]\(([^)]+)\)/g;
+  // retired リンクの REQ 番号抽出は桁数上限なし（受理上限撤廃 Decision）。
+  const linkPattern = /\[REQ-(\d+)\]\(([^)]+)\)/g;
   for (let i = 0; i < lines.length; i++) {
     const heading = lines[i].match(/^#{1,6}\s+(.+)$/);
     if (heading) {
@@ -4873,13 +4884,19 @@ function checkReqRangeStaleness(root: string): CheckResult[] {
     return results;
   }
 
-  const actualIds = reqFiles.map((f) => f.replace(".md", "")).sort();
+  // REQ 番号の大小比較は辞書式（lexicographic）ではなく数値で行う（増桁時に
+  // REQ-0999 > REQ-1000 となる辞書式ハザードの置換）。
+  const numericIdOf = (id: string): number => Number(id.slice("REQ-".length));
+  const actualIds = reqFiles
+    .map((f) => f.replace(".md", ""))
+    .sort((a, b) => numericIdOf(a) - numericIdOf(b));
   const firstId = actualIds[0];
   const lastId = actualIds[actualIds.length - 1];
 
   // Extract range from text: patterns like "v2:REQ-0101 through v2:REQ-0114", "v2:REQ-0101〜v2:REQ-0114", "v2:REQ-0101~v2:REQ-0114"
+  // 桁数上限なし（現行帯の範囲明記も検査対象）。
   const rangePattern =
-    /REQ-\d{4}\s*(?:through|〜|~|から|through)\s*REQ-\d{4}/gi;
+    /REQ-\d+\s*(?:through|〜|~|から|through)\s*REQ-\d+/gi;
 
   // v2:REQ-0144-018: scan docs/guides/*.md and vocabulary-registry.md in addition to core files
   // IR-042 (ACT-DESIGN-017): docs/README.md hardcoded count statements are scanned here.
@@ -4932,18 +4949,23 @@ function checkReqRangeStaleness(root: string): CheckResult[] {
     const rangeMatches = content.match(rangePattern);
     if (rangeMatches) {
       for (const match of rangeMatches) {
-        const ids = match.match(/REQ-\d{4}/g);
+        const ids = match.match(/REQ-\d+/g);
         if (ids && ids.length === 2) {
           const rangeEnd = ids[1];
           const matchLineIdx = scanLines.findIndex((l) => l.includes(match));
           if (
             matchLineIdx >= 0 &&
             (isRetiredSectionInLines(scanLines, matchLineIdx) ||
-              /旧\s*REQ|retired|historical/i.test(scanLines[matchLineIdx]))
+              /旧\s*REQ|retired|historical/i.test(scanLines[matchLineIdx]) ||
+              // 欠番範囲明記（REQ-a〜REQ-b は欠番である旨）は「現行 REQ 範囲」の
+              // 主張ではないため、range-staleness の終点一致検査の対象外とする
+              // （欠番明記自体の検査は IR-069 が所有する）
+              scanLines[matchLineIdx].includes("欠番"))
           ) {
             continue;
           }
-          if (rangeEnd !== lastId) {
+          // 終点一致は数値比較（辞書式比較の増桁ハザード回避）
+          if (numericIdOf(rangeEnd) !== numericIdOf(lastId)) {
             foundStale = true;
             results.push(
               ng(
@@ -6939,7 +6961,8 @@ function checkReqVerificationBasis(root: string): CheckResult[] {
     const lines = content.split("\n");
     for (const line of lines) {
       if (!line.startsWith("|") || line.includes("---")) continue;
-      if (line.includes("REQ-") && /\d{3}/.test(line)) {
+      // 要件テーブル行の判定は行ID形式（桁数上限なし）で行う。
+      if (/REQ-\d+-\d+(?!\d)/.test(line)) {
         totalReqRows++;
         const legacyMarkerPattern = new RegExp(`（(${["S" + "HALL", "S" + "HOULD", "M" + "AY", "M" + "UST"].join("|")})）`);
         if (legacyMarkerPattern.test(line)) {
@@ -7090,9 +7113,11 @@ function checkReqDesignBoundaryViolation(root: string): CheckResult[] {
     const lines = content.split("\n");
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      // Only inspect requirement table rows: | REQ-NNNN-NNN | description |
+      // Only inspect requirement table rows: | REQ-NNN-NNN | description |
+      // （桁数上限なし。固定幅パターンだと現行 3 桁 corpus の要件行に一致せず
+      // dead check になるため、形式妥当性のみの一般化パターンとする）
       const rowMatch = line.match(
-        /^\|\s*(REQ-\d{4}-\d{3})\s*\|\s*([\s\S]*?)\s*\|\s*$/,
+        /^\|\s*(REQ-\d+-\d+)\s*\|\s*([\s\S]*?)\s*\|\s*$/,
       );
       if (!rowMatch) continue;
       const reqItemId = rowMatch[1];
@@ -7345,11 +7370,13 @@ function checkDraftSpecStaleness(designsDir: string, root: string): CheckResult[
 // fail in delta guard / impact guard. Full audit fails once baseline reaches 0.
 
 const IR055_STRICT_PATTERNS: ReadonlyArray<{ name: string; pattern: RegExp }> = [
-  { name: "REQ-NNNN-NNN", pattern: /\bREQ-\d{4}-\d{3}\b/g },
+  // REQ 行ID の抽出は桁数上限なし（受理上限撤廃 Decision）。前置一致除外のための
+  // 後置数字の非消費（(?!\d)）により REQ-0063-0123 の REQ-0063-012 誤抽出を防ぐ。
+  { name: "REQ-NNNN-NNN", pattern: /\bREQ-\d+-\d+(?!\d)\b/g },
   // OU-003 (Issue #2559): `(?!-\d)` prevents the standalone pattern from
   // consuming the head token of a `-NNN` sub-item line reference, which the
   // design IR-055 pattern split treats as a separate pattern, not an ID.
-  { name: "REQ-NNNN", pattern: /\bREQ-\d{3,4}(?!-\d)\b/g },
+  { name: "REQ-NNNN", pattern: /\bREQ-\d+(?!-\d)(?!\d)\b/g },
   { name: "DEC-NNN", pattern: /\bDEC-\d{3}\b/g },
   { name: "ADR-NNNN", pattern: /\bADR-\d{3,4}\b/g },
   { name: "obsolete src/opencode/{commands,skills,tools}/", pattern: /\bsrc\/opencode\/(?:commands|skills|tools)\//g },
@@ -10323,7 +10350,10 @@ function checkDocsDesignsLegacyPathDeclarations(root: string): CheckResult[] {
 // 正規表現上マッチしない。code span / code block、テンプレート領域（_template.md・
 // templates/）、IR ルール説明文（v2:REQ-0145-015）、AUTOGEN ブロック（checker-execution-contracts
 // 検出対象除外規定）、retired ディレクトリ、docs/reports/ を免除領域とする。
-const IR067_ROW_ID_RE = /(?<!v2:)(?<![\w-])REQ-(\d{3})-(\d{3})(?!\d)/g;
+// IR-067 の階層 REQ 行ID 抽出。桁数上限なし（各セグメント最小1桁、受理上限撤廃
+// Decision）。v2: プレフィックス免除、前置一致除外、後置数字の非消費（(?!\d) により
+// REQ-0063-0123 の REQ-0063-012 誤抽出を防止）を維持する。
+const IR067_ROW_ID_RE = /(?<!v2:)(?<![\w-])REQ-(\d+)-(\d+)(?![\w-])/g;
 
 function buildReqRowIndex(root: string): Set<string> {
   const rows = new Set<string>();
@@ -10419,6 +10449,8 @@ function checkReferencedReqRowExistence(root: string): CheckResult[] {
       while ((m = IR067_ROW_ID_RE.exec(lines[i])) !== null) {
         if (isInsideCodeSpan(lines[i], m.index)) continue;
         const id = m[0];
+        if (isV2HistoricalReqRowId(id)) continue;
+        const reqPartNumber = Number(m[1]);
         const dedupeKey = `${i}:${id}`;
         if (reportedOnLine.has(dedupeKey)) continue;
         reportedOnLine.add(dedupeKey);
@@ -10433,7 +10465,7 @@ function checkReferencedReqRowExistence(root: string): CheckResult[] {
             i + 1,
             {
               evidence: id,
-              expected: `${id} must exist as a requirement row in docs/requirements/REQ-${m[1]}.md`,
+              expected: `${id} must exist as a requirement row in docs/requirements/REQ-${String(reqPartNumber).padStart(3, "0")}.md`,
               route: "intake",
               finding_category: "document-drift",
               finding_level: "strict",
@@ -10751,15 +10783,16 @@ function checkSkillProjectionManifest(root: string): CheckResult[] {
 }
 
 // ─── IR-069: req-number-gap-recorded (REQ-010-070, Case #2917) ────────────
-// REQ 番号（3桁帯 REQ-001〜REQ-999）の実体（active + retired）から欠番を算出し、
-// docs/requirements/README.md と docs/README.md の両「欠番」明記（AUTOGEN 外の
-// 本文行での REQ-NNN 単体または REQ-NNN〜REQ-NNN 範囲）と突合する。
+// REQ 番号（現行採番帯。桁数上限なし。旧4桁帯 v2:REQ-01XX〔0141 未満〕は検出対象外）
+// の実体（active + retired）から欠番を算出し、docs/requirements/README.md と
+// docs/README.md の両「欠番」明記（AUTOGEN 外の本文行での REQ-NNN 単体または
+// REQ-NNN〜REQ-NNN 範囲）と突合する。
 // 検出対象は「無記録の欠番」: 最大採番番号の直前に位置する末尾予約枠（並行 Case の
 // 共有予約・採番返却の過渡帯。REQ-083〜096 共有予約枠運用参照）を除く欠番は、
 // 両 README での明記を必須とする（numbering-policy「既知の欠番」、REQ-010-070）。
-const IR069_REQ_FILE_RE = /^REQ-(\d{3})\.md$/;
-const IR069_RANGE_RE = /REQ-(\d{3})\s*[〜~]\s*REQ-(\d{3})/g;
-const IR069_SINGLE_RE = /REQ-(\d{3})/g;
+const IR069_REQ_FILE_RE = /^REQ-(\d+)\.md$/;
+const IR069_RANGE_RE = /REQ-(\d+)\s*[〜~]\s*REQ-(\d+)/g;
+const IR069_SINGLE_RE = /REQ-(\d+)(?!\d)/g;
 
 function collectIr069ReqNumbers(root: string): Set<number> {
   const numbers = new Set<number>();
@@ -10768,7 +10801,11 @@ function collectIr069ReqNumbers(root: string): Set<number> {
     if (!fs.existsSync(dir)) continue;
     for (const file of listFiles(dir)) {
       const m = file.match(IR069_REQ_FILE_RE);
-      if (m) numbers.add(parseInt(m[1], 10));
+      if (!m || m[1] === undefined) continue;
+      // 旧4桁番号帯（v2 歴史帯。0141 未満）は IR-069 の検出対象外（桁数上限なしの
+      // 現行採番帯に限定する帯規則。受理上限撤廃 Decision により維持）。
+      if (m[1].length === 4 && parseInt(m[1], 10) < 141) continue;
+      numbers.add(parseInt(m[1], 10));
     }
   }
   return numbers;
@@ -10837,13 +10874,14 @@ function formatIr069Run(run: number[]): string {
 function checkReqNumberGapRecorded(root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const numbers = collectIr069ReqNumbers(root);
-  const band = [...numbers].filter((n) => n >= 1 && n <= 999).sort((a, b) => a - b);
+  // 現行採番帯（collectIr069ReqNumbers が v2 歴史帯を除外済み。桁数上限なし）。
+  const band = [...numbers].filter((n) => n >= 1).sort((a, b) => a - b);
   if (band.length === 0) {
     results.push(
       info(
         "ReqNumbering",
         "req-number-gap-recorded",
-        "No 3-digit REQ files found; IR-069 skipped (REQ-010-070)",
+        "No current-band REQ files found; IR-069 skipped (REQ-010-070)",
       ),
     );
     return results;
@@ -10976,9 +11014,10 @@ function checkReqNumberGapRecorded(root: string): CheckResult[] {
 // 省略形等）は検出対象外。抽出は generate_indexes.ts collectIrFiles を再利用し、
 // rule-ownership.md AUTOGEN 派生表と単一情報源を維持する。検出契約の正本は
 // rules/IR-071-*.md。
-const IR071_ROW_ID_RE = /^REQ-(\d{3})-(\d{3})$/;
-const IR071_FILE_ID_RE = /^REQ-(\d{3})$/;
-const IR071_REQ_FILENAME_RE = /^(REQ-\d{3})\.md$/;
+// related_req 参照の受理は形式妥当性のみ（桁数上限なし。受理上限撤廃 Decision）。
+const IR071_ROW_ID_RE = /^REQ-(\d+)-(\d+)$/;
+const IR071_FILE_ID_RE = /^REQ-(\d+)$/;
+const IR071_REQ_FILENAME_RE = /^(REQ-\d+)\.md$/;
 
 function buildReqFileIndex(root: string): Set<string> {
   const files = new Set<string>();
@@ -11034,7 +11073,7 @@ function checkIntegrityRuleRelatedReqExistence(root: string): CheckResult[] {
           {
             evidence: rawId,
             expected: isRowId
-              ? `${rawId} must exist as a requirement row in docs/requirements/REQ-${rawId.slice(4, 7)}.md (current or retired)`
+              ? `${rawId} must exist as a requirement row in docs/requirements/REQ-${String(Number(rawId.slice("REQ-".length, rawId.lastIndexOf("-")))).padStart(3, "0")}.md (current or retired)`
               : `${rawId} must exist as docs/requirements/${rawId}.md (current or retired)`,
             route: "intake",
             finding_category: "document-drift",
@@ -11071,12 +11110,13 @@ function checkIntegrityRuleRelatedReqExistence(root: string): CheckResult[] {
 // git 情報が取得不能な環境（archive 展開等の git 履歴不在ツリー）では info で
 // skip する（検査対象が原理的に不在であり、既知 NG の info スキップ IR-069 と同一
 // 扱い）。updated 欠落・非日付形式は required-fields / IR-002 相当の別ルール対象。
-// 検査対象は現行 3 桁帯 REQ ファイル（README.md、retired/、4 桁旧番号帯は対象外）と、
-// Design ファイル（docs/designs/**/*.md。ACT-DESIGN-041 適用拡張）。Design も同一基準
+// 検査対象は現行 REQ ファイル（桁数上限なし。README.md、retired/、旧4桁番号帯
+// v2:REQ-01XX は対象外）と、Design ファイル（docs/designs/**/*.md。ACT-DESIGN-041
+// 適用拡張）。Design も同一基準
 //（最終内容変更 commit の author date 突合、frontmatter のみの変更 commit の除外、
 // git 履歴不在時の info skip、untracked 対象外）で検査する。Design frontmatter 必須キー
 //（IR-070）との役割分担は維持する（updated 欠落は本ルールで計上しない）。
-const IR072_REQ_FILENAME_RE = /^REQ-(\d{3})\.md$/;
+const IR072_REQ_FILENAME_RE = /^REQ-(\d+)\.md$/;
 
 // commit が当該ファイルの frontmatter（1 行目 --- から次の --- 行まで）のみを
 // 変更しているかを判定する。変更 hunk（--unified=0）の old 側行範囲が全て、
@@ -11194,7 +11234,10 @@ function checkReqUpdatedFreshness(root: string): CheckResult[] {
     return results;
   }
   const reqFiles = fs.existsSync(reqDir)
-    ? listFiles(reqDir).filter((f) => IR072_REQ_FILENAME_RE.test(f))
+    ? listFiles(reqDir).filter((f) => {
+      const m = f.match(IR072_REQ_FILENAME_RE);
+      return m !== null && !(m[1].length === 4 && Number(m[1]) < 141);
+    })
     : [];
   if (reqFiles.length === 0 && designFiles.length === 0) {
     results.push(
