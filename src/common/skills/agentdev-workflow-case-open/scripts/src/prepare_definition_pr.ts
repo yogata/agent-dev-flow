@@ -18,7 +18,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { spawnSync } from "node:child_process";
-import { consumeDefinitionTraceability, isReqRowId, type DeferredObligation } from "../lib/definition-traceability-gate.ts";
+import { consumeDefinitionTraceability, isReqRowId, REQ_ROW_ID_LIST_PATTERN, type DeferredObligation } from "../lib/definition-traceability-gate.ts";
 
 const USAGE = `usage: bun ./src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts --input <input.json> [--validate-input]
   --input           機械工程入力 JSON（worktree、branch、Definition 編集内容、品質ゲート実行仕様等）
@@ -426,7 +426,7 @@ export interface KnownArgContract {
 }
 
 export const KNOWN_GATE_ARG_CONTRACTS: readonly KnownArgContract[] = [
-  { flag: "--req", pattern: /^(REQ-\d{3,4}-\d{3})(,REQ-\d{3,4}-\d{3})*$/ },
+  { flag: "--req", pattern: REQ_ROW_ID_LIST_PATTERN },
   { flag: "--profile", values: ["source", "link"] },
   { flag: "--fail-level", values: ["strict", "warning"] },
   { flag: "--workflow", pattern: /^[a-z][a-z0-9-]*$/ },

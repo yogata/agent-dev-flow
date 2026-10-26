@@ -179,8 +179,8 @@ describe("入力検証（品質ゲートの省略禁止・明示パス stage）"
     expect(() => validateInput(accepted as unknown as Record<string, unknown>)).not.toThrow();
   });
 
-  test("行番号 2桁の REQ 行 ID は許容書式から外れるため拒否する", () => {
-    const broken = input({ traceabilityReqIds: ["REQ-1024-49"] });
+  test("空の行番号を持つ REQ 行 ID は許容書式から外れるため拒否する", () => {
+    const broken = input({ traceabilityReqIds: ["REQ-1024-"] });
     expect(() => validateInput(broken as unknown as Record<string, unknown>)).toThrow(/invalid requirement row id/);
   });
 
@@ -208,11 +208,13 @@ describe("入力検証（品質ゲートの省略禁止・明示パス stage）"
   });
 
   test("許容書式を緩める reqRowIdPattern の設定値でも実効範囲は緩まない（許容書式検証が先行）", () => {
+    // 空セグメント（REQ-1024-）は reqRowIdPattern の緩和に依存せず、
+    // 桁数上限なしの許容書式検証でも不正値として拒否される。
     const broken = input({
-      traceabilityReqIds: ["REQ-1024-1"],
+      traceabilityReqIds: ["REQ-1024-"],
       traceabilityGate: {
         ...gate("traceability-check"),
-        args: ["./checker.ts", "--gate", "traceability-check", "--req", "REQ-1024-1"],
+        args: ["./checker.ts", "--gate", "traceability-check", "--req", "REQ-1024-"],
       },
       reqRowIdPattern: "REQ-\\d{3,4}-\\d{1,3}",
     });

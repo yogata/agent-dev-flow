@@ -92,6 +92,7 @@ implementation:
     - REQ-061-031
   src/common/skills/agentdev-workflow-case-open/scripts/lib/definition-traceability-gate.ts:
     - REQ-029-014
+    - REQ-009-053
   src/common/skills/agentdev-workflow-case-open/scripts/lib/shared_area_registration.ts:
     - REQ-061-030
   src/common/skills/agentdev-workflow-case-open/scripts/README.md:

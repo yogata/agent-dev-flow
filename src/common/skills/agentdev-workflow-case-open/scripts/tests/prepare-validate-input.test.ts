@@ -50,7 +50,7 @@ describe("runValidateInputOnly (verification-only entry)", () => {
     const fixture = consumerFixture() as unknown as Record<string, unknown>;
     const broken = JSON.parse(JSON.stringify(fixture)) as Record<string, unknown>;
     (broken.traceabilityGate as { args: string[] }).args = [
-      gateScript, "--root", cwd, "--req", "REQ-" + "1-1",
+      gateScript, "--root", cwd, "--req", "REQ-" + "1-",
     ];
     expect(() => runValidateInputOnly(broken as never, () => true)).toThrow(/--req/);
   });

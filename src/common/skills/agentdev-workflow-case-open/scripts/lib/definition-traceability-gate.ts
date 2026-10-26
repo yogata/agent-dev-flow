@@ -64,13 +64,27 @@ function isCheckKind(value: string): value is CheckKind {
 }
 
 /**
- * REQ 行ID の許容書式（traceability checker 契約と同じ REQ-{NNNN}-{MMM} 形式）。
- * REQ 部の桁数を固定しない（producer 側の採番桁数の前提を埋め込まない）。
+ * REQ 行ID の許容書式（traceability checker 契約と同じ REQ-{NNN}-{NNN} 形式）。
+ * 受理検査が要求するのは形式妥当性のみとする: REQ- 接頭辞、ハイフン区切り、
+ * 数値セグメント2つ、各セグメント最小1桁。桁数上限は設けない
+ * （「要件ID桁数の受理上限撤廃と表示ゼロ埋め・受理検証の分離」Decision 参照）。
+ * 表示上のゼロ埋め（pad3/pad4 等の pad 指定）は最小幅の表示規則（切詰めなし）であり、
+ * 受理上限として機能させない。
  * 機械工程 script は本関数を共有して検証する（工程別 script 側で書式を再定義しない）。
  */
+const REQ_ROW_ID_SOURCE = "REQ-\\d+-\\d+";
+const REQ_ROW_ID_PATTERN = new RegExp(`^${REQ_ROW_ID_SOURCE}$`);
+
 export function isReqRowId(value: string): boolean {
-  return /^REQ-\d{3,4}-\d{3}$/.test(value);
+  return REQ_ROW_ID_PATTERN.test(value);
 }
+
+/**
+ * 定義PR準備・受入検査・クローズ機械工程の `--req` 引数契約で共有する
+ * REQ 行ID カンマ連結リストの受理パターン（単一実装）。ID 1件の受理条件は
+ * isReqRowId（形式妥当性のみ・桁数上限なし）と同一である。
+ */
+export const REQ_ROW_ID_LIST_PATTERN = new RegExp(`^${REQ_ROW_ID_SOURCE}(,${REQ_ROW_ID_SOURCE})*$`);
 
 function parseReport(value: unknown): ParsedReport | null {
   if (!isRecord(value)) return null;
