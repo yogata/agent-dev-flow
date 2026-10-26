@@ -175,38 +175,38 @@
    "RU-0247": {
     "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261027T034727JST.md",
     "operation_unit": "OU-001",
-    "実行単位": "未確定"
+    "実行単位": "#3868（Epic #3866 Wave 1）"
    },
    "RU-0248": {
     "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261027T034727JST.md",
     "operation_unit": "OU-002",
-    "実行単位": "未確定"
+    "実行単位": "#3868（Epic #3866 Wave 1）"
    },
    "RU-0249": {
     "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261027T034727JST.md",
     "operation_unit": "OU-003",
-    "実行単位": "未確定",
+    "実行単位": "#3868（Epic #3866 Wave 1）",
     "depends_on": "RU-0247"
    },
    "RU-0250": {
     "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261027T034727JST.md",
     "operation_unit": "OU-004",
-    "実行単位": "未確定"
+    "実行単位": "#3869（Epic #3866 Wave 1）"
    },
    "RU-0251": {
     "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261027T034727JST.md",
     "operation_unit": "OU-005",
-    "実行単位": "未確定"
+    "実行単位": "#3870（Epic #3866 Wave 1）"
    },
    "RU-0252": {
     "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261027T034727JST.md",
     "operation_unit": "OU-006",
-    "実行単位": "未確定"
+    "実行単位": "#3871（Epic #3866 Wave 1）"
    },
    "RU-0253": {
     "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261027T034727JST.md",
     "operation_unit": "OU-007",
-    "実行単位": "未確定"
+    "実行単位": "#3872（Epic #3866 Wave 1）"
    },
    "RU-0254": {
     "要件doc": "対象外（再スコープ）",
@@ -217,42 +217,42 @@
    "RU-0255": {
     "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261027T034727JST.md",
     "operation_unit": "OU-008",
-    "実行単位": "未確定"
+    "実行単位": "#3872（Epic #3866 Wave 1）"
    },
    "RU-0256": {
     "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261027T034727JST.md",
     "operation_unit": "OU-009",
-    "実行単位": "未確定"
+    "実行単位": "#3868（Epic #3866 Wave 1）"
    },
    "RU-0257": {
     "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261027T034727JST.md",
     "operation_unit": "OU-010",
-    "実行単位": "未確定"
+    "実行単位": "#3873（Epic #3866 Wave 1）"
    },
    "RU-0258": {
     "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261027T034727JST.md",
     "operation_unit": "OU-011",
-    "実行単位": "未確定"
+    "実行単位": "#3874（Epic #3866 Wave 1）"
    },
    "RU-0259": {
     "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261027T034727JST.md",
     "operation_unit": "OU-012",
-    "実行単位": "未確定"
+    "実行単位": "#3876（Epic #3866 Wave 1）"
    },
    "RU-0260": {
     "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261027T034727JST.md",
     "operation_unit": "OU-013",
-    "実行単位": "未確定"
+    "実行単位": "#3875（Epic #3866 Wave 1）"
    },
    "RU-0261": {
     "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261027T034727JST.md",
     "operation_unit": "OU-014",
-    "実行単位": "未確定"
+    "実行単位": "#3868（Epic #3866 Wave 1）"
    },
    "RU-0262": {
     "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261027T034727JST.md",
     "operation_unit": "OU-015",
-    "実行単位": "未確定"
+    "実行単位": "#3868（Epic #3866 Wave 1）"
    }
   },
   "stage4確定": {
@@ -261,14 +261,50 @@
    "確定コミット": "149677912",
    "確定日時": "2026-10-27T07:0x JST頃",
    "備考": "単一 req-define 実行（RDQ 壁打ち 7問は Hermes 監督代理回答）。OU-003 は depends_on: OU-001"
+  },
+  "stage5確定": {
+   "確定日時": "2026-10-27T11:20:00+09:00",
+   "RootCase": "Epic #3866（closed completed・2026-10-27 07:30-11:20 JST）",
+   "DefinitionPR": "#3867（squash merge a20d58d27・REQ-117 新設・canonical 適用）",
+   "実行構造": "15 OU → 機能的一貫性により 9子Issue（単一 Wave 1・依存 0エッジ）。OU-001→OU-003 依存は設計PR merge で解消",
+   "実行単位とPR": {
+    "#3868": "OU-001+OU-002残部+OU-003検証+OU-009+OU-014+OU-015 → PR #3877 (706e7ae9d) + 再是正 PR #3886 (d89006524)",
+    "#3869": "OU-004 → PR #3878 (cef070890)",
+    "#3870": "OU-005 → PR #3879 (e35677fc8)",
+    "#3871": "OU-006 → PR #3880 (70bd0a7c8)",
+    "#3872": "OU-007+OU-008 → PR #3881 (dae06b725)",
+    "#3873": "OU-010 → PR #3882 (fa821f58b)",
+    "#3874": "OU-011 → PR #3883 (e41af2277)",
+    "#3875": "OU-013 → PR #3884 (fe09595d3)",
+    "#3876": "OU-012 → PR #3885 (f9b571188)"
+   },
+   "追加コミット": "Epic Wave クローズ時配布依存境界是正 56cd7608b・2a3f819df（main 直接 commit・逸脱記録済み）+ Capture cced62bb4 + bookkeeping（ea6ba213・cc0dbc744）",
+   "HITL": "case-auto 本体 0件。ただし親 stage6 突合による TS-002 検証不成立発見（check_content_corruption exit 1・終了コード誤読）→ #3868 reopen → 再是正 PR #3886 → 再実測 exit 0 → completed 再クローズ・Epic 記録訂正（親判断・根拠記録済み）"
+  },
+  "stage6完遂判定": {
+   "判定": "完遂",
+   "判定日時": "2026-10-27T11:3x JST",
+   "義務対応確認": "義務スナップショット 15 RU（RU-0254 は RDQ-7(γ) 除外記録済み）すべてが要件doc REQ-117 AG-001〜015・OU-001〜015・実行単位 #3868〜#3876 に過不足なく対応。RU-0249→RU-0247 依存も設計PR merge で解消",
+   "検証結果成立確認": [
+    "TS-002/REQ-117-002: check_content_corruption exit 0・broken-code-span 0件（親が main root HEAD d89006524 でリダイレクト取得により再実測）",
+    "TS-003/REQ-117-003: IR-044 warning 0件・pre-demote warning total 49≤58・cap 変更なし（親再実測）",
+    "traceability: 区分外達成義務行 0件（REQ-096 8行 ADF-COVERS(implementation) v4-responsibility-boundaries:8・REQ-113-001/002 runtime-package-boundary・REQ-001-069 document-type-responsibilities:12+README:1・REQ-052-012 custom-tool-contracts:8 を親実測）",
+    "IR-073: untracked 残存 0件（tmp-runner-cli-* 削除・.gitignore:26 追加・jev 8件コミット済み）",
+    "bun test QG-4 3cwd 分割: 2997+854+692 pass・11 fail は既知 baseline #3862（PR #3886 は Markdown/JSDoc prose 変更のみで検証対象不変）",
+    "textlint・lint_skills・配布依存境界・check_extensions・targeted docs guard: pass（description 592≤600・集約 20261≤20300 親実測）",
+    "Epic #3866 完了条件 6/6 [x]（TS-002 訂正記録入り）・9子Issue 全 completed・全 PR merge 済み"
+   ],
+   "親スポット検証": "REQ-108 表統合・REQ-060:10 用語・REQ-010 行順・numbering-policy:34 ID参照化・REQ-039-007 境界文言・REQ-117 frontmatter/covers・case-run scripts tsconfig/package.json・sidecar 重複検出 (check_integrity L9551/L10544)・validateInput 分離入口・measurement-convergence (prepare_definition_pr.ts)・applySection 空行保証 (record-comments.ts L304-305)・絶対パス規定 (checker-execution-contracts)・req-file-manager L64-74 現行化・DEC-062 受理記述 — すべて実在確認",
+   "判定根拠": "義務スナップショットと対応表を正とする突合で義務の過不足なし・必要範囲の検証結果すべて成立。個別 Issue 終了・PR merge のみでなく REQ-117 全要件行の受け入れ条件と TS-001〜015 の成立を確認"
   }
  },
  "進捗": {
   "整理サイクル": "完了(stage1 inspect-docs 2026-10-27T03:49-04:06 検出15件 commit b737148e3 / stage2 昇格3系統並列 04:08-06:05 learning 7880d6407〔promote2+duplicate17+deferred16+rejected1〕・intake 5e10d51b3+c868b9bae〔採用11・HITL2件代理回答〕・inspect 3a508c7ad〔promote5→1ファイル・defer継続〕・jev観測8件コミット ece068dce / stage3 backlog-review 05:23-05:58 RU16件生成 RU-0247〜0262・promoted14件削除・commit adae3c755・HITL3問代理回答 BKR-Q1①/Q2①/Q3①)",
   "stage4_要件定義": "完了（2026-10-27T07:0x JST頃・単一 req-define 実行・要件doc .agentdev/drafts/req-draft-backlog-auto-e2e-20261027T034727JST.md 766行確定・auto_ready: true・work_type: maintenance・scale: large・壁打ち RDQ-1〜7 の Hermes 監督代理回答反映・RU-0254 は RDQ-7 (γ) で除外され一式は 15 RU・adversarial-review finding 0 件・Jev 観測 20261026T211109Z-9e9f / 20261026T212337Z-a9de・commits 4052d6368+149677912）",
-  "stage5_実行": "未着手",
+  "stage5_実行": "完了（2026-10-27T07:30-11:20 JST・単一 case-auto 実行〔要件doc 明示指定〕。Epic #3866 closed・Definition PR #3867 squash merge・9子Issue 全完了〔PR #3877〜#3885 + 再是正 #3886〕・QG-4 全ゲート合格・Capture 2件回収・worktree 掃除完。親 stage6 突合で TS-002 不成立を検出し #3868 reopen→再是正 PR #3886→再実測 exit 0→完了記録訂正まで実施）",
   "stage6_全体完了判定": "未着手",
-  "stage7_リリース": "未着手"
+  "stage7_リリース": "未着手",
+  "stage6_完遂判定": "完遂（2026-10-27T11:3x JST・親による突合。義務スナップショット15RU×対応表×検証証跡の突合成立・対応表 stage6完遂判定節に証拠一覧）"
  },
  "リリース状態": {
   "状態": "未着手",
