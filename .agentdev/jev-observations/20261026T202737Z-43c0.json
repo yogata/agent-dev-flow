@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261026T202737Z-43c0",
+  "workflow": "backlog-review",
+  "evaluationKind": "ru-composition-decision",
+  "subject": "backlog-review stage3 RU構成案（14成果物→15RU、統合2、分割1、依存1）",
+  "sourceRevision": "c868b9bae",
+  "durationMs": 1507,
+  "inputTokens": 1614,
+  "inputs": {
+    "requestDigest": "3db3e1d2855cf4ef1d0488c81afebff85f21345e2f79d7e91882585977a00e72"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-inspect-merge",
+      "questionForm": "choice",
+      "value": "統合が妥当",
+      "probabilityDistribution": {
+        "統合が妥当": 0.93,
+        "分割すべき": 0.05,
+        "1:1維持が妥当": 0.02
+      }
+    },
+    {
+      "questionId": "q2-residue-merge",
+      "questionForm": "choice",
+      "value": "統合が妥当",
+      "probabilityDistribution": {
+        "統合が妥当": 0.98,
+        "分割すべき": 0.01,
+        "1:1維持が妥当": 0.01
+      }
+    },
+    {
+      "questionId": "q3-req115-116-split",
+      "questionForm": "choice",
+      "value": "分割が妥当",
+      "probabilityDistribution": {
+        "分割が妥当": 0.99,
+        "統合すべき": 0,
+        "1:1維持が妥当": 0.01
+      }
+    },
+    {
+      "questionId": "q4-dependency-order",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.64,
+        "false": 0.36
+      }
+    }
+  ],
+  "confidence": 0.89,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-inspect-merge",
+        "value": "統合が妥当"
+      },
+      {
+        "questionId": "q2-residue-merge",
+        "value": "統合が妥当"
+      },
+      {
+        "questionId": "q3-req115-116-split",
+        "value": "分割が妥当"
+      },
+      {
+        "questionId": "q4-dependency-order",
+        "value": true
+      }
+    ]
+  }
+}
