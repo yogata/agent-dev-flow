@@ -47,7 +47,9 @@ export interface SidecarParseResult {
   readonly issues: readonly SidecarIssue[];
 }
 
-const REQ_LINE_RE = /^REQ-\d{3,4}-\d{3}$/;
+// 要件行 ID の受理は形式妥当性のみ（REQ- 接頭辞・ハイフン区切り・数値セグメント2つ・
+// 各セグメント最小1桁）。桁数上限なし（受理上限撤廃 Decision 参照）。
+const REQ_LINE_RE = /^REQ-\d+-\d+$/;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);

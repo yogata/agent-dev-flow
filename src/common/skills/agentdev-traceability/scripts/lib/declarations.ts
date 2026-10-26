@@ -48,8 +48,12 @@ export interface DeclarationIssue {
   readonly detail: string;
 }
 
+// 対応宣言の ID リスト抽出。桁数上限なし（各セグメント最小1桁）。前置一致と
+// 後続数字の非消費（lookaround）により長い行番号の部分一致を防ぐ
+// （非曖昧抽出）。宣言リストの後続トークンはカンマ区切りであるため、リスト末尾の
+// ID に (?!\d) を適用しても次 ID の先頭は消費しない。
 const DECLARATION_RE =
-  /ADF-COVERS\((decision|design|implementation|verification)\):\s*(REQ-\d{3,4}-\d{3}(?:\s*,\s*REQ-\d{3,4}-\d{3})*)/;
+  /ADF-COVERS\((decision|design|implementation|verification)\):\s*((?<![\w-])REQ-\d+-\d+(?![\w-])(?:\s*,\s*REQ-\d+-\d+(?![\w-]))*)/;
 const ROLE_PROBE_RE = /ADF-COVERS\(([A-Za-z][A-Za-z0-9-]*)\)/;
 const MARKDOWN_COMMENT_LINE_RE = /^\s*<!--\s*(.*?)\s*-->\s*$/;
 const TS_LINE_COMMENT_RE = /^\s*\/\/(.*)$/;

@@ -51,7 +51,7 @@ interface ParseIssue {
 }
 
 const DECLARATION_RE =
-  /ADF-COVERS\((decision|design|implementation|verification)\):\s*(REQ-\d{3}-\d{3}(?:\s*,\s*REQ-\d{3}-\d{3})*)/;
+  /ADF-COVERS\((decision|design|implementation|verification)\):\s*((?<![\w-])REQ-\d+-\d+(?![\w-])(?:\s*,\s*REQ-\d+-\d+(?![\w-]))*)/;
 const ROLE_PROBE_RE = /ADF-COVERS\(([A-Za-z][A-Za-z-]*)\):/;
 const KNOWN_ROLES: readonly string[] = ["decision", "design", "implementation", "verification"];
 
@@ -444,12 +444,29 @@ describe("TIM モデル規則（フィクスチャ）", () => {
     ]);
     const bad = writeFixture("line-id-bad.md", [
       decl("implementation", "REQ-900"),
-      decl("verification", "REQ-900-1"),
+      decl("verification", "REQ-900-"),
     ]);
     const goodDecls = parseFiles([good]);
     const [entry] = judgeCompleteness(goodDecls, ["REQ-900-001"]);
     expect(entry.complete).toBe(true);
     const badDecls = parseFiles([bad]);
     expect(badDecls).toEqual([]);
+  });
+});
+
+describe("producer 側宣言解析との期待値結合（桁数上限なし受理）", () => {
+  it("テスト側と producer 側が増桁した宣言を同じIDとして解析する", async () => {
+    const producer = await import("../../../../src/common/skills/agentdev-traceability/scripts/lib/declarations.ts");
+    const fiveDigitLine = decl("design", "REQ-12345-0123");
+    const local = fiveDigitLine.match(DECLARATION_RE)?.[2];
+    expect(local).toBe("REQ-12345-0123");
+    expect(producer.parseDeclarations("fixture.md", fiveDigitLine).declarations[0]?.reqIds).toEqual(["REQ-12345-0123"]);
+  });
+
+  it("行部4桁の ID を行部3桁の部分一致として誤抽出しない（非曖昧抽出）", () => {
+    const line = decl("design", "REQ-0063-0123");
+    const reqIds = line.match(DECLARATION_RE)?.[2].split(/\s*,\s*/) ?? [];
+    expect(reqIds).toEqual(["REQ-0063-0123"]);
+    expect(reqIds).not.toContain("REQ-0063-012");
   });
 });

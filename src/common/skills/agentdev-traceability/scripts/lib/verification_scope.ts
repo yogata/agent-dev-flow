@@ -27,7 +27,8 @@ import { join } from "node:path";
 
 export const DEFAULT_POLICY_FILE = "traceability/policy.yaml";
 
-const REQ_LINE_RE = /^REQ-\d{3,4}-\d{3}$/;
+// 要件行 ID の受理は形式妥当性のみ（桁数上限なし。受理上限撤廃 Decision 参照）。
+const REQ_LINE_RE = /^REQ-\d+-\d+$/;
 
 export type VerificationPolicyIssueReason =
   | "unreadable-policy"

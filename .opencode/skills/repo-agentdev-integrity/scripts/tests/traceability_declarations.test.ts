@@ -151,7 +151,7 @@ describe("対応宣言の解析", () => {
       `<!-- ${MARKER}(design) REQ-900-001 -->`,          // コロンなし
       `<!-- ${MARKER}(design): REQ900-001 -->`,          // ID 形式違反
       `<!-- ${MARKER}(design): -->`,                     // ID 空
-      `<!-- ${MARKER}(implementation): REQ-900-1 -->`,   // 桁数不足
+      `<!-- ${MARKER}(implementation): REQ-900- -->`,   // 空セグメント
     ];
     for (let i = 0; i < cases.length; i++) {
       const { declarations, issues } = parseDeclarations(`m${i}.md`, cases[i]!);
