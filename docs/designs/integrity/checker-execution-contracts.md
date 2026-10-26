@@ -2,8 +2,9 @@
 title: checker 実行契約と検出基盤規則
 status: accepted
 created: 2026-08-15
-updated: 2026-10-22
+updated: 2026-10-27
 ---
+<!-- ADF-COVERS(design): REQ-010-009 -->
 <!-- ADF-COVERS(implementation): REQ-002-035 -->
 <!-- ADF-COVERS(implementation): REQ-010-062 -->
 <!-- ADF-COVERS(implementation): REQ-010-010 -->
@@ -190,6 +191,8 @@ checker は module import 経由（node --experimental-strip-types）での実�
 既存 checker の互換化は本契約の要件として段階的に適用する。
 
 ### link profile 実効実行要件
+
+checker および機械工程 script のパス引数（--root、gate spec の --input 等の入力パス）の解決基点は checker・script 起動時の作業ディレクトリ（cwd）であり repo root ではない。パス引数は絶対パスで構成する標準とする。絶対パスで構成しない場合は gate spec の cwd からの相対解決を意図したパスであることを呼出側が明示的に管理し、repo root 基準の相対パスを渡さないこと。checker 実行記録（検証差分・証跡）には root 等のパス引数の解決先（実測絶対パス）を明記すること。
 
 - link profile は main root を位置引数 `repoRoot` に指定して読取専用で実行する（worktree 汎用手順の読取専用実行・環境ラベル規定と整合）。
 - worktree 内実行は junction 未伝播により concrete-id 0件の無効実行になり得る。link profile を worktree で実行した
