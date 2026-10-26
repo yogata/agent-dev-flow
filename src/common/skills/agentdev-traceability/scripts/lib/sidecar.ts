@@ -57,8 +57,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 /**
  * sidecar 本文の重複キーを raw parse（行ベースの単純走査）で検出する
- * （REQ-117-006・AG-006 (a)。Bun.YAML の last-wins 解釈による shadow 義務黙失を
- * 機械検出で事前防止する）。保証サブセット内の block style マッピングキー行を
+ * （Bun.YAML の last-wins 解釈による shadow 義務黙失を機械検出で事前防止する）。保証サブセット内の block style マッピングキー行を
  * 対象とし、comment 行・空行は対象外とする。重複キーは Bun.YAML.parse の結果と
  * しては shadow された状態で現れるため、parse 前に本検出を実行して issues として
  * 報告する。

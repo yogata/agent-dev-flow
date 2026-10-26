@@ -74,7 +74,7 @@ docs/knowledge/README.md を変更する Case では、targeted docs guard（doc
 - **実行コマンド**: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_knowledge_docs.ts --root <検査対象 root> --json`（host 起点で起動し、`--root` で検査対象を指定する。check_knowledge_docs.ts は `--root` による worktree 指定に対応する）
 - **判定**: 列挙不整合（README 未記載の知識文書ファイル、実在しないエントリ等）の検出時は修正して再実行し、実行結果を Evidence へ記録する
 
-パス引数の絶対パス構成前置規律（REQ-117-012・AG-012）: checker・機械工程 script のパス引数（--root、gate spec の --input 等の入力パス）の解決基点は checker・script 起動時の作業ディレクトリ（cwd）であり repo root ではない。gate spec のパス引数は絶対パスで構成する標準とし、絶対パスで構成しない場合は gate spec の cwd からの相対解決を意図したパスであることを呼出側が明示的に管理する（repo root 基準の相対パスを渡さない）。gate spec の --input は非空検査のみ・解決基準は呼出側責任の現行 flag 契約を変更しない（規律の明示のみ）。checker 実行記録（検証差分・証跡）には root 等のパス引数の解決先（実測絶対パス）を明記する。恒久契約の正は checker-execution-contracts.md「link profile 実効実行要件」節の一般化規定
+パス引数の絶対パス構成前置規律: checker・機械工程 script のパス引数（--root、gate spec の --input 等の入力パス）の解決基点は checker・script 起動時の作業ディレクトリ（cwd）であり repo root ではない。gate spec のパス引数は絶対パスで構成する標準とし、絶対パスで構成しない場合は gate spec の cwd からの相対解決を意図したパスであることを呼出側が明示的に管理する（repo root 基準の相対パスを渡さない）。gate spec の --input は非空検査のみ・解決基準は呼出側責任の現行 flag 契約を変更しない（規律の明示のみ）。checker 実行記録（検証差分・証跡）には root 等のパス引数の解決先（実測絶対パス）を明記する。恒久契約の正は checker-execution-contracts.md「link profile 実効実行要件」節の一般化規定
 
 #### AUTOGEN 鮮度 gate（境界 close 時の再検査）
 

@@ -13,7 +13,7 @@ scripts/
     └── record-comments.test.ts
 ```
 
-## 機械工程 script の入力検証専用入口仕様（REQ-117-010・AG-010）
+## 機械工程 script の入力検証専用入口仕様
 
 配布 skill の機械工程 script（`agentdev-workflow-case-open` scripts `prepare_definition_pr.ts`、`agentdev-workflow-case-ready` scripts `accept_definition_checks.ts`、`agentdev-workflow-case-close` scripts `close_mechanical_steps.ts`）は、入力検証専用入口（`--validate-input` フラグ）を正規入口として持つ。入口仕様の正規所有は各機械工程 script の script 契約（配布 skill 配下 README）であり、本節は導入時検証（`scripts/install.ps1 -Mode check`）から見た入口の統一契約を記述する（install-script-usability Design「機械工程 script の実行時前提の導入時検証」節の所有関係に従う）。
 
@@ -27,10 +27,10 @@ scripts/
 
 - 入力: argv（記録種別・本文・テンプレートパス等。詳細は `--help` とテスト参照）
 - 出力: stdout に検証結果・構築済みセクション本文
-- 決定的処理: 種別別必須項目検証、進行状況・結果セクション構築と既存本文への適用（applySection は置換・追記両分岐で見出し直前に空行 1 行保証〔REQ-117-013〕）
+- 決定的処理: 種別別必須項目検証、進行状況・結果セクション構築と既存本文への適用（applySection は置換・追記両分岐で見出し直前に空行 1 行保証）
 - テスト: `tests/record-comments.test.ts`（bun test）
 
-## 型検査（REQ-117-007）
+## 型検査
 
 ```bash
 # scripts ディレクトリを cwd として起動

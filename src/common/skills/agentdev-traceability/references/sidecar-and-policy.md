@@ -55,7 +55,7 @@ sidecar へ対応宣言（artifact パス × role × 要件行 ID）を追加す
 - 統合時の component 名整合: 統合により component の命名と内容が乖離した場合、sidecar ファイル名と component キーを一貫して改名して解消する。sidecar は配布対象外（project 側の開発管理成果物）であるため配布互換性の拘束を受けず、恒常的な乖離は残さない
 - checker との関係: 本規則は適用前の予防規則であり、事後検出は既存の `duplicate-inconsistencies` 検出器が維持する。検出器・検査契約は変更しない
 
-### 重複キーの事前統合ルール（REQ-117-006）
+### 重複キーの事前統合ルール
 
 sidecar の YAML を更新する場合は、同一インデントレベルに同一キー（component、role キー、artifact キー）を重複して書かない。既存内容への追記は、該当 role 配下または該当 artifact 配下の既存箇所へ追加統合する方式で行い、同名キーの新規ブロックを末尾へ追記する方式を取らない。
 

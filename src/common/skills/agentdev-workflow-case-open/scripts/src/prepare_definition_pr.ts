@@ -629,7 +629,7 @@ function runSpec(runner: MechanicalRunner, spec: GateCommandSpec): CommandResult
 }
 
 /**
- * 計測日収束補正（REQ-117-011・AG-011）。check_integrity 報告から
+ * 計測日収束補正。check_integrity 報告から
  * req-updated-freshness NG（frontmatter updated が commit author date と不一致の
  * 対象ファイル）と IndexGenerationConsistency（req-metrics 計測日 AUTOGEN の 1 日
  * 遅れ）を検出し、(a) generate_indexes 再実行、(b) frontmatter updated を commit
@@ -703,7 +703,7 @@ export function runMeasurementDateConvergence(
       warnings.push("measurement convergence staging failed");
       return { steps, warnings };
     }
-    const message = `chore(definition): 計測日収束と frontmatter updated 追随の補正（REQ-117-011 機械化 step）`;
+    const message = `chore(definition): 計測日収束と frontmatter updated 追随の補正（measurement-convergence step）`;
     const commit = runner.run({ command: "git", args: ["commit", "-m", message], cwd: worktreeCwd });
     if (commit.exitCode !== 0) {
       steps.push({
@@ -953,7 +953,7 @@ export function runPrepareDefinitionPr(
         },
       });
 
-      // 計測日収束補正（REQ-117-011・AG-011）。check_integrity 報告の計測日不整合
+      // 計測日収束補正。check_integrity 報告の計測日不整合
       // （req-metrics-measurement-example の IndexGenerationConsistency）と
       // req-updated-freshness NG を trigger 条件として検出し、
       // (a) generate_indexes 再実行（req-metrics 計測日 AUTOGEN 更新）と

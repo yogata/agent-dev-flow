@@ -301,9 +301,9 @@ export function applySection(existingBody: string, sectionMarkdown: string): str
   const heading = sectionMarkdown.split("\n", 1)[0]?.replace(/^##\s*/, "").trim() ?? "";
   const lines = existingBody.replace(/\n+$/, "\n").split("\n");
   const headingLine = `## ${heading}`;
-  // 見出し直前の空行 1 行保証（REQ-117-013・AG-013）。置換・追記両分岐の連結前に
+  // 見出し直前の空行 1 行保証。置換・追記両分岐の連結前に
   // before 末尾へ空行 1 行を保証する（sectionMarkdown 側の先頭行見出し抽出契約は
-  // 壊さない）。Root Case #3820 の本文構造崩壊を恒久化する。
+  // 壊さない）。
   const joinWithBlankLine = (before: string): string =>
     before.length === 0 ? before : `${before.replace(/\n+$/, "")}\n\n`;
 
