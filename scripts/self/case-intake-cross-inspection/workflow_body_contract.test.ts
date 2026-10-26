@@ -207,7 +207,8 @@ describe("配布物の具体参照排除（RA-003、TS-004）", () => {
   });
 
   test("エンジン配布ファイルに宣言行以外の具体要件行IDが含まれない", () => {
-    const concreteIdRe = /REQ-\d{3,4}-\d{3}/;
+    // 桁数上限なし受理（受理上限撤廃 Decision）に対応し、任意桁数の具体IDを検出対象とする。
+    const concreteIdRe = /(?<![\w-])REQ-\d+-\d+(?!\d)/;
     for (const file of walkFiles(ENGINE_TREE, [".ts", ".md"])) {
       const content = read(file);
       const nonDeclarationLines = content
