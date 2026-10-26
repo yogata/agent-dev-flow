@@ -64,3 +64,5 @@ source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides�
 | GR-05: supervisor-credential-bridge.md 実測記録埋め込み | 残存 | supervisor-credential-bridge.md:115（docs/knowledge/supervisor-bridge-credential-supply.md 側に同一実測の履歴があり複製に相当。cleanup モデル MOVE/REFERENCE 候補は継続） |
 
 補正（2026-10-07 adversarial-review）: 上記「同一実測の複製に相当」の表現は厳密には不正確の可能性。guide:115 の実測は 2026-09-28 Case #3190 実行時（旧変数名言及 0 件の掃き出し検証）、knowledge 側 :47 の実測は Case #3080 の導入検証であり別 Case・別内容。ただし guide:115 が knowledge 側の履歴実測記録を参照しており両者に履歴実測記述が並存すること、実測記録の guide 埋め込み問題（GR-05 本体）が未解消なことは正確。
+
+- 2026-10-27 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: F-07/F-10/F-11 は再評価条件未発火のため defer 継続（自律確定）: stage 1 診断（20261026T190542Z）の既知項目照合で対象変化の報告なし（F-07 の retired-req-primary-ref 機械検査実装も未発生）

@@ -80,3 +80,5 @@
 ## docs-check route 候補（STEP-3-2）
 
 - RQ-20（retired status 値の混在）: retired/*.md の status 値域チェック（2値許容の明確化後、値域外検出）は docs-check 機械検査候補
+
+- 2026-10-27 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: RQ-20/DS-13/DC-10/RM-01 は再評価条件未充足のため defer 継続（自律確定）: stage 1 診断（20261026T190542Z）の既知項目照合で対象変化の報告なし。DS-13 は IDX-02〔20261019T143944Z〕との同時再評価条件を維持（親子状態表示契約の判断未了・status 遷移なし）、DC-10 は DC-07/DC01 族の同時再評価条件のまま

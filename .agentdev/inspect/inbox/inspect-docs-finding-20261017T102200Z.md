@@ -182,3 +182,5 @@ NG 分類は docs-spec-rebuild-integrity Design の NG 分類表に従う。全�
 - 検査対象ファイルの修正（本 workflow は診断専用）
 - full integrity suite（bun test 全件）の実行（docs-check / QG-4 の責務）
 - GitHub Issue/PR の作成・更新
+
+- 2026-10-27 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: DC01/GR12/RQ16/RQ17/DS36/DS37/DC02/GR13 は defer 継続（自律確定）。発火済み再評価条件の再検討: RQ16〔REQ-110 次回更新時 発火〕は TS-001〜005/TS-010 の test ファイル名直書き6件存続を現物確認（REQ-110.md:64-73、sidecar 正本宣言不変・REQ 側列挙要否の規約確認未了）のため defer 継続。RQ17〔REQ-114 次回更新時 発火〕は REQ-114-010 の行内 Decision 参照が DEC-059 のままで DEC-060/061 参照追記未実施を現物確認（REQ-114.md:25、行内参照必須の明文規約未確認）のため defer 継続。GR12〔同ガイド次回更新時 発火〕は cursor 表現の表層修正のみで対象表（multi-host-operations.md:93「2026-10-02 時点、13件」）が未更新のまま存続を現物確認し、REQ-099-018 組合せ記録確認の前提未了のため defer 継続。増分: 20261026T190542Z IDX-06（DEC-061→DEC-060 行の Map 未掲載・DEC-062 のみ掲載の非対称を実確認）を DC01 へ、IDX-07（REQ-114-010/016 の DEC-061 由来拡大を実確認）を RQ17 へ増分併合し、DC01 族・ID 化不足家族の同時再評価条件に統合。DC02 は DEC-059.md:62 現物確認で変化なし（stage 1 診断報告）、DS36/DS37 は対象条件変化なし、GR13 は DEC-061/062 も同構造で未接続のまま（stage 1 診断報告）

@@ -43,3 +43,5 @@
 
 - 分類確定: **defer**（自律確定）: 「全 Design の status を追跡」宣言と references 親行備考規則の両規則の実在、v4-v5-crosswalk の status: draft を現物確認。ただし「親の status 列が子も含む」運用なら問題不成立の可能性が残り（診断の自己申告不確実性どおり）、表示契約の正とする解釈が未確定のため採否を保留。既知 defer DS-13（20260927、Design 索引の references/ 規則と独立行の不整合）と同一索引規則領域のため、DS-13 側（20260927T135638Z）へ同時再評価の相互注記を追記済み。Jev 先行評価（観測 20261019T150102Z-f15b、defer 1.0）と LLM 最終判断一致
 - 再評価条件: Design 索引の親子状態表示契約（親 status 列の包含範囲）が判断される時（DS-13〔20260927〕の再評価条件「Design 索引規則の経過措置判断の機会」と同時）、または references 配下 Design の status が accepted へ遷移して可視性の実害が顕在化する時
+
+- 2026-10-27 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: IDX-02 は defer 継続（自律確定）: 再評価条件（親子状態表示契約の判断〔DS-13 同時〕、references 配下 Design の status 遷移による実害顕在化）はいずれも未発火。stage 1 診断（20261026T190542Z）の既知項目照合で対象変化の報告なし

@@ -236,3 +236,5 @@ docs-check ルール候補:
 - Issue/PR 作成、Intake/Learning/RU 処理。
 - 無効な check_extensions 実行の修復そのもの。再実行は検査手順の route 候補として記録。
 - 機械検査の再実装、または担当間で窓・深度を完全一致させた全面再診断。
+
+- 2026-10-27 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: RQ03/RQ07・DS02〜DS05・GR04/GR05/GR06・MECH01 は再評価条件未充足のため defer 継続（自律確定）: stage 1 診断（20261026T190542Z）の既知項目照合で対象変化の報告なし（GR06 は DC01 族〔IDX-06 増分を併合済み〕の同時再評価条件のまま、MECH01 の実行契約恒久化〔learning 送付候補〕は未実施のまま）

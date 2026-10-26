@@ -125,3 +125,5 @@ NG 分類: false positive / pre-existing / 今回修正対象（docs-spec-rebuil
 | GR-05: supervisor-credential-bridge.md:115 実測記録埋め込み | 変化なし（defer 維持） | 実測記録本文は残留（節再構成ありだが本質不変）。MOVE/REFERENCE 候補の性質不変 |
 
 2026-10-17 実施（backlog-auto stage 2 inspect 系統、--auto なし）相互注記: 20261017T102200Z GR12（multi-host-operations.md:93-109 の「全公開 command の対応表（2026-10-02 時点、13件）」が root README 18コマンドに対して stale。medium）は F-25 と同一対象表のため、次回再評価時に併せて判定すること。再評価条件: phase 系5コマンドの Senpi 探索接続での解決可否〔REQ-099-018 組合せ記録〕の確認、または同ガイド次回更新時。GR12 側の表更新採否は当該確認を前提に判断する
+
+- 2026-10-27 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: F-07〔REQ-030-024〕/F-12/F-14/F-15/F-21/F-23/F-24/F-25 は再評価条件未充足のため defer 継続（自律確定）: stage 1 診断（20261026T190542Z）の既知項目照合で対象変化の報告なし。F-25 の同時再評価相手 GR12 は再評価条件「同ガイド次回更新時」が発火したが対象表（:93「2026-10-02 時点、13件」）が未更新のまま存続を現物確認（REQ-099-018 組合せ記録確認の前提は未了のため GR12 も defer 継続）

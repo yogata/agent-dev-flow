@@ -219,3 +219,5 @@ REQ の6観点（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）を fan-in で確認�
 - DEC-058.md:32 の Context 節「v4-v5 crosswalk は REQ-005-001/010/011 を優先棚卸し行（処遇 defer）として記録している」は決定時点のスナップショットであり、現行 crosswalk は同3行を redefine で記録済み。履歴記述として成立するが初読時に矛盾と誤読し得る（Design 担当 FD09 から参考送り）。
 - `.agentdev/README.md` の phase 行「操作の実装は後続 Wave で導入」は実装追加（2026-10-13）後は陳腐化する（DS11 の附随観察）。
 - v4-standard-lifecycle の Wave 語彙（:24,73、既知 DS06/GR01 対象）は今回 delta で不変。
+
+- 2026-10-27 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: RQ08〜RQ14・DS10/DS14/DS16・GR07/GR09 は再評価条件未充足のため defer 継続（自律確定）: stage 1 診断（20261026T190542Z）の既知項目照合で対象変化の報告なし（RQ08 の移行確定条件〔crosswalk executed〕も未発火のまま）

@@ -149,3 +149,5 @@
 - **recommended_route**: intake
 - **ng_classification**: pre-existing
 - **notes**: 要約許容範囲かは F-25（command-selection.md、defer 継続中）と同様の判断余地
+
+- 2026-10-27 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: RQ-04/RQ-08/RQ-09/RQ-13/RQ-16/DS-03/DC-02/DC-04/DC-06/DC-07/GD-02/GD-03 は再評価条件未充足のため defer 継続（自律確定）: stage 1 診断（20261026T190542Z）の既知項目照合で対象変化の報告なし（DC-02 は DEC-059.md:62 現物確認で変化なし。DC-07 は DC01 族の同時再評価条件のまま）

@@ -117,3 +117,5 @@
 - 2026-10-15 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: F-04/GUIDE-6 は新情報なく defer 継続（自律確定）: REQ-038.md と artifacts-and-state.md は delta 窓（2026-10-12 以降）で対象行不変（artifacts-and-state.md の対象節は d89506c8 で変更されたが 2026-10-13 再評価時に確認済みで以後不変）。再評価条件に変化なし
 - 2026-10-16 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: F-04/GUIDE-6 は新情報なく defer 継続（自律確定）: 38bc58c7..636b1e2b の delta に REQ-038.md・artifacts-and-state.md は含まれず対象行不変。再評価条件に変化なし。Jev 先行評価（観測 20261016T041350Z-3c9e）＋ adversarial-review 2 stream 収束済み
 - 2026-10-19 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: F-04/GUIDE-6 は新情報なく defer 継続（自律確定）: REQ-038-006（REQ-038.md:24、2フェーズ読込要件行は行番号ずれあり本文不変）と artifacts-and-state.md 状態モデル制約節（:144「全体横断の状態遷移モデルを持たない」・:155「frontmatter や status フィールドによる状態管理は行わず」）の対象記述存続を現物 grep で確認。再評価条件に変化なし
+
+- 2026-10-27 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: F-04/GUIDE-6 は新情報なく defer 継続（自律確定）: stage 1 診断（20261026T190542Z、差分範囲 abe519fc7..a7a0cdb84）の既知項目照合で対象領域の変化報告なし。再評価条件に変化なし（GUIDE-6 は GD-02〔20260926〕との同時再評価条件を維持）

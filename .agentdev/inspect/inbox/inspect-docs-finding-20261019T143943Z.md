@@ -63,3 +63,5 @@
 
 - 分類確定: **defer**（自律確定）: docs/README.md の DEC-059 行に部分置換注記がない事実は現物確認済み（DEC-059 frontmatter は supersede_note あり・superseded_by なし、DEC-060 側 supersedes 宣言あり、生成器は superseded_by のみ参照）だが、部分置換時に前提側へ superseded_by を置くことを必須とする規範は明文化されておらず、修正経路（frontmatter 追加 vs 生成器が supersede_note／後継側 supersedes を参照する拡張）と正とする情報源が未確定。既知 defer DC01（decisions/README.md Decision Map）・DC-07・DC-10 と同一テーマ族（掲載基準・記録方式が慣行ベースで契約上明文化されず、欠落＝違反と確定できない）であり、処分一貫性から defer とする。Jev 先行評価（観測 20261019T150102Z-f15b、defer 0.94）を受けて暫定 promote から defer へ変更（LLM 最終判断。DC01 族前例との処分一貫性を評価器指摘の規範未文書化論拠と併せて採用）。DC01 側（20261017T102200Z）へ同時再評価の相互注記を追記済み
 - 再評価条件: Decision Map・docs/README Decision 索引の掲載基準が明文化される時（DC01 族の同時再評価時）、または部分置換メタデータ運用（superseded_by の要否）の判断が確定する時。docs-check 候補（後継側部分置換関係・前身側注記・索引生成入力の不一致検出）は DC01 由来候補と併せて backlog-review 経由で検討
+
+- 2026-10-27 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: IDX-01 は defer 継続（自律確定）: docs/README.md Decision 表の DEC-060 行に部分置換注記がない状態を現物確認（同表 DEC-028/033/034 等は注記付きのまま）。増分: 20261026T190542Z IDX-05（DEC-060 行も同型の注記欠落。DEC-061 受理 2026-10-20 で影響2行目）を増分併合。再評価条件は変化なし（Decision 索引掲載基準の明文化時〔DC01 族同時〕または部分置換メタデータ運用の確定時）

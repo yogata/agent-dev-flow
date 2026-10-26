@@ -10,32 +10,6 @@
 
 ## 検出事項リスト
 
-### IDX-03: REQ-108 要件表が空行で分断され、REQ-108-014..024 がヘッダなし表行として解釈される
-
-- id: IDX-03
-- category: REQ 構造整合性（Markdown 表分断）
-- target: `docs/requirements/REQ-108.md:30`（空行）、`:31-41`（REQ-108-014..024）
-- evidence: `REQ-108.md:29`（REQ-108-013 = 旧最終行）→ `:30`（空行）→ `:31`（REQ-108-014 開始。`| ID | 要件 |` ヘッダと `|---|` 区切り行を持たない表行の連続）。GFM では空行で表が終了し、区切り行のない後続 `|` 行は表として解釈されないため、11行が本文テキスト扱いになる。PR #3848（c60f7d716）で旧最終行の終端空行の後に新規行を挿入した構造由来
-- severity: medium
-- confidence: high
-- source_of_truth: REQ-001（文書体系）・文書フォーマット規約（patterns.md）の要件表書式
-- recommended_route: inspect-promote による分類後、intake 経由で `:30` の空行削除による表統合（1行削除の小修正）
-- ng_classification: pre-existing（今回診断時点の main 既存。delta 窓内 2026-10-16 #3848 で混入）
-- notes: REQ-108-014..024 は重要変更通知要件（#3847〜#3849 実装）の正本行であり、表として読めない状態は要件行の機械抽出・閲覧の両面で阻害要因。意図的な視覚的分離の可能性は低い（013 と 014 に主題断絶なし）
-
-### IDX-04: コード囲み認識規則の段落に inline ``` が3箇所（奇数）で壊れたコードスパン。check_content_corruption exit 1・docs-check gate fail 状態
-
-- id: IDX-04
-- category: 配布物整合性検査（壊れたコードスパン、REQ-053-008）
-- target: `docs/designs/skills/agentdev-design-file-manager.md:75`、`src/common/skills/agentdev-design-file-manager/references/target-area-matching.md:33`
-- evidence: 両ファイルの同一段落「見出しの走査と…行頭（字下げなし）の ``` で開始する…行頭の ``` のみを条件とし…閉じの ``` がない場合は…」に inline ``` ラン3箇所（奇数）。CommonMark では1つ目と2つ目が対になって中間文がコードスパンに飲み込まれ、3つ目が未対応のリテラルとして残る。check_content_corruption 実測: 428ファイル走査・違反2件・exit 1（REQ-053-008 準拠、2026-10-26T19:0x JST 実行）。配布物側（src/common → .opencode 投影）は REQ-053-008「配布物は…壊れたコードスパンを含まない」への直接違反。PR #3821（78041ccf4、2026-10-20）で混入し、2026-10-17 検査時は全違反 0 だった
-- severity: medium（docs-check gate を fail させる現行状態＋配布物への REQ-053-008 直接違反。ただし文意は保持され是正は機械的）
-- confidence: high（機械検査 exit 1 の実測・違反2ファイル特定済み）
-- source_of_truth: REQ-053-008（配布物の構造健全性）と content-corruption-checker Design の検出契約（段落内 backtick ラン奇数）
-- recommended_route: inspect-promote による分類後、是正 Case（fence マーカーの表現を ```` ``` ```` 等の4バッククォート囲みへ変更する表現修正、または ALLOWED_USAGE 登録のいずれかを判断）。同規則の同一内容維持は REQ-004-066..068 が要求するため、修正時は9箇所の複製（Design 3・配布 reference 2・script JSDoc 3・REQ 行）の整合を含む
-- ng_classification: pre-existing（delta 窓内 2026-10-20 #3821 で混入した回帰）
-- notes: 2ラン（偶数）の複製3箇所（numbering-policy.md:77、req-define.md:147、draft-generation.md:73）は検査契約上合格だが、同様に中間文がコードスパン化する表示になり得る。表現統一の際に併せて検討する価値がある
-
 ### IDX-05: DEC-060 の部分置換注記も docs/README・decisions/README に表示されない（既知 IDX-01 の同型2件目）
 
 - id: IDX-05
@@ -75,32 +49,6 @@
 - ng_classification: pre-existing（delta 窓内 2026-10-20 f3c082398 で拡大）
 - notes: 行内 Decision 参照必須の明文規約は未確認（既知 RQ17 の不確実性を引継）
 
-### IDX-08: REQ-060 本文の旧用語残存（frontmatter title と本文の用語非整合）
-
-- id: IDX-08
-- category: DRIFT（用語現行化の部分反映）
-- target: `docs/requirements/REQ-060.md:10`
-- evidence: `REQ-060.md:3` の title は「リポジトリルートを cwd にして実行・`./` 付きパス指定」に現行化済み（README 表 `docs/requirements/README.md:58` も追随済み）だが、`:10` の目的節本文は「repo root 起 cwd + `./` 付き相対パス指定」の旧用語のまま。knowledge 2件（`docs/knowledge/bun-test-execution-form-drift-signals.md:19`、`windows-bun-test-spawn-timeout-classification.md:28`）も旧用語を記述
-- severity: low
-- confidence: high
-- source_of_truth: REQ-094（ADF の Markdown 日本語表現および用語選択基準）の現行化方向
-- recommended_route: inspect-promote による分類後、intake（REQ-060.md:10 の用語現行化の小修正。knowledge 側を含めるかは採否判断）
-- ng_classification: pre-existing
-- notes: なし
-
-### IDX-09: REQ-010 の要件行並び順乱れ（REQ-010-080 の誤位置）
-
-- id: IDX-09
-- category: REQ 構造整合性（行順序）
-- target: `docs/requirements/REQ-010.md:44`
-- evidence: 表行の出現順が 070（:43）→ 080（:44）→ 071（:45）→ … → 079（:53）→ 081（:54）。正しくは 070 → 071..079 → 080 → 081。番号の欠番は規約対象外だが、出現順序の逆転は連番検査・diff 突合の妨げになる構造乱れ
-- severity: low
-- confidence: high
-- source_of_truth: 要件表の連番整列は REQ ファイル書式の前提（patterns.md）
-- recommended_route: inspect-promote による分類後、intake（REQ-010-080 行の移動。1行の並べ替え）
-- ng_classification: pre-existing
-- notes: なし
-
 ### IDX-10: REQ-116-002 の「RA-005 判断」参照が一意解決不能・衝突
 
 - id: IDX-10
@@ -126,19 +74,6 @@
 - recommended_route: inspect-promote による分類後、対象集合の恒常解決先（traceability yaml 宣言先）への参照統一候補
 - ng_classification: pre-existing
 - notes: 「工程系コマンドおよびワークフロースキル」という行内記述で実質特定可能なため解決不能とは言えない
-
-### IDX-12: numbering-policy の DEC-062 参照が ID なしタイトル引用
-
-- id: IDX-12
-- category: 第一参照導線（Decision 参照の ID 化不足）
-- target: `docs/designs/foundations/numbering-policy.md:34`
-- evidence: 「（「要件ID桁数の受理上限撤廃と表示ゼロ埋め・受理検証の分離」Decision 参照）」— DEC-062 の内容反映自体は完了（:32-33、DEC-062.md:4 accepted・題名一致確認済み）だが、参照が ID ではなくタイトル文字列のみで機械解決不能
-- severity: low
-- confidence: high
-- source_of_truth: DEC-062（accepted）
-- recommended_route: inspect-promote による分類後、intake（「Decision `DEC-062`」への ID 化の小修正）
-- ng_classification: pre-existing（delta 窓内 68f5492ad #3865 で新設された行）
-- notes: なし
 
 ### IDX-13: IR-069 detection_method の `REQ-{NNN}.md` 表記と「桁数上限なし」の整合
 
@@ -250,3 +185,10 @@
 - docs/src の修正、既存 finding の変更、採否判断、Issue/PR 操作、Git 永続化（STEP-4 で実施）
 - intake/learning/RU の処理、Jev 観測の変更、end-to-end 状態の変更
 - 全テスト、型検査、Senpi 実機検証
+
+## 処理記録（2026-10-27 inspect-promote、backlog-auto stage 2 inspect 系統、--auto なし）
+
+- promote 5件（IDX-03・IDX-04・IDX-08・IDX-09・IDX-12。全件自律確定、HITL 対象なし・破壊的変更なし）→ `.agentdev/inspect/promoted/finding-20261027-docs-mechanical-fixes.md` へ原状保存・本ファイルから削除。根拠: いずれも明確な不整合（機械検査 exit 1 の現行違反〔IDX-04〕、GFM 表分断〔IDX-03〕、title・README 現行化済みに対する本文旧用語残存〔IDX-08〕、行順序逆転〔IDX-09〕、Decision 参照の ID 化漏れ〔IDX-12〕）で正規情報源特定済み・修正対象行一意。IDX-04 の是正方向（表現修正 vs ALLOWED_USAGE 登録）と IDX-08 の knowledge 側包含は未決の実装判断として promoted 成果物側に記載
+- defer 10件（本ファイルに残置）: IDX-05〔既知 IDX-01（20261019T143943Z）への増分併合・同時再評価〕、IDX-06〔既知 DC01（20261017T102200Z）への増分併合・同時再評価〕、IDX-07〔既知 RQ17（20261017T102200Z）への増分併合。再評価条件「REQ-114 次回更新時」発火済みだが行内 Decision 参照必須の明文規約が未確認のため指摘適否未確定〕、IDX-10〔参照先置換の正本未確定・RA-005 現物確認不能〕、IDX-11〔恒常解決先への参照統一候補で修正方向未確定〕、IDX-13〔confidence low・{NNN} 汎用プレースホルダー読み成立のため観察〕、IDX-14〔被覆契約が節紐付け必須かファイル単位所有宣言かの明文規約未確認〕、IDX-15〔語彙レジストリ適用対象に guides/README.md が含まれるか未確認〕、IDX-16〔参照表記正規化・検査除外規則・NG baseline 登録のいずれかの判断が未確定。check_integrity 稼働 NG 6件の構成要素〕、IDX-17〔観察メモ寄り〕。reject 0件
+- 再評価条件（defer 分）: IDX-05 は IDX-01 と同一（Decision 索引掲載基準明文化時〔DC01 族同時〕または部分置換メタデータ運用確定時）、IDX-06 は DC01 族の同時再評価時、IDX-07 は RQ17 家族（RQ03/RQ10/RQ11）の同時再評価時、IDX-10 は REQ-116 次回更新時または RA 台帳側の参照解決先整備時、IDX-11 は REQ-110 次回更新時、IDX-13 は IR-069 次回更新時または4桁現行帯 REQ 出現時、IDX-14 は ADF-COVERS 被覆契約の明文化時、IDX-15 は語彙レジストリ適用範囲の確認時、IDX-16 は check_integrity reference-path-existence の cross-skill 参照取扱い確定時、IDX-17 は REQ-110 適用範囲節の整理時
+- 分類は in-context 審議（legacy LLM パス）で全件自律確定。Jev 先行評価は本 run の git 永続化スコープ制約により不使用。STEP-5 adversarial-review は監査後の条件付き化発動条件（手動分類対象が存在し本質的争点が残る）を満たさないため生成せず（観測なし=契約どおり）
