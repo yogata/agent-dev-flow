@@ -45,7 +45,9 @@ describe("runValidateInputOnly (REQ-009-053 verification-only entry)", () => {
     const traceKey = Object.keys(fixture).find((k) => k.toLowerCase().includes("traceability")) ?? "traceabilityGate";
     const trace = fixture[traceKey] as { args: string[] };
     const broken = JSON.parse(JSON.stringify(fixture)) as Record<string, unknown>;
-    (broken[traceKey] as { args: string[] }).args = [...trace.args.slice(0, -1), "--req", "REQ-1-1"];
+    // --req の値は末尾1件を不正値へ置換する（--req の重複を作らない）。
+    // 空セグメント（REQ-1-）は桁数上限なしの許容書式でも不正値。
+    (broken[traceKey] as { args: string[] }).args = [...trace.args.slice(0, -1), "REQ-1-"];
     expect(() => runValidateInputOnly(broken as never, () => true)).toThrow(/--req/);
   });
 });

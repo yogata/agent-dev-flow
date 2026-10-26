@@ -40,9 +40,9 @@ import {
   type ConditionPopulation,
   type ConditionVerdict,
   type CrossObligation,
-  type FinalAcceptanceResult,
   type SubjectKind,
 } from "./final-acceptance.ts";
+import { REQ_ROW_ID_LIST_PATTERN } from "../../../agentdev-workflow-case-open/scripts/lib/definition-traceability-gate.ts";
 
 const USAGE = `usage: bun ./src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts --input <input.json> [--validate-input]
   --input           機械工程入力 JSON（phase、worktree_root、PR番号、品質ゲート実行仕様等）
@@ -274,7 +274,7 @@ export interface KnownArgContract {
 }
 
 export const KNOWN_GATE_ARG_CONTRACTS: readonly KnownArgContract[] = [
-  { flag: "--req", pattern: /^(REQ-\d{3,4}-\d{3})(,REQ-\d{3,4}-\d{3})*$/ },
+  { flag: "--req", pattern: REQ_ROW_ID_LIST_PATTERN },
   { flag: "--profile", values: ["source", "link"] },
   { flag: "--fail-level", values: ["strict", "warning"] },
   { flag: "--workflow", pattern: /^[a-z][a-z0-9-]*$/ },

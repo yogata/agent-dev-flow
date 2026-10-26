@@ -21,7 +21,7 @@ import {
   type IntegrityMachineAcceptanceRecord,
   type MechanicalRunner,
 } from "../src/close_mechanical_steps";
-import type { ConditionVerdict } from "../src/final-acceptance";
+import type { ConditionPopulation, ConditionVerdict } from "../src/final-acceptance";
 
 function findRepoRoot(start: string): string {
   let dir = path.resolve(start);
@@ -940,11 +940,12 @@ describe("pre-merge 機械工程の実行（品質ゲート省略なし・報告
 
   test("既知ゲート契約（--req の許容書式）と同一前提の入力検証で不正値を検査開始前に拒否する", () => {
     const runner = fakeRunner({ issueBody: "- [x] A\n" });
+    // 空セグメント（REQ-1024-）は桁数上限なしの許容書式でも不正値。
     const broken = preMergeInput({
       traceabilityGate: {
         name: "traceability-check",
         command: "bun",
-        args: ["./checker.ts", "traceability-check", "--req", "REQ-1024-1"],
+        args: ["./checker.ts", "traceability-check", "--req", "REQ-1024-"],
         cwd: "<repo>/.worktrees/100-case",
       },
     });
@@ -1150,7 +1151,7 @@ describe("受入評価の実経路接続（final-acceptance-evaluation step と�
     const evaluation = report.diff.acceptanceEvaluation as {
       determined: boolean;
       closeAllowed: boolean;
-      population: { contractConditionCount: number; contractRequiredCount: number };
+      population: ConditionPopulation;
       blockingUnmet: string[];
     };
     expect(evaluation.determined).toBe(true);
