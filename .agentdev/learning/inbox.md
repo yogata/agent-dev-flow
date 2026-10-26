@@ -718,3 +718,20 @@
 - **関連**: Case #3862 実行記録・docs/knowledge/supervisor-bridge-credential-supply.md・agentdev-gh runner-cli.ts failFromExec
 - **タグ**: #agentdev_gh #gh #windows #bun #spawnSync #環境障害 #再開
 
+## Windows 環境で git worktree remove が Filename too long で失敗した場合の回復手順（bash rm -rf → prune）
+
+- **問題事象**: case-close STEP-6-1 の git worktree remove が node_modules 配下の深いパスを原因に Filename too long で失敗した（.worktrees/3862-review・.worktrees/3862-fix の両方。--force 不使用運用のまま）
+- **発生局面**: Case #3862 case-close STEP-6-1（worktree・ブランチ削除。2026-10-27）
+- **検知方法**: git worktree remove の error: failed to delete ... Filename too long 出力
+- **根本原因**: Windows の MAX_PATH 制約（260 文字超の深い node_modules パス）により git の削除処理が失敗する。worktree 自体の管理情報（.git/worktrees）は無傷
+- **自律対応内容**: bash の rm -rf で worktree ディレクトリ内容を除去（MSYS パス処理で長いパスも削除可能）した後、git worktree remove（not a working tree で終端済み確認）と git worktree prune で管理情報を掃除し、git branch -D でローカルブランチを削除した。git status・worktree list で main worktree の健全性を確認済み
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（agentdev-git-worktree の worktree 削除手順への運用上の補足知識。fail-closed 挙動は変更なし）
+- **横展開観点**: bun install を実行した worktree の cleanup で同一失敗が再現し得る。Permission denied との区別（本件は長いパスが原因で、rm -rf による先掃除が有効）
+- **再発条件**: Windows 環境で node_modules を含む worktree を git worktree remove する場合
+- **予防策候補**: worktree remove 失敗時に Filename too long かどうかを出力で判別し、該当時のみ bash rm -rf → remove/prune の手順へ接続する（agentdev-git-worktree references への反映候補）
+- **想定反映先**: learning-promote による評価・昇華
+- **関連**: Case #3862 工程記録コメント 6419460990・agentdev-git-worktree worktree-operations.md
+- **タグ**: #git #worktree #windows #cleanup #長いパス
+
+---
