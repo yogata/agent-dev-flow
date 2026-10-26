@@ -37,4 +37,4 @@ scripts/
 bun run typecheck
 ```
 
-case-run scripts 配下（record-comments.ts・tests を含む）は tsconfig.json の型検査対象であり、integrity suite 経由の typecheck gate テスト（`repo-agentdev-integrity` scripts の `case_run_scripts_typecheck.test.ts`）から品質検査経路へ組み込まれる。
+case-run scripts 配下（record-comments.ts・tests を含む）は tsconfig.json の型検査対象であり、integrity suite 経由の typecheck gate テストから品質検査経路へ組み込まれる。
