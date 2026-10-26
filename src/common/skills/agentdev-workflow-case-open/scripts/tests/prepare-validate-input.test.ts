@@ -1,7 +1,7 @@
 // runValidateInputOnly（--validate-input 検証専用経路）の単体検証。
 // 入力検証・gate 引数契約検査・ゲート実行体存在確認のみで ok を返し、副作用を持たない。
 import { describe, expect, test } from "bun:test";
-import { runValidateInputOnly } from "../src/prepare_definition_pr.ts";
+import { runValidateInputOnly, type PrepareDefinitionPrInput } from "../src/prepare_definition_pr.ts";
 
 const cwd = process.cwd().replaceAll("\\", "/");
 const gateScript = import.meta.dir + "/../package.json";
@@ -10,7 +10,7 @@ function mk(name: string, args: string[]) {
   return { name, command: "bun", args, cwd };
 }
 
-function consumerFixture() {
+function consumerFixture(): PrepareDefinitionPrInput {
   return {
     repoRoot: cwd,
     worktreeRoot: ".worktrees/x",
@@ -25,7 +25,7 @@ function consumerFixture() {
     generateIndexesGate: mk("generate_indexes", [gateScript]),
     checkIntegrityGate: mk("check_integrity", [gateScript, "--profile", "source"]),
     traceabilityGate: mk("traceability-check", [gateScript, "--root", cwd, "--req", "REQ-" + "001-001"]),
-  } as never;
+  };
 }
 
 describe("runValidateInputOnly (verification-only entry)", () => {
@@ -47,11 +47,12 @@ describe("runValidateInputOnly (verification-only entry)", () => {
   });
 
   test("rejects an invalid gate flag contract before availability checks (fail-closed)", () => {
-    const fixture = consumerFixture() as unknown as Record<string, unknown>;
-    const broken = JSON.parse(JSON.stringify(fixture)) as Record<string, unknown>;
-    (broken.traceabilityGate as { args: string[] }).args = [
+    // 正常 fixture から --req 値のみを不正値（空セグメント）へ置換した不正入力を注入する
+    // （意図的な契約違反注入のため、入力型への再適合はさせない）。
+    const broken = structuredClone(consumerFixture()) as PrepareDefinitionPrInput;
+    broken.traceabilityGate!.args = [
       gateScript, "--root", cwd, "--req", "REQ-" + "1-",
     ];
-    expect(() => runValidateInputOnly(broken as never, () => true)).toThrow(/--req/);
+    expect(() => runValidateInputOnly(broken, () => true)).toThrow(/--req/);
   });
 });
