@@ -22,3 +22,5 @@ AGENTS.md
 outputs/
 dist/
 node_modules/
+# agentdev-gh テスト実行残骸の非追跡領域宣言（REQ-117-004・防御的 cleanup 前置）
+src/common/tools/agentdev-gh/tests/tmp-runner-cli-*
