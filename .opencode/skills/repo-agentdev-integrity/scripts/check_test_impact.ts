@@ -274,10 +274,13 @@ function classifySpecChanges(
     // 伝播対象 ID は「ファイル自身の ID」のみ。
     // REQ/ADR ファイル名由来の ID のみを採用し、Design 本文の ADR/REQ 言及は伝播させない
     // （Design が ADR-001 を言及しても ADR-001 変更ではなく、過検出になるため）。
+    // REQ ファイル名の抽出は桁数上限なし（受理上限撤廃 Decision）。固定幅だと
+    // 増桁した REQ ファイル名から接頭部の部分一致抽出が起きるため、
+    // basename 全体を照合する。
     const reqIds: string[] = [];
     const adrIds: string[] = [];
-    const reqFileMatch = rel.match(/REQ-(\d{3})/);
-    if (reqFileMatch) reqIds.push(`REQ-${reqFileMatch[1]}`);
+    const reqFileMatch = path.basename(rel).match(/^REQ-(\d+)\.md$/);
+    if (reqFileMatch && reqFileMatch[1] !== undefined) reqIds.push(`REQ-${reqFileMatch[1]}`);
     const adrFileMatch = rel.match(/ADR-(\d{3})/);
     if (adrFileMatch) adrIds.push(`ADR-${adrFileMatch[1]}`);
     result.push({

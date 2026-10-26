@@ -260,6 +260,48 @@ describe("check_test_impact.ts stale candidate detection (TS-004)", () => {
     execSync(`git branch -q -D ${branch}`, { cwd: TEMP_ROOT });
   });
 
+  it("propagates the full REQ file id without truncating increased-width ids", () => {
+    const branch = "test-req-id-increased-width";
+    execSync(`git checkout -q main`, { cwd: TEMP_ROOT });
+    // 5桁REQ部の REQ ファイルとその ID を参照するテストを用意する。
+    // basename 由来の伝播 ID が接頭部部分一致（REQ-123）ではなく全体（REQ-12345）
+    // のときのみ参照ヒットすることを、REQ-12345 参照テストの stale 検出で確認する。
+    writeFile(
+      "docs/requirements/REQ-12345.md",
+      "---\nid: REQ-12345\n---\n# Increased width REQ\n",
+    );
+    writeFile(
+      "src/scripts/req12345.test.ts",
+      [
+        "// REQ-12345 を参照する regression test",
+        'import { describe, it, expect } from "bun:test";',
+        'describe("req12345", () => { it("ok", () => {}); });',
+        "",
+      ].join("\n"),
+    );
+    commitAll("add REQ-12345 and its test on main");
+    execSync(`git checkout -q -b ${branch}`, { cwd: TEMP_ROOT });
+    writeFile(
+      "docs/requirements/REQ-12345.md",
+      "---\nid: REQ-12345\nupdated: 2026-10-26\n---\n# Increased width REQ (revised)\n",
+    );
+    commitAll("revise REQ-12345 only");
+
+    const r = runScript(TEMP_ROOT, ["--base-ref", "main", "--json"]);
+    expect(r.exitCode).toBe(0);
+    const report = JSON.parse(r.stdout);
+    expect(report.spec_changes).toContain("docs/requirements/REQ-12345.md");
+    const stale = report.stale_candidates.find(
+      (f: any) => f.test_path === "src/scripts/req12345.test.ts",
+    );
+    expect(stale).toBeDefined();
+    expect(stale.reference_kind).toBe("req-id");
+    expect(stale.spec_path).toBe("docs/requirements/REQ-12345.md");
+
+    execSync(`git checkout -q main`, { cwd: TEMP_ROOT });
+    execSync(`git branch -q -D ${branch}`, { cwd: TEMP_ROOT });
+  });
+
   it("emits silent-pass warning when Design changes but no test references found", () => {
     const branch = "test-silent-pass";
     execSync(`git checkout -q -b ${branch}`, { cwd: TEMP_ROOT });
