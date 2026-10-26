@@ -844,18 +844,22 @@ $MechanicalStepProbeTimeoutMs = 60000
 function Assert-MechanicalProbeContainedPath {
     param([string]$Path, [string]$Root)
     $full = [System.IO.Path]::GetFullPath($Path)
-    $rootPrefix = [System.IO.Path]::GetFullPath($Root).TrimEnd('\', '/') + [System.IO.Path]::DirectorySeparatorChar
+    $rootFull = [System.IO.Path]::GetFullPath($Root).TrimEnd('\', '/')
+    $rootPrefix = $rootFull + [System.IO.Path]::DirectorySeparatorChar
     if (-not $full.StartsWith($rootPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
         throw "Mechanical-step probe path is outside the workspace: $Path"
     }
+    # 封じ込め検査は probe path から workspace root の直下まで。root 自体とその上位は
+    # consumer 環境の正当な配置（OneDrive、symlinked home 等）であり、probe の書込み
+    # 閉包の外として検査しない（恒常的な誤 divergence の防止）。
     $current = $full
-    while ($current) {
+    while ($current -and $current.Length -gt $rootFull.Length) {
         $item = if (Test-Path -LiteralPath $current -ErrorAction Stop) { Get-Item -LiteralPath $current -Force -ErrorAction Stop } else { $null }
         if ($null -ne $item -and ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint)) {
             throw "Mechanical-step probe ancestor is a junction/reparse point: $current"
         }
         $parent = Split-Path -Path $current -Parent
-        if ($parent -eq $current) { break }
+        if (-not $parent -or $parent -eq $current -or $parent.Length -le $rootFull.Length) { break }
         $current = $parent
     }
 }
