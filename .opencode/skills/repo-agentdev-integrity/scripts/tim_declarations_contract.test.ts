@@ -170,14 +170,17 @@ function corpusFiles(): string[] {
 }
 
 function currentRequirementLineIds(): string[] {
+  // 実 corpus の列挙（producer 側 requirements.ts の currentRequirementLineIds と同一の
+  // 受理意味論。桁数上限なし）。増桁 corpus でも対決対象の要件行集合が欠けないため、
+  // 3桁固定の列挙は使わない。
   const reqDir = join(REPO_ROOT, "docs", "requirements");
   const ids: string[] = [];
   for (const name of readdirSync(reqDir)) {
-    if (!/^REQ-\d{3}\.md$/.test(name)) continue;
+    if (!/^REQ-\d+\.md$/.test(name)) continue;
     const content = readFileSync(join(reqDir, name), "utf-8");
     for (const raw of content.split("\n")) {
-      const m = raw.match(/^\|\s*(REQ-\d{3}-\d{3})\s*\|/);
-      if (m) ids.push(m[1]);
+      const m = raw.match(/^\|\s*(REQ-\d+-\d+)\s*\|/);
+      if (m && m[1] !== undefined) ids.push(m[1]);
     }
   }
   return ids;
