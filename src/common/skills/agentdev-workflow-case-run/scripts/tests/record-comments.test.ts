@@ -459,6 +459,38 @@ describe("本文進行状況・結果セクションの構築と適用", () => {
     expect(next.trimEnd().endsWith("- 終了日時: N/A")).toBe(true);
   });
 
+  test("applySection は置換・追記両分岐で見出し直前に空行 1 行を保証する（REQ-117-013 回帰）", () => {
+    const section = buildProgressSection({
+      canonicalState: "running",
+      startDate: "2026-10-04 05:25 JST",
+      endDate: "N/A",
+    });
+    // 置換分岐: 既存本文が before 末尾に空行を持たない形（Root Case #3820 発生形）
+    const existingReplace = [
+      "# Issue",
+      "",
+      "## 目的",
+      "",
+      "内容",
+      "## 進行状況",
+      "",
+      "- 正規状態: open",
+      "",
+      "## 結果",
+    ].join("\n");
+    const replaced = applySection(existingReplace, section);
+    const linesReplaced = replaced.split("\n");
+    const idxProgressReplaced = linesReplaced.indexOf("## 進行状況");
+    expect(linesReplaced[idxProgressReplaced - 1]).toBe("");
+
+    // 追記分岐: before 末尾が空行なし（既存本文末尾に直結する形）
+    const existingAppend = ["# Issue", "", "## 目的", "", "内容"].join("\n");
+    const appended = applySection(existingAppend, section);
+    const linesAppended = appended.split("\n");
+    const idxProgressAppended = linesAppended.indexOf("## 進行状況");
+    expect(linesAppended[idxProgressAppended - 1]).toBe("");
+  });
+
   test("applySection は文書末尾セクション置換で後続する HTML コメント群を消費しない", () => {
     const trailingComments = [
       "<!-- case-open 記録 2026-10-16: Root Case 起票 -->",
