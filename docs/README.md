@@ -22,7 +22,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 74件、廃止済み: 19件
+現行 REQ: 75件、廃止済み: 19件
 <!-- AUTOGEN:END -->
 
 現行要件は74件である。廃止済み要件のIDは再利用せず、廃止済み要件は [retired/](requirements/retired/) に配置する。番号には欠番が存在する。
@@ -108,6 +108,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [REQ-114](requirements/REQ-114.md) | backlog-auto 一気通貫実行とパッチリリース実行契約 |
 | [REQ-115](requirements/REQ-115.md) | case-run scripts 配下の型検査基盤導入方針 |
 | [REQ-116](requirements/REQ-116.md) | GitHub 版隔離検証環境の管理者事前準備常備方針 |
+| [REQ-117](requirements/REQ-117.md) | docs 整合・検査体系と機械工程の堅牢化（15 作業単位） |
 <!-- AUTOGEN:END -->
 
 - [要件インデックス](requirements/README.md)

@@ -61,15 +61,15 @@ REQ ファイルの作成、追記、更新を管理する知識ベースとし�
 
 ### REQ-ID 形式契約の一律性
 
-`alloc-composite-id.ts` が提供する複合ID（要件行ID）の抽出・認識関数は、REQ 番号の桁数として3桁（`REQ-001-NNN`）と4桁（`REQ-0011-NNN`）の両方を一貫して認識する。
+`alloc-composite-id.ts` が提供する複合ID（要件行ID）の抽出・認識関数は、REQ 番号の桁数上限を持たない（DEC-062）。受理検査は形式妥当性のみ（`REQ-` 接頭辞、ハイフン区切り、数値セグメント、各セグメント最小1桁）を検査し、実在性は IR-067・参照実在検査が扱う。
 現行 REQ 群は3桁帯、retired の旧 REQ 群（v2:REQ-0001〜0050）は4桁帯である。
 
 関数間で正規表現の桁数契約を不一致させてはならない。
-`extractAllCompositeIds`、`extractCompositeIdNumbers`、`extractReqNumber`、`reqNumberFromFilename` は全て `(\d{3,4})` を用い、3桁と4桁を同一に扱う。
-一部の関数だけ `(\d{4})` に固定する変更を加えてはならない。
+`extractAllCompositeIds`、`extractCompositeIdNumbers`、`extractReqNumber`、`reqNumberFromFilename` は同一の桁数非依存の認識契約を用い、任意桁数の REQ 番号を同一に扱う。
+一部の関数だけ桁数を固定する変更を加えてはならない。
 
-採番結果（`formatCompositeId`）の正規化出力は4桁ゼロ埋めとする。
-入力認識は3桁と4桁を許容するが、新規採番結果は4桁へ正規化する。
+採番結果（`formatCompositeId`）の正規化出力は pad3/pad4 の最小幅表示とする。
+表示は切詰めを行わず、表示規則を受理上限として機能させない（DEC-062）。
 
 採番検証テスト（`scripts/tests/alloc-composite-id.test.ts`）は、3桁 REQ 群（REQ-001, REQ-003, REQ-006, REQ-008, REQ-010）と4桁 REQ 群（REQ-0011）が混在する入力で `extractAllCompositeIds` と `extractCompositeIdNumbers` が正しく max を返すことを検証する。
 桁数混在による max 計算の歪みを検出するため、混在入力を必須とする。

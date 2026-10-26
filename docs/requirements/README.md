@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下74件を第一参照先とする。
+現在の要件判断では、以下75件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -86,6 +86,7 @@
 | [REQ-114](REQ-114.md) | backlog-auto 一気通貫実行とパッチリリース実行契約 |
 | [REQ-115](REQ-115.md) | case-run scripts 配下の型検査基盤導入方針 |
 | [REQ-116](REQ-116.md) | GitHub 版隔離検証環境の管理者事前準備常備方針 |
+| [REQ-117](REQ-117.md) | docs 整合・検査体系と機械工程の堅牢化（15 作業単位） |
 <!-- AUTOGEN:END -->
 
 ## 廃止済み要件
