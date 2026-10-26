@@ -80,6 +80,7 @@ case-open STEP-4（実変更判定と設計PR作成）の機械工程（専用 w
 - 入力 JSON: 対象 draft パス、Root Case 識別子、Definition branch 名など所定の入力一式を渡す
 - 報告 JSON: 実行結果（各処理の成否）、差分、警告、提案する Issue/PR 本文を stdout へ返す。提案本文の採否と報告内容の意味レビューはモデルが担当する
 - 終了コード: 成功は 0、要判断・失敗は非 0 を区別する。script は処理を省略せず、失敗時は途中結果とともに非 0 で終了する
+- 計測日収束（REQ-117-011）: check_integrity 報告の計測日不整合・req-updated-freshness NG を trigger 条件として、frontmatter updated 追随と generate_indexes 再実行を script 内の measurement-convergence step で補正 commit まで完結する。trigger 条件が満たされない場合は本 step を生成せず、既存の一巡実行の挙動は変化しない。手動 contingency は本 step の失敗時救済として維持する
 - 既存の品質ゲート（check_integrity、traceability check、generate_indexes 差分検出）は script 内で実行し、省略しない
 - traceability gate を有効にする入力では、判定対象 REQ 集合（traceabilityReqIds）の存在と有効性を gate 実行前に検証する（REQ-030-028）。欠落・空・不整合入力は fail-closed で報告し、空配列への暗黙正規化で入力不備を隠蔽しない
 - REQ 追加を伴う Definition Package 生成時は、docs/README.md 手動管理区間の件数記述の照合を初回の変更・検証範囲に含め（REQ-030-029）、REQ 行数由来の派生物が stage paths に事前包含できない場合は既存の事後突合 contingency 手順に従う
