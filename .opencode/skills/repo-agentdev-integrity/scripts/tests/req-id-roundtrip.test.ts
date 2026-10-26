@@ -111,4 +111,22 @@ describe("TS-007/008 allocation and consumer round-trip", () => {
     }
   });
 
+  test("TS-008 integrity checker detects whole increased-width row IDs and retains historical-band exclusion", () => {
+    const fixture = join(root, "integrity-digit");
+    mkdirSync(join(fixture, "docs/requirements"), { recursive: true });
+    mkdirSync(join(fixture, "docs/guides"), { recursive: true });
+    writeFileSync(join(fixture, "docs/requirements/REQ-12345.md"), "---\nid: REQ-12345\n---\n| REQ-12345-001 | fixture |\n", "utf8");
+    writeFileSync(join(fixture, "docs/guides/citations.md"), "REQ-12345-001 REQ-12345-002 REQ-12345-0012 REQ-0063-0123", "utf8");
+    const script = join(process.cwd(), ".opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts");
+    const result = spawnSync(process.execPath, [script, "--root", fixture, "--profile", "source", "--json"], { encoding: "utf8", maxBuffer: 10_000_000 });
+    expect(result.error).toBeUndefined();
+    expect(result.stdout).not.toBe("");
+    const report: { results: readonly { check: string; evidence?: string }[] } = JSON.parse(result.stdout);
+    const ids = report.results.filter((r) => r.check === "referenced-req-row-existence").map((r) => r.evidence);
+    expect(ids).toContain("REQ-12345-002");
+    expect(ids).toContain("REQ-12345-0012");
+    expect(ids).not.toContain("REQ-12345-001");
+    expect(ids).not.toContain("REQ-0063-0123");
+  });
+
 });
