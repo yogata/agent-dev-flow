@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261026T200139Z-a7ea",
+  "workflow": "learning-promote",
+  "evaluationKind": "disposition-category-after-review",
+  "subject": "learning-promote 2026-10-27 run・review 反映後の 5 クラス再判定",
+  "sourceRevision": "3a508c7ada2ba07fb53d0e668ab35e304508b208",
+  "durationMs": 1054,
+  "inputTokens": 2044,
+  "inputs": {
+    "requestDigest": "12d1bb60b1f73ea294c31f05b99cf43f86837a7e1877f1fd3d9b5b572a6a153a"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "r-p2",
+      "questionForm": "choice",
+      "value": "rejected",
+      "probabilityDistribution": {
+        "rejected": 0.87,
+        "deferred": 0.04,
+        "duplicate": 0.02,
+        "既存対策の更新": 0.07
+      }
+    },
+    {
+      "questionId": "r-p4",
+      "questionForm": "choice",
+      "value": "rejected",
+      "probabilityDistribution": {
+        "duplicate": 0.04,
+        "deferred": 0.01,
+        "既存対策の更新": 0.11,
+        "rejected": 0.84
+      }
+    },
+    {
+      "questionId": "r-p19",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "deferred": 0.46,
+        "duplicate": 0.19,
+        "既存対策の更新": 0.28,
+        "恒久契約候補（REQ）": 0.07
+      }
+    },
+    {
+      "questionId": "r-p23",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "duplicate": 0.98,
+        "deferred": 0,
+        "既存対策の更新": 0,
+        "rejected": 0.02
+      }
+    },
+    {
+      "questionId": "r-p36",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "duplicate": 0.97,
+        "deferred": 0,
+        "既存対策の更新": 0.01,
+        "rejected": 0.02
+      }
+    }
+  ],
+  "confidence": 0.83
+}

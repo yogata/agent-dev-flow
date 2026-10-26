@@ -1,0 +1,362 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261026T193925Z-5f5a",
+  "workflow": "learning-promote",
+  "evaluationKind": "axis-scoring-promote",
+  "subject": "learning-promote 2026-10-27 run・promote 対象クラスの 8軸評価（7軸）",
+  "sourceRevision": "3a508c7ada2ba07fb53d0e668ab35e304508b208",
+  "durationMs": 632,
+  "inputTokens": 3440,
+  "inputs": {
+    "requestDigest": "0812bf5683ca80a1227cef09bf10980a472d828a4c230c7122c31729aa4fdfd4",
+    "references": [
+      {
+        "digest": "7e2276ac3b04aaa11d1620e0bef72be0ea1b0adc89969e28dc93b0b042ca1e08",
+        "label": "inbox",
+        "path": ".agentdev/learning/inbox.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "c1-影響度",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1": 0.04,
+        "2": 0.61,
+        "3": 0.31,
+        "4": 0.04,
+        "5": 0
+      }
+    },
+    {
+      "questionId": "c1-横展開性",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.01,
+        "3": 0.01,
+        "4": 0.23,
+        "5": 0.74
+      }
+    },
+    {
+      "questionId": "c1-反映先明確度",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.020000000000000004,
+        "2": 0.010000000000000002,
+        "3": 0.030000000000000002,
+        "4": 0.8500000000000001,
+        "5": 0.09000000000000001
+      }
+    },
+    {
+      "questionId": "c1-自動化適性",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1": 0.33,
+        "2": 0.05,
+        "3": 0.41000000000000003,
+        "4": 0.11,
+        "5": 0.1
+      }
+    },
+    {
+      "questionId": "c1-再利用性",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.01,
+        "3": 0.01,
+        "4": 0.19,
+        "5": 0.78
+      }
+    },
+    {
+      "questionId": "c1-再発可能性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.01,
+        "3": 0.04,
+        "4": 0.52,
+        "5": 0.42
+      }
+    },
+    {
+      "questionId": "c1-費用対効果",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.04,
+        "2": 0.03,
+        "3": 0.1,
+        "4": 0.53,
+        "5": 0.3
+      }
+    },
+    {
+      "questionId": "c2-影響度",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.03,
+        "2": 0.12,
+        "3": 0.21,
+        "4": 0.57,
+        "5": 0.07
+      }
+    },
+    {
+      "questionId": "c2-横展開性",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1": 0.32,
+        "2": 0.34,
+        "3": 0.25,
+        "4": 0.07,
+        "5": 0.02
+      }
+    },
+    {
+      "questionId": "c2-反映先明確度",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.01,
+        "3": 0.03,
+        "4": 0.89,
+        "5": 0.06
+      }
+    },
+    {
+      "questionId": "c2-自動化適性",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.01,
+        "3": 0.02,
+        "4": 0.23,
+        "5": 0.73
+      }
+    },
+    {
+      "questionId": "c2-再利用性",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1": 0.16,
+        "2": 0.16,
+        "3": 0.35,
+        "4": 0.27,
+        "5": 0.06
+      }
+    },
+    {
+      "questionId": "c2-再発可能性",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1": 0.02,
+        "2": 0.02,
+        "3": 0.02,
+        "4": 0.12,
+        "5": 0.82
+      }
+    },
+    {
+      "questionId": "c2-費用対効果",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.01,
+        "3": 0.01,
+        "4": 0.45,
+        "5": 0.52
+      }
+    },
+    {
+      "questionId": "c3-影響度",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1": 0.47,
+        "2": 0.5,
+        "3": 0.03,
+        "4": 0,
+        "5": 0
+      }
+    },
+    {
+      "questionId": "c3-横展開性",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1": 0.07,
+        "2": 0.24,
+        "3": 0.24,
+        "4": 0.39,
+        "5": 0.06
+      }
+    },
+    {
+      "questionId": "c3-反映先明確度",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.06,
+        "2": 0.02,
+        "3": 0.03,
+        "4": 0.74,
+        "5": 0.15
+      }
+    },
+    {
+      "questionId": "c3-自動化適性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.11,
+        "2": 0.05,
+        "3": 0.12,
+        "4": 0.15,
+        "5": 0.57
+      }
+    },
+    {
+      "questionId": "c3-再利用性",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1": 0.26,
+        "2": 0.08,
+        "3": 0.43,
+        "4": 0.18,
+        "5": 0.05
+      }
+    },
+    {
+      "questionId": "c3-再発可能性",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.01,
+        "3": 0.01,
+        "4": 0.25,
+        "5": 0.72
+      }
+    },
+    {
+      "questionId": "c3-費用対効果",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.07,
+        "2": 0.05,
+        "3": 0.1,
+        "4": 0.4,
+        "5": 0.38
+      }
+    },
+    {
+      "questionId": "c4-影響度",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0.01,
+        "3": 0.05,
+        "4": 0.76,
+        "5": 0.18
+      }
+    },
+    {
+      "questionId": "c4-横展開性",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1": 0.22999999999999995,
+        "2": 0.17999999999999997,
+        "3": 0.18999999999999995,
+        "4": 0.2899999999999999,
+        "5": 0.10999999999999997
+      }
+    },
+    {
+      "questionId": "c4-反映先明確度",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.02,
+        "2": 0.01,
+        "3": 0.03,
+        "4": 0.53,
+        "5": 0.41
+      }
+    },
+    {
+      "questionId": "c4-自動化適性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.01,
+        "3": 0.3,
+        "4": 0.52,
+        "5": 0.16
+      }
+    },
+    {
+      "questionId": "c4-再利用性",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1": 0.3400000000000001,
+        "2": 0.07000000000000002,
+        "3": 0.32000000000000006,
+        "4": 0.18000000000000002,
+        "5": 0.09000000000000001
+      }
+    },
+    {
+      "questionId": "c4-再発可能性",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0.01,
+        "2": 0.01,
+        "3": 0.03,
+        "4": 0.51,
+        "5": 0.44
+      }
+    },
+    {
+      "questionId": "c4-費用対効果",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1": 0,
+        "2": 0.01,
+        "3": 0.24,
+        "4": 0.72,
+        "5": 0.03
+      }
+    }
+  ],
+  "confidence": 0.64
+}

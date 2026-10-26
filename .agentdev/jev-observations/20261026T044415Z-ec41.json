@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261026T044415Z-ec41",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "req-draft-req-id-digit-acceptance-unification: ID桁数不整合是正の既存REQ照合（REQ操作帰属）",
+  "sourceRevision": "e16674747",
+  "durationMs": 2254,
+  "inputTokens": 1446,
+  "inputs": {
+    "requestDigest": "375c1a3cb94fd83bdd6f40dc902523af4eb4c18a0b665acdf33a4ac06de6a1db",
+    "references": [
+      {
+        "digest": "b0026dc112c81a38199135e456b4420b8952fddb38eaca533bdb9b37fad7b3a8",
+        "label": "numbering-policy",
+        "path": "docs/designs/foundations/numbering-policy.md"
+      },
+      {
+        "digest": "8d6cdc233bae0abc1dc3469f58733b5dfe3ec880af740fee7295b7838584278e",
+        "label": "REQ-009",
+        "path": "docs/requirements/REQ-009.md"
+      },
+      {
+        "digest": "c4f20decf3619bfec056a9f215e444c6164b315529d35b943dea62a9bb34016e",
+        "label": "REQ-004",
+        "path": "docs/requirements/REQ-004.md"
+      },
+      {
+        "digest": "c46074bad594a199388c34f6e570de4e94c5a3002721120a74869b4399cacb54",
+        "label": "DEC-001",
+        "path": "docs/decisions/DEC-001.md"
+      },
+      {
+        "digest": "1f803040dcc571b149891c7d1f79331ff5a82fbcc15b0c0ca00c138d4b3e4cf4",
+        "label": "DEC-009",
+        "path": "docs/decisions/DEC-009.md"
+      },
+      {
+        "digest": "24e410adf270a19677286dbc068724fd01eb90f383bc2801ab6167277a76a0ba",
+        "label": "install-script-usability",
+        "path": "docs/designs/local/install-script-usability.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-req-operation-20261026",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1
+      }
+    },
+    {
+      "questionId": "q2-confirm-20261026",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.11,
+        "false": 0.89
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-req-operation-20261026",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q2-confirm-20261026",
+        "value": false
+      }
+    ]
+  }
+}

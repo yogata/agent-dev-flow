@@ -1,0 +1,431 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261026T193521Z-845d",
+  "workflow": "learning-promote",
+  "evaluationKind": "disposition-category",
+  "subject": "learning-promote 2026-10-27 run・36 問題クラスの処分区分",
+  "sourceRevision": "3a508c7ada2ba07fb53d0e668ab35e304508b208",
+  "durationMs": 745,
+  "inputTokens": 8115,
+  "inputs": {
+    "requestDigest": "508f82253f688c45e0b3038cef68e537628eae3e882c2accc7788c810367b132",
+    "references": [
+      {
+        "digest": "7e2276ac3b04aaa11d1620e0bef72be0ea1b0adc89969e28dc93b0b042ca1e08",
+        "label": "inbox",
+        "path": ".agentdev/learning/inbox.md"
+      },
+      {
+        "digest": "29148b944e14cb7b574003b615a69877e9dce8bd4b54fd28113d27e9733002c4",
+        "label": "deferred",
+        "path": ".agentdev/learning/deferred.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-p1",
+      "questionForm": "choice",
+      "value": "既存対策の更新",
+      "probabilityDistribution": {
+        "既存対策の更新": 0.88,
+        "deferred": 0.1,
+        "duplicate": 0,
+        "恒久契約候補（REQ）": 0.01,
+        "rejected": 0.01
+      }
+    },
+    {
+      "questionId": "q-p2",
+      "questionForm": "choice",
+      "value": "既存対策の更新",
+      "probabilityDistribution": {
+        "既存対策の更新": 0.98,
+        "deferred": 0,
+        "duplicate": 0,
+        "恒久契約候補（REQ）": 0.01,
+        "rejected": 0.01
+      }
+    },
+    {
+      "questionId": "q-p3",
+      "questionForm": "choice",
+      "value": "既存対策の更新",
+      "probabilityDistribution": {
+        "既存対策の更新": 0.98,
+        "deferred": 0.01,
+        "duplicate": 0,
+        "恒久契約候補（REQ）": 0.01,
+        "rejected": 0
+      }
+    },
+    {
+      "questionId": "q-p4",
+      "questionForm": "choice",
+      "value": "既存対策の更新",
+      "probabilityDistribution": {
+        "既存対策の更新": 0.99,
+        "deferred": 0,
+        "duplicate": 0,
+        "恒久契約候補（REQ）": 0.01,
+        "rejected": 0
+      }
+    },
+    {
+      "questionId": "q-p5",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "duplicate": 0.97,
+        "deferred": 0.02,
+        "既存対策の更新": 0.01,
+        "rejected": 0
+      }
+    },
+    {
+      "questionId": "q-p6",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "duplicate": 0.95,
+        "deferred": 0.03,
+        "既存対策の更新": 0.01,
+        "rejected": 0.01
+      }
+    },
+    {
+      "questionId": "q-p7",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "duplicate": 0.97,
+        "deferred": 0.02,
+        "既存対策の更新": 0.01,
+        "rejected": 0
+      }
+    },
+    {
+      "questionId": "q-p8",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "duplicate": 0.62,
+        "deferred": 0.07,
+        "既存対策の更新": 0.29,
+        "rejected": 0.02
+      }
+    },
+    {
+      "questionId": "q-p9",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "deferred": 0.99,
+        "duplicate": 0,
+        "既存対策の更新": 0.01,
+        "rejected": 0
+      }
+    },
+    {
+      "questionId": "q-p10",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "duplicate": 0.97,
+        "deferred": 0.02,
+        "既存対策の更新": 0.01,
+        "rejected": 0
+      }
+    },
+    {
+      "questionId": "q-p11",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "duplicate": 0.96,
+        "deferred": 0.01,
+        "既存対策の更新": 0.02,
+        "rejected": 0.01
+      }
+    },
+    {
+      "questionId": "q-p12",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "duplicate": 0.5,
+        "deferred": 0.27,
+        "既存対策の更新": 0.22,
+        "rejected": 0.01
+      }
+    },
+    {
+      "questionId": "q-p13",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "duplicate": 0.86,
+        "deferred": 0.09,
+        "既存対策の更新": 0.04,
+        "rejected": 0.01
+      }
+    },
+    {
+      "questionId": "q-p14",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "deferred": 0.86,
+        "duplicate": 0.01,
+        "既存対策の更新": 0.02,
+        "rejected": 0.11
+      }
+    },
+    {
+      "questionId": "q-p15",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "duplicate": 0.97,
+        "deferred": 0.01,
+        "既存対策の更新": 0.01,
+        "rejected": 0.01
+      }
+    },
+    {
+      "questionId": "q-p16",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "duplicate": 0.81,
+        "deferred": 0.09,
+        "既存対策の更新": 0.09,
+        "rejected": 0.01
+      }
+    },
+    {
+      "questionId": "q-p17",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "duplicate": 0.72,
+        "deferred": 0.13,
+        "既存対策の更新": 0.13,
+        "rejected": 0.02
+      }
+    },
+    {
+      "questionId": "q-p18",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "duplicate": 0.93,
+        "deferred": 0.02,
+        "既存対策の更新": 0.05,
+        "rejected": 0
+      }
+    },
+    {
+      "questionId": "q-p19",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "deferred": 0.93,
+        "duplicate": 0.03,
+        "既存対策の更新": 0.04,
+        "rejected": 0
+      }
+    },
+    {
+      "questionId": "q-p20",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "duplicate": 0.88,
+        "deferred": 0.07,
+        "既存対策の更新": 0.03,
+        "rejected": 0.02
+      }
+    },
+    {
+      "questionId": "q-p21",
+      "questionForm": "choice",
+      "value": "duplicate",
+      "probabilityDistribution": {
+        "duplicate": 0.87,
+        "deferred": 0.03,
+        "既存対策の更新": 0.08,
+        "rejected": 0.02
+      }
+    },
+    {
+      "questionId": "q-p22",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "deferred": 0.84,
+        "duplicate": 0.04,
+        "既存対策の更新": 0.06,
+        "rejected": 0.06
+      }
+    },
+    {
+      "questionId": "q-p23",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "deferred": 0.89,
+        "duplicate": 0.02,
+        "既存対策の更新": 0.08,
+        "rejected": 0.01
+      }
+    },
+    {
+      "questionId": "q-p24",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "deferred": 0.66,
+        "duplicate": 0.01,
+        "既存対策の更新": 0.32,
+        "rejected": 0.01
+      }
+    },
+    {
+      "questionId": "q-p25",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "deferred": 0.71,
+        "duplicate": 0.14,
+        "既存対策の更新": 0.04,
+        "rejected": 0.11
+      }
+    },
+    {
+      "questionId": "q-p26",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "deferred": 0.9,
+        "duplicate": 0.01,
+        "既存対策の更新": 0.03,
+        "rejected": 0.06
+      }
+    },
+    {
+      "questionId": "q-p27",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "deferred": 0.6,
+        "duplicate": 0.2,
+        "既存対策の更新": 0.09,
+        "rejected": 0.11
+      }
+    },
+    {
+      "questionId": "q-p28",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "deferred": 0.62,
+        "duplicate": 0.16,
+        "既存対策の更新": 0.01,
+        "rejected": 0.21
+      }
+    },
+    {
+      "questionId": "q-p29",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "deferred": 0.94,
+        "duplicate": 0.01,
+        "既存対策の更新": 0.04,
+        "rejected": 0.01
+      }
+    },
+    {
+      "questionId": "q-p30",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "deferred": 0.9,
+        "duplicate": 0,
+        "既存対策の更新": 0.05,
+        "rejected": 0.05
+      }
+    },
+    {
+      "questionId": "q-p31",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "deferred": 0.98,
+        "duplicate": 0,
+        "既存対策の更新": 0,
+        "rejected": 0.02
+      }
+    },
+    {
+      "questionId": "q-p32",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "deferred": 0.98,
+        "duplicate": 0,
+        "既存対策の更新": 0,
+        "rejected": 0.02
+      }
+    },
+    {
+      "questionId": "q-p33",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "deferred": 0.84,
+        "duplicate": 0.07,
+        "既存対策の更新": 0.04,
+        "rejected": 0.05
+      }
+    },
+    {
+      "questionId": "q-p34",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "deferred": 0.57,
+        "duplicate": 0.07,
+        "既存対策の更新": 0.31,
+        "rejected": 0.05
+      }
+    },
+    {
+      "questionId": "q-p35",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "deferred": 0.6868686868686869,
+        "duplicate": 0.0404040404040404,
+        "既存対策の更新": 0.2222222222222222,
+        "rejected": 0.050505050505050504
+      }
+    },
+    {
+      "questionId": "q-p36",
+      "questionForm": "choice",
+      "value": "deferred",
+      "probabilityDistribution": {
+        "deferred": 0.87,
+        "duplicate": 0.02,
+        "既存対策の更新": 0.1,
+        "rejected": 0.01
+      }
+    }
+  ],
+  "confidence": 0.85
+}

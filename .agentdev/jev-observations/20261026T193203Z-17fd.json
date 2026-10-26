@@ -1,0 +1,425 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261026T193203Z-17fd",
+  "workflow": "learning-promote",
+  "evaluationKind": "problem-class-classification",
+  "subject": "learning-promote 2026-10-27 run・inbox 41 エントリの問題クラス帰属",
+  "sourceRevision": "3a508c7ada2ba07fb53d0e668ab35e304508b208",
+  "durationMs": 1780,
+  "inputTokens": 9069,
+  "inputs": {
+    "requestDigest": "55d444038b8efa46a7093a8bdc1cde7f0d52ce2380aa9a222aa6c0248b550a9e",
+    "references": [
+      {
+        "digest": "7e2276ac3b04aaa11d1620e0bef72be0ea1b0adc89969e28dc93b0b042ca1e08",
+        "label": "inbox",
+        "path": ".agentdev/learning/inbox.md"
+      },
+      {
+        "digest": "29148b944e14cb7b574003b615a69877e9dce8bd4b54fd28113d27e9733002c4",
+        "label": "deferred",
+        "path": ".agentdev/learning/deferred.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-e1",
+      "questionForm": "choice",
+      "value": "P2 typecheck pre-existing エラー恒常化（gate 機能不全）",
+      "probabilityDistribution": {
+        "P2 typecheck pre-existing エラー恒常化（gate 機能不全）": 0.99,
+        "typecheck 対象範囲外領域の既出 strict エラー系": 0,
+        "新規単独クラス": 0.01
+      }
+    },
+    {
+      "questionId": "q-e2",
+      "questionForm": "choice",
+      "value": "P21 bun test サマリは stderr 出力・退避経路が stderr を捕捉しない問題",
+      "probabilityDistribution": {
+        "P21 bun test サマリは stderr 出力・退避経路が stderr を捕捉しない問題": 0.98,
+        "P23 機械工程 script の gate 入力・証跡接続の問題": 0,
+        "新規単独クラス": 0.02
+      }
+    },
+    {
+      "questionId": "q-e3",
+      "questionForm": "choice",
+      "value": "P24 配布物本文の様式例示で実在番号を含む形式が concrete-id 検出に掛かる",
+      "probabilityDistribution": {
+        "P24 配布物本文の様式例示で実在番号を含む形式が concrete-id 検出に掛かる": 0.88,
+        "P5 配布物本文への concrete ID 直書き（直書き規律違反）": 0,
+        "新規単独クラス": 0.12
+      }
+    },
+    {
+      "questionId": "q-e4",
+      "questionForm": "choice",
+      "value": "P18 traceability 宣言先の管理経路規律（複数情報源分散・sidecar/inline 選択誤り）",
+      "probabilityDistribution": {
+        "P18 traceability 宣言先の管理経路規律（複数情報源分散・sidecar/inline 選択誤り）": 0.94,
+        "新規単独クラス": 0.06
+      }
+    },
+    {
+      "questionId": "q-e5",
+      "questionForm": "choice",
+      "value": "P25 検証環境の node_modules junction 残存で checker が read 失敗（adapter-failure）",
+      "probabilityDistribution": {
+        "P25 検証環境の node_modules junction 残存で checker が read 失敗（adapter-failure）": 0.98,
+        "P6 worktree の junction 不在で link profile が zero-targets": 0,
+        "新規単独クラス": 0.02
+      }
+    },
+    {
+      "questionId": "q-e6",
+      "questionForm": "choice",
+      "value": "P22 Epic Wave クローズルートに residue check 単独実行経路が入力契約上ない",
+      "probabilityDistribution": {
+        "P22 Epic Wave クローズルートに residue check 単独実行経路が入力契約上ない": 0.79,
+        "P23 機械工程 script の gate 入力・証跡接続の問題": 0.09,
+        "新規単独クラス": 0.12
+      }
+    },
+    {
+      "questionId": "q-e7",
+      "questionForm": "choice",
+      "value": "P26 Issue 完了条件の TS 番号引用が REQ 正規検証戦略採番とズレる",
+      "probabilityDistribution": {
+        "P26 Issue 完了条件の TS 番号引用が REQ 正規検証戦略採番とズレる": 0.96,
+        "新規単独クラス": 0.04
+      }
+    },
+    {
+      "questionId": "q-e8",
+      "questionForm": "choice",
+      "value": "P27 YAML 宣言的データへの重複キー追記が last-wins で先行ブロックを shadow する",
+      "probabilityDistribution": {
+        "P27 YAML 宣言的データへの重複キー追記が last-wins で先行ブロックを shadow する": 0.97,
+        "新規単独クラス": 0.03
+      }
+    },
+    {
+      "questionId": "q-e9",
+      "questionForm": "choice",
+      "value": "P28 draft 合意の REQ 行採番が並行 merge で消費され case-open 適用前検証で差し戻し",
+      "probabilityDistribution": {
+        "P28 draft 合意の REQ 行採番が並行 merge で消費され case-open 適用前検証で差し戻し": 0.94,
+        "新規単独クラス": 0.06
+      }
+    },
+    {
+      "questionId": "q-e10",
+      "questionForm": "choice",
+      "value": "P6 worktree の .opencode junction 不在で link profile が zero-targets（main root 実行が正）",
+      "probabilityDistribution": {
+        "P6 worktree の .opencode junction 不在で link profile が zero-targets（main root 実行が正）": 0.99,
+        "新規単独クラス": 0.01
+      }
+    },
+    {
+      "questionId": "q-e11",
+      "questionForm": "choice",
+      "value": "P3 applySection のセクション置換で直前空行が消え見出しが前文に接続",
+      "probabilityDistribution": {
+        "P3 applySection のセクション置換で直前空行が消え見出しが前文に接続": 0.98,
+        "P29 req-draft content の変更なし行漂い差異": 0,
+        "新規単独クラス": 0.02
+      }
+    },
+    {
+      "questionId": "q-e12",
+      "questionForm": "choice",
+      "value": "P29 req-draft content の変更なし行が現行本文と漂う差異を含み突合を阻害",
+      "probabilityDistribution": {
+        "P29 req-draft content の変更なし行が現行本文と漂う差異を含み突合を阻害": 0.96,
+        "P4 target_area append 適用の節本文欠落と突合精度": 0,
+        "新規単独クラス": 0.04
+      }
+    },
+    {
+      "questionId": "q-e13",
+      "questionForm": "choice",
+      "value": "P30 deno LSP が bun 前提テストファイルの bun 固有 API を誤検知",
+      "probabilityDistribution": {
+        "P30 deno LSP が bun 前提テストファイルの bun 固有 API を誤検知": 0.87,
+        "P13 worktree suite fail の環境依存判別": 0.01,
+        "新規単独クラス": 0.12
+      }
+    },
+    {
+      "questionId": "q-e14",
+      "questionForm": "choice",
+      "value": "P15 generate_indexes 派生物自身の frontmatter updated 追随が計測日収束手順の明示対象外",
+      "probabilityDistribution": {
+        "P15 generate_indexes 派生物自身の frontmatter updated 追随が計測日収束手順の明示対象外": 0.9,
+        "P17 IR-072 進行の PR 手順明示不足": 0.05,
+        "新規単独クラス": 0.05
+      }
+    },
+    {
+      "questionId": "q-e15",
+      "questionForm": "choice",
+      "value": "P6 worktree の .opencode junction 不在で link profile が zero-targets（main root 実行が正）",
+      "probabilityDistribution": {
+        "P6 worktree の .opencode junction 不在で link profile が zero-targets（main root 実行が正）": 0.98,
+        "新規単独クラス": 0.02
+      }
+    },
+    {
+      "questionId": "q-e16",
+      "questionForm": "choice",
+      "value": "P7 Windows 環境の git worktree remove 失敗の回復手順（半失敗・長パス）",
+      "probabilityDistribution": {
+        "P7 Windows 環境の git worktree remove 失敗の回復手順（半失敗・長パス）": 0.92,
+        "新規単独クラス": 0.08
+      }
+    },
+    {
+      "questionId": "q-e17",
+      "questionForm": "choice",
+      "value": "P9 bun test 並行分割起動による timeout 系テストの flake 誘発",
+      "probabilityDistribution": {
+        "P9 bun test 並行分割起動による timeout 系テストの flake 誘発": 0.96,
+        "P13 worktree suite fail の環境依存判別": 0,
+        "新規単独クラス": 0.04
+      }
+    },
+    {
+      "questionId": "q-e18",
+      "questionForm": "choice",
+      "value": "P14 spawnSync shell:true で大量 stdout の checker をラップすると exit が null 返却",
+      "probabilityDistribution": {
+        "P14 spawnSync shell:true で大量 stdout の checker をラップすると exit が null 返却": 0.95,
+        "P21 bun test サマリ stderr 分離退避": 0,
+        "新規単独クラス": 0.05
+      }
+    },
+    {
+      "questionId": "q-e19",
+      "questionForm": "choice",
+      "value": "P23 機械工程 script の integrityGates 必須入力と full suite 再実行禁止の両立（証跡 replay gate 接続）",
+      "probabilityDistribution": {
+        "P23 機械工程 script の integrityGates 必須入力と full suite 再実行禁止の両立（証跡 replay gate 接続）": 0.98,
+        "P22 Epic Wave residue check 単独経路": 0,
+        "新規単独クラス": 0.02
+      }
+    },
+    {
+      "questionId": "q-e20",
+      "questionForm": "choice",
+      "value": "P31 merge 直後の未 pull main worktree は git show origin/main: でツリー読取",
+      "probabilityDistribution": {
+        "P31 merge 直後の未 pull main worktree は git show origin/main: でツリー読取": 0.94,
+        "新規単独クラス": 0.06
+      }
+    },
+    {
+      "questionId": "q-e21",
+      "questionForm": "choice",
+      "value": "P16 squash merge の author date 機構による IR-072 drift",
+      "probabilityDistribution": {
+        "P16 squash merge の author date 機構による IR-072 drift": 0.97,
+        "P15 generate_indexes 派生物 updated 追随": 0,
+        "新規単独クラス": 0.03
+      }
+    },
+    {
+      "questionId": "q-e22",
+      "questionForm": "choice",
+      "value": "P32 作業一覧型 docs 是正の「該当箇所」列の意味契約未定義による機械突合不正確",
+      "probabilityDistribution": {
+        "P32 作業一覧型 docs 是正の「該当箇所」列の意味契約未定義による機械突合不正確": 0.97,
+        "新規単独クラス": 0.03
+      }
+    },
+    {
+      "questionId": "q-e23",
+      "questionForm": "choice",
+      "value": "P17 IR-072 進行の PR 手順・テンプレート明示不足",
+      "probabilityDistribution": {
+        "P17 IR-072 進行の PR 手順・テンプレート明示不足": 0.97,
+        "P16 squash merge author date drift": 0,
+        "新規単独クラス": 0.03
+      }
+    },
+    {
+      "questionId": "q-e24",
+      "questionForm": "choice",
+      "value": "P18 traceability 宣言先の管理経路規律（sidecar/inline 選択誤り）",
+      "probabilityDistribution": {
+        "P18 traceability 宣言先の管理経路規律（sidecar/inline 選択誤り）": 0.96,
+        "新規単独クラス": 0.04
+      }
+    },
+    {
+      "questionId": "q-e25",
+      "questionForm": "choice",
+      "value": "P5 配布物本文への concrete REQ-ID 直書き（直書き規律違反）",
+      "probabilityDistribution": {
+        "P5 配布物本文への concrete REQ-ID 直書き（直書き規律違反）": 0.96,
+        "P24 様式例示の非数字形式": 0,
+        "新規単独クラス": 0.04
+      }
+    },
+    {
+      "questionId": "q-e26",
+      "questionForm": "choice",
+      "value": "P10 bun test の cwd 依存テスト（scripts/ cwd 実行で失敗）",
+      "probabilityDistribution": {
+        "P10 bun test の cwd 依存テスト（scripts/ cwd 実行で失敗）": 0.96,
+        "P11 bun test 一発実行と 3 cwd 分割の網羅集合差": 0.01,
+        "新規単独クラス": 0.03
+      }
+    },
+    {
+      "questionId": "q-e27",
+      "questionForm": "choice",
+      "value": "P19 prepare_definition_pr の definitionEdits が行削除・ファイル削除編集を表現できない",
+      "probabilityDistribution": {
+        "P19 prepare_definition_pr の definitionEdits が行削除・ファイル削除編集を表現できない": 0.98,
+        "新規単独クラス": 0.02
+      }
+    },
+    {
+      "questionId": "q-e28",
+      "questionForm": "choice",
+      "value": "P11 bun test 一発実行（対象指定なし）と 3 cwd 分割正規形の網羅集合差",
+      "probabilityDistribution": {
+        "P11 bun test 一発実行（対象指定なし）と 3 cwd 分割正規形の網羅集合差": 0.95,
+        "P10 bun test cwd 依存": 0,
+        "新規単独クラス": 0.05
+      }
+    },
+    {
+      "questionId": "q-e29",
+      "questionForm": "choice",
+      "value": "P12 bun test 件数突合の物理列挙乖離（junction 経由対象を find が数えられない）",
+      "probabilityDistribution": {
+        "P12 bun test 件数突合の物理列挙乖離（junction 経由対象を find が数えられない）": 0.97,
+        "P11 一発実行集合差": 0,
+        "新規単独クラス": 0.03
+      }
+    },
+    {
+      "questionId": "q-e30",
+      "questionForm": "choice",
+      "value": "P4 target_area append 適用の節本文欠落と verbatim 突合の見出し単位検出不能",
+      "probabilityDistribution": {
+        "P4 target_area append 適用の節本文欠落と verbatim 突合の見出し単位検出不能": 0.97,
+        "P29 draft content 漂い": 0,
+        "新規単独クラス": 0.03
+      }
+    },
+    {
+      "questionId": "q-e31",
+      "questionForm": "choice",
+      "value": "P13 worktree integrity suite fail の環境依存判別（main root 同一 tree 再実行 + 構成要素比較）",
+      "probabilityDistribution": {
+        "P13 worktree integrity suite fail の環境依存判別（main root 同一 tree 再実行 + 構成要素比較）": 0.92,
+        "P9 timeout flake": 0,
+        "新規単独クラス": 0.08
+      }
+    },
+    {
+      "questionId": "q-e32",
+      "questionForm": "choice",
+      "value": "P5 配布物本文への concrete ID 直書き（直書き規律違反）",
+      "probabilityDistribution": {
+        "P5 配布物本文への concrete ID 直書き（直書き規律違反）": 0.97,
+        "P24 様式例示の非数字形式": 0,
+        "新規単独クラス": 0.03
+      }
+    },
+    {
+      "questionId": "q-e33",
+      "questionForm": "choice",
+      "value": "P20 pr_create の入力契約は labels を受け付けず issue_create との契約差異が fail-closed 検出",
+      "probabilityDistribution": {
+        "P20 pr_create の入力契約は labels を受け付けず issue_create との契約差異が fail-closed 検出": 0.94,
+        "新規単独クラス": 0.06
+      }
+    },
+    {
+      "questionId": "q-e34",
+      "questionForm": "choice",
+      "value": "P1 機械工程・checker のパス引数は実行 cwd で解決される（絶対パス標準）",
+      "probabilityDistribution": {
+        "P1 機械工程・checker のパス引数は実行 cwd で解決される（絶対パス標準）": 0.99,
+        "P22 Epic Wave residue check": 0,
+        "新規単独クラス": 0.01
+      }
+    },
+    {
+      "questionId": "q-e35",
+      "questionForm": "choice",
+      "value": "P33 jev evaluate の observationMetadata.references は sha256 digest 必須（用意しないなら省略）",
+      "probabilityDistribution": {
+        "P33 jev evaluate の observationMetadata.references は sha256 digest 必須（用意しないなら省略）": 0.97,
+        "新規単独クラス": 0.03
+      }
+    },
+    {
+      "questionId": "q-e36",
+      "questionForm": "choice",
+      "value": "P34 PowerShell Parser::ParseFile は BOM なし UTF-8 を既定エンコーディング（cp932）で読む",
+      "probabilityDistribution": {
+        "P34 PowerShell Parser::ParseFile は BOM なし UTF-8 を既定エンコーディング（cp932）で読む": 0.94,
+        "P35 子プロセス標準出力読取エンコーディングの親コンソール依存": 0.01,
+        "新規単独クラス": 0.05
+      }
+    },
+    {
+      "questionId": "q-e37",
+      "questionForm": "choice",
+      "value": "P35 子プロセス標準出力読取エンコーディングの親コンソール依存",
+      "probabilityDistribution": {
+        "P35 子プロセス標準出力読取エンコーディングの親コンソール依存": 0.93,
+        "P34 ParseFile cp932": 0,
+        "新規単独クラス": 0.07
+      }
+    },
+    {
+      "questionId": "q-e38",
+      "questionForm": "choice",
+      "value": "P36 Windows の junction は bash rmdir では削除できず cmd /c rmdir または Directory.Delete が必要",
+      "probabilityDistribution": {
+        "P36 Windows の junction は bash rmdir では削除できず cmd /c rmdir または Directory.Delete が必要": 0.91,
+        "P25 node_modules junction 残存 read 失敗": 0,
+        "新規単独クラス": 0.09
+      }
+    },
+    {
+      "questionId": "q-e39",
+      "questionForm": "choice",
+      "value": "P1 機械工程・checker のパス引数は実行 cwd で解決される（絶対パス標準）",
+      "probabilityDistribution": {
+        "P1 機械工程・checker のパス引数は実行 cwd で解決される（絶対パス標準）": 0.99,
+        "新規単独クラス": 0.01
+      }
+    },
+    {
+      "questionId": "q-e40",
+      "questionForm": "choice",
+      "value": "P8 agentdev_gh host プロセス内 gh exit 66 一貫失敗（host プロセス再起動で回復）",
+      "probabilityDistribution": {
+        "P8 agentdev_gh host プロセス内 gh exit 66 一貫失敗（host プロセス再起動で回復）": 0.93,
+        "新規単独クラス": 0.07
+      }
+    },
+    {
+      "questionId": "q-e41",
+      "questionForm": "choice",
+      "value": "P7 Windows 環境の git worktree remove 失敗の回復手順（半失敗・長パス）",
+      "probabilityDistribution": {
+        "P7 Windows 環境の git worktree remove 失敗の回復手順（半失敗・長パス）": 0.71,
+        "新規単独クラス": 0.29
+      }
+    }
+  ],
+  "confidence": 0.98
+}
