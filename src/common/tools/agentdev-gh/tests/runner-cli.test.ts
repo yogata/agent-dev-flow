@@ -9,7 +9,7 @@
 // 実操作（追跡軸保持、再オープン遷移、一覧完全性、部分更新）を検証する。
 
 
-import { describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "bun:test";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { createCliRunner, type GhExec, type GhSpawnError } from "../runner-cli.ts";
@@ -23,10 +23,22 @@ interface ExecCall {
   readonly args: readonly string[];
 }
 
+const createdTempDirs = new Set<string>();
+
 function makeTempDir(): string {
   const dir = fs.mkdtempSync(path.join(import.meta.dir, "tmp-runner-cli-"));
+  createdTempDirs.add(dir);
   return dir;
 }
+
+// テスト後クリーンアップ: 作成した一時ディレクトリを毎テスト後に除去し
+// tmp-runner-cli-* 残骸の再生成を防止する（REQ-117-004）。
+afterEach(() => {
+  for (const dir of createdTempDirs) {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+  createdTempDirs.clear();
+});
 
 function fakeExec(
   handler: (call: ExecCall) => {
