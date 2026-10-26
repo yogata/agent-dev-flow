@@ -77,9 +77,10 @@ async function main(): Promise<void> {
   const warnings: string[] = [];
 
   for (const filename of files) {
-    // REQ/ADR/DEC 以外の .md（README.md 等）はスキップ
+    // REQ/ADR/DEC 以外の .md（README.md 等）はスキップ。
+    // REQ の受理は桁数上限なし（各セグメント最小1桁）。
     const isTarget =
-      (kind === "req" && /^REQ-\d{4}\.md$/.test(filename)) ||
+      (kind === "req" && /^REQ-\d+\.md$/.test(filename)) ||
       (kind === "adr" && /^ADR-\d{4}\.md$/.test(filename)) ||
       (kind === "decision" && /^DEC-\d{3}\.md$/.test(filename));
     if (!isTarget) continue;
@@ -89,7 +90,8 @@ async function main(): Promise<void> {
     if (!result.ok) {
       const i = result.issues;
       const prefix = kind === "req" ? "REQ" : kind === "adr" ? "ADR" : "DEC";
-      const width = kind === "decision" ? 3 : 4;
+      // 期待表示は numbering-policy の最小幅ゼロ埋め（REQ は pad3 最小幅。切詰めなし）。
+      const width = kind === "req" ? 3 : kind === "adr" ? 4 : 3;
       const expected = i.filenameNumber !== null ? `${prefix}-${String(i.filenameNumber).padStart(width, "0")}` : "(no filename number)";
       errors.push(
         `${filename}: frontmatter id "${i.frontmatterId ?? "(missing)"}" does not match expected "${expected}"`,

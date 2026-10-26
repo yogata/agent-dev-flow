@@ -44,9 +44,9 @@ function stripQuotes(value: string): string {
   return value;
 }
 
-/** `REQ-NNNN` 形式から数値を取り出す。未整形式は null。 */
+/** `REQ-NNN` 形式（桁数上限なし）から数値を取り出す。未整形式は null。 */
 export function extractReqNumber(id: string): number | null {
-  const m = /^REQ-(\d{4})$/.exec(id);
+  const m = /^REQ-(\d+)$/.exec(id);
   return m && m[1] ? parseInt(m[1], 10) : null;
 }
 
@@ -62,11 +62,11 @@ export function extractDecisionNumber(id: string): number | null {
   return m && m[1] ? parseInt(m[1], 10) : null;
 }
 
-/** `REQ-NNNN-MMM` 形式から { req, row } を取り出す。未整形式は null。 */
+/** `REQ-NNN-MMM` 形式（桁数上限なし）から { req, row } を取り出す。未整形式は null。 */
 export function extractCompositeIdNumbers(
   id: string,
 ): { req: number; row: number } | null {
-  const m = /^REQ-(\d{4})-(\d{3})$/.exec(id);
+  const m = /^REQ-(\d+)-(\d+)$/.exec(id);
   if (!m || !m[1] || !m[2]) return null;
   return { req: parseInt(m[1], 10), row: parseInt(m[2], 10) };
 }
