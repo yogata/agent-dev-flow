@@ -140,7 +140,7 @@ describe("findPhantomCitations", () => {
         "<!-- AUTOGEN:END -->",
         "placeholder: REQ-010-NNN and REQ-{NNNN}-{NNN} and REQ-107-NNN",
         "historical: v2:REQ-0108-193",
-        "longer id partial: REQ-107-0012",
+        "invalid empty segment: REQ-107-",
       ].join("\n"),
     };
     const phantoms = findPhantomCitations(target, index, compile(DEFAULT_ID_PATTERN));

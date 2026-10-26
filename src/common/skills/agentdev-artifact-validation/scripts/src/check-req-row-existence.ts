@@ -13,8 +13,8 @@
  *   整合性ルール説明文、履歴領域（retired、docs/reports/）、v2: 歴史識別子プレフィックス
  * - プレースホルダー様式例示（REQ-0NN-NNN、REQ-{NNNN}-{NNN} 等の非数字形式）は
  *   正規表現上マッチしないため誤検出しない
- * - 検出対象の形式幅は既定では接頭番号 3〜4 桁を許容する（旧番号帯を書込み時版の
- *   既定で除外しない）。プロジェクトの採番に従って idPattern で上書きできる。
+ * - 既定では各数値セグメントを最小1桁とし、桁数上限を設けない（旧番号帯を
+ *   書込み時版の既定で除外しない）。プロジェクトの採番に従って idPattern で上書きできる。
  *
  * I/O:
  *   入力: argv --root <repo-root> --file <repo-relative-path> [--file ...]
@@ -50,10 +50,12 @@ export type ReqRowCheckInput = {
 /**
  * 書込み時版の既定 ID 正規表現（regex source）。
  * v2: 歴史識別子プレフィックス免除、前置一致除外、後置数字除外を含む。
- * 接頭番号は 3〜4 桁を許容する（旧番号帯を書込み時版の既定で除外しない）。
+ * 受理は形式妥当性のみ（REQ- 接頭辞・ハイフン区切り・数値セグメント2つ・
+ * 各セグメント最小1桁）。桁数上限なし（受理上限撤廃 Decision 参照）。
+ * 後置数字除外（(?!\d)）により長い行番号の部分一致を防ぐ。
  */
 export const DEFAULT_ID_PATTERN =
-  "(?<!v2:)(?<![\\w-])REQ-\\d{3,4}-\\d{3}(?!\\d)";
+  "(?<!v2:)(?<![\\w-])REQ-\\d+-\\d+(?![\\w-])";
 
 /** Windows パス区切りを POSIX に正規化する。 */
 export function toPosixPath(p: string): string {
@@ -65,7 +67,7 @@ export function toPosixPath(p: string): string {
  * docs/requirements 直下と retired/ 配下の REQ-{NNNN}.md / REQ-{NNNN}.md。
  */
 export function isRequirementTablePath(relPosixPath: string): boolean {
-  return /^docs\/requirements\/(retired\/)?REQ-\d{3,4}\.md$/.test(relPosixPath);
+  return /^docs\/requirements\/(retired\/)?REQ-\d+\.md$/.test(relPosixPath);
 }
 
 /**
@@ -242,7 +244,7 @@ function readBaseTableFiles(root: string): ReqRowRef[] {
       continue;
     }
     for (const name of names
-      .filter((n) => /^REQ-\d{3,4}\.md$/.test(n))
+      .filter((n) => /^REQ-\d+\.md$/.test(n))
       .sort()) {
       try {
         files.push({
