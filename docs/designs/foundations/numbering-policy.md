@@ -2,7 +2,7 @@
 title: 採番管理 Design
 status: accepted
 created: 2026-07-19
-updated: 2026-10-20
+updated: 2026-10-26
 ---
 <!-- ADF-COVERS(implementation): REQ-001-008, REQ-001-009, REQ-001-013, REQ-001-042 -->
 <!-- ADF-COVERS(implementation): REQ-004-003 -->
@@ -23,11 +23,15 @@ AgentDevFlow 配布物が前提する採番の不変条件を宣言し、各所�
 
 ## 識別子形式
 
-| 種別 | 形式 | 桁数 | 接頭辞 |
+| 種別 | 形式 | 表示 | 接頭辞 |
 |------|------|------|--------|
-| REQ | `REQ-{NNN}` | 3桁ゼロ埋め | `REQ-` |
-| Decision | `DEC-{NNN}` | 3桁ゼロ埋め | `DEC-` |
-| IR | `IR-{NNN}` | 3桁ゼロ埋め | `IR-` |
+| REQ | `REQ-{NNN}` | 3桁ゼロ埋め（最小幅。切詰めしない） | `REQ-` |
+| Decision | `DEC-{NNN}` | 3桁ゼロ埋め（最小幅。切詰めしない） | `DEC-` |
+| IR | `IR-{NNN}` | 3桁ゼロ埋め（最小幅。切詰めしない） | `IR-` |
+
+表示のゼロ埋めは最小幅の表示規則であり、受理検査の桁数上限として機能させない。識別子の受理検査は、
+接頭辞、区切り、数値セグメント、各セグメント最小1桁という形式妥当性のみを要求し、桁数上限を設けない
+（「要件ID桁数の受理上限撤廃と表示ゼロ埋め・受理検証の分離」Decision 参照）。
 
 要件行 ID（`REQ-{NNN}-{MMM}`）は REQ 識別子を前置し、REQ 内の要件行連番を付ける。
 詳細は `agentdev-req-file-manager` SKILL が定める。

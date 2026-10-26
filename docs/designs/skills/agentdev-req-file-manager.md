@@ -2,7 +2,7 @@
 title: `agentdev-req-file-manager` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-10-03
+updated: 2026-10-26
 ---
 <!-- ADF-COVERS(implementation): REQ-001-050, REQ-001-051, REQ-004-004, REQ-004-005, REQ-004-006 -->
 <!-- ADF-COVERS(implementation): REQ-059-004 -->
@@ -37,7 +37,7 @@ REQ ファイルの作成、追記、更新を管理する知識ベースとし�
 
 ## 現在の動作
 
-- REQ-{NNN} 形式で3桁ゼロ埋め採番
+- REQ-{NNN} 形式でゼロ埋め採番（最小幅の表示。受理検査に桁数上限を設けない。SKILL の4桁記述は表示の代表例であり受理上限ではない）
 - 要件行は「変更後に満たすべき振る舞い、制約、状態」のみ記述
 - 実装指示は要件行に含めない
 - bugfix では REQ ファイルを作成しない

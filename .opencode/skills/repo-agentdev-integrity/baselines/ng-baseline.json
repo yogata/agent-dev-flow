@@ -1,7 +1,7 @@
 {
   "version": 1,
   "rule_id": "NG-BASELINE",
-  "generated_at": "2026-10-15",
+  "generated_at": "2026-10-26",
   "entries": [
     {
       "category": "ADR",
@@ -263,6 +263,15 @@
       "count": 1,
       "provenance": "proposed-decision-citation",
       "reason": "proposed-decision-citation: proposed Decision DEC-008 を根拠として引用する意図的な記述。Decision の accepted 昇格または SPEC 再構成（OU-009）で解消するまでの承認（Issue #2136 NG21 外 warning 分類）"
+    },
+    {
+      "category": "Decision",
+      "check": "adr-req-crossref",
+      "file": null,
+      "evidence": null,
+      "count": 2,
+      "provenance": "case-3862-amend-dec062-example-refs",
+      "reason": "DEC-062 背景・影響節が例示する外部プロジェクト（staff-schedule-cf）の階層 ID REQ-0063-004 と旧4桁帯裸 ID REQ-0136-029 の明示的言及。現行 checker の extractCurrentReqRefs（正規表現 REQ-d{3,4} の単独トークン抽出、階層 ID 非対応）が接頭部 REQ-0063 / REQ-0136 のみを抽出する一時的偽陽性であり、本 Case の case-run RA-004（current_refs.ts:3 の桁数一般化・階層 ID 対応）で解消予定の既知債務"
     },
     {
       "category": "IndexGenerationConsistency",

@@ -2,7 +2,7 @@
 title: "IR-067: referenced-req-row-existence"
 status: accepted
 created: 2026-08-22
-updated: 2026-10-05
+updated: 2026-10-26
 ---
 
 # IR-067: referenced-req-row-existence
@@ -10,10 +10,10 @@ updated: 2026-10-05
 | Field | Value |
 |-------|-------|
 | rule_id | IR-067 |
-| description | docs 本文が引用する階層 REQ 行 ID（`REQ-NNN-NNN`、現行3桁番号帯）の実在性を機械検査する。引用先の行 ID が docs/requirements の要件行テーブルに存在しない場合（ファントム引用: 未コミット草案番号の引用残存、要件分割前の旧行 ID 残存）に検出する。テンプレート・例示のプレースホルダー（`REQ-010-NNN`、`REQ-{NNNN}-{NNN}` 等の非数字形式）は正規表現上マッチせず誤検出しない（REQ-010-065 許容条件準拠、REQ-010-069） |
+| description | docs 本文が引用する階層 REQ 行 ID（`REQ-NNN-NNN`、現行番号帯。桁数上限なし。旧4桁番号帯 `REQ-NNNN-NNN`〔0141 未満〕は設計要件4により検出対象外を維持）の実在性を機械検査する。引用先の行 ID が docs/requirements の要件行テーブルに存在しない場合（ファントム引用: 未コミット草案番号の引用残存、要件分割前の旧行 ID 残存）に検出する。テンプレート・例示のプレースホルダー（`REQ-010-NNN`、`REQ-{NNNN}-{NNN}` 等の非数字形式）は正規表現上マッチせず誤検出しない（REQ-010-065 許容条件準拠、REQ-010-069） |
 | severity | strict |
 | category | document-drift |
-| detection_method | `check_integrity.ts`（`checkReferencedReqRowExistence`）による走査。(1) `docs/requirements/*.md` と `retired/*.md` の表行（`\|` 先頭行）から行 ID インデックスを構築、(2) docs 本文（docs/designs、docs/requirements、docs/decisions、docs/guides、src/common、.opencode/commands、.agentdev/extensions、ルート README.md、docs/README.md）の引用を突合する。階層 ID 検索の3点設計（checker-execution-contracts Design）: v2: プレフィックス許容、表行先頭出現を実在の正とする、前置一致除外（旧4桁番号帯 `REQ-NNNN-NNN` は検出対象外） |
+| detection_method | `check_integrity.ts`（`checkReferencedReqRowExistence`）による走査。(1) `docs/requirements/*.md` と `retired/*.md` の表行（`\|` 先頭行）から行 ID インデックスを構築、(2) docs 本文（docs/designs、docs/requirements、docs/decisions、docs/guides、src/common、.opencode/commands、.agentdev/extensions、ルート README.md、docs/README.md）の引用を突合する。階層 ID 検索の3点設計（checker-execution-contracts Design）: v2: プレフィックス許容、表行先頭出現を実在の正とする、前置一致除外（旧4桁番号帯 `REQ-NNNN-NNN` は検出対象外。現行帯内の増桁は前置一致誤検出しない解析で扱う） |
 | affected_artifacts | [docs/designs/**, docs/requirements/*.md, docs/decisions/*.md, docs/guides/*.md, src/common/**, .opencode/commands/**, .agentdev/extensions/**, README.md, docs/README.md] |
 | related_req | [REQ-010-069, REQ-010-065, REQ-010-068] |
 | related_design | [../integrity-rule-catalog.md, ../checker-execution-contracts.md] |
@@ -21,7 +21,7 @@ updated: 2026-10-05
 | false_positive_risk | 中。履歴・様式領域を免除する: `v2:` プレフィックス付き歴史識別子、code span / code block、テンプレート領域（`_template.md`、`templates/`）、IR ルール説明文（v2:REQ-0145-015）、AUTOGEN ブロック（checker-execution-contracts 検出対象除外規定）、retired ディレクトリ、`docs/reports/`。導入時点の既知違反（要件分割由来の旧行 ID 引用）は NG baseline で管理する |
 | regression_test | `check_integrity.test.ts` describe "IR-067 referenced-req-row-existence (REQ-010-069, Issue #2383 (a))"。正常例（実在行 ID の引用）・違反例（ファントム行 ID）・境界例（v2: プレフィックス・プレースホルダー・旧4桁番号帯・code span）・許容例（_template.md・AUTOGEN ブロック・IR ルール説明文）・再現例（PR 2284 ファントム引用パターン）の 5 種 fixture |
 | finding_route | intake |
-| triage_action | 新規検出（baseline 超過分）は引用先の再同定（現行要件行への置換、または履歴注記化・削除）。旧4桁番号帯（`REQ-0136-029` 等、F-04）は本ルールの検出対象外である |
+| triage_action | 新規検出（baseline 超過分）は引用先の再同定（現行要件行への置換、または履歴注記化・削除）。旧4桁番号帯（`REQ-0136-029` 等、F-04）は本ルールの検出対象外である（0141 未満の v2 歴史帯） |
 | last_verified | 2026-08-22 |
 
 ## 検査項目
@@ -44,7 +44,7 @@ updated: 2026-10-05
 | `docs/designs/integrity/rules/IR-*.md` | 例示用 ID を含む自己参照的資料（v2:REQ-0145-015、他検出関数と同一） |
 | AUTOGEN ブロック内の行 | 機械生成領域（checker-execution-contracts 検出対象除外規定） |
 | `docs/requirements/retired/`、`docs/decisions/retired/`、`docs/reports/` | 履歴領域 |
-| 旧4桁番号帯 `REQ-NNNN-NNN`（v2: なし） | 検出対象外（前置一致除外。F-04 是正は OU-007 スコープ） |
+| 旧4桁番号帯 `REQ-NNNN-NNN`（v2: なし、0141 未満） | 検出対象外（前置一致除外。F-04 是正は OU-007 スコープ） |
 
 ## baseline 運用
 

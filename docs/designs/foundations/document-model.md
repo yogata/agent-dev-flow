@@ -2,7 +2,7 @@
 title: 文書モデル
 status: accepted
 created: 2026-08-20
-updated: 2026-10-22
+updated: 2026-10-26
 ---
 <!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006, REQ-001-007, REQ-001-020, REQ-001-035, REQ-001-038, REQ-001-039, REQ-001-040, REQ-001-041, REQ-001-052, REQ-056-001 -->
 <!-- ADF-COVERS(implementation): REQ-001-066, REQ-001-067, REQ-001-068 -->
@@ -351,8 +351,8 @@ v4 移行期間中、accepted の v4 モデル定義 Design と未置換の v3 a
 
 | 規則 | 内容 |
 |---|---|
-| REQ ID | 4桁ゼロ埋めの安定ID。現行・廃止を問わず再利用しない |
-| Decision ID | 3桁ゼロ埋め。状態はfrontmatterで管理する |
+| REQ ID | 安定ID。表示はゼロ埋め（最小幅、切詰めしない）とし、受理検査に桁数上限を設けない。現行・廃止を問わず再利用しない |
+| Decision ID | 3桁ゼロ埋め（最小幅、切詰めしない）。状態はfrontmatterで管理する |
 | Design配置 | `docs/designs/**/*.md` |
 | Design status | `draft`、`accepted` の2値。status欠落は`accepted`相当。確定時の昇格はcase-closeが行う |
 | Guides配置 | `docs/guides/*.md` |
