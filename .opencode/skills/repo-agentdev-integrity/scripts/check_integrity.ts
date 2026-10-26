@@ -2171,7 +2171,9 @@ function checkLifecycleBoundary(root: string): CheckResult[] {
     const content = readText(filePath);
     if (!content) continue;
     const contentLines = content.split("\n");
-    const refs = content.match(/\bREQ-\d{3,4}\b/g) || [];
+    // retired REQ ファイルID（桁数上限なし）への単体参照の抽出。階層行ID の接頭部を
+    // 別のファイルID として抽出しない（非曖昧抽出。current_refs と同一の境界）。
+    const refs = [...content.matchAll(/(?<![\w-])REQ-\d+(?![\w-])/g)].map((m) => m[0]);
     const uniqueRefs = [...new Set(refs)];
     for (const ref of uniqueRefs) {
       if (retiredIds.has(ref) && !activeIds.has(ref)) {
