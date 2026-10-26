@@ -1,7 +1,7 @@
 // runValidateInputOnly（--validate-input 検証専用経路）の単体検証（REQ-009-053、Case #3862）。
 // 入力検証・gate 引数契約検査・ゲート実行体存在確認のみで ok を返し、副作用を持たない。
 import { describe, expect, test } from "bun:test";
-import { runValidateInputOnly } from "../src/close_mechanical_steps.ts";
+import { runValidateInputOnly, type CloseMechanicalInput } from "../src/close_mechanical_steps.ts";
 
 const cwd = process.cwd().replaceAll("\\", "/");
 const gateScript = import.meta.dir + "/../package.json";
@@ -10,7 +10,7 @@ function mk(name: string, args: string[]) {
   return { name, command: "bun", args, cwd };
 }
 
-function consumerFixture() {
+function consumerFixture(): CloseMechanicalInput {
   return {
   phase: "pre-merge", worktreeRoot: ".worktrees/x", repoRoot: cwd, branch: "fix/issue-9", prNumber: 9,
   issueBodyPath: "body.md",
@@ -19,7 +19,7 @@ function consumerFixture() {
   integrityGates: [mk("full-integrity-suite", [gateScript])],
   textlintGate: mk("textlint-final-check", [gateScript]),
   contractStateCheck: { contractStatePaths: [".agentdev/learning/inbox.md"], approvalEntries: [] },
-} as never;
+};
 }
 
 describe("runValidateInputOnly (REQ-009-053 verification-only entry)", () => {
@@ -41,13 +41,10 @@ describe("runValidateInputOnly (REQ-009-053 verification-only entry)", () => {
   });
 
   test("rejects an invalid gate flag contract before availability checks (fail-closed)", () => {
-    const fixture = consumerFixture() as unknown as Record<string, unknown>;
-    const traceKey = Object.keys(fixture).find((k) => k.toLowerCase().includes("traceability")) ?? "traceabilityGate";
-    const trace = fixture[traceKey] as { args: string[] };
-    const broken = JSON.parse(JSON.stringify(fixture)) as Record<string, unknown>;
-    // --req の値は末尾1件を不正値へ置換する（--req の重複を作らない）。
-    // 空セグメント（REQ-1-）は桁数上限なしの許容書式でも不正値。
-    (broken[traceKey] as { args: string[] }).args = [...trace.args.slice(0, -1), "REQ-1-"];
-    expect(() => runValidateInputOnly(broken as never, () => true)).toThrow(/--req/);
+    // 正常 fixture から --req 値のみを不正値（空セグメント）へ置換した不正入力を注入する
+    // （意図的な契約違反注入のため、入力型への再適合はさせない）。
+    const broken = structuredClone(consumerFixture()) as CloseMechanicalInput;
+    broken.traceabilityGate!.args = [...broken.traceabilityGate!.args.slice(0, -1), "REQ-1-"];
+    expect(() => runValidateInputOnly(broken, () => true)).toThrow(/--req/);
   });
 });
