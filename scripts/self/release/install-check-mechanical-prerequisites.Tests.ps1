@@ -114,7 +114,7 @@ function Invoke-Apply {
 
 function New-TempRepo {
     param([string]$Prefix)
-    $root = Join-Path ([System.IO.Path]::GetTempPath()) "$Prefix-$(Get-Random)"
+    $root = Join-Path $RepoRoot ".agentdev\tmp\$Prefix-$([guid]::NewGuid().ToString('N'))"
     New-Item -ItemType Directory -Path $root | Out-Null
     return $root
 }
@@ -206,13 +206,22 @@ function Test-GitTreeUnchanged {
 function Get-DirectorySnapshot {
     <#
     .SYNOPSIS
-        ディレクトリ状態の同一性比較用のスナップショット（実ファイル相対パスの
-        ソート済み一覧）を返す（TS-003 の合格条件）。
+        ディレクトリ状態の同一性比較用のスナップショット（TS-003 の合格条件）。
+        実ファイル相対パス一覧に各ファイルの SHA256 内容ハッシュを含め、空ディレクトリ
+        も相対パスで列挙する（ファイル名のみ・git 未追跡比較のみでは検出できない
+        内容変更と空ディレクトリの消失を検出対象に含める）。
     #>
     param([string]$Root)
-    return ((Get-ChildItem -LiteralPath $Root -Recurse -File -Force |
-            ForEach-Object { $_.FullName.Substring($Root.Length) } |
-            Sort-Object) -join "`n")
+    $files = (Get-ChildItem -LiteralPath $Root -Recurse -File -Force |
+        ForEach-Object {
+            $hash = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash
+            "$($_.FullName.Substring($Root.Length)):$hash"
+        } |
+        Sort-Object)
+    $emptyDirs = (Get-ChildItem -LiteralPath $Root -Recurse -Directory -Force |
+        ForEach-Object { "DIR:$($_.FullName.Substring($Root.Length))" } |
+        Sort-Object)
+    return (($files + $emptyDirs) -join "`n")
 }
 
 # ============================================================
@@ -383,6 +392,7 @@ function Invoke-Ts002MechanicalPrerequisites {
                 [System.Text.Encoding]::ASCII)
         }
         $statusBefore = Get-GitStatusText -Root $root
+        $snapshotBefore = Get-DirectorySnapshot -Root $root
         $r = Invoke-Check -Cwd $root -PathPrefix "$shimDir;"
         $shimRecords = if (Test-Path -LiteralPath $shimLog) { (Get-Content -LiteralPath $shimLog | Measure-Object).Count } else { 0 }
         Assert-True 'TS-003 (7) git/gh shim records zero invocations during the whole check run' `
@@ -393,7 +403,88 @@ function Invoke-Ts002MechanicalPrerequisites {
             ($r.ExitCode -eq 0) "exit=$($r.ExitCode)"
         Assert-True 'TS-003 (7) git status is unchanged by the shimmed check run' `
             ((Get-GitStatusText -Root $root) -eq $statusBefore) 'git status differs'
+        Assert-True 'TS-003 (7) hashes and directory structure are unchanged under shims' `
+            ((Get-DirectorySnapshot -Root $root) -eq $snapshotBefore) 'content or directories differ'
     } finally {
+        Remove-TempRepo $root
+    }
+
+    $root = New-MechanicalProbeConsumerRepo
+    try {
+        $prov = Invoke-Apply -Cwd $root
+        if ($prov.ExitCode -ne 0) { throw 'apply failed for response tests' }
+        Convert-PlacedSkillToRealCopy -Root $root -SkillName 'agentdev-workflow-case-open'
+        $script = Join-Path $root '.opencode\skills\agentdev-workflow-case-open\scripts\src\inspect_cross_dependencies.ts'
+        $valid = '{"ok":true,"scan":{"population_count":1},"condition_a":{"count":0},"condition_b":[{"file_results":[{"read_ok":true}]}],"detection_unavailable":[]}'
+        foreach ($mutation in @('missing-unavailable', 'empty-areas', 'missing-files', 'false-read', 'string-read', 'string-ok')) {
+            $report = $valid | ConvertFrom-Json -AsHashtable
+            switch ($mutation) {
+                'missing-unavailable' { $report.Remove('detection_unavailable') }
+                'empty-areas' { $report.condition_b = @() }
+                'missing-files' { $report.condition_b = @(@{}) }
+                'false-read' { $report.condition_b[0].file_results[0].read_ok = $false }
+                'string-read' { $report.condition_b[0].file_results[0].read_ok = 'true' }
+                'string-ok' { $report.ok = 'true' }
+            }
+            $json = $report | ConvertTo-Json -Depth 10 -Compress
+            [System.IO.File]::WriteAllText($script, "process.stdout.write(JSON.stringify($json));", [System.Text.Encoding]::UTF8)
+            $r = Invoke-Check -Cwd $root
+            Assert-True "TS-001 (8) rejects malformed response $mutation" `
+                (($r.ExitCode -ne 0) -and ($r.Output -match 'contract mismatch: .*inspect_cross_dependencies')) $r.Output
+        }
+    } finally {
+        Remove-TempRepo $root
+    }
+
+    $root = New-MechanicalProbeConsumerRepo
+    $outside = New-TempRepo 'adf-mechanical-outside'
+    try {
+        $prov = Invoke-Apply -Cwd $root
+        if ($prov.ExitCode -ne 0) { throw 'apply failed for containment test' }
+        [System.IO.File]::WriteAllText((Join-Path $outside 'sentinel.txt'), 'unchanged', [System.Text.Encoding]::UTF8)
+        $before = Get-DirectorySnapshot -Root $outside
+        New-TestJunction -LinkPath (Join-Path $root '.agentdev') -TargetPath $outside
+        $r = Invoke-Check -Cwd $root
+        Assert-True 'TS-006 (9) rejects ancestor junction before any probe writes' `
+            (($r.ExitCode -ne 0) -and ($r.Output -match 'probe ancestor is a junction/reparse point')) $r.Output
+        Assert-True 'TS-002 (9) external target content and directories are unchanged' `
+            ((Get-DirectorySnapshot -Root $outside) -eq $before) 'external target changed'
+        [System.IO.Directory]::Delete((Join-Path $root '.agentdev'), $false)
+    } finally {
+        Remove-TempRepo $root
+        Remove-TempRepo $outside
+    }
+
+    $root = New-MechanicalProbeConsumerRepo
+    $lockJob = $null
+    try {
+        $prov = Invoke-Apply -Cwd $root
+        if ($prov.ExitCode -ne 0) { throw 'apply failed for cleanup test' }
+        $ready = Join-Path $root 'watcher-ready'
+        $lockJob = Start-Job -ArgumentList $root, $ready -ScriptBlock {
+            param($Root, $Ready)
+            [System.IO.File]::WriteAllText($Ready, 'ready')
+            $until = [DateTime]::UtcNow.AddSeconds(30)
+            while ([DateTime]::UtcNow -lt $until) {
+                $file = Get-ChildItem -LiteralPath (Join-Path $Root '.agentdev\integrity\reports') -Filter 'cross-dependency.json' -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+                if ($file) {
+                    $handle = [System.IO.File]::Open($file.FullName, 'Open', 'Read', 'ReadWrite')
+                    try { Start-Sleep -Seconds 12 } finally { $handle.Dispose() }
+                    break
+                }
+                Start-Sleep -Milliseconds 5
+            }
+        }
+        $until = [DateTime]::UtcNow.AddSeconds(10)
+        while (-not (Test-Path -LiteralPath $ready) -and [DateTime]::UtcNow -lt $until) { Start-Sleep -Milliseconds 20 }
+        if (-not (Test-Path -LiteralPath $ready)) { throw 'cleanup watcher did not start' }
+        $r = Invoke-Check -Cwd $root
+        Assert-True 'TS-002 (10) locked probe cleanup surfaces divergence and nonzero exit' `
+            (($r.ExitCode -ne 0) -and ($r.Output -match 'probe input cleanup failed')) $r.Output
+        Wait-Job $lockJob | Out-Null
+        Receive-Job $lockJob | Out-Null
+    } finally {
+        if ($lockJob) { Remove-Job $lockJob -Force }
         Remove-TempRepo $root
     }
 }

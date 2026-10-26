@@ -841,10 +841,31 @@ $MechanicalStepProbeContract = @(
 
 $MechanicalStepProbeTimeoutMs = 60000
 
+function Assert-MechanicalProbeContainedPath {
+    param([string]$Path, [string]$Root)
+    $full = [System.IO.Path]::GetFullPath($Path)
+    $rootPrefix = [System.IO.Path]::GetFullPath($Root).TrimEnd('\', '/') + [System.IO.Path]::DirectorySeparatorChar
+    if (-not $full.StartsWith($rootPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "Mechanical-step probe path is outside the workspace: $Path"
+    }
+    $current = $full
+    while ($current) {
+        $item = if (Test-Path -LiteralPath $current -ErrorAction Stop) { Get-Item -LiteralPath $current -Force -ErrorAction Stop } else { $null }
+        if ($null -ne $item -and ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint)) {
+            throw "Mechanical-step probe ancestor is a junction/reparse point: $current"
+        }
+        $parent = Split-Path -Path $current -Parent
+        if ($parent -eq $current) { break }
+        $current = $parent
+    }
+}
+
 # 検査入力 fixture の組み立て（配布先の実際の consumer 条件を表現する）。
 # ゲート実行体の参照は配置済み skill の実在 script（agentdev-traceability の checker）
-# を指し、REQ 行 ID は入力書式契約（REQ-NNN-MMM、3〜4桁 REQ 部）に従う実在書式値を
-# 使う。横断依存検査の shared_areas は consumer チェックアウト内の実在ファイルを指す。
+# を指し、REQ 行 ID は入力書式契約（REQ- 接頭辞・ハイフン区切り・数値セグメント2つ・
+# 各セグメント最小1桁。桁数上限なし。受理上限撤廃 Decision）に従う有効書式サンプルを
+# 使う（Case 非依存の値で機械 probe として自己完結する）。
+# 横断依存検査の shared_areas は consumer チェックアウト内の実在ファイルを指す。
 function New-MechanicalStepProbeInput {
     param(
         [string]$Kind,
@@ -1360,7 +1381,9 @@ if ($Mode -eq 'check') {
         $probeReportsDir = Join-Path $RepoRoot '.agentdev\integrity\reports'
         $probeTempDir = Join-Path $probeReportsDir "adf-install-check-$([guid]::NewGuid().ToString('N')).tmp"
         $createdAncestors = [System.Collections.Generic.List[string]]::new()
+        $probeCreated = $false
         try {
+            Assert-MechanicalProbeContainedPath -Path $probeTempDir -Root $RepoRoot
             $missingAncestors = [System.Collections.Generic.List[string]]::new()
             $ensureDir = $probeReportsDir
             while (-not (Test-Path -LiteralPath $ensureDir)) {
@@ -1370,15 +1393,18 @@ if ($Mode -eq 'check') {
                 $ensureDir = $parentDir
             }
             foreach ($dirPath in $missingAncestors) {
+                Assert-MechanicalProbeContainedPath -Path $dirPath -Root $RepoRoot
                 New-Item -ItemType Directory -Path $dirPath -Force | Out-Null
                 $createdAncestors.Add($dirPath)
             }
             New-Item -ItemType Directory -Path $probeTempDir -Force | Out-Null
+            $probeCreated = $true
 
             # 横断依存検査 fixture は定義PR受入検査 fixture の overlapGate 参照（--input）
             # からも使われるため、最初に書き込む。クローズ機械工程 fixture の
             # issueBodyPath 参照（完了条件本文抽出対象）も同様に先に書き込む。
             $crossDepFixture = New-MechanicalStepProbeInput -Kind 'cross-dependency' -RepoRoot $RepoRoot -SkillsDir $SkillsDir -ProbeDir $probeTempDir
+            Assert-MechanicalProbeContainedPath -Path $probeTempDir -Root $RepoRoot
             [System.IO.File]::WriteAllText(
                 (Join-Path $probeTempDir 'cross-dependency.json'),
                 ($crossDepFixture | ConvertTo-Json -Depth 10),
@@ -1402,6 +1428,7 @@ if ($Mode -eq 'check') {
                 }
                 $inputPath = Join-Path $probeTempDir ($probeSpec.Kind + '.json')
                 $fixture = New-MechanicalStepProbeInput -Kind $probeSpec.Kind -RepoRoot $RepoRoot -SkillsDir $SkillsDir -ProbeDir $probeTempDir
+                Assert-MechanicalProbeContainedPath -Path $probeTempDir -Root $RepoRoot
                 [System.IO.File]::WriteAllText($inputPath, ($fixture | ConvertTo-Json -Depth 10), (New-Object System.Text.UTF8Encoding($false)))
                 if ($probeSpec.Entry -eq 'validate-input') {
                     $expectedDetail = 'exit 0 with a validation report (ok: true) on stdout via --validate-input (consumer-condition fixture)'
@@ -1422,31 +1449,38 @@ if ($Mode -eq 'check') {
                 }
                 $probeContractOk = $false
                 if ($probeSpec.Entry -eq 'validate-input') {
-                    $probeContractOk = ($probe.ExitCode -eq 0) -and ($null -ne $probeReport) -and ($probeReport.ok -eq $true)
+                    $probeContractOk = ($probe.ExitCode -eq 0) -and ($null -ne $probeReport) -and ($probeReport.ok -is [bool]) -and ($probeReport.ok -eq $true)
                 } else {
-                    $readOkAll = $true
-                    if ($null -ne $probeReport -and $null -ne $probeReport.condition_b) {
+                    # 応答述語は fail-closed: condition_b と detection_unavailable は
+                    # 配列として存在しなければならない（欠落を空と同等に受理しない）。
+                    # file_results は shared_areas の file_paths 非空を前提とするため、
+                    # 欠落・空の file_results は読取証拠不在として不成立とする。
+                    $conditionBPresent = ($null -ne $probeReport) -and ($probeReport.condition_b -is [array]) -and ($probeReport.condition_b.Count -eq 1)
+                    $readOkAll = $conditionBPresent
+                    if ($conditionBPresent) {
                         foreach ($area in @($probeReport.condition_b)) {
-                            foreach ($fileResult in @($area.file_results)) {
-                                if ($fileResult.read_ok -ne $true) { $readOkAll = $false }
+                            if ($area.file_results -isnot [array]) { $readOkAll = $false; continue }
+                            $areaResults = @($area.file_results)
+                            if ($areaResults.Count -ne 1) { $readOkAll = $false; continue }
+                            foreach ($fileResult in $areaResults) {
+                                if (($fileResult.read_ok -isnot [bool]) -or ($fileResult.read_ok -ne $true)) { $readOkAll = $false }
                             }
                         }
-                    } else {
-                        $readOkAll = $false
                     }
-                    $unavailableCount = 0
-                    if ($null -ne $probeReport -and $null -ne $probeReport.detection_unavailable) {
-                        $unavailableCount = @($probeReport.detection_unavailable).Count
+                    $detectionUnavailableEmpty = $false
+                    if ($null -ne $probeReport -and $probeReport.detection_unavailable -is [array]) {
+                        $detectionUnavailableEmpty = (@($probeReport.detection_unavailable).Count -eq 0)
                     }
                     $probeContractOk = ($probe.ExitCode -eq 0) -and
                         ($null -ne $probeReport) -and
-                        ($probeReport.ok -eq $true) -and
+                        ($probeReport.ok -is [bool]) -and ($probeReport.ok -eq $true) -and
                         ($null -ne $probeReport.scan) -and
-                        ($probeReport.scan.population_count -eq 1) -and
+                        (($probeReport.scan.population_count -is [int]) -or ($probeReport.scan.population_count -is [long])) -and ($probeReport.scan.population_count -eq 1) -and
                         ($null -ne $probeReport.condition_a) -and
-                        ($probeReport.condition_a.count -eq 0) -and
+                        (($probeReport.condition_a.count -is [int]) -or ($probeReport.condition_a.count -is [long])) -and ($probeReport.condition_a.count -eq 0) -and
+                        $conditionBPresent -and
                         $readOkAll -and
-                        ($unavailableCount -eq 0)
+                        $detectionUnavailableEmpty
                 }
                 if ($probeContractOk) {
                     Write-Host "[OK] Mechanical-step script prerequisite ($($probeSpec.Entry)): $scriptDisplay"
@@ -1460,14 +1494,34 @@ if ($Mode -eq 'check') {
             }
             Write-Host "Mechanical-step prerequisites: $mechanicalTargets target(s), $mechanicalDivergences divergence(s) (section summary; unified divergence aggregation and exit code are maintained by check mode)"
         }
+        catch {
+            Write-Host "[DIVERGENCE] Mechanical-step prerequisite verification failed: $($_.Exception.Message)"
+            $divergences++
+        }
         finally {
-            if (Test-Path -LiteralPath $probeTempDir) {
-                Remove-Item -LiteralPath $probeTempDir -Recurse -Force -ErrorAction SilentlyContinue
+            # 後片付けの失敗は黙殺しない（検証前後のディレクトリ状態同一の契約）。
+            # 削除失敗は divergence として検出し、installer の非ゼロ終了へ反映する。
+            $cleanupDiverged = $false
+            if ($probeCreated -and (Test-Path -LiteralPath $probeTempDir)) {
+                try {
+                    Assert-MechanicalProbeContainedPath -Path $probeTempDir -Root $RepoRoot
+                    Remove-Item -LiteralPath $probeTempDir -Recurse -Force -ErrorAction Stop
+                } catch {
+                    Write-Host "[DIVERGENCE] Mechanical-step probe input cleanup failed; probe inputs must not remain after check: $probeTempDir"
+                    $divergences++
+                    $cleanupDiverged = $true
+                }
             }
             for ($i = $createdAncestors.Count - 1; $i -ge 0; $i--) {
                 $dirPath = $createdAncestors[$i]
-                if ((Test-Path -LiteralPath $dirPath) -and -not (Get-ChildItem -LiteralPath $dirPath -Force)) {
-                    Remove-Item -LiteralPath $dirPath -Force -ErrorAction SilentlyContinue
+                try {
+                    Assert-MechanicalProbeContainedPath -Path $dirPath -Root $RepoRoot
+                    if ((Test-Path -LiteralPath $dirPath) -and -not (Get-ChildItem -LiteralPath $dirPath -Force -ErrorAction Stop)) {
+                        Remove-Item -LiteralPath $dirPath -Force -ErrorAction Stop
+                    }
+                } catch {
+                    Write-Host "[DIVERGENCE] Mechanical-step probe ancestor cleanup failed; created ancestors must be removed after check: $dirPath"
+                    if (-not $cleanupDiverged) { $divergences++; $cleanupDiverged = $true }
                 }
             }
         }
