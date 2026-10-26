@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-auto
-description: "case-auto command の workflow 実装本体。case-open → case-ready → case-run → case-close（例外経路: case-revise → case-ready 経由）の自走 orchestration、orchestration stage モデル、クリーンアップ検証ゲート、stage 3 スロット型キュー制御（共有 active Issue task 枠・空き枠補充・状態管理・再開時二重起動防止・依存充足ゲートの完了即次投入・委譲前重複実行時検出・single-flight 保護）、HITL question スキップ可能キュー、bounded parent decision resolution、コンフリクト解消 Level 2/3、停止理由分類、adversarial-review 由来の停止伝播、Root Case 再開入口（req-define）停止、v5 有限実行モード契約（責務分割・小規模連続実行・設計確定独立終了・移行期区別）、結果集約を所有する。USE FOR: case-auto 実行時の workflow 制御（入力解決・工程分岐・orchestration・停止検出・停止理由分類）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "case-auto command の workflow 実装本体。case-open → case-ready → case-run → case-close（例外経路: case-revise → case-ready 経由）の自走 orchestration、orchestration stage モデル、クリーンアップ検証ゲート、stage 3 スロット型キュー制御、HITL question スキップ可能キュー、bounded parent decision resolution、コンフリクト解消 Level 2/3、停止理由分類、adversarial-review 由来の停止伝播、Root Case 再開入口（req-define）停止、v5 有限実行モード契約（責務分割・小規模連続実行・設計確定独立終了・移行期区別）、結果集約を所有する。USE FOR: case-auto 実行時の workflow 制御（入力解決・工程分岐・orchestration・停止検出・停止理由分類）。DO NOT USE FOR: 単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
 ---
 
 # case-auto workflow スキル

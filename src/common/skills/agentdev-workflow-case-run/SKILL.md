@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-run
-description: "内部 lifecycle 段階 case-run の workflow 実装本体。単一 Issue 実行への収斂（実行担当サブエージェント委譲1件、result 4状態処理、前置/最終 gate）を所有する。Epic・Wave を処理対象とする実行契約は廃止され、Wave 実行制御（Wave 構成の読み取り、現在 Wave 判定、fan-out/fan-in、子 Issue 並列起動、共有 active Issue task 枠）は case-auto の orchestration stage 3 が単一所有する。USE FOR: case-run 実行時の workflow 制御（単一 Issue 実行・再開フェーズ判定・委譲・前置/最終 gate）。DO NOT USE FOR: 実装実行そのもの（委譲内の実行担当サブエージェントが担う）、Epic や Wave の実行制御（case-auto orchestration stage 3 の責務）、単独起動（case-auto の内部 lifecycle orchestration から起動される内部段階である）。"
+description: "内部 lifecycle 段階 case-run の workflow 実装本体。単一 Issue 実行への収斂（実行担当サブエージェント委譲1件、result 4状態処理、前置/最終 gate）を所有する。Epic・Wave を処理対象とする実行契約は廃止され、Wave 実行制御は case-auto の orchestration stage 3 が単一所有する。USE FOR: case-run 実行時の workflow 制御（単一 Issue 実行・再開フェーズ判定・委譲・前置/最終 gate）。DO NOT USE FOR: 実装実行そのもの（委譲内の実行担当サブエージェントが担う）、Epic や Wave の実行制御（case-auto orchestration stage 3 の責務）、単独起動（case-auto の内部 lifecycle orchestration から起動される内部段階である）。"
 ---
 
 

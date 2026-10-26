@@ -1,6 +1,6 @@
 ---
 name: agentdev-phase-theme-collaboration
-description: "工程駆動コラボレーションの Capability Skill。テーマ正本（themes.md・pending.md・identity.yaml・received/）の管理操作知識と、外部検討の持出し・戻り受理の機械的処理を所有する。戻り入力は O(n) 線形走査・fail-closed・採用件数比例の証跡量で受理し、採用根拠は利用者の明示判断に限定する。USE FOR: 対象の取組・対象版・現在工程の特定と再開、テーマ正本の読み書き規律と一覧導出、旧テーマ識別の後継解決、未決事項の引継ぎ参照、持出し文書の構成確認と機密混入検出、戻り入力の受理・採否記録生成、受領済み知見の再取得。DO NOT USE FOR: テーマ形成・更新の workflow 制御（agentdev-workflow-phase-tasks-create / phase-tasks-update）、正規成果物への反映判断（agentdev-workflow-phase-artifacts-update）、独立レビュー・工程遷移（phase-review / phase-transition）、採用規約の解決（agentdev-adopted-conventions）。"
+description: "工程駆動コラボレーションの Capability Skill。テーマ正本（themes.md・pending.md・identity.yaml・received/）の管理操作知識と、外部検討の持出し・戻り受理の機械的処理を所有する。戻り入力の受理は fail-closed とし、採用根拠は利用者の明示判断に限定する。USE FOR: 対象の取組・対象版・現在工程の特定と再開、テーマ正本の読み書き規律と一覧導出、旧テーマ識別の後継解決、未決事項の引継ぎ参照、持出し文書の構成確認と機密混入検出、戻り入力の受理・採否記録生成、受領済み知見の再取得。DO NOT USE FOR: テーマ形成・更新の workflow 制御（agentdev-workflow-phase-tasks-create / phase-tasks-update）、正規成果物への反映判断（agentdev-workflow-phase-artifacts-update）、独立レビュー・工程遷移（phase-review / phase-transition）、採用規約の解決（agentdev-adopted-conventions）。"
 ---
 
 # agentdev-phase-theme-collaboration

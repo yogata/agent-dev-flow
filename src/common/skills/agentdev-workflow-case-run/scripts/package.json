@@ -1,0 +1,14 @@
+{
+  "name": "agentdev-workflow-case-run-scripts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Deterministic processing for case-run work-record comments (record-comments.ts): per-record-kind required-field validation, progress/result section construction, and application to the existing Issue body. Pure functions, argv input, stdout JSON output.",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/bun": "^1.3.0"
+  }
+}
