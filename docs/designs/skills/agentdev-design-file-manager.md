@@ -2,7 +2,7 @@
 title: agentdev-design-file-manager Design
 status: accepted
 created: 2026-07-22
-updated: 2026-10-20
+updated: 2026-10-27
 ---
 
 <!-- ADF-COVERS(design): REQ-021-013, REQ-021-026, REQ-012-031（Design action 不在の要件行の保存処理を Design 保存内部責務が阻害しない設計判断） -->

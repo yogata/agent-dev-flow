@@ -2,7 +2,7 @@
 title: ADF v4 実装責務境界（意味判断 Skill / 決定的処理 code / Harness adapter / Project Extensions）
 status: accepted
 created: 2026-09-18
-updated: 2026-10-08
+updated: 2026-10-27
 ---
 <!-- ADF-COVERS(implementation): REQ-003-021, REQ-003-022, REQ-003-023 -->
 <!-- ADF-COVERS(implementation): REQ-096-010, REQ-096-014, REQ-096-021, REQ-096-025, REQ-096-027, REQ-096-028, REQ-096-029, REQ-096-030（ADF判断アーキテクチャの正規実体としての実装対応。REQ-096-028/029/030 は本文規範の実保持を適用時に確認〔閉包条件節等の契約面実在を確認済み 2026-10-27〕） -->

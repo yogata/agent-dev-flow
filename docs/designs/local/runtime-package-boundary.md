@@ -2,7 +2,7 @@
 title: 実行時パッケージ境界
 status: accepted
 created: 2026-08-20
-updated: 2026-10-16
+updated: 2026-10-27
 ---
 <!-- ADF-COVERS(implementation): REQ-002-007, REQ-002-008, REQ-002-011, REQ-002-019, REQ-002-020, REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-113-001, REQ-113-002（tsconfig 参照共有と typecheck 組込みの実装対応） -->
