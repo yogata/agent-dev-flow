@@ -1,0 +1,208 @@
+{
+  "一式識別子": "20261027T034727JST",
+  "作成日時": "2026-10-27T06:12:00+09:00",
+  "backlog_auto_started_at": "2026-10-27T03:47:27+09:00",
+  "基準点情報": {
+    "最後の正式リリース": {
+      "版番号": "5.1.6",
+      "タグ名": "v5.1.6",
+      "タグ対象コミット": "8bb4e18d008960f553b02758ca6a9a42ab8b1916",
+      "確定根拠": "正式 SemVer タグ列挙（rc・非 SemVer ベースライン除外）→HEAD 到達判定（v5.1.4/v5.1.5/v5.1.6 到達可能を実測）→SemVer 数値比較で最大版 5.1.6。基準点確認手続 2026-10-27T06:10 JST 実施（backlog-auto stage3 完了後）"
+    },
+    "開始コミットID": "a7a0cdb8415b8ea53e1bd7f45e1cf9d1a44494cb",
+    "開始コミット確定時のHEAD": "adae3c7556b9982b43cfcb4e6583822d9ae161f9",
+    "開始コミット採用根拠": "backlog-auto 実行開始時点（2026-10-27T03:47:27+09:00）の main HEAD が a7a0cdb84（STEP-1 実測）。実行開始後の stage1〜3 永続化コミット（b737148e3 stage1 finding / 5e10d51b3+c868b9bae intake / 3a508c7ad inspect / 7880d6407 learning / ece068dce jev観測 / adae3c755 RU生成）は本一式実行に帰属する bookkeeping 変更として差分突合で本一式に数える"
+  },
+  "義務スナップショット": {
+    "抽出根拠": ".agentdev/backlog/req-units/RU-0247.md〜RU-0262.md（2026-10-27T05:48 JST backlog-review 生成・HITL 代理回答 BKR-Q1①/Q2①/Q3① で承認確定）の本文（Source Summary・要件化の方向）から抽出。完了突合の正の一つ",
+    "義務": {
+      "RU-0247": {
+        "タイトル": "docs 正規成果物の機械的是正 4 件（表構造・用語現行化・行順序・参照 ID 化）",
+        "必須要求": "IDX-03 REQ-108.md:30 空行削除による表統合（REQ-108-014..024 が同一表として解釈されること）、IDX-08 REQ-060.md:10 目的節本文の現行用語化（リポジトリルートを cwd にして実行・./ 付きパス指定）、IDX-09 REQ-010.md:44 REQ-010-080 行の正しい連番位置（081 直前）への移動、IDX-12 numbering-policy.md:34 の DEC-062 参照を ID 参照（Decision DEC-062 形式）へ変更、の 4 修正を実施すること",
+        "受け入れ義務": [
+          "IDX-08 の knowledge 2 件（bun-test-execution-form-drift-signals.md:19・windows-bun-test-spawn-timeout-classification.md:28）は自覚的除外として本修正範囲外であること（REQ-094 適用範囲は req-define で確定）",
+          "検証は docs-check（REQ 構造・用語・参照解決）の pass で行うこと",
+          "修正対象行と修正内容は RU 記載どおり一意確定しており、内容解釈の変更を含めないこと"
+        ]
+      },
+      "RU-0248": {
+        "タイトル": "IDX-04 配布物・Design 内の inline コードスパン破損の是正（docs-check gate fail 緊急）",
+        "必須要求": "design-file-manager.md:75 と target-area-matching.md:33 の同一段落の inline ``` ラン 3 箇所（奇数）によるコードスパン破損を、是正方向 (a) 4 バッククォート囲み等の表現修正 または (b) ALLOWED_USAGE 登録による例外化のいずれかで解消し、check_content_corruption の exit 1（docs-check gate fail）を解消すること。是正方向は req-define の合意対象",
+        "受け入れ義務": [
+          "(a) 採用時は REQ-004-066..068 が要求する同内容 9 箇所複製（Design 3・配布 reference 2・script JSDoc 3・REQ 行）の整合を必須条件とし、2 ラン複製 3 箇所（numbering-policy.md:77・req-define.md:147・draft-generation.md:73）の表現統一を併せ検討し、REQ-001-071（認識規則同一性契約）への波及を評価すること",
+          "(b) 採用時は content-corruption-checker Design 変更を伴い、壊れたコードスパン自体は配布物に残る（REQ-053-008 との緊張）ことを合意内容に明記すること",
+          "IDX-04 修正が IR-055 検出パターンを新規発生させない表現修正であること"
+        ]
+      },
+      "RU-0249": {
+        "タイトル": "IR-055 warning_total_cap 超過の根本解消: 8 REQ の Design 候補行 11 件の分離修正",
+        "必須要求": "REQ-001/008/010/014/034/061/094/103 の 8 REQ に残存する REQ/Design 分離基準違反の Design 候補行 11 件を IR-044 triage_action（Design 的内容を正規所有 Design へ移管し REQ 側は外部契約・状態要件の要約に置換）に従って分離修正し、pre-demote warning total を cap 58 以下へ復帰させること。確定済み処置: (b) 分離修正の後続要求化・実施まで (c) 維持・(a) cap 変更不採用",
+        "受け入れ義務": [
+          "対象行 11 件は req-define の要件分析時に check_integrity（IR-044 warning 検出）を実行した実測リストを一次情報として確定すること（昇格時スナップショットを正としない。BKR-Q3① 確定）",
+          "REQ-001-069 が実測で 11 行に含まれる場合、RU-0251 の missing-design 対象と突合し二重要求化しないこと",
+          "cap（ir-055-baseline.json warning_total_cap 58）の変更は一切行わないこと",
+          "depends_on RU-0247（REQ-010.md 行順序修正の先行）を尊重すること（REQ-010 内 IR-044 true positive 不在判明時は依存冗長だが無害）",
+          "完了判定: 修正後 check_integrity で pre-demote warning total ≤ 58 かつ IR-055 が NG でないこと"
+        ]
+      },
+      "RU-0250": {
+        "タイトル": "main root 未追跡残存の運用処置: tmp-runner-cli-* の ignore・削除・cleanup と .tmp-jev-analysis/ の削除（IR-073 pass 回復）",
+        "必須要求": "src/common/tools/agentdev-gh/tests/ 配下 tmp-runner-cli-* パターンを .gitignore へ追加し、既存物理残骸（400+ ディレクトリ）を削除し、テスト後クリーンアップ改善を実施すること。.tmp-jev-analysis/ を削除すること（恒久 ignore 化しない）。jev 観測 8 件のコミットは親実施済み（ece068dce）で本 RU 対象外",
+        "受け入れ義務": [
+          "intake 時点の即時処置削除除外（L18）は即時処置への限定であり、確定処置（2026-10-27 HITL）が本 RU 内での物理削除含有を指示している旨の解釈記録を req-define で保持すること",
+          "完了判定: check_integrity（IR-073 含む）が main root 起点実行で untracked 残存起因の NG 0（exit 1 解消）であること"
+        ]
+      },
+      "RU-0251": {
+        "タイトル": "traceability check 区分外達成義務行の解消（REQ-021-031 区分結果の後続別要求化）",
+        "必須要求": "traceability check の区分外達成義務行（昇格時: missing-design REQ-001-069/REQ-052-012、missing-implementation REQ-096 8行+REQ-098-010、missing-verification 重複の REQ-113-001/002）を、実行時点の現行 covers 状態で再区分した実測リストに基づいて解消すること。13-vs-11 計数差は REQ-113-001/002 の二重計数（9+2×2=13）と解釈する",
+        "受け入れ義務": [
+          "対象行リストは req-define の要件分析時に現行 covers 状態（design/implementation/verification 3 役割+policy optional 3 区分）で再区分した実測を一次情報とすること（REQ-098-010 のように現行解消済み行は対象外。BKR-Q3① 確定）",
+          "REQ-113-001/002 は implementation と verification の両解消を単一 RU 内で行い二重 RU 化しないこと",
+          "REQ-001-069 が RU-0249 の 11 行に含まれる場合 req-define で突合し二重要求化しないこと",
+          "REQ-096 の行単位の implementation covers 新設 vs implementation.optional 区分化の選択、REQ-052-012 の design covers 新設 vs design.optional 区分化の選択は req-define で確定すること（除外・抑制・参照宣言行への一律実装義務付けは不自然）",
+          "完了判定: 対象行の現行実測分の解消後、traceability check（コーパス全体）が区分外達成義務行 0 件であること"
+        ]
+      },
+      "RU-0252": {
+        "タイトル": "traceability sidecar 重複パスキーの構造的予防の導入",
+        "必須要求": "sidecar（traceability/*.yaml）追記・更新での同一パスキー重複を、(a) check_integrity malformed-declarations への重複キー検出追加（Bun.YAML last-wins 回避の raw parse を含む）、(b) sidecar 更新手順への重複キー事前統合ルール明記、または (a)+(b) のいずれかで構造的に予防すること。導入方式は req-define の設計判断",
+        "受け入れ義務": [
+          "(a) 採用時は重複キーを含む sidecar に対する check が NG 検出する回帰テストを含めること",
+          "(b) 採用時は手順規定の存在と適用確認を完了条件とすること",
+          "いずれも PR #3819 相当の重複が再発時に検出または防止されること"
+        ]
+      },
+      "RU-0253": {
+        "タイトル": "REQ-115 の後続実装: case-run scripts への tsconfig.json・package.json 実追加と typecheck gate 組込み",
+        "必須要求": "case-run scripts の正規配置先（src/common/skills/agentdev-workflow-case-run/scripts/）に tsconfig.json と package.json を実追加し、typecheck gate を品質検査経路へ組込み、case-run scripts 全体を型検査対象とすること",
+        "受け入れ義務": [
+          "REQ-115-003 の確認条件（bun test 正規形・QG-4 3 cwd 分割実行の実行経路・検査対象集合を変化させない）を維持すること",
+          "REQ-115 の方針本文と整合し、実装後に REQ-115 の対象外明記が obsolete とならない整合方針を req-define で確定すること",
+          "local ツール package の tsconfig 統合（REQ-112/113 系・RU-0251）とは対象 package が異なる旨の境界維持と、品質検査経路の組込み箇所が近接する場合の REQ-113 との経路共有有無確認を req-define で行うこと",
+          "完了判定: case-run scripts 配下が typecheck gate の検査対象として緑であること・QG-4 実行経路と検査対象集合が不変であること"
+        ]
+      },
+      "RU-0254": {
+        "タイトル": "REQ-116 の後続実装: 隔離検証リポジトリの管理者側実際の準備",
+        "必須要求": "REQ-116 の方針に基づく隔離検証リポジトリを管理者側で実際に準備し（repo 外操作）、準備結果（URL・構成・利用手順）を文書化して REQ-116 の方針本文と knowledge（gh-isolated-verification-repository.md）に反映すること",
+        "受け入れ義務": [
+          "repo 外操作の実行前提（実行主体・権限・手順）を req-define の段階で明示すること",
+          "repo 内の配布物・実装の変更を本 RU に含めないこと",
+          "完了判定: 隔離検証リポジトリが準備され REQ-116 の方針が宣言済みから実際に利用可能へ完結していること（準備記録・文書化の存在確認）"
+        ]
+      },
+      "RU-0255": {
+        "タイトル": "phase-artifacts-update skill description 上限超過（676>600・集約 20724>20300）の漸進回収",
+        "必須要求": "agentdev-workflow-phase-artifacts-update の description を 600 chars 以下へ削減（top 層からの削減）し、description 集約合計を 20300 以下へ回収すること。frontmatter 変更は skill 構造契約に従い投影（src/common → .opencode）との同期を含める",
+        "受け入れ義務": [
+          "skill の役割・トリガー情報の保持と AG-005 適合の両立は agentdev-skill-authoring / command-authoring の description 品質基準に従うこと",
+          "漸進回収方式（lint_skills 運用方針）の範囲内で実施し、他 skill description への全面的な一括変更を行わないこと",
+          "完了判定: lint_skills（profile source・全件スキャン）で AG-005 個別 NG 0 件（当該 skill）・集約合計 ≤ 20300 であること"
+        ]
+      },
+      "RU-0256": {
+        "タイトル": "REQ-039-007 の履歴検査「検査成功 / 検査不能」境界の文言明示化（Issue #3823 TS-008 文言乖離是正）",
+        "必須要求": "REQ-039-007 行へ「git リポジトリかつコミット 0（git log --all が exit 0・空出力）は使用済み集合が空の検査成功であり履歴検査不能に該当しない。履歴検査不能とは検査手段の失敗時（非 git・権限欠如・git 破損等）で fail-closed」の境界文言を追加すること（文言確定は req-define）",
+        "受け入れ義務": [
+          "修正内容は REQ-039-007 行への明示的文言追加であり、既存文面の削除ではないこと",
+          "REQ-039.md に test strategy 節は存在しないため新規節の追加を行わず、既存の REQ 行・受け入れ条件・検証の構造内で文言を明示化すること",
+          "手続正（integration-judgment.md「履歴検査不能時の fail-closed」）と git 実挙動に整合すること"
+        ]
+      },
+      "RU-0257": {
+        "タイトル": "機械工程 script への入力検証専用入口（validateInput 分離入口）の新設",
+        "必須要求": "機械工程 script（prepare_definition_pr.ts 等）に入力検証のみを実行する専用入口（validateInput 分離入口）を新設し、worktree 作成等の副作用ステップへ到達しない入口として、scripts 契約（scripts/README.md 等）へ dry-run 入口仕様を定義すること",
+        "受け入れ義務": [
+          "入口は入力検証（必須ゲート実行体の availability を含む入力妥当性検証）のみを実行すること",
+          "REQ-009-053（install.ps1 check・PR #3861）との関係で、入口新設後に install.ps1 check を重複実装から正規入口呼出しへ整理するかを req-define で確定すること",
+          "完了判定: 入口が consumer の check モードから呼出可能であり、ゲート実行体欠如在時に fail-closed で検出すること。script 契約への仕様定義の存在"
+        ]
+      },
+      "RU-0258": {
+        "タイトル": "prepare_definition_pr の計測日収束補正 commit の script 内完結化",
+        "必須要求": "prepare_definition_pr.ts に拡張 step（generate_indexes 実行後・check_integrity 実行前に、計測日不整合〔req-metrics 計測日 AUTOGEN 更新+req-updated-freshness による frontmatter updated 追随〕を検出し、明示パス指定の補正 commit を script 内で完結）を追加し、手順契約（case-open Design「機械工程の script 呼び出し契約」節）を追随更新すること",
+        "受け入れ義務": [
+          "trigger 条件は check_integrity 報告の計測日不整合 NG と req-updated-freshness NG であること",
+          "既存の contingency 手順（definition-pr-and-idempotency.md「計測日収束」節）の機械化であること",
+          "RU-0259 とは論点が別であり、script 実装の共通箇所の競合有無を req-define で確認すること",
+          "完了判定: 機械工程実行で手動補正 commit が不要となり（実測で Definition PR 生成が一巡で pass）、script 契約と手順文書が実装と整合すること"
+        ]
+      },
+      "RU-0259": {
+        "タイトル": "checker・機械工程 script のパス引数に対する絶対パス標準の一般化（恒久契約化）",
+        "必須要求": "パス引数の絶対パス構成標準（または gate spec cwd からの相対解決意図の明示）を機械工程 gate spec のパス引数全般・main root 対象 checker の --root へ一般化し、checker 実行記録へのパス引数解決先（実測絶対パス）明記規律を含めて恒久契約化すること。変更対象（checker-execution-contracts.md L198-201 規定の一般化・機械工程手順 references への前置規律）は req-define の変更影響分析で確定",
+        "受け入れ義務": [
+          "gate spec の --input は非空検査のみ・解決基準は呼出側責任という現行 flag 契約を変更しないこと",
+          "報告 JSON の stderr 原証跡による fail-closed 検出は維持すること",
+          "既存知識文書（windows-checker-msys-path-argument.md・windows-checker-observation-discipline.md）は再定義せず補完関係を維持すること",
+          "完了判定: (1) パス引数の解決基点と絶対パス標準の適用範囲が恒久契約で明文化、(2) 検証記録に解決先明記規律が定義、(3) 3 回の出現事例（2026-10-13・E34・E39）の再発条件が恒久規定で防止されることを機械検査または手順検査で確認可能、の 3 項目充足"
+        ]
+      },
+      "RU-0260": {
+        "タイトル": "record-comments.ts applySection のセクション置換時における見出し直前空行保持の恒久修正",
+        "必須要求": "record-comments.ts applySection の置換分岐（L320-322）と追記分岐（L325-326）の両方で、連結前の before 末尾に空行 1 行を保証する修正を行い、record-comments.test.ts に見出し直前空行の回帰検証を追加すること。投影（src/common → .opencode）との同期を含める",
+        "受け入れ義務": [
+          "空行の付与は before 側（連結前）で行うこと（sectionMarkdown 先頭行見出し抽出契約 L301 を壊さない）",
+          "applyEpicChildStatusUpdates（行内置換）は対象外であること",
+          "agentdev_gh の issue_update 操作契約・VERIFY 契約、セクション構築関数（buildProgressSection 等）の出力形式は不変であること",
+          "完了判定: 置換・追記両分岐で見出し直前空行が保証され、回帰テストが追加され、既存契約が不変であること"
+        ]
+      },
+      "RU-0261": {
+        "タイトル": "agentdev-req-file-manager Design の旧受理記述（L64-74）の canonical DRIFT 解消（Definition Amendment 経路）",
+        "必須要求": "req-define で旧受理記述（d{3,4} 認識・4桁正規化、design-file-manager.md L64-74）の変更を再合意した後、case-auto の例外経路（case-revise → case-ready）経由の Definition Amendment として、受理は形式妥当性のみ・桁数上限なし・pad3/pad4 最小幅表示の現行受理意味論へ Design 文言を更新すること",
+        "受け入れ義務": [
+          "修正後の文言が numbering-policy.md L26-33 の現行記述（受理上限なし・最小幅表示）と不矛盾であること",
+          "numbering-policy.md:34 の DEC-062 参照 ID 化（RU-0247/IDX-12）と干渉しないこと（参照表記のみで意味変更なし）",
+          "完了判定: canonical Design の受理記述と実装・DEC-062 の受理意味論が一致し、numbering-policy 委譲構造（L37）を介した参照整合が維持されること"
+        ]
+      },
+      "RU-0262": {
+        "タイトル": "DEC-062 括弧内と IR 側の受理例示表記の文言整理（低優先度・助言的）",
+        "必須要求": "DEC-062.md の括弧内受理 pattern 例示と IR-067/IR-069 側受理例示表記を、受理意味論（形式妥当性のみ・桁数上限なし）と整合する文言整理（accepted Decision の意味的不変の非意味修正）として実施すること。実施には REQ-001-056 の非意味修正枠の明示承認を req-define で確定すること",
+        "受け入れ義務": [
+          "DEC-062.md L47「IR-067 の旧4桁帯除外（設計要件4、v2 歴史帯）は本 Decision により変更しない」の宣言を守ること",
+          "変更範囲の明示（例示表記のみ・IR-067 の仕様・除外要件の変更ではない）を修正記録に含めること",
+          "完了判定: 例示表記が受理意味論と整合し、IR-067 の旧4桁帯除外等の既存仕様が不変であること（diff で意味変化なし確認）"
+        ]
+      }
+    }
+  },
+  "対応表": {
+    "初期登録": "2026-10-27T06:12 JST。RU-0247〜RU-0262（16件）を登録。stage 4 以降で要件doc・operation_unit・実行単位（Case Issue/Issue/Epic）の対応を追記する",
+    "RU": {
+      "RU-0247": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0248": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0249": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定", "depends_on": "RU-0247" },
+      "RU-0250": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0251": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0252": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0253": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0254": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0255": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0256": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0257": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0258": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0259": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0260": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0261": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" },
+      "RU-0262": { "要件doc": "未確定", "operation_unit": "未確定", "実行単位": "未確定" }
+    }
+  },
+  "進捗": {
+    "整理サイクル": "完了(stage1 inspect-docs 2026-10-27T03:49-04:06 検出15件 commit b737148e3 / stage2 昇格3系統並列 04:08-06:05 learning 7880d6407〔promote2+duplicate17+deferred16+rejected1〕・intake 5e10d51b3+c868b9bae〔採用11・HITL2件代理回答〕・inspect 3a508c7ad〔promote5→1ファイル・defer継続〕・jev観測8件コミット ece068dce / stage3 backlog-review 05:23-05:58 RU16件生成 RU-0247〜0262・promoted14件削除・commit adae3c755・HITL3問代理回答 BKR-Q1①/Q2①/Q3①)",
+    "stage4_要件定義": "未着手",
+    "stage5_実行": "未着手",
+    "stage6_全体完了判定": "未着手",
+    "stage7_リリース": "未着手"
+  },
+  "リリース状態": {
+    "状態": "未着手",
+    "備考": "利用者事前承認済み: 2026-10-27 利用者指示『リリース公開して良い』（正常な検証・全体完遂・既存タグ不移動・二重採番禁止等の条件は維持）。stage7 実行時に基準点再確認→版番導出（v5.1.6 のパッチ+1 = v5.1.7 想定）→タグ作成→Release 草稿→公開（承認根拠: 2026-10-27 利用者指示『リリース公開して良い』・スケジューラー削除といまから開始の指示）"
+  },
+  "単一書き手": {
+    "規則": "set-state への書込みは同一 backlog-auto 実行（一式識別子 20261027T034727JST）に限定する",
+    "二重起動保護": "進行中の実行を示す set-state（完了か保留か中断を確定できない状態）を検出した後行起動は、新規実行を開始せず既存実行の状態確認と再開へ切り替える"
+  }
+}
