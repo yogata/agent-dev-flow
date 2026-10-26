@@ -628,6 +628,139 @@ function runSpec(runner: MechanicalRunner, spec: GateCommandSpec): CommandResult
   return runner.run({ command: spec.command, args: spec.args, cwd: spec.cwd, timeoutMs: spec.timeoutMs });
 }
 
+/**
+ * 計測日収束補正（REQ-117-011・AG-011）。check_integrity 報告から
+ * req-updated-freshness NG（frontmatter updated が commit author date と不一致の
+ * 対象ファイル）と IndexGenerationConsistency（req-metrics 計測日 AUTOGEN の 1 日
+ * 遅れ）を検出し、(a) generate_indexes 再実行、(b) frontmatter updated を commit
+ * author date へ追随させる編集適用、(c) 明示パス指定の補正 commit、を script 内で
+ * 完結させる。trigger 条件が満たされない場合は補正 step を生成しない（既存の
+ * 一巡実行の挙動を変えない）。計測日のずれを内容変更として扱わない。
+ */
+export function runMeasurementDateConvergence(
+  runner: MechanicalRunner,
+  input: PrepareDefinitionPrInput,
+  worktreeCwd: string,
+  checkStdout: string,
+  head: string,
+): { steps: StepRecord[]; warnings: string[] } {
+  const steps: StepRecord[] = [];
+  const warnings: string[] = [];
+
+  const freshnessTargets = extractFreshnessTargets(checkStdout);
+  const hasMeasurementDrift = /IndexGenerationConsistency/.test(checkStdout) &&
+    /計測日/.test(checkStdout);
+  if (freshnessTargets.length === 0 && !hasMeasurementDrift) {
+    return { steps, warnings };
+  }
+
+  const today = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const commitDate = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+
+  const touchedPaths: string[] = [];
+  if (freshnessTargets.length > 0) {
+    for (const rel of freshnessTargets) {
+      const abs = path.resolve(worktreeCwd, rel);
+      if (!runner.exists(abs)) continue;
+      const content = runner.readTextFile(abs);
+      const m = content.match(/^updated: ?"?([0-9]{4}-[0-9]{2}-[0-9]{2})"?/m);
+      if (m === null || m[1] === undefined || m[1] === commitDate) continue;
+      const replaced = m[0].replace(m[1], commitDate);
+      runner.writeTextFile(abs, content.replace(m[0], replaced));
+      touchedPaths.push(rel);
+    }
+    steps.push({
+      name: "measurement-convergence",
+      status: "pass",
+      detail: {
+        trigger: "req-updated-freshness",
+        frontmatterUpdatedTargets: touchedPaths,
+        commitDate,
+      },
+    });
+  }
+  if (hasMeasurementDrift) {
+    steps.push({
+      name: "measurement-convergence",
+      status: "pass",
+      detail: {
+        trigger: "req-metrics-measurement-example",
+        plannedAction: "regenerate indexes via generateIndexesGate after freshness commit",
+        head,
+      },
+    });
+  }
+
+  if (touchedPaths.length > 0) {
+    const add = runner.run({ command: "git", args: ["add", "--", ...touchedPaths], cwd: worktreeCwd });
+    if (add.exitCode !== 0) {
+      steps.push({
+        name: "measurement-convergence",
+        status: "fail",
+        detail: { stage: "stage-failed", stderr: add.stderr.trim().slice(-400) },
+      });
+      warnings.push("measurement convergence staging failed");
+      return { steps, warnings };
+    }
+    const message = `chore(definition): 計測日収束と frontmatter updated 追随の補正（REQ-117-011 機械化 step）`;
+    const commit = runner.run({ command: "git", args: ["commit", "-m", message], cwd: worktreeCwd });
+    if (commit.exitCode !== 0) {
+      steps.push({
+        name: "measurement-convergence",
+        status: "fail",
+        detail: { stage: "commit-failed", stderr: commit.stderr.trim().slice(-400) },
+      });
+      warnings.push("measurement convergence commit failed");
+      return { steps, warnings };
+    }
+    steps.push({
+      name: "measurement-convergence",
+      status: "pass",
+      detail: { stage: "converged", stagedPaths: touchedPaths, commitMessage: message },
+    });
+  }
+
+  if (hasMeasurementDrift && input.generateIndexesGate != null) {
+    const gen = runSpec(runner, input.generateIndexesGate);
+    steps.push({
+      name: "measurement-convergence",
+      status: gen.exitCode === 0 ? "pass" : "fail",
+      detail: {
+        action: "generate_indexes rerun",
+        executedCommand: {
+          command: input.generateIndexesGate.command,
+          args: input.generateIndexesGate.args,
+          cwd: input.generateIndexesGate.cwd,
+        },
+        exitCode: gen.exitCode,
+        stderrTail: gen.exitCode === 0 ? "" : gen.stderr.trim().slice(-400),
+      },
+    });
+    if (gen.exitCode !== 0) {
+      warnings.push("measurement convergence generate_indexes rerun failed");
+    }
+  }
+
+  return { steps, warnings };
+}
+
+/**
+ * check_integrity 報告から req-updated-freshness NG の対象ファイル（repo root 相対）を
+ * 抽出する。報告メッセージの「for <path>:」形式を機械解釈し、REQ 編集対象に限定せず
+ * 報告された対象全体を返す（check_integrity が clean な対象は報告しないため過剰適用
+ * にはならない）。
+ */
+export function extractFreshnessTargets(checkStdout: string): readonly string[] {
+  const targets: string[] = [];
+  const re = /for ((?:docs|src|scripts)[^\s:]*\.md):/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(checkStdout)) !== null) {
+    if (m[1] !== undefined && !targets.includes(m[1])) targets.push(m[1]);
+  }
+  return targets;
+}
+
 /** 機械工程を実行し、報告 JSON を返す（省略なし。失敗時は途中結果とともに fail を返す）。 */
 export function runPrepareDefinitionPr(
   input: PrepareDefinitionPrInput,
@@ -819,6 +952,20 @@ export function runPrepareDefinitionPr(
           ...buildGateEvidence(input.checkIntegrityGate, check, head),
         },
       });
+
+      // 計測日収束補正（REQ-117-011・AG-011）。check_integrity 報告の計測日不整合
+      // （req-metrics-measurement-example の IndexGenerationConsistency）と
+      // req-updated-freshness NG を trigger 条件として検出し、
+      // (a) generate_indexes 再実行（req-metrics 計測日 AUTOGEN 更新）と
+      // (b) frontmatter updated の commit author date 追随を明示パス指定の
+      // 補正 commit で script 内完結させる。既存 contingency 手順の機械化であり、
+      // 計測日のずれを内容変更として扱わない。
+      const convergence = runMeasurementDateConvergence(runner, input, worktreeCwd, check.stdout, head);
+      if (convergence.steps.length > 0) {
+        steps.push(...convergence.steps);
+        warnings.push(...convergence.warnings);
+      }
+
       if (check.exitCode !== 0) {
         warnings.push("check_integrity failed");
         return assembleReport(false, steps, diff, warnings, proposal);
