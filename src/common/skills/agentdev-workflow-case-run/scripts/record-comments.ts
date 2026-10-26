@@ -301,6 +301,11 @@ export function applySection(existingBody: string, sectionMarkdown: string): str
   const heading = sectionMarkdown.split("\n", 1)[0]?.replace(/^##\s*/, "").trim() ?? "";
   const lines = existingBody.replace(/\n+$/, "\n").split("\n");
   const headingLine = `## ${heading}`;
+  // 見出し直前の空行 1 行保証（REQ-117-013・AG-013）。置換・追記両分岐の連結前に
+  // before 末尾へ空行 1 行を保証する（sectionMarkdown 側の先頭行見出し抽出契約は
+  // 壊さない）。Root Case #3820 の本文構造崩壊を恒久化する。
+  const joinWithBlankLine = (before: string): string =>
+    before.length === 0 ? before : `${before.replace(/\n+$/, "")}\n\n`;
 
   const startIndex = lines.indexOf(headingLine);
   if (startIndex >= 0) {
@@ -317,13 +322,13 @@ export function applySection(existingBody: string, sectionMarkdown: string): str
         endIndex = trailingStart;
       }
     }
-    const before = lines.slice(0, startIndex).join("\n").replace(/\n+$/, "");
+    const before = joinWithBlankLine(lines.slice(0, startIndex).join("\n"));
     const after = lines.slice(endIndex).join("\n");
-    return `${before}\n${sectionMarkdown.replace(/\n+$/, "\n")}${after.startsWith("\n") ? after : `\n${after}`}`;
+    return `${before}${sectionMarkdown.replace(/\n+$/, "\n")}${after.startsWith("\n") ? after : `\n${after}`}`;
   }
 
-  const base = existingBody.replace(/\n+$/, "");
-  return `${base}\n${sectionMarkdown.replace(/\n+$/, "\n")}`;
+  const base = joinWithBlankLine(existingBody);
+  return `${base}${sectionMarkdown.replace(/\n+$/, "\n")}`;
 }
 
 // 文書末尾から逆走し、空行と完了した HTML コメントブロック（`<!--` 〜 `-->`）の
