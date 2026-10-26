@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261026T222458Z-9eb8",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-epic-attribution",
+  "subject": "Case #3866 の operation_units 15件の execution_unit 構成帰属（Standard または Epic）",
+  "sourceRevision": "a9a2414ab",
+  "durationMs": 730,
+  "inputTokens": 1602,
+  "inputs": {
+    "requestDigest": "170e68e677d719856941a15d96b3422b0dcc9b329950c72094a37decdf7ce147",
+    "snapshot": "operation_units OU-001〜OU-015（RU-0254除外済み）・必須依存エッジ OU-001→OU-003 1件・連結成分14（OU-001+OU-003成分1・単独根13）・Epicサイズ上限10ハード制約・OU 1:1配置で15子Issue・機能統合候補（docs文言系5OU統合・typecheck/description 2OU統合）で10子Issue・単一REQ-117・同一Case内"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-attribution",
+      "questionForm": "choice",
+      "value": "Epic",
+      "probabilityDistribution": {
+        "Standard": 0.01,
+        "Epic": 0.99
+      }
+    },
+    {
+      "questionId": "q2-dependency-strength",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "関連": 0.21,
+        "弱": 0.21,
+        "必須": 0.58
+      }
+    },
+    {
+      "questionId": "q3-functional-coherence",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "分散": 0.1,
+        "部分的": 0.88,
+        "一貫": 0.02
+      }
+    }
+  ],
+  "confidence": 0.98,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-attribution",
+        "value": "Epic"
+      },
+      {
+        "differenceReason": "deterministic_override",
+        "questionId": "q2-dependency-strength",
+        "value": 2
+      },
+      {
+        "questionId": "q3-functional-coherence",
+        "value": 1
+      }
+    ]
+  }
+}

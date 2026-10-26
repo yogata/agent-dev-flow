@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261026T222554Z-e1b7",
+  "workflow": "case-ready",
+  "evaluationKind": "wave-composition",
+  "subject": "Case #3866 Epic 10子Issue 構成の Wave 構成判断（並列可否）",
+  "sourceRevision": "a9a2414ab",
+  "durationMs": 251,
+  "inputTokens": 876,
+  "inputs": {
+    "requestDigest": "542ee241370edce24a1ecbdbcf53f9819961f88823b838d3250aaa71cdb03a64",
+    "snapshot": "Epic 確定後の条件付き判断・Wave1 = 9子Issue（依存0件・相互依存なし）・Wave2 = 1子Issue（OU-003・子Issue-A 必須依存）・重複前置検出: 子Issue-F（README 新設）/H（record-comments.ts+tests）/I（tsconfig+package.json）は case-run scripts 配下の同一ディレクトリで作業するが直接同一パス重複なし"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-parallel-ok",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.92,
+        "false": 0.07999999999999996
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-parallel-ok",
+        "value": true
+      }
+    ]
+  }
+}
