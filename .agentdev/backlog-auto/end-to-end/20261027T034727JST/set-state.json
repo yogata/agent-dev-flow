@@ -303,12 +303,23 @@
   "stage4_要件定義": "完了（2026-10-27T07:0x JST頃・単一 req-define 実行・要件doc .agentdev/drafts/req-draft-backlog-auto-e2e-20261027T034727JST.md 766行確定・auto_ready: true・work_type: maintenance・scale: large・壁打ち RDQ-1〜7 の Hermes 監督代理回答反映・RU-0254 は RDQ-7 (γ) で除外され一式は 15 RU・adversarial-review finding 0 件・Jev 観測 20261026T211109Z-9e9f / 20261026T212337Z-a9de・commits 4052d6368+149677912）",
   "stage5_実行": "完了（2026-10-27T07:30-11:20 JST・単一 case-auto 実行〔要件doc 明示指定〕。Epic #3866 closed・Definition PR #3867 squash merge・9子Issue 全完了〔PR #3877〜#3885 + 再是正 #3886〕・QG-4 全ゲート合格・Capture 2件回収・worktree 掃除完。親 stage6 突合で TS-002 不成立を検出し #3868 reopen→再是正 PR #3886→再実測 exit 0→完了記録訂正まで実施）",
   "stage6_全体完了判定": "未着手",
-  "stage7_リリース": "未着手",
+  "stage7_リリース": "完了（2026-10-27。基準点再確認→版番導出 v5.1.7→対象コミット確定・混入検知 0件→lightweight タグ作成・push→Release 草稿→読み戻し→公開〔workflow 実行・承認根拠記録〕→最終読み戻し 1:1 確認）",
   "stage6_完遂判定": "完遂（2026-10-27T11:3x JST・親による突合。義務スナップショット15RU×対応表×検証証跡の突合成立・対応表 stage6完遂判定節に証拠一覧）"
  },
  "リリース状態": {
-  "状態": "未着手",
-  "備考": "利用者事前承認済み: 2026-10-27 利用者指示『リリース公開して良い』（正常な検証・全体完遂・既存タグ不移動・二重採番禁止等の条件は維持）。stage7 実行時に基準点再確認→版番導出（v5.1.6 のパッチ+1 = v5.1.7 想定）→タグ作成→Release 草稿→公開（承認根拠: 2026-10-27 利用者指示『リリース公開して良い』・スケジューラー削除といまから開始の指示）"
+  "状態": "完了",
+  "版番号": "v5.1.7",
+  "版番号導出根拠": "基準点再確認（リリース時点で正式 SemVer タグ最大 = v5.1.6・HEAD から到達可能・開始時基準から変化なし）→ パッチ+1 のみで v5.1.7 を導出。衝突なし（ローカル・リモート実測）・major/minor 自動判定なし・同一実行での二番号消費なし",
+  "タグ名": "v5.1.7",
+  "タグ種別": "lightweight（v5.1.4/v5.1.5/v5.1.6 様式準拠）",
+  "タグ対象コミット": "7ea066b2ece667c5d2aac4b0b80b37054584cd2e",
+  "タグpush確認": "local/remote 同一 hash 実測（2026-10-27）・既存タグ不移動・再作成なし",
+  "差分突合": "a7a0cdb84..7ea066b2e の 28 コミット全数検査で本一式（stage1〜6 bookkeeping + Case #3866 実行 + 再是正）に帰属。無関係コミット混入 0 件（利用者判断不要）",
+  "Release対応": "release_list 読み戻しで全版タグ（v1.0.0〜v5.1.7・RC 2件）と Release の 1:1 対応・重複なしを実測。v5.1.7 Release は release_create で草稿作成（title=v5.1.7・prerelease=false）→ release_read で本文完全・draft:true 確認 → 公開",
+  "公開": "公開済み（draft=false・publishedAt=2026-10-26T23:59:08Z・release_publish 後読み戻しで確認）。URL: https://github.com/yogata/agent-dev-flow/releases/tag/v5.1.7",
+  "公開実行形態": "workflow 実行",
+  "承認根拠": "HITL 質問 ID: 2026-10-27-backlog-auto-launch-release-publication、回答の記録参照: 利用者起動指示原文 2026-10-27『リリース公開して良い』『リリース公開は明示許可済み』（事前明示承認。条件〔正常な検証・全体完遂・既存タグ不移動・二重採番禁止〕は stage 6 完遂判定・v5.1.6 基準点維持・v5.1.7 単一新規採番で維持確認済み）",
+  "リリース完了日時": "2026-10-27T08:59:08+09:00（publishedAt サーバー記録）"
  },
  "単一書き手": {
   "規則": "set-state への書込みは同一 backlog-auto 実行（一式識別子 20261027T034727JST）に限定する",
