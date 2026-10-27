@@ -263,8 +263,8 @@
    "備考": "単一 req-define 実行（RDQ 壁打ち 7問は Hermes 監督代理回答）。OU-003 は depends_on: OU-001"
   },
   "stage5確定": {
-   "確定日時": "2026-10-27T11:20:00+09:00",
-   "RootCase": "Epic #3866（closed completed・2026-10-27 07:30-11:20 JST）",
+   "確定日時": "2026-10-27T08:48:00+09:00",
+   "RootCase": "Epic #3866（closed completed・2026-10-27 07:00-08:48 JST（git コミット時刻基準））",
    "DefinitionPR": "#3867（squash merge a20d58d27・REQ-117 新設・canonical 適用）",
    "実行構造": "15 OU → 機能的一貫性により 9子Issue（単一 Wave 1・依存 0エッジ）。OU-001→OU-003 依存は設計PR merge で解消",
    "実行単位とPR": {
@@ -283,7 +283,7 @@
   },
   "stage6完遂判定": {
    "判定": "完遂",
-   "判定日時": "2026-10-27T11:3x JST",
+   "判定日時": "2026-10-27T08:56 JST（git 7ea066b2e 時刻基準）",
    "義務対応確認": "義務スナップショット 15 RU（RU-0254 は RDQ-7(γ) 除外記録済み）すべてが要件doc REQ-117 AG-001〜015・OU-001〜015・実行単位 #3868〜#3876 に過不足なく対応。RU-0249→RU-0247 依存も設計PR merge で解消",
    "検証結果成立確認": [
     "TS-002/REQ-117-002: check_content_corruption exit 0・broken-code-span 0件（親が main root HEAD d89006524 でリダイレクト取得により再実測）",
@@ -301,10 +301,10 @@
  "進捗": {
   "整理サイクル": "完了(stage1 inspect-docs 2026-10-27T03:49-04:06 検出15件 commit b737148e3 / stage2 昇格3系統並列 04:08-06:05 learning 7880d6407〔promote2+duplicate17+deferred16+rejected1〕・intake 5e10d51b3+c868b9bae〔採用11・HITL2件代理回答〕・inspect 3a508c7ad〔promote5→1ファイル・defer継続〕・jev観測8件コミット ece068dce / stage3 backlog-review 05:23-05:58 RU16件生成 RU-0247〜0262・promoted14件削除・commit adae3c755・HITL3問代理回答 BKR-Q1①/Q2①/Q3①)",
   "stage4_要件定義": "完了（2026-10-27T07:0x JST頃・単一 req-define 実行・要件doc .agentdev/drafts/req-draft-backlog-auto-e2e-20261027T034727JST.md 766行確定・auto_ready: true・work_type: maintenance・scale: large・壁打ち RDQ-1〜7 の Hermes 監督代理回答反映・RU-0254 は RDQ-7 (γ) で除外され一式は 15 RU・adversarial-review finding 0 件・Jev 観測 20261026T211109Z-9e9f / 20261026T212337Z-a9de・commits 4052d6368+149677912）",
-  "stage5_実行": "完了（2026-10-27T07:30-11:20 JST・単一 case-auto 実行〔要件doc 明示指定〕。Epic #3866 closed・Definition PR #3867 squash merge・9子Issue 全完了〔PR #3877〜#3885 + 再是正 #3886〕・QG-4 全ゲート合格・Capture 2件回収・worktree 掃除完。親 stage6 突合で TS-002 不成立を検出し #3868 reopen→再是正 PR #3886→再実測 exit 0→完了記録訂正まで実施）",
+  "stage5_実行": "完了（2026-10-27T07:00-08:48 JST（git コミット時刻基準）・単一 case-auto 実行〔要件doc 明示指定〕。Epic #3866 closed・Definition PR #3867 squash merge・9子Issue 全完了〔PR #3877〜#3885 + 再是正 #3886〕・QG-4 全ゲート合格・Capture 2件回収・worktree 掃除完。親 stage6 突合で TS-002 不成立を検出し #3868 reopen→再是正 PR #3886→再実測 exit 0→完了記録訂正まで実施）",
   "stage6_全体完了判定": "未着手",
   "stage7_リリース": "完了（2026-10-27。基準点再確認→版番導出 v5.1.7→対象コミット確定・混入検知 0件→lightweight タグ作成・push→Release 草稿→読み戻し→公開〔workflow 実行・承認根拠記録〕→最終読み戻し 1:1 確認）",
-  "stage6_完遂判定": "完遂（2026-10-27T11:3x JST・親による突合。義務スナップショット15RU×対応表×検証証跡の突合成立・対応表 stage6完遂判定節に証拠一覧）"
+  "stage6_完遂判定": "完遂（2026-10-27T08:56 JST・親による突合。義務スナップショット15RU×対応表×検証証跡の突合成立・対応表 stage6完遂判定節に証拠一覧）"
  },
  "リリース状態": {
   "状態": "完了",
