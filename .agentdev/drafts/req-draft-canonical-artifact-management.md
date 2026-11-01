@@ -153,7 +153,7 @@ conflict_resolutions:
     resolution: |
       RU 自身が「対象候補のすべてを変更することは要求しない」「既存REQの規定だけで成立する要求は重複追加せず」と定めるため、工程駆動側は REQ-110 の既存行（110-001/009/017/019/020/021/026/027/029/030/033）で成立すると判断し無変更とした。所有状況の対応は review_dispositions（RD-002）に記録する。
   - id: CR-002
-    conflict: 第1版で残した2つの未解決質問（UQ-1: REQ-004 の SPLIT 要否、UQ-2: REQ-110-017 の判断基準の文言上の非対称への対応方針）。
+    conflict: "第1版で残した2つの未解決質問（UQ-1: REQ-004 の SPLIT 要否、UQ-2: REQ-110-017 の判断基準の文言上の非対称への対応方針）。"
     resolution: |
       UQ-1 は計測により解決した。req-impact-map Design の「影響するアーティファクト」列における REQ-004 の影響先は REQ 単一（種別数 +0）、関心分類は単一（要求の形成と合意、+0）、要件行数は 68→75（+1）で、SPLIT シグナル合計は 1（0〜1 = APPEND 許可）。req-health-metrics Design の手順がユーザーへの SPLIT 提案を要求するのは合計 2 以上であるため、提案不要として質問を閉じた（測定根拠: docs/designs/responsibilities/req-impact-map.md REQ-004 行、docs/designs/quality/req-health-metrics.md 閾値表）。
       UQ-2 は契約照合により解決した。REQ-110-019 と phase-artifacts-update の実装は、REQ・Decision・Design の作成・更新処理を既存の成果物管理スキル（agentdev-req-file-manager、agentdev-decision-file-manager、agentdev-design-file-manager）へ委譲し、採番・配置・既存成果物との照合等の既存規則を適用する。本 draft は共有 Capability Skill の照合基準（ACT-DESIGN-001、RA-001）を更新するため、目的・関心基準と5区分は委譲経由で工程駆動側にも適用され、REQ-110 への文言追記は不要と判断した。文言の対称性だけで追加変更は決めず、同じ判断規則が両経路で実際に適用されることは TS-007 の検証対象として残す（成立を実証済みとはしない）。
@@ -183,7 +183,7 @@ test_strategy:
     verification: |
       RU1-AC2 の8事例（既存要求を満たす不具合修正でREQ変更が不要、既存REQの目的を拡張する要求で既存REQへの追加が必要、同じ部品を対象とするが独立した目的の新要求、恒久要求・既存REQ更新・一時作業を含む複数入力、同じ内容の個別投入と一括投入、Designのみの変更、既存要件行の修正、REQ・Decision・Designのいずれも変更不要）を用意し、照合・操作分類を実行して判断結果と根拠を記録する。
     pass_criteria: |
-      内容ごとの目的・関心を基準に、追加・更新・新規作成・変更不要・保留を適切に選択できること。一括入力や対象部品の一致だけを理由に独立要求を統合した事例が1件でもあれば不合格とする。判定は pass / fail / blocked / not applicable の4区分とし、構造検査・部品試験・模擬実行・実経路による検証を区別して記録する。
+      RU1-AC2 のとおり、内容ごとの目的・関心を基準に、追加・更新・新規作成・変更不要・保留を適切に選択できること。一括入力や対象部品の一致だけを理由に独立要求を統合した事例が1件でもあれば不合格とする。判定は pass / fail / blocked / not applicable の4区分とし、構造検査・部品試験・模擬実行・実経路による検証を区別して記録する。
     on_failure: |
       fix-and-reverify。照合基準・操作分類手順（matching-and-merge.md の5軸評価の主軸修正を含む）を修正して再検証する。証拠不足と実装不備を区別して記録し、証拠不足のみで実装不備と断定しない。検証に必要な環境・権限がなく成立を証明できない場合は blocked とし、承認済み要件・受け入れ条件の変更、対象範囲の拡大、利用者に留保された判断が必要な場合は停止して判断事項を報告する。
   - id: TS-003
