@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261101T225558Z-c1c8",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching-and-final-classification",
+  "subject": "RU-0255（正規成果物の照合・所有先判断・確実な反映）の正規成果物上の帰属判断と、新規規範行の REQ/Design 帰属判断",
+  "sourceRevision": "2cf2799802e7a4b3b312debc522044649bf99b19",
+  "durationMs": 1842,
+  "inputTokens": 2036,
+  "inputs": {
+    "requestDigest": "77747bc60346eaf982c57d96986f6e06d1b553f43ed126e88067bcdfeb4093bf",
+    "references": [
+      {
+        "digest": "3d27147a4418e9ccd2afc93ab6ab3e443697924df1eba1ca2040a0cf1aa550be",
+        "label": "入力RU",
+        "path": ".agentdev/backlog/req-units/RU-0255.md"
+      },
+      {
+        "digest": "7369170d9c958f37ef17cf986e9145096515afda54081ac930960e8731037e5a",
+        "label": "主対象REQ（変更駆動系）",
+        "path": "docs/requirements/REQ-004.md"
+      },
+      {
+        "digest": "7b8e410b5f406c64933a862d60f979b7a48ae27f105a6fc26553ce9b2ca903f5",
+        "label": "主対象REQ（工程駆動系）",
+        "path": "docs/requirements/REQ-110.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-req-matching",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0.03,
+        "APPEND": 0.1,
+        "UPDATE": 0.29,
+        "REQ操作なし": 0.58
+      }
+    },
+    {
+      "questionId": "q1-req-matching-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.31,
+        "false": 0.69
+      }
+    },
+    {
+      "questionId": "q2-final-classification",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.77,
+        "Design行": 0.23
+      }
+    },
+    {
+      "questionId": "q2-design-separation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.35,
+        "false": 0.65
+      }
+    }
+  ],
+  "confidence": 0.44,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-req-matching",
+        "value": "APPEND",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q1-req-matching-confirm",
+        "value": false
+      },
+      {
+        "questionId": "q2-final-classification",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q2-design-separation",
+        "value": true,
+        "differenceReason": "semantic_disagreement"
+      }
+    ]
+  }
+}
