@@ -1,7 +1,28 @@
 component: agentdev-req-file-manager
+design:
+  docs/designs/skills/agentdev-req-file-manager.md:
+    - REQ-004-069
+    - REQ-004-070
+    - REQ-004-073
+    - REQ-004-074
 implementation:
   src/common/skills/agentdev-req-file-manager/scripts/src/alloc-req-number.ts:
     - REQ-001-071
+  src/common/skills/agentdev-req-file-manager/references/matching-and-merge.md:
+    - REQ-004-069
+    - REQ-004-070
+  src/common/skills/agentdev-req-file-manager/references/save-procedure.md:
+    - REQ-107-009
+    - REQ-004-073
+    - REQ-004-074
 verification:
   src/common/skills/agentdev-req-file-manager/scripts/tests/alloc-req-number.test.ts:
     - REQ-001-071
+  src/common/skills/agentdev-req-file-manager/scripts/tests/req-matching-save-pins.test.ts:
+    - REQ-004-069
+    - REQ-004-070
+    - REQ-004-071
+    - REQ-004-072
+    - REQ-004-073
+    - REQ-004-074
+    - REQ-004-075

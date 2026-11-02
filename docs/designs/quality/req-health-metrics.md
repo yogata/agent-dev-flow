@@ -91,7 +91,7 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 <!-- AUTOGEN:BEGIN:id=req-metrics-measurement-example -->
 | REQ | 要件行数 | 行数シグナル | 備考 |
 |---|---|---|---|
-| REQ-004 | 68 | +1 |  |
+| REQ-004 | 75 | +1 |  |
 | REQ-001 | 67 | +1 |  |
 | REQ-008 | 62 | +1 |  |
 | REQ-009 | 53 | +1 |  |
@@ -167,7 +167,7 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 | REQ-055 | 2 | +0 |  |
 | REQ-113 | 2 | +0 |  |
 
-計測日: 2026-10-27。
+計測日: 2026-11-02。
 <!-- AUTOGEN:END -->
 
 要件行数は要件テーブル行のみをカウント（目的、適用範囲セクションの散文は除外）。

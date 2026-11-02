@@ -2,12 +2,13 @@
 title: req-define Design
 status: accepted
 created: 2026-06-21
-updated: 2026-10-27
+updated: 2026-11-02
 ---
 <!-- ADF-COVERS(implementation): REQ-008-018, REQ-008-019, REQ-008-020, REQ-008-021, REQ-008-023, REQ-008-024, REQ-008-025, REQ-008-026, REQ-008-027, REQ-008-028, REQ-008-029, REQ-008-030, REQ-008-031, REQ-008-034, REQ-008-035, REQ-008-038, REQ-008-039, REQ-008-040, REQ-008-042, REQ-008-043, REQ-008-044, REQ-008-045, REQ-008-046, REQ-008-050, REQ-008-051, REQ-008-054, REQ-008-058, REQ-008-059 -->
 <!-- ADF-COVERS(design): REQ-008-058, REQ-008-059, REQ-008-060, REQ-008-061, REQ-008-062, REQ-004-056, REQ-004-057, REQ-004-058, REQ-004-059, REQ-004-060, REQ-004-062, REQ-004-063 -->
 <!-- ADF-COVERS(design): REQ-004-064, REQ-004-065（draft 保存後 git 永続化手順と oldText 転記規約の組立手順設計） -->
 <!-- ADF-COVERS(design): REQ-004-066, REQ-004-067, REQ-004-068（コード囲み認識規則の組立・検査規律と target_area 検索・採番の同一記述設計） -->
+<!-- ADF-COVERS(design): REQ-004-071, REQ-004-072, REQ-004-075（判断根拠の維持・採用範囲の維持・両経路共通原則節。AG-003、AG-004、AG-007 に対応） -->
 <!-- ADF-COVERS(design): REQ-108-014, REQ-108-015, REQ-108-016, REQ-108-017（重要変更の通知と結果説明節。AG-001〜003 に対応） -->
 
 <!-- ADF-COVERS(implementation): REQ-021-011, REQ-021-022 -->
@@ -116,6 +117,14 @@ req-define は Workflow Skill と手順番号を複製せず、公開目的、�
 3. 最終分類への上書き値も7値のいずれかであること
 
 7値の定義、検出時の具体的挙動は backlog-review.md「tentative_classification フィールド仕様」を参照すること。
+
+### 判断根拠の維持・採用範囲の維持・両経路共通原則（RU-0255）
+
+壁打ちからドラフト保存、Definition 保存までの各段階で、所有先判断（CREATE、APPEND、UPDATE、REQ操作なし、保留）とその根拠を draft-data（agreed_items、artifact_actions の source_items、conflict_resolutions）を通じて追跡可能に維持する。初期判断と異なる所有先へ保存する場合は再判断の根拠を記録する。判断不能な部分は未解決質問・保留として扱い、無断で解決済みにしない。
+
+採用済み・未採用・採否不明が混在する入力では、採用根拠照合（STEP-2）の結果に基づき採用された対象・内容・範囲だけを保存対象とする。保存先ファイルへの書込み権限や編集範囲の存在だけを根拠に、採用されていない意味的変更を確定しない。重要変更の反映前通知と結果説明は既存の通知契約（REQ-108）に従う。
+
+req-define 系経路の所有先判断、採用範囲の維持、保存結果の確認、中断後の再実行は、工程駆動系経路（phase-artifacts-update、REQ-110）に適用されるのと同じ基本原則に基づいて成立させる。両経路の成立は、公開入口から正規保存と保存結果確認までの実経路（GitHub版・Local版の対象経路を含む）で確認し、部品試験だけの成功をもって完了としない。
 
 ## 組立検査証拠の同一実行内引継ぎ
 
