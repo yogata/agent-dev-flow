@@ -6,6 +6,8 @@ implementation:
   - REQ-107-009
   src/common/skills/agentdev-req-file-manager/references/save-procedure.md:
   - REQ-107-009
+  - REQ-004-073
+  - REQ-004-074
 verification:
   src/common/skills/agentdev-artifact-validation/scripts/tests/check-req-row-existence.test.ts:
   - REQ-107-009

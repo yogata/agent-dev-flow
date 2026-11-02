@@ -83,6 +83,7 @@ implementation:
     - REQ-111-018
     - REQ-110-033
   src/common/skills/agentdev-workflow-req-define/references/requirement-development.md:
+    - REQ-004-070
     - REQ-008-062
     - REQ-021-029
     - REQ-090-004
@@ -108,6 +109,8 @@ implementation:
     - REQ-103-011
   src/common/skills/agentdev-workflow-req-define/references/input-and-dialogue.md:
     - REQ-110-033
+    - REQ-004-071
+    - REQ-004-072
   src/common/skills/agentdev-workflow-req-define/scripts/tests/important-change-notification-pins.test.ts:
     - REQ-108-024
 verification:
@@ -151,3 +154,11 @@ verification:
     - REQ-108-021
     - REQ-108-022
     - REQ-108-023
+  src/common/skills/agentdev-req-file-manager/scripts/tests/req-matching-save-pins.test.ts:
+    - REQ-004-069
+    - REQ-004-070
+    - REQ-004-071
+    - REQ-004-072
+    - REQ-004-073
+    - REQ-004-074
+    - REQ-004-075
