@@ -30,19 +30,33 @@ RU-0255 実装検証（GitHub 版変更駆動・隔離 repo yogata/adf-ru0255-gi
 
 ### 第3次調査の追実測（2026-11-03、設計確定前の事実記録）
 
-- 隔離 repo の merge 形状実測: 設計PR #4 の merge は merge commit（7907b16。parents = main 側 32f1a40 + 設計 branch tip 066ff9f「case-open による Definition 保存」）。一方、事象時の acceptance-checks 報告の targetRevision 32298c0 は merge 後の canonical 再取得統合 commit であり設計 branch tip ではない（順序逸脱の実形状）。すなわち「報告 targetRevision == 設計PR merge commit の第二 parent」の照合は、正順（受入検査→merge）かつ merge-commit 方法（設計PRの実測慣習: 本 repo #3888・#3851、隔離 repo #4 の3例）で成立し、(i) 本事象のような merge 後検査・順序逸脱形状、 検査後に設計 branch へ追加された commit を含む merge（同一PR古い成功報告の再利用）を検出できる。squash/rebase merge では第二 parent が不在のため当該照合は不能であり、fail-closed 拒否（acceptance 再実行要求）とするかは再評価項目3の比較で確定する
+- 隔離 repo の merge 形状実測: 設計PR #4 の merge は merge commit（7907b16。parents = main 側 32f1a40 + 設計 branch tip 066ff9f「case-open による Definition 保存」）。一方、事象時の acceptance-checks 報告の targetRevision 32298c0 は merge 後の canonical 再取得統合 commit であり設計 branch tip ではない（順序逸脱の実形状）。すなわち「報告 targetRevision == 設計PR merge commit の第二 parent」の照合は、正順（受入検査→merge）かつ merge-commit 方法（設計PRの実測慣習: 本 repo #3888・#3851、隔離 repo #4 の3例）で成立し、(i) 本事象のような merge 後検査・順序逸脱形状、 検査後に設計 branch へ追加された commit を含む merge（同一PR古い成功報告の再利用）を検出できる見込みである（本照合機構は未実装・未検証であり、公開入口での実証は未実施）。squash/rebase merge では第二 parent が不在のため当該照合は不能であり、fail-closed 拒否（acceptance 再実行要求）とするかは再評価項目3の比較で確定する
 - 次段階前置 gate の接続点実測: case-run STEP-S3「前置 gate 群」（precondition / staleness / targeted docs / 配布依存境界 事前 gate / AUTOGEN 索引再生成）が実在し、QG-3 前置 staleness check（ファイルパス現行存在確認・検査結果件数再計測）等の決定的検査を含む（references/single.md STEP-S3-3・S3-5・S3-6）。案B（次段階での進行抑止）の接続点として構造的に存在する。追加検査の要否・形態（script 実装か手順規定か）は再評価項目1・3の比較で確定する
+
+### 独立監査第一報の受理と追加調査（2026-11-03、設計確定前の事実記録）
+
+監査対象は本 draft の最新版（4a2aeabc4 時点）。監査第一報の指摘は監督者経由で受理したものであり、本節は一次情報での追認・追加調査の記録である。
+
+- **監査確認事項のコード追認（accept_definition_checks.ts main）**: 入力ファイル読取失敗・JSON 不正（L861-871）・validateInput 不合格（L872・L904-906）は報告を出力せず終了 1 で終わる。報告の出力は正常経路のみ（L900-902）。現行実装に固定パス保存は存在しない（保存は本 draft の設計追加要素）
+- **懸念 (1) 再実行が報告保存前に終わる場合の旧成功報告残存**: 完了時のみ保存する設計では、同一PRの再実行が入力不正・異常終了で報告保存前に終わると旧成功報告が残り、cleanup が受理し得る（「再実行せず旧報告を使う」経路とは別形状。設計の上書き前提が成立しないケース）。対策候補（採否は再評価で確定）: (a) acceptance-checks phase 開始時（引数解析直後・入力検証前）に当該PRの既存報告を無効化（削除または running marker 化。再実行の開始だけで旧報告を失効させ fail-closed を維持。入力誤りの再実行も旧報告を失効させる運用コストあり） 報告に実行識別子（実行時刻・入力 digest）を記録し cleanup 側で照合（保存前異常そのものの検出は不可。鮮度評価の補強にとどまる） 残留リスクとして明記し対象版一致（第二 parent 照合構想）で軽減
+- **懸念 (2) 検証方針の追加候補**: 現 TS-001 に phase 不一致・保存前異常の分岐がない。追加候補: (h) phase 不一致（acceptance-checks 以外の phase 値を持つ報告。例: cleanup 自身の報告）→ 終了 1 (i) 再実行が報告保存前に終了した後の旧成功報告存在状態での cleanup（対策 (a) 採用時は無効化済みで終了 1、非採用時は対象版一致構成との組合せ評価）
+- **懸念 (3) merge 方法と Local 版の一次情報**: (i) 設計PR merge 方法は case-ready Design・references で契約化されていない（pr_merge の method は呼出側指定。実測慣習は merge commit 3例: 本 repo #3888・#3851、隔離 repo #4。squash は case-close 系・IR-072 等の別用途で実績） ローカル版は PR 系操作を role: case ローカルIssueへ読み替え（docs/designs/local/local-case-file.md「PR 系操作の対象解決」）、merge の実行主体は workflow 側のローカル Git 操作であり Tool は取り込み記録（commitHash 実在 VERIFY。docs/designs/responsibilities/custom-tool-contracts.md pr_merge 入力契約。case-close の「ローカル版 PR マージ（取り込み）の手順」が同構造の実績）→ ローカル版では merge 方法を workflow が直接制御可能 GitHub 版で設計PRを squash/rebase merge した実測は不在。評価方向: 第二 parent 照合を唯一手段とせず、 設計PR merge 方法の契約化（GitHub 版 method=merge・ローカル版 --no-ff 等で両経路で parent2 を安定確保。正規経路を狭める契約変更のため影響評価が必要） 方法非依存の鮮度・順序判定（報告への入力 digest 記録、ローカル版「## マージ結果」記録・GitHub 版 pr_read による model 側照合など機械境界をまたぐ組合せ。機械強制の強度は下がる）を比較する。squash/rebase・ローカル版正規経路の一律拒否は採用しない
+- **懸念 (4) 構想と実証の区別**: 追実測節の第二 parent 照合は構想であり未実装・未検証（文言を「見込み」に修正済み）。TS-002〜005 は公開入口での検証予定で未実施。本 draft に「実証済み」とする記述はないことを確認し、今後の追記でも構想と実測を区別して記載する
+- **懸念 (5) QG 文字列「未定」の機械検出**: 決定的マーカー検査（TBD / TODO / 未定 / 後続工程で確定 / case-run で確定。引用・禁止事例は除外）は agentdev-quality-gates references qg-1-definition-integrity.md の規定であり、src/common・.opencode/skills 配下の script 実装は存在しない（実装検索 0 件。機械検出は決定的文字列検査として実装可能だが、現状は模型手順）。本 draft の agreed_items / artifact_actions content は 5 マーカーとの字面衝突を避けるため AG-004 の「未定義」を「定義されていない」へ修正した（「未定義」は marker「未定」の部分一致となり、将来の機械検証器で偽陽性になり得るため）
+- **候補必要性の再検討（比較軸の追加）**: 事象の一次原因が実行主体による記録済み failure の黙過と非同一環境対照による正当化（監督側指示の適用誤りを含む）であることに照らし、 既存契約・実行手順の修正（模型契約の明確化・実行手順の修正・監督者照合手続きの整備。新機構なし） 本 draft の新機構（cleanup 前置確認等）を、事象再発防止・検出可能性・正当経路への影響・維持費用の4軸で比較する。確定は監査継続報告・別途独立調査の結果との突合後に行う
 
 ## 第3次監督者照合・訂正指示による再評価中項目（確定前・2026-11-03）
 
-当該指示は監督者の照合・訂正指示であり、利用者発言ではない。次の項目を再評価中であり、本 draft の該当記述（AG-002 の残留リスク文、AG-003、ACT-REQ-061-001 / ACT-DESIGN-001 の該当文、TS-002 の合格基準）は現時点の案であって確定ではない。
+当該指示は監督者の照合・訂正指示であり、利用者発言ではない。次の項目を再評価中であり、本 draft の該当記述（AG-002 の残留リスク文、AG-003、ACT-REQ-061-001 / ACT-DESIGN-001 の該当文、TS-001 の検証分岐・TS-002 の合格基準）は現時点の案であって確定ではない。
 
 1. 保護対象の範囲: 本事象の保護対象の実例は受入検査失敗後の ready 状態への移行を含む。cleanup 拒否のみでは不正な ready 記録と merge が残存し、元目的（失敗後の進行防止）に届かない可能性の再評価
 2. 回避経路の扱い: 設計PRあり Case を設計PRなしと入力する経路識別の虚偽申告、同一設計PRの古い成功報告の再利用を、単に残留リスクとして受け入れる扱いの再評価。局所 git 検証（main 履歴の設計PR merge commit〔"Merge pull request #N from …/definition/issue-{Case}"。実測: #3888・#3851〕の検出、merge commit の第二 parent と報告 targetRevision の一致、definition 系 branch・worktree の残存検出）で排除可能な範囲の評価を含む
 3. ready/merge 抑止の選択肢比較: agentdev_gh（GitHub 版・ローカル版の両 Tool）への状態知識付与だけを唯一の選択肢と決めつけない。 次段階の機械前置確認（case-run 前置 gate）による進行抑止、 既存の case-ready 処理を通じた外部操作の発行自体の制御、 受入検査と続く操作の同一実行単位化（script による merge 実行。既存契約〔GitHub I/O 書込みの agentdev_gh 限定・script の gh 操作禁止〕との抵触評価を含む）を、現在の実装・権限・Local/GitHub 両経路で具体的に成立するか比較する
 4. 元要件の強制水準: REQ-061-025 の文言（「成功後に削除。blocked、failed、中断した場合は保持」）が機械的強制まで要求していない可能性、および本事象の検査失敗が監督側指示の適用誤り（非同一環境手動対照による正当化・未検証の合格化）である可能性の検討。必要な変更を先取りしない
+5. 報告の保存前異常と旧成功報告残存への対策採否・検証範囲（独立監査第一報 懸念1・2。対策候補 (a)(b)(c) と TS-001 追加分岐 (h)(i) の評価。「独立監査第一報の受理と追加調査」節参照）
+6. 設計PR merge 方法の契約化と鮮度・順序判定の方法非依存化（同 懸念3。第二 parent 照合構想の位置づけ、GitHub/Local 両経路の正規利用を失わない判定手段の比較）
 
-再評価は並行して実施中の独立監査の報告を待ち、確定は監督者照合後に行う。形式的な再確認や一律追加検査ではなく、異常時に実際の ready・merge・削除の発行が必要に応じて抑止され、正当な経路が成立することを検証可能にすることを評価基準とする。
+再評価は独立監査（第一報受理済み・継続報告待ち）および別途進行中の独立調査の結果を待ち、確定は監督者照合後に行う。形式的な再確認や一律追加検査ではなく、異常時に実際の ready・merge・削除の発行が必要に応じて抑止され、正当な経路が成立することを検証可能にすることを評価基準とする。
 
 ## 重要変更の事前通知の実施記録
 
@@ -130,7 +144,7 @@ agreed_items:
   - id: AG-004
     content: >-
       境界と通常経路の保護。実変更なし経路には acceptance-checks が存在しないため報告を要求しない。現行
-      wrapper 入力は prNumber を全 phase で必須とするが実変更なし経路の prNumber の意味は契約上未定義であり、
+      wrapper 入力は prNumber を全 phase で必須とするが実変更なし経路の prNumber の意味は契約上定義されておらず、
       経路識別入力（設計PR番号 / 設計PRなし識別）によって解消する。既存の acceptance-checks phase 内
       fail-closed・後続ゲート抑止・Form Zero・明示パス指定 commit・REQ-061-053 skippedPaths 報告を変更しない。
       新たな汎用ゲート・台帳・承認機構を作らない。case-close（close_mechanical_steps.ts）の同種構造は対象外と
