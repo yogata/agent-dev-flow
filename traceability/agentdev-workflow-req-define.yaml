@@ -1,4 +1,36 @@
 component: agentdev-workflow-req-define
+design:
+  docs/designs/commands/req-define.md:
+    - REQ-004-056
+    - REQ-004-057
+    - REQ-004-058
+    - REQ-004-059
+    - REQ-004-060
+    - REQ-004-062
+    - REQ-004-063
+    - REQ-004-064
+    - REQ-004-065
+    - REQ-004-066
+    - REQ-004-067
+    - REQ-004-068
+    - REQ-004-071
+    - REQ-004-072
+    - REQ-004-075
+    - REQ-008-058
+    - REQ-008-059
+    - REQ-008-060
+    - REQ-008-061
+    - REQ-008-062
+    - REQ-108-014
+    - REQ-108-015
+    - REQ-108-016
+    - REQ-108-017
+    - REQ-012-031
+    - REQ-021-011
+    - REQ-021-012
+    - REQ-021-023
+    - REQ-021-028
+    - REQ-021-029
 implementation:
   src/common/skills/agentdev-workflow-req-define/scripts/src/assemble-draft-section.ts:
     - REQ-004-058
