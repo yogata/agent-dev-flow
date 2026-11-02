@@ -28,6 +28,11 @@ RU-0255 実装検証（GitHub 版変更駆動・隔離 repo yogata/adf-ru0255-gi
 
 - 独立レビュー（2026-11-03 実施、read-only）の検出反映: traceability-check の deferred obligations（missing-implementation / missing-verification）は新規要件行を含む設計PRの正規経路で報告の終了区分を needs-judgment にする（REQ-061-023。検証対応の完全性は受入条件に含めない。definition-traceability-gate.ts が deferred 時 status: warn を返し、assembleReport が needs-judgment に組む）。cleanup 前置確認は failure と deferred 以外の警告を拒否し、deferred 由来の needs-judgment は許可することでこの正規経路を維持する。同一設計PRの古い success 報告の再利用（acceptance-checks 再実行を経ない cleanup）も残留リスクとして契約へ明記した
 
+### 第3次調査の追実測（2026-11-03、設計確定前の事実記録）
+
+- 隔離 repo の merge 形状実測: 設計PR #4 の merge は merge commit（7907b16。parents = main 側 32f1a40 + 設計 branch tip 066ff9f「case-open による Definition 保存」）。一方、事象時の acceptance-checks 報告の targetRevision 32298c0 は merge 後の canonical 再取得統合 commit であり設計 branch tip ではない（順序逸脱の実形状）。すなわち「報告 targetRevision == 設計PR merge commit の第二 parent」の照合は、正順（受入検査→merge）かつ merge-commit 方法（設計PRの実測慣習: 本 repo #3888・#3851、隔離 repo #4 の3例）で成立し、(i) 本事象のような merge 後検査・順序逸脱形状、 検査後に設計 branch へ追加された commit を含む merge（同一PR古い成功報告の再利用）を検出できる。squash/rebase merge では第二 parent が不在のため当該照合は不能であり、fail-closed 拒否（acceptance 再実行要求）とするかは再評価項目3の比較で確定する
+- 次段階前置 gate の接続点実測: case-run STEP-S3「前置 gate 群」（precondition / staleness / targeted docs / 配布依存境界 事前 gate / AUTOGEN 索引再生成）が実在し、QG-3 前置 staleness check（ファイルパス現行存在確認・検査結果件数再計測）等の決定的検査を含む（references/single.md STEP-S3-3・S3-5・S3-6）。案B（次段階での進行抑止）の接続点として構造的に存在する。追加検査の要否・形態（script 実装か手順規定か）は再評価項目1・3の比較で確定する
+
 ## 第3次監督者照合・訂正指示による再評価中項目（確定前・2026-11-03）
 
 当該指示は監督者の照合・訂正指示であり、利用者発言ではない。次の項目を再評価中であり、本 draft の該当記述（AG-002 の残留リスク文、AG-003、ACT-REQ-061-001 / ACT-DESIGN-001 の該当文、TS-002 の合格基準）は現時点の案であって確定ではない。
