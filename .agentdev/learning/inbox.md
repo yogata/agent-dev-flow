@@ -31,3 +31,20 @@
 - 対処: 本 Case では pre-existing 分類として記録し、修正は対象範囲外として次回 phase 系 docs 変更 Case への追随修正候補として残置。同 full audit で検出された ReqFreshness 1 件（本変更起因、req-health-metrics.md の frontmatter updated 更新漏れ）は case-close 対象範囲内修正として commit 266a8df2 で解消。
 - 学び: pre-merge の targeted 検査では full audit 系の検出（ReferencePath、ReqFreshness 等）が観測されない。merge 直後の full integrity 実行を case-close 標準工程へ組み込むことで、変更起因の freshness 違反を直近で是正できる。設計書変更時に frontmatter updated を同一 PR で更新する規律の再確認が改善候補。
 - 出典: Issue #3887 AC 判定コメント（2026-11-02）、check_integrity 実行記録（postmerge-check-integrity-2.json）、commit 266a8df2
+
+## 2026-11-02T12:45+09:00 Case #3889（訂正 Case）Capture
+
+### 1. install.ps1 の LocalMode 検証には consumer レイアウト変換が必要
+
+- 問題クラス: workflow deviation / 環境構築
+- 内容: install.ps1 は consumer 専用公開入口であり、実行ディレクトリ直下に src/opencode/ が存在すると誤実行防止（REQ-050-006）で exit 1 する。本 repo（agent-dev-flow）を clone して -LocalMode の配置検証をする際は、clone 内で src/ を .agentdev-plugin/src/ へ移動し、textlint guard の vendor/（導入時生成依存・gitignore）を正規配置から読み取り専用複製する必要がある
+- 発生条件: TS-C003（Local 版 plugin 公開入口検証）の環境構築。実際に exit 1 を確認し、consumer レイアウト変換で解消（install apply/check とも ok）
+- 証跡: C:/WINDOWS/TEMP/opencode/ts3889-local/execution-log.md 第 0 節・install-apply.log
+
+### 2. MSYS パス変換による clone 誤配置の落とし穴
+
+- 問題クラス: implementation error / 環境依存
+- 内容: Git Bash（MSYS）で `git clone C:/... C:/WINDOWS/TEMP/...` 形式を使うと、一部コンテキストで先頭 / を持つ POSIX 風パスへ変換され C:\c\WINDOWS\... へ誤配置する場合がある。Windows 形式パス指定で再実行し、誤配置ツリーは配下のみを確認して削除した
+- 予防: MSYS から Windows 絶対パスを渡す引数は Windows 形式（バックスラッシュまたはドライブレター）で統一するか、MSYS_NO_PATHCONV 系の抑制を検討する
+- 発生条件: Case #3889 TS-C003 サブエージェントの clone 初回実行
+- 証跡: C:/WINDOWS/TEMP/opencode/ts3889-local/execution-log.md 第 0 節注記
