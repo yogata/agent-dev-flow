@@ -29,7 +29,7 @@
 ### Procedure
 
 - `agentdev-req-file-manager` の照合方法論に従って実行する。CREATE 前に APPEND/UPDATE 候補を必ず評価する。操作分類は要求の持続的な目的・関心と既存REQの目的・所有範囲との対応を主軸とし、作業種別・実装部品の一致・入力体裁だけでの統合判断やREQ変更要否の決定をしない。既存の要件行の規定だけで要求が成立する場合は変更不要（REQ操作なし）とし、所有先を一意に決定できない場合は保留して候補と不足を報告する（判定基準と正規情報の取得・取り扱いの詳細は `agentdev-req-file-manager` の照合方法論参照）。要件の分割が必要な場合は保存操作ではなく requirements review 候補として扱う。操作分類結果とその根拠は `draft-data` の `artifact_actions` に記録する
-- **定量的データ検証**: `glob docs/requirements/<REQ-*>.md`（および副次的に `glob docs/decisions/<DEC-*>.md`）で実ファイル列挙と AGENTS.md 等の文書記載レンジとの乖離を確認・解消する（詳細は `agentdev-req-analysis` 参照）
+- **定量的データ検証**: `glob docs/requirements/<REQ-*>.md`（および副次的に `glob docs/decisions/<DEC-*>.md`）で実ファイル列挙と AGENTS.md 等の文書記載レンジとの乖離を確認する。実行側で解消できる乖離（列挙手段の過不足等）は解消する。正規情報の取得異常（インデックス掲載 REQ の実ファイル不在など、実行側で解消できない乖離）は解消対象とせず、`agentdev-req-file-manager` 照合方法論「正規情報の取得と取り扱い」の保留規律（取得失敗が照合・操作分類の判断に必要な場合の操作分類確定禁止・補完禁止）に従って候補と不足している判断材料を報告する（詳細は `agentdev-req-analysis` 参照）
 - **SPLIT 予兆計測（既存REQ）**: APPEND/UPDATE 対象の既存 REQ の健全性メトリクス（要件行数、関心分類数、成果物種別数）を計測し、req-health-metrics Design（extension 経由）の定量閾値で SPLIT シグナルを算出する。合計 2 以上の場合、APPEND 実施前にユーザーへ SPLIT 要否を提案する。計測対象は当該 REQ の要件テーブル行（`^| REQ-NNNN-MMM |`）
 
 ### Result
