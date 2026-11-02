@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261102T132904Z-cbad",
+  "workflow": "req-define",
+  "evaluationKind": "ru0255-retrieval-ownership-reverify-classification",
+  "subject": "RU-0255 継続検証訂正版（所有先判断に必要な欠落での再現・実測先行）の操作分類",
+  "sourceRevision": "fe9f04b7d",
+  "durationMs": 887,
+  "inputTokens": 1521,
+  "inputs": {
+    "requestDigest": "313a95a54aec5520c0c075b844b74246152c8992d92467e510ae213de8c27298",
+    "references": [
+      {
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "label": "matching-and-merge.md 既存規律",
+        "path": "src/common/skills/agentdev-req-file-manager/references/matching-and-merge.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-revised-operation",
+      "questionForm": "choice",
+      "value": "REQ操作なし（検証実行中心の maintenance。具体的不一致確認後に条件付きで範囲内修正）",
+      "probabilityDistribution": {
+        "REQ操作なし（検証実行中心の maintenance。具体的不一致確認後に条件付きで範囲内修正）": 1,
+        "APPEND（REQ-004 へ新要件行追加）": 0,
+        "UPDATE（既存行 REQ-004-069 の意味修正）": 0,
+        "CREATE（新規 REQ 作成）": 0
+      }
+    },
+    {
+      "questionId": "q2-no-precommit",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.87,
+        "false": 0.13
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-revised-operation",
+        "value": "REQ操作なし（検証実行中心の maintenance。具体的不一致確認後に条件付きで範囲内修正）"
+      },
+      {
+        "questionId": "q2-no-precommit",
+        "value": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261102T132029Z-9bc4",
+  "workflow": "req-define",
+  "evaluationKind": "ru0255-retrieval-anomaly-hold-matching",
+  "subject": "RU-0255 継続検証由来の取得異常判断保留規律の操作分類・Design分離判断",
+  "sourceRevision": "fe9f04b7d",
+  "durationMs": 845,
+  "inputTokens": 1362,
+  "inputs": {
+    "requestDigest": "98e9cb8967677a22a9775811f64e8217150b7b86c31925be49a67f57e545973f",
+    "references": [
+      {
+        "label": "run1-result",
+        "path": "C:/Users/ogatay/work/adf-ru0255-local-ac2.evidence.d/run1-result.md",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      {
+        "label": "run2-result",
+        "path": "C:/Users/ogatay/work/adf-ru0255-local-ac2.evidence.d/run2-result.md",
+        "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-matching-operation",
+      "questionForm": "choice",
+      "value": "APPEND（REQ-004 への新要件行追加）",
+      "probabilityDistribution": {
+        "APPEND（REQ-004 への新要件行追加）": 0.93,
+        "UPDATE（既存行 REQ-004-069 の意味修正）": 0.07,
+        "CREATE（新規 REQ 作成）": 0,
+        "REQ操作なし（既存行の規定だけで成立）": 0
+      }
+    },
+    {
+      "questionId": "q2-design-separation",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.86,
+        "false": 0.14
+      }
+    }
+  ],
+  "confidence": 0.91,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-matching-operation",
+        "value": "APPEND（REQ-004 への新要件行追加）"
+      },
+      {
+        "questionId": "q2-design-separation",
+        "value": true
+      }
+    ]
+  }
+}
