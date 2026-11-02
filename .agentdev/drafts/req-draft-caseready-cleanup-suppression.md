@@ -14,7 +14,7 @@ RU-0255 実装検証（GitHub 版変更駆動・隔離 repo yogata/adf-ru0255-gi
 
 - 確定事実（証拠付き）: 事象タイムライン（file mtime + git log + 証跡 .agentdev/integrity/reports/case-ready-acceptance-checks.out）、wrapper 実装全文読取、版同一性（隔離 repo pin ≡ main repo src/common）、正規契約群（case-ready Design・SKILL.md・references・REQ-061・REQ-007・DEC-022）の読取、再検証（ru0255-caseready-rerun/evidence: exit 1・52 NG・後続ゲート抑止）と対照（ru0255-contrast/evidence: 3 revision・8 NG signature 一致・delta 0。合格証明ではない）、経路追跡（下記「経路追跡結果」。2026-11-03 実測）
 - 利用者の判断（第1次指示として確定）: 失敗無視の呼出し特定、既存検証義務・安全境界の維持、最小限修正、台帳・承認・新汎用ゲート不設置、対照証拠の合格証明扱い禁止
-- 利用者の判断（監督者照合所見・第2次指示として確定）: ready 不適切確定が残る点を踏まえた現行経路の追跡と責務の恣意的対象外の禁止、実変更なし経路の前提・検査結果・保存操作の実確認と架空の必須報告による通常経路破壊の防止、呼出側供給案の評価と既存機構内接続との比較による実効ある最小案の選定、phase 値差異と prNumber なし経路を踏まえた一致条件の明記、draft-data スキーマの現行契約・実パーサ準拠、組立検査証拠の実出力限定、必要な独立レビューの実施、保存時 commit（明示パス・今回分のみ）の実施
+- 監督者の照合・訂正指示（第2次。利用者発言ではなく、利用者判断・利用者合意として記録しない）: ready 不適切確定が残る点を踏まえた現行経路の追跡と責務の恣意的対象外の禁止、実変更なし経路の前提・検査結果・保存操作の実確認と架空の必須報告による通常経路破壊の防止、呼出側供給案の評価と既存機構内接続との比較による実効ある最小案の選定、phase 値差異と prNumber なし経路を踏まえた一致条件の明記、draft-data スキーマの現行契約・実パーサ準拠、組立検査証拠の実出力限定、必要な独立レビューの実施、保存時 commit（明示パス・今回分のみ）の実施
 - 境界外（本 draft では扱わない）: ready 遷移・merge への新規機構追加（AG-003 の経路追跡根拠による。模型契約 REQ-061-028 等 + 監督者訂正経路は維持）、case-close の同種構造（報告のみ）、隔離 repo の baseline 登録・gitignore・commit 処置（IR-073/REQ-010-084 の人間判断留保）、RU-0254/0256〜0260、訂正 Case draft（req-draft-correction-3887-verification.md）の編集
 
 ## 経路追跡結果（2026-11-03、現行契約の実測）
@@ -28,10 +28,21 @@ RU-0255 実装検証（GitHub 版変更駆動・隔離 repo yogata/adf-ru0255-gi
 
 - 独立レビュー（2026-11-03 実施、read-only）の検出反映: traceability-check の deferred obligations（missing-implementation / missing-verification）は新規要件行を含む設計PRの正規経路で報告の終了区分を needs-judgment にする（REQ-061-023。検証対応の完全性は受入条件に含めない。definition-traceability-gate.ts が deferred 時 status: warn を返し、assembleReport が needs-judgment に組む）。cleanup 前置確認は failure と deferred 以外の警告を拒否し、deferred 由来の needs-judgment は許可することでこの正規経路を維持する。同一設計PRの古い success 報告の再利用（acceptance-checks 再実行を経ない cleanup）も残留リスクとして契約へ明記した
 
+## 第3次監督者照合・訂正指示による再評価中項目（確定前・2026-11-03）
+
+当該指示は監督者の照合・訂正指示であり、利用者発言ではない。次の項目を再評価中であり、本 draft の該当記述（AG-002 の残留リスク文、AG-003、ACT-REQ-061-001 / ACT-DESIGN-001 の該当文、TS-002 の合格基準）は現時点の案であって確定ではない。
+
+1. 保護対象の範囲: 本事象の保護対象の実例は受入検査失敗後の ready 状態への移行を含む。cleanup 拒否のみでは不正な ready 記録と merge が残存し、元目的（失敗後の進行防止）に届かない可能性の再評価
+2. 回避経路の扱い: 設計PRあり Case を設計PRなしと入力する経路識別の虚偽申告、同一設計PRの古い成功報告の再利用を、単に残留リスクとして受け入れる扱いの再評価。局所 git 検証（main 履歴の設計PR merge commit〔"Merge pull request #N from …/definition/issue-{Case}"。実測: #3888・#3851〕の検出、merge commit の第二 parent と報告 targetRevision の一致、definition 系 branch・worktree の残存検出）で排除可能な範囲の評価を含む
+3. ready/merge 抑止の選択肢比較: agentdev_gh（GitHub 版・ローカル版の両 Tool）への状態知識付与だけを唯一の選択肢と決めつけない。 次段階の機械前置確認（case-run 前置 gate）による進行抑止、 既存の case-ready 処理を通じた外部操作の発行自体の制御、 受入検査と続く操作の同一実行単位化（script による merge 実行。既存契約〔GitHub I/O 書込みの agentdev_gh 限定・script の gh 操作禁止〕との抵触評価を含む）を、現在の実装・権限・Local/GitHub 両経路で具体的に成立するか比較する
+4. 元要件の強制水準: REQ-061-025 の文言（「成功後に削除。blocked、failed、中断した場合は保持」）が機械的強制まで要求していない可能性、および本事象の検査失敗が監督側指示の適用誤り（非同一環境手動対照による正当化・未検証の合格化）である可能性の検討。必要な変更を先取りしない
+
+再評価は並行して実施中の独立監査の報告を待ち、確定は監督者照合後に行う。形式的な再確認や一律追加検査ではなく、異常時に実際の ready・merge・削除の発行が必要に応じて抑止され、正当な経路が成立することを検証可能にすることを評価基準とする。
+
 ## 重要変更の事前通知の実施記録
 
 - 第1次（2026-11-03T03:19+09:00）: ドラフト保存（write 実行）に先立つセッション出力として、REQ-061 への新行追加と case-ready Design の script 呼び出し契約節更新の事前通知（変更理由・変更内容・影響・確定事項と未確認事項の区別）を実施した
-- 第2次（2026-11-03T03:40+09:00 以降、本次訂正）: 監督者照合所見による変更内容（経路別前置確認・実変更なし経路の非破壊・script 固定パス保存と一致条件・スキーマ准拠）は監督者自身の指示として確定しており、本訂正の内容は指示どおりに反映した
+- 第2次（2026-11-03T03:40+09:00 以降、本次訂正）: 当該訂正は監督者の照合・訂正指示によるものであり、利用者による内容確定ではない。変更内容（経路別前置確認・実変更なし経路の非破壊・script 固定パス保存と一致条件・スキーマ准拠）は監督者指示の受理・反映として扱った
 
 ## 事象証拠（本文記録）
 
@@ -59,11 +70,12 @@ summary: >-
   後に cleanup が成功実行され draft が削除された」事象の製品機構側欠落（REQ-061-025 の「成功後に削除」が
   模型遵守のみに依存）を閉じる。ready 遷移・merge への新規機構は追加しない（AG-003 の経路追跡根拠）。
 auto_gate:
-  auto_ready: true
+  auto_ready: false
   unresolved_questions: []
   unresolved_conflicts: []
   out_of_repo_operations: []
-  stop_reasons: []
+  stop_reasons:
+    - 第3次監督者照合・訂正指示による再評価中（保護対象範囲・回避経路の残留リスク扱い・ready/merge 抑止オプション比較・元要件の強制水準。並行独立監査の報告受理と監督者照合後に確定）
 agreed_items:
   - id: AG-001
     content: >-
@@ -308,4 +320,4 @@ case_open_hints:
 
 ## 保存後の扱い
 
-本 draft の保存時永続化として、保存した draft ファイルのみを対象とする明示パス指定の commit を実施する（スイープ操作なし。利用者第2次指示による）。新しい承認待ちを作らず、正規工程（case-auto）への継続は監督者の忠実性照合後に行う。実装・試験は case-run 責務であり、pin 同期（.agentdev-plugin）の更新も case-run 側の既存手順に従う。
+本 draft の保存時永続化として、保存した draft ファイルのみを対象とする明示パス指定の commit を実施する（スイープ操作なし。監督者第2次訂正指示による）。正規工程（case-auto）への継続は、並行して実施中の独立監査の報告受理と監督者照合の後に行う（第3次監督者照合・訂正指示）。第3次指示による再評価中項目は本文「第3次監督者照合・訂正指示による再評価中項目」のとおり確定前であり、再評価結果により本 draft の該当記述は変更される可能性がある。実装・試験は case-run 責務であり、pin 同期（.agentdev-plugin）の更新も case-run 側の既存手順に従う。
