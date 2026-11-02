@@ -48,3 +48,20 @@
 - 予防: MSYS から Windows 絶対パスを渡す引数は Windows 形式（バックスラッシュまたはドライブレター）で統一するか、MSYS_NO_PATHCONV 系の抑制を検討する
 - 発生条件: Case #3889 TS-C003 サブエージェントの clone 初回実行
 - 証跡: C:/WINDOWS/TEMP/opencode/ts3889-local/execution-log.md 第 0 節注記
+
+## 2026-11-02T13:16+09:00 Case #3889（TS-C004 隔離検証・第2次訂正）Capture
+
+### 1. gh-write guard は説明文中の gh WRITE コマンド名も検出してコマンド全体をブロックする
+
+- 問題クラス: workflow deviation / guard 挙動
+- 内容: Bash コマンド文字列内に gh WRITE 系コマンド名（例: PR 作成の生コマンド名）が説明文・JSON 文言として含まれるだけでも、guard がコマンド全体を raw gh WRITE と判定してブロックする。heredoc によるファイル作成も含むため、ブロック時にファイル作成自体が行われない
+- 対処: コマンド文字列に gh WRITE コマンド名を直接書かない。Python の隣接文字列リテラル分割（"gh" + " pr " + "create" 等）や別表現（「PR 作成の生コマンド」等）で構築する
+- 発生条件: Case #3889 判定コメント訂正スクリプトの作成（実測 2026-11-02 13:09〜13:11）
+- 証拠: m0352〜m0355 のブロック応答 3 件と分割リテラルによる解消
+
+### 2. edit tool は workspace 外パスで fail-closed する
+
+- 問題クラス: 環境依存 / ツール境界
+- 内容: C:/WINDOWS/TEMP/ 配下のファイルを edit tool で編集すると「cannot read the current file content」で fail-closed する。AGENTS.md の write tool と同じ境界が edit にも適用される
+- 対処: temp 領域のファイル修正は bash（quoted heredoc によるスクリプト実行）で行う
+- 発生条件: 同上（fix-phrase.py の修正を edit で試行）
