@@ -162,3 +162,22 @@
 - 想定反映先: agentdev-workflow-case-open の prepare_definition_pr 入力構成と STEP-4 proposal review 手順
 - 関連: Case #3902、PR #3903、Definition branch `definition/issue-3902`
 - タグ: `#case-open` `#gate-configuration` `#integrity` `#proposal-review`
+
+## [2026-11-04T07:30+09:00][learning_candidate][Windows git-bash での junction 作成][Case #3902]
+- 検知: bash 経由で `node -e` 内のバックスラッシュパス（`C:\\Users\\...`）を渡すと shell 解釈でバックスラッシュが食われ、dangling junction（target が mangle された path）が生成され得る。
+- 対処: `String.fromCharCode(92)` による runtime join で target を構築すれば安全に作成できる。削除は `fs.unlinkSync`（link のみ削除、target に影響なし）で往復検証済み。
+- 学び: Windows git-bash で junction を作る処理は、バックスラッシュを文字列リテラルで直接渡さず runtime で結合するのが安全。dangling junction は存在検査が通るため発見が遅れやすい。link 削除は unlinkSync で target を壊さない。
+- 出典: PR #3904 本文 `## Findings / Capture候補`（### learning 第1項）
+
+## [2026-11-04T07:30+09:00][learning_candidate][worktree での bun test 実行][Case #3902]
+- 検知: 本リポジトリの traceability scripts・integrity scripts は bun 組込 runner + node 組込モジュールのみで動作し、worktree（node_modules 未伝播）でも targeted test・フルスイートの大半が node_modules なしで実行可能。typecheck のみ typescript を要する。
+- 対処: メインリポジトリ側 node_modules への一時 junction で typecheck を解決できる（実行後に junction のみ削除）。probe test を先に実行して依存の要否を確認する手順が有効。
+- 学び: worktree での full suite 実行は、依存の要否を probe test で先に確定してから bun 組込 runner 経路で実行すれば node_modules 未伝播のまま成立する。textlint gate の vendor は plugin package 配下の `bun install && bun run build:engine` を worktree 内で実行すれば生成できる（vendor は plugin 配下 .gitignore 管理対象のため residue に現れない）。
+- 出典: PR #3904 本文 `## Findings / Capture候補`（### learning 第2項）、case-close 対応記録コメント 6617043300（検証差分）
+
+## [2026-11-04T07:30+09:00][learning_candidate][case-close full suite 機械受理の baseline 再現確認構成][Case #3902]
+- 検知: close 時の full integrity suite 機械受理では、fail 全件の由来分類（pre-existing）に baseline 再現確認（baselineCommit・method・sameFailureReproduced の記録実体）が必要だが、機械工程 script は gate 実行と分類突合を同時に要求するため、fail 明細を知らずに input を組み立てられない。
+- 対処: 手動で3分割を先に実行して fail 明細と件数を実測し、detached worktree（baseline commit）での全対象実行1回で fail 全件の再現確認を被覆してから、機械工程 script に integrityMachineAcceptance 入力を渡して突合させる2段階構成とした。13件全件の baselineReproduction を1回の全対象実行（split1 該当2ファイル単独 + split3 全対象）で充足した。
+- 学び: fail 全件の baseline 再現確認は、fail 対象の単独実行と全対象実行の組み合わせで1回ずつ実行すれば被覆できる。機械工程の受理入力は実測後に組み立てるのが実務的であり、手動予備実行は「失敗由来分類」の正当理由に該当する。
+- 出典: case-close 対応記録コメント 6617043300（検証差分）、QG-4 checker 実測手順（agentdev-quality-gates）
+
