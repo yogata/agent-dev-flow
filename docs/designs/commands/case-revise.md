@@ -51,10 +51,12 @@ case-revise の公開契約を定義する。case-revise は req-define で再�
 
 case-revise は再合意済み Definition 変更の影響再評価において、`agentdev-traceability` の impact 拡張（差分候補）を利用できる。
 本節は利用側の接続を所有し、能力の提供面は agentdev-traceability Design「impact 拡張（差分候補）」節が所有する。
+差分候補・影響分類の取得機構は relied-diff CLI（同スキル SKILL.md の公開操作契約、agentdev-traceability Design「relied-diff（依拠版に基づく差分・変更影響 CLI）」節）であり、依拠版・現行版の差分から影響候補・変更起点・判断結果・未確認事項を構造化出力として取得する。
 差分候補の利用は設計上の接続であり、本変更では workflow の実行手順や CLI を変更しない。
 
 再合意案と canonical Definition の実変更判定を、下流が依拠した版と新しい上流との影響比較から区別する。
 前者が空でも後者の確認を省略しない。影響評価記録は変更起点、比較根拠、候補の分類・理由、証拠の再利用判断を含めて case-ready へ引き継ぐ。
+relied-diff の出力に対応する引継ぎ項目は、変更起点の後続伝播対象（propagationRequired）、未確認候補とその判断根拠（unverified・basis）、変更反映完了判定（fullyPropagated）であり、中間工程で更新不要と評価された変更起点もこれらの項目を通じて後続へ引き継がれる。
 case-ready は実行契約を再確定し、case-run / case-close は必要な更新・再検証と受け入れを行う。未確認が残る範囲は完了として引き継がない。
 
 - 影響候補の取扱い: 更新必要は影響再評価の対象とする。更新不要は、影響しない旨の根拠とともに確認できた場合に限り維持判断の根拠とする。作成は対応する下流成果物が存在しないことを示し、存在しない旧下流成果物との比較を要求しない。未確認は根拠が示されるまで影響再評価の対象として扱い、「影響なし」や「完了」と判定しない

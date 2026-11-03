@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-106-001, REQ-106-002, REQ-106-003, REQ-106-004, REQ-106-005, REQ-106-006, REQ-106-007, REQ-106-008, REQ-106-009
+// ADF-COVERS(verification): REQ-106-001, REQ-106-002, REQ-106-003, REQ-106-004, REQ-106-005, REQ-106-006, REQ-106-007, REQ-106-008, REQ-106-009, REQ-106-010, REQ-106-011
 //
 // agentdev-traceability 配布スキル relied-diff（依拠版に基づく差分・変更影響・増分更新）の
 // 公開契約検証（REQ-106、agentdev-traceability Design「impact 拡張（差分候補）」節）。
@@ -10,19 +10,21 @@
 
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   classifyDownstream,
   classifyEvidenceIntegration,
   classifyPathImpact,
   judgePropagationCompletion,
+  listTouchedPaths,
 } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/relied_diff.ts";
 import type { PathGitFacts } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/relied_diff.ts";
 
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `trace-relied-${crypto.randomUUID().slice(0, 8)}`;
 const ROOT = join(TEMP_BASE, RUN_ID);
+const ROOT_BROKEN = join(TEMP_BASE, `${RUN_ID}-broken`);
 const RELIED_DIFF_CLI = join(
   "src",
   "common",
@@ -40,23 +42,27 @@ function git(args: readonly string[]): string {
   return execFileSync("git", ["-C", ROOT, ...args], { encoding: "utf-8" });
 }
 
-function commitFile(rel: string, content: string, message: string): string {
-  const filePath = join(ROOT, rel);
+function commitFile(rel: string, content: string, message: string, root: string = ROOT): string {
+  const filePath = join(root, rel);
   mkdirSync(join(filePath, ".."), { recursive: true });
   writeFileSync(filePath, content + "\n", "utf-8");
-  execFileSync("git", ["-C", ROOT, "add", "."], { encoding: "utf-8" });
-  execFileSync("git", ["-C", ROOT, "commit", "-m", message], { encoding: "utf-8" });
-  return git(["rev-parse", "HEAD"]).trim();
+  execFileSync("git", ["-C", root, "add", "."], { encoding: "utf-8" });
+  execFileSync("git", ["-C", root, "commit", "-m", message], { encoding: "utf-8" });
+  return execFileSync("git", ["-C", root, "rev-parse", "HEAD"], { encoding: "utf-8" }).trim();
 }
 
-function runCli(args: readonly string[]): { stdout: string; exitCode: number } {
-  const proc = Bun.spawnSync(["bun", RELIED_DIFF_CLI, "--root", ROOT, ...args], {
+function runCli(
+  args: readonly string[],
+  root: string = ROOT,
+): { stdout: string; stderr: string; exitCode: number } {
+  const proc = Bun.spawnSync(["bun", RELIED_DIFF_CLI, "--root", root, ...args], {
     cwd: process.cwd(),
     stdout: "pipe",
     stderr: "pipe",
   });
   return {
     stdout: proc.stdout.toString(),
+    stderr: proc.stderr.toString(),
     exitCode: proc.exitCode ?? -1,
   };
 }
@@ -65,6 +71,8 @@ let commitA = "";
 let commitB = "";
 let commitC = "";
 let commitD = "";
+let brokenA = "";
+let brokenC = "";
 
 beforeAll(() => {
   mkdirSync(ROOT, { recursive: true });
@@ -84,10 +92,33 @@ beforeAll(() => {
   commitC = commitFile(UPSTREAM, "v1", "C revert");
   commitD = commitFile("upstream/n.md", "new", "D new upstream");
   commitFile(UPSTREAM, "v3", "D upstream v3");
+
+  // T3/T4 用の隔離リポジトリ: A→B→C（正味差分ゼロ）。git init 直後の全 loose object 構成で、
+  // 中間コミット B のツリー loose object を削除して履歴取得（git log --name-only）の失敗を作る。
+  mkdirSync(ROOT_BROKEN, { recursive: true });
+  execFileSync("git", ["-C", ROOT_BROKEN, "init"], { encoding: "utf-8" });
+  execFileSync("git", ["-C", ROOT_BROKEN, "config", "user.name", "test"], { encoding: "utf-8" });
+  execFileSync("git", ["-C", ROOT_BROKEN, "config", "user.email", "test@example.invalid"], { encoding: "utf-8" });
+  execFileSync("git", ["-C", ROOT_BROKEN, "config", "commit.gpgsign", "false"], { encoding: "utf-8" });
+  execFileSync("git", ["-C", ROOT_BROKEN, "config", "core.autocrlf", "false"], { encoding: "utf-8" });
+  brokenA = commitFile(UPSTREAM, "v1", "A", ROOT_BROKEN);
+  const brokenB = commitFile(UPSTREAM, "v2", "B intermediate", ROOT_BROKEN);
+  brokenC = commitFile(UPSTREAM, "v1", "C revert", ROOT_BROKEN);
+  const treeLine = execFileSync("git", ["-C", ROOT_BROKEN, "cat-file", "-p", brokenB], {
+    encoding: "utf-8",
+  })
+    .split(/\r?\n/)
+    .find((line) => line.startsWith("tree "));
+  if (!treeLine) throw new Error("broken fixture: tree line not found");
+  const treeSha = treeLine.slice("tree ".length).trim();
+  const objectPath = join(ROOT_BROKEN, ".git", "objects", treeSha.slice(0, 2), treeSha.slice(2));
+  if (!existsSync(objectPath)) throw new Error(`broken fixture: loose object not found: ${treeSha}`);
+  rmSync(objectPath);
 });
 
 afterAll(() => {
   rmSync(ROOT, { recursive: true, force: true });
+  rmSync(ROOT_BROKEN, { recursive: true, force: true });
 });
 
 describe("relied-diff CLI（依拠版指定）", () => {
@@ -209,6 +240,68 @@ describe("relied-diff CLI（依拠版指定）", () => {
     );
     expect(createRun.downstream.classification).toBe("create");
     expect(createRun.fullyPropagated).toBe("no");
+  });
+});
+
+describe("relied-diff 取得失敗の構造化報告と変更起点の保持", () => {
+  it("T1: 無指定＋正味差分ゼロでも中間変更の変更起点が報告に残る（完了判定と分離）", () => {
+    const { stdout, exitCode } = runCli(["--relied", commitA, "--head", commitC]);
+    expect(exitCode).toBe(0);
+    const report = JSON.parse(stdout);
+    const u = report.impacts.find((i: { path: string }) => i.path === UPSTREAM);
+    expect(u).toBeDefined();
+    expect(u.classification).toBe("up-to-date");
+    expect(u.intermediateTouched).toBe(true);
+    expect(u.propagationRequired).toBe(true);
+    expect(u.basis).toContain("後続工程へ引き継ぐ");
+    expect(report.emptyResult).toBe(false);
+    expect(report.fullyPropagated).toBe("yes");
+  });
+
+  it("T2: --paths の不在パスは unverified で報告され、完了判定にならない", () => {
+    const { stdout, exitCode } = runCli(["--relied", commitA, "--paths", "ghost.md"]);
+    expect(exitCode).toBe(0);
+    const report = JSON.parse(stdout);
+    const ghost = report.impacts.find((i: { path: string }) => i.path === "ghost.md");
+    expect(ghost).toBeDefined();
+    expect(ghost.classification).toBe("unverified");
+    expect(ghost.basis).toContain("存在せず");
+    expect(ghost.basis).toContain("完了」と判定しない");
+    expect(report.fullyPropagated).toBe("undetermined");
+    expect(report.emptyResult).toBe(false);
+  });
+
+  it("T3: 履歴取得失敗は構造化エラーで非ゼロ終了し、空の変更集合として正常扱いしない", () => {
+    const { stdout, stderr, exitCode } = runCli(["--relied", brokenA, "--head", brokenC], ROOT_BROKEN);
+    expect(exitCode).not.toBe(0);
+    expect(stderr).toContain("git-unavailable");
+    expect(stdout).not.toContain("fullyPropagated");
+  });
+
+  it("T4: lib の listTouchedPaths は履歴取得失敗時に空集合ではなく null を返す", () => {
+    expect(listTouchedPaths(ROOT_BROKEN, brokenA, brokenC)).toBe(null);
+  });
+
+  it("T5: 同一引数の再実行は同一出力を返す（読取専用・決定論）", () => {
+    const first = runCli(["--relied", commitA, "--head", commitC, "--paths", UPSTREAM]);
+    const second = runCli(["--relied", commitA, "--head", commitC, "--paths", UPSTREAM]);
+    expect(first.exitCode).toBe(0);
+    expect(second.exitCode).toBe(0);
+    expect(second.stdout).toBe(first.stdout);
+  });
+
+  it("T6: 後続消費経路の文書接続が存在する（case-revise 引継ぎ項目・工程駆動の能力参照）", () => {
+    const caseRevise = readFileSync("docs/designs/commands/case-revise.md", "utf-8");
+    expect(caseRevise).toContain("relied-diff");
+    expect(caseRevise).toContain("propagationRequired");
+    expect(caseRevise).toContain("unverified");
+    expect(caseRevise).toContain("fullyPropagated");
+    const v51 = readFileSync(
+      "docs/designs/workflows/v51-phase-transition-and-coexistence-model.md",
+      "utf-8",
+    );
+    expect(v51).toContain("impact 拡張（差分候補）");
+    expect(v51).toContain("relied-diff");
   });
 });
 

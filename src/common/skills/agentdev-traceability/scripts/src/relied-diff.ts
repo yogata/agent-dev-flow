@@ -27,7 +27,7 @@ import {
   listTouchedPaths,
   resolveCommit,
 } from "../lib/relied_diff.ts";
-import type { PathGitFacts } from "../lib/relied_diff.ts";
+import type { PathGitFacts, PathImpact } from "../lib/relied_diff.ts";
 
 const args = parseArgs(process.argv.slice(2));
 const rootValue = args.get("root");
@@ -101,8 +101,9 @@ function parsePaths(value: string): string[] {
     .filter((s) => s.length > 0);
 }
 
-// 候補パス集合の決定: --paths 指定時は指定パス ∪ 依拠版..現行版の name-status パス（指定内）。
-// 未指定時は name-status 全パス。
+// 候補パス集合の決定: 指定パス（--paths）∪ 依拠版..現行版の name-status 全パス
+// ∪ 履歴で触れたパス（git log --name-only）。履歴由来のパスは正味差分ゼロでも
+// 中間変更情報を候補決定へ反映する（変更起点の後続引き継ぎ）。
 const nameStatus = diffNameStatus(root, reliedCommit, headCommit);
 if (nameStatus === null) {
   fail(JSON.stringify({ error: "git-unavailable", reason: "git diff --name-status の実行に失敗した" }));
@@ -113,6 +114,15 @@ const candidateSet = new Set<string>(requestedPaths);
 for (const entry of nameStatus) candidateSet.add(entry.path);
 
 const touched = listTouchedPaths(root, reliedCommit, headCommit);
+if (touched === null) {
+  fail(
+    JSON.stringify({
+      error: "git-unavailable",
+      reason: "git log --name-only（履歴取得）の実行に失敗した。失敗を空の変更集合として隠蔽しない",
+    }),
+  );
+}
+for (const p of touched) candidateSet.add(p);
 
 const factEntries: PathGitFacts[] = [...candidateSet].sort().map((path) => {
   const entry = nameStatus.find((e) => e.path === path);
@@ -129,6 +139,32 @@ const factEntries: PathGitFacts[] = [...candidateSet].sort().map((path) => {
 const impacts = factEntries
   .map((facts) => classifyPathImpact(facts))
   .filter((impact): impact is NonNullable<typeof impact> => impact !== null);
+
+// lib 決定表契約「両版とも不在のパスは候補から除外する」は維持する（除外は lib）。
+// 候補のうち分類結果に現れないパスを CLI 層で unverified として報告し、
+// 判断根拠の得られない指定・参照不能パスが無判定のまま完了にならないようにする（報告は CLI）。
+const classifiedPaths = new Set<string>(impacts.map((impact) => impact.path));
+const unverifiedImpacts: PathImpact[] = [...candidateSet]
+  .filter((path) => !classifiedPaths.has(path))
+  .sort()
+  .map((path) => {
+    const entry = nameStatus.find((e) => e.path === path);
+    return {
+      path,
+      changeKind: entry?.kind ?? "unchanged",
+      classification: "unverified" as const,
+      basis:
+        "依拠版・現行版のいずれにもパスが存在せず、分類の判断根拠が得られない" +
+        "（指定誤り・参照不能・中間版での作成と削除の可能性）。根拠が得られないため" +
+        "「影響なし」や「完了」と判定しない",
+      propagationRequired: touched.has(path),
+      reliedBlob: null,
+      headBlob: null,
+      intermediateTouched: touched.has(path),
+      ...(entry?.peer !== undefined ? { renamePeer: entry.peer } : {}),
+    };
+  });
+impacts.push(...unverifiedImpacts);
 
 const downstream = downstreamArg
   ? classifyDownstream(normalizeArtifactPath(downstreamArg), blobAt(root, headCommit, normalizeArtifactPath(downstreamArg)))
