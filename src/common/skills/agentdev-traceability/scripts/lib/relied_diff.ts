@@ -145,11 +145,15 @@ export function blobAt(root: string, rev: string, path: string): string | null {
   return blob.length > 0 ? blob : null;
 }
 
-/** from..to の間でいずれかのコミットが触れたパス集合（git log --name-only）。 */
-export function listTouchedPaths(root: string, from: string, to: string): ReadonlySet<string> {
+/**
+ * from..to の間でいずれかのコミットが触れたパス集合（git log --name-only）。
+ * 実行不能（git 不在・履歴取得失敗等）は空集合ではなく null を返す
+ * （失敗を空の変更集合として正常扱いしない。Design「relied-diff」節の取得失敗契約）。
+ */
+export function listTouchedPaths(root: string, from: string, to: string): ReadonlySet<string> | null {
   const result = runGit(root, ["log", "--format=", "--name-only", `${from}..${to}`]);
+  if (!result.ok) return null;
   const touched = new Set<string>();
-  if (!result.ok) return touched;
   for (const line of result.stdout.split(/\r?\n/)) {
     const p = line.trim();
     if (p.length > 0) touched.add(toForwardSlash(p));

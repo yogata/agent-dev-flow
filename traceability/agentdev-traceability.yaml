@@ -44,6 +44,8 @@ implementation:
     - REQ-106-007
     - REQ-106-008
     - REQ-106-009
+    - REQ-106-010
+    - REQ-106-011
   src/common/skills/agentdev-traceability/scripts/lib/reuse.ts:
     - REQ-107-008
   src/common/skills/agentdev-traceability/scripts/lib/sidecar.ts:
@@ -71,6 +73,8 @@ implementation:
     - REQ-106-007
     - REQ-106-008
     - REQ-106-009
+    - REQ-106-010
+    - REQ-106-011
   src/common/skills/agentdev-traceability/scripts/src/reuse.ts:
     - REQ-107-008
   traceability/policy.yaml:
@@ -120,3 +124,5 @@ verification:
     - REQ-106-007
     - REQ-106-008
     - REQ-106-009
+    - REQ-106-010
+    - REQ-106-011
