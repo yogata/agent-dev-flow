@@ -1255,6 +1255,32 @@ export function deriveReqMetricsMeasureDate(
 }
 // ─── main ──────────────────────────────────────────────────────────────────
 
+/**
+ * セクション入力の不存在時の扱いを本体 / 導入先で分岐する。
+ * 本体（rules dir 存在 = IR 管理対象）では従来どおり fail-fast で異常終了し、
+ * 導入先（rules dir 不在）では IR-061 と同一の適用範囲（マーカー不在 =
+ * 検証対象外）でスキップを記録して継続する（自動生成領域を持たない索引ファイルは
+ * 導入先として正常な状態である）。
+ */
+function skipOrExit(hasIntegrityStructure: boolean, message: string): void {
+  if (hasIntegrityStructure) {
+    console.error(`[generate_indexes] ${message}`);
+    process.exit(EXIT_ERROR);
+  }
+  console.log(
+    `[generate_indexes] ${message} (integrity structure absent, skipping)`,
+  );
+}
+
+/** content 内に存在しない AUTOGEN block ID の一覧を返す（全て存在すれば空配列）。 */
+function missingAutogenIds(
+  content: string,
+  expectedIds: readonly string[],
+): string[] {
+  const foundIds = new Set(findAutogenBlocks(content).map((b) => b.id));
+  return expectedIds.filter((id) => !foundIds.has(id));
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   let options;
@@ -1345,13 +1371,16 @@ RELATED:
   const qualityDir = path.join(designsDir, "quality");
   const reqHealthMetricsPath = path.join(qualityDir, "req-health-metrics.md");
 
-  if (!fs.existsSync(rulesDir)) {
-    console.error(`[generate_indexes] rules dir not found: ${rulesDir}`);
-    process.exit(EXIT_ERROR);
-  }
-
-  const infos = collectIrFiles(rulesDir);
-  if (infos.length === 0) {
+  // IR 管理対象判定: rules dir の存在は check_integrity.ts
+  // checkIndexGenerationConsistency（IR-061）が既に使用する同一の存在条件である。
+  // 本体（producer, rules dir 存在）では従来どおり全セクション必須の fail-fast を
+  // 維持する。導入先（consumer, rules dir 不在）では integrity 系セクションを
+  // スキップし、AUTOGEN 領域を保持するファイルのみを再生成する（IR-061 exemption
+  // 「自動生成マーカーが存在しないファイルは検証対象外」と同一の適用範囲。
+  // REQ-029-001: 配布成果物は producer 内部依存に依存しない）。
+  const hasIntegrityStructure = fs.existsSync(rulesDir);
+  const infos = hasIntegrityStructure ? collectIrFiles(rulesDir) : [];
+  if (hasIntegrityStructure && infos.length === 0) {
     console.error(`[generate_indexes] no IR-*.md files found in ${rulesDir}`);
     process.exit(EXIT_ERROR);
   }
@@ -1390,90 +1419,112 @@ RELATED:
   const reqActiveTable = generateReqActiveTable(reqInfos);
   const reqRetiredTable = generateReqRetiredTable(reqRetiredInfos);
 
-  const reqMetrics = collectReqMetrics(reqDir);
-  const reqMeasureDate = deriveReqMetricsMeasureDate(root, reqDir, reqMetrics);
-  if (reqMeasureDate === null) {
+  // req-health-metrics の生成源は AUTOGEN 領域が存在する場合のみ計測する
+  // （導入先に計測ブロックが無い場合、git 履歴に依存する計測日導出も行わない）。
+  const reqMetricsOriginal = readText(reqHealthMetricsPath);
+  const reqHealthMetricsReady = reqMetricsOriginal !== null &&
+    findAutogenBlocks(reqMetricsOriginal).some(
+      (b) => b.id === REQ_METRICS_BLOCK_ID,
+    );
+  const reqMetrics = reqHealthMetricsReady ? collectReqMetrics(reqDir) : [];
+  const reqMeasureDate = reqHealthMetricsReady
+    ? deriveReqMetricsMeasureDate(root, reqDir, reqMetrics)
+    : null;
+  if (reqHealthMetricsReady && reqMeasureDate === null) {
     console.error(
       `[generate_indexes] measure date derivation failed for docs/requirements/REQ-*.md ` +
         `(no commit history or git failure)`,
     );
     process.exit(EXIT_ERROR);
   }
-  const reqMetricsTable = generateReqMetricsTable(reqMetrics, reqMeasureDate);
+  const reqMetricsTable = reqHealthMetricsReady && reqMeasureDate !== null
+    ? generateReqMetricsTable(reqMetrics, reqMeasureDate)
+    : [];
 
   const readmeReqSummary = generateReadmeReqSummaryCount({
     activeReqCount: reqInfos.length,
     retiredReqCount: reqRetiredInfos.length,
   });
 
-  const { pre: catalogPre, post: catalogPost } = generateCatalogBlocks(infos);
-  const ruleOwnershipLines = generateRuleOwnershipAppendix(infos);
+  // integrity 系の生成ブロックは rules dir が存在する場合のみ生成する。
+  const { pre: catalogPre, post: catalogPost } = hasIntegrityStructure
+    ? generateCatalogBlocks(infos)
+    : { pre: [], post: [] };
+  const ruleOwnershipLines = hasIntegrityStructure
+    ? generateRuleOwnershipAppendix(infos)
+    : [];
 
   const updates: { file: string; content: string }[] = [];
 
-  // catalog 更新
-  const catalogOriginal = readText(catalogPath);
-  if (catalogOriginal === null) {
-    console.error(`[generate_indexes] catalog not found: ${catalogPath}`);
-    process.exit(EXIT_ERROR);
-  }
-  let catalogUpdated = catalogOriginal;
-  const catalogPreBlocks = findAutogenBlocks(catalogOriginal).filter(
-    (b) => b.id === CATALOG_PRE_BLOCK_ID,
-  );
-  const catalogPostBlocks = findAutogenBlocks(catalogOriginal).filter(
-    (b) => b.id === CATALOG_POST_BLOCK_ID,
-  );
-  if (catalogPreBlocks.length === 0 && catalogPostBlocks.length === 0) {
-    console.error(
-      `[generate_indexes] catalog AUTOGEN markers not found. ` +
-        `Expected ids: ${CATALOG_PRE_BLOCK_ID}, ${CATALOG_POST_BLOCK_ID}`,
+  if (hasIntegrityStructure) {
+    // catalog 更新
+    const catalogOriginal = readText(catalogPath);
+    if (catalogOriginal === null) {
+      console.error(`[generate_indexes] catalog not found: ${catalogPath}`);
+      process.exit(EXIT_ERROR);
+    }
+    let catalogUpdated = catalogOriginal;
+    const catalogPreBlocks = findAutogenBlocks(catalogOriginal).filter(
+      (b) => b.id === CATALOG_PRE_BLOCK_ID,
     );
-    process.exit(EXIT_ERROR);
-  }
-  if (catalogPreBlocks.length > 0) {
-    catalogUpdated = replaceAutogenBlock(
-      catalogUpdated,
-      CATALOG_PRE_BLOCK_ID,
-      catalogPre,
+    const catalogPostBlocks = findAutogenBlocks(catalogOriginal).filter(
+      (b) => b.id === CATALOG_POST_BLOCK_ID,
     );
-  }
-  if (catalogPostBlocks.length > 0) {
-    catalogUpdated = replaceAutogenBlock(
-      catalogUpdated,
-      CATALOG_POST_BLOCK_ID,
-      catalogPost,
-    );
-  }
-  if (catalogUpdated !== catalogOriginal) {
-    updates.push({ file: catalogPath, content: catalogUpdated });
-  }
+    if (catalogPreBlocks.length === 0 && catalogPostBlocks.length === 0) {
+      console.error(
+        `[generate_indexes] catalog AUTOGEN markers not found. ` +
+          `Expected ids: ${CATALOG_PRE_BLOCK_ID}, ${CATALOG_POST_BLOCK_ID}`,
+      );
+      process.exit(EXIT_ERROR);
+    }
+    if (catalogPreBlocks.length > 0) {
+      catalogUpdated = replaceAutogenBlock(
+        catalogUpdated,
+        CATALOG_PRE_BLOCK_ID,
+        catalogPre,
+      );
+    }
+    if (catalogPostBlocks.length > 0) {
+      catalogUpdated = replaceAutogenBlock(
+        catalogUpdated,
+        CATALOG_POST_BLOCK_ID,
+        catalogPost,
+      );
+    }
+    if (catalogUpdated !== catalogOriginal) {
+      updates.push({ file: catalogPath, content: catalogUpdated });
+    }
 
-  // rule-ownership 更新
-  const ruleOwnershipOriginal = readText(ruleOwnershipPath);
-  if (ruleOwnershipOriginal === null) {
-    console.error(
-      `[generate_indexes] rule-ownership not found: ${ruleOwnershipPath}`,
+    // rule-ownership 更新
+    const ruleOwnershipOriginal = readText(ruleOwnershipPath);
+    if (ruleOwnershipOriginal === null) {
+      console.error(
+        `[generate_indexes] rule-ownership not found: ${ruleOwnershipPath}`,
+      );
+      process.exit(EXIT_ERROR);
+    }
+    const ruleOwnershipBlocks = findAutogenBlocks(
+      ruleOwnershipOriginal,
+    ).filter((b) => b.id === RULE_OWNERSHIP_BLOCK_ID);
+    if (ruleOwnershipBlocks.length === 0) {
+      console.error(
+        `[generate_indexes] rule-ownership AUTOGEN marker not found. ` +
+          `Expected id: ${RULE_OWNERSHIP_BLOCK_ID}`,
+      );
+      process.exit(EXIT_ERROR);
+    }
+    const ruleOwnershipUpdated = replaceAutogenBlock(
+      ruleOwnershipOriginal,
+      RULE_OWNERSHIP_BLOCK_ID,
+      ruleOwnershipLines,
     );
-    process.exit(EXIT_ERROR);
-  }
-  const ruleOwnershipBlocks = findAutogenBlocks(ruleOwnershipOriginal).filter(
-    (b) => b.id === RULE_OWNERSHIP_BLOCK_ID,
-  );
-  if (ruleOwnershipBlocks.length === 0) {
-    console.error(
-      `[generate_indexes] rule-ownership AUTOGEN marker not found. ` +
-        `Expected id: ${RULE_OWNERSHIP_BLOCK_ID}`,
+    if (ruleOwnershipUpdated !== ruleOwnershipOriginal) {
+      updates.push({ file: ruleOwnershipPath, content: ruleOwnershipUpdated });
+    }
+  } else {
+    console.log(
+      `[generate_indexes] integrity catalog / rule-ownership not found, skipping (integrity structure absent)`,
     );
-    process.exit(EXIT_ERROR);
-  }
-  const ruleOwnershipUpdated = replaceAutogenBlock(
-    ruleOwnershipOriginal,
-    RULE_OWNERSHIP_BLOCK_ID,
-    ruleOwnershipLines,
-  );
-  if (ruleOwnershipUpdated !== ruleOwnershipOriginal) {
-    updates.push({ file: ruleOwnershipPath, content: ruleOwnershipUpdated });
   }
 
   // Decision README 更新 (AG-008 / DEC-009)。対象ファイル不存在時はスキップ。
@@ -1483,7 +1534,6 @@ RELATED:
       `[generate_indexes] Decision README not found, skipping: ${decisionReadmePath}`,
     );
   } else {
-    const decisionReadmeBlocks = findAutogenBlocks(decisionReadmeOriginal);
     const decisionReadmeExpectedIds = [
       DECISION_BASELINE_COUNT_BLOCK_ID,
       DECISION_BASELINE_TABLE_BLOCK_ID,
@@ -1494,184 +1544,186 @@ RELATED:
       DECISION_RETIRED_TABLE_BLOCK_ID,
       DECISION_RELATED_REQ_TABLE_BLOCK_ID,
     ];
-    const decisionReadmeFoundIds = new Set(
-      decisionReadmeBlocks.map((b) => b.id),
-    );
-    const decisionReadmeMissing = decisionReadmeExpectedIds.filter(
-      (id) => !decisionReadmeFoundIds.has(id),
+    const decisionReadmeMissing = missingAutogenIds(
+      decisionReadmeOriginal,
+      decisionReadmeExpectedIds,
     );
     if (decisionReadmeMissing.length > 0) {
-      console.error(
-        `[generate_indexes] Decision README AUTOGEN markers not found: ${decisionReadmeMissing.join(", ")}`,
+      skipOrExit(
+        hasIntegrityStructure,
+        `Decision README AUTOGEN markers not found: ${decisionReadmeMissing.join(", ")}`,
       );
-      process.exit(EXIT_ERROR);
-    }
-    const relatedReqNotes = extractRelatedReqNotes(decisionReadmeOriginal);
-    const reqCtx = collectReqIdContext(reqDir, reqRetiredDir);
-    const decisionRelatedReqTable = generateDecisionRelatedReqTable(
-      decisionInfos,
-      reqCtx,
-      relatedReqNotes,
-    );
-    let decisionReadmeUpdated = decisionReadmeOriginal;
-    const decisionReadmeReplacements: Record<string, string[]> = {
-      [DECISION_BASELINE_COUNT_BLOCK_ID]: decisionBaselineCaption,
-      [DECISION_BASELINE_TABLE_BLOCK_ID]: decisionBaselineTable,
-      [DECISION_STATUS_ACCEPTED_BLOCK_ID]: decisionStatusAccepted,
-      [DECISION_STATUS_PROPOSED_BLOCK_ID]: decisionStatusProposed,
-      [DECISION_STATUS_SUPERSEDED_BLOCK_ID]: decisionStatusSuperseded,
-      [DECISION_STATUS_DEPRECATED_BLOCK_ID]: decisionStatusDeprecated,
-      [DECISION_RETIRED_TABLE_BLOCK_ID]: decisionRetiredTable,
-      [DECISION_RELATED_REQ_TABLE_BLOCK_ID]: decisionRelatedReqTable,
-    };
-    for (const blockId of decisionReadmeExpectedIds) {
-      decisionReadmeUpdated = replaceAutogenBlock(
-        decisionReadmeUpdated,
-        blockId,
-        decisionReadmeReplacements[blockId],
+    } else {
+      const relatedReqNotes = extractRelatedReqNotes(decisionReadmeOriginal);
+      const reqCtx = collectReqIdContext(reqDir, reqRetiredDir);
+      const decisionRelatedReqTable = generateDecisionRelatedReqTable(
+        decisionInfos,
+        reqCtx,
+        relatedReqNotes,
       );
-    }
-    if (decisionReadmeUpdated !== decisionReadmeOriginal) {
-      updates.push({
-        file: decisionReadmePath,
-        content: decisionReadmeUpdated,
-      });
+      let decisionReadmeUpdated = decisionReadmeOriginal;
+      const decisionReadmeReplacements: Record<string, string[]> = {
+        [DECISION_BASELINE_COUNT_BLOCK_ID]: decisionBaselineCaption,
+        [DECISION_BASELINE_TABLE_BLOCK_ID]: decisionBaselineTable,
+        [DECISION_STATUS_ACCEPTED_BLOCK_ID]: decisionStatusAccepted,
+        [DECISION_STATUS_PROPOSED_BLOCK_ID]: decisionStatusProposed,
+        [DECISION_STATUS_SUPERSEDED_BLOCK_ID]: decisionStatusSuperseded,
+        [DECISION_STATUS_DEPRECATED_BLOCK_ID]: decisionStatusDeprecated,
+        [DECISION_RETIRED_TABLE_BLOCK_ID]: decisionRetiredTable,
+        [DECISION_RELATED_REQ_TABLE_BLOCK_ID]: decisionRelatedReqTable,
+      };
+      for (const blockId of decisionReadmeExpectedIds) {
+        decisionReadmeUpdated = replaceAutogenBlock(
+          decisionReadmeUpdated,
+          blockId,
+          decisionReadmeReplacements[blockId],
+        );
+      }
+      if (decisionReadmeUpdated !== decisionReadmeOriginal) {
+        updates.push({
+          file: decisionReadmePath,
+          content: decisionReadmeUpdated,
+        });
+      }
     }
   }
 
-  // REQ README 更新 (AG-009)
+  // REQ README 更新 (AG-009)。導入先に AUTOGEN 領域が未整備の場合は IR-061 と同一の
+  // 取り扱い（マーカー不在 = 検証対象外）でスキップし、本体では従来どおり fail-fast。
   const reqReadmeOriginal = readText(reqReadmePath);
   if (reqReadmeOriginal === null) {
-    console.error(`[generate_indexes] REQ README not found: ${reqReadmePath}`);
-    process.exit(EXIT_ERROR);
-  }
-  const reqReadmeBlocks = findAutogenBlocks(reqReadmeOriginal);
-  const reqReadmeExpectedIds = [
-    REQ_ACTIVE_COUNT_BLOCK_ID,
-    REQ_ACTIVE_TABLE_BLOCK_ID,
-    REQ_RETIRED_TABLE_BLOCK_ID,
-  ];
-  const reqReadmeFoundIds = new Set(reqReadmeBlocks.map((b) => b.id));
-  const reqReadmeMissing = reqReadmeExpectedIds.filter(
-    (id) => !reqReadmeFoundIds.has(id),
-  );
-  if (reqReadmeMissing.length > 0) {
-    console.error(
-      `[generate_indexes] REQ README AUTOGEN markers not found: ${reqReadmeMissing.join(", ")}`,
+    skipOrExit(hasIntegrityStructure, `REQ README not found: ${reqReadmePath}`);
+  } else {
+    const reqReadmeExpectedIds = [
+      REQ_ACTIVE_COUNT_BLOCK_ID,
+      REQ_ACTIVE_TABLE_BLOCK_ID,
+      REQ_RETIRED_TABLE_BLOCK_ID,
+    ];
+    const reqReadmeMissing = missingAutogenIds(
+      reqReadmeOriginal,
+      reqReadmeExpectedIds,
     );
-    process.exit(EXIT_ERROR);
-  }
-  let reqReadmeUpdated = reqReadmeOriginal;
-  const reqReadmeReplacements: Record<string, string[]> = {
-    [REQ_ACTIVE_COUNT_BLOCK_ID]: reqActiveCaption,
-    [REQ_ACTIVE_TABLE_BLOCK_ID]: reqActiveTable,
-    [REQ_RETIRED_TABLE_BLOCK_ID]: reqRetiredTable,
-  };
-  for (const blockId of reqReadmeExpectedIds) {
-    reqReadmeUpdated = replaceAutogenBlock(
-      reqReadmeUpdated,
-      blockId,
-      reqReadmeReplacements[blockId],
-    );
-  }
-  if (reqReadmeUpdated !== reqReadmeOriginal) {
-    updates.push({ file: reqReadmePath, content: reqReadmeUpdated });
+    if (reqReadmeMissing.length > 0) {
+      skipOrExit(
+        hasIntegrityStructure,
+        `REQ README AUTOGEN markers not found: ${reqReadmeMissing.join(", ")}`,
+      );
+    } else {
+      let reqReadmeUpdated = reqReadmeOriginal;
+      const reqReadmeReplacements: Record<string, string[]> = {
+        [REQ_ACTIVE_COUNT_BLOCK_ID]: reqActiveCaption,
+        [REQ_ACTIVE_TABLE_BLOCK_ID]: reqActiveTable,
+        [REQ_RETIRED_TABLE_BLOCK_ID]: reqRetiredTable,
+      };
+      for (const blockId of reqReadmeExpectedIds) {
+        reqReadmeUpdated = replaceAutogenBlock(
+          reqReadmeUpdated,
+          blockId,
+          reqReadmeReplacements[blockId],
+        );
+      }
+      if (reqReadmeUpdated !== reqReadmeOriginal) {
+        updates.push({ file: reqReadmePath, content: reqReadmeUpdated });
+      }
+    }
   }
 
   // req-health-metrics 更新 (AG-006 候補5, Wave 3)
-  const reqMetricsOriginal = readText(reqHealthMetricsPath);
   if (reqMetricsOriginal === null) {
-    console.error(
-      `[generate_indexes] req-health-metrics not found: ${reqHealthMetricsPath}`,
+    skipOrExit(
+      hasIntegrityStructure,
+      `req-health-metrics not found: ${reqHealthMetricsPath}`,
     );
-    process.exit(EXIT_ERROR);
-  }
-  if (!findAutogenBlocks(reqMetricsOriginal).some(
-    (b) => b.id === REQ_METRICS_BLOCK_ID,
-  )) {
-    console.error(
-      `[generate_indexes] req-health-metrics AUTOGEN marker not found. Expected id: ${REQ_METRICS_BLOCK_ID}`,
+  } else if (!reqHealthMetricsReady) {
+    skipOrExit(
+      hasIntegrityStructure,
+      `req-health-metrics AUTOGEN marker not found. Expected id: ${REQ_METRICS_BLOCK_ID}`,
     );
-    process.exit(EXIT_ERROR);
-  }
-  const reqMetricsUpdated = replaceAutogenBlock(
-    reqMetricsOriginal,
-    REQ_METRICS_BLOCK_ID,
-    reqMetricsTable,
-  );
-  if (reqMetricsUpdated !== reqMetricsOriginal) {
-    updates.push({ file: reqHealthMetricsPath, content: reqMetricsUpdated });
+  } else {
+    const reqMetricsUpdated = replaceAutogenBlock(
+      reqMetricsOriginal,
+      REQ_METRICS_BLOCK_ID,
+      reqMetricsTable,
+    );
+    if (reqMetricsUpdated !== reqMetricsOriginal) {
+      updates.push({ file: reqHealthMetricsPath, content: reqMetricsUpdated });
+    }
   }
 
   // docs/README.md 更新 (Phase E 残, Wave 5 / REQ-057-018 readme-req-summary-table)
   const docsReadmePath = path.join(root, "docs", "README.md");
   const docsReadmeOriginal = readText(docsReadmePath);
   if (docsReadmeOriginal === null) {
-    console.error(
-      `[generate_indexes] docs/README.md not found: ${docsReadmePath}`,
+    skipOrExit(
+      hasIntegrityStructure,
+      `docs/README.md not found: ${docsReadmePath}`,
     );
-    process.exit(EXIT_ERROR);
-  }
-  const docsReadmeBlocks = findAutogenBlocks(docsReadmeOriginal);
-  const docsReadmeExpectedIds = [
-    README_REQ_SUMMARY_COUNT_BLOCK_ID,
-    README_REQ_SUMMARY_TABLE_BLOCK_ID,
-    README_DECISION_SUMMARY_TABLE_BLOCK_ID,
-  ];
-  const docsReadmeFoundIds = new Set(docsReadmeBlocks.map((b) => b.id));
-  const docsReadmeMissing = docsReadmeExpectedIds.filter(
-    (id) => !docsReadmeFoundIds.has(id),
-  );
-  if (docsReadmeMissing.length > 0) {
-    console.error(
-      `[generate_indexes] docs/README.md AUTOGEN markers not found: ${docsReadmeMissing.join(", ")}`,
+  } else {
+    const docsReadmeExpectedIds = [
+      README_REQ_SUMMARY_COUNT_BLOCK_ID,
+      README_REQ_SUMMARY_TABLE_BLOCK_ID,
+      README_DECISION_SUMMARY_TABLE_BLOCK_ID,
+    ];
+    const docsReadmeMissing = missingAutogenIds(
+      docsReadmeOriginal,
+      docsReadmeExpectedIds,
     );
-    process.exit(EXIT_ERROR);
-  }
-  let docsReadmeUpdated = docsReadmeOriginal;
-  const docsReadmeReplacements: Record<string, string[]> = {
-    [README_REQ_SUMMARY_COUNT_BLOCK_ID]: readmeReqSummary,
-    [README_REQ_SUMMARY_TABLE_BLOCK_ID]: generateReqActiveTable(
-      reqInfos,
-      "requirements/",
-    ),
-    [README_DECISION_SUMMARY_TABLE_BLOCK_ID]: generateDocsReadmeDecisionTable(
-      decisionInfos,
-    ),
-  };
-  for (const blockId of docsReadmeExpectedIds) {
-    docsReadmeUpdated = replaceAutogenBlock(
-      docsReadmeUpdated,
-      blockId,
-      docsReadmeReplacements[blockId],
-    );
-  }
-  if (docsReadmeUpdated !== docsReadmeOriginal) {
-    updates.push({ file: docsReadmePath, content: docsReadmeUpdated });
+    if (docsReadmeMissing.length > 0) {
+      skipOrExit(
+        hasIntegrityStructure,
+        `docs/README.md AUTOGEN markers not found: ${docsReadmeMissing.join(", ")}`,
+      );
+    } else {
+      let docsReadmeUpdated = docsReadmeOriginal;
+      const docsReadmeReplacements: Record<string, string[]> = {
+        [README_REQ_SUMMARY_COUNT_BLOCK_ID]: readmeReqSummary,
+        [README_REQ_SUMMARY_TABLE_BLOCK_ID]: generateReqActiveTable(
+          reqInfos,
+          "requirements/",
+        ),
+        [README_DECISION_SUMMARY_TABLE_BLOCK_ID]: generateDocsReadmeDecisionTable(
+          decisionInfos,
+        ),
+      };
+      for (const blockId of docsReadmeExpectedIds) {
+        docsReadmeUpdated = replaceAutogenBlock(
+          docsReadmeUpdated,
+          blockId,
+          docsReadmeReplacements[blockId],
+        );
+      }
+      if (docsReadmeUpdated !== docsReadmeOriginal) {
+        updates.push({ file: docsReadmePath, content: docsReadmeUpdated });
+      }
+    }
   }
 
   if (options.dryRun) {
-    console.log(
-      `[generate_indexes] dry-run: ${infos.length} IR files collected`,
-    );
-    console.log(
-      `[generate_indexes] catalog pre-block: ${catalogPre.length} entries`,
-    );
-    console.log(
-      `[generate_indexes] catalog post-block: ${catalogPost.length} entries`,
-    );
-    console.log(
-      `[generate_indexes] rule-ownership appendix: ${ruleOwnershipLines.length} rows (incl. header)`,
-    );
+    if (hasIntegrityStructure) {
+      console.log(
+        `[generate_indexes] dry-run: ${infos.length} IR files collected`,
+      );
+      console.log(
+        `[generate_indexes] catalog pre-block: ${catalogPre.length} entries`,
+      );
+      console.log(
+        `[generate_indexes] catalog post-block: ${catalogPost.length} entries`,
+      );
+      console.log(
+        `[generate_indexes] rule-ownership appendix: ${ruleOwnershipLines.length} rows (incl. header)`,
+      );
+    }
     console.log(
       `[generate_indexes] Decision README: ${decisionInfos.length} active, ${decisionRetiredInfos.length} retired`,
     );
     console.log(
       `[generate_indexes] REQ README: ${reqInfos.length} active, ${reqRetiredInfos.length} retired`,
     );
-    console.log(
-      `[generate_indexes] req-health-metrics: ${reqMetrics.length} REQs (measure date ${reqMeasureDate})`,
-    );
+    if (reqHealthMetricsReady) {
+      console.log(
+        `[generate_indexes] req-health-metrics: ${reqMetrics.length} REQs (measure date ${reqMeasureDate ?? "-"})`,
+      );
+    }
     console.log(
       `[generate_indexes] docs/README.md: REQ summary active=${reqInfos.length} retired=${reqRetiredInfos.length}, table=${reqActiveTable.length - 2} rows, Decision table=${decisionInfos.length} rows`,
     );
