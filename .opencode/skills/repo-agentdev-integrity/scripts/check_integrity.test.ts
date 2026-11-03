@@ -367,9 +367,10 @@ function buildValidFixture(root: string): void {
     "utf-8",
   );
 
-  // Issue #1769 / AG-002: case-run, case-close, req-save は具体的 capture 責務を持ち、
-  // capture-boundaries 参照が必須。case-open（非関与）、case-auto（各工程の責務を継承）
-  // は capture 責務表により検出対象外（capture-boundaries 参照不要）。
+  // Issue #1769 / AG-002 由来の fixture。duties 表は Case #2981（DEC-033）と
+  // Issue #2810 / PR #2818（req-save.md 廃止）を経て空になり、現行公開 command に
+  // specific-duty 該当は存在しない。fixture ファイル自体は README 突合系検査の
+  // 在庫整合のため維持する。
   const captureCmdDuties: Record<string, string> = {
     "case-run.md":
       "---\ndescription: case-run\nagent: sisyphus\n---\n\nSee capture-boundaries for duty. 記録のみ.\n",
@@ -590,8 +591,9 @@ function buildInvalidFixture(root: string): void {
     "utf-8",
   );
 
-  // Case #2981（DEC-033）: case-run / case-close は duties 表から除去済みのため、
-  // command-capture-duty の NG 検出検査は duties 残存の req-save.md で行う。
+  // Case #2981（DEC-033）: case-run / case-close は duties 表から除去済み。
+  // Issue #2810 / PR #2818 で req-save.md も廃止され duties 表は空。この fixture は
+  // 検出対象外の非 duty command として誤検出不在の確認に使う。
   writeFileSync(
     join(cmdDir, "req-save.md"),
     [
@@ -1147,18 +1149,18 @@ describe("Capture boundary checks", () => {
     expect(check.level).toBe("ok");
   });
 
-  it("valid fixture: command-capture-duty checks pass for the remaining specific-duty command (req-save)", () => {
+  it("valid fixture: command-capture-duty emits no findings (no specific-duty command remains)", () => {
     // Case #2981（DEC-033）: case-run / case-close は duties 表から除去済み（内部
-    // lifecycle 段階化）。残る specific-duty command は req-save のみ。
+    // lifecycle 段階化）。Issue #2810 / PR #2818 で req-save.md も廃止されたため、
+    // duties 表は空で command-capture-duty の検出対象 command は存在しない。
     const r = getValidJsonRun();
     const parsed = JSON.parse(r.stdout);
-    const dutyOk = parsed.results.filter(
-      (res: { check: string; category: string; level: string }) =>
+    const dutyResults = parsed.results.filter(
+      (res: { check: string; category: string }) =>
         res.category === "CaptureBoundary" &&
-        res.check === "command-capture-duty" &&
-        res.level === "ok",
+        res.check === "command-capture-duty",
     );
-    expect(dutyOk.length).toBe(1);
+    expect(dutyResults.length).toBe(0);
   });
 
   it("valid fixture: exempt commands (case-open, case-auto) are not checked even without capture-boundaries reference", () => {
@@ -1174,22 +1176,11 @@ describe("Capture boundary checks", () => {
     expect(exemptResults.length).toBe(0);
   });
 
-  it("valid fixture: the remaining specific-duty command (req-save) is checked and retired commands are not", () => {
+  it("valid fixture: retired commands (case-run, case-close, req-save) are not checked", () => {
     const r = getValidJsonRun();
     const parsed = JSON.parse(r.stdout);
-    const checkedCommands = ["req-save.md"];
-    for (const cmd of checkedCommands) {
-      const found = parsed.results.find(
-        (res: { check: string; category: string; message: string; level: string }) =>
-          res.category === "CaptureBoundary" &&
-          res.check === "command-capture-duty" &&
-          res.message.includes(cmd),
-      );
-      expect(found).toBeDefined();
-      expect(found.level).toBe("ok");
-    }
-    // Case #2981（DEC-033）: 廃止された case-run.md / case-close.md は検査対象外。
-    for (const retired of ["case-run.md", "case-close.md"]) {
+    // duties 表は空のため、廃止済み command はいずれも検出対象外。
+    for (const retired of ["case-run.md", "case-close.md", "req-save.md"]) {
       const found = parsed.results.find(
         (res: { check: string; category: string; message: string }) =>
           res.category === "CaptureBoundary" &&
@@ -1225,17 +1216,18 @@ describe("Capture boundary checks", () => {
     expect(check.message).toContain("Intake候補");
   });
 
-  it("invalid fixture: command-capture-duty detects missing reference", () => {
+  it("invalid fixture: command-capture-duty stays dormant while duties 表 is empty (no false positive on non-duty commands)", () => {
+    // Issue #2810 / PR #2818: req-save.md 廃止後、duties 表は空。検出対象外の
+    // command ファイル（capture-boundaries 参照・duty keyword なし）から
+    // command-capture-duty の誤検出が発生しないことを検証する。
     const r = getInvalidJsonRun();
     const parsed = JSON.parse(r.stdout);
-    const dutyNg = parsed.results.filter(
-      (res: { check: string; category: string; level: string; message: string }) =>
+    const dutyResults = parsed.results.filter(
+      (res: { check: string; category: string }) =>
         res.category === "CaptureBoundary" &&
-        res.check === "command-capture-duty" &&
-        res.level === "ng" &&
-        res.message.includes("req-save.md"),
+        res.check === "command-capture-duty",
     );
-    expect(dutyNg.length).toBeGreaterThanOrEqual(1);
+    expect(dutyResults.length).toBe(0);
   });
 });
 

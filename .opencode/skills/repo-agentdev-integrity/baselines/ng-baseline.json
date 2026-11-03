@@ -157,15 +157,6 @@
       "reason": "Pre-existing baseline before provenance tracking (REQ-0161-005, Issue #1780)"
     },
     {
-      "category": "CaptureBoundary",
-      "check": "command-capture-duty",
-      "file": "src/common/commands/agentdev/req-save.md",
-      "evidence": null,
-      "count": 1,
-      "provenance": "legacy",
-      "reason": "req-save.md の capture duty 宣言不在（main 既知 NG）。本 case 対象範囲外のため正規管理下で追跡"
-    },
-    {
       "category": "Decision",
       "check": "accepted-adr-only-citation",
       "file": "docs/designs/commands/case-auto.md",
