@@ -8,7 +8,7 @@ updated: "2026-10-09"
 <!-- ADF-COVERS(design): REQ-012-027, REQ-012-028, REQ-012-033, REQ-012-042, REQ-012-045, REQ-012-046, REQ-012-047, REQ-012-048, REQ-012-051, REQ-012-054, REQ-012-055 -->
 <!-- ADF-COVERS(design): REQ-107-001, REQ-107-002, REQ-107-003, REQ-107-004, REQ-107-005, REQ-107-006 -->
 <!-- ADF-COVERS(design): REQ-012-043, REQ-012-044, REQ-012-049, REQ-012-050 -->
-<!-- ADF-COVERS(design): REQ-106-001, REQ-106-002, REQ-106-003, REQ-106-004, REQ-106-005, REQ-106-006, REQ-106-007 -->
+<!-- ADF-COVERS(design): REQ-106-001, REQ-106-002, REQ-106-003, REQ-106-004, REQ-106-005, REQ-106-006, REQ-106-007, REQ-106-010, REQ-106-011 -->
 <!-- ADF-COVERS(implementation): REQ-012-030, REQ-012-043, REQ-012-044, REQ-012-045, REQ-012-046, REQ-012-047, REQ-012-048, REQ-012-049, REQ-012-050, REQ-012-051 -->
 <!-- ADF-COVERS(implementation): REQ-021-030 -->
 
@@ -94,6 +94,17 @@ check は構造検査（対応関係の存在と参照整合）のみを担い�
 policy.yaml が存在しない場合、全現行要件行を検証対応 required として扱う（未指定 = required の安全側既定）。
 policy.yaml が読取不能またはスキーマ不適合の場合、検証対応の要否判定を不能として当該検査を不合格にする（完全性判定不能を合格として扱わない）。
 Decision 対応の欠落は不合格としない。
+
+### relied-diff（依拠版に基づく差分・変更影響 CLI）
+
+依拠版（--relied）と現行版の差分から、影響候補（update / up-to-date / unverified・propagationRequired）、
+下流作成分類（create）、旧検証証拠の上流整合（confirmed / stale / unconfirmed）、
+変更反映完了判定（fullyPropagated: yes / no / undetermined）を出力する。
+
+- Git 実行不能（git 不在・非 git リポジトリ・履歴取得失敗）は構造化エラーで非ゼロ終了し、空の変更集合として正常扱いしない。
+- 正味差分ゼロでも中間変更があるパスは propagationRequired とし、変更起点を後続へ引き継ぐ。
+- 比較基準が指定なし・解決不能の場合は unverified レポートを返し、「影響なし」「完了」の判定を出さない。
+- 後続工程（工程駆動・変更駆動）は本 CLI の出力を影響評価の入力として取得する。
 
 ## 正規成果物の棚卸しと宣言外候補の発見
 
