@@ -131,3 +131,19 @@
 - 想定反映先: 検証環境構築手順（case-run の隔離検証手順・ENVIRONMENT.md 記載規約）
 - 関連: #3890・#3891（訂正記録の限界 1）・#3892（iteration-1 検証記録のディレクトリ名選定根拠）
 - タグ: `#検証環境` `#fixture中立性` `#文脈リーク`
+
+## 2026-11-03T22:15+09:00 Case #3900 case-close Capture
+
+### 1. traceability-check の #3899 由来別検出は REQ-029 スコープ限定実行では findings に現れない
+
+- 問題クラス: workflow deviation / 検査範囲解釈
+- 内容: 配布 runtime script の inline ADF-COVERS と REQ-029 の矛盾（Issue #3899 対象）は、traceability check の --req REQ-029-001 スコープ限定実行では findings に現れず、フルスコープ実行でも REQ-029 関連 findings は 0 件であった。本 Case の合格条件から除外し、検出事実として記録済み。Issue #3899 の処置は別 Case 対象
+- 発生条件: Case #3900 case-run TS-R002（スコープ限定実行とフルスコープ補足実行の双方）
+- 証跡: PR #3901 本文検証差分セクション行5・6、Issue #3900 対応記録コメント（2026-11-03）
+
+### 2. フルスコープ traceability check の既存構造検出（missing-implementation 14件・missing-verification 16件）
+
+- 問題クラス: pre-existing / 検出事実の記録
+- 内容: フルスコープ traceability check（exit 2・pass 9 / fail 2）で REQ-029 非関連の missing-implementation 14件・missing-verification 16件を確認した。本 Case の変更起因ではなく対象外。corpus 完全性の診断指標（advisory・fail-open）として後続の処置判断材料に使える
+- 発生条件: Case #3900 case-run のフルスコープ補足実行（合格条件外・記録目的）
+- 証跡: PR #3901 本文検証差分セクション行6（要約転記。生データは一時退避のため保存しない）
