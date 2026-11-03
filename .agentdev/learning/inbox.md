@@ -147,3 +147,18 @@
 - 内容: フルスコープ traceability check（exit 2・pass 9 / fail 2）で REQ-029 非関連の missing-implementation 14件・missing-verification 16件を確認した。本 Case の変更起因ではなく対象外。corpus 完全性の診断指標（advisory・fail-open）として後続の処置判断材料に使える
 - 発生条件: Case #3900 case-run のフルスコープ補足実行（合格条件外・記録目的）
 - 証跡: PR #3901 本文検証差分セクション行6（要約転記。生データは一時退避のため保存しない）
+
+## [2026-11-04T01:03+09:00][workflow_deviation][case-open STEP-4][Case #3902]
+- 問題事象: prepare_definition_pr.ts の `check_integrity` 入力に `check_changed_docs.ts --workflow case-run` を指定したため、script report の gate 名は pass でも full integrity check では REQ-106.md、agentdev-traceability.md、req-health-metrics.md の `req-updated-freshness` 3件が NG になった。script 提案本文の変更ファイル一覧も同一 Design パスを重複し、generate_indexes 派生物を含めなかった。
+- 発生局面: case-open STEP-4（Definition PR 準備と gate 設定）
+- 検知方法: `check_integrity.ts --root <definition worktree> --json` の全件実行と PR proposal のファイル一覧を実差分と突合して検知した。
+- 根本原因: GateCommandSpec の存在・引数検証だけで gate の意味を確認せず、`check_changed_docs.ts` を full `check_integrity.ts` と同じ役割に誤接続した。また、proposal の file list 生成が `editedPaths` の重複除去や generate_indexes 派生物の包含を行わない。
+- 自律対応内容: Definition 3文書の frontmatter `updated` を最終内容変更日 2026-11-04 に追随させ、計測日と派生物を明示パス commit した。generate_indexes を再実行して no changes、full integrity check を再実行して 951 ok / 0 ng / 0 warning を確認し、PR コメントに実 gate と実際の3ファイル差分を記録した。
+- ユーザー確認有無: なし
+- Decision/REQ/spec影響: なし（今回の Definition 変更内容は維持し、case-open workflow skill / script contract は更新していない）
+- 横展開観点: 機械工程へ caller 生成 GateCommandSpec を渡すすべての Workflow。validate-input pass は入力形式と gate 実体の存在を証明するが、指定 gate の意味的適合までは証明しない。
+- 再発条件: 類似名の検査スクリプトを gate に割り当て、実体の責務・入力・出力を確認せず proposal の gate 名だけから合格を解釈する。
+- 予防策候補: gate 設定前に正規 checker の CLI 契約を確認し、script 内 gate の名前と実行実体を evidence で照合する。PR 作成前に proposal の file list を最終 branch diff と突合し、重複・派生物漏れ・誤った gate 成功表現を確認する。
+- 想定反映先: agentdev-workflow-case-open の prepare_definition_pr 入力構成と STEP-4 proposal review 手順
+- 関連: Case #3902、PR #3903、Definition branch `definition/issue-3902`
+- タグ: `#case-open` `#gate-configuration` `#integrity` `#proposal-review`
