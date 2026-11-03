@@ -6814,11 +6814,15 @@ function checkCommandCaptureDuties(cmdDir: string, root: string): CheckResult[] 
   // 下記 duties は具体的 capture 責務を持つ command の正例集合（capture 責務表から導出）。
   // リスト外の command は一般規則により検出対象外となる。
   const duties: Record<string, { dutyKeyword: string; dutyLabel: string }> = {
-    "req-save.md": { dutyKeyword: "原則非関与", dutyLabel: "principle: non-involvement" },
     // Case #2981（DEC-033）: case-run.md / case-close.md は公開 command から内部
     // lifecycle 段階へ移行し定義ファイルは削除済み。capture 責務は対応する
     // Workflow Skill（agentdev-workflow-case-run / case-close）側へ継承されるため
     // command 検査対象から除去する。
+    // Issue #2810 / PR #2818: req-save.md は case-revise 配布物新規に伴い廃止済みで
+    // capture 責務表（docs/designs/workflows/capture-boundaries.md）に該当行がない。
+    // duties 残存による恒常 NG（本体では baseline 吸収・導入先では残存）を検出器調整で
+    // 解消した（integrity-contracts 統一選択基準 (c)）。現行公開 command のうち
+    // capture 責務表の specific-duty 該当は存在しない。
   };
 
   for (const [filename, { dutyKeyword, dutyLabel }] of Object.entries(duties)) {

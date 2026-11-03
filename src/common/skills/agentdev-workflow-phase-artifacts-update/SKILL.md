@@ -182,7 +182,7 @@ resume point / export / import を持たない。各反映操作が1完結単位
 
 ## 領域契約文書の非破壊実体化
 
-保存（正規成果物への反映、記録の保存）を実行する操作では、保存の前に領域契約文書（`.agentdev/phase/README.md`）の有無を確認し、存在しない場合のみ Capability Skill `agentdev-phase-theme-collaboration` の配布テンプレート（`templates/phase-readme.md`）から実体化する。
+保存（正規成果物への反映、記録の保存）を実行する操作では、保存の前に領域契約文書（`.agentdev/phase/README.md`）の有無を確認し、存在しない場合のみ Capability Skill `agentdev-phase-theme-collaboration` の配布テンプレート（`.opencode/skills/agentdev-phase-theme-collaboration/templates/phase-readme.md`）から実体化する。
 
 - 実体化は既存の領域契約文書を上書きしない。既存の場合は現行内容を維持し、再編や値の追加を行わない
 - 実体化の内容はテンプレートと一致させる。テンプレート更新を既存の実体へさかのぼって適用しない（既存の実体は領域契約文書として現行の正であり、非破壊を優先する）
