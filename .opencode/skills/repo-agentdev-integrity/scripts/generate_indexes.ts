@@ -1378,7 +1378,21 @@ RELATED:
   // スキップし、AUTOGEN 領域を保持するファイルのみを再生成する（IR-061 exemption
   // 「自動生成マーカーが存在しないファイルは検証対象外」と同一の適用範囲。
   // REQ-029-001: 配布成果物は producer 内部依存に依存しない）。
+  //
+  // ただし rules dir 不在でも catalog / rule-ownership が残存する場合は
+  // consumer と分類しない。両ファイルは producer モードでは必須成果物であり、
+  // 導入先（REQ-029: integrity 構造は producer 内部成果物）には存在しないため、
+  // この残存は producer 側 integrity 構造の部分欠損を示す。consumer と誤分類すると
+  // 全 fail-fast が skip 記録に退化し exit 0 で正常終了するため、rules dir 不在時の
+  // 旧実装（#3898以前）と同一の fail-closed（exit 2）を維持する。
   const hasIntegrityStructure = fs.existsSync(rulesDir);
+  if (
+    !hasIntegrityStructure &&
+    (fs.existsSync(catalogPath) || fs.existsSync(ruleOwnershipPath))
+  ) {
+    console.error(`[generate_indexes] rules dir not found: ${rulesDir}`);
+    process.exit(EXIT_ERROR);
+  }
   const infos = hasIntegrityStructure ? collectIrFiles(rulesDir) : [];
   if (hasIntegrityStructure && infos.length === 0) {
     console.error(`[generate_indexes] no IR-*.md files found in ${rulesDir}`);

@@ -14,6 +14,10 @@
  * (5) consumer partial markers (2 of 3 present, stale content): the present
  *     regions regenerate independently and the missing marker stays reported
  *     (PR #3898 regression: whole-file skip kept stale blocks passing).
+ * (6) broken producer (rules dir absent, integrity catalog / rule-ownership
+ *     remaining): exit 2 like the pre-#3898 implementation. Classifying this
+ *     shape as consumer degrades every fail-fast to a skip record and exits 0.
+ * (7) broken producer with a single remaining producer artifact: same exit 2.
  *
  * 生成器の終了コード・書込み差分は case-open / case-ready / case-close の
  * 必須品質ゲート（REQUIRED_GATES 系）が消費するため、両環境の分岐を固定する。
@@ -254,5 +258,72 @@ describe("generate_indexes on producer-shaped repo (rules dir present)", () => {
 
     expect(result.exitCode).toBe(2);
     expect(result.stderr).toContain("no IR-*.md files found");
+  });
+});
+
+describe("generate_indexes on broken producer shape (rules dir absent, producer artifacts remain)", () => {
+  it("fails closed when the rules dir is lost while integrity artifacts remain (PR #3898 regression)", () => {
+    // producer から rules dir のみ喪失した部分欠損形状。consumer（導入先）は
+    // catalog / rule-ownership も持たないため、この形状は consumer ではなく
+    // producer 側構造の異常である。consumer と誤分類すると全 fail-fast が
+    // skip 記録に退化し exit 0 で正常終了するため、旧実装同様 exit 2 を返す。
+    const brokenProducerRoot = join(TEMP_ROOT, "producer-rules-dir-absent");
+    writeReqFile(join(brokenProducerRoot, "docs", "requirements"), "REQ-001");
+    writeFile(
+      join(brokenProducerRoot, "docs", "requirements", "README.md"),
+      "# Requirements\n",
+    );
+    writeFile(
+      join(
+        brokenProducerRoot,
+        "docs",
+        "designs",
+        "integrity",
+        "integrity-rule-catalog.md",
+      ),
+      [
+        "<!-- AUTOGEN:BEGIN:id=catalog-ir-entries-pre-045 -->",
+        "<!-- AUTOGEN:END -->",
+        "",
+      ].join("\n"),
+    );
+    writeFile(
+      join(brokenProducerRoot, "docs", "designs", "integrity", "rule-ownership.md"),
+      [
+        "<!-- AUTOGEN:BEGIN:id=rule-ownership-ir-crossref -->",
+        "<!-- AUTOGEN:END -->",
+        "",
+      ].join("\n"),
+    );
+
+    const result = runGenerator(brokenProducerRoot);
+
+    expect(result.exitCode).toBe(2);
+    expect(result.stderr).toContain("rules dir not found");
+    expect(result.stderr).toContain(brokenProducerRoot);
+  });
+
+  it("fails closed when only one producer artifact remains without the rules dir", () => {
+    // catalog / rule-ownership のいずれか片方のみ残存しても producer 証跡と
+    // して扱う（producer モードでは両者が必須ファイルであるため）。
+    const brokenProducerRoot = join(TEMP_ROOT, "producer-rule-ownership-only");
+    writeReqFile(join(brokenProducerRoot, "docs", "requirements"), "REQ-001");
+    writeFile(
+      join(brokenProducerRoot, "docs", "requirements", "README.md"),
+      "# Requirements\n",
+    );
+    writeFile(
+      join(brokenProducerRoot, "docs", "designs", "integrity", "rule-ownership.md"),
+      [
+        "<!-- AUTOGEN:BEGIN:id=rule-ownership-ir-crossref -->",
+        "<!-- AUTOGEN:END -->",
+        "",
+      ].join("\n"),
+    );
+
+    const result = runGenerator(brokenProducerRoot);
+
+    expect(result.exitCode).toBe(2);
+    expect(result.stderr).toContain("rules dir not found");
   });
 });
