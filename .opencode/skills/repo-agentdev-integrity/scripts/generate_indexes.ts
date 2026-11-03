@@ -1378,7 +1378,21 @@ RELATED:
   // スキップし、AUTOGEN 領域を保持するファイルのみを再生成する（IR-061 exemption
   // 「自動生成マーカーが存在しないファイルは検証対象外」と同一の適用範囲。
   // REQ-029-001: 配布成果物は producer 内部依存に依存しない）。
+  //
+  // ただし rules dir 不在でも catalog / rule-ownership が残存する場合は
+  // consumer と分類しない。両ファイルは producer モードでは必須成果物であり、
+  // 導入先（REQ-029: integrity 構造は producer 内部成果物）には存在しないため、
+  // この残存は producer 側 integrity 構造の部分欠損を示す。consumer と誤分類すると
+  // 全 fail-fast が skip 記録に退化し exit 0 で正常終了するため、rules dir 不在時の
+  // 旧実装（#3898以前）と同一の fail-closed（exit 2）を維持する。
   const hasIntegrityStructure = fs.existsSync(rulesDir);
+  if (
+    !hasIntegrityStructure &&
+    (fs.existsSync(catalogPath) || fs.existsSync(ruleOwnershipPath))
+  ) {
+    console.error(`[generate_indexes] rules dir not found: ${rulesDir}`);
+    process.exit(EXIT_ERROR);
+  }
   const infos = hasIntegrityStructure ? collectIrFiles(rulesDir) : [];
   if (hasIntegrityStructure && infos.length === 0) {
     console.error(`[generate_indexes] no IR-*.md files found in ${rulesDir}`);
@@ -1553,43 +1567,47 @@ RELATED:
         hasIntegrityStructure,
         `Decision README AUTOGEN markers not found: ${decisionReadmeMissing.join(", ")}`,
       );
-    } else {
-      const relatedReqNotes = extractRelatedReqNotes(decisionReadmeOriginal);
-      const reqCtx = collectReqIdContext(reqDir, reqRetiredDir);
-      const decisionRelatedReqTable = generateDecisionRelatedReqTable(
-        decisionInfos,
-        reqCtx,
-        relatedReqNotes,
+    }
+    // 欠落マーカーがあっても、存在する AUTOGEN 領域は独立に再生成する
+    // （PR #3898 本文「マーカーがあれば通常再生成」。部分マーカーで
+    // 既存領域の陳腐化を残さない）。replaceAutogenBlock は未検出 block を
+    // unchanged で返すため、欠落分は書込み差分にならない。
+    const relatedReqNotes = extractRelatedReqNotes(decisionReadmeOriginal);
+    const reqCtx = collectReqIdContext(reqDir, reqRetiredDir);
+    const decisionRelatedReqTable = generateDecisionRelatedReqTable(
+      decisionInfos,
+      reqCtx,
+      relatedReqNotes,
+    );
+    let decisionReadmeUpdated = decisionReadmeOriginal;
+    const decisionReadmeReplacements: Record<string, string[]> = {
+      [DECISION_BASELINE_COUNT_BLOCK_ID]: decisionBaselineCaption,
+      [DECISION_BASELINE_TABLE_BLOCK_ID]: decisionBaselineTable,
+      [DECISION_STATUS_ACCEPTED_BLOCK_ID]: decisionStatusAccepted,
+      [DECISION_STATUS_PROPOSED_BLOCK_ID]: decisionStatusProposed,
+      [DECISION_STATUS_SUPERSEDED_BLOCK_ID]: decisionStatusSuperseded,
+      [DECISION_STATUS_DEPRECATED_BLOCK_ID]: decisionStatusDeprecated,
+      [DECISION_RETIRED_TABLE_BLOCK_ID]: decisionRetiredTable,
+      [DECISION_RELATED_REQ_TABLE_BLOCK_ID]: decisionRelatedReqTable,
+    };
+    for (const blockId of decisionReadmeExpectedIds) {
+      decisionReadmeUpdated = replaceAutogenBlock(
+        decisionReadmeUpdated,
+        blockId,
+        decisionReadmeReplacements[blockId],
       );
-      let decisionReadmeUpdated = decisionReadmeOriginal;
-      const decisionReadmeReplacements: Record<string, string[]> = {
-        [DECISION_BASELINE_COUNT_BLOCK_ID]: decisionBaselineCaption,
-        [DECISION_BASELINE_TABLE_BLOCK_ID]: decisionBaselineTable,
-        [DECISION_STATUS_ACCEPTED_BLOCK_ID]: decisionStatusAccepted,
-        [DECISION_STATUS_PROPOSED_BLOCK_ID]: decisionStatusProposed,
-        [DECISION_STATUS_SUPERSEDED_BLOCK_ID]: decisionStatusSuperseded,
-        [DECISION_STATUS_DEPRECATED_BLOCK_ID]: decisionStatusDeprecated,
-        [DECISION_RETIRED_TABLE_BLOCK_ID]: decisionRetiredTable,
-        [DECISION_RELATED_REQ_TABLE_BLOCK_ID]: decisionRelatedReqTable,
-      };
-      for (const blockId of decisionReadmeExpectedIds) {
-        decisionReadmeUpdated = replaceAutogenBlock(
-          decisionReadmeUpdated,
-          blockId,
-          decisionReadmeReplacements[blockId],
-        );
-      }
-      if (decisionReadmeUpdated !== decisionReadmeOriginal) {
-        updates.push({
-          file: decisionReadmePath,
-          content: decisionReadmeUpdated,
-        });
-      }
+    }
+    if (decisionReadmeUpdated !== decisionReadmeOriginal) {
+      updates.push({
+        file: decisionReadmePath,
+        content: decisionReadmeUpdated,
+      });
     }
   }
 
-  // REQ README 更新 (AG-009)。導入先に AUTOGEN 領域が未整備の場合は IR-061 と同一の
-  // 取り扱い（マーカー不在 = 検証対象外）でスキップし、本体では従来どおり fail-fast。
+  // REQ README 更新 (AG-009)。マーカー欠落は IR-061 と同一の取り扱い
+  // （マーカー不在 = 検証対象外）で記録し、本体では従来どおり fail-fast。
+  // 欠落があっても存在する AUTOGEN 領域は独立に再生成する。
   const reqReadmeOriginal = readText(reqReadmePath);
   if (reqReadmeOriginal === null) {
     skipOrExit(hasIntegrityStructure, `REQ README not found: ${reqReadmePath}`);
@@ -1608,23 +1626,25 @@ RELATED:
         hasIntegrityStructure,
         `REQ README AUTOGEN markers not found: ${reqReadmeMissing.join(", ")}`,
       );
-    } else {
-      let reqReadmeUpdated = reqReadmeOriginal;
-      const reqReadmeReplacements: Record<string, string[]> = {
-        [REQ_ACTIVE_COUNT_BLOCK_ID]: reqActiveCaption,
-        [REQ_ACTIVE_TABLE_BLOCK_ID]: reqActiveTable,
-        [REQ_RETIRED_TABLE_BLOCK_ID]: reqRetiredTable,
-      };
-      for (const blockId of reqReadmeExpectedIds) {
-        reqReadmeUpdated = replaceAutogenBlock(
-          reqReadmeUpdated,
-          blockId,
-          reqReadmeReplacements[blockId],
-        );
-      }
-      if (reqReadmeUpdated !== reqReadmeOriginal) {
-        updates.push({ file: reqReadmePath, content: reqReadmeUpdated });
-      }
+    }
+    // 欠落マーカーがあっても、存在する AUTOGEN 領域は独立に再生成する
+    // （PR #3898 本文「マーカーがあれば通常再生成」。部分マーカーで
+    // 既存領域の陳腐化を残さない）。
+    let reqReadmeUpdated = reqReadmeOriginal;
+    const reqReadmeReplacements: Record<string, string[]> = {
+      [REQ_ACTIVE_COUNT_BLOCK_ID]: reqActiveCaption,
+      [REQ_ACTIVE_TABLE_BLOCK_ID]: reqActiveTable,
+      [REQ_RETIRED_TABLE_BLOCK_ID]: reqRetiredTable,
+    };
+    for (const blockId of reqReadmeExpectedIds) {
+      reqReadmeUpdated = replaceAutogenBlock(
+        reqReadmeUpdated,
+        blockId,
+        reqReadmeReplacements[blockId],
+      );
+    }
+    if (reqReadmeUpdated !== reqReadmeOriginal) {
+      updates.push({ file: reqReadmePath, content: reqReadmeUpdated });
     }
   }
 
@@ -1673,28 +1693,29 @@ RELATED:
         hasIntegrityStructure,
         `docs/README.md AUTOGEN markers not found: ${docsReadmeMissing.join(", ")}`,
       );
-    } else {
-      let docsReadmeUpdated = docsReadmeOriginal;
-      const docsReadmeReplacements: Record<string, string[]> = {
-        [README_REQ_SUMMARY_COUNT_BLOCK_ID]: readmeReqSummary,
-        [README_REQ_SUMMARY_TABLE_BLOCK_ID]: generateReqActiveTable(
-          reqInfos,
-          "requirements/",
-        ),
-        [README_DECISION_SUMMARY_TABLE_BLOCK_ID]: generateDocsReadmeDecisionTable(
-          decisionInfos,
-        ),
-      };
-      for (const blockId of docsReadmeExpectedIds) {
-        docsReadmeUpdated = replaceAutogenBlock(
-          docsReadmeUpdated,
-          blockId,
-          docsReadmeReplacements[blockId],
-        );
-      }
-      if (docsReadmeUpdated !== docsReadmeOriginal) {
-        updates.push({ file: docsReadmePath, content: docsReadmeUpdated });
-      }
+    }
+    // 欠落マーカーがあっても、存在する AUTOGEN 領域は独立に再生成する
+    // （他 README セクションと同一の扱い）。
+    let docsReadmeUpdated = docsReadmeOriginal;
+    const docsReadmeReplacements: Record<string, string[]> = {
+      [README_REQ_SUMMARY_COUNT_BLOCK_ID]: readmeReqSummary,
+      [README_REQ_SUMMARY_TABLE_BLOCK_ID]: generateReqActiveTable(
+        reqInfos,
+        "requirements/",
+      ),
+      [README_DECISION_SUMMARY_TABLE_BLOCK_ID]: generateDocsReadmeDecisionTable(
+        decisionInfos,
+      ),
+    };
+    for (const blockId of docsReadmeExpectedIds) {
+      docsReadmeUpdated = replaceAutogenBlock(
+        docsReadmeUpdated,
+        blockId,
+        docsReadmeReplacements[blockId],
+      );
+    }
+    if (docsReadmeUpdated !== docsReadmeOriginal) {
+      updates.push({ file: docsReadmePath, content: docsReadmeUpdated });
     }
   }
 

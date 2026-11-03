@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261103T115012Z-e2b8",
+  "workflow": "case-ready",
+  "evaluationKind": "scope-overlap-detection",
+  "subject": "Root Case #3900 と既存オープン Case 群の対象範囲交差判断",
+  "sourceRevision": "587dc28e3",
+  "durationMs": 307,
+  "inputTokens": 833,
+  "inputs": {
+    "requestDigest": "ef0fae7a028e654c69f5702803d0fe2f9d38631ec4a3a054ce7447e5cef3d835"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-overlap",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.13,
+        "false": 0.87
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-overlap",
+        "value": false
+      }
+    ]
+  }
+}
