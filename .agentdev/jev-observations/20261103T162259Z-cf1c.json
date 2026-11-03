@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261103T162259Z-cf1c",
+  "workflow": "case-ready",
+  "evaluationKind": "scope-overlap-detection",
+  "subject": "Root Case #3902（RU-0256・REQ-106-010/011・Standard・単独根）と既存オープン Case #3899 の対象範囲交差判断",
+  "sourceRevision": "b15c01461f4180fdbf7c1e3687d325c90f8a4298",
+  "durationMs": 821,
+  "inputTokens": 1477,
+  "inputs": {
+    "requestDigest": "a7b6b76dd9a844e055c3f83a40c1359c743a9518806de68a75ca9c9687670af0"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-scope-overlap",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.09,
+        "false": 0.91
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-scope-overlap",
+        "value": false
+      }
+    ]
+  }
+}
