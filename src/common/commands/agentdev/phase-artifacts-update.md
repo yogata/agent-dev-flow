@@ -46,6 +46,7 @@ description: 採用済みの内容を正規成果物へ増分反映または初�
 入力の受理・採否記録生成の機械的部分は Capability Skill `agentdev-phase-theme-collaboration` の決定的処理 script が担い、入力サイズに対する線形走査（時間計算量 O(n)）で処理し、採用・不採用の記録は明示採用件数に比例する証跡量で出力し、不正または曖昧な入力は不採用として残し確定しない。
 REQ・Decision・Design の作成・更新と構造再編（分割・統合・項目移動）の処理は各成果物の管理スキル（`agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-design-file-manager`）へ委譲する。
 本コマンドは単独で起動でき、テーマ形成・更新や他の工程操作を前置しない。
+本コマンドは GitHub 版・Local 版のいずれの正規利用経路からも同じ契約で実行できる。反映の保存結果（正規成果物、採否記録・受領記録）は両版共通の配置（正規成果物と `.agentdev/phase/` 配下の domain state）へ保存され、完了報告の保存先の一覧で実際の保存状態を確認する。
 
 ## 不変条件
 

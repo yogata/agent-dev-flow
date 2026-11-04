@@ -38,6 +38,7 @@ description: 利用者判断による工程遷移を単独実行する人間向�
 本コマンドは workflow 実装本体を `agentdev-workflow-phase-transition` スキルへ委譲する。
 工程関係の解決、利用者判断の受領、遷移記録の保存と一度実行の制御、取消時の現在工程維持は同スキルの制御平面（control plane）が所有する。
 本コマンドは単独で起動でき、他の工程操作を前置しない。
+本コマンドは GitHub 版・Local 版のいずれの正規利用経路からも同じ契約で実行できる。遷移記録は両版共通の domain state 配置（`.agentdev/phase/transitions/`）へ保存され、完了報告の保存先の一覧で実際の保存状態を確認する。
 
 ## 不変条件
 

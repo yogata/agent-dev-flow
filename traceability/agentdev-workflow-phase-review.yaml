@@ -13,6 +13,8 @@ implementation:
     - REQ-110-037
     - REQ-110-038
     - REQ-110-039
+    - REQ-111-029
+    - REQ-111-031
   src/common/commands/agentdev/phase-review.md:
     - REQ-111-001
     - REQ-111-011
@@ -26,6 +28,8 @@ implementation:
     - REQ-110-037
     - REQ-110-038
     - REQ-110-039
+    - REQ-111-029
+    - REQ-111-031
 verification:
   src/common/skills/agentdev-workflow-phase-review/SKILL.md:
     - REQ-111-001
@@ -40,6 +44,8 @@ verification:
     - REQ-110-037
     - REQ-110-038
     - REQ-110-039
+    - REQ-111-029
+    - REQ-111-031
   src/common/commands/agentdev/phase-review.md:
     - REQ-111-001
     - REQ-111-011
@@ -53,3 +59,5 @@ verification:
     - REQ-110-037
     - REQ-110-038
     - REQ-110-039
+    - REQ-111-029
+    - REQ-111-031

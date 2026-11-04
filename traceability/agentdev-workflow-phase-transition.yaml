@@ -15,6 +15,11 @@ implementation:
     - REQ-110-037
     - REQ-110-038
     - REQ-110-039
+    - REQ-111-029
+    - REQ-111-030
+    - REQ-111-033
+    - REQ-111-034
+    - REQ-111-035
   src/common/commands/agentdev/phase-transition.md:
     - REQ-111-002
     - REQ-111-003
@@ -29,6 +34,9 @@ implementation:
     - REQ-110-037
     - REQ-110-038
     - REQ-110-039
+    - REQ-111-029
+    - REQ-111-030
+    - REQ-111-034
   src/common/skills/agentdev-workflow-phase-transition/scripts/lib/schema.ts:
     - REQ-111-019
   src/common/skills/agentdev-workflow-phase-transition/scripts/lib/store.ts:
@@ -57,6 +65,11 @@ verification:
     - REQ-110-037
     - REQ-110-038
     - REQ-110-039
+    - REQ-111-029
+    - REQ-111-030
+    - REQ-111-033
+    - REQ-111-034
+    - REQ-111-035
   src/common/commands/agentdev/phase-transition.md:
     - REQ-111-024
     - REQ-110-034
@@ -65,6 +78,9 @@ verification:
     - REQ-110-037
     - REQ-110-038
     - REQ-110-039
+    - REQ-111-029
+    - REQ-111-030
+    - REQ-111-034
   src/common/skills/agentdev-workflow-phase-transition/scripts/tests/transition-state.test.ts:
     - REQ-111-002
     - REQ-111-003
