@@ -44,12 +44,13 @@ export function parseOneArgArgv(argv: readonly string[]): OneArgOptions {
   return { input: values.input };
 }
 
-export function parseLookupArgv(argv: readonly string[]): { dir: string; key: string } {
+export function parseLookupArgv(argv: readonly string[]): { dir: string; key: string; identityFile: string } {
   const { values } = parseArgs({
     args: [...argv],
     options: {
       dir: { type: "string" },
       key: { type: "string" },
+      "identity-file": { type: "string" },
     },
   });
   if (typeof values.dir !== "string" || values.dir.length === 0) {
@@ -58,7 +59,10 @@ export function parseLookupArgv(argv: readonly string[]): { dir: string; key: st
   if (typeof values.key !== "string" || values.key.length === 0) {
     throw new Error("--key is required (idempotency key of the transition)");
   }
-  return { dir: values.dir, key: values.key };
+  if (typeof values["identity-file"] !== "string" || values["identity-file"].length === 0) {
+    throw new Error("--identity-file is required (identity.yaml path; the recorded transition is restored only after the identity state is verified against it)");
+  }
+  return { dir: values.dir, key: values.key, identityFile: values["identity-file"] };
 }
 
 /** Read JSON from a file path or from stdin when the path is "-". */

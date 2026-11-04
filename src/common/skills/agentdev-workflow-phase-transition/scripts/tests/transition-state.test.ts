@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { isTerminalRecord, parseTransitionRecord } from "../lib/schema.ts";
 import { applyRecord, lookupRecord } from "../lib/store.ts";
+import { checkIdentityAgainstRecord, parseIdentity } from "../lib/identity.ts";
 import { parseSuccessorInput, resolveSuccessor } from "../lib/successor.ts";
 
 const baseRecord = {
@@ -278,5 +279,72 @@ describe("resolveSuccessor", () => {
     expect(parseSuccessorInput({}).ok).toBe(false);
     expect(parseSuccessorInput({ candidates: ["a", ""] }).ok).toBe(false);
     expect(parseSuccessorInput({ candidates: ["a", "b"] }).ok).toBe(true);
+  });
+});
+
+describe("identity check at the re-acquisition entry (REQ-111-023)", () => {
+  test("parses the flat identity file with quoted values", () => {
+    const identity = parseIdentity('undertaking: "work-scope-a"\ntarget_version: ""\ncurrent_phase: "design"\n');
+    expect(identity).toEqual({ undertaking: "work-scope-a", currentPhase: "design" });
+  });
+
+  test("matches a post-transition identity (current_phase equals toPhase)", () => {
+    const check = checkIdentityAgainstRecord(
+      { undertaking: "work-scope-a", currentPhase: "design" },
+      baseRecord,
+    );
+    expect(check).toEqual({ ok: true, undertaking: "match", currentPhase: "match-toPhase" });
+  });
+
+  test("matches a pre-finalized identity (current_phase equals fromPhase)", () => {
+    const check = checkIdentityAgainstRecord(
+      { undertaking: "work-scope-a", currentPhase: "requirements" },
+      baseRecord,
+    );
+    expect(check).toEqual({ ok: true, undertaking: "match", currentPhase: "match-fromPhase" });
+  });
+
+  test("holds a different undertaking (opN-b class: another undertaking inheriting the recorded transition)", () => {
+    const check = checkIdentityAgainstRecord(
+      { undertaking: "work-scope-z unrelated tool", currentPhase: "design" },
+      baseRecord,
+    );
+    expect(check.ok).toBe(false);
+    if (!check.ok) {
+      expect(check.reasons.some((reason) => reason.includes("work-scope-z unrelated tool"))).toBe(true);
+    }
+  });
+
+  test("holds an empty undertaking instead of treating it as a match", () => {
+    const check = checkIdentityAgainstRecord({ undertaking: "", currentPhase: "design" }, baseRecord);
+    expect(check.ok).toBe(false);
+    if (!check.ok) {
+      expect(check.reasons[0]).toContain("undertaking is empty");
+    }
+  });
+
+  test("holds a current_phase matching neither fromPhase nor toPhase", () => {
+    const check = checkIdentityAgainstRecord(
+      { undertaking: "work-scope-a", currentPhase: "implementation" },
+      baseRecord,
+    );
+    expect(check.ok).toBe(false);
+    if (!check.ok) {
+      expect(check.reasons[0]).toContain("current_phase");
+    }
+  });
+
+  test("a terminal record (toPhase null) only matches fromPhase", () => {
+    const terminal = { ...baseRecord, toPhase: null };
+    expect(checkIdentityAgainstRecord({ undertaking: "work-scope-a", currentPhase: "requirements" }, terminal).ok).toBe(true);
+    expect(checkIdentityAgainstRecord({ undertaking: "work-scope-a", currentPhase: "design" }, terminal).ok).toBe(false);
+  });
+
+  test("does not auto-resolve a label-only difference (exact string comparison)", () => {
+    const check = checkIdentityAgainstRecord(
+      { undertaking: "work-scope-a (tool)", currentPhase: "design" },
+      baseRecord,
+    );
+    expect(check.ok).toBe(false);
   });
 });
