@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261104T014559Z-07a9",
+  "workflow": "case-ready",
+  "evaluationKind": "wave-structure-determination",
+  "subject": "Case #3909 Wave 2 構成（OU-602 と OU-603 の並列可否）",
+  "sourceRevision": "3469d6329",
+  "durationMs": 262,
+  "inputTokens": 1177,
+  "inputs": {
+    "requestDigest": "eb273e470dfcb7014bcaf12ecc81196b83311208a62ddd27e48054bb52b0dc2c"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "parallel-ok",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.9,
+        "false": 0.09999999999999998
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "parallel-ok",
+        "value": true
+      }
+    ]
+  }
+}
