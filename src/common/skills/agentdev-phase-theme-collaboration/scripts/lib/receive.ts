@@ -21,7 +21,7 @@ import {
   type ReceiveResult,
 } from "./schema.ts";
 
-const ENTRY_HEADING = /^##\s+(\S+)?\s*:?\s*(.*)$/;
+const ENTRY_HEADING = /^##\s+([^\s:]+)?\s*:?\s*(.*)$/;
 const SELF_REPORT_PATTERN = /(承認済み|承認された|採用済み|approved|ACCEPTED|PASS OK)/i;
 
 /** 両経路で同一結果となる正規化。 */

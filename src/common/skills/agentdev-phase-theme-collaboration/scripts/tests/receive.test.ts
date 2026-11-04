@@ -58,6 +58,26 @@ describe("採用根拠の限定", () => {
   test("明示採用指示に該当するエントリが存在しない場合は例外で拒否する（fail-closed）", () => {
     expect(() => receiveReturnInput(SAMPLE_RETURN, ["E-999"], null, null)).toThrow();
   });
+
+  test("コロン付きの文書契約様式見出しで非連続 id を保持し、--adopt <id> が同一項目に正着する", () => {
+    // 回帰: ラベル候補がコロまで飲まれて自動採番されると、--adopt E-003 が出現順
+    // 3 番目（元 E-005）に着地する（隔離検証 outputs/o03 で観測された旧挙動）。
+    const text = `## E-003: 既解消所見の確認\n\n本文Aです。\n\n## E-004: R1提案\n\n本文Bです。\n\n## E-005: R2提案\n\n本文Cです。\n\n## E-006: 後続の提案\n\n本文Dです。\n`;
+    const result = receiveReturnInput(text, ["E-003"], null, null);
+    expect(result.entries.map((entry) => entry.id)).toEqual(["E-003", "E-004", "E-005", "E-006"]);
+    const adopted = result.entries.find((entry) => entry.id === "E-003");
+    expect(adopted?.disposition).toBe("accepted");
+    expect(adopted?.basis).toBe("user-explicit");
+    expect(adopted?.title).toBe("既解消所見の確認");
+  });
+
+  test("id なしのコロン付き見出しは従来どおり自動採番され、採用はタイトル指定で正着する", () => {
+    const text = `## 自由見出し: 一般の提案\n\n本文です。\n`;
+    const result = receiveReturnInput(text, ["一般の提案"], null, null);
+    expect(result.entries[0]?.disposition).toBe("accepted");
+    expect(result.entries[0]?.title).toBe("一般の提案");
+    expect(/^E-\d+$/.test(result.entries[0]?.id ?? "")).toBe(true);
+  });
 });
 
 describe("不正・曖昧な入力の扱い（fail-closed）", () => {
