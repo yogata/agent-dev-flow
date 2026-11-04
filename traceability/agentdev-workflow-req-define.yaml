@@ -113,6 +113,10 @@ implementation:
     - REQ-004-072
   src/common/skills/agentdev-workflow-req-define/scripts/tests/important-change-notification-pins.test.ts:
     - REQ-108-024
+  src/common/commands/agentdev/req-define.md:
+    - REQ-096-023
+    - REQ-096-024
+    - REQ-108-025
 verification:
   docs/designs/commands/req-define.md:
     - REQ-021-029

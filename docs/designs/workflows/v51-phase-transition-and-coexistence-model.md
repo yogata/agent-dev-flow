@@ -60,6 +60,8 @@ phase-review が提示した所見のうち、利用者が明示的に採用し�
 REQ-108-006 の既有義務に従い、実際の正規状態から必要な範囲だけ継続する。既存の実行主体と責務境界
 （case 系 workflow、実行担当 subagent、harness）は変更しない。
 
+実行接続の実装所在（反映確認）: 上記 (1)(2)(3) の実現面の接続先は、case-auto orchestration の実行境界を case-auto workflow 実装本体（`agentdev-workflow-case-auto` スキル「v5 有限実行モード」節。モード契約の「単独工程の独立完了」「v5 小規模連続実行モード」「再開」「変更駆動能力群の維持と横断検証義務」各条項）が所有し、実装・検証のみの単独工程の実行は case-run 委譲契約（`agentdev-workflow-case-run` スキル「単独工程からの実装・検証接続」節）を再利用し、要件確定のみの単独工程の入口接続は req-define command（不変条件の要件確定のみの単独工程条項）が所有する。対応関係の正は repository top-level `traceability/` 配下 sidecar が保持し、本 Design は実装所在を重複定義しない。
+
 ## 過去工程の改訂と影響伝播
 
 完了済み過去工程の改訂における下流の更新・再検証の完遂確認は、次の経路で行う。差分・影響評価の能力と出力契約は agentdev-traceability Design「relied-diff（依拠版に基づく差分・変更影響 CLI）」節の第1段階共通能力を利用し、本 Design は工程管理側の消費と完遂確認を所有する。

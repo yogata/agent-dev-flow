@@ -12,9 +12,6 @@ implementation:
   src/common/commands/agentdev/backlog-review.md:
   - REQ-096-020
   - REQ-096-023
-  src/common/commands/agentdev/req-define.md:
-  - REQ-096-024
-  - REQ-096-023
   src/common/commands/agentdev/README.md:
   - REQ-096-023
   - REQ-111-009
