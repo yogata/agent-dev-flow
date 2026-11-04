@@ -226,3 +226,18 @@
 - 想定反映先: req-define の draft 生成ガイダンス（case_open_hints / wave_hints 記述規律）
 - 関連: Case #3910、PR #3912、draft .agentdev/drafts/req-draft-artifact-finalization-and-version-reconstruction.md wave_hints
 - タグ: #draft-hints #traceability-gate #case-open
+
+## [2026-11-04T09:54+09:00][workflow_deviation][case-open STEP-4][Case #3909]
+- 問題事象: prepare_definition_pr.ts の measurement-convergence step が check_integrity の req-updated-freshness NG 6 件を trigger に発動したが、frontmatter updated の収束対象は Design 3 件（case-revise.md、v5-adopted-conventions、v51）のみで REQ 3 件（REQ-104/108/111）を収束しなかった。script 報告は stage「converged」を示しつつ exit 1 で終了し、REQ 分の NG 6 件のうち 3 件が残存した。
+- 発生局面: case-open STEP-4（機械工程 script 呼び出しと計測日収束）
+- 検知方法: script 報告 JSON の check_integrity step detail（stdout 全文・NG カウント 6 件）と measurement-convergence の frontmatterUpdatedTargets（Design 3 件のみ）の突合
+- 根本原因: measurement-convergence step の frontmatter updated 追随が Design targets のみを実装対象とし、REQ frontmatter（REQ frontmatter 規約〔patterns.md、IR-072〕の対象）を収束対象に含めていない。check_integrity の NG 検出は REQ も含むが追随 step が REQ を処理しない対象差が生じている
+- 自律対応内容: reference 既定の手動 contingency（REQ frontmatter updated の commit author date 2026-11-04 追随 + 明示パス指定補正 commit fdecf8180）で REQ 3 件を収束し、補正後 HEAD の check_integrity 再実行で NG 0 件（OK 951 / Warning 0）を確認。generate_indexes 派生物（req-health-metrics REQ 行数 AUTOGEN）は commit bf1402e4f で同一 PR 収束済み
+- ユーザー確認有無: なし
+- Decision/REQ/spec影響: なし（既存契約どおりの手動 contingency 経路の実施。script 契約・workflow 契約の変更なし）
+- 横展開観点: REQ 行 APPEND を伴う Definition 変更では、REQ ファイルの frontmatter updated 追随が measurement-convergence の機械対象外であるため、REQ APPEND の Case では常に手動 contingency の補正 commit が発生する
+- 再発条件: REQ 行 APPEND を含む DefinitionEdit で prepare_definition_pr を実行し、check_integrity が req-updated-freshness の REQ 分 NG を検出する場合
+- 予防策候補: prepare_definition_pr の definitionEdits 入力へ REQ frontmatter updated 追随を標準で組込む（stagePaths 含む）か、measurement-convergence step の収束対象へ REQ frontmatter を追加する。いずれも script 契約の変更候補
+- 想定反映先: prepare_definition_pr.ts の measurement-convergence step 実装、case-open Design「機械工程の script 呼び出し契約」節
+- 関連: Case #3909、PR #3913、Case #3902（同系統の gate 設定由来収束）、Case #3910（宣言外パス補正の区分問題）
+- タグ: #case-open #measurement-convergence #integrity #frontmatter-freshness
