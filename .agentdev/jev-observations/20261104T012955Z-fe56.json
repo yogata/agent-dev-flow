@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261104T012955Z-fe56",
+  "workflow": "case-ready",
+  "evaluationKind": "execution-structure-determination",
+  "subject": "Root Case #3910（RU-0257・REQ-105-009〜014 増分定義・3 OU の単一連結成分・全 OU issue_policy single）の実行構造帰属",
+  "sourceRevision": "46ea3c609bf1d1d98c1f72f849c382d335fd18fc",
+  "durationMs": 856,
+  "inputTokens": 1969,
+  "inputs": {
+    "requestDigest": "7ce0bb7cef5e8460a6323dc43247a13876866540c9c4e984c6490c5566d8a3d8",
+    "references": [
+      {
+        "digest": "28654f55ca1c74c448b151bcc859d231a6b6925e93aa8d409ac0f74ed153f3f9",
+        "label": "req_draft（合意済み判断入力の正）",
+        "path": ".agentdev/drafts/req-draft-artifact-finalization-and-version-reconstruction.md"
+      },
+      {
+        "digest": "079568fe8fc3c0d7f1a0d706976265279f90e450c642591d3567f44c53ccc663",
+        "label": "RU-0257（source RU）",
+        "path": ".agentdev/backlog/req-units/RU-0257.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-attribution",
+      "questionForm": "choice",
+      "value": "Epic",
+      "probabilityDistribution": {
+        "Standard": 0.42,
+        "Epic": 0.58
+      }
+    },
+    {
+      "questionId": "q2-dependency-strength",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "関連": 0.01,
+        "弱": 0,
+        "必須": 0.99
+      }
+    },
+    {
+      "questionId": "q3-functional-coherence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "分散": 0,
+        "部分的": 0,
+        "一貫": 1
+      }
+    }
+  ],
+  "confidence": 0.16,
+  "finalResult": {
+    "results": [
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "q1-attribution",
+        "value": "Standard"
+      },
+      {
+        "questionId": "q2-dependency-strength",
+        "value": 2
+      },
+      {
+        "questionId": "q3-functional-coherence",
+        "value": 2
+      }
+    ]
+  }
+}
