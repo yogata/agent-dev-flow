@@ -117,7 +117,7 @@ bun src/revision-record.ts [--impact <relied-diff-report.json | ->] --items <ite
 - `--impact` は依拠版基準の影響評価の入力（`agentdev-traceability` の relied-diff 公開 CLI の stdout JSON）。依拠版の解決不能・比較基準の未確定（`comparisonRange: "unresolved"`、`fullyPropagated: "undetermined"`）は取得できていない状態として扱い、全下流対象を完了側に含めない。省略時も同様。破損入力（様式不備・mode 不一致）は非ゼロ終了で隠蔽しない
 - `--items` は下流対象ごとの処置結果（JSON 配列。要素: `{ path, outcome, reason, verification, evidenceReuse }`）。`outcome` は `updated` / `created` / `no-update` / `unconfirmed` / `failed` / `pending`。`updated` / `created` は実施した検証の結果（`verification`）が必須で、なければ非ゼロ終了（検証なし更新の記録確定を禁止）。`no-update` を含む全項目で根拠（`reason`）が必須。`evidenceReuse` は `applicable` / `stale` / `unconfirmed` または null。path 重複は非ゼロ終了
 - `--approval` は適用した承認の対象・内容・範囲の記録（必須。空は非ゼロ終了）。承認範囲の記録なしでは改訂実行記録を確定しない
-- `--notice` は通知の時点区分（repeatable。stage は `pre`（正規反映前の事前通知）/ `in-progress`（実行中の追加通知）/ `post`（反映後の結果説明）。同一区分の複数回指定可〔実行中の追加通知は新たな影響の判明ごとに複数回あり得る。REQ-111-026〕。語彙外・空参照は非ゼロ終了）
+- `--notice` は通知の時点区分（repeatable。stage は `pre`（正規反映前の事前通知）/ `in-progress`（実行中の追加通知）/ `post`（反映後の結果説明）。同一区分の複数回指定可〔実行中の追加通知は新たな影響の判明ごとに複数回あり得る〕。語彙外・空参照は非ゼロ終了）
 - 出力は改訂実行記録（JSON）。`completion`（`completed` / `incomplete`）、`excludedFromCompletion`（完了側に含めない対象と理由）、`resumeTargets`（未成立の更新・再検証と再開に必要な情報）を含む。取得失敗・未確認・処理失敗・旧証拠の適用不能を完了側に含めない
 - 本 CLI は改訂実行記録の保存を行わない（stdout への JSON 出力のみ）。保存先は `.agentdev/phase/revisions/`（1改訂1ファイル）であり、保存先への書込みは保存する操作（成果物反映 Workflow Skill）の責務である
 - 記録量は下流対象の列挙数に比例し、正規成果物や差分の本文を複写しない

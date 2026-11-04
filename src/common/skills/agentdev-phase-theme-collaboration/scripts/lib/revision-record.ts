@@ -198,7 +198,8 @@ export function buildRevisionRecord(input: RevisionRecordInput): RevisionRecordO
   }
 
   // 通知の時点区分は語彙と記録参照のみを検証する。同一区分の複数回は許容する
-  // （実行中の追加通知は新たな影響の判明ごとに複数回あり得る。REQ-111-026）
+  // （事前通知・実行中の追加通知・反映後の結果説明の 3 時点区分の確認可能性が義務。
+  //   実行中の追加通知は新たな影響の判明ごとに複数回あり得る）
   for (const notice of input.notices) {
     if (!(NOTICE_STAGES as readonly string[]).includes(notice.stage)) {
       throw new Error(`通知の時点区分が不正（fail-closed）: ${String(notice.stage)}`);

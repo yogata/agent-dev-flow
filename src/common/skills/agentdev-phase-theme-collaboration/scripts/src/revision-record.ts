@@ -12,7 +12,7 @@
  *   要素: { path, outcome, reason, verification, evidenceReuse }
  * - --approval は適用した承認の対象・内容・範囲の記録（必須。空は非ゼロ終了）
  * - --notice は通知の時点区分（repeatable。stage は pre / in-progress / post。
- *   同一区分の複数回指定可。実行中の追加通知は新たな影響の判明ごとに複数回あり得る。REQ-111-026）
+ *   同一区分の複数回指定可。実行中の追加通知は新たな影響の判明ごとに複数回あり得る）
  * - 様式違反・語彙外・空参照は非ゼロ終了（fail-closed。確定しない）
  * - 本 CLI は改訂実行記録の保存を行わない（stdout への JSON 出力のみ）。
  *   保存先は `.agentdev/phase/revisions/`（1改訂1ファイル）であり、
