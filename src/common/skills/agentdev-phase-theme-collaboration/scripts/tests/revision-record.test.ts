@@ -265,19 +265,20 @@ describe("改訂実行記録の生成（buildRevisionRecord）", () => {
     ).toThrow();
   });
 
-  test("通知の時点区分の重複・語彙外・空参照は例外（REQ-111-026 の fail-closed）", () => {
-    expect(() =>
-      buildRevisionRecord({
-        recordedAt: RECORDED_AT,
-        impactInput: RESOLVED_IMPACT,
-        items: [],
-        approval: "利用者の明示指示",
-        notices: [
-          { stage: "pre", reference: "事前通知の記録" },
-          { stage: "pre", reference: "重複" },
-        ],
-      }),
-    ).toThrow();
+  test("通知の時点区分は語彙外・空参照を例外とし、同一区分の複数回は受理する（REQ-111-026 の fail-closed）", () => {
+    const repeated = buildRevisionRecord({
+      recordedAt: RECORDED_AT,
+      impactInput: RESOLVED_IMPACT,
+      items: [],
+      approval: "利用者の明示指示",
+      notices: [
+        { stage: "pre", reference: "事前通知の記録" },
+        { stage: "in-progress", reference: "1件目の追加通知の記録" },
+        { stage: "in-progress", reference: "2件目の追加通知の記録" },
+        { stage: "post", reference: "結果説明の記録" },
+      ],
+    });
+    expect(repeated.notices).toHaveLength(4);
     expect(() =>
       buildRevisionRecord({
         recordedAt: RECORDED_AT,

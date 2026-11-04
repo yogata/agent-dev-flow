@@ -158,7 +158,7 @@ function asOptionalString(value: unknown, field: string): string | null {
  * 判定規則:
  * - 承認範囲の記録が空なら例外（有効な承認の対象・内容・範囲の記録なしでは確定しない）
  * - 下流対象の path 重複、語彙外の区分、検証結果なしの updated / created、
- *   根拠なしの項目、重複・語彙外の通知時点区分は例外（fail-closed。修正して再実行）
+ *   根拠なしの項目、語彙外・空参照の通知時点区分は例外（fail-closed。修正して再実行）
  * - 影響評価の入力が未取得・未解決なら全下流対象を完了側から除外する
  * - 未確認・処理失敗・未処理・旧証拠の適用不能（stale / unconfirmed）は
  *   完了側に含めない。failed / pending は再開対象として列挙する
@@ -197,18 +197,15 @@ export function buildRevisionRecord(input: RevisionRecordInput): RevisionRecordO
     }
   }
 
-  const noticeStages = new Set<string>();
+  // 通知の時点区分は語彙と記録参照のみを検証する。同一区分の複数回は許容する
+  // （実行中の追加通知は新たな影響の判明ごとに複数回あり得る。REQ-111-026）
   for (const notice of input.notices) {
     if (!(NOTICE_STAGES as readonly string[]).includes(notice.stage)) {
       throw new Error(`通知の時点区分が不正（fail-closed）: ${String(notice.stage)}`);
     }
-    if (noticeStages.has(notice.stage)) {
-      throw new Error(`通知の時点区分が重複している（fail-closed）: ${notice.stage}`);
-    }
     if (notice.reference.trim().length === 0) {
       throw new Error(`通知の記録参照が空（fail-closed）: ${notice.stage}`);
     }
-    noticeStages.add(notice.stage);
   }
 
   const inputUnavailable = !input.impactInput.resolved;
