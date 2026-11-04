@@ -2,14 +2,14 @@
 title: ADF v4 Operating Model（目的・三層責務・Project Contract・寿命・文書モデル）
 status: accepted
 created: 2026-09-18
-updated: "2026-10-09"
+updated: "2026-11-04"
 ---
 <!-- ADF-COVERS(design): REQ-088-001, REQ-088-002, REQ-088-003, REQ-088-004, REQ-088-005, REQ-088-006, REQ-088-007 -->
 <!-- ADF-COVERS(implementation): REQ-088-006（REQ、Decision、Design、Implementation、Evidence の意味境界の正規所有の構成実体は本 Design「中核文書モデル」節そのものである） -->
 <!-- ADF-COVERS(design): REQ-103-001, REQ-103-020, REQ-103-021, REQ-103-027（REQ-103 の v4 正規モデル・情報寿命・中核維持の設計対応面） -->
 <!-- ADF-COVERS(implementation): REQ-103-001, REQ-103-027（REQ-103 の正規モデル要素と正規所有 Design の対応表と「v4 の中核と維持条件」節が、正規モデル一意説明・中核 5 要素維持契約の構成実体） -->
 <!-- ADF-COVERS(implementation): REQ-103-029, REQ-103-030, REQ-103-031（REQ-103 の有限完了・並列化と横断整合確認・AC 個別判定の完了記録面。判定記録本体は docs/reports/req-103-ac-judgment-wave3.md。並列実行基盤実体は agentdev-workflow-case-auto 側） -->
-<!-- ADF-COVERS(design): REQ-104-001, REQ-104-002, REQ-104-005, REQ-104-006, REQ-104-007, REQ-105-001, REQ-105-002, REQ-105-003, REQ-105-004, REQ-105-005, REQ-105-006, REQ-105-007（採用済み工程・成果物の解決と保持、移行期デフォルトの設計対応は foundations/v5-adopted-conventions.md が所有する） -->
+<!-- ADF-COVERS(design): REQ-104-001, REQ-104-002, REQ-104-005, REQ-104-006, REQ-104-007, REQ-105-001, REQ-105-002, REQ-105-003, REQ-105-004, REQ-105-005, REQ-105-006, REQ-105-007, REQ-105-009, REQ-105-010, REQ-105-011, REQ-105-012, REQ-105-013, REQ-105-014（REQ-105-008 の採用済み工程・成果物の解決と移行期デフォルトの設計対応は foundations/v5-adopted-conventions.md が所有する。REQ-105-009〜014 は「意味境界の正規所有と工程別正式確定の区別」節の増分対応） -->
 <!-- ADF-COVERS(implementation): REQ-104-001, REQ-104-002, REQ-104-003, REQ-104-004, REQ-104-005, REQ-104-006, REQ-104-007, REQ-105-001, REQ-105-002, REQ-105-003, REQ-105-004, REQ-105-005, REQ-105-006, REQ-105-007, REQ-105-008（v5 基盤要件の設計・構成実体は v4-operating-model の後継更新として RA-003/RA-004 が後続 OU で所有する） -->
 
 # ADF v4 Operating Model（目的・三層責務・Project Contract・寿命・文書モデル）
@@ -68,6 +68,16 @@ REQ / Decision / Design / Implementation / Evidence の意味境界（What/Why/H
 上記 5 要素の意味境界は、本節が ADF の基盤モデル定義として正規所有する（REQ-088-006）。運用面（文書種別ごとの責務、配置基準、対応関係の表現方法）は responsibilities/document-type-responsibilities.md が所有し、responsibilities/artifact-contracts.md は成果物間の入出力と操作契約を扱う副次参照である。意味境界の判定を成果物間契約の側から再定義せず、基盤モデル定義と運用面から到達する構造を維持する。
 
 工程別の成果物の正式確定と最終的な要求充足は別判定であり、この区別は本節の所有対象ではなく、REQ-105（ADF v5 成果物の意味と工程別正式確定）が所有する。各工程の成果物は当該工程の要求充足、上流整合、必要な検証の成立をもって後続工程を待たずに正式確定でき（REQ-105-006）、設計成果物の正式確定をもって最終的な要求充足済みと判定しない（REQ-105-007）。最終的な要求充足の判定は case-close の QG-4 最終完了判定が所有する。ゲートが判定条件の前提とする工程・成果物規約は、プロジェクトが採用した採用済み規約から解決し、採用宣言が存在しない間は移行期デフォルト（REQ-105-008）として当該プロジェクトの現に実効している運用を用いる（foundations/v5-adopted-conventions.md「採用規約の構成要素」「移行期デフォルトとの接続」参照）。
+
+成果物種別ごとの正式確定の独立性（REQ-105-009）。後続実装、Issue、PR の存在または完了を一律の確定条件とせず、要求・設計の各成果物の正式確定を成立させる。実装前の設計確定を設計成果物単独で成立させ、独立設計書を採用しない案件では設計文書の作成を確定条件としない。正式確定の構造判定（agentdev-artifact-semantics の finalize）は後続工程の成果物を要求しない。
+
+判定と正規の確定操作・確定状態の区別（REQ-105-010、REQ-105-011）。正式確定の構造判定（agentdev-artifact-semantics の finalize。判定器は副作用を持たず、designValidity は常に not-evaluated-by-this-tool、requirementSatisfaction は常に not-assessed-by-this-tool を返す）は判定であり確定操作を伴わない。判定結果（finalized: true 等）だけを根拠に確定状態を反映・完了扱いとしない。確定可否判断では、構造判定の成立（対応宣言・検証資料の実在と対応の成立）と、検証が実際に成立していること（機械検査結果、内容評価、検証証拠）を区別して扱い、上流との内容整合の確認を含める。構造的な成立や検証資料の存在だけを根拠に正式確定可能と判定しない。この内容評価は閉じた意味判断であり判定器へ組込まない（REQ-096 の判断方法3分類に従う）。
+
+確定状態の反映は各成果物種別の既存状態規則が定める正規の確定経路で実行する。変更駆動では case-close の Design 確定フロー（docs/designs/commands/case-close.md「Design 状態評価の棚卸し制」）が draft から accepted への昇格と docs/designs/README.md status 列の同時更新を担い、Design 保存内部責務は accepted を付与しない。工程駆動では v51 工程駆動モデル（docs/designs/workflows/v51-phase-driven-collaboration-model.md「実行主体と責務境界」）のとおり確定（Design の draft から accepted への昇格、Decision の状態遷移）の権限と経路を既存のまま維持し、経路別所有境界は v51 工程遷移・双経路併存モデルと整合させる。確定状態の反映では権限外の状態変更を行わず、既存の一覧・索引との整合を維持する。
+
+確定記録と版の再構成（REQ-105-012、REQ-105-013）。正式確定では、確定対象、対象範囲、確定根拠を既存の証拠チャネル（当該 Case の Issue 対応記録コメント、PR 本文、正規成果物、Git 履歴）に保持し、確定時点の main 上のコミット（squash merge の場合は squash merge コミット）から確定時の内容を特定できるようにする。別セッションからの再構成は、正規成果物・証拠チャネル・Git 履歴の既存情報から対象取組、工程、確定対象、対象範囲、確定根拠、確定時のGitコミットとその時点の内容を復元する。改訂後の現在の内容を過去に確定した内容として扱わない。再構成が不能な場合（確定根拠の不足、対象版不明、必要な情報の取得失敗）は、不足と確認範囲を区別して報告し、根拠なく確定状態・対象版を推測せず、確定時点を特定できないまま最新コミットを確定版とみなさない。新規の版台帳・確定履歴データベースは一律に新設せず、既存の正規情報と Git を優先利用する。
+
+正式確定と工程遷移・最終要求充足の区別（REQ-105-007、REQ-105-014）。成果物の正式確定は、工程遷移および工程全体の完了を自動的に認定せず、成果物の確定と工程遷移を別々に判定できる。工程遷移は利用者判断による独立操作として維持され（REQ-111-002）、最終的な要求充足の判定は case-close の QG-4 最終完了判定が所有する。
 
 ## v4 の中核と維持条件（REQ-103-027）
 
