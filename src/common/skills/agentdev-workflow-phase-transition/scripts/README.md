@@ -38,9 +38,9 @@ bun src/lookup.ts --dir <transitions-dir> --key <idempotency-key>
 ```
 
 - 出力:
-  - `{"result":"absent"}` — 記録なし（ディレクトリ不存在を含む）
+  - `{"result":"absent"}` — 記録なし。記録領域自体の不存在のみを記録不在として扱う
   - `{"result":"existing","record":{...},"path":"..."}` — 既存記録の検出（再実行はこれを復元して二重実行を防ぐ）
-  - `{"result":"error","reason":"...","path":"..."}` — 破損記録の検出。existing として扱わない
+  - `{"result":"error","reason":"...","path":"..."}` — 確認不能または破損記録の検出。記録領域の列挙・読取が技術的に失敗した場合（存在確認不能、パスが通常ファイル等）と、記録ファイルの読取失敗・JSON 破損・schema 違反を含む。existing として扱わず、記録不在（absent）としても扱わない
 
 ### `src/apply.ts` — 遷移記録の保存（冪等）
 
@@ -74,8 +74,10 @@ bun src/apply.ts --dir <transitions-dir> --input <record.json | ->
 
 - 出力:
   - `{"result":"recorded","record":{...},"path":"..."}` — 新規記録の保存成功
-  - `{"result":"duplicate","record":{...},"path":"..."}` — 既存記録の検出（二重記録なし。記録から復元）
+  - `{"result":"duplicate","record":{...},"path":"..."}` — 既存記録の検出（二重記録なし。記録から復元）。同一キーで対象範囲（scope）・遷移元（fromPhase）・遷移先（toPhase）が一致する場合のみ duplicate として復元する。recordedAt は記録時刻メタデータであり内容照合の対象外
 - 入力不正、破損状態の検出、書込み失敗は非ゼロ終了（保存を実行しない）
+- 同一キーで対象範囲・遷移元・遷移先のいずれかが異なる要求は、既存記録を復元せず、上書き・置換せず、当該要求の記録を保存せずに非ゼロ終了で拒否する（fail-closed）
+- 既存記録領域の読取が確認不能（`{"result":"error",...}`）な場合は保存を実行せず非ゼロ終了する
 
 ### `src/resolve-successor.ts` — 後続候補の判別
 
