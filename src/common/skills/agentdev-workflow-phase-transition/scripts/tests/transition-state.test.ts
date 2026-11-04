@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { mkdtemp, rm, writeFile, mkdir } from "node:fs/promises";
+import { mkdtemp, readdir, rm, writeFile, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { isTerminalRecord, parseTransitionRecord } from "../lib/schema.ts";
@@ -171,6 +171,91 @@ describe("lookupRecord restoration", () => {
     await mkdir(dir, { recursive: true });
     await writeFile(join(dir, `${encodeURIComponent("transition-20261013-002")}.json`), "{broken", "utf8");
     const lookup = await lookupRecord(dir, "transition-20261013-002");
+    expect(lookup.result).toBe("error");
+  });
+});
+
+describe("same-key content match (duplicate restoration vs fail-closed refusal)", () => {
+  test("treats a same-key re-run with a differing recordedAt as duplicate (recordedAt is not compared)", async () => {
+    const first = await applyRecord(dir, baseRecord);
+    expect(first.result).toBe("recorded");
+    const second = await applyRecord(dir, { ...baseRecord, recordedAt: "2026-10-13T11:30:00Z" });
+    expect(second.result).toBe("duplicate");
+    if (second.result === "duplicate") {
+      expect(second.record.recordedAt).toBe("2026-10-13T09:00:00Z");
+    }
+  });
+
+  test("refuses a same-key request with a differing scope without restoring, overwriting, or saving", async () => {
+    await applyRecord(dir, baseRecord);
+    let threw = false;
+    try {
+      await applyRecord(dir, { ...baseRecord, scope: "work-scope-b" });
+    } catch {
+      threw = true;
+    }
+    expect(threw).toBe(true);
+    const lookup = await lookupRecord(dir, baseRecord.key);
+    expect(lookup.result).toBe("existing");
+    if (lookup.result === "existing") {
+      expect(lookup.record.scope).toBe("work-scope-a");
+    }
+    const files = await readdir(dir);
+    expect(files.filter((f) => f.endsWith(".json")).length).toBe(1);
+  });
+
+  test("refuses a same-key request with a differing toPhase and keeps the recorded transition", async () => {
+    await applyRecord(dir, baseRecord);
+    let threw = false;
+    try {
+      await applyRecord(dir, { ...baseRecord, toPhase: "review" });
+    } catch {
+      threw = true;
+    }
+    expect(threw).toBe(true);
+    const lookup = await lookupRecord(dir, baseRecord.key);
+    expect(lookup.result).toBe("existing");
+    if (lookup.result === "existing") {
+      expect(lookup.record.toPhase).toBe("design");
+    }
+    const files = await readdir(dir);
+    expect(files.filter((f) => f.endsWith(".json")).length).toBe(1);
+  });
+
+  test("refuses a same-key request with a differing fromPhase", async () => {
+    await applyRecord(dir, baseRecord);
+    let threw = false;
+    try {
+      await applyRecord(dir, { ...baseRecord, fromPhase: "plan" });
+    } catch {
+      threw = true;
+    }
+    expect(threw).toBe(true);
+  });
+});
+
+describe("unreadable record area is error, never absence", () => {
+  test("reports an unreadable record area as error, not as absence", async () => {
+    const filePath = join(dir, "blocked");
+    await writeFile(filePath, "placeholder", "utf8");
+    const lookup = await lookupRecord(filePath, "transition-20261013-001");
+    expect(lookup.result).toBe("error");
+    if (lookup.result === "error") {
+      expect(lookup.path).toBe(filePath);
+    }
+  });
+
+  test("refuses to record over an unverifiable existing state without saving", async () => {
+    const filePath = join(dir, "blocked");
+    await writeFile(filePath, "placeholder", "utf8");
+    let threw = false;
+    try {
+      await applyRecord(filePath, baseRecord);
+    } catch {
+      threw = true;
+    }
+    expect(threw).toBe(true);
+    const lookup = await lookupRecord(filePath, baseRecord.key);
     expect(lookup.result).toBe("error");
   });
 });
