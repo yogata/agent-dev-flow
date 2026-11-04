@@ -38,6 +38,10 @@ implementation:
   - REQ-110-039
   - REQ-110-040
   - REQ-110-041
+  - REQ-111-029
+  - REQ-111-030
+  - REQ-111-031
+  - REQ-111-032
   src/common/commands/agentdev/phase-artifacts-update.md:
   - REQ-110-007
   - REQ-110-008
@@ -61,6 +65,10 @@ implementation:
   - REQ-110-039
   - REQ-110-040
   - REQ-110-041
+  - REQ-111-029
+  - REQ-111-030
+  - REQ-111-031
+  - REQ-111-032
 verification:
   src/common/skills/agentdev-workflow-phase-artifacts-update/SKILL.md:
   - REQ-106-012
@@ -93,6 +101,10 @@ verification:
   - REQ-110-039
   - REQ-110-040
   - REQ-110-041
+  - REQ-111-029
+  - REQ-111-030
+  - REQ-111-031
+  - REQ-111-032
   src/common/commands/agentdev/phase-artifacts-update.md:
   - REQ-110-007
   - REQ-110-008
@@ -116,6 +128,10 @@ verification:
   - REQ-110-039
   - REQ-110-040
   - REQ-110-041
+  - REQ-111-029
+  - REQ-111-030
+  - REQ-111-031
+  - REQ-111-032
   .opencode/skills/repo-agentdev-integrity/scripts/tests/phase_adoption_record_contract.test.ts:
   - REQ-110-040
   - REQ-110-041
