@@ -227,6 +227,36 @@
 - 関連: Case #3910、PR #3912、draft .agentdev/drafts/req-draft-artifact-finalization-and-version-reconstruction.md wave_hints
 - タグ: #draft-hints #traceability-gate #case-open
 
+## [2026-11-04][learning_candidate][coverage 契約の役割語彙と REQ 成果物][Case #3910]
+- 問題事象: TS-701 事例 (a) の構築時、coverage 契約の role 語彙（decision / design / implementation / verification）に requirement 役割がなく、REQ 工程成果物（docs/requirements/ 配下）自身への covers 表現にどの役割を割り当てるか自明でないことを観測した。一時 sidecar では検証事例用に design 役割を使用した。
+- 発生局面: 検証（TS-701 事例 (a) の構築）
+- 検知方法: 要求成果物のみを対象に finalize --phase requirement の公開 CLI 事例を構成する際、対応役割の表現を確認した。
+- 根本原因: coverage 契約は成果物の機能上の役割を定義するが、工程で作成される REQ 文書自体を示す専用 role を定義していない。
+- 自律対応内容: 契約の拡張や規約化は本 Case の対象範囲外として行わず、検証用 sidecar による仮表現で事例を構成し、仮入力であることを PR Findings に記録した。
+- ユーザー確認有無: なし
+- Decision/REQ/spec影響: なし。判定器契約の拡張・REQ 工程成果物の coverage 表現規約化は対象範囲外。
+- 横展開観点: REQ 成果物そのものを coverage 対象として扱う検証や設計では、既存 role の意味と一時表現を正規規約と混同しない。
+- 再発条件: REQ 文書のみを対象に coverage 宣言を構成し、専用 role の不存在を無視して役割を決める場合。
+- 予防策候補: coverage 契約を変更または規約化する検討時に、REQ 工程成果物自身への covers 表現をどう扱うかを明示的に評価する。
+- 想定反映先: agentdev-traceability の coverage 契約検討。
+- 関連: PR #3923、TS-701 事例 (a)
+- タグ: #traceability #coverage #REQ
+
+## [2026-11-04][learning_candidate][design-basis --adopted の root 相対解決][Case #3910]
+- 問題事象: TS-701 事例 (c) の実行時、`design-basis.ts` の `--adopted` 引数が root 相対パスとして解決される一方、scripts README の実行例にそのパス基準が記載されていないため、最初の読取が失敗した。
+- 発生局面: 検証（TS-701 事例 (c) の公開 CLI 実行）
+- 検知方法: `--adopted` で採用規約ファイルを渡した際の読取失敗を観測した。
+- 根本原因: CLI のパス解決基準が実行例・説明に記載されておらず、利用者が cwd 相対と誤解しうる。
+- 自律対応内容: root 相対のパス指定に修正して事例を実行し、失敗は fail-closed のエラーとして報告されたことを PR Findings に記録した。scripts README の修正は本 Case の対象範囲外として行っていない。
+- ユーザー確認有無: なし
+- Decision/REQ/spec影響: なし。README の記載改善は本 Case の対象範囲外。
+- 横展開観点: CLI のファイルパス引数では、実装上の解決基準を確認してから検証入力を構成する。
+- 再発条件: `--adopted` の実行例を用いる際、root と cwd の相対解決基準を確認せずパスを渡す場合。
+- 予防策候補: 実行例に `--adopted` の root 相対パス解決基準を明記する。
+- 想定反映先: agentdev-artifact-semantics scripts README。
+- 関連: PR #3923、TS-701 事例 (c)
+- タグ: #artifact-semantics #design-basis #CLI
+
 ## [2026-11-04T09:54+09:00][workflow_deviation][case-open STEP-4][Case #3909]
 - 問題事象: prepare_definition_pr.ts の measurement-convergence step が check_integrity の req-updated-freshness NG 6 件を trigger に発動したが、frontmatter updated の収束対象は Design 3 件（case-revise.md、v5-adopted-conventions、v51）のみで REQ 3 件（REQ-104/108/111）を収束しなかった。script 報告は stage「converged」を示しつつ exit 1 で終了し、REQ 分の NG 6 件のうち 3 件が残存した。
 - 発生局面: case-open STEP-4（機械工程 script 呼び出しと計測日収束）
