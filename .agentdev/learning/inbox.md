@@ -286,3 +286,11 @@
 - 想定反映先: agentdev-workflow-case-ready の definition-acceptance.md 機械工程節、accept_definition_checks.ts の autogen-regeneration-diff step 説明
 - 関連: Case #3907、PR #3914、accept-input-3907-acceptance-report-2.json（警告証跡）、af44cd4d2（解消 commit）
 - タグ: #case-ready #acceptance-checks #generate_indexes #working-tree-cleanliness
+
+## [2026-11-04][learning_candidate][MSYS /tmp 仮想パス×bun ネイティブ fs の解釈差][Case #3908]
+- 検知: Windows 環境で `mktemp -d` が返す MSYS 仮想 /tmp パスを bun（Windows ネイティブ fs）に渡すと、bun 側は別の実パス（カレントドライブ直下の \tmp\ 等）へ解釈し、bash 側の `ls` 観測と bun の fs 操作が不一致になる（遷移記録の記録ファイル数の観測が誤る・TS-802 公開 CLI 観測で発生）。
+- 対処: bun で fs を操作する検証の観測先を MSYS 仮想パスから Windows 実パス（C:/WINDOWS/TEMP/opencode 配下等）へ切り替えて再取得した。
+- 学び: bun で fs を操作する検証では観測先パスを MSYS 仮想パス（/tmp 等）にせず、Windows 実パスを明示する。bash 側の ls と bun 側の fs は同じパス文字列でも実体が別になり得るため、記録ファイル数等の観測は bun 自身の fs API で行うのが確実。
+- 出典: PR #3920 本文 `## Findings/ Capture候補`（### learning）、case-close 対応コメント issuecomment-6632234961
+- 関連: Case #3889 の「MSYS パス変換による clone 誤配置」（2026-11-02）は別事象（clone の引数パス変換）。本項は fs 操作対象パスの解釈差で重複しない。
+- タグ: #learning-capture #windows #msys #bun-fs #検証観測
