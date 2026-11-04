@@ -1,6 +1,6 @@
 # `agentdev-phase-theme-collaboration` scripts
 
-工程駆動コラボレーション（テーマ正本管理・外部検討の持出しと戻り受理）の決定的処理: 戻り入力の受理、持出し文書の検証、テーマ一覧の導出、受領記録の照会。
+工程駆動コラボレーション（テーマ正本管理・外部検討の持出しと戻り受理）の決定的処理: 戻り入力の受理、持出し文書の検証、テーマ一覧の導出、受領記録の照会、完了済み過去工程の改訂実行記録の生成。
 
 ## 構成
 
@@ -14,15 +14,18 @@ scripts/
 │   ├── sections.ts  # themes.md / pending.md セクション解析、一覧導出、旧新解決、carried 未決抽出、採用状態照合
 │   ├── handoff.ts   # 持出し文書の構成検証（必須4要素）と既知機密パターンの混入検出
 │   ├── receive.ts   # 戻り入力の受理・採否分類（O(n) 線形走査、fail-closed、証跡量比例）
+│   ├── revision-record.ts # 改訂実行記録の生成と変更反映完了判定（完了側除外・再開対象の決定的導出、fail-closed）
 │   └── received-record.ts # 受領記録の生成と区別保存（1受領1ファイル、受領日時の信頼性、由来と採用根拠の区別）
 ├── src/
 │   ├── handoff-check.ts  # CLI: 持出し文書の検証
 │   ├── receive.ts        # CLI: 戻り入力の受理・採否記録生成
+│   ├── revision-record.ts # CLI: 完了済み過去工程の改訂実行記録の生成
 │   ├── themes.ts         # CLI: テーマ一覧の導出、旧新対応の解決、未決の連携参照、採用主張の照合
 │   └── received.ts       # CLI: 受領済み知見の照会
 └── tests/
     ├── handoff.test.ts
     ├── receive.test.ts
+    ├── revision-record.test.ts
     ├── sections.test.ts
     └── received.test.ts
 ```
@@ -102,6 +105,22 @@ adoptionBasis: null
 - 出力: 受領情報の一覧（`records`、`count`）。各レコードに採用済み判定（`adopted`。`adoptionBasis` のみから導出）を含める。`--theme` でテーマ識別の限定照会
 - received/ に記録が存在しない内容は返らない（未受領の外部検討内容を復元したと扱わない契約の機械的基盤）
 - frontmatter 不備の受領記録は非ゼロ終了で報告する（破損した記録を受領済み知見として扱わない）
+
+### `src/revision-record.ts` — 完了済み過去工程の改訂実行記録の生成（変更反映完了判定の機械的部分）
+
+```
+bun src/revision-record.ts [--impact <relied-diff-report.json | ->] --items <items.json | ->
+                           --approval <承認の対象・内容・範囲の記録>
+                           [--notice <pre|in-progress|post>=<記録参照>]...
+```
+
+- `--impact` は依拠版基準の影響評価の入力（`agentdev-traceability` の relied-diff 公開 CLI の stdout JSON）。依拠版の解決不能・比較基準の未確定（`comparisonRange: "unresolved"`、`fullyPropagated: "undetermined"`）は取得できていない状態として扱い、全下流対象を完了側に含めない。省略時も同様。破損入力（様式不備・mode 不一致）は非ゼロ終了で隠蔽しない
+- `--items` は下流対象ごとの処置結果（JSON 配列。要素: `{ path, outcome, reason, verification, evidenceReuse }`）。`outcome` は `updated` / `created` / `no-update` / `unconfirmed` / `failed` / `pending`。`updated` / `created` は実施した検証の結果（`verification`）が必須で、なければ非ゼロ終了（検証なし更新の記録確定を禁止）。`no-update` を含む全項目で根拠（`reason`）が必須。`evidenceReuse` は `applicable` / `stale` / `unconfirmed` または null。path 重複は非ゼロ終了
+- `--approval` は適用した承認の対象・内容・範囲の記録（必須。空は非ゼロ終了）。承認範囲の記録なしでは改訂実行記録を確定しない
+- `--notice` は通知の時点区分（repeatable。stage は `pre`（正規反映前の事前通知）/ `in-progress`（実行中の追加通知）/ `post`（反映後の結果説明）で各1回。重複・語彙外・空参照は非ゼロ終了）
+- 出力は改訂実行記録（JSON）。`completion`（`completed` / `incomplete`）、`excludedFromCompletion`（完了側に含めない対象と理由）、`resumeTargets`（未成立の更新・再検証と再開に必要な情報）を含む。取得失敗・未確認・処理失敗・旧証拠の適用不能を完了側に含めない
+- 本 CLI は改訂実行記録の保存を行わない（stdout への JSON 出力のみ）。保存先は `.agentdev/phase/revisions/`（1改訂1ファイル）であり、保存先への書込みは保存する操作（成果物反映 Workflow Skill）の責務である
+- 記録量は下流対象の列挙数に比例し、正規成果物や差分の本文を複写しない
 
 ## テストと型検査
 

@@ -1,6 +1,9 @@
 component: agentdev-phase-theme-collaboration
 implementation:
   src/common/skills/agentdev-phase-theme-collaboration/SKILL.md:
+  - REQ-106-016
+  - REQ-111-025
+  - REQ-111-026
   - REQ-110-001
   - REQ-110-004
   - REQ-110-006
@@ -19,10 +22,30 @@ implementation:
   - REQ-110-040
   - REQ-110-041
   src/common/skills/agentdev-phase-theme-collaboration/templates/phase-readme.md:
+  - REQ-106-016
+  - REQ-111-025
+  - REQ-111-026
   - REQ-110-041
   - REQ-111-020
   src/common/skills/agentdev-phase-theme-collaboration/scripts/README.md:
+  - REQ-106-016
+  - REQ-111-025
+  - REQ-111-026
   - REQ-110-040
+  src/common/skills/agentdev-phase-theme-collaboration/scripts/lib/revision-record.ts:
+  - REQ-106-013
+  - REQ-106-014
+  - REQ-106-015
+  - REQ-106-016
+  - REQ-111-025
+  - REQ-111-026
+  src/common/skills/agentdev-phase-theme-collaboration/scripts/src/revision-record.ts:
+  - REQ-106-013
+  - REQ-106-014
+  - REQ-106-015
+  - REQ-106-016
+  - REQ-111-025
+  - REQ-111-026
   src/common/skills/agentdev-phase-theme-collaboration/scripts/lib/receive.ts:
   - REQ-110-007
   - REQ-110-009
@@ -50,12 +73,22 @@ implementation:
   - REQ-110-032
 verification:
   src/common/skills/agentdev-phase-theme-collaboration/SKILL.md:
+  - REQ-106-016
+  - REQ-111-025
+  - REQ-111-026
   - REQ-110-034
   - REQ-110-035
   - REQ-110-036
   - REQ-110-037
   - REQ-110-038
   - REQ-110-039
+  src/common/skills/agentdev-phase-theme-collaboration/scripts/tests/revision-record.test.ts:
+  - REQ-106-013
+  - REQ-106-014
+  - REQ-106-015
+  - REQ-106-016
+  - REQ-111-025
+  - REQ-111-026
   src/common/skills/agentdev-phase-theme-collaboration/scripts/tests/receive.test.ts:
   - REQ-110-007
   - REQ-110-009
