@@ -14,6 +14,9 @@ implementation:
   - REQ-110-038
   - REQ-110-039
   - REQ-110-041
+  - REQ-111-029
+  - REQ-111-030
+  - REQ-111-031
   src/common/commands/agentdev/phase-tasks-create.md:
   - REQ-110-001
   - REQ-110-002
@@ -24,6 +27,9 @@ implementation:
   - REQ-110-038
   - REQ-110-039
   - REQ-110-041
+  - REQ-111-029
+  - REQ-111-030
+  - REQ-111-031
 verification:
   src/common/skills/agentdev-workflow-phase-tasks-create/SKILL.md:
   - REQ-110-001
@@ -39,6 +45,9 @@ verification:
   - REQ-110-038
   - REQ-110-039
   - REQ-110-041
+  - REQ-111-029
+  - REQ-111-030
+  - REQ-111-031
   src/common/commands/agentdev/phase-tasks-create.md:
   - REQ-110-001
   - REQ-110-002
@@ -53,6 +62,9 @@ verification:
   - REQ-110-038
   - REQ-110-039
   - REQ-110-041
+  - REQ-111-029
+  - REQ-111-030
+  - REQ-111-031
 links:
   upstream:
     src/common/skills/agentdev-workflow-phase-tasks-create/SKILL.md:
