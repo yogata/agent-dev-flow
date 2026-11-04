@@ -181,3 +181,48 @@
 - 学び: fail 全件の baseline 再現確認は、fail 対象の単独実行と全対象実行の組み合わせで1回ずつ実行すれば被覆できる。機械工程の受理入力は実測後に組み立てるのが実務的であり、手動予備実行は「失敗由来分類」の正当理由に該当する。
 - 出典: case-close 対応記録コメント 6617043300（検証差分）、QG-4 checker 実測手順（agentdev-quality-gates）
 
+
+## [2026-11-04T10:30+09:00][workflow_deviation][case-open STEP-4 measurement-convergence][Case #3910]
+- 問題事象: prepare_definition_pr.ts の measurement-convergence step が check_integrity 報告の req-updated-freshness 対象から REQ ファイルの報告形式（for REQ-105.md: 形式・docs/ プレフィックスなし）を捕捉できず、REQ-105.md の frontmatter updated 補正が script 内で完結せず script が fail 終了した（Case #3910・PR #3912 実測）。
+- 発生局面: 実装（case-open STEP-4 機械工程、REQ 行 APPEND を含む Definition PR）
+- 検知方法: script 報告 JSON の check_integrity step fail（5 new unmanaged NG）と convergence の frontmatterUpdatedTargets に REQ-105.md が含まれないことの突合
+- 根本原因: extractFreshnessTargets の正規表現 /for ((?:docs|src|scripts)[^s:]*.md):/g がプレフィックス付きパス形式のみに対応し、REQ freshness 報告のファイル名のみ形式と不一致
+- 自律対応内容: 手動 contingency で REQ-105.md frontmatter updated を commit author date に追随させ、req-metrics 派生物（req-health-metrics.md AUTOGEN 8→14）とともに明示パス指定補正 commit（20a6eb9e8）を作成。新 HEAD で check_integrity（0 new unmanaged NG）と traceability check（missing-design 0 件・対象行）を完了させ PR #3912 検証欄へ経緯を記録。修正対象は intake item 化済み（.agentdev/intake/inbox/2026-11-04-prepare-definition-pr-freshness-path-extraction.md）。
+- ユーザー確認有無: なし
+- Decision/REQ/spec影響: なし（既存契約の手動 contingency 経路の実施）
+- 横展開観点: REQ 行 APPEND を含む全 Definition PR で REQ ファイルの freshness 補正が同様に漏れ得る
+- 再発条件: REQ ファイル編集を含む Definition PR で measurement-convergence が発動し、REQ ファイルの freshness NG が初回 check_integrity で報告される場合
+- 予防策候補: extractFreshnessTargets の REQ ファイル形式対応と、NG 報告対象と補正適用対象の差分検査（補正漏れ検出）の script 組込み
+- 想定反映先: src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts、REQ-117 系機械工程堅牢化との突合
+- 関連: Case #3910、PR #3912 検証欄、.agentdev/intake/inbox/2026-11-04-prepare-definition-pr-freshness-path-extraction.md
+- タグ: #script-gap #measurement-convergence #case-open
+
+## [2026-11-04T10:30+09:00][workflow_deviation][case-open STEP-4 並行 case-open と measurement-convergence の補正混入][Case #3910]
+- 問題事象: measurement-convergence step の補正 commit（9e95df932）が本 Case の artifact_actions 宣言外ファイル（docs/designs/commands/case-revise.md、docs/designs/workflows/v51-phase-transition-and-coexistence-model.md〔並行兄弟 Case #3907/#3908/#3909 の変更対象共有ファイル〕）の frontmatter updated を含めて commit した。
+- 発生局面: 実装（case-open STEP-4 機械工程、並行 case-open 実行下）
+- 検知方法: convergence step detail の stagedPaths に宣言外 2 ファイルが含まれていることの差分確認
+- 根本原因: convergence step が REQ 編集対象に限定せず報告対象全体を補正する契約どおりに動作した結果、並行 Case の対象ファイルの main HEAD 起点の既存 freshness 債務が本 Case branch で解消された
+- 自律対応内容: 契約どおりの機械 step であることを確認し、PR #3912 検証欄へ補正対象・根拠・本変更起因の悪化 0 件を記録。共有ファイルの merge 順序接触は記録して解決しない（親判断は case-auto の decision_context へ委譲）。
+- ユーザー確認有無: なし
+- Decision/REQ/spec影響: なし
+- 横展開観点: 並行 case-open で measurement-convergence が発動する全 Case で宣言外ファイルの補正混入が起き得る
+- 再発条件: 並行 case-open 実行下で check_integrity の freshness 報告に他 Case 対象ファイルの既存債務が含まれる場合
+- 予防策候補: convergence の補正対象報告へ artifact_actions 宣言パスと main HEAD 既存債務パスの区分追加、または宣言外パス補正の別 commit 分離による PR diff の意味明確化
+- 想定反映先: prepare_definition_pr.ts の measurement-convergence step 報告詳細、case-open Design「並行 case-open の作業隔離規律」節の補正 commit 扱い明確化
+- 関連: Case #3910、PR #3912 検証欄、Case #3907/#3908/#3909（横断依存検査で共有ファイル重複を記録済み）
+- タグ: #workflow-deviation #parallel-case-open #measurement-convergence
+
+## [2026-11-04T10:30+09:00][learning_candidate][draft case_open_hints の宣言追随時期記述][Case #3910]
+- 問題事象: draft（req-draft-artifact-finalization-and-version-reconstruction）の wave_hints が ADF-COVERS(design/implementation) 宣言への REQ-105-009〜014 追加を実装の変更セットで行うと一括記述していた。case-open 契約の missing-design 0 件ゲート（設計PR作成前に design 役割の対応が必要・fail-closed）と矛盾し、hint を字義どおりに実行すると設計PRを作成できない。
+- 発生局面: 実装（case-open STEP-3/4 Definition Package 構成）
+- 検知方法: STEP-3 の宣言追随要否確認と missing-design 0 件ゲートの契約照合
+- 根本原因: wave_hints の記述が design 役割（設計PR時に必要）と implementation 役割（case-run 時に追加）の適用時期を区別せず一括で先送り記述していた
+- 自律対応内容: design 役割の宣言追随を設計PRの変更セットへ組込み（v4-operating-model.md: REQ-105-009〜014、document-type-responsibilities.md: REQ-105-011〜013）、implementation 役割の追加は case-run へ維持。区分の根拠を Root Case #3910 本文の構成上の注記へ記録し、traceability check で missing-design 0 件（対象行）を機械確認済み。
+- ユーザー確認有無: なし
+- Decision/REQ/spec影響: なし（case-open 契約の優先適用。draft hint の記述改善は req-define の case_open_hints 記述ガイダンス候補）
+- 横展開観点: REQ 行 APPEND を伴う draft の wave_hints で宣言追随時期を記述する場合、design/implementation 役割の適用時期を区別して記述する
+- 再発条件: REQ 行追加を伴い ADF-COVERS 宣言追随の先送りを wave_hints に記述する draft が case-open に入力される場合
+- 予防策候補: req-define 側の wave_hints 記述ガイダンスへ「design 役割宣言追随は設計PR変更セット、implementation 役割は実装変更セット」の区分記述を追加
+- 想定反映先: req-define の draft 生成ガイダンス（case_open_hints / wave_hints 記述規律）
+- 関連: Case #3910、PR #3912、draft .agentdev/drafts/req-draft-artifact-finalization-and-version-reconstruction.md wave_hints
+- タグ: #draft-hints #traceability-gate #case-open
