@@ -2,7 +2,7 @@
 title: ADF v5 採用規約機構（採用済み工程・成果物規約の宣言・保存・解決）
 status: draft
 created: 2026-10-09
-updated: "2026-10-09"
+updated: "2026-11-04"
 ---
 <!-- ADF-COVERS(design): REQ-104-003, REQ-104-004, REQ-104-009, REQ-104-010, REQ-104-011, REQ-104-012, REQ-104-013, REQ-104-014, REQ-105-008 -->
 
