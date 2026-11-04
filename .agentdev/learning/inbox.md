@@ -294,3 +294,11 @@
 - 出典: PR #3920 本文 `## Findings/ Capture候補`（### learning）、case-close 対応コメント issuecomment-6632234961
 - 関連: Case #3889 の「MSYS パス変換による clone 誤配置」（2026-11-02）は別事象（clone の引数パス変換）。本項は fs 操作対象パスの解釈差で重複しない。
 - タグ: #learning-capture #windows #msys #bun-fs #検証観測
+
+## [2026-11-05][learning_candidate][traceability_relied_diff T6 の期待文言と v51 Design 実文言の不整合][Case #3918]
+- 検知: bun test 分割①（QG-4 フル suite）で `traceability_relied_diff.test.ts` T6「後続消費経路の文書接続が存在する」が fail。T6 が期待する v51 Design の `impact 拡張（差分候補）` 文言が実文言に不在。main（21df6658a・84491f816）で単独再実行し同一 fail 再現（pre-existing・PR #3924 の diff 11 files は期待対象行に触れないことを `git diff 21df6658a..5fcb369d9 --name-only` で確認）。
+- 対処: 未修正（本 Issue 対象範囲外・fail は fail のまま申告・合格への読み替えなし）。PR #3924 本文 Findings に記録済み。
+- 学び: 既存 pin/期待テストの文言期待は、対象文書の節更新と同期していないと pre-existing fail として滞留する。文言期待の pin は対象文書の正規文言への追随更新を対応 PR で行うか、期待の再確認を検証差分に記録する。類似の pre-existing fail（REQ-110-041 phase_adoption_record_contract・前回 #3919 から計上継続）と合わせ、integrity suite の fail 滞留の由来分類記録に baseline 再現確認を付ける運用が機能している。
+- 出典: PR #3924 本文 `## Findings/ Capture候補`（修正候補: 同文言の正規文言への pin 更新または期待の再確認）、QG-4 機械検証の実行証跡（split1.stderr・main-relied-diff 再現ログ・C:/WINDOWS/TEMP/opencode/qg4-3918/）
+- 関連: 分割① REQ-110-041（phase_adoption_record_contract・別系統の pre-existing fail・同一分割で観測）、Case #3919（同一 2 fail の計上記録・comment 6631838809）
+- タグ: #learning-capture #traceability #relied-diff #pin期待文言 #pre-existing
