@@ -241,3 +241,18 @@
 - 想定反映先: prepare_definition_pr.ts の measurement-convergence step 実装、case-open Design「機械工程の script 呼び出し契約」節
 - 関連: Case #3909、PR #3913、Case #3902（同系統の gate 設定由来収束）、Case #3910（宣言外パス補正の区分問題）
 - タグ: #case-open #measurement-convergence #integrity #frontmatter-freshness
+
+## [2026-11-04T11:12+09:00][workflow_deviation][case-ready STEP-1 acceptance-checks][Case #3907]
+- 問題事象: accept_definition_checks.ts（acceptance-checks phase）の autogen-regeneration-diff step が、generate_indexes を手動で先行実行した未 commit の派生更新（req-health-metrics.md +1/-2）を AUTOGEN 再生成差分として検出し、警告（AUTOGEN derived files differ after regeneration / restore applied）を出して手動更新分を restore で巻き戻した（exitCategory needs-judgment・第2回実行）。
+- 発生局面: case-ready STEP-1（Definition PR 受入検査。origin/main との merge conflict 解消後の機械工程再実行）
+- 検知方法: script 報告 JSON の autogen-regeneration-diff step の diffStat と warnings（restore applied・Regeneration diff must be resolved before merge）
+- 根本原因: 機械工程手順の実行順序を守らず、generate_indexes を手動先行実行して派生更新を working tree に未 commit のまま残した。script の autogen step は working tree がクリーンである前提で git diff 差分を検出するため、手動更新分を検出対象に含めた
+- 自律対応内容: conflict 解消ファイルと generate_indexes 更新を git add して解消 commit（af44cd4d2）を作成し、working tree をクリーンにした上で acceptance-checks script を再実行（第3回）。autogen diff 0・integrity OK 951 相当・overlap 警告 4 件（既知・検出不能 0）・traceability missing-design pass を確認し merge へ進めた
+- ユーザー確認有無: なし
+- Decision/REQ/spec影響: なし（script 契約・workflow 契約の変更なし。実行順序の運用 learning）
+- 横展開観点: acceptance-checks script を実行する前に generate_indexes 等の派生更新を手動実行した場合は、必ず先に commit して working tree をクリーンにする。script は差分検出後に restore を行うため、未 commit の手動更新は失われる
+- 再発条件: Definition PR の conflict 解消後に派生物を手動生成し、commit 前に acceptance-checks script を実行する場合
+- 予防策候補: case-ready reference（definition-acceptance.md）の機械工程節へ「script 実行前の working tree クリーン前提（先行手動派生更新は commit 済みであること）」の明示追加候補。script 側の restore 対象説明の追記候補
+- 想定反映先: agentdev-workflow-case-ready の definition-acceptance.md 機械工程節、accept_definition_checks.ts の autogen-regeneration-diff step 説明
+- 関連: Case #3907、PR #3914、accept-input-3907-acceptance-report-2.json（警告証跡）、af44cd4d2（解消 commit）
+- タグ: #case-ready #acceptance-checks #generate_indexes #working-tree-cleanliness
