@@ -38,7 +38,7 @@ scripts/
 bun src/lookup.ts --dir <transitions-dir> --key <idempotency-key> --identity-file <identity.yaml>
 ```
 
-- `--identity-file` は必須（`.agentdev/phase/identity.yaml`）。既存記録の復元は、現在工程の識別状態を記録と照合して矛盾がないことを確認した後でのみ行う（REQ-111-023）。照合は逐語一致のみで行い、正規化・部分一致・自動解消を行わない。照合対象は undertaking↔scope と current_phase↔fromPhase/toPhase（current_phase は fromPhase または toPhase のいずれかと一致すればよく、終端記録 toPhase null は fromPhase のみ）。identity ファイルは読取専用であり、本 script はこれを変更しない
+- `--identity-file` は必須（`.agentdev/phase/identity.yaml`）。既存記録の復元は、現在工程の識別状態を記録と照合して矛盾がないことを確認した後でのみ行う（遷移後の現在工程の照合の規律）。照合は逐語一致のみで行い、正規化・部分一致・自動解消を行わない。照合対象は undertaking↔scope と current_phase↔fromPhase/toPhase（current_phase は fromPhase または toPhase のいずれかと一致すればよく、終端記録 toPhase null は fromPhase のみ）。identity ファイルは読取専用であり、本 script はこれを変更しない
 - 出力:
   - `{"result":"absent"}` — 記録なし。記録領域自体の不存在のみを記録不在として扱う
   - `{"result":"existing","record":{...},"path":"...","identityCheck":{"ok":true,"undertaking":"match","currentPhase":"match-toPhase"|"match-fromPhase"}}` — 既存記録の検出と identity 照合一致（再実行はこれを復元して二重実行を防ぐ）
