@@ -8,6 +8,14 @@ implementation:
     - REQ-105-006
     - REQ-105-007
     - REQ-105-008
+    - REQ-105-009
+    - REQ-105-010
+    - REQ-105-011
+    - REQ-105-014
+  src/common/skills/agentdev-artifact-semantics/scripts/README.md:
+    - REQ-105-009
+    - REQ-105-010
+    - REQ-105-011
   src/common/skills/agentdev-artifact-semantics/scripts/lib/conventions.ts:
     - REQ-105-002
     - REQ-105-003
@@ -39,9 +47,16 @@ verification:
     - REQ-105-003
     - REQ-105-004
     - REQ-105-008
+    - REQ-105-010
+    - REQ-105-013
   src/common/skills/agentdev-artifact-semantics/scripts/tests/finalization.test.ts:
     - REQ-105-006
     - REQ-105-007
+    - REQ-105-009
+    - REQ-105-010
+    - REQ-105-011
+    - REQ-105-012
+    - REQ-105-014
   src/common/skills/agentdev-artifact-semantics/scripts/tests/roles.test.ts:
     - REQ-105-001
     - REQ-105-005
