@@ -1,0 +1,15 @@
+component: req-106-111-s5-verification
+# Issue #3916（Epic #3907 Wave 2・DEL-3916-1）の S5 通し検証による verification 対応。
+# 検証成果物は docs/reports/req-106-111-s5-endtoend-case-3916.md（今回限りの記録・恒久台帳ではない）。
+# 通し検証は正規利用経路（phase-artifacts-update 手順 → agentdev-traceability relied-diff 公開 CLI →
+# agentdev-phase-theme-collaboration revision-record 公開 CLI）で実行し、
+# 観測証跡は PR 本文の検証差分セクションと一時検証環境の Git 履歴・改訂実行記録から到達できる。
+verification:
+  docs/reports/req-106-111-s5-endtoend-case-3916.md:
+  - REQ-106-012
+  - REQ-106-013
+  - REQ-106-014
+  - REQ-106-015
+  - REQ-106-016
+  - REQ-111-025
+  - REQ-111-026
