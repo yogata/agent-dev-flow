@@ -1,5 +1,5 @@
 import { test, expect, describe, beforeEach, afterEach } from "bun:test";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { readFileSync, rmSync, mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { assessFinalization, ARTIFACT_PHASES, FinalizationError } from "../lib/finalization.ts";
@@ -132,5 +132,29 @@ describe("assessFinalization", () => {
 
   test("accepts every artifact role as a phase", () => {
     expect(ARTIFACT_PHASES).toEqual(["requirement", "decision", "design", "implementation", "verification"]);
+  });
+
+  test("does not mutate the artifact or repository state when finalizing", () => {
+    // 判定は確定操作を伴わない: 判定の実行前後で成果物の内容・frontmatter・状態が変化しない
+    const before = readFileSync(join(root, DESIGN_ARTIFACT), "utf-8");
+    const result = assessFinalization(
+      root,
+      DESIGN_ARTIFACT,
+      "design",
+      [UPSTREAM_REQ],
+      [VERIFICATION_TEST],
+      artifactCoverageJson([{ reqId: UPSTREAM_REQ, role: "design", line: 1 }]),
+    );
+    expect(result.finalized).toBe(true);
+    const after = readFileSync(join(root, DESIGN_ARTIFACT), "utf-8");
+    expect(after).toBe(before);
+  });
+
+  test("returns the same verdict for identical inputs across runs", () => {
+    // 判定は既存情報（成果物・coverage 報告・REQ ファイル・検証根拠）のみから決定的に再現する
+    const coverage = artifactCoverageJson([{ reqId: UPSTREAM_REQ, role: "design", line: 1 }]);
+    const first = assessFinalization(root, DESIGN_ARTIFACT, "design", [UPSTREAM_REQ], [VERIFICATION_TEST], coverage);
+    const second = assessFinalization(root, DESIGN_ARTIFACT, "design", [UPSTREAM_REQ], [VERIFICATION_TEST], coverage);
+    expect(second).toEqual(first);
   });
 });
