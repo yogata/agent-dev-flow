@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261104T012445Z-719f",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-epic-attribution",
+  "subject": "Root Case #3908 の実行構成帰属（OU-801・OU-802、連結成分 1 件・2 units・単一ルート）",
+  "sourceRevision": "46ea3c609bf1d1d98c1f72f849c382d335fd18fc",
+  "durationMs": 1802,
+  "inputTokens": 1779,
+  "inputs": {
+    "requestDigest": "66c8b801f3440e4cca69afd9f25626ee83650e7a4355328ba5945959aadb8516"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-attribution",
+      "questionForm": "choice",
+      "value": "Standard",
+      "probabilityDistribution": {
+        "Standard": 0.99,
+        "Epic": 0.01
+      }
+    },
+    {
+      "questionId": "q-dependency-strength",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "関連": 0,
+        "弱": 0,
+        "必須": 1
+      }
+    },
+    {
+      "questionId": "q-functional-coherence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "分散": 0,
+        "部分的": 0,
+        "一貫": 1
+      }
+    }
+  ],
+  "confidence": 0.98,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-attribution",
+        "value": "Standard"
+      },
+      {
+        "questionId": "q-dependency-strength",
+        "value": 2
+      },
+      {
+        "questionId": "q-functional-coherence",
+        "value": 2
+      }
+    ]
+  }
+}
