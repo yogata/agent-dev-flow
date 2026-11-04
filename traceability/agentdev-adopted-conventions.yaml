@@ -66,3 +66,10 @@ verification:
   - REQ-104-004
   - REQ-104-006
   - REQ-104-007
+  src/common/skills/agentdev-adopted-conventions/scripts/tests/execution-connection-pins.test.ts:
+  - REQ-108-025
+  - REQ-108-026
+  - REQ-108-027
+  - REQ-108-028
+  - REQ-108-029
+  - REQ-108-030

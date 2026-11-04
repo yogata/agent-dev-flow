@@ -13,7 +13,7 @@ GitHub Issue 入力時は Root Case 指定により、Root Case の正規状態�
 
 - 要件doc（標準導線は req-define 完了直後の単一要件doc 起動 / 引数なし時は `.agentdev/drafts/req-draft-*.md` 全件処理がデフォルト / 明示パス指定 / セッション指定キーワードによるセッション内要件doc参照。暗黙判断廃止、構造化 `draft-data` 形式）
 - Issue番号（数値）または Issue URL: 既存 Root Case から継続工程（case-ready / case-run / case-close）を解決して自走する場合。Root Case 指定により、Root Case の正規状態、Epic 実行構成、既存成果物、実行の生存状況の照合で通常経路と例外経路を解決し、再合意済み Definition 変更の未適用が確認された場合は例外経路 case-revise → case-ready を駆動する
-- 実行モード指定（省略時は v4 標準モード）: v5 有限実行モード（v5 小規模連続実行モード / v5 設計確定モード）を指定できる。モード契約、v5 責務分割、移行期区別の正は workflow 実装本体（`agentdev-workflow-case-auto` スキル「v5 有限実行モード」節）が所有する
+- 実行モード指定（省略時は v4 標準モード）: v5 有限実行モード（v5 小規模連続実行モード / v5 設計確定モード / 確定済み設計からの実装接続）を指定できる。要件確定のみ・設計確定のみ・確定済み設計からの実装・検証のみの各単独工程の独立完了、小規模案件の一気通貫実行、中断・再開の実行境界を含むモード契約、v5 責務分割、移行期区別の正は workflow 実装本体（`agentdev-workflow-case-auto` スキル「v5 有限実行モード」節）が所有する
 
 ## 出力
 
