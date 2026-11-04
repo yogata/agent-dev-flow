@@ -7,6 +7,7 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { resolveBasis, identifyCriteria, type ResolutionBasis } from "../lib/resolve.ts";
 import { evaluateCriteria } from "../lib/judge.ts";
 import type { EvaluateOutcome } from "../lib/judge.ts";
@@ -380,6 +381,288 @@ describe("AC06: 同じ共通責務モデルで、単独工程の実施と一気�
       const result = judged(evaluateCriteria(root, resolveBasis(root), { checkPaths: [".agentdev/adopted-conventions.yaml"] }));
       expect(result.summary.notInCriteria).toBe(1);
       expect(result.summary.missing).toBe(0);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+});
+
+// 以下は公開 script CLI（src/resolve.ts、src/evaluate.ts）を実際に起動して
+// 出力 JSON を観測する受入テスト。解決器内部の部品試験（上記 lib 関数の直接呼出）と
+// 別経路として、実際の解決経路（公開操作・公開 script CLI）での動作を検査する。
+// REQ-104-009〜014（採用規約解決の実行経路接続）の受入シナリオを CLI 出力で確認する。
+
+const SCRIPTS_ROOT = fileURLToPath(new URL("..", import.meta.url));
+
+interface CliResult {
+  readonly exitCode: number;
+  readonly stdout: string;
+  readonly stderr: string;
+}
+
+function runCli(script: string, args: readonly string[]): CliResult {
+  const spawned = Bun.spawnSync([process.execPath, script, ...args], {
+    cwd: SCRIPTS_ROOT,
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  return {
+    exitCode: spawned.exitCode,
+    stdout: spawned.stdout.toString(),
+    stderr: spawned.stderr.toString(),
+  };
+}
+
+function cliJson(result: CliResult): Record<string, unknown> {
+  expect(result.exitCode).toBe(0);
+  return JSON.parse(result.stdout) as Record<string, unknown>;
+}
+
+describe("REQ-104-009/014: 4状態の代表事例を公開 CLI で区別して解決する", () => {
+  test("状態1（有効採用宣言あり）: resolve が adopted と特定済み基準を返し、evaluate が judged を返す", () => {
+    const root = makeProject();
+    try {
+      writeDeclaration(root, [
+        "version: adopted-conventions-v1",
+        'adoptedAt: "2026-10-10"',
+        "processes:",
+        "  - id: detail-design",
+        "    requires: []",
+        "requiredArtifacts:",
+        "  - process: detail-design",
+        "    path: docs/designs/detail-design.md",
+        "exclusions: []",
+      ]);
+      writeFile(root, "docs/designs/detail-design.md");
+      const resolved = cliJson(runCli("src/resolve.ts", ["--root", root]));
+      expect(resolved["basis"]).toBe("adopted");
+      const evaluated = cliJson(runCli("src/evaluate.ts", ["--root", root]));
+      expect(evaluated["outcome"]).toBe("judged");
+      expect((evaluated["accepted"] as boolean)).toBe(true);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("状態2（宣言なしで有効運用あり）: resolve が移行期デフォルト接続（判断留保ではない）を返し、evaluate が judgment-deferred を返す", () => {
+    const root = makeProject();
+    try {
+      // 採用宣言なし。現行運用の意味判断は呼出側の実行契約が行う（resolver は参照点の提示のみ）
+      const resolved = cliJson(runCli("src/resolve.ts", ["--root", root]));
+      expect(resolved["basis"]).toBe("transition-default");
+      expect(typeof resolved["reference"]).toBe("string");
+      expect((resolved["reference"] as string).length).toBeGreaterThan(0);
+      const evaluated = cliJson(runCli("src/evaluate.ts", ["--root", root]));
+      expect(evaluated["outcome"]).toBe("judgment-deferred");
+      // 宣言あり基準（adopted）でも実行不能留保（unresolvable）でもない
+      expect(evaluated["outcome"]).not.toBe("unresolvable");
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("状態3（両方なし）: 宣言不在は移行期デフォルト接続の参照点提示として扱われ、採用済み基準を偽らず判断留保も返さない", () => {
+    const root = makeProject();
+    try {
+      // 宣言なし・有効運用なし。resolver は宣言の有無と読取可否だけを区別し、
+      // 現行運用の有無の意味判断を呼出側に委ねる（Design「解決手順」節の契約どおり）
+      const resolved = cliJson(runCli("src/resolve.ts", ["--root", root]));
+      expect(resolved["basis"]).toBe("transition-default");
+      expect(resolved["file"]).toBe(null);
+      const evaluated = cliJson(runCli("src/evaluate.ts", ["--root", root]));
+      expect(evaluated["outcome"]).toBe("judgment-deferred");
+      expect(evaluated["verdicts"]).toBeUndefined();
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("状態4（宣言ありで読取不能）: resolve が判断留保 unresolvable を返し、移行期デフォルト接続として扱われない", () => {
+    const root = makeProject();
+    try {
+      mkdirSync(join(root, ".agentdev"), { recursive: true });
+      writeFileSync(join(root, ".agentdev", "adopted-conventions.yaml"), "version: [この行は YAML として不正", "utf8");
+      const resolved = cliJson(runCli("src/resolve.ts", ["--root", root]));
+      expect(resolved["basis"]).toBe("unresolvable");
+      expect(resolved["basis"]).not.toBe("transition-default");
+      expect(typeof resolved["reason"]).toBe("string");
+      const evaluated = cliJson(runCli("src/evaluate.ts", ["--root", root]));
+      expect(evaluated["outcome"]).toBe("unresolvable");
+      expect(evaluated["outcome"]).not.toBe("judgment-deferred");
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("状態4の別事例（schema 不適合・継承宣言なしの再構成）: 判定留保 unresolvable が返る（REQ-104-013 と共通経路）", () => {
+    const root = makeProject();
+    try {
+      writeDeclaration(root, [
+        "version: adopted-conventions-v1",
+        'adoptedAt: "2026-10-10"',
+        "processes:",
+        "  - id: design-verification",
+        "    requires: []",
+        "  - id: design-review",
+        "    requires: []",
+        "    restructuredFrom: [design-verification]",
+        "requiredArtifacts: []",
+        "exclusions: []",
+      ]);
+      const resolved = cliJson(runCli("src/resolve.ts", ["--root", root]));
+      expect(resolved["basis"]).toBe("unresolvable");
+      const issues = resolved["issues"] as readonly Record<string, unknown>[];
+      expect(issues.length).toBeGreaterThan(0);
+      expect(JSON.stringify(resolved)).toContain("inheritsObligations");
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+});
+
+describe("REQ-104-010〜013: 判定規則の代表事例を公開 CLI の公開操作契約（--scope/--check-path/--exclude）で確認する", () => {
+  test("詳細工程を採用しない事例: 標準案（参照例）のパスは not-in-criteria で欠落に計上されず、合格する（REQ-104-011）", () => {
+    const root = makeProject();
+    try {
+      writeDeclaration(root, [
+        "version: adopted-conventions-v1",
+        'adoptedAt: "2026-10-10"',
+        "processes: []",
+        "requiredArtifacts: []",
+        "exclusions: []",
+      ]);
+      const evaluated = cliJson(runCli("src/evaluate.ts", [
+        "--root", root,
+        "--check-path", "docs/designs/basic-design.md",
+        "--check-path", "docs/designs/detail-design.md",
+      ]));
+      expect(evaluated["outcome"]).toBe("judged");
+      expect((evaluated["accepted"] as boolean)).toBe(true);
+      const summary = evaluated["summary"] as Record<string, number>;
+      expect(summary["notInCriteria"]).toBe(2);
+      expect(summary["missing"]).toBe(0);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("複数詳細工程を採用した事例: --scope で採用済み各工程を単独の作業単位として解決する（REQ-104-011）", () => {
+    const root = makeProject();
+    try {
+      writeDeclaration(root, [
+        "version: adopted-conventions-v1",
+        'adoptedAt: "2026-10-10"',
+        "processes:",
+        "  - id: env-definition",
+        "    requires: []",
+        "  - id: detail-design",
+        "    requires: [env-definition]",
+        "requiredArtifacts:",
+        "  - process: env-definition",
+        "    path: docs/designs/env-definition.md",
+        "  - process: detail-design",
+        "    path: docs/designs/detail-design.md",
+        "exclusions: []",
+      ]);
+      writeFile(root, "docs/designs/env-definition.md");
+      writeFile(root, "docs/designs/detail-design.md");
+      const resolved = cliJson(runCli("src/resolve.ts", ["--root", root, "--scope", "detail-design"]));
+      expect(resolved["basis"]).toBe("adopted");
+      const criteria = resolved["criteria"] as Record<string, unknown>;
+      const processes = criteria["processes"] as readonly { id: string }[];
+      expect(processes.map((p) => p.id)).toEqual(["env-definition", "detail-design"]);
+      // 未採用の工程を scope に指定した場合は解決しない（未採用参照工程を基準に含めない）
+      const rejected = runCli("src/resolve.ts", ["--root", root, "--scope", "basic-design"]);
+      expect(rejected.exitCode).not.toBe(0);
+      expect(rejected.stderr.length).toBeGreaterThan(0);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("採用済み必須成果物が欠落した事例: missing が合格せず、--exclude の根拠確認経路でのみ解消する（REQ-104-012）", () => {
+    const root = makeProject();
+    try {
+      writeDeclaration(root, [
+        "version: adopted-conventions-v1",
+        'adoptedAt: "2026-10-10"',
+        "processes:",
+        "  - id: detail-design",
+        "    requires: []",
+        "requiredArtifacts:",
+        "  - process: detail-design",
+        "    path: docs/designs/detail-design.md",
+        "exclusions: []",
+      ]);
+      const judgedMissing = cliJson(runCli("src/evaluate.ts", ["--root", root]));
+      expect(judgedMissing["accepted"]).toBe(false);
+      const missingVerdicts = judgedMissing["verdicts"] as readonly Record<string, unknown>[];
+      expect(missingVerdicts[0]?.["status"]).toBe("missing");
+      expect(missingVerdicts[0]?.["confirmationRequired"]).toBe(true);
+      // 空の根拠は除外宣言として不成立（CLI 入力検証が非ゼロ終了で拒否する）
+      const emptyBasis = runCli("src/evaluate.ts", ["--root", root, "--exclude", "detail-design:docs/designs/detail-design.md:"]);
+      expect(emptyBasis.exitCode).not.toBe(0);
+      expect(emptyBasis.stderr.length).toBeGreaterThan(0);
+      // 根拠確認を経た除外でのみ解消する
+      const withBasis = cliJson(runCli("src/evaluate.ts", [
+        "--root", root,
+        "--exclude", "detail-design:docs/designs/detail-design.md:対象作業の実行契約で省略を明示",
+      ]));
+      expect(withBasis["accepted"]).toBe(true);
+      const excludedVerdicts = withBasis["verdicts"] as readonly Record<string, unknown>[];
+      expect(excludedVerdicts[0]?.["status"]).toBe("excluded-with-basis");
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("再構成宣言の継承必須化: 継承宣言なし・空宣言とも受理せず、継承宣言ありのみ受理して義務を保持する（REQ-104-013）", () => {
+    const root = makeProject();
+    const base = [
+      "version: adopted-conventions-v1",
+      'adoptedAt: "2026-10-10"',
+      "processes:",
+      "  - id: design-verification",
+      "    requires: []",
+      "  - id: design-review",
+      "    requires: []",
+      "    restructuredFrom: [design-verification]",
+    ];
+    try {
+      // 継承宣言なし: 受理しない（unresolvable）
+      writeDeclaration(root, [...base, "requiredArtifacts: []", "exclusions: []"]);
+      const missingInheritance = cliJson(runCli("src/resolve.ts", ["--root", root]));
+      expect(missingInheritance["basis"]).toBe("unresolvable");
+      // 空宣言（全キー空配列）: 受理しない（義務喪失として拒否）
+      writeDeclaration(root, [
+        ...base,
+        "    inheritsObligations:",
+        "      requirements: []",
+        "      constraints: []",
+        "      acceptanceCriteria: []",
+        "      verificationObligations: []",
+        "requiredArtifacts: []",
+        "exclusions: []",
+      ]);
+      const emptyInheritance = cliJson(runCli("src/resolve.ts", ["--root", root]));
+      expect(emptyInheritance["basis"]).toBe("unresolvable");
+      // 継承宣言あり: 受理し、元の義務を基準に保持する
+      writeDeclaration(root, [
+        ...base,
+        "    inheritsObligations:",
+        "      requirements:",
+        "        - 元の設計検証の要求",
+        "      verificationObligations:",
+        "        - 元の検証義務",
+        "requiredArtifacts: []",
+        "exclusions: []",
+      ]);
+      const accepted = cliJson(runCli("src/resolve.ts", ["--root", root]));
+      expect(accepted["basis"]).toBe("adopted");
+      const criteria = accepted["criteria"] as Record<string, unknown>;
+      const inherited = criteria["inheritedObligations"] as readonly Record<string, unknown>[];
+      expect(inherited).toHaveLength(1);
+      expect(JSON.stringify(inherited[0])).toContain("元の検証義務");
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
