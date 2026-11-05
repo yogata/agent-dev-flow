@@ -70,6 +70,12 @@ implementation:
     - REQ-032-038
     - REQ-032-039
     - REQ-032-042
+    - REQ-118-003
+    - REQ-118-005
+    - REQ-032-043
+    - REQ-032-044
+    - REQ-032-045
+    - REQ-032-046
   src/common/skills/agentdev-workflow-case-close/SKILL.md:
     - REQ-108-009
     - REQ-108-010
@@ -95,6 +101,12 @@ verification:
     - REQ-032-038
     - REQ-032-039
     - REQ-032-042
+    - REQ-118-003
+    - REQ-118-005
+    - REQ-032-043
+    - REQ-032-044
+    - REQ-032-045
+    - REQ-032-046
   src/common/skills/agentdev-workflow-case-close/scripts/tests/final-acceptance.test.ts:
     - REQ-032-031
     - REQ-032-032

@@ -43,6 +43,15 @@ import {
   type SubjectKind,
 } from "./final-acceptance.ts";
 import { REQ_ROW_ID_LIST_PATTERN } from "../../../agentdev-workflow-case-open/scripts/lib/definition-traceability-gate.ts";
+import {
+  readLedger,
+  resolveLedgerPath,
+  resolveMainRepoRoot,
+  type LedgerIo,
+  type LedgerReadResult,
+  type VerificationResourceEntry,
+  type VerificationResourceOwnership,
+} from "./verification-resources-ledger.ts";
 
 const USAGE = `usage: bun ./src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts --input <input.json> [--validate-input]
   --input           機械工程入力 JSON（phase、worktree_root、PR番号、品質ゲート実行仕様等）
@@ -69,6 +78,12 @@ export interface MechanicalRunner {
   readTextFile(absolutePath: string): string;
   sleep(ms: number): void;
   exists(absolutePath: string): boolean;
+  /** 台帳・終了判定記録の書出し（pre-merge 照合で使用）。未提供時は照合が成立しない。 */
+  writeTextFile?(absolutePath: string, content: string): void;
+  mkdirRecursive?(absolutePath: string): void;
+  removeFile?(absolutePath: string): void;
+  /** メインrepo root 解決（worktree 非依存。メインrepo の .git 絶対パスを返す）。 */
+  gitCommonDir?(): string;
 }
 
 export interface GateCommandSpec {
@@ -200,6 +215,8 @@ export interface CloseMechanicalInput {
   repoRoot: string;
   branch: string;
   prNumber: number;
+  /** Fresh issue_read revision (`updated_at`/Local frontmatter `updated_at`), never a git commit. */
+  issueUpdatedAt?: string;
   issueBodyPath?: string;
   epicBodyPath?: string;
   epicChildStatusUpdates?: readonly { issue: number; status: PersistedStatus }[];
@@ -217,6 +234,8 @@ export interface CloseMechanicalInput {
   acceptanceEmptyBasis?: string;
   /** pre-merge（完了判定工程）で必須の契約状態記録・未追跡残存検査の入力。 */
   contractStateCheck?: ContractStateCheck;
+  /** pre-merge（完了判定工程）で必須の検証用一時資材照合の入力（case-close 実行契約の照合規定）。 */
+  verificationResourceCheck?: VerificationResourceCheck;
 }
 
 export interface StepRecord {
@@ -462,8 +481,14 @@ export function validateInput(value: unknown): CloseMechanicalInput {
     if (typeof v.issueBodyPath !== "string" || (v.issueBodyPath as string).length === 0) {
       missing.push("issue-body-extraction");
     }
+    if (!isNonEmptyString(v.issueUpdatedAt)) {
+      missing.push("issue-updated-at");
+    }
     if (v.contractStateCheck == null) {
       missing.push("contract-state-residue-check");
+    }
+    if (v.verificationResourceCheck == null) {
+      missing.push("verification-resource-reconciliation");
     }
     if (missing.length > 0) {
       fail(
@@ -500,7 +525,104 @@ export function validateInput(value: unknown): CloseMechanicalInput {
       }
     }
   }
+  if (v.verificationResourceCheck != null) {
+    validateVerificationResourceCheckInput(v.verificationResourceCheck);
+  }
   return input;
+}
+
+/**
+ * 検証用一時資材照合入力の形式検証。検査コマンドの scope 宣言は固定必須集合の
+ * 被覆を要求し（検査設定の省略禁止）、未知 scope・実行制限確認の実体欠落は
+ * fail-closed で拒否する。
+ */
+function validateVerificationResourceCheckInput(value: unknown): void {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    fail("input.verificationResourceCheck must be an object");
+  }
+  const v = value as Record<string, unknown>;
+  if (!isNonEmptyString(v.caseId)) fail("input.verificationResourceCheck.caseId is required");
+  if (typeof v.issueNumber !== "number" || !Number.isInteger(v.issueNumber) || v.issueNumber < 1) {
+    fail("input.verificationResourceCheck.issueNumber must be a positive integer");
+  }
+  const isIdentifierRecord = (identifiers: unknown) =>
+    typeof identifiers === "object" &&
+    identifiers !== null &&
+    !Array.isArray(identifiers) &&
+    Object.keys(identifiers as Record<string, unknown>).length > 0 &&
+    Object.values(identifiers as Record<string, unknown>).every((entry) => typeof entry === "string");
+  if (!Array.isArray(v.knownResidualEntries)) {
+    fail("input.verificationResourceCheck.knownResidualEntries must be an array");
+  }
+  for (const entry of v.knownResidualEntries) {
+    const e = entry as Record<string, unknown>;
+    if (typeof entry !== "object" || entry === null || !isNonEmptyString(e.location)) {
+      fail("input.verificationResourceCheck.knownResidualEntries[].location is required");
+    }
+    if (!isIdentifierRecord(e.identifiers)) {
+      fail(
+        "input.verificationResourceCheck.knownResidualEntries[].identifiers must be a non-empty object of string values",
+      );
+    }
+  }
+  if (!Array.isArray(v.deletionConfirmations)) {
+    fail("input.verificationResourceCheck.deletionConfirmations must be an array");
+  }
+  for (const confirmation of v.deletionConfirmations) {
+    const c = confirmation as Record<string, unknown>;
+    if (typeof confirmation !== "object" || confirmation === null || !isNonEmptyString(c.entryId)) {
+      fail("input.verificationResourceCheck.deletionConfirmations[].entryId is required");
+    }
+    if (!isIdentifierRecord(c.identifiers)) {
+      fail(
+        "input.verificationResourceCheck.deletionConfirmations[].identifiers must be a non-empty object of string values",
+      );
+    }
+    if (!isNonEmptyString(c.confirmedBy) || !isNonEmptyString(c.confirmedAt)) {
+      fail(
+        "input.verificationResourceCheck.deletionConfirmations[].confirmedBy and .confirmedAt are required",
+      );
+    }
+  }
+  if (!Array.isArray(v.inspectionCommands) || v.inspectionCommands.length === 0) {
+    fail("input.verificationResourceCheck.inspectionCommands must be a non-empty array");
+  }
+  const declaredScopes = new Set<string>();
+  for (const command of v.inspectionCommands) {
+    const c = command as Record<string, unknown>;
+    if (typeof command !== "object" || command === null || !isNonEmptyString(c.scope)) {
+      fail("input.verificationResourceCheck.inspectionCommands[].scope is required");
+    }
+    if (!(REQUIRED_INSPECTION_SCOPES as readonly string[]).includes(c.scope as string)) {
+      fail(
+        `input.verificationResourceCheck.inspectionCommands[].scope must be one of: ${REQUIRED_INSPECTION_SCOPES.join(", ")} (got: ${c.scope as string})`,
+      );
+    }
+    if (!isNonEmptyString(c.command)) {
+      fail("input.verificationResourceCheck.inspectionCommands[].command is required");
+    }
+    if (!Array.isArray(c.args) || c.args.length === 0) {
+      fail("input.verificationResourceCheck.inspectionCommands[].args must be a non-empty array");
+    }
+    if (!isNonEmptyString(c.cwd)) {
+      fail("input.verificationResourceCheck.inspectionCommands[].cwd is required");
+    }
+    declaredScopes.add(c.scope as string);
+  }
+  const missingScopes = REQUIRED_INSPECTION_SCOPES.filter((scope) => !declaredScopes.has(scope));
+  if (missingScopes.length > 0) {
+    fail(
+      `input.verificationResourceCheck.inspectionCommands must cover all required inspection scopes (omission forbidden): missing ${missingScopes.join(", ")}`,
+    );
+  }
+  if (v.inspectionArtifactPaths !== undefined) {
+    const isPathList =
+      Array.isArray(v.inspectionArtifactPaths) &&
+      v.inspectionArtifactPaths.every((p) => typeof p === "string" && p.trim().length > 0);
+    if (!isPathList) {
+      fail("input.verificationResourceCheck.inspectionArtifactPaths must be an array of non-empty strings");
+    }
+  }
 }
 
 /**
@@ -558,6 +680,691 @@ function normalizeRelPath(value: string): string {
 
 function isUnderPath(candidate: string, base: string): boolean {
   return candidate === base || candidate.startsWith(`${base}/`);
+}
+
+//
+// 検証用一時資材の照合（close時）・完了拒否・終了判定記録書出し。
+// 様式の正は検証用一時資材のライフサイクル Design「照合（close時）と全終了経路」
+// 「検査対象の除外根拠」「検出範囲の宣言と未達の機械的接続」節と case-close
+// Design「機械工程の script 呼び出し契約」節、case-close 実行契約の照合・
+// 拒否・remote 判定・全終了経路規定。台帳（生成記録）モジュールは Wave-1 の
+// verification-resources-ledger.ts を消費する。
+//
+
+/**
+ * 観測手段 (a)〜(f) の検出範囲宣言（script 単一所有。入力側の検査設定の解除・
+ * 未指定で対象外・作成物ゼロ扱いにできない）。
+ */
+export const DECLARED_DETECTION_SCOPES = [
+  "dedicated-area-diff",
+  "remote-worktree-branch-enumeration",
+  "process-liveness-commandline",
+  "os-temp-area-scan",
+  "gitignored-temporary-output",
+  "known-residual-list",
+] as const;
+
+/**
+ * OS依存観測を検査コマンドとして呼出側が宣言する scope の固定必須集合。
+ * 欠落は validateInput で拒否する（検査設定の省略禁止）。
+ */
+export const REQUIRED_INSPECTION_SCOPES = [
+  "dedicated-area-listing",
+  "os-temp-area-scan",
+  "process-liveness",
+  "listen-port-check",
+  "remote-absence-verification",
+] as const;
+
+/** 機械検出も制限効果の独立観測もない作成経路を受入未達として扱う。 */
+export const CREATION_ROUTES_REQUIRING_CONTROL_CONFIRMATION = ["arbitrary-path-creation"] as const;
+
+/** 一時資材と正式成果物の役割分類値（ライフサイクル Design「正式成果物と一時資材の役割分類」節）。 */
+export type ResourceRole = "official-artifact" | "test-run-generated" | "undetermined";
+
+export interface KnownResidualEntry {
+  /** 資材の所在（絶対パスまたは URL）。 */
+  location: string;
+  /** 識別情報（最低1項目）。 */
+  identifiers: Record<string, string>;
+  /** 由来メモ（導入時に既存した検証資材の識別）。 */
+  note?: string;
+}
+
+export interface DeletionConfirmation {
+  /** 台帳エントリ ID。 */
+  entryId: string;
+  /** 確認対象の識別情報（台帳エントリの識別情報を被覆する）。 */
+  identifiers: Record<string, string>;
+  confirmedBy: string;
+  confirmedAt: string;
+}
+
+/** OS依存観測の検査コマンド仕様（scope 単位の JSON stdout 契約）。 */
+export interface InspectionCommandSpec {
+  scope: string;
+  command: string;
+  args: readonly string[];
+  cwd: string;
+  timeoutMs?: number;
+}
+
+export interface VerificationResourceCheck {
+  /** 台帳解決の案件識別子（メインrepo root の .agentdev/tmp/verification-resources/{caseId}.json）。 */
+  caseId: string;
+  /** 評価単位の子 Issue 番号（子所有エントリの照合と終了判定記録の対象）。 */
+  issueNumber: number;
+  /** 導入時既知残存リスト（観測 (f)。記載資材は存在する限り拒否理由となる）。 */
+  knownResidualEntries: readonly KnownResidualEntry[];
+  /** 削除確認記録（回収済み記録で実物消失のエントリに対応する確認）。 */
+  deletionConfirmations: readonly DeletionConfirmation[];
+  /** OS依存観測の検査コマンド仕様（scope 固定必須集合の被覆が必須）。 */
+  inspectionCommands: readonly InspectionCommandSpec[];
+  /** 検査実行が作成記録付きで書き出す特定実体のパス集合（除外根拠1の機械確認対象）。 */
+  inspectionArtifactPaths?: readonly string[];
+}
+
+export interface RemoteAbsenceJudgementInput {
+  /** HTTP 404 応答の観測（単独では不存在判定の根拠にならない）。 */
+  httpStatus404Observed: boolean;
+  authenticationConfirmed: boolean;
+  visibilityConfirmed: boolean;
+  targetIdConfirmed: boolean;
+  /** 認証・可視性・対象ID確認後に取得した、404 によらない確定的不存在根拠の記録参照。 */
+  confirmedAbsenceEvidence?: string;
+}
+
+export interface ObservedTemporaryResource {
+  path: string;
+  source: "dedicated-area" | "os-temp-area" | "gitignored-output";
+  /** 役割根拠（機械確認可能な記録の参照を持つ場合のみ有効。申告単独では除外根拠にしない）。 */
+  roleBasis?: { role: ResourceRole; basis: string };
+  /** 帰属根拠（本件と無関係の共有資材の判別根拠。帰属が確認できない場合は検査対象のまま拒否）。 */
+  attributionBasis?: string;
+}
+
+export interface VerificationResourceObservation {
+  exists(absolutePath: string): boolean;
+  /** (b) remote列挙。 */
+  remotes: readonly { name: string; url: string }[];
+  /** (b) worktree列挙。 */
+  worktrees: readonly string[];
+  /** (b) branch列挙。 */
+  branches: readonly string[];
+  /** (c) 台帳記録PIDの生存確認結果。 */
+  processes: Record<string, { alive: boolean; commandLine: string | null }>;
+  /** listenポート確認結果。 */
+  listenPorts: Record<string, { listening: boolean }>;
+  /** (b) remote不存在判定入力（URLごと。remote列挙に現れない台帳remoteの不存在判定に使用）。 */
+  remoteAbsenceInputs: Record<string, RemoteAbsenceJudgementInput>;
+  /** (a)(d)(e) 観測の実在物一覧。 */
+  observedEntries: readonly ObservedTemporaryResource[];
+  /** 検査不能・検査器異常の記録。 */
+  inspectionFailures: readonly { scope: string; reason: string; exitCode?: number }[];
+  /** 除外根拠の機械確認対象パス集合（台帳・終了判定記録自身、検査実行の作成記録付き特定実体）。 */
+  excludedPaths: readonly { path: string; basis: string }[];
+  /** 相対パス観測の絶対化基準。 */
+  resolveBase: string;
+}
+
+export type DetectionFindingCode =
+  | "ledger-missing"
+  | "ledger-unavailable"
+  | "residual-uncollected"
+  | "residual-after-collection"
+  | "deletion-confirmation-missing"
+  | "identifier-mismatch"
+  | "inspection-unavailable"
+  | "remote-absence-undetermined"
+  | "known-residual-still-present"
+  | "unregistered-resource";
+
+export interface ResourceReconciliationFinding {
+  code: DetectionFindingCode;
+  detail: string;
+}
+
+export interface VerificationResourceReconciliationEvaluation {
+  ledgerState: "missing" | "present";
+  entryCount: number;
+  childEntryCount: number;
+  findings: readonly ResourceReconciliationFinding[];
+  uncollectedParentOrCommon: readonly { id: string; ownership: VerificationResourceOwnership }[];
+  terminationUnitBlocked: boolean;
+  permitted: boolean;
+  excludedObservations: readonly { path: string; basis: string }[];
+  knownResidualStillPresent: readonly string[];
+}
+
+export interface AcceptanceGap {
+  code: "creation-route-without-detection-or-enforcement";
+  route: string;
+  detail: string;
+}
+
+export interface CloseAcceptanceRecord {
+  issueNumber: number;
+  /** GitHub/Local issue_read が返す対象 Issue の updated_at。git commit SHAではない。 */
+  targetRevision: string;
+  generatedAt: string;
+  accepted: boolean;
+}
+
+export interface EntryPresenceObservation {
+  presence: "present" | "absent" | "unavailable" | "undetermined";
+  observedIdentifiers?: Record<string, string>;
+  observationBasis: string;
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+/**
+ * 一時資材と正式成果物の役割分類。分類は役割根拠（機械確認可能な
+ * 記録の参照を持つ roleBasis）で判定し、拡張子・testという名前・git追跡済みという
+ * 事実単独では正式成果物（回収対象外）に分類しない。役割根拠のない候補は
+ * undetermined（一時資材候補として検査対象）とする。
+ */
+export function classifyResourceRole(candidate: {
+  fileName?: string;
+  extension?: string;
+  isGitTracked?: boolean;
+  roleBasis?: { role: ResourceRole; basis: string };
+}): { role: ResourceRole; basis: string | null } {
+  const basis = candidate.roleBasis;
+  if (
+    basis !== undefined &&
+    (basis.role === "official-artifact" || basis.role === "test-run-generated") &&
+    basis.basis.trim().length > 0
+  ) {
+    return { role: basis.role, basis: basis.basis };
+  }
+  return { role: "undetermined", basis: null };
+}
+
+/**
+ * remote 上の対象の不存在判定（case-close 実行契約の remote 判定規定）。HTTP 404 単独では
+ * 不存在と判定せず、認証・可視性・対象IDの確認を要求する。確認後も確定的不存在根拠が
+ * 得られない場合は undetermined（終了拒否）とする。
+ */
+export function evaluateRemoteAbsenceJudgement(
+  input: RemoteAbsenceJudgementInput,
+): { verdict: "confirmed-absent" | "undetermined"; basis: string } {
+  if (!input.authenticationConfirmed || !input.visibilityConfirmed || !input.targetIdConfirmed) {
+    return {
+      verdict: "undetermined",
+      basis: "authentication, visibility, or target-id confirmation is missing",
+    };
+  }
+  const evidence =
+    typeof input.confirmedAbsenceEvidence === "string" ? input.confirmedAbsenceEvidence.trim() : "";
+  if (evidence.length === 0) {
+    return {
+      verdict: "undetermined",
+      basis:
+        "the target remains undetermined after authentication, visibility and target-id confirmation (an HTTP 404 alone does not establish absence)",
+    };
+  }
+  return { verdict: "confirmed-absent", basis: evidence };
+}
+
+export function normalizeObservationPath(value: string): string {
+  return value.replace(/\\/g, "/").replace(/^\.\//, "").replace(/\/+$/, "");
+}
+
+function isUnderNormalizedPath(candidate: string, base: string): boolean {
+  return candidate === base || candidate.startsWith(`${base}/`);
+}
+
+function resolveObservationPath(value: string, base: string): string {
+  const normalizedValue = value.replace(/\\/g, "/");
+  const normalizedBase = base.replace(/\\/g, "/").replace(/\/+$/, "");
+  if (path.isAbsolute(value) || normalizedValue === normalizedBase || normalizedValue.startsWith(`${normalizedBase}/`)) {
+    return value;
+  }
+  if (/^<[^>]+>$/.test(normalizedBase)) return `${normalizedBase}/${normalizedValue.replace(/^\.\//, "")}`;
+  return path.resolve(base, value);
+}
+
+const ABSOLUTE_URL_LOCATION_PATTERN = /^[a-z][a-z0-9+.-]*:\/\//;
+const SCP_LIKE_URL_LOCATION_PATTERN = /^git@[^:]+:/;
+
+function isUrlLocation(location: string): boolean {
+  return ABSOLUTE_URL_LOCATION_PATTERN.test(location) || SCP_LIKE_URL_LOCATION_PATTERN.test(location);
+}
+
+/** 台帳エントリの識別情報と観測識別情報の交差突合（観測に存在するキーのみ比較）。 */
+export function evaluateIdentifierMatch(
+  entryIdentifiers: Record<string, string>,
+  observed: Record<string, string>,
+): { matched: boolean; mismatchedKeys: readonly string[] } {
+  const mismatchedKeys: string[] = [];
+  for (const [key, expected] of Object.entries(entryIdentifiers)) {
+    const actual = observed[key];
+    if (actual === undefined) continue;
+    if (actual !== expected) mismatchedKeys.push(key);
+  }
+  return { matched: mismatchedKeys.length === 0, mismatchedKeys };
+}
+
+/**
+ * 台帳エントリの実物観測状態の導出。remote URL 形・パス形の location 判定に
+ * identifiers ベースの PID・listen 観測を結合する。remote 不存在判定が
+ * undetermined の場合は照合自体が成立しないため undetermined を優先する。
+ */
+export function deriveEntryPresence(
+  entry: VerificationResourceEntry,
+  observation: VerificationResourceObservation,
+): EntryPresenceObservation {
+  const observedIdentifiers: Record<string, string> = {};
+  let presentEvidence = "";
+  let missingEvidence = "";
+  let unavailableEvidence = "";
+  let remoteAbsenceUndetermined = false;
+
+  const remoteMatch = observation.remotes.find((remote) => remote.url === entry.location);
+  if (remoteMatch !== undefined) {
+    presentEvidence = `remote enumeration contains the recorded URL: ${entry.location}`;
+    observedIdentifiers.url = entry.location;
+  } else if (isUrlLocation(entry.location)) {
+    const absenceInput = observation.remoteAbsenceInputs[entry.location];
+    const judgement = absenceInput === undefined
+      ? {
+          verdict: "undetermined" as const,
+          basis: "no remote absence verification observation is provided for the recorded URL",
+        }
+      : evaluateRemoteAbsenceJudgement(absenceInput);
+    if (judgement.verdict === "confirmed-absent") {
+      missingEvidence = `remote absence confirmed after authentication, visibility and target-id verification: ${judgement.basis}`;
+    } else {
+      remoteAbsenceUndetermined = true;
+      unavailableEvidence = `remote absence could not be determined after verification: ${judgement.basis}`;
+    }
+  } else if (observation.exists(entry.location)) {
+    presentEvidence = `filesystem observation confirms the recorded location exists: ${entry.location}`;
+    observedIdentifiers.path = entry.location;
+  } else {
+    const worktreeMatch = observation.worktrees.some(
+      (worktree) => normalizeObservationPath(worktree) === normalizeObservationPath(entry.location),
+    );
+    if (worktreeMatch) {
+      presentEvidence = `git worktree enumeration contains the recorded location: ${entry.location}`;
+      observedIdentifiers.path = entry.location;
+    } else {
+      missingEvidence = `filesystem observation does not confirm the recorded location: ${entry.location}`;
+    }
+  }
+
+  const pid = entry.identifiers.pid;
+  if (pid !== undefined) {
+    const processObservation = observation.processes[pid];
+    if (processObservation === undefined) {
+      unavailableEvidence = unavailableEvidence === ""
+        ? `process liveness observation does not cover the recorded pid: ${pid}`
+        : unavailableEvidence;
+    } else if (processObservation.alive) {
+      presentEvidence = presentEvidence === "" ? `the recorded pid is alive: ${pid}` : presentEvidence;
+      observedIdentifiers.pid = pid;
+      if (processObservation.commandLine !== null && processObservation.commandLine !== undefined) {
+        observedIdentifiers.commandLine = processObservation.commandLine;
+      }
+    } else {
+      missingEvidence = missingEvidence === "" ? `the recorded pid is not alive: ${pid}` : missingEvidence;
+    }
+  }
+
+  const listenPort = entry.identifiers.listenPort;
+  if (listenPort !== undefined) {
+    const portObservation = observation.listenPorts[listenPort];
+    if (portObservation === undefined) {
+      unavailableEvidence = unavailableEvidence === ""
+        ? `listen port observation does not cover the recorded port: ${listenPort}`
+        : unavailableEvidence;
+    } else if (portObservation.listening) {
+      presentEvidence = presentEvidence === "" ? `the recorded listen port is active: ${listenPort}` : presentEvidence;
+      observedIdentifiers.listenPort = listenPort;
+    } else {
+      missingEvidence = missingEvidence === "" ? `the recorded listen port is not active: ${listenPort}` : missingEvidence;
+    }
+  }
+
+  const branch = entry.identifiers.branch;
+  if (branch !== undefined && presentEvidence === "") {
+    const branchMatch = observation.branches.some((name) => name === branch);
+    if (branchMatch) {
+      presentEvidence = `branch enumeration contains the recorded branch: ${branch}`;
+      observedIdentifiers.branch = branch;
+    }
+  }
+
+  if (remoteAbsenceUndetermined) {
+    return { presence: "undetermined", observationBasis: unavailableEvidence };
+  }
+  if (presentEvidence !== "") {
+    return { presence: "present", observedIdentifiers, observationBasis: presentEvidence };
+  }
+  if (unavailableEvidence !== "" && missingEvidence !== "") {
+    return {
+      presence: "unavailable",
+      observationBasis: `incomplete observation (${unavailableEvidence}; ${missingEvidence})`,
+    };
+  }
+  if (unavailableEvidence !== "") {
+    return { presence: "unavailable", observationBasis: unavailableEvidence };
+  }
+  if (missingEvidence !== "") {
+    return { presence: "absent", observationBasis: missingEvidence };
+  }
+  return {
+    presence: "unavailable",
+    observationBasis: "no observation basis covers the recorded location or identifiers",
+  };
+}
+
+/**
+ * 削除確認記録が台帳エントリの識別情報を被覆し値一致する場合のみ有効な確認として
+ * 受理する（同名別物・PID再利用の防止。確認済み識別情報との対応が確認の前提）。
+ */
+function deletionConfirmationCoversEntry(
+  entry: VerificationResourceEntry,
+  confirmation: DeletionConfirmation,
+): boolean {
+  return Object.entries(entry.identifiers).every(
+    ([key, value]) => confirmation.identifiers[key] === value,
+  );
+}
+
+/**
+ * 観測実在物の未登録判定。除外根拠（台帳・終了判定記録自身、検査実行の作成記録付き
+ * 特定実体、正式成果物の役割根拠、無関係共有資材の帰属根拠）と台帳・既知残存リストの
+ * 突合を行い、根拠のない実在物を未登録として検出する。帰属が機械確認できない実体は
+ * 検査対象のまま拒否する。
+ */
+export function evaluateUnregisteredObservations(
+  observedEntries: readonly ObservedTemporaryResource[],
+  entries: readonly VerificationResourceEntry[],
+  knownResidualEntries: readonly KnownResidualEntry[],
+  excludedPaths: readonly { path: string; basis: string }[],
+  resolveBase: string,
+): {
+  findings: readonly ResourceReconciliationFinding[];
+  excludedObservations: readonly { path: string; basis: string }[];
+  knownResidualStillPresent: readonly string[];
+} {
+  const findings: ResourceReconciliationFinding[] = [];
+  const excludedObservations: { path: string; basis: string }[] = [];
+  const knownResidualStillPresent: string[] = [];
+  const normalizedExcluded = excludedPaths.map((entry) => ({
+    ...entry,
+    normalized: normalizeObservationPath(resolveObservationPath(entry.path, resolveBase)),
+  }));
+  const normalizedLedgerLocations = entries.map((entry) => ({
+    id: entry.id,
+    normalized: normalizeObservationPath(resolveObservationPath(entry.location, resolveBase)),
+  }));
+  const normalizedKnown = knownResidualEntries.map((entry) => ({
+    ...entry,
+    normalized: normalizeObservationPath(resolveObservationPath(entry.location, resolveBase)),
+  }));
+  for (const observed of observedEntries) {
+    const normalized = normalizeObservationPath(resolveObservationPath(observed.path, resolveBase));
+    const exclusion = normalizedExcluded.find((entry) =>
+      isUnderNormalizedPath(normalized, entry.normalized),
+    );
+    if (exclusion !== undefined) {
+      excludedObservations.push({ path: observed.path, basis: exclusion.basis });
+      continue;
+    }
+    const registered = normalizedLedgerLocations.some((entry) => entry.normalized === normalized);
+    if (registered) continue;
+    const known = normalizedKnown.find((entry) => entry.normalized === normalized);
+    if (known !== undefined) {
+      knownResidualStillPresent.push(observed.path);
+      findings.push({
+        code: "known-residual-still-present",
+        detail: `known residual list entry is still present: ${observed.path} (source: ${observed.source}${known.note !== undefined ? `, note: ${known.note}` : ""})`,
+      });
+      continue;
+    }
+    if (observed.roleBasis?.role === "official-artifact" && observed.roleBasis.basis.trim().length > 0) {
+      excludedObservations.push({ path: observed.path, basis: "official-artifact-role-basis" });
+      continue;
+    }
+    if (typeof observed.attributionBasis === "string" && observed.attributionBasis.trim().length > 0) {
+      excludedObservations.push({ path: observed.path, basis: "unrelated-shared-resource-attribution" });
+      continue;
+    }
+    findings.push({
+      code: "unregistered-resource",
+      detail: `no ledger record or exclusion basis for the observed temporary resource: ${observed.path} (source: ${observed.source})`,
+    });
+  }
+  return { findings, excludedObservations, knownResidualStillPresent };
+}
+
+/**
+ * 検証用一時資材の照合判定（case-close 実行契約の照合・完了拒否規定）。子 Issue の終了判定は子所有の
+ * 一時資材のみを照合対象とし、親・共通の未回収は終了単位の全体未完了
+ * （terminationUnitBlocked）として報告する（Design 台帳節「評価単位」）。
+ */
+export function evaluateVerificationResourceReconciliation(
+  ledger: LedgerReadResult,
+  observation: VerificationResourceObservation,
+  check: VerificationResourceCheck,
+): VerificationResourceReconciliationEvaluation {
+  const findings: ResourceReconciliationFinding[] = [];
+  const uncollectedParentOrCommon: { id: string; ownership: VerificationResourceOwnership }[] = [];
+
+  for (const failure of observation.inspectionFailures) {
+    findings.push({
+      code: "inspection-unavailable",
+      detail: `inspection is unavailable for scope ${failure.scope}: ${failure.reason}${failure.exitCode !== undefined ? ` (exitCode: ${failure.exitCode})` : ""}`,
+    });
+  }
+
+  if (ledger.state === "missing") {
+    findings.push({
+      code: "ledger-missing",
+      detail:
+        "the verification resources ledger is missing (a missing generation record is not treated as evidence of zero creations)",
+    });
+  }
+
+  const childEntries = ledger.entries.filter(
+    (entry) => entry.ownership === "child" && entry.childIssue === check.issueNumber,
+  );
+  for (const entry of ledger.entries) {
+    if (entry.ownership === "child" && entry.childIssue === check.issueNumber) continue;
+    if (entry.collectedAt === null) {
+      uncollectedParentOrCommon.push({ id: entry.id, ownership: entry.ownership });
+    }
+  }
+
+  for (const entry of childEntries) {
+    const presence = deriveEntryPresence(entry, observation);
+    if (presence.presence === "undetermined") {
+      findings.push({
+        code: "remote-absence-undetermined",
+        detail: `${entry.id}: ${presence.observationBasis}`,
+      });
+      continue;
+    }
+    if (presence.presence === "unavailable") {
+      findings.push({
+        code: "inspection-unavailable",
+        detail: `${entry.id}: ${presence.observationBasis}`,
+      });
+      continue;
+    }
+    if (presence.presence === "present") {
+      const match = evaluateIdentifierMatch(entry.identifiers, presence.observedIdentifiers ?? {});
+      if (!match.matched) {
+        findings.push({
+          code: "identifier-mismatch",
+          detail: `${entry.id}: observed identifiers differ from the ledger record (keys: ${match.mismatchedKeys.join(", ")})`,
+        });
+      }
+      if (entry.collectedAt === null) {
+        findings.push({
+          code: "residual-uncollected",
+          detail: `${entry.id}: the resource is still present and collection is not confirmed (${presence.observationBasis})`,
+        });
+      } else {
+        findings.push({
+          code: "residual-after-collection",
+          detail: `${entry.id}: the resource is still present although the ledger records it as collected`,
+        });
+      }
+      continue;
+    }
+    if (entry.collectedAt === null) {
+      findings.push({
+        code: "residual-uncollected",
+        detail: `${entry.id}: the resource is not observed and collection is not confirmed (${presence.observationBasis})`,
+      });
+    } else {
+      const confirmation = check.deletionConfirmations.find((c) => c.entryId === entry.id);
+      if (confirmation === undefined || !deletionConfirmationCoversEntry(entry, confirmation)) {
+        findings.push({
+          code: "deletion-confirmation-missing",
+          detail: `${entry.id}: the resource is absent after a recorded collection, without a deletion confirmation matching the recorded identifiers`,
+        });
+      }
+    }
+  }
+
+  const unregistered = evaluateUnregisteredObservations(
+    observation.observedEntries,
+    ledger.entries,
+    check.knownResidualEntries,
+    observation.excludedPaths,
+    observation.resolveBase,
+  );
+  findings.push(...unregistered.findings);
+
+  return {
+    ledgerState: ledger.state,
+    entryCount: ledger.entries.length,
+    childEntryCount: childEntries.length,
+    findings,
+    uncollectedParentOrCommon,
+    terminationUnitBlocked: uncollectedParentOrCommon.length > 0,
+    permitted: findings.length === 0,
+    excludedObservations: unregistered.excludedObservations,
+    knownResidualStillPresent: unregistered.knownResidualStillPresent,
+  };
+}
+
+/**
+ * 受入未達の集約判定（ライフサイクル Design「検出範囲の宣言と未達の機械的接続」節）。
+ * 機械検出も実行制限も宣言された検出範囲に対して
+ * 成立しない作成経路が残る場合、当該経路を受入未達として報告し、終了操作の許可判定は
+ * 受入不成立として扱う。申告された集合だけの検査を成立扱いにしない。
+ */
+export function deriveAcceptanceGaps(): readonly AcceptanceGap[] {
+  return CREATION_ROUTES_REQUIRING_CONTROL_CONFIRMATION.map((route) => ({
+    code: "creation-route-without-detection-or-enforcement",
+    route,
+    detail: `the route lacks an independently executed observation of the external control's actual effect (declared detection scopes: ${DECLARED_DETECTION_SCOPES.join(", ")}); caller-provided route, basis, or confirmer strings are not effect evidence`,
+  }));
+}
+
+/** 終了判定記録の保存場所（main repo root 固定・worktree 非依存）。 */
+export function resolveCloseAcceptanceRecordPath(mainRepoRoot: string, issueNumber: number): string {
+  const root = mainRepoRoot.replace(/[\\/]+$/, "");
+  if (root.length === 0) throw new MechanicalInputError("mainRepoRoot is required");
+  if (!Number.isInteger(issueNumber) || issueNumber < 1) {
+    throw new MechanicalInputError("issueNumber must be a positive integer");
+  }
+  return path.join(root, ".agentdev", "close-acceptance", `issue-${String(issueNumber).padStart(4, "0")}.json`);
+}
+
+/** 終了判定記録の直列化（Design 様式: 対象Issue番号・判定対象版・判定生成時刻・判定内容）。 */
+export function serializeCloseAcceptanceRecord(record: CloseAcceptanceRecord): string {
+  return `${JSON.stringify(record, null, 2)}\n`;
+}
+
+interface CloseAcceptanceRecordWrite {
+  path: string | null;
+  record: CloseAcceptanceRecord | null;
+  written: boolean;
+  error: string | null;
+}
+
+function writeCloseAcceptanceRecord(
+  input: CloseMechanicalInput,
+  runner: MechanicalRunner,
+  accepted: boolean,
+): CloseAcceptanceRecordWrite {
+  const issueNumber = input.verificationResourceCheck?.issueNumber;
+  if (issueNumber === undefined) {
+    return {
+      path: null,
+      record: null,
+      written: false,
+      error: "the verification resource check has no target Issue number",
+    };
+  }
+  if (!isNonEmptyString(input.issueUpdatedAt)) {
+    return {
+      path: null,
+      record: null,
+      written: false,
+      error: "the current Issue updated_at revision is missing",
+    };
+  }
+  let record: CloseAcceptanceRecord | null = null;
+  let recordPath: string | null = null;
+  try {
+    const ledgerIo = requireRunnerLedgerIo(runner);
+    const mainRepoRoot = resolveMainRepoRoot(ledgerIo);
+    recordPath = resolveCloseAcceptanceRecordPath(mainRepoRoot, issueNumber);
+    record = {
+      issueNumber,
+      targetRevision: input.issueUpdatedAt,
+      generatedAt: new Date().toISOString(),
+      accepted,
+    };
+    ledgerIo.mkdirRecursive(path.dirname(recordPath));
+    ledgerIo.writeTextFile(recordPath, serializeCloseAcceptanceRecord(record));
+    return { path: recordPath, record, written: true, error: null };
+  } catch (error) {
+    let invalidationError: string | null = null;
+    if (!accepted && recordPath !== null) {
+      try {
+        if (runner.exists(recordPath)) {
+          if (runner.removeFile === undefined) {
+            throw new MechanicalInputError("runner does not provide removeFile to invalidate an old acceptance record");
+          }
+          runner.removeFile(recordPath);
+        }
+      } catch (removeError) {
+        invalidationError = `old acceptance record invalidation failed: ${String(removeError)}`;
+      }
+    }
+    return {
+      path: recordPath,
+      record,
+      written: false,
+      error: [
+        `close acceptance record ${accepted ? "finalization" : "invalidation"} failed: ${String(error)}`,
+        invalidationError,
+      ].filter((entry): entry is string => entry !== null).join("; "),
+    };
+  }
+}
+
+function isCloseAcceptanceReady(report: CloseMechanicalReport): boolean {
+  if (report.result.phase !== "pre-merge" || report.result.exitCategory !== "success") return false;
+  const evaluation = report.diff.acceptanceEvaluation as AcceptanceEvaluationReport | undefined;
+  if (evaluation?.determined !== true || evaluation.closeAllowed !== true) return false;
+  const reconciliation = report.diff.verificationResourceReconciliation as
+    | { permitted?: boolean }
+    | undefined;
+  if (reconciliation?.permitted !== true) return false;
+  const acceptanceGaps = report.diff.acceptanceGaps as readonly AcceptanceGap[] | undefined;
+  return acceptanceGaps !== undefined && acceptanceGaps.length === 0;
 }
 
 /**
@@ -884,8 +1691,31 @@ export function isCloseOperationPermitted(
   if (evaluation.closeAllowed !== true) {
     return { permitted: false, reason: "acceptance-denied" };
   }
-  if (report.result.exitCategory === "failure") {
+  const reconciliation = report.diff.verificationResourceReconciliation as
+    | { permitted?: boolean }
+    | undefined;
+  if (reconciliation === undefined || reconciliation.permitted !== true) {
+    return { permitted: false, reason: "verification-resource-reconciliation-denied" };
+  }
+  const failedOtherGate = report.result.steps.some(
+    (step) =>
+      step.status === "fail" &&
+      step.name !== "verification-resource-reconciliation" &&
+      step.name !== "close-acceptance-record",
+  );
+  if (failedOtherGate) return { permitted: false, reason: "mechanical-failure" };
+  const acceptanceGaps = report.diff.acceptanceGaps as readonly AcceptanceGap[] | undefined;
+  if (acceptanceGaps === undefined || acceptanceGaps.length > 0) {
+    return { permitted: false, reason: "acceptance-gap-remains" };
+  }
+  if (report.result.exitCategory !== "success") {
     return { permitted: false, reason: "mechanical-failure" };
+  }
+  const record = report.diff.closeAcceptanceRecord as
+    | { accepted?: boolean; written?: boolean }
+    | undefined;
+  if (record?.accepted !== true || record.written !== true) {
+    return { permitted: false, reason: "close-acceptance-record-not-accepted" };
   }
   return { permitted: true };
 }
@@ -982,6 +1812,344 @@ function runSpec(runner: MechanicalRunner, spec: GateCommandSpec): CommandResult
   return runner.run({ command: spec.command, args: spec.args, cwd: spec.cwd, timeoutMs: spec.timeoutMs });
 }
 
+function requireRunnerLedgerIo(runner: MechanicalRunner): LedgerIo {
+  const writeTextFile = runner.writeTextFile;
+  const mkdirRecursive = runner.mkdirRecursive;
+  const gitCommonDir = runner.gitCommonDir;
+  return {
+    exists: (absolutePath) => runner.exists(absolutePath),
+    readTextFile: (absolutePath) => runner.readTextFile(absolutePath),
+    writeTextFile: (absolutePath, content) => {
+      if (writeTextFile === undefined) {
+        throw new MechanicalInputError(
+          "runner does not provide writeTextFile for close acceptance record writing",
+        );
+      }
+      writeTextFile(absolutePath, content);
+    },
+    mkdirRecursive: (absolutePath) => {
+      if (mkdirRecursive === undefined) {
+        throw new MechanicalInputError(
+          "runner does not provide mkdirRecursive for close acceptance record writing",
+        );
+      }
+      mkdirRecursive(absolutePath);
+    },
+    gitCommonDir: () => {
+      if (gitCommonDir === undefined) {
+        throw new MechanicalInputError("runner does not provide gitCommonDir for main repo root resolution");
+      }
+      return gitCommonDir();
+    },
+  };
+}
+
+function parseGitRemotesListing(text: string): { name: string; url: string }[] {
+  const seen = new Set<string>();
+  const result: { name: string; url: string }[] = [];
+  for (const line of text.split("\n")) {
+    const trimmed = line.trim();
+    if (trimmed.length === 0) continue;
+    const match = trimmed.match(/^(\S+)\t(\S+)/);
+    if (!match) continue;
+    const key = `${match[1]} ${match[2]}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push({ name: match[1] ?? "", url: match[2] ?? "" });
+  }
+  return result;
+}
+
+function parseWorktreeListing(text: string): string[] {
+  const result: string[] = [];
+  for (const line of text.split("\n")) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith("worktree ")) {
+      const value = trimmed.slice("worktree ".length).trim();
+      if (value.length > 0) result.push(value);
+    }
+  }
+  return result;
+}
+
+function parseBranchListing(text: string): string[] {
+  return text.split("\n").map((line) => line.trim()).filter((line) => line.length > 0);
+}
+
+function isJsonObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * 検証用一時資材の照合を実行し、照合 step・報告 diff・受入未達を組み立てる。
+ * 観測は申告（台帳）と独立に git 列挙・検査コマンドで実行し、観測の欠落・不一致を
+ * findings として検出する（Design「専用領域と作成経路の制限」節の観測手段 (a)〜(f)）。
+ * 終了判定記録は permitted / denied の双方で書き出す（機械受理前提の消費対象）。
+ */
+function executeVerificationResourceReconciliation(
+  input: CloseMechanicalInput,
+  check: VerificationResourceCheck,
+  runner: MechanicalRunner,
+  ledgerIo: LedgerIo,
+): {
+  step: StepRecord;
+  diff: VerificationResourceReconciliationEvaluation;
+  gaps: readonly AcceptanceGap[];
+} {
+  const earlyFindings: ResourceReconciliationFinding[] = [];
+  const observationFailures: { scope: string; reason: string; exitCode?: number }[] = [];
+
+  let mainRepoRoot: string | null;
+  try {
+    mainRepoRoot = resolveMainRepoRoot(ledgerIo);
+  } catch (error) {
+    mainRepoRoot = null;
+    earlyFindings.push({
+      code: "ledger-unavailable",
+      detail: `main repo root resolution failed: ${String(error)}`,
+    });
+  }
+
+  let ledger: LedgerReadResult = { state: "missing", entries: [] };
+  let ledgerPath: string | null = null;
+  if (earlyFindings.length === 0 && mainRepoRoot !== null) {
+    try {
+      ledgerPath = resolveLedgerPath(mainRepoRoot, check.caseId);
+      ledger = readLedger(ledgerIo, ledgerPath);
+    } catch (error) {
+      earlyFindings.push({
+        code: "ledger-unavailable",
+        detail: `ledger read failed: ${String(error)}`,
+      });
+    }
+  }
+
+  const remotesResult = runner.run({ command: "git", args: ["remote", "-v"], cwd: input.repoRoot });
+  if (remotesResult.exitCode !== 0) {
+    observationFailures.push({
+      scope: "remote-worktree-branch-enumeration",
+      reason: `git remote listing failed: ${remotesResult.stderr.trim()}`,
+      exitCode: remotesResult.exitCode,
+    });
+  }
+  const worktreeResult = runner.run({
+    command: "git",
+    args: ["worktree", "list", "--porcelain"],
+    cwd: input.repoRoot,
+  });
+  if (worktreeResult.exitCode !== 0) {
+    observationFailures.push({
+      scope: "remote-worktree-branch-enumeration",
+      reason: `git worktree listing failed: ${worktreeResult.stderr.trim()}`,
+      exitCode: worktreeResult.exitCode,
+    });
+  }
+  const branchResult = runner.run({
+    command: "git",
+    args: ["branch", "--list", "--all", "--format=%(refname:short)"],
+    cwd: input.repoRoot,
+  });
+  if (branchResult.exitCode !== 0) {
+    observationFailures.push({
+      scope: "remote-worktree-branch-enumeration",
+      reason: `git branch listing failed: ${branchResult.stderr.trim()}`,
+      exitCode: branchResult.exitCode,
+    });
+  }
+  const gitignoredResult = runner.run({
+    command: "git",
+    args: ["ls-files", "--others", "-i", "--exclude-standard"],
+    cwd: input.repoRoot,
+  });
+  if (gitignoredResult.exitCode !== 0) {
+    observationFailures.push({
+      scope: "gitignored-temporary-output",
+      reason: `gitignore 対象一時出力の列挙 failed: ${gitignoredResult.stderr.trim()}`,
+      exitCode: gitignoredResult.exitCode,
+    });
+  }
+
+  const dedicatedEntries: string[] = [];
+  const osTempMatches: string[] = [];
+  const processes: Record<string, { alive: boolean; commandLine: string | null }> = {};
+  const listenPorts: Record<string, { listening: boolean }> = {};
+  const remoteAbsenceInputs: Record<string, RemoteAbsenceJudgementInput> = {};
+  for (const spec of check.inspectionCommands) {
+    const result = runner.run({
+      command: spec.command,
+      args: spec.args,
+      cwd: spec.cwd,
+      timeoutMs: spec.timeoutMs,
+    });
+    if (result.exitCode !== 0) {
+      observationFailures.push({
+        scope: spec.scope,
+        reason: `inspection command failed: ${result.stderr.trim().slice(-200)}`,
+        exitCode: result.exitCode,
+      });
+      continue;
+    }
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(result.stdout);
+    } catch (error) {
+      observationFailures.push({
+        scope: spec.scope,
+        reason: `inspection output is not valid JSON: ${String(error)}`,
+      });
+      continue;
+    }
+    if (!isJsonObject(parsed)) {
+      observationFailures.push({
+        scope: spec.scope,
+        reason: "inspection output does not match the declared JSON contract shape",
+      });
+      continue;
+    }
+    let shapeOk = false;
+    if (spec.scope === "dedicated-area-listing" && Array.isArray(parsed.entries)) {
+      for (const entry of parsed.entries) {
+        if (isNonEmptyString(entry)) dedicatedEntries.push(entry);
+      }
+      shapeOk = true;
+    } else if (spec.scope === "os-temp-area-scan" && Array.isArray(parsed.matches)) {
+      for (const entry of parsed.matches) {
+        if (isNonEmptyString(entry)) osTempMatches.push(entry);
+      }
+      shapeOk = true;
+    } else if (spec.scope === "process-liveness") {
+      for (const [pid, value] of Object.entries(parsed)) {
+        if (isJsonObject(value) && typeof value.alive === "boolean") {
+          processes[pid] = {
+            alive: value.alive,
+            commandLine: typeof value.commandLine === "string" ? value.commandLine : null,
+          };
+        }
+      }
+      shapeOk = true;
+    } else if (spec.scope === "listen-port-check") {
+      for (const [port, value] of Object.entries(parsed)) {
+        if (isJsonObject(value) && typeof value.listening === "boolean") {
+          listenPorts[port] = { listening: value.listening };
+        }
+      }
+      shapeOk = true;
+    } else if (spec.scope === "remote-absence-verification") {
+      let validRemoteObservations = true;
+      for (const [url, value] of Object.entries(parsed)) {
+        if (
+          !isJsonObject(value) ||
+          typeof value.httpStatus404Observed !== "boolean" ||
+          typeof value.authenticationConfirmed !== "boolean" ||
+          typeof value.visibilityConfirmed !== "boolean" ||
+          typeof value.targetIdConfirmed !== "boolean" ||
+          (value.confirmedAbsenceEvidence !== undefined && typeof value.confirmedAbsenceEvidence !== "string")
+        ) {
+          validRemoteObservations = false;
+          continue;
+        }
+        remoteAbsenceInputs[url] = {
+          httpStatus404Observed: value.httpStatus404Observed,
+          authenticationConfirmed: value.authenticationConfirmed,
+          visibilityConfirmed: value.visibilityConfirmed,
+          targetIdConfirmed: value.targetIdConfirmed,
+          ...(typeof value.confirmedAbsenceEvidence === "string"
+            ? { confirmedAbsenceEvidence: value.confirmedAbsenceEvidence }
+            : {}),
+        };
+      }
+      shapeOk = validRemoteObservations;
+    }
+    if (!shapeOk) {
+      observationFailures.push({
+        scope: spec.scope,
+        reason: "inspection output does not match the declared JSON contract shape",
+      });
+    }
+  }
+
+  const gitignoredOutputs =
+    gitignoredResult.exitCode === 0
+      ? gitignoredResult.stdout.split("\n").map((line) => line.trim()).filter((line) => line.length > 0)
+      : [];
+  // gitignore 対象出力は案件識別子の有無で除外せず、台帳・既知残存・明示除外根拠と突合する。
+  const observedEntries: ObservedTemporaryResource[] = [
+    ...dedicatedEntries.map((entry) => ({ path: entry, source: "dedicated-area" as const })),
+    ...osTempMatches.map((entry) => ({ path: entry, source: "os-temp-area" as const })),
+    ...gitignoredOutputs.map((entry) => ({ path: entry, source: "gitignored-output" as const })),
+  ];
+
+  const excludedPaths = [
+    {
+      path: path.join(mainRepoRoot ?? input.repoRoot, ".agentdev", "tmp", "verification-resources"),
+      basis: "ledger-itself",
+    },
+    {
+      path: path.join(mainRepoRoot ?? input.repoRoot, ".agentdev", "close-acceptance"),
+      basis: "close-acceptance-record-itself",
+    },
+    ...(check.inspectionArtifactPaths ?? []).map((entry) => ({
+      path: entry,
+      basis: "inspection-execution-recorded-artifact",
+    })),
+  ];
+
+  const evaluation =
+    earlyFindings.length === 0
+      ? evaluateVerificationResourceReconciliation(
+          ledger,
+          {
+            exists: (absolutePath) => ledgerIo.exists(absolutePath),
+            remotes: parseGitRemotesListing(remotesResult.stdout),
+            worktrees: parseWorktreeListing(worktreeResult.stdout),
+            branches: parseBranchListing(branchResult.stdout),
+            processes,
+            listenPorts,
+            remoteAbsenceInputs,
+            observedEntries,
+            inspectionFailures: observationFailures,
+            excludedPaths,
+            resolveBase: input.repoRoot,
+          },
+          check,
+        )
+      : null;
+  const gaps = deriveAcceptanceGaps();
+  const mergedFindings: ResourceReconciliationFinding[] = [
+    ...earlyFindings,
+    ...(evaluation?.findings ?? []),
+  ];
+
+  const permitted = mergedFindings.length === 0;
+  const step: StepRecord = {
+    name: "verification-resource-reconciliation",
+    status: permitted && gaps.length === 0 ? "pass" : "fail",
+    detail: {
+      ledgerState: ledger.state,
+      ledgerPath,
+      mainRepoRoot: mainRepoRoot ?? "",
+      entryCount: ledger.entries.length,
+      childEntryCount: evaluation?.childEntryCount ?? 0,
+      findings: mergedFindings,
+      permitted,
+      gaps,
+      declaredDetectionScopes: [...DECLARED_DETECTION_SCOPES],
+    },
+  };
+  const diff = {
+    ledgerState: ledger.state,
+    entryCount: ledger.entries.length,
+    childEntryCount: evaluation?.childEntryCount ?? 0,
+    findings: mergedFindings,
+    permitted,
+    uncollectedParentOrCommon: evaluation?.uncollectedParentOrCommon ?? [],
+    terminationUnitBlocked: evaluation?.terminationUnitBlocked ?? false,
+    excludedObservations: evaluation?.excludedObservations ?? [],
+    knownResidualStillPresent: evaluation?.knownResidualStillPresent ?? [],
+  };
+  return { step, diff, gaps };
+}
+
 function runAcceptanceEvaluation(
   input: CloseMechanicalInput,
   population: ConditionPopulation,
@@ -1030,6 +2198,35 @@ export function runCloseMechanicalSteps(
   const diff: Record<string, unknown> = {};
   const proposal: Record<string, string> = {};
   const worktreeCwd = path.resolve(input.repoRoot, input.worktreeRoot);
+  let provisionalAcceptanceRecord: CloseAcceptanceRecordWrite | null = null;
+  let acceptanceRecordStep: StepRecord | null = null;
+
+  if (input.phase === "pre-merge") {
+    provisionalAcceptanceRecord = writeCloseAcceptanceRecord(input, runner, false);
+    acceptanceRecordStep = {
+      name: "close-acceptance-record",
+      status: provisionalAcceptanceRecord.written ? "pass" : "fail",
+      detail: {
+        path: provisionalAcceptanceRecord.path,
+        targetRevision: provisionalAcceptanceRecord.record?.targetRevision ?? null,
+        accepted: false,
+        written: provisionalAcceptanceRecord.written,
+        error: provisionalAcceptanceRecord.error,
+      },
+    };
+    steps.push(acceptanceRecordStep);
+    diff.closeAcceptanceRecord = {
+      path: provisionalAcceptanceRecord.path,
+      issueNumber: provisionalAcceptanceRecord.record?.issueNumber ?? null,
+      targetRevision: provisionalAcceptanceRecord.record?.targetRevision ?? null,
+      generatedAt: provisionalAcceptanceRecord.record?.generatedAt ?? null,
+      accepted: false,
+      written: provisionalAcceptanceRecord.written,
+    };
+    if (!provisionalAcceptanceRecord.written) {
+      warnings.push(provisionalAcceptanceRecord.error ?? "close acceptance record invalidation failed");
+    }
+  }
 
   if (input.phase === "pre-merge") {
     for (const spec of [...(input.integrityGates ?? []), input.generateIndexesGate, input.traceabilityGate, input.textlintGate]) {
@@ -1125,6 +2322,24 @@ export function runCloseMechanicalSteps(
       acceptancePopulation,
       steps,
     );
+
+    const verificationResourceCheck = input.verificationResourceCheck
+      ?? fail("input.verificationResourceCheck is required for pre-merge completion determination");
+    const reconciliation = executeVerificationResourceReconciliation(
+      input,
+      verificationResourceCheck,
+      runner,
+      requireRunnerLedgerIo(runner),
+    );
+    steps.push(reconciliation.step);
+    diff.verificationResourceReconciliation = reconciliation.diff;
+    diff.acceptanceGaps = reconciliation.gaps;
+    if (!reconciliation.diff.permitted) {
+      warnings.push("verification-resource reconciliation failed; close operation is denied");
+    }
+    if (reconciliation.gaps.length > 0) {
+      warnings.push("creation routes remain without verified detection or enforcement; close operation is denied");
+    }
 
     // 契約状態記録・未追跡残存検査（完了判定工程）。検証範囲は
     // 正規契約から導出した全状態記録パスとリポジトリ全体の未追跡対象であり、
@@ -1327,7 +2542,39 @@ export function runCloseMechanicalSteps(
     if (!cleanupOk) warnings.push("worktree/branch cleanup did not fully complete (要判断)");
   }
 
-  return assembleReport(input.phase, steps, diff, warnings, proposal);
+  let report = assembleReport(input.phase, steps, diff, warnings, proposal);
+  if (input.phase === "pre-merge" && provisionalAcceptanceRecord !== null && acceptanceRecordStep !== null) {
+    let finalAcceptanceRecord = provisionalAcceptanceRecord;
+    if (isCloseAcceptanceReady(report)) {
+      const acceptedWrite = writeCloseAcceptanceRecord(input, runner, true);
+      finalAcceptanceRecord = acceptedWrite.written
+        ? acceptedWrite
+        : writeCloseAcceptanceRecord(input, runner, false);
+      acceptanceRecordStep.status = acceptedWrite.written ? "pass" : "fail";
+      if (!acceptedWrite.written) {
+        warnings.push(acceptedWrite.error ?? "close acceptance record finalization failed");
+      }
+    }
+    const accepted = finalAcceptanceRecord.written && finalAcceptanceRecord.record?.accepted === true;
+    acceptanceRecordStep.detail = {
+      path: finalAcceptanceRecord.path,
+      targetRevision: finalAcceptanceRecord.record?.targetRevision ?? input.issueUpdatedAt ?? null,
+      generatedAt: finalAcceptanceRecord.record?.generatedAt ?? null,
+      accepted,
+      written: finalAcceptanceRecord.written,
+      error: finalAcceptanceRecord.error,
+    };
+    diff.closeAcceptanceRecord = {
+      path: finalAcceptanceRecord.path,
+      issueNumber: finalAcceptanceRecord.record?.issueNumber ?? input.verificationResourceCheck?.issueNumber ?? null,
+      targetRevision: finalAcceptanceRecord.record?.targetRevision ?? input.issueUpdatedAt ?? null,
+      generatedAt: finalAcceptanceRecord.record?.generatedAt ?? null,
+      accepted,
+      written: finalAcceptanceRecord.written,
+    };
+    report = assembleReport(input.phase, steps, diff, warnings, proposal);
+  }
+  return report;
 }
 
 function main(): void {
@@ -1373,6 +2620,26 @@ function main(): void {
       },
       readTextFile(absolutePath) {
         return fs.readFileSync(absolutePath, "utf-8");
+      },
+      writeTextFile(absolutePath, content) {
+        fs.writeFileSync(absolutePath, content, "utf-8");
+      },
+      mkdirRecursive(absolutePath) {
+        fs.mkdirSync(absolutePath, { recursive: true });
+      },
+      removeFile(absolutePath) {
+        fs.rmSync(absolutePath, { force: true });
+      },
+      gitCommonDir() {
+        const result = spawnSync(
+          "git",
+          ["rev-parse", "--path-format=absolute", "--git-common-dir"],
+          { cwd: repoRootAbsolute, encoding: "utf-8", timeout: 10000 },
+        );
+        if (result.status !== 0) {
+          throw new MechanicalInputError(`cannot resolve main repository git common dir: ${result.stderr ?? ""}`);
+        }
+        return result.stdout ?? "";
       },
       sleep(ms) {
         Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
