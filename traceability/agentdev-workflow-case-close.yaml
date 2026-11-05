@@ -1,5 +1,13 @@
 component: agentdev-workflow-case-close
 implementation:
+  src/common/skills/agentdev-workflow-case-close/scripts/src/verification-resources-ledger.ts:
+    - REQ-118-001
+    - REQ-118-002
+    - REQ-118-004
+    - REQ-118-008
+  src/common/skills/agentdev-workflow-case-close/scripts/src/verification-resource-register.ts:
+    - REQ-118-001
+    - REQ-118-004
   src/common/skills/agentdev-workflow-case-close/references/cleanup-and-capture.md:
     - REQ-018-008
     - REQ-032-007
@@ -68,6 +76,14 @@ implementation:
     - REQ-032-042
     - REQ-108-020
 verification:
+  src/common/skills/agentdev-workflow-case-close/scripts/tests/verification-resources-ledger.test.ts:
+    - REQ-118-001
+    - REQ-118-002
+    - REQ-118-004
+    - REQ-118-008
+  src/common/skills/agentdev-workflow-case-close/scripts/tests/verification-resource-register.test.ts:
+    - REQ-118-001
+    - REQ-118-004
   src/common/skills/agentdev-workflow-case-close/scripts/tests/close-validate-input.test.ts:
     - REQ-009-053
   src/common/skills/agentdev-workflow-case-close/scripts/tests/close_mechanical_steps.test.ts:
