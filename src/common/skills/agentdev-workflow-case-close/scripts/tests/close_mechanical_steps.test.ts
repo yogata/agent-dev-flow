@@ -2379,3 +2379,44 @@ describe("検証用一時資材の回収実行面（Wave-2: 台帳回収・終�
     expect(valid.reclamation?.ledger?.caseId).toBe("3928");
   });
 });
+
+// ---------------------------------------------------------------
+// 終了判定記録（.agentdev/close-acceptance/）の参照 pin（Wave-2 #3932）。
+// 書出し側（機械工程）と読み取り検証側（agentdev_gh issue_close 前提検証）の
+// 契約の正は Design 文書に置かれており、本 pin はその契約行の存続を固定する。
+// ---------------------------------------------------------------
+describe("終了判定記録の契約参照 pin（custom-tool-contracts・verification-resource-lifecycle）", () => {
+  test("issue_close の終了前提（Tool 実行境界）の契約行が Design 正本に存在する", () => {
+    const toolContracts = fs.readFileSync(
+      path.join(
+        REPO_ROOT,
+        "docs",
+        "designs",
+        "responsibilities",
+        "custom-tool-contracts.md",
+      ),
+      "utf-8",
+    );
+    expect(toolContracts).toContain("issue_close の終了前提（Case Issue）");
+    expect(toolContracts).toContain(".agentdev/close-acceptance/issue-{NNNN}.json");
+    expect(toolContracts).toContain("追跡Issue（tracking role）の終了には本前提を適用しない");
+    expect(toolContracts).toContain("fail-closed");
+    expect(toolContracts).toContain("REQ-052-018");
+  });
+
+  test("終了判定記録の様式（対象 Issue 番号・判定対象版・判定生成時刻・判定内容）の契約行がライフサイクル Design に存在する", () => {
+    const lifecycle = fs.readFileSync(
+      path.join(
+        REPO_ROOT,
+        "docs",
+        "designs",
+        "workflows",
+        "verification-resource-lifecycle.md",
+      ),
+      "utf-8",
+    );
+    expect(lifecycle).toContain("終了判定記録の様式は対象 Issue 番号、判定対象版（close 時点の対象を識別する版情報）、判定生成時刻、判定内容を含み");
+    expect(lifecycle).toContain("issue_reopen は当該 Issue の終了判定記録を無効化する");
+    expect(lifecycle).toContain("issue_close は、Case Issue（case role）への終了操作について、呼出元の申告によらず自ら終了判定記録を読み取り検証し");
+  });
+});

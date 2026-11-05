@@ -251,6 +251,7 @@ describe("CliRunner: 各操作の API 写像", () => {
         state: "OPEN",
         labels: [{ name: "bug" }],
         state_reason: null,
+        updated_at: "2026-10-01T00:00:00Z",
       }),
       stderr: "",
     }));
@@ -265,6 +266,7 @@ describe("CliRunner: 各操作の API 写像", () => {
         labels: ["bug"],
         role: "case",
         closeReason: null,
+        updatedAt: "2026-10-01T00:00:00Z",
       });
     }
     expect(calls[0]?.args).toContain("repos/owner/repo/issues/7");
@@ -280,6 +282,7 @@ describe("CliRunner: 各操作の API 写像", () => {
         state: "open",
         labels: [{ name: "tracking" }],
         state_reason: null,
+        updated_at: "2026-10-01T00:00:00Z",
       }),
       stderr: "",
     }));
@@ -302,6 +305,7 @@ describe("CliRunner: 各操作の API 写像", () => {
         state: "closed",
         labels: [{ name: "tracking" }],
         state_reason: "not_planned",
+        updated_at: "2026-10-01T00:00:00Z",
       }),
       stderr: "",
     }));
@@ -486,7 +490,7 @@ describe("CliRunner: 各操作の API 写像", () => {
       if (i >= 0) body = fs.readFileSync(call.args[i + 1] as string, "utf8");
       return {
         status: 0,
-        stdout: JSON.stringify({ number: 7, state: "closed" }),
+        stdout: JSON.stringify({ number: 7, state: i >= 0 ? "closed" : "open", labels: [{ name: "tracking" }] }),
         stderr: "",
       };
     });
@@ -496,7 +500,8 @@ describe("CliRunner: 各操作の API 写像", () => {
     });
     expect(reply.ok).toBe(true);
     expect(JSON.parse(body)).toEqual({ state: "closed", state_reason: "not_planned" });
-    expect(calls[0]?.args.slice(0, 4)).toEqual(["api", "-X", "PATCH", "repos/owner/repo/issues/7"]);
+    expect(calls[0]?.args).toEqual(["api", "repos/owner/repo/issues/7"]);
+    expect(calls[1]?.args.slice(0, 4)).toEqual(["api", "-X", "PATCH", "repos/owner/repo/issues/7"]);
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
@@ -683,6 +688,8 @@ interface StubIssue {
   state: "open" | "closed";
   state_reason: string | null;
   labels: string[];
+  /** GitHub API 準拠の updated_at（issue_read の runner payload 内部契約・終了判定記録の判定対象版照合に使用）。 */
+  updated_at?: string;
 }
 
 interface StubComment {
@@ -733,6 +740,7 @@ function issueJson(issue: StubIssue): Record<string, unknown> {
     state: issue.state.toUpperCase(),
     state_reason: issue.state_reason,
     labels: issue.labels.map((name) => ({ name })),
+    updated_at: issue.updated_at ?? "2026-10-01T00:00:00Z",
     html_url: `https://example/i/${issue.number}`,
   };
 }

@@ -267,6 +267,7 @@ export type GhToolSuccess =
       readonly labels: readonly string[];
       readonly role: "tracking" | "case";
       readonly closeReason: "completed" | "not_planned" | null;
+      readonly updatedAt?: string;
     }
   | {
       readonly operation: "issue_update";

@@ -7,10 +7,17 @@
 // Local バックエンドは一時 issuesDir の実ファイルで検証する。
 // engine（runAgentdevGhOperation）の VERIFY を通過した操作だけが
 // ok:true を返すため、ok:true の連なりが読み戻し検証の証跡になる。
+//
+// TS-007 終了経路シナリオ（issue_close の終了前提検証）も本 helper が共有する。
+// Case Issue の終了は、main repo root 固定の機械受理の終了判定記録
+// （.agentdev/close-acceptance/issue-{NNNN}.json）を経由しない限り拒否される
+// （fail-closed）。記録の書出し本体は case-close 機械工程（別実行単位）の責務であり、
+// 本シナリオは書出し相当の fixture で記録を用意して読み取り検証側を検証する。
 
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
+import type { CloseAcceptanceIo } from "../close-acceptance.ts";
 import type { GhExec, GhSpawnError } from "../runner-cli.ts";
 
 interface StubIssue {
@@ -20,6 +27,8 @@ interface StubIssue {
   state: "open" | "closed";
   state_reason: string | null;
   labels: string[];
+  /** GitHub API 準拠の updated_at（終了判定記録の判定対象版照合に使用）。 */
+  updated_at?: string;
 }
 
 interface StubComment {
@@ -38,6 +47,7 @@ function issueJson(issue: StubIssue): Record<string, unknown> {
     state: issue.state.toUpperCase(),
     state_reason: issue.state_reason,
     labels: issue.labels.map((name) => ({ name })),
+    updated_at: issue.updated_at ?? "2026-10-01T00:00:00Z",
     html_url: `https://example/i/${issue.number}`,
   };
 }
@@ -85,6 +95,7 @@ export function createGitHubStub(init: { issues?: StubIssue[]; comments?: StubCo
         state: "open",
         state_reason: null,
         labels: (inputBody.labels as string[] | undefined ?? []).filter((l) => typeof l === "string"),
+        updated_at: "2026-10-01T00:00:00Z",
       };
       issues.push(issue);
       return {
@@ -108,6 +119,7 @@ export function createGitHubStub(init: { issues?: StubIssue[]; comments?: StubCo
           issue.state = inputBody.state;
           issue.state_reason = (inputBody.state_reason as string | null) ?? null;
         }
+        issue.updated_at = "2026-10-01T01:00:00Z";
       }
       return { status: 0, stdout: JSON.stringify(issueJson(issue)), stderr: "" };
     }
@@ -214,3 +226,143 @@ export function makeTempDir(prefix: string): string {
 }
 
 export type { GhSpawnError };
+
+// -------------------------------------------------------------------------
+// TS-007 終了経路シナリオ（issue_close の終了前提検証・Case Issue）
+// -------------------------------------------------------------------------
+
+/** 終了判定記録 fixture（main repo root 固定の保存場所と I/O 注入）。 */
+export interface CloseAcceptanceFixture {
+  /** fixture のメイン repo root（記録の保存場所の基準）。 */
+  readonly mainRoot: string;
+  /** main root の .git を指す I/O（engine の終了前提検証へ注入する）。 */
+  readonly io: CloseAcceptanceIo;
+}
+
+/** 終了判定記録 fixture の作成（実 fs + gitCommonDir を main root の .git に固定）。 */
+export function makeCloseAcceptanceFixture(prefix: string): CloseAcceptanceFixture {
+  const mainRoot = fs.mkdtempSync(path.join(import.meta.dir, prefix));
+  fs.mkdirSync(path.join(mainRoot, ".git"), { recursive: true });
+  return {
+    mainRoot,
+    io: {
+      exists: (p) => fs.existsSync(p),
+      readTextFile: (p) => fs.readFileSync(p, "utf8"),
+      gitCommonDir: () => path.join(mainRoot, ".git"),
+    },
+  };
+}
+
+function closeAcceptanceRecordPath(fixture: CloseAcceptanceFixture, issueNumber: number): string {
+  return path.join(
+    fixture.mainRoot,
+    ".agentdev",
+    "close-acceptance",
+    `issue-${String(issueNumber).padStart(4, "0")}.json`,
+  );
+}
+
+/** 終了判定記録の書出し（機械工程の書出し相当 fixture）。 */
+export function writeCloseAcceptanceRecord(
+  fixture: CloseAcceptanceFixture,
+  issueNumber: number,
+  record: Record<string, unknown>,
+): void {
+  const file = closeAcceptanceRecordPath(fixture, issueNumber);
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, JSON.stringify(record), "utf8");
+}
+
+/** 生テキストの終了判定記録書出し（形式不正 fixture 用）。 */
+export function writeRawCloseAcceptanceRecord(
+  fixture: CloseAcceptanceFixture,
+  issueNumber: number,
+  raw: string,
+): void {
+  const file = closeAcceptanceRecordPath(fixture, issueNumber);
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, raw, "utf8");
+}
+
+/** ローカルIssueファイルの updated_at（frontmatter）を読む（Local 組合せの判定対象版の観測値）。 */
+export function localIssueUpdatedAt(issuesDir: string, issueNumber: number): string {
+  const file = path.join(issuesDir, `issue-${String(issueNumber).padStart(4, "0")}.md`);
+  const raw = fs.readFileSync(file, "utf8");
+  const m = /^updated_at: "?([^"\n]+)"?$/m.exec(raw);
+  if (m === null) throw new Error(`updated_at not found in ${file}`);
+  return m[1]?.trim() ?? "";
+}
+
+export interface CaseCloseRouteOutcome {
+  readonly label: string;
+  readonly result: StepResult;
+  readonly stateAfterRefusal?: unknown;
+}
+
+/**
+ * Case Issue の終了経路シナリオ（TS-007）。
+ * 起票 → 記録なし拒否 → 形式不正拒否 → 対象不一致拒否 → 判定不成立拒否 →
+ * 判定対象版不一致（過去の合格結果の再利用）拒否 → 検証成立時の終了 → 読み戻し、
+ * の順に実行する。記録の書出しは判定対象版（currentRevision の観測値）を用いて
+ * 各拒否ケースごとに差し替える。
+ */
+export async function runCaseIssueCloseRoute(
+  execute: (step: OperationStep) => Promise<StepResult>,
+  fixture: CloseAcceptanceFixture,
+  currentRevision: () => string,
+): Promise<CaseCloseRouteOutcome[]> {
+  const outcomes: CaseCloseRouteOutcome[] = [];
+  const run = async (label: string, step: OperationStep): Promise<StepResult> => {
+    const result = await execute(step);
+    if (step.operation === "issue_close" && !result.ok) {
+      const read = await execute({ operation: "issue_read", args: { number: step.args.number } });
+      outcomes.push({ label, result, stateAfterRefusal: read.payload?.state });
+    } else {
+      outcomes.push({ label, result });
+    }
+    return result;
+  };
+  const created = await run("起票(case)", {
+    operation: "issue_create",
+    args: { title: "統合試験 Case Issue", body: "TS-007 本文", labels: ["feature"], role: "case" },
+  });
+  if (!created.ok || created.payload === null) return outcomes;
+  const issueNumber = Number(created.payload.number);
+  const close = (reason = "completed"): OperationStep => ({
+    operation: "issue_close",
+    args: { number: issueNumber, reason },
+  });
+  await run("〔1〕記録なし拒否", close());
+  writeRawCloseAcceptanceRecord(fixture, issueNumber, "not-json{{{");
+  await run("〔2〕形式不正拒否", close());
+  writeCloseAcceptanceRecord(fixture, issueNumber, {
+    issueNumber: issueNumber + 1,
+    targetRevision: currentRevision(),
+    generatedAt: "2026-11-05T00:00:00Z",
+    accepted: true,
+  });
+  await run("〔3〕対象不一致拒否", close());
+  writeCloseAcceptanceRecord(fixture, issueNumber, {
+    issueNumber,
+    targetRevision: currentRevision(),
+    generatedAt: "2026-11-05T00:00:00Z",
+    accepted: false,
+  });
+  await run("〔4〕判定不成立拒否", close());
+  writeCloseAcceptanceRecord(fixture, issueNumber, {
+    issueNumber,
+    targetRevision: "2020-01-01T00:00:00Z",
+    generatedAt: "2026-11-05T00:00:00Z",
+    accepted: true,
+  });
+  await run("〔5〕判定対象版不一致（過去の合格結果の再利用）拒否", close());
+  writeCloseAcceptanceRecord(fixture, issueNumber, {
+    issueNumber,
+    targetRevision: currentRevision(),
+    generatedAt: "2026-11-05T00:00:00Z",
+    accepted: true,
+  });
+  await run("検証成立時の終了", close());
+  await run("読み戻し(closed)", { operation: "issue_read", args: { number: issueNumber } });
+  return outcomes;
+}

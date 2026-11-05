@@ -1,10 +1,14 @@
 // agentdev-gh Custom Tool の fail-closed 実行ゲート（決定6）。
 //
 // 全操作に共通する実行制御を所有する:
-//   1. preflight  : 設定解釈（config-uninterpretable）とパス解決（path-unresolvable）。
-//                   いずれか失敗すれば対象副作用を実行しない。
-//   2. 実行       : 操作スペックの execute を呼ぶ。例外・異常終了は enforcement-crashed。
-//   3. VERIFY     : 読み戻し照合。失敗・未了は verification-incomplete とし成功扱いとしない。
+//   1. preflight   : 設定解釈（config-uninterpretable）とパス解決（path-unresolvable）。
+//                    いずれか失敗すれば対象副作用を実行しない。
+//   2. 入力解釈    : 操作スペックの validate。契約違反は invalid-input。
+//   3. 前提検証    : 操作スペックの precondition（省略可）。操作単位の実行前提
+//                    （例: issue_close の終了前提検証）を runner 副作用の前に検証し、
+//                    不成立時は対象副作用を実行しない。
+//   4. 実行        : 操作スペックの execute を呼ぶ。例外・異常終了は enforcement-crashed。
+//   5. VERIFY      : 読み戻し照合。失敗・未了は verification-incomplete とし成功扱いとしない。
 //
 // Tool は実行機構であり、副作用の実行権限の所有者を変更しない。
 // 権限の判断・承認は Workflow / 利用者側に留まり、本 Tool は操作の実行と検証のみを担う。
@@ -14,12 +18,14 @@ import {
   GH_TOOL_OPERATION_CATALOG,
   type CapabilityContingency,
   type GhToolFailure,
+  type GhToolFailureKind,
   type GhToolOperation,
   type GhToolRequest,
   type GhToolResult,
   type GhToolSuccess,
   type OperationCatalogEntry,
 } from "./contracts.ts";
+import { defaultCloseAcceptanceIo, type CloseAcceptanceIo } from "./close-acceptance.ts";
 import type { GhRunner, GhRunnerFailureClass, GhRunnerRequest } from "./runner.ts";
 
 // ---------------------------------------------------------------------------
@@ -176,11 +182,37 @@ export type ValidateOutcome =
   | { readonly ok: true; readonly request: GhToolRequest }
   | { readonly ok: false; readonly error: InputContractError };
 
+/**
+ * 操作単位の実行前提検証に注入する依存（実行時は既定実装、テストは偽実装）。
+ */
+export interface OperationDeps {
+  /** issue_close の終了前提検証が読み取る判定記録 I/O。 */
+  readonly closeAcceptanceIo: CloseAcceptanceIo;
+  /** 前提検証の実行コンテキスト（省略時は process.cwd()。worktree コンテキスト解決の検査に注入する）。 */
+  readonly cwd?: string;
+}
+
+/** 前提検証の不成立（構造化失敗。contingency は engine が操作カタログから付与する）。 */
+export type PreconditionFailure = {
+  readonly kind: GhToolFailureKind;
+  readonly retryable: boolean;
+  readonly detail: string;
+};
+
 /** 操作ごとの差分実装。specs-issue.ts / specs-pr.ts が全操作分を定義する。 */
 export interface OperationSpec {
   readonly operation: GhToolOperation;
   /** 未検証の要求（unknown）を構造化入力へ解釈する。失敗は構造化エラー（invalid-input）。 */
   readonly validate: (raw: unknown) => ValidateOutcome;
+  /**
+   * 副作用実行前の前提検証（省略可）。null は前提成立、それ以外は
+   * 対象副作用を実行せず返される構造化失敗（fail-closed）。
+   */
+  readonly precondition?: (
+    runner: GhRunner,
+    request: GhToolRequest,
+    deps: OperationDeps,
+  ) => Promise<PreconditionFailure | null>;
   /** runner への構造化要求の組立て。 */
   readonly buildRequest: (request: GhToolRequest) => GhRunnerRequest;
   /** 実行応答の解釈。失敗は operation-failed。 */
@@ -220,13 +252,14 @@ async function callRunner(
 
 /**
  * fail-closed 実行ゲート。全操作がこの順序を通る:
- * preflight（環境構築時）→ 入力解釈 → 実行 → 読み戻し照合 → 成功。
+ * preflight（環境構築時）→ 入力解釈 → 前提検証 → 実行 → 読み戻し照合 → 成功。
  * いずれかの段階が失敗すれば成功を返さない。
  */
 export async function executeOperation(
   env: GhToolEnv,
   spec: OperationSpec,
   rawRequest: unknown,
+  deps?: Partial<OperationDeps>,
 ): Promise<GhToolResult> {
   const validated = spec.validate(rawRequest);
   if (!validated.ok) {
@@ -238,12 +271,37 @@ export async function executeOperation(
         `(${validated.error.code} [${validated.error.field}]: ${validated.error.detail})`,
     );
   }
+  if (spec.precondition !== undefined) {
+    const operationDeps: OperationDeps = {
+      closeAcceptanceIo: deps?.closeAcceptanceIo ?? defaultCloseAcceptanceIo(),
+      ...(deps?.cwd !== undefined ? { cwd: deps.cwd } : {}),
+    };
+    let preconditionFailure: PreconditionFailure | null;
+    try {
+      preconditionFailure = await spec.precondition(env.runner, validated.request, operationDeps);
+    } catch (e) {
+      return fail(
+        spec.operation,
+        "enforcement-crashed",
+        false,
+        `precondition check threw: ${e instanceof Error ? e.message : String(e)}`,
+      );
+    }
+    if (preconditionFailure !== null) {
+      return fail(
+        spec.operation,
+        preconditionFailure.kind,
+        preconditionFailure.retryable,
+        preconditionFailure.detail,
+      );
+    }
+  }
   const run = await callRunner(env.runner, spec.buildRequest(validated.request));
   if (!run.ok) {
     return fail(
       spec.operation,
       run.failureClass,
-      true,
+      run.failureClass !== "verification-incomplete" && run.failureClass !== "path-unresolvable",
       `operation execution failed (${run.failureClass}): ${run.error}`,
     );
   }

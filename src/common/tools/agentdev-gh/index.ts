@@ -13,7 +13,7 @@ import {
   GH_TOOL_OPERATIONS,
   type GhToolResult,
 } from "./contracts.ts";
-import type { GhToolEnv, OperationSpec } from "./engine.ts";
+import type { GhToolEnv, OperationDeps, OperationSpec } from "./engine.ts";
 import { executeOperation } from "./engine.ts";
 import { ISSUE_OPERATION_SPECS, COMMENT_OPERATION_SPECS } from "./specs-issue.ts";
 import { PR_OPERATION_SPECS } from "./specs-pr.ts";
@@ -62,6 +62,7 @@ const SPECS_BY_OPERATION: ReadonlyMap<string, OperationSpec> = new Map(
 export async function runAgentdevGhOperation(
   env: GhToolEnv,
   rawRequest: unknown,
+  deps?: Partial<OperationDeps>,
 ): Promise<GhToolResult> {
   if (typeof rawRequest !== "object" || rawRequest === null) {
     return {
@@ -98,7 +99,7 @@ export async function runAgentdevGhOperation(
       },
     };
   }
-  return executeOperation(env, spec, rawRequest);
+  return executeOperation(env, spec, rawRequest, deps);
 }
 
 export { buildGhToolEnv, executeOperation } from "./engine.ts";
@@ -106,7 +107,19 @@ export type {
   GhToolConfig,
   GhToolEnv,
   GhToolPaths,
+  OperationDeps,
   OperationSpec,
   PathProber,
+  PreconditionFailure,
 } from "./engine.ts";
+export {
+  closeAcceptanceRecordFileName,
+  defaultCloseAcceptanceIo,
+  parseCloseAcceptanceRecord,
+  resolveCloseAcceptanceRecordPath,
+  resolveMainRepoRoot,
+  verifyCloseAcceptanceForClose,
+  type CloseAcceptanceIo,
+  type CloseAcceptanceRecord,
+} from "./close-acceptance.ts";
 export type { GhRunner, GhRunnerReply, GhRunnerRequest } from "./runner.ts";

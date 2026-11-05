@@ -22,6 +22,13 @@ import {
 } from "../runner-local.ts";
 import { buildGhToolEnv, type GhToolEnv } from "../../engine.ts";
 import { runAgentdevGhOperation } from "../../index.ts";
+import type { CloseAcceptanceIo } from "../../close-acceptance.ts";
+import {
+  localIssueUpdatedAt,
+  makeCloseAcceptanceFixture,
+  writeCloseAcceptanceRecord,
+  writeRawCloseAcceptanceRecord,
+} from "../../tests/four-combination-shared.ts";
 import type { GhRunnerReply, GhRunnerRequest } from "../../runner.ts";
 
 function makeIssuesDir(): string {
@@ -56,8 +63,12 @@ function makeEnv(issuesDir: string): GhToolEnv {
   return result.env;
 }
 
-async function run(issuesDir: string, request: GhRunnerRequest): Promise<GhRunnerReply> {
-  const runner = createLocalRunner({ issuesDir });
+async function run(
+  issuesDir: string,
+  request: GhRunnerRequest,
+  closeAcceptanceIo?: CloseAcceptanceIo,
+): Promise<GhRunnerReply> {
+  const runner = createLocalRunner({ issuesDir, ...(closeAcceptanceIo ? { closeAcceptanceIo } : {}) });
   return runner.run(request);
 }
 
@@ -829,13 +840,22 @@ describe("LocalRunner: クローズと再オープン", () => {
 
   test("case の close は reason で closed / cancelled を書き分ける", async () => {
     const issuesDir = makeIssuesDir();
-    await run(issuesDir, { operation: "issue_create", args: { title: "A", body: "b", labels: [], role: "case" } });
-    await run(issuesDir, { operation: "issue_create", args: { title: "B", body: "b", labels: [], role: "case" } });
-    await run(issuesDir, { operation: "issue_close", args: { number: 1, reason: "not_planned" } });
-    await run(issuesDir, { operation: "issue_close", args: { number: 2 } });
-    expect(readIssueFile(issuesDir, 1)).toContain("status: cancelled");
-    expect(readIssueFile(issuesDir, 2)).toContain("status: closed");
-    fs.rmSync(issuesDir, { recursive: true, force: true });
+    const fixture = makeCloseAcceptanceFixture("ts007-reasons-");
+    try {
+      const runner = createLocalRunner({ issuesDir, closeAcceptanceIo: fixture.io });
+      await runner.run({ operation: "issue_create", args: { title: "A", body: "b", labels: [], role: "case" } });
+      await runner.run({ operation: "issue_create", args: { title: "B", body: "b", labels: [], role: "case" } });
+      for (const number of [1, 2]) {
+        writeCloseAcceptanceRecord(fixture, number, { issueNumber: number, targetRevision: localIssueUpdatedAt(issuesDir, number), generatedAt: "2026-11-05T00:00:00Z", accepted: true });
+      }
+      expect((await runner.run({ operation: "issue_close", args: { number: 1, reason: "not_planned" } })).ok).toBe(true);
+      expect((await runner.run({ operation: "issue_close", args: { number: 2 } })).ok).toBe(true);
+      expect(readIssueFile(issuesDir, 1)).toContain("status: cancelled");
+      expect(readIssueFile(issuesDir, 2)).toContain("status: closed");
+    } finally {
+      fs.rmSync(issuesDir, { recursive: true, force: true });
+      fs.rmSync(fixture.mainRoot, { recursive: true, force: true });
+    }
   });
 
   test("issue_reopen は tracking の クローズ済み から再検討へ戻し、open 済みは冪等に成功し、case は拒否する", async () => {
@@ -1192,5 +1212,210 @@ describe("LocalRunner: Release 操作（GitHub 接続専用例外）", () => {
       }
     }
     fs.rmSync(issuesDir, { recursive: true, force: true });
+  });
+});
+
+describe("LocalRunner: issue_close の終了前提検証（TS-007・role は frontmatter の既存 role）", () => {
+  let clock = new Date("2026-11-05T00:00:00Z");
+
+  function makeCaseEnv(
+    issuesDir: string,
+    fixture: { io: CloseAcceptanceIo },
+  ): { env: GhToolEnv; issuesDir: string } {
+    const runner = createLocalRunner({ issuesDir, now: () => clock, closeAcceptanceIo: fixture.io });
+    const result = buildGhToolEnv(
+      { repo: "local/issues" },
+      { tempDir: () => path.join(issuesDir, "..", "tmp") },
+      runner,
+    );
+    if (!result.ok) throw new Error("env build failed");
+    return { env: result.env, issuesDir };
+  }
+
+  async function createCaseIssue(issuesDir: string, fixture: { io: CloseAcceptanceIo }): Promise<GhToolEnv> {
+    const { env } = makeCaseEnv(issuesDir, fixture);
+    const created = await runAgentdevGhOperation(env, {
+      operation: "issue_create",
+      title: "TS-007 ローカルCase Issue",
+      body: "本文",
+      labels: ["feature"],
+      role: "case",
+    }, { closeAcceptanceIo: fixture.io });
+    expect(created.ok).toBe(true);
+    return env;
+  }
+
+  async function closeWith(
+    env: GhToolEnv,
+    fixture: { io: CloseAcceptanceIo },
+    issueNumber: number,
+  ): Promise<{ ok: boolean; kind: string | null; detail: string }> {
+    const result = await runAgentdevGhOperation(env, {
+      operation: "issue_close",
+      number: issueNumber,
+      reason: "completed",
+    }, { closeAcceptanceIo: fixture.io });
+    return {
+      ok: result.ok,
+      kind: result.ok ? null : result.failure.kind,
+      detail: result.ok ? "" : result.failure.detail,
+    };
+  }
+
+  test("〔1〕記録なしの Case Issue 終了は拒否され、ローカルIssueは open のまま保持される", async () => {
+    const issuesDir = makeIssuesDir();
+    const fixture = makeCloseAcceptanceFixture("ts007-local-a1-");
+    const env = await createCaseIssue(issuesDir, fixture);
+    const outcome = await closeWith(env, fixture, 1);
+    expect(outcome.ok).toBe(false);
+    expect(outcome.kind).toBe("verification-incomplete");
+    expect(outcome.detail).toContain("the close acceptance record is missing");
+    expect(readIssueFile(issuesDir, 1)).toContain("status: open");
+    fs.rmSync(issuesDir, { recursive: true, force: true });
+    fs.rmSync(fixture.mainRoot, { recursive: true, force: true });
+  });
+
+  test("〔2〕記録の読取不能・形式不正は拒否される", async () => {
+    const issuesDir = makeIssuesDir();
+    const fixture = makeCloseAcceptanceFixture("ts007-local-a2-");
+    const env = await createCaseIssue(issuesDir, fixture);
+    writeRawCloseAcceptanceRecord(fixture, 1, "not-json{{{");
+    expect((await closeWith(env, fixture, 1)).kind).toBe("verification-incomplete");
+    writeCloseAcceptanceRecord(fixture, 1, { issueNumber: 1, generatedAt: "2026-11-05T00:00:00Z", accepted: true });
+    expect((await closeWith(env, fixture, 1)).kind).toBe("verification-incomplete");
+    expect(readIssueFile(issuesDir, 1)).toContain("status: open");
+    fs.rmSync(issuesDir, { recursive: true, force: true });
+    fs.rmSync(fixture.mainRoot, { recursive: true, force: true });
+  });
+
+  test("〔3〕対象 Issue 番号の不一致は拒否される", async () => {
+    const issuesDir = makeIssuesDir();
+    const fixture = makeCloseAcceptanceFixture("ts007-local-a3-");
+    const env = await createCaseIssue(issuesDir, fixture);
+    writeCloseAcceptanceRecord(fixture, 1, {
+      issueNumber: 2,
+      targetRevision: localIssueUpdatedAt(issuesDir, 1),
+      generatedAt: "2026-11-05T00:00:00Z",
+      accepted: true,
+    });
+    const outcome = await closeWith(env, fixture, 1);
+    expect(outcome.kind).toBe("verification-incomplete");
+    expect(outcome.detail).toContain("targets issue 2, not the requested issue 1");
+    fs.rmSync(issuesDir, { recursive: true, force: true });
+    fs.rmSync(fixture.mainRoot, { recursive: true, force: true });
+  });
+
+  test("〔4〕判定不成立（accepted=false・照合拒否を含む）は拒否される", async () => {
+    const issuesDir = makeIssuesDir();
+    const fixture = makeCloseAcceptanceFixture("ts007-local-a4-");
+    const env = await createCaseIssue(issuesDir, fixture);
+    writeCloseAcceptanceRecord(fixture, 1, {
+      issueNumber: 1,
+      targetRevision: localIssueUpdatedAt(issuesDir, 1),
+      generatedAt: "2026-11-05T00:00:00Z",
+      accepted: false,
+    });
+    const outcome = await closeWith(env, fixture, 1);
+    expect(outcome.kind).toBe("verification-incomplete");
+    expect(outcome.detail).toContain("the judgment is not accepted");
+    expect(readIssueFile(issuesDir, 1)).toContain("status: open");
+    fs.rmSync(issuesDir, { recursive: true, force: true });
+    fs.rmSync(fixture.mainRoot, { recursive: true, force: true });
+  });
+
+  test("〔5〕判定対象版の不一致（対象更新後の旧記録＝過去の合格結果の再利用）は拒否される", async () => {
+    const issuesDir = makeIssuesDir();
+    const fixture = makeCloseAcceptanceFixture("ts007-local-a5-");
+    const env = await createCaseIssue(issuesDir, fixture);
+    const firstRevision = localIssueUpdatedAt(issuesDir, 1);
+    writeCloseAcceptanceRecord(fixture, 1, {
+      issueNumber: 1,
+      targetRevision: firstRevision,
+      generatedAt: "2026-11-05T00:00:00Z",
+      accepted: true,
+    });
+    // 対象の版が判定後に変化（updated_at 更新）すると、旧記録での終了は拒否される。
+    clock = new Date("2026-11-05T06:00:00Z");
+    const updated = await runAgentdevGhOperation(env, {
+      operation: "issue_update",
+      number: 1,
+      title: "TS-007 ローカルCase Issue 更新後",
+    }, { closeAcceptanceIo: fixture.io });
+    expect(updated.ok).toBe(true);
+    const refused = await closeWith(env, fixture, 1);
+    expect(refused.ok).toBe(false);
+    expect(refused.kind).toBe("verification-incomplete");
+    expect(refused.detail).toContain("reusing a past acceptance result is refused");
+    expect(readIssueFile(issuesDir, 1)).toContain("status: open");
+    fs.rmSync(issuesDir, { recursive: true, force: true });
+    fs.rmSync(fixture.mainRoot, { recursive: true, force: true });
+  });
+
+  test("〔6〕cwd 注入（worktree コンテキスト相当）でも main repo root 側の記録で検証される", async () => {
+    const issuesDir = makeIssuesDir();
+    const fixture = makeCloseAcceptanceFixture("ts007-local-a6-");
+    const env = await createCaseIssue(issuesDir, fixture);
+    writeCloseAcceptanceRecord(fixture, 1, {
+      issueNumber: 1,
+      targetRevision: localIssueUpdatedAt(issuesDir, 1),
+      generatedAt: "2026-11-05T00:00:00Z",
+      accepted: true,
+    });
+    // 前提検証の実行コンテキスト（cwd）は記録の保存場所の決定性に影響しない。
+    const result = await runAgentdevGhOperation(env, {
+      operation: "issue_close",
+      number: 1,
+      reason: "completed",
+    }, { closeAcceptanceIo: fixture.io, cwd: path.join(issuesDir, "any-worktree-context") });
+    expect(result.ok).toBe(true);
+    expect(readIssueFile(issuesDir, 1)).toContain("status: closed");
+    fs.rmSync(issuesDir, { recursive: true, force: true });
+    fs.rmSync(fixture.mainRoot, { recursive: true, force: true });
+  });
+
+  test("機械受理成立時のみ終了が実行され、追跡Issue（tracking role）には前提が適用されない", async () => {
+    const issuesDir = makeIssuesDir();
+    const fixture = makeCloseAcceptanceFixture("ts007-local-a7-");
+    const env = await createCaseIssue(issuesDir, fixture);
+    const refused = await closeWith(env, fixture, 1);
+    expect(refused.ok).toBe(false);
+    expect(readIssueFile(issuesDir, 1)).toContain("status: open");
+    writeCloseAcceptanceRecord(fixture, 1, {
+      issueNumber: 1,
+      targetRevision: localIssueUpdatedAt(issuesDir, 1),
+      generatedAt: "2026-11-05T00:00:00Z",
+      accepted: true,
+    });
+    const closed = await closeWith(env, fixture, 1);
+    expect(closed.ok).toBe(true);
+    expect(readIssueFile(issuesDir, 1)).toContain("status: closed");
+    fs.rmSync(issuesDir, { recursive: true, force: true });
+    fs.rmSync(fixture.mainRoot, { recursive: true, force: true });
+
+    const trackingDir = makeIssuesDir();
+    const trackingFixture = makeCloseAcceptanceFixture("ts007-local-a7t-");
+    const trackingRunner = createLocalRunner({ issuesDir: trackingDir, now: () => clock });
+    const trackingEnvResult = buildGhToolEnv(
+      { repo: "local/issues" },
+      { tempDir: () => path.join(trackingDir, "..", "tmp") },
+      trackingRunner,
+    );
+    if (!trackingEnvResult.ok) throw new Error("env build failed");
+    const trackingCreated = await runAgentdevGhOperation(trackingEnvResult.env, {
+      operation: "issue_create",
+      title: "TS-007 追跡Issue",
+      body: "本文",
+      labels: [],
+      role: "tracking",
+    }, { closeAcceptanceIo: trackingFixture.io });
+    expect(trackingCreated.ok).toBe(true);
+    const trackingClosed = await runAgentdevGhOperation(trackingEnvResult.env, {
+      operation: "issue_close",
+      number: 1,
+      reason: "completed",
+    }, { closeAcceptanceIo: trackingFixture.io });
+    expect(trackingClosed.ok).toBe(true);
+    fs.rmSync(trackingDir, { recursive: true, force: true });
+    fs.rmSync(trackingFixture.mainRoot, { recursive: true, force: true });
   });
 });

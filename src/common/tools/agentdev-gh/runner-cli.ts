@@ -17,6 +17,7 @@
 import { spawnSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { defaultCloseAcceptanceIo, verifyCloseAcceptanceForClose, type CloseAcceptanceIo } from "./close-acceptance.ts";
 import type {
   GhRunner,
   GhRunnerFailureClass,
@@ -75,6 +76,8 @@ export interface CliRunnerOptions {
   readonly tempDir: string;
   /** gh 実行の注入点（省略時は既定実装）。 */
   readonly exec?: GhExec;
+  readonly closeAcceptanceIo?: CloseAcceptanceIo;
+  readonly workspaceRoot?: string;
 }
 
 interface RawReply {
@@ -124,12 +127,16 @@ export class CliRunner implements GhRunner {
   private readonly repo: string;
   private readonly tempDir: string;
   private readonly exec: GhExec;
+  private readonly closeAcceptanceIo: CloseAcceptanceIo;
+  private readonly workspaceRoot: string;
   private tempCounter = 0;
 
   constructor(options: CliRunnerOptions) {
     this.repo = options.repo;
     this.tempDir = options.tempDir;
     this.exec = options.exec ?? defaultGhExec();
+    this.closeAcceptanceIo = options.closeAcceptanceIo ?? defaultCloseAcceptanceIo();
+    this.workspaceRoot = options.workspaceRoot ?? process.cwd();
   }
 
   async run(request: GhRunnerRequest): Promise<GhRunnerReply> {
@@ -377,8 +384,9 @@ export class CliRunner implements GhRunner {
       const state = normalizeIssueState(rec.state);
       const title = str(rec.title);
       const body = str(rec.body);
-      if (state === null || title === null || body === null) {
-        return this.fail("issue reply missing state/title/body", 0);
+      const updatedAt = str(rec.updated_at);
+      if (state === null || title === null || body === null || updatedAt === null) {
+        return this.fail("issue reply missing state/title/body/updated_at", 0);
       }
       const meta = this.trackingMetaFrom(rec);
       if (meta === null) {
@@ -394,6 +402,7 @@ export class CliRunner implements GhRunner {
           labels: meta.labels,
           role: meta.role,
           closeReason: meta.closeReason,
+          updatedAt,
         },
       };
     });
@@ -451,6 +460,21 @@ export class CliRunner implements GhRunner {
   private issueClose(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
     if (number === null) return this.fail("issue_close requires number", 0, "invalid-input");
+    const current = this.apiGet(`repos/${this.repo}/issues/${number}`, (rec) => ({ ok: true, payload: rec }));
+    if (!current.ok) return current;
+    if (!isRecord(current.payload) || current.payload.number !== number) {
+      return this.fail("issue close cannot identify the target issue", 0);
+    }
+    const meta = this.trackingMetaFrom(current.payload);
+    if (meta === null) return this.fail("issue close cannot read current role", 0);
+    if (meta.role === "case") {
+      const revision = str(current.payload.updated_at);
+      if (revision === null || revision.length === 0) {
+        return this.fail("issue close cannot read the target revision", 0, "verification-incomplete");
+      }
+      const acceptance = verifyCloseAcceptanceForClose(this.closeAcceptanceIo, this.workspaceRoot, number, revision);
+      if (!acceptance.ok) return this.fail(acceptance.detail, 0, acceptance.kind);
+    }
     const reason = str(args.reason) ?? "completed";
     return this.apiWithInput("PATCH", `repos/${this.repo}/issues/${number}`, {
       state: "closed",
