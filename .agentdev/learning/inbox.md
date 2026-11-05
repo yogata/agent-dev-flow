@@ -335,3 +335,18 @@
 - 出典: Case #3928 設計PR #3929（受入検査で検出・6ed481996 で補正）、.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts の IR-072 実装、agentdev-workflow-case-open references/definition-pr-and-idempotency.md 計測日収束節
 - 関連: Case #3928 STEP-1、REQ-010-068（IR-072 根拠 REQ）
 - タグ: #learning-capture #frontmatter-updated #IR-072 #definition-pr #case-ready
+
+## [2026-11-05T20:40+09:00][intake_candidate][配布依存境界 phase-transition identity.ts の既存REQ識別子コメント][Case #3928]
+- 検知: case-run の配布依存境界 source profile 検査（PR #3939 pre-gate・#3931 実行）で、変更外の src/common/skills/agentdev-workflow-phase-transition/scripts/lib/identity.ts:4 の REQ識別子コメントを検出（exit 1）。該当ファイルは main との差分なしを確認し、本 PR では未変更。
+- 対処: 本 Case（#3931）の対象範囲外として未変更。変更ファイルに新規違反がないことを確認の上で PR を進め、既存違反として PR #3939 本文 Findings へ記録済み。
+- 学び: 配布依存境界 pre-gate は既存違反も報告するため exit 1 となる。変更外の既存違反はスコープ判定（main 差分の不在確認）で PR を進める判断と、恒久的な是正処置（識別子コメントの除去）を区別して記録する。処置判断は intake-promote での分類確定対象。
+- 出典: PR #3939 本文 Findings / Capture候補（intake 第1項）・品質メトリクス「配布依存境界 pre-gate」行
+- 関連: Case #3928・Wave-2 #3931・2026-10-27T10:45 の intake_candidate（case-close Epic Wave クローズ・配布物への REQ/AG 識別子記述）と同系統の配布物識別子規律
+- タグ: #intake-capture #配布依存境界 #REQ識別子 #pre-existing
+
+## [2026-11-05T20:40+09:00][design_promotion_candidate][検査scope別JSON stdout形状の Design 実装契約明記][Case #3928]
+- 検知: PR #3939（#3931）の Design確定候補として、検査scopeごとのJSON stdout形状と不正形状の扱いを検証用一時資材ライフサイクルDesign（docs/designs/workflows/verification-resource-lifecycle.md）の実装契約へ明記する候補が申告された。終了判定記録の4-field形式（issueNumber / targetRevision=issueUpdatedAt / generatedAt / accepted）は reader と一致、追加の設計値は導入なし。
+- 対処: 本 boundary（Wave-2 #3931 子Issue クローズ）では記録のみ。Design適用判断は Epic #3928 最終 close 時に行う。
+- 出典: PR #3939 本文 Design確定候補セクション
+- 関連: Case #3928・docs/designs/workflows/verification-resource-lifecycle.md・close_mechanical_steps.ts の終了判定記録書出し
+- タグ: #design-promotion-candidate #case-close #終了判定記録 #json-stdout
