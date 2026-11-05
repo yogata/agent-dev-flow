@@ -2214,3 +2214,168 @@ describe("検証用一時資材照合の入力検証（検査設定の省略禁�
     expect(() => validateInput(broken as unknown)).toThrow(/issue-updated-at/);
   });
 });
+
+describe("検証用一時資材の回収実行面（Wave-2: 台帳回収・終了判定記録回収）", () => {
+  interface InMemoryLedgerRunner extends MechanicalRunner {
+    files: Map<string, string>;
+    deleted: string[];
+    setFile(absolutePath: string, content: string): void;
+  }
+
+  function normalizePathKey(absolutePath: string): string {
+    return absolutePath.replace(/\\/g, "/");
+  }
+
+  function inMemoryLedgerRunner(initialFiles: Record<string, string> = {}): InMemoryLedgerRunner {
+    const files = new Map<string, string>(
+      Object.entries(initialFiles).map(([key, value]) => [normalizePathKey(key), value]),
+    );
+    const deleted: string[] = [];
+    const base = fakeRunner();
+    return {
+      ...base,
+      files,
+      deleted,
+      setFile(absolutePath, content) {
+        files.set(normalizePathKey(absolutePath), content);
+      },
+      exists(absolutePath: string) {
+        return files.has(normalizePathKey(absolutePath));
+      },
+      readTextFile(absolutePath: string) {
+        return files.get(normalizePathKey(absolutePath)) ?? "";
+      },
+      deleteFile(absolutePath: string) {
+        files.delete(normalizePathKey(absolutePath));
+        deleted.push(absolutePath);
+      },
+    };
+  }
+
+  const LEDGER_PATH = "C:/repo/main/.agentdev/tmp/verification-resources/3928.json";
+  const ACCEPTANCE_RECORD_PATH = "C:/repo/main/.agentdev/close-acceptance/issue-3934.json";
+
+  function reclaimedLedgerFile(): string {
+    return JSON.stringify([
+      {
+        id: "vr-3928-1",
+        caseId: "3928",
+        kind: "clone",
+        location: "C:/tmp/case-3928/verification-clone",
+        identifiers: { path: "C:/tmp/case-3928/verification-clone" },
+        collector: "case-run",
+        ownership: "child",
+        childIssue: 3930,
+        recordedBy: "case-run",
+        createdAt: "2026-11-05T12:00:00.000Z",
+        collectedAt: "2026-11-05T13:00:00.000Z",
+      },
+    ]);
+  }
+
+  function postMergeInputWithReclamation(overrides: {
+    ledgerFile?: string | null;
+    acceptanceRecord?: boolean;
+  } = {}): { input: CloseMechanicalInput; runner: ReturnType<typeof inMemoryLedgerRunner> } {
+    const runner = inMemoryLedgerRunner();
+    if (overrides.ledgerFile !== null) {
+      runner.setFile(LEDGER_PATH, overrides.ledgerFile ?? reclaimedLedgerFile());
+    }
+    if (overrides.acceptanceRecord) {
+      runner.setFile(ACCEPTANCE_RECORD_PATH, JSON.stringify({ issue: 3934, verdict: "pass" }));
+    }
+    const input: CloseMechanicalInput = {
+      phase: "post-merge",
+      worktreeRoot: ".worktrees/100-case",
+      repoRoot: "C:/repo/main",
+      branch: "case-100",
+      prNumber: 200,
+      reclamation: {
+        ledger: {
+          mainRepoRoot: "C:/repo/main",
+          caseId: "3928",
+          confirmation: {
+            confirmedBy: "case-close 機械工程（削除確認フロー成立後の回収手続き）",
+            confirmedAt: "2026-11-05T18:00:00.000Z",
+            targetIds: ["vr-3928-1"],
+          },
+        },
+        closeAcceptanceRecord: { recordPath: ACCEPTANCE_RECORD_PATH, terminalOperationCompleted: true },
+      },
+    };
+    return { input, runner };
+  }
+
+  test("post-merge で台帳回収と終了判定記録回収を実行し、収束材料を proposal に記録する", () => {
+    const { input, runner } = postMergeInputWithReclamation({ acceptanceRecord: true });
+    const report = runCloseMechanicalSteps(input, runner);
+    const step = report.result.steps.find((s) => s.name === "verification-resource-reclamation");
+    expect(step?.status).toBe("pass");
+    expect(runner.files.has(LEDGER_PATH)).toBe(false);
+    expect(runner.files.has(ACCEPTANCE_RECORD_PATH)).toBe(false);
+    expect(report.proposal.verification_resource_final_record).toContain("vr-3928-1");
+    expect((report.diff.reclamation as { ledgerStatus?: string }).ledgerStatus).toBe("reclaimed");
+    expect((report.diff.reclamation as { closeAcceptanceRecordStatus?: string }).closeAcceptanceRecordStatus).toBe("reclaimed");
+  });
+
+  test("台帳不在は記録欠落として報告し、作成物なしの根拠へ変換しない", () => {
+    const { input, runner } = postMergeInputWithReclamation({ ledgerFile: null });
+    const report = runCloseMechanicalSteps(input, runner);
+    const step = report.result.steps.find((s) => s.name === "verification-resource-reclamation");
+    expect((step?.detail as { ledgerStatus?: string }).ledgerStatus).toBe("ledger-missing");
+    expect(report.warnings.some((w) => w.includes("no ledger file"))).toBe(true);
+    expect(report.proposal.verification_resource_final_record).toBeUndefined();
+  });
+
+  test("未回収エントリが残る台帳の回収は実行せず fail step で報告する（全体未完了の維持）", () => {
+    const { input, runner } = postMergeInputWithReclamation();
+    runner.setFile(
+      LEDGER_PATH,
+      JSON.stringify([
+        {
+          id: "vr-3928-2",
+          caseId: "3928",
+          kind: "remote",
+          location: "https://example.test/verification.git",
+          identifiers: { url: "https://example.test/verification.git" },
+          collector: "case-run",
+          ownership: "common",
+          childIssue: null,
+          recordedBy: "case-run",
+          createdAt: "2026-11-05T12:00:00.000Z",
+          collectedAt: null,
+        },
+      ]),
+    );
+    const report = runCloseMechanicalSteps(input, runner);
+    const step = report.result.steps.find((s) => s.name === "verification-resource-reclamation");
+    expect(step?.status).toBe("fail");
+    expect(runner.files.has(LEDGER_PATH)).toBe(true);
+    expect(report.result.exitCategory).toBe("failure");
+  });
+
+  test("pre-merge で reclamation 指定を拒否する（回収は終了操作完了後の保持期間契約に従う）", () => {
+    const runner = fakeRunner();
+    const broken = preMergeInput({
+      reclamation: {
+        closeAcceptanceRecord: { recordPath: ACCEPTANCE_RECORD_PATH, terminalOperationCompleted: true },
+      },
+    } as Partial<CloseMechanicalInput>);
+    expect(() => runCloseMechanicalSteps(broken, runner)).toThrow(/reclamation/);
+  });
+
+  test("入力検証は reclamation の契約違反を拒否する", () => {
+    const base = postMergeInputWithReclamation().input as unknown as Record<string, unknown>;
+    const badConfirmation = JSON.parse(JSON.stringify(base));
+    (badConfirmation.reclamation as { ledger: { confirmation: unknown } }).ledger.confirmation = { confirmedBy: "", confirmedAt: "2026-11-05T18:00:00.000Z", targetIds: ["vr-3928-1"] };
+    expect(() => validateInput(badConfirmation)).toThrow();
+    const badRecordPath = JSON.parse(JSON.stringify(base));
+    (badRecordPath.reclamation as { closeAcceptanceRecord: { recordPath: string } }).closeAcceptanceRecord.recordPath = "";
+    expect(() => validateInput(badRecordPath)).toThrow();
+    const badCompleted = JSON.parse(JSON.stringify(base));
+    (badCompleted.reclamation as { closeAcceptanceRecord: { terminalOperationCompleted: unknown } }).closeAcceptanceRecord.terminalOperationCompleted = "yes";
+    expect(() => validateInput(badCompleted)).toThrow();
+    const valid = validateInput(JSON.parse(JSON.stringify(base)));
+    expect(valid.reclamation?.ledger?.caseId).toBe("3928");
+  });
+});

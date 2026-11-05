@@ -12,6 +12,10 @@ implementation:
   src/common/skills/agentdev-workflow-case-close/scripts/src/verification-resource-register.ts:
     - REQ-118-001
     - REQ-118-004
+  src/common/skills/agentdev-workflow-case-close/scripts/src/verification-evidence-record.ts:
+    - REQ-118-007
+  src/common/skills/agentdev-workflow-case-close/scripts/src/verification-resource-reclamation.ts:
+    - REQ-118-009
   src/common/skills/agentdev-workflow-case-close/references/cleanup-and-capture.md:
     - REQ-018-008
     - REQ-032-007
@@ -77,6 +81,7 @@ implementation:
     - REQ-118-003
     - REQ-118-005
     - REQ-118-006
+    - REQ-118-009
     - REQ-032-043
     - REQ-032-044
     - REQ-032-045
@@ -100,6 +105,10 @@ verification:
   src/common/skills/agentdev-workflow-case-close/scripts/tests/verification-resource-register.test.ts:
     - REQ-118-001
     - REQ-118-004
+  src/common/skills/agentdev-workflow-case-close/scripts/tests/verification-evidence-record.test.ts:
+    - REQ-118-007
+  src/common/skills/agentdev-workflow-case-close/scripts/tests/verification-resource-reclamation.test.ts:
+    - REQ-118-009
   src/common/skills/agentdev-workflow-case-close/scripts/tests/close-validate-input.test.ts:
     - REQ-009-053
   src/common/skills/agentdev-workflow-case-close/scripts/tests/close_mechanical_steps.test.ts:
@@ -113,6 +122,7 @@ verification:
     - REQ-032-042
     - REQ-118-003
     - REQ-118-005
+    - REQ-118-009
     - REQ-032-043
     - REQ-032-044
     - REQ-032-045

@@ -47,6 +47,14 @@ import {
   type DeletionTargetObservation,
   type UserDeletionConfirmation,
 } from "./deletion-confirmation.ts";
+import {
+  reclaimCloseAcceptanceRecord,
+  reclaimLedger,
+  type CloseAcceptanceReclamationResult,
+  type LedgerReclamationResult,
+  type ReclamationConfirmation,
+  type ReclamationIo,
+} from "./verification-resource-reclamation.ts";
 import { REQ_ROW_ID_LIST_PATTERN } from "../../../agentdev-workflow-case-open/scripts/lib/definition-traceability-gate.ts";
 import {
   readLedger,
@@ -89,6 +97,8 @@ export interface MechanicalRunner {
   removeFile?(absolutePath: string): void;
   /** メインrepo root 解決（worktree 非依存。メインrepo の .git 絶対パスを返す）。 */
   gitCommonDir?(): string;
+  /** 回収実行面（台帳回収・終了判定記録回収）で使用するファイル削除。未提供時は回収ステップを fail で報告する。 */
+  deleteFile?(absolutePath: string): void;
 }
 
 export interface GateCommandSpec {
@@ -214,6 +224,21 @@ export interface ContractStateResidueEvaluation {
   untrackedTotal: number;
 }
 
+/** 終了操作完了後の回収指定（post-merge のみ。pre-merge では入力検証で拒否する）。 */
+export interface ReclamationSection {
+  /** 台帳（追跡記録）自体の終了時回収。指定時のみ実行する。 */
+  ledger?: {
+    mainRepoRoot: string;
+    caseId: string;
+    confirmation: ReclamationConfirmation;
+  };
+  /** 終了判定記録（.agentdev/close-acceptance/）の終了後回収。指定時のみ実行する。 */
+  closeAcceptanceRecord?: {
+    recordPath: string;
+    terminalOperationCompleted: boolean;
+  };
+}
+
 export interface CloseMechanicalInput {
   phase: "pre-merge" | "post-merge";
   worktreeRoot: string;
@@ -252,6 +277,8 @@ export interface CloseMechanicalInput {
     confirmations: readonly UserDeletionConfirmation[];
     observations: readonly DeletionTargetObservation[];
   };
+  /** post-merge での検証用一時資材の台帳回収・終了判定記録回収。pre-merge では指定できない。 */
+  reclamation?: ReclamationSection;
 }
 
 export interface StepRecord {
@@ -486,6 +513,55 @@ export function validateInput(value: unknown): CloseMechanicalInput {
   }
   if (typeof v.prNumber !== "number") fail("input.prNumber is required");
   const input = v as unknown as CloseMechanicalInput;
+  if (v.reclamation != null) {
+    if (input.phase === "pre-merge") {
+      fail("input.reclamation is not allowed in pre-merge (reclamation runs only after the terminal operation)");
+    }
+    const reclamation = v.reclamation;
+    if (typeof reclamation !== "object" || Array.isArray(reclamation)) {
+      fail("input.reclamation must be an object");
+    }
+    const rec = reclamation as Record<string, unknown>;
+    if (rec.ledger != null) {
+      const ledger = rec.ledger;
+      if (typeof ledger !== "object" || Array.isArray(ledger)) {
+        fail("input.reclamation.ledger must be an object");
+      }
+      const l = ledger as Record<string, unknown>;
+      for (const field of ["mainRepoRoot", "caseId"] as const) {
+        if (typeof l[field] !== "string" || (l[field] as string).trim().length === 0) {
+          fail(`input.reclamation.ledger.${field} is required`);
+        }
+      }
+      const confirmation = l.confirmation;
+      if (typeof confirmation !== "object" || confirmation === null || Array.isArray(confirmation)) {
+        fail("input.reclamation.ledger.confirmation must be an object");
+      }
+      const c = confirmation as Record<string, unknown>;
+      if (typeof c.confirmedBy !== "string" || (c.confirmedBy as string).trim().length === 0) {
+        fail("input.reclamation.ledger.confirmation.confirmedBy is required");
+      }
+      if (typeof c.confirmedAt !== "string" || (c.confirmedAt as string).trim().length === 0) {
+        fail("input.reclamation.ledger.confirmation.confirmedAt is required");
+      }
+      if (!Array.isArray(c.targetIds) || !c.targetIds.every((id) => typeof id === "string" && id.trim().length > 0)) {
+        fail("input.reclamation.ledger.confirmation.targetIds must be an array of non-empty entry ids");
+      }
+    }
+    if (rec.closeAcceptanceRecord != null) {
+      const record = rec.closeAcceptanceRecord;
+      if (typeof record !== "object" || Array.isArray(record)) {
+        fail("input.reclamation.closeAcceptanceRecord must be an object");
+      }
+      const r = record as Record<string, unknown>;
+      if (typeof r.recordPath !== "string" || (r.recordPath as string).trim().length === 0) {
+        fail("input.reclamation.closeAcceptanceRecord.recordPath is required");
+      }
+      if (typeof r.terminalOperationCompleted !== "boolean") {
+        fail("input.reclamation.closeAcceptanceRecord.terminalOperationCompleted must be a boolean");
+      }
+    }
+  }
   if (input.phase === "pre-merge") {
     const missing: string[] = [];
     if (v.generateIndexesGate == null) missing.push("generate_indexes");
@@ -2249,6 +2325,73 @@ function runAcceptanceEvaluation(
   };
 }
 
+interface ReclamationStepOutcome {
+  status: "pass" | "warn" | "fail";
+  detail: Record<string, unknown>;
+  convergenceMaterial: string | null;
+  warnings: readonly string[];
+}
+
+/** 回収実行面（台帳回収・終了判定記録回収）を runner 注入で実行する。 */
+function runReclamation(section: ReclamationSection, runner: MechanicalRunner): ReclamationStepOutcome {
+  if (runner.deleteFile === undefined) {
+    return {
+      status: "fail",
+      detail: { error: "mechanical runner does not provide deleteFile; reclamation cannot execute (fail-closed)" },
+      convergenceMaterial: null,
+      warnings: [],
+    };
+  }
+  const io: ReclamationIo = {
+    exists: (absolutePath) => runner.exists(absolutePath),
+    readTextFile: (absolutePath) => runner.readTextFile(absolutePath),
+    writeTextFile: () => fail("ledger write is not available through the mechanical runner (read/delete only)"),
+    mkdirRecursive: () => fail("ledger directory creation is not available through the mechanical runner (read/delete only)"),
+    gitCommonDir: () => fail("git common dir resolution is not available through the mechanical runner"),
+    deleteFile: (absolutePath) => runner.deleteFile?.(absolutePath),
+  };
+  const detail: Record<string, unknown> = {};
+  const warnings: string[] = [];
+  let status: "pass" | "warn" | "fail" = "pass";
+  let convergenceMaterial: string | null = null;
+  if (section.ledger != null) {
+    const ledgerResult: LedgerReclamationResult = reclaimLedger(
+      io,
+      section.ledger.mainRepoRoot,
+      section.ledger.caseId,
+      section.ledger.confirmation,
+    );
+    detail.ledgerStatus = ledgerResult.status;
+    detail.ledgerPath = ledgerResult.ledgerPath;
+    detail.reclaimedEntryCount = ledgerResult.reclaimedEntryCount;
+    if (ledgerResult.status === "uncollected-entries") {
+      detail.uncollectedIds = ledgerResult.uncollectedIds;
+      status = "fail";
+      warnings.push(
+        `ledger reclamation refused: uncollected entries remain (termination unit incomplete): ${ledgerResult.uncollectedIds.join(", ")}`,
+      );
+    } else if (ledgerResult.status === "ledger-missing") {
+      status = "warn";
+      warnings.push(
+        `ledger reclamation found no ledger file (a missing ledger is a record gap, not a basis for zero creations): ${ledgerResult.ledgerPath}`,
+      );
+    } else if (ledgerResult.convergenceMaterial !== null) {
+      convergenceMaterial = ledgerResult.convergenceMaterial;
+    }
+  }
+  if (section.closeAcceptanceRecord != null) {
+    const recordResult: CloseAcceptanceReclamationResult = reclaimCloseAcceptanceRecord(io, section.closeAcceptanceRecord);
+    detail.closeAcceptanceRecordStatus = recordResult.status;
+    detail.closeAcceptanceRecordPath = recordResult.recordPath;
+    if (recordResult.status === "record-missing") {
+      warnings.push(
+        `close acceptance record was not found at reclamation time (idempotent): ${recordResult.recordPath}`,
+      );
+    }
+  }
+  return { status, detail, convergenceMaterial, warnings };
+}
+
 /** 機械工程を実行し、報告 JSON を返す（省略なし。失敗時は fail step を含める）。 */
 export function runCloseMechanicalSteps(
   input: CloseMechanicalInput,
@@ -2261,6 +2404,10 @@ export function runCloseMechanicalSteps(
   const worktreeCwd = path.resolve(input.repoRoot, input.worktreeRoot);
   let provisionalAcceptanceRecord: CloseAcceptanceRecordWrite | null = null;
   let acceptanceRecordStep: StepRecord | null = null;
+
+  if (input.phase === "pre-merge" && input.reclamation != null) {
+    fail("input.reclamation is not allowed in pre-merge (reclamation runs only after the terminal operation)");
+  }
 
   if (input.phase === "pre-merge") {
     provisionalAcceptanceRecord = writeCloseAcceptanceRecord(input, runner, false);
@@ -2629,6 +2776,19 @@ export function runCloseMechanicalSteps(
       }
     }
   } else {
+    if (input.reclamation != null) {
+      const outcome = runReclamation(input.reclamation, runner);
+      steps.push({
+        name: "verification-resource-reclamation",
+        status: outcome.status,
+        detail: outcome.detail,
+      });
+      if (outcome.convergenceMaterial !== null) {
+        proposal.verification_resource_final_record = outcome.convergenceMaterial;
+      }
+      for (const warning of outcome.warnings) warnings.push(warning);
+      diff.reclamation = outcome.detail;
+    }
     const removed = runner.run({
       command: "git",
       args: ["worktree", "remove", worktreeCwd],
