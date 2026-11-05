@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261105T051736Z-acc4",
+  "workflow": "case-ready",
+  "evaluationKind": "wave-composition-parallelizability",
+  "subject": "Root Case #3928（Epic 構成確定済み）Wave 2 子 Issue 集合の並列可否と重複処置",
+  "sourceRevision": "ee442fbc18abc67a7520ba8cdb45d13b5b47116b",
+  "durationMs": 484,
+  "inputTokens": 1698,
+  "inputs": {
+    "requestDigest": "cb5e87cca6bbae3d8230f7db14d63f62046b1a7d93e6269c4a1c01af382975c6",
+    "references": [
+      {
+        "digest": "9be160bf1a6e71e4b0178be5ce83f3ef4fa7cd97d0fb41c692b08b0c5c3fffa5",
+        "label": "req_draft",
+        "path": ".agentdev/drafts/req-draft-verification-resource-cleanup.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-parallelizable",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.91,
+        "false": 0.08999999999999997
+      }
+    },
+    {
+      "questionId": "q2-duplicate-handling",
+      "questionForm": "choice",
+      "value": "重複許容（衝突解消の担当とマージ順序の事前記録を含む）",
+      "probabilityDistribution": {
+        "変更対象分割": 0.15,
+        "重複許容（衝突解消の担当とマージ順序の事前記録を含む）": 0.85
+      }
+    }
+  ],
+  "confidence": 0.7,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-parallelizable",
+        "value": true
+      },
+      {
+        "questionId": "q2-duplicate-handling",
+        "value": "重複許容（衝突解消の担当とマージ順序の事前記録を含む）"
+      }
+    ]
+  }
+}
