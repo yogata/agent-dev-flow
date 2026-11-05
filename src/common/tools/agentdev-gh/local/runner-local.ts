@@ -1,6 +1,4 @@
 // agentdev-gh Custom Tool の Local 実現（GhRunner、REQ-011-006 / DEC-004）。
-// ADF-COVERS(implementation): REQ-011-024, REQ-011-025, REQ-011-026, REQ-011-027, REQ-011-030, REQ-083-001
-// ADF-COVERS(implementation): REQ-009-015, REQ-099-008, REQ-099-009, REQ-006-112
 //
 // 同一の操作契約（contracts.ts の16操作）を、GitHub Issue/PR の代わりに
 // ローカルIssue（`.agentdev/issues/issue-{NNNN}.md`、単一採番空間）の
@@ -42,6 +40,7 @@ import type {
   GhRunnerRequest,
 } from "../runner.ts";
 import type { GhToolOperation } from "../contracts.ts";
+import { defaultCloseAcceptanceIo, verifyCloseAcceptanceForClose, type CloseAcceptanceIo } from "../close-acceptance.ts";
 import {
   LOCAL_TRACKING_STATUS_VALUES,
   REOPEN_TRACKING_STATE,
@@ -77,6 +76,7 @@ export interface LocalRunnerOptions {
   readonly issuesDir: string;
   /** 日時の注入点（テスト用）。省略時は実行時刻。 */
   readonly now?: () => Date;
+  readonly closeAcceptanceIo?: CloseAcceptanceIo;
 }
 
 /** ローカルIssueの共通メタデータ（frontmatter）。 */
@@ -453,10 +453,12 @@ function isoNow(now: () => Date): string {
 export class LocalRunner implements GhRunner {
   private readonly issuesDir: string;
   private readonly now: () => Date;
+  private readonly closeAcceptanceIo: CloseAcceptanceIo;
 
   constructor(options: LocalRunnerOptions) {
     this.issuesDir = options.issuesDir;
     this.now = options.now ?? (() => new Date());
+    this.closeAcceptanceIo = options.closeAcceptanceIo ?? defaultCloseAcceptanceIo();
   }
 
   async run(request: GhRunnerRequest): Promise<GhRunnerReply> {
@@ -697,6 +699,7 @@ export class LocalRunner implements GhRunner {
         labels: c.parsed.fm.labels,
         role: c.parsed.fm.role,
         closeReason: meta.closeReason,
+        updatedAt: c.parsed.fm.updated_at,
       },
     };
   }
@@ -775,6 +778,12 @@ export class LocalRunner implements GhRunner {
     if (number === null) return this.fail("issue_close requires number");
     const c = this.readIssue(number);
     if (c === null) return this.fail(`local issue not found: ${issueFileName(number)}`);
+    if (c.parsed.fm.role === "case") {
+      const acceptance = verifyCloseAcceptanceForClose(
+        this.closeAcceptanceIo, path.resolve(this.issuesDir, "..", ".."), number, c.parsed.fm.updated_at,
+      );
+      if (!acceptance.ok) return this.fail(acceptance.detail, null, acceptance.kind);
+    }
     const reason = typeof args.reason === "string" ? args.reason : "completed";
     const terminal =
       c.parsed.fm.role === "tracking"
