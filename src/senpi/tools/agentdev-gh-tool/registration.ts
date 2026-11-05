@@ -25,6 +25,7 @@ import { createCliRunner } from "../../../common/tools/agentdev-gh/runner-cli.ts
 import { buildGhToolEnv } from "../../../common/tools/agentdev-gh/engine.ts";
 import { AGENTDEV_GH_REQUEST_PROPERTY_SCHEMA } from "../../../common/tools/agentdev-gh/public-schema.ts";
 import { defaultResolveRepo, type RepoResolution } from "../../../common/tools/agentdev-gh/repo-resolution.ts";
+import type { CloseAcceptanceIo } from "../../../common/tools/agentdev-gh/close-acceptance.ts";
 import type { GhRunner } from "../../../common/tools/agentdev-gh/runner.ts";
 import type { SenpiToolContext, SenpiToolDefinition, SenpiToolResult } from "../tool-registration.ts";
 
@@ -39,6 +40,8 @@ export interface AgentdevGhSenpiDeps {
   readonly createRunner?: (worktree: string, repo: string) => GhRunner | Promise<GhRunner>;
   /** Local 実装投影パスの検出。既定は worktree 配下の LOCAL_RUNNER_PROJECTION。 */
   readonly detectLocalRunner?: (worktree: string) => string | null;
+  /** issue_close の終了前提検証が読み取る判定記録 I/O（省略時は既定の node 実装）。 */
+  readonly closeAcceptanceIo?: CloseAcceptanceIo;
   readonly tmpDir?: () => string;
 }
 
@@ -49,15 +52,16 @@ function defaultDetectLocalRunner(worktree: string): string | null {
 
 function createDefaultRunner(
   detectLocalRunner: (worktree: string) => string | null,
+  closeAcceptanceIo?: CloseAcceptanceIo,
 ): (worktree: string, repo: string) => Promise<GhRunner> {
   return async (worktree: string, repo: string): Promise<GhRunner> => {
     const localPath = detectLocalRunner(worktree);
     if (localPath !== null) {
       const mod = (await import(pathToFileURL(localPath).href)) as {
-        createLocalRunner?: (options: { issuesDir: string }) => GhRunner;
+        createLocalRunner?: (options: { issuesDir: string; closeAcceptanceIo?: CloseAcceptanceIo }) => GhRunner;
       };
       if (typeof mod.createLocalRunner === "function") {
-        return mod.createLocalRunner({ issuesDir: path.join(worktree, ".agentdev", "issues") });
+        return mod.createLocalRunner({ issuesDir: path.join(worktree, ".agentdev", "issues"), ...(closeAcceptanceIo !== undefined ? { closeAcceptanceIo } : {}) });
       }
       // 破損した Local 実装投影は GitHub 実装へ暗黙 fallback させず fail-closed する（必須能力不足の暗黙吸収禁止）。
       throw new Error(
@@ -65,7 +69,7 @@ function createDefaultRunner(
           `the Local backend selection is broken and must not silently fall back to the GitHub implementation`,
       );
     }
-    return createCliRunner({ repo, tempDir: os.tmpdir() });
+    return createCliRunner({ repo, tempDir: os.tmpdir(), workspaceRoot: worktree, ...(closeAcceptanceIo !== undefined ? { closeAcceptanceIo } : {}) });
   };
 }
 
@@ -88,7 +92,7 @@ export function createAgentdevGhSenpiRegistration(deps: AgentdevGhSenpiDeps = {}
     if (repo === null) {
       return { error: `cannot resolve the target repository (set AGENTDEV_GH_REPO=owner/name or run inside a gh repo)` };
     }
-    const create = deps.createRunner ?? createDefaultRunner(deps.detectLocalRunner ?? defaultDetectLocalRunner);
+    const create = deps.createRunner ?? createDefaultRunner(deps.detectLocalRunner ?? defaultDetectLocalRunner, deps.closeAcceptanceIo);
     let runner: GhRunner;
     try {
       runner = await create(worktree, repo);
@@ -144,7 +148,12 @@ export function createAgentdevGhSenpiRegistration(deps: AgentdevGhSenpiDeps = {}
           metadata: { ok: false, operation },
         };
       }
-      const result = await runAgentdevGhOperation(env.env, raw);
+      const result = await runAgentdevGhOperation(env.env, raw, {
+        cwd: context.worktree,
+        ...(deps.closeAcceptanceIo !== undefined
+          ? { closeAcceptanceIo: deps.closeAcceptanceIo }
+          : {}),
+      });
       const ok = result.ok;
       return {
         title: ok

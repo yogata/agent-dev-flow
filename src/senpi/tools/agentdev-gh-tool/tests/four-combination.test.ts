@@ -14,15 +14,18 @@ import * as path from "node:path";
 import {
   createAgentdevGhSenpiRegistration,
   LOCAL_RUNNER_PROJECTION,
-  type SenpiToolDefinition,
 } from "../registration.ts";
-import type { SenpiToolContext } from "../../tool-registration.ts";
+import type { SenpiToolContext, SenpiToolDefinition } from "../../tool-registration.ts";
 import { createCliRunner } from "../../../../common/tools/agentdev-gh/runner-cli.ts";
 import {
   createGitHubStub,
+  localIssueUpdatedAt,
+  makeCloseAcceptanceFixture,
   mainOperationSequence,
+  runCaseIssueCloseRoute,
   toStepResult,
   type StepOutcome,
+  type StepResult,
 } from "../../../../common/tools/agentdev-gh/tests/four-combination-shared.ts";
 
 const CANONICAL_LOCAL_RUNNER = path.resolve(
@@ -132,5 +135,86 @@ describe("TS-003 Senpi×ローカルIssue（投影検出 → LocalRunner によ�
     const commentList = outcomes.find((o) => o.step.operation === "comment_list")?.result.payload as Record<string, unknown>;
     expect((commentList?.comments as unknown[]).length).toBe(1);
     fs.rmSync(worktree, { recursive: true, force: true });
+  });
+});
+
+describe("TS-007 終了経路シナリオ（issue_close の終了前提検証・Senpi 登録表面）", () => {
+  function expectRefused(
+    outcomes: { label: string; result: StepResult; stateAfterRefusal?: unknown }[],
+    label: string,
+    kind: string,
+  ): void {
+    const refused = outcomes.find((o) => o.label === label);
+    expect(refused).toBeDefined();
+    expect(refused?.result.ok).toBe(false);
+    expect(refused?.result.failure?.kind).toBe(kind);
+    expect(refused?.stateAfterRefusal).toBe("open");
+  }
+
+  test("Senpi×GitHub: 機械受理不成立時の終了操作が実行されない", async () => {
+    const worktree = makeWorktree();
+    const tempDir = makeWorktree();
+    const fixture = makeCloseAcceptanceFixture("ts007-senpi-gh-");
+    const stub = createGitHubStub();
+    const registration = createAgentdevGhSenpiRegistration({
+      resolveRepo: () => "owner/repo",
+      createRunner: () => createCliRunner({ repo: "owner/repo", tempDir, exec: stub.exec, closeAcceptanceIo: fixture.io }),
+      closeAcceptanceIo: fixture.io,
+    });
+    const outcomes = await runCaseIssueCloseRoute(async (step) => {
+      const result = await registration.execute(
+        { request: { operation: step.operation, ...step.args } },
+        makeContext(worktree),
+      );
+      return toStepResult(step.operation, JSON.parse(result.output));
+    }, fixture, () => stub.issues[0]?.updated_at ?? "2026-10-01T00:00:00Z");
+    for (const label of [
+      "〔1〕記録なし拒否",
+      "〔2〕形式不正拒否",
+      "〔3〕対象不一致拒否",
+      "〔4〕判定不成立拒否",
+      "〔5〕判定対象版不一致（過去の合格結果の再利用）拒否",
+    ]) {
+      expectRefused(outcomes, label, "verification-incomplete");
+    }
+    const closed = outcomes.find((o) => o.label === "検証成立時の終了");
+    expect(closed?.result.ok).toBe(true);
+    const read = outcomes.find((o) => o.label === "読み戻し(closed)");
+    expect((read?.result.payload as Record<string, unknown> | null)?.state).toBe("closed");
+    fs.rmSync(worktree, { recursive: true, force: true });
+    fs.rmSync(tempDir, { recursive: true, force: true });
+    fs.rmSync(fixture.mainRoot, { recursive: true, force: true });
+  });
+
+  test("Senpi×ローカルIssue: 機械受理不成立時の終了操作が実行されない", async () => {
+    const worktree = makeWorktree();
+    writeLocalRunnerProjection(worktree);
+    const fixture = makeCloseAcceptanceFixture("ts007-senpi-local-");
+    const registration = createAgentdevGhSenpiRegistration({
+      resolveRepo: () => "local/issues",
+      closeAcceptanceIo: fixture.io,
+    });
+    const outcomes = await runCaseIssueCloseRoute(async (step) => {
+      const result = await registration.execute(
+        { request: { operation: step.operation, ...step.args } },
+        makeContext(worktree),
+      );
+      return toStepResult(step.operation, JSON.parse(result.output));
+    }, fixture, () => localIssueUpdatedAt(path.join(worktree, ".agentdev", "issues"), 1));
+    for (const label of [
+      "〔1〕記録なし拒否",
+      "〔2〕形式不正拒否",
+      "〔3〕対象不一致拒否",
+      "〔4〕判定不成立拒否",
+      "〔5〕判定対象版不一致（過去の合格結果の再利用）拒否",
+    ]) {
+      expectRefused(outcomes, label, "verification-incomplete");
+    }
+    const closed = outcomes.find((o) => o.label === "検証成立時の終了");
+    expect(closed?.result.ok).toBe(true);
+    const issueFile = path.join(worktree, ".agentdev", "issues", "issue-0001.md");
+    expect(fs.readFileSync(issueFile, "utf8")).toContain("status: closed");
+    fs.rmSync(worktree, { recursive: true, force: true });
+    fs.rmSync(fixture.mainRoot, { recursive: true, force: true });
   });
 });
