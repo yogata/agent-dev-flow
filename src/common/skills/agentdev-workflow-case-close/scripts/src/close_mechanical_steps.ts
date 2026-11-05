@@ -2356,7 +2356,7 @@ function buildAcceptanceControlObservation(
   if (ledger.state === "present" && mainRepoRoot !== null) {
     const tempRoot = os.tmpdir();
     for (const entry of ledger.entries) {
-      const destination = evaluateCreationDestination(entry.location, check.caseId, mainRepoRoot, tempRoot);
+      const destination = evaluateCreationDestination(entry.location, mainRepoRoot, tempRoot);
       if (!destination.valid) {
         creationDestinationRejections.push({
           entryId: entry.id,

@@ -1648,6 +1648,36 @@ describe("検証用一時資材の照合・完了拒否・終了判定記録書�
     expect(isCloseOperationPermitted(report).permitted).toBe(false);
   });
 
+  test("実経路: ①再評価は修正後の作成先境界を消費し、repo内正規一時領域配下の登録はgap化せず、正規一時領域外のrepo内パスはgap化する", () => {
+    const mainRoot = REPO_ROOT;
+    const repoTempLocation = path.join(mainRoot, ".agentdev", "tmp", "gap-test-regular-temp-entry");
+    const repoOutsideTempArea = path.join(mainRoot, "src", "gap-test-outside-regular-temp-entry");
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({ id: "vr-3928-1", location: repoTempLocation, identifiers: { path: repoTempLocation } }),
+        ledgerEntryJson({ id: "vr-3928-2", location: repoOutsideTempArea, identifiers: { path: repoOutsideTempArea } }),
+      ]),
+    });
+    runner.gitCommonDir = () => path.join(mainRoot, ".git");
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const gaps = report.diff.acceptanceGaps as readonly { code: string; route: string }[];
+
+    expect(
+      gaps.some(
+        (gap) => gap.code === "creation-entry-rejection-disconnected" && gap.route === repoTempLocation,
+      ),
+    ).toBe(false);
+    expect(
+      gaps.some(
+        (gap) => gap.code === "creation-entry-rejection-disconnected" && gap.route === repoOutsideTempArea,
+      ),
+    ).toBe(true);
+  });
+
   test("実経路: 4制御が接続された構成では受入gapが空で機械受理が成立する", () => {
     const tempLocation = path.join(tmpdir(), "adf-3928-verify-clone");
     const runner = fakeRunner({

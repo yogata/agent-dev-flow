@@ -15,6 +15,7 @@ import * as path from "node:path";
 import { tmpdir } from "node:os";
 
 const LEDGER_DIR_RELATIVE = ".agentdev/tmp/verification-resources";
+const REGULAR_TEMP_AREA_RELATIVE = ".agentdev/tmp";
 
 /** 一時資材の種別（Design 台帳データモデルの列挙に対応）。 */
 export const VERIFICATION_RESOURCE_KINDS = [
@@ -301,15 +302,17 @@ export function isConfirmedEmptyBasis(readResult: LedgerReadResult): boolean {
 
 /**
  * 作成先確認（専用領域配置・作成経路の制限の機械拒否面）。
- * ファイルシステム パス形の所在は、環境指定TEMP配下または案件専用領域
- * （案件識別子をパス要素に含むrepo外ディレクトリ）に限り許可し、プロジェクト親
- * ディレクトリ等の作成先違反を拒否する。リポジトリ内部は案件専用領域でないため
- * 拒否する。URL形・疑似スキーマ所在（process:pid=… 等）は作成先確認の対象外とする。
+ * ファイルシステム パス形の所在は、環境指定TEMP配下またはプロジェクト内正規一時領域
+ * （repo root の .agentdev/tmp/）に限り許可し、プロジェクト親ディレクトリ等の作成先違反を
+ * 拒否する。リポジトリ内部は正規一時領域（.agentdev/tmp/）配下のみ許可し、それ以外の
+ * repo 内領域は拒否する。パスは node:path の標準APIで解決して境界判定し、`..` による
+ * 境界外逃げを許可しない。パス要素に案件番号が含まれることは許可根拠にしない。
+ * URL形・疑似スキーマ所在（process:pid=… 等）は作成先確認の対象外とする。
  * 正は 検証用一時資材のライフサイクル Design「専用領域と作成経路の制限」節。
  */
 export interface CreationDestinationEvaluation {
   valid: boolean;
-  /** 許可根拠（env-temp-area / case-dedicated-area / non-path-location）。invalid 時は null。 */
+  /** 許可根拠（env-temp-area / repo-regular-temp-area / non-path-location）。invalid 時は null。 */
   basis: string | null;
   /** 拒否理由。許可時は null。 */
   reason: string | null;
@@ -337,23 +340,13 @@ function isAbsoluteLocation(location: string): boolean {
   );
 }
 
-function normalizeDestinationPath(value: string): string {
-  return value.replace(/\\/g, "/").replace(/\/+$/, "");
-}
-
 function isUnderDestinationPath(candidate: string, base: string): boolean {
-  return base.length > 0 && (candidate === base || candidate.startsWith(`${base}/`));
-}
-
-function hasCaseIdentifierSegment(candidate: string, caseId: string): boolean {
-  const escaped = caseId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const boundary = new RegExp(`(^|[^0-9])${escaped}([^0-9]|$)`);
-  return candidate.split("/").some((segment) => segment.length > 0 && boundary.test(segment));
+  const relative = path.relative(base, candidate);
+  return relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative));
 }
 
 export function evaluateCreationDestination(
   location: string,
-  caseId: string,
   mainRepoRoot: string,
   tempRoot: string,
 ): CreationDestinationEvaluation {
@@ -365,31 +358,30 @@ export function evaluateCreationDestination(
       valid: false,
       basis: null,
       reason:
-        "relative destination paths are not permitted; use an absolute path under the environment TEMP area or the case dedicated area",
+        "relative destination paths are not permitted; use an absolute path under the environment-designated TEMP area or the project-internal regular temporary area (.agentdev/tmp/)",
     };
   }
-  const normalized = normalizeDestinationPath(location);
-  const normalizedTemp = normalizeDestinationPath(tempRoot);
-  const normalizedRepo = normalizeDestinationPath(mainRepoRoot);
-  if (isUnderDestinationPath(normalized, normalizedTemp)) {
+  const resolved = path.resolve(location);
+  if (isUnderDestinationPath(resolved, path.resolve(tempRoot))) {
     return { valid: true, basis: "env-temp-area", reason: null };
   }
-  if (isUnderDestinationPath(normalized, normalizedRepo)) {
+  const resolvedRepo = path.resolve(mainRepoRoot);
+  if (isUnderDestinationPath(resolved, resolvedRepo)) {
+    if (isUnderDestinationPath(resolved, path.join(resolvedRepo, REGULAR_TEMP_AREA_RELATIVE))) {
+      return { valid: true, basis: "repo-regular-temp-area", reason: null };
+    }
     return {
       valid: false,
       basis: null,
       reason:
-        "creation inside the repository is not the case dedicated area; verification resources are placed outside the repository",
+        "creation inside the repository is permitted only under the project-internal regular temporary area (.agentdev/tmp/); other repository areas are not permitted destinations",
     };
-  }
-  if (hasCaseIdentifierSegment(normalized, caseId)) {
-    return { valid: true, basis: "case-dedicated-area", reason: null };
   }
   return {
     valid: false,
     basis: null,
     reason:
-      "creation destination is not permitted: only the environment-designated TEMP area or a case dedicated area (a directory carrying the case identifier) is allowed; the project parent directory and arbitrary paths are rejected",
+      "creation destination is not permitted: only the environment-designated TEMP area or the project-internal regular temporary area (.agentdev/tmp/ under the repository root) is allowed; the presence of the case identifier in a path segment is not a permission basis, so the project parent directory and arbitrary paths are rejected",
   };
 }
 
@@ -488,7 +480,8 @@ export function appendEntry(
 /**
  * 作成と同時の台帳登録（作成ヘルパーの本体）。登録→作成先確認→保存を1回の呼出で行い、
  * 登録結果（登録 ID・台帳パス・記録数）を返す。台帳不在の案件では新規台帳を作成する。
- * 作成先確認（環境指定TEMPまたは案件専用領域への制限）で違反の所在は台帳を書換えずに拒否する。
+ * 作成先確認（環境指定TEMPまたはプロジェクト内正規一時領域への制限）で違反の所在は
+ * 台帳を書換えずに拒否する。
  */
 export function registerResource(
   io: LedgerIo,
@@ -499,7 +492,6 @@ export function registerResource(
   const validated = validateRegistrationInput(input);
   const destination = evaluateCreationDestination(
     validated.location,
-    validated.caseId,
     mainRepoRoot,
     options.tempRoot ?? tmpdir(),
   );

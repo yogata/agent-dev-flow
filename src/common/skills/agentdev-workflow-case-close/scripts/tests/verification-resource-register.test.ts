@@ -73,7 +73,7 @@ function baseArgs(overrides: string[] = []): string[] {
     "--kind",
     "capture-log",
     "--location",
-    "C:/tmp/case-3928/verification.log",
+    "C:/repo/main/.agentdev/tmp/verification.log",
     "--ownership",
     "child",
     "--child",
@@ -83,7 +83,7 @@ function baseArgs(overrides: string[] = []): string[] {
     "--recorded-by",
     "case-run",
     "--identifier",
-    "path=C:/tmp/case-3928/verification.log",
+    "path=C:/repo/main/.agentdev/tmp/verification.log",
     "--identifier",
     "size=1024",
     ...overrides,
@@ -96,13 +96,13 @@ describe("検証用一時資材 作成ヘルパー（verification-resource-regis
       const { input } = parseRegisterArgs(baseArgs(), () => FIXED_NOW);
       expect(input.caseId).toBe("3928");
       expect(input.kind).toBe("capture-log");
-      expect(input.location).toBe("C:/tmp/case-3928/verification.log");
+      expect(input.location).toBe("C:/repo/main/.agentdev/tmp/verification.log");
       expect(input.ownership).toBe("child");
       expect(input.childIssue).toBe(3930);
       expect(input.collector).toBe("case-run:3930");
       expect(input.recordedBy).toBe("case-run");
       expect(input.identifiers).toEqual({
-        path: "C:/tmp/case-3928/verification.log",
+        path: "C:/repo/main/.agentdev/tmp/verification.log",
         size: "1024",
       });
       expect(input.createdAt).toBe(FIXED_NOW);
