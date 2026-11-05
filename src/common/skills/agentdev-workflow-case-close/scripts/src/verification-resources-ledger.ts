@@ -12,6 +12,7 @@
 //
 
 import * as path from "node:path";
+import { tmpdir } from "node:os";
 
 const LEDGER_DIR_RELATIVE = ".agentdev/tmp/verification-resources";
 
@@ -298,6 +299,100 @@ export function isConfirmedEmptyBasis(readResult: LedgerReadResult): boolean {
   return readResult.state === "present" && readResult.entries.length === 0;
 }
 
+/**
+ * 作成先確認（専用領域配置・作成経路の制限の機械拒否面）。
+ * ファイルシステム パス形の所在は、環境指定TEMP配下または案件専用領域
+ * （案件識別子をパス要素に含むrepo外ディレクトリ）に限り許可し、プロジェクト親
+ * ディレクトリ等の作成先違反を拒否する。リポジトリ内部は案件専用領域でないため
+ * 拒否する。URL形・疑似スキーマ所在（process:pid=… 等）は作成先確認の対象外とする。
+ * 正は 検証用一時資材のライフサイクル Design「専用領域と作成経路の制限」節。
+ */
+export interface CreationDestinationEvaluation {
+  valid: boolean;
+  /** 許可根拠（env-temp-area / case-dedicated-area / non-path-location）。invalid 時は null。 */
+  basis: string | null;
+  /** 拒否理由。許可時は null。 */
+  reason: string | null;
+}
+
+function isPathLikeLocation(location: string): boolean {
+  return (
+    /^[a-zA-Z]:[\\/]/.test(location) ||
+    location.startsWith("//") ||
+    location.startsWith("\\\\") ||
+    location.startsWith("/") ||
+    location.startsWith("\\") ||
+    location.startsWith("./") ||
+    location.startsWith("../")
+  );
+}
+
+function isAbsoluteLocation(location: string): boolean {
+  return (
+    /^[a-zA-Z]:[\\/]/.test(location) ||
+    location.startsWith("//") ||
+    location.startsWith("\\\\") ||
+    location.startsWith("/") ||
+    location.startsWith("\\")
+  );
+}
+
+function normalizeDestinationPath(value: string): string {
+  return value.replace(/\\/g, "/").replace(/\/+$/, "");
+}
+
+function isUnderDestinationPath(candidate: string, base: string): boolean {
+  return base.length > 0 && (candidate === base || candidate.startsWith(`${base}/`));
+}
+
+function hasCaseIdentifierSegment(candidate: string, caseId: string): boolean {
+  const escaped = caseId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const boundary = new RegExp(`(^|[^0-9])${escaped}([^0-9]|$)`);
+  return candidate.split("/").some((segment) => segment.length > 0 && boundary.test(segment));
+}
+
+export function evaluateCreationDestination(
+  location: string,
+  caseId: string,
+  mainRepoRoot: string,
+  tempRoot: string,
+): CreationDestinationEvaluation {
+  if (!isPathLikeLocation(location)) {
+    return { valid: true, basis: "non-path-location", reason: null };
+  }
+  if (!isAbsoluteLocation(location)) {
+    return {
+      valid: false,
+      basis: null,
+      reason:
+        "relative destination paths are not permitted; use an absolute path under the environment TEMP area or the case dedicated area",
+    };
+  }
+  const normalized = normalizeDestinationPath(location);
+  const normalizedTemp = normalizeDestinationPath(tempRoot);
+  const normalizedRepo = normalizeDestinationPath(mainRepoRoot);
+  if (isUnderDestinationPath(normalized, normalizedTemp)) {
+    return { valid: true, basis: "env-temp-area", reason: null };
+  }
+  if (isUnderDestinationPath(normalized, normalizedRepo)) {
+    return {
+      valid: false,
+      basis: null,
+      reason:
+        "creation inside the repository is not the case dedicated area; verification resources are placed outside the repository",
+    };
+  }
+  if (hasCaseIdentifierSegment(normalized, caseId)) {
+    return { valid: true, basis: "case-dedicated-area", reason: null };
+  }
+  return {
+    valid: false,
+    basis: null,
+    reason:
+      "creation destination is not permitted: only the environment-designated TEMP area or a case dedicated area (a directory carrying the case identifier) is allowed; the project parent directory and arbitrary paths are rejected",
+  };
+}
+
 /** 登録入力の契約検証。必須項目欠落・列挙外の値は LedgerInputError（fail-closed）。 */
 export function validateRegistrationInput(input: unknown): VerificationResourceRegistrationInput {
   if (typeof input !== "object" || input === null || Array.isArray(input)) {
@@ -391,15 +486,28 @@ export function appendEntry(
 }
 
 /**
- * 作成と同時の台帳登録（作成ヘルパーの本体）。登録→保存を1回の呼出で行い、
+ * 作成と同時の台帳登録（作成ヘルパーの本体）。登録→作成先確認→保存を1回の呼出で行い、
  * 登録結果（登録 ID・台帳パス・記録数）を返す。台帳不在の案件では新規台帳を作成する。
+ * 作成先確認（環境指定TEMPまたは案件専用領域への制限）で違反の所在は台帳を書換えずに拒否する。
  */
 export function registerResource(
   io: LedgerIo,
   mainRepoRoot: string,
   input: VerificationResourceRegistrationInput,
+  options: { tempRoot?: string } = {},
 ): { ok: true; ledgerPath: string; entryId: string; entryCount: number } {
   const validated = validateRegistrationInput(input);
+  const destination = evaluateCreationDestination(
+    validated.location,
+    validated.caseId,
+    mainRepoRoot,
+    options.tempRoot ?? tmpdir(),
+  );
+  if (!destination.valid) {
+    throw new LedgerInputError(
+      `registration input.location rejected by the creation destination check: ${validated.location} (${destination.reason})`,
+    );
+  }
   const ledgerPath = resolveLedgerPath(mainRepoRoot, validated.caseId);
   const read = readLedger(io, ledgerPath);
   const { entry, entries } = appendEntry(read.entries, validated);

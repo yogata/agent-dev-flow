@@ -842,6 +842,17 @@ export const DECLARED_DETECTION_SCOPES = [
 ] as const;
 
 /**
+ * 台帳欠落時に照合不能として明示報告する entity 系スコープ（process・listen・remote）。
+ * 台帳不在は空の観測集合の黙過ではなく検査不能として報告する（空状態の区別。正は
+ * 検証用一時資材のライフサイクル Design「専用領域と作成経路の制限」節）。
+ */
+export const ENTITY_RECONCILIATION_SCOPES = [
+  "process-liveness",
+  "listen-port-check",
+  "remote-absence-verification",
+] as const;
+
+/**
  * OS依存観測を検査コマンドとして呼出側が宣言する scope の固定必須集合。
  * 欠落は validateInput で拒否する（検査設定の省略禁止）。
  */
@@ -928,8 +939,8 @@ export interface VerificationResourceObservation {
   worktrees: readonly string[];
   /** (b) branch列挙。 */
   branches: readonly string[];
-  /** (c) 台帳記録PIDの生存確認結果。 */
-  processes: Record<string, { alive: boolean; commandLine: string | null }>;
+  /** (c) プロセス生存観測結果（実物側網羅列挙の観測値。cwd・開始時刻は正規形の観測で取得できた場合に保持）。 */
+  processes: Record<string, { alive: boolean; commandLine: string | null; cwd?: string; startedAt?: string }>;
   /** listenポート確認結果。 */
   listenPorts: Record<string, { listening: boolean }>;
   /** (b) remote不存在判定入力（URLごと。remote列挙に現れない台帳remoteの不存在判定に使用）。 */
@@ -1146,6 +1157,12 @@ export function deriveEntryPresence(
       if (processObservation.commandLine !== null && processObservation.commandLine !== undefined) {
         observedIdentifiers.commandLine = processObservation.commandLine;
       }
+      if (processObservation.cwd !== undefined) {
+        observedIdentifiers.cwd = processObservation.cwd;
+      }
+      if (processObservation.startedAt !== undefined) {
+        observedIdentifiers.startedAt = processObservation.startedAt;
+      }
     } else {
       missingEvidence = missingEvidence === "" ? `the recorded pid is not alive: ${pid}` : missingEvidence;
     }
@@ -1228,10 +1245,13 @@ export function evaluateUnregisteredObservations(
   findings: readonly ResourceReconciliationFinding[];
   excludedObservations: readonly { path: string; basis: string }[];
   knownResidualStillPresent: readonly string[];
+  /** 正規化した既知残存リスト位置のうちパス突合で既に報告したもの（識別情報消費との重複報告防止に使用）。 */
+  knownResidualReportedLocations: readonly string[];
 } {
   const findings: ResourceReconciliationFinding[] = [];
   const excludedObservations: { path: string; basis: string }[] = [];
   const knownResidualStillPresent: string[] = [];
+  const knownResidualReportedLocations: string[] = [];
   const normalizedExcluded = excludedPaths.map((entry) => ({
     ...entry,
     normalized: normalizeObservationPath(resolveObservationPath(entry.path, resolveBase)),
@@ -1257,6 +1277,7 @@ export function evaluateUnregisteredObservations(
     if (registered) continue;
     const known = normalizedKnown.find((entry) => entry.normalized === normalized);
     if (known !== undefined) {
+      knownResidualReportedLocations.push(known.normalized);
       knownResidualStillPresent.push(observed.path);
       findings.push({
         code: "known-residual-still-present",
@@ -1277,7 +1298,155 @@ export function evaluateUnregisteredObservations(
       detail: `no ledger record or exclusion basis for the observed temporary resource: ${observed.path} (source: ${observed.source})`,
     });
   }
-  return { findings, excludedObservations, knownResidualStillPresent };
+  return { findings, excludedObservations, knownResidualStillPresent, knownResidualReportedLocations };
+}
+
+/**
+ * 観測結果に現れた実体（process・listen・remote）の消費経路（実装完全化）。
+ * 台帳記録分の実体照合は deriveEntryPresence が消費するため、本関数は台帳に現れない
+ * キーの消費と、既知残存リストの識別情報（pid・listenPort・url・branch）の消費を行う。
+ * 台帳・既知残存リストのどちらにも照合されない実在entityは未登録資材として検出する
+ * （正は検証用一時資材のライフサイクル Design「実物側網羅列挙と未記録entityの検出対象性」
+ * の記述。検出対象は正の存在証拠〔生存process・listen中ポート・不存在確認が成立しない
+ * remote〕に限り、消滅済みの観測値は残存資材として報告しない）。
+ */
+export function evaluateObservationEntityConsumption(
+  observation: Pick<
+    VerificationResourceObservation,
+    "processes" | "listenPorts" | "remoteAbsenceInputs" | "remotes" | "branches"
+  >,
+  entries: readonly VerificationResourceEntry[],
+  knownResidualEntries: readonly KnownResidualEntry[],
+  knownResidualReportedLocations: readonly string[],
+): {
+  findings: readonly ResourceReconciliationFinding[];
+  knownResidualStillPresent: readonly string[];
+} {
+  const findings: ResourceReconciliationFinding[] = [];
+  const knownResidualStillPresent: string[] = [];
+  const reportedLocations = new Set(knownResidualReportedLocations);
+  const ledgerPids = new Set(
+    entries.map((entry) => entry.identifiers.pid).filter((pid): pid is string => pid !== undefined),
+  );
+  const ledgerListenPorts = new Set(
+    entries
+      .map((entry) => entry.identifiers.listenPort)
+      .filter((listenPort): listenPort is string => listenPort !== undefined),
+  );
+  const ledgerUrls = new Set(entries.map((entry) => entry.location));
+  const knownPids = new Set<string>();
+  const knownListenPorts = new Set<string>();
+  const knownUrls = new Set<string>();
+
+  for (const known of knownResidualEntries) {
+    if (reportedLocations.has(normalizeObservationPath(known.location))) continue;
+    const observedIdentifiers: Record<string, string> = {};
+    let survivalEvidence = "";
+    const pid = known.identifiers.pid;
+    if (pid !== undefined) {
+      knownPids.add(pid);
+      const processObservation = observation.processes[pid];
+      if (processObservation !== undefined && processObservation.alive) {
+        survivalEvidence = survivalEvidence === "" ? `the known residual pid is alive: ${pid}` : survivalEvidence;
+        observedIdentifiers.pid = pid;
+        if (processObservation.commandLine !== null && processObservation.commandLine !== undefined) {
+          observedIdentifiers.commandLine = processObservation.commandLine;
+        }
+        if (processObservation.cwd !== undefined) {
+          observedIdentifiers.cwd = processObservation.cwd;
+        }
+        if (processObservation.startedAt !== undefined) {
+          observedIdentifiers.startedAt = processObservation.startedAt;
+        }
+      }
+    }
+    const listenPort = known.identifiers.listenPort;
+    if (listenPort !== undefined) {
+      knownListenPorts.add(listenPort);
+      if (survivalEvidence === "") {
+        const portObservation = observation.listenPorts[listenPort];
+        if (portObservation !== undefined && portObservation.listening) {
+          survivalEvidence = `the known residual listen port is active: ${listenPort}`;
+          observedIdentifiers.listenPort = listenPort;
+        }
+      }
+    }
+    const knownUrl = known.identifiers.url ?? (isUrlLocation(known.location) ? known.location : undefined);
+    if (knownUrl !== undefined) {
+      knownUrls.add(knownUrl);
+      if (survivalEvidence === "") {
+        const remotePresent = observation.remotes.some((remote) => remote.url === knownUrl);
+        const absenceInput = observation.remoteAbsenceInputs[knownUrl];
+        if (remotePresent) {
+          survivalEvidence = `the known residual remote is present in the remote enumeration: ${knownUrl}`;
+          observedIdentifiers.url = knownUrl;
+        } else if (
+          absenceInput !== undefined &&
+          evaluateRemoteAbsenceJudgement(absenceInput).verdict === "undetermined"
+        ) {
+          survivalEvidence = `the known residual remote remains undetermined after the absence verification: ${knownUrl}`;
+          observedIdentifiers.url = knownUrl;
+        }
+      }
+    }
+    const branch = known.identifiers.branch;
+    if (branch !== undefined && observation.branches.some((name) => name === branch)) {
+      if (survivalEvidence === "") {
+        survivalEvidence = `the known residual branch is present in the branch enumeration: ${branch}`;
+      }
+      observedIdentifiers.branch = branch;
+    }
+    if (survivalEvidence === "") continue;
+    knownResidualStillPresent.push(known.location);
+    findings.push({
+      code: "known-residual-still-present",
+      detail: `known residual list entry is still present by identifier observation: ${known.location} (${survivalEvidence})`,
+    });
+    const match = evaluateIdentifierMatch(known.identifiers, observedIdentifiers);
+    if (!match.matched) {
+      findings.push({
+        code: "identifier-mismatch",
+        detail: `known residual entry identifiers differ from the observation (location: ${known.location}, keys: ${match.mismatchedKeys.join(", ")})`,
+      });
+    }
+  }
+
+  for (const [pid, processObservation] of Object.entries(observation.processes)) {
+    if (ledgerPids.has(pid) || knownPids.has(pid)) continue;
+    if (!processObservation.alive) continue;
+    const detailParts = [`pid ${pid}`];
+    if (processObservation.commandLine !== null && processObservation.commandLine !== undefined) {
+      detailParts.push(`commandLine: ${processObservation.commandLine}`);
+    }
+    if (processObservation.cwd !== undefined) {
+      detailParts.push(`cwd: ${processObservation.cwd}`);
+    }
+    if (processObservation.startedAt !== undefined) {
+      detailParts.push(`startedAt: ${processObservation.startedAt}`);
+    }
+    findings.push({
+      code: "unregistered-resource",
+      detail: `no ledger record or known residual entry covers the observed live process: ${detailParts.join(", ")}`,
+    });
+  }
+  for (const [port, portObservation] of Object.entries(observation.listenPorts)) {
+    if (ledgerListenPorts.has(port) || knownListenPorts.has(port)) continue;
+    if (!portObservation.listening) continue;
+    findings.push({
+      code: "unregistered-resource",
+      detail: `no ledger record or known residual entry covers the observed listening port: ${port}`,
+    });
+  }
+  for (const [url, absenceInput] of Object.entries(observation.remoteAbsenceInputs)) {
+    if (ledgerUrls.has(url) || knownUrls.has(url)) continue;
+    const judgement = evaluateRemoteAbsenceJudgement(absenceInput);
+    if (judgement.verdict === "confirmed-absent") continue;
+    findings.push({
+      code: "unregistered-resource",
+      detail: `no ledger record or known residual entry covers the observed remote target and its absence could not be confirmed: ${url} (${judgement.basis})`,
+    });
+  }
+  return { findings, knownResidualStillPresent };
 }
 
 /**
@@ -1306,6 +1475,12 @@ export function evaluateVerificationResourceReconciliation(
       detail:
         "the verification resources ledger is missing (a missing generation record is not treated as evidence of zero creations)",
     });
+    for (const scope of ENTITY_RECONCILIATION_SCOPES) {
+      findings.push({
+        code: "inspection-unavailable",
+        detail: `inspection is unavailable for scope ${scope}: the ledger is missing, so scope observations cannot be reconciled against generation records (explicit unavailability, not an empty observation set)`,
+      });
+    }
   }
 
   const childEntries = ledger.entries.filter(
@@ -1380,6 +1555,14 @@ export function evaluateVerificationResourceReconciliation(
   );
   findings.push(...unregistered.findings);
 
+  const entityConsumption = evaluateObservationEntityConsumption(
+    observation,
+    ledger.entries,
+    check.knownResidualEntries,
+    unregistered.knownResidualReportedLocations,
+  );
+  findings.push(...entityConsumption.findings);
+
   return {
     ledgerState: ledger.state,
     entryCount: ledger.entries.length,
@@ -1389,7 +1572,10 @@ export function evaluateVerificationResourceReconciliation(
     terminationUnitBlocked: uncollectedParentOrCommon.length > 0,
     permitted: findings.length === 0,
     excludedObservations: unregistered.excludedObservations,
-    knownResidualStillPresent: unregistered.knownResidualStillPresent,
+    knownResidualStillPresent: [
+      ...unregistered.knownResidualStillPresent,
+      ...entityConsumption.knownResidualStillPresent,
+    ],
   };
 }
 
@@ -2160,6 +2346,8 @@ function executeVerificationResourceReconciliation(
           processes[pid] = {
             alive: value.alive,
             commandLine: typeof value.commandLine === "string" ? value.commandLine : null,
+            ...(typeof value.cwd === "string" ? { cwd: value.cwd } : {}),
+            ...(typeof value.startedAt === "string" ? { startedAt: value.startedAt } : {}),
           };
         }
       }
