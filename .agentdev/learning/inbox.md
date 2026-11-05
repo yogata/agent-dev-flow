@@ -430,3 +430,11 @@
 - 出典: PR #3939 本文 Design確定候補セクション
 - 関連: Case #3928・docs/designs/workflows/verification-resource-lifecycle.md・close_mechanical_steps.ts の終了判定記録書出し
 - タグ: #design-promotion-candidate #case-close #終了判定記録 #json-stdout
+
+## [2026-11-05T21:58+09:00][learning_candidate][配布依存境界 gate の scan 対象集合が実行コンテキストで変動し親側証跡と close 側再実行で判定が分岐し得る][Case #3928]
+- 検知: Wave-2 #3932 close の post-merge main 再実行で、配布依存境界 checker が identity.ts:4（#3927 dac7852b3 由来・pre-merge main f824e8cf3 と同一内容・checker は merge 区間で無変更）の concrete-id 1 件を検出した（exit 1・468 files）。rebase 後 #3932 worktree の再実行も同一 1 件。一方、親側が PR head b047a5805 で実行した同 gate は exit=0・違反 0・462 files と申告されており、462 と 468 の差は scan 対象集合の差である。checker 自身の zero-targets 警告（Verify the inspected root (--root) and the junction propagation state）と整合する観測。
+- 対処: 本 close では検出の #3938 起因性を機械判定した（19 変更ファイルへの帰属不在・identity.ts の f824e8cf3 との同一内容・checker 無変更）うえで既存 1 件は本 Case 外として処置せず、parent-side evidence と close 側再実行の両方を完了コメントへ並記した。恒久的な是正（識別子コメントの除去）は intake-promote での分類確定対象。
+- 学び: gate の親側事前実行証跡（exit=0）と同一内容ツリーの close 側再実行（exit=1）が実行コンテキスト差で分岐し得る。pre-recorded 証跡の採用前には gate の scan 対象集合（files 数）と検出件数の両方を記録・突合し、検出の変更起因性を独立確認する。worktree コンテキストの junction 伝播は checker の scan 集合を縮小させ得る。
+- 出典: PR #3938 close 完了コメント（検証差分節・comment 6658435822）・bun check_distribution_boundary.ts 実行記録（main 468 files exit 1 / worktree 468 files exit 1 / 親側申告 b047a5805 462 files exit 0）
+- 関連: Case #3928・Wave-2 #3932・同 inbox の intake_candidate（配布依存境界 phase-transition identity.ts の既存REQ識別子コメント・#3931 記録分）
+- タグ: #learning-capture #配布依存境界 #scan-coverage #証跡突合
