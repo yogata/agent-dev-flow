@@ -13,6 +13,7 @@ import {
   evaluateIntegrityMachineAcceptance,
   extractCompletionCheckboxes,
   isCloseOperationPermitted,
+  resolveCloseAcceptanceRecordPath,
   runCloseMechanicalSteps,
   validateInput,
   type CloseMechanicalInput,
@@ -57,6 +58,7 @@ function preMergeInput(overrides: Partial<CloseMechanicalInput> = {}): CloseMech
     repoRoot: "<repo>",
     branch: "case-100",
     prNumber: 200,
+    issueUpdatedAt: "2026-11-05T08:00:00Z",
     issueBodyPath: "<repo>/.agentdev/tmp/issue-body.md",
     generateIndexesGate: gate("generate_indexes"),
     traceabilityGate: gate("traceability-check"),
@@ -71,13 +73,6 @@ function preMergeInput(overrides: Partial<CloseMechanicalInput> = {}): CloseMech
       issueNumber: 3931,
       knownResidualEntries: [],
       deletionConfirmations: [],
-      creationRouteControlConfirmations: [
-        {
-          route: "arbitrary-path-creation",
-          basis: "実行制限能力の消費確認記録の所在（Epic #3928 実現方針の enforcement 記録）",
-          confirmedBy: "case-close-model",
-        },
-      ],
       inspectionCommands: [
         inspectionCommand("dedicated-area-listing"),
         inspectionCommand("os-temp-area-scan"),
@@ -148,7 +143,7 @@ function fakeRunner(overrides: {
   integrityExitCodes?: Record<string, number>;
   ledgerText?: string;
   ledgerMissing?: boolean;
-  headCommit?: string;
+  previousAcceptanceRecord?: string;
   remotesText?: string;
   worktreeListingText?: string;
   branchesText?: string;
@@ -162,13 +157,23 @@ function fakeRunner(overrides: {
 } = {}): MechanicalRunner & {
   calls: { command: string; args: readonly string[]; cwd: string }[];
   writes: { absolutePath: string; content: string }[];
+  deletions: string[];
 } {
   const calls: { command: string; args: readonly string[]; cwd: string }[] = [];
   const writes: { absolutePath: string; content: string }[] = [];
+  const deletions: string[] = [];
+  const files = new Map<string, string>();
+  const acceptanceRecordPath = path.join("<repo>", ".agentdev", "close-acceptance", "issue-3931.json");
+  if (overrides.previousAcceptanceRecord !== undefined) {
+    files.set(acceptanceRecordPath, overrides.previousAcceptanceRecord);
+  }
   return {
     calls,
     writes,
+    deletions,
     exists(absolutePath) {
+      if (files.has(absolutePath)) return true;
+      if (absolutePath === acceptanceRecordPath) return false;
       if (absolutePath.includes("verification-resources") && overrides.ledgerMissing === true) {
         return false;
       }
@@ -209,9 +214,6 @@ function fakeRunner(overrides: {
       if (spec.command === "git" && spec.args[0] === "worktree") {
         result.stdout = overrides.worktreeListingText ?? "";
       }
-      if (spec.command === "git" && spec.args[0] === "rev-parse") {
-        result.stdout = `${overrides.headCommit ?? "0275e2d7b1cd4517004a0e7b4a6fc0464de39416"}\n`;
-      }
       if (spec.args.includes("dedicated-area-listing")) {
         result.stdout = JSON.stringify({ entries: overrides.dedicatedAreaEntries ?? [] });
       }
@@ -239,6 +241,8 @@ function fakeRunner(overrides: {
       return result;
     },
     readTextFile(absolutePath) {
+      const existingFile = files.get(absolutePath);
+      if (existingFile !== undefined) return existingFile;
       if (absolutePath.includes("verification-resources")) return overrides.ledgerText ?? "[]";
       if (absolutePath.endsWith("issue-body.md")) return overrides.issueBody ?? "";
       if (absolutePath.endsWith("epic-body.md")) return overrides.epicBody ?? "";
@@ -246,6 +250,11 @@ function fakeRunner(overrides: {
     },
     writeTextFile(absolutePath, content) {
       writes.push({ absolutePath, content });
+      files.set(absolutePath, content);
+    },
+    removeFile(absolutePath) {
+      deletions.push(absolutePath);
+      files.delete(absolutePath);
     },
     mkdirRecursive() {},
     gitCommonDir() {
@@ -352,7 +361,7 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
     expect(evaluation.humanConfirmationItems).toEqual(["notes/unattributed.txt"]);
   });
 
-  test("実経路: リポジトリ全体の未追跡対象と状態記録パスを repoRoot で検査し、クリーンな場合は完了操作を許可する", () => {
+  test("実経路: リポジトリ全体の未追跡対象と状態記録を検査し、外部制限未確認は別に完了を拒否する", () => {
     const runner = fakeRunner({ issueBody: "- [x] 条件1\n" });
     const report = runCloseMechanicalSteps(
       preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
@@ -376,8 +385,11 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
     );
     expect(untrackedCall?.cwd).toBe("<repo>");
     expect(untrackedCall?.args).toEqual(["ls-files", "--others", "--exclude-standard"]);
-    expect(report.result.exitCategory).toBe("success");
-    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+    expect(report.result.exitCategory).toBe("failure");
+    expect(isCloseOperationPermitted(report)).toEqual({
+      permitted: false,
+      reason: "acceptance-gap-remains",
+    });
   });
 
   test("実経路: 未コミット契約状態記録の検出時は失敗で完了扱いにしない", () => {
@@ -448,7 +460,10 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
       { path: "stray.txt", basis: "対応記録コメントで本 Case 由来・起票済みと確認" },
     ]);
     expect(residue.humanConfirmationItems).toEqual([]);
-    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+    expect(isCloseOperationPermitted(report)).toEqual({
+      permitted: false,
+      reason: "acceptance-gap-remains",
+    });
   });
 
   test("実経路: 承認一覧対象の未追跡検出は承認記録として報告し、対象外残存とは分離する", () => {
@@ -595,8 +610,11 @@ describe("full integrity suite の機械受理基準（記録実体の検証と�
     expect(diff.accepted).toBe(true);
     expect(diff.failedGateNames).toEqual(["check_integrity"]);
     expect(diff.observedFailCounts).toEqual([{ gate: "check_integrity", failCount: 1 }]);
-    expect(report.result.exitCategory).toBe("success");
-    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+    expect(report.result.exitCategory).toBe("failure");
+    expect(isCloseOperationPermitted(report)).toEqual({
+      permitted: false,
+      reason: "acceptance-gap-remains",
+    });
   });
 
   test("(a') execution-form 分類は規律適合再実行結果の採用実体が揃った場合のみ受理される", () => {
@@ -1032,7 +1050,7 @@ describe("Epic 実行構成表の解析と現在 Wave 特定（投入順序に�
 });
 
 describe("pre-merge 機械工程の実行（品質ゲート省略なし・報告 JSON 4要素）", () => {
-  test("全ステップが成功し、報告は4要素を持ち終了コード 0 に対応する", () => {
+  test("全品質ゲートを実行しても未確認の作成経路が残れば完了を拒否する", () => {
     const runner = fakeRunner({
       issueBody: "- [ ] 条件1\n- [x] 条件2\n",
       epicBody: "| Wave | Issue | 前提 | 状態 |\n|---|---|---|---|\n| 1 | #101 | なし | pending |",
@@ -1056,8 +1074,8 @@ describe("pre-merge 機械工程の実行（品質ゲート省略なし・報告
     ]) {
       expect(stepNames).toContain(required);
     }
-    expect(report.result.exitCategory).toBe("success");
-    expect(decideExitCode(report)).toBe(0);
+    expect(report.result.exitCategory).toBe("failure");
+    expect(decideExitCode(report)).toBe(1);
     expect(Object.keys(report).sort()).toEqual(["diff", "proposal", "result", "warnings"]);
     expect(report.proposal.epic_body).toContain("#101 | なし | completed |");
     expect(report.proposal.completion_checkboxes).toContain("条件1");
@@ -1068,8 +1086,8 @@ describe("pre-merge 機械工程の実行（品質ゲート省略なし・報告
     const report = runCloseMechanicalSteps(preMergeInput(), runner);
     const polling = report.result.steps.find((s) => s.name === "mergeable-polling");
     expect(polling?.status).toBe("warn");
-    expect(report.result.exitCategory).toBe("needs-judgment");
-    expect(decideExitCode(report)).toBe(2);
+    expect(report.result.exitCategory).toBe("failure");
+    expect(decideExitCode(report)).toBe(1);
     expect(report.warnings.join("\n")).toContain("CONFLICTING");
   });
 
@@ -1306,7 +1324,7 @@ describe("受入評価の実経路接続（final-acceptance-evaluation step と�
     });
   });
 
-  test("証拠が揃った対象は同一の実経路で終了操作を許可する（正常終了）", () => {
+  test("完了条件の証拠が揃っても未確認の外部制限があれば終了操作を拒否する", () => {
     const runner = fakeRunner({ issueBody: "- [ ] 条件1\n- [ ] 条件2\n" });
     const report = runCloseMechanicalSteps(
       preMergeInput({
@@ -1318,8 +1336,11 @@ describe("受入評価の実経路接続（final-acceptance-evaluation step と�
       (s) => s.name === "final-acceptance-evaluation",
     );
     expect(evaluationStep?.status).toBe("pass");
-    expect(decideExitCode(report)).toBe(0);
-    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+    expect(decideExitCode(report)).toBe(1);
+    expect(isCloseOperationPermitted(report)).toEqual({
+      permitted: false,
+      reason: "acceptance-gap-remains",
+    });
   });
 
   test("不足で停止した対象は修正後、同一の実経路の再検証で終了操作を許可する（fix-and-reverify）", () => {
@@ -1339,7 +1360,10 @@ describe("受入評価の実経路接続（final-acceptance-evaluation step と�
       }),
       fakeRunner({ issueBody: "- [ ] 条件1\n- [ ] 条件2\n" }),
     );
-    expect(isCloseOperationPermitted(reverified)).toEqual({ permitted: true });
+    expect(isCloseOperationPermitted(reverified)).toEqual({
+      permitted: false,
+      reason: "acceptance-gap-remains",
+    });
   });
 
   test("拒否・未確定の実経路では終了操作（issue_close 相当の gh 書込み）が呼び出されない", () => {
@@ -1487,18 +1511,86 @@ describe("一時資材と正式成果物の役割分類（REQ-118-003）", () =>
 });
 
 describe("検証用一時資材の照合・完了拒否・終了判定記録書出し（REQ-032-043/044/045/046）", () => {
-  test("実経路: クリーン構成（台帳記録ゼロ・観測ゼロ・制限確認あり）では照合が成立し完了操作を許可する", () => {
+  test("終了判定記録のissue番号はreaderと同じ4桁ゼロ埋めのパスへ解決する", () => {
+    expect(resolveCloseAcceptanceRecordPath("<repo>", 12)).toBe(
+      path.join("<repo>", ".agentdev", "close-acceptance", "issue-0012.json"),
+    );
+  });
+
+  test("後段gate失敗時は最終reader契約のaccepted=falseを記録し、HEADをtargetRevisionに流用しない", () => {
+    const issueUpdatedAt = "2026-11-05T08:00:00Z";
+    const input = {
+      ...preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      issueUpdatedAt,
+    } as unknown as CloseMechanicalInput;
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      integrityExitCodes: { "textlint-final-check": 1 },
+      previousAcceptanceRecord: JSON.stringify({
+        issueNumber: 3931,
+        targetRevision: issueUpdatedAt,
+        generatedAt: "2026-11-05T07:00:00Z",
+        accepted: true,
+      }),
+    });
+
+    const report = runCloseMechanicalSteps(input, runner);
+    const recordPath = path.join("<repo>", ".agentdev", "close-acceptance", "issue-3931.json");
+    const recordText = runner.writes.find((write) => write.absolutePath === recordPath)?.content;
+    expect(recordText).toBeDefined();
+    const record = JSON.parse(recordText ?? "{}") as Record<string, unknown>;
+
+    expect(record).toMatchObject({
+      issueNumber: 3931,
+      targetRevision: issueUpdatedAt,
+      accepted: false,
+    });
+    expect(JSON.parse(runner.readTextFile(recordPath))).toMatchObject({ accepted: false });
+    expect(report.result.exitCategory).toBe("failure");
+  });
+
+  test("basis・confirmedBy等の任意申告と旧版参照は外部制限の効果確認として受理しない", () => {
+    const input = {
+      ...preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      issueUpdatedAt: "2026-11-05T08:00:00Z",
+      verificationResourceCheck: {
+        ...verificationResourceCheck(),
+        creationRouteControlConfirmations: [
+          {
+            route: "arbitrary-path-creation",
+            basis: "enforcement succeeded",
+            confirmedBy: "case-close-model",
+            targetRevision: "2026-11-04T08:00:00Z",
+          },
+        ],
+      },
+    } as unknown as CloseMechanicalInput;
+    const report = runCloseMechanicalSteps(
+      input,
+      fakeRunner({ issueBody: "- [x] 条件1\n", ledgerText: "[]" }),
+    );
+    const gaps = report.diff.acceptanceGaps as readonly { route: string }[];
+
+    expect(gaps.some((gap) => gap.route === "arbitrary-path-creation")).toBe(true);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: クリーン構成でも外部制限の効果未確認を受入未達として完了を拒否する", () => {
     const runner = fakeRunner({ issueBody: "- [x] 条件1\n", ledgerText: "[]" });
     const report = runCloseMechanicalSteps(
       preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
       runner,
     );
     const step = report.result.steps.find((s) => s.name === "verification-resource-reconciliation");
-    expect(step?.status).toBe("pass");
+    expect(step?.status).toBe("fail");
     const reconciliation = report.diff.verificationResourceReconciliation as { permitted: boolean };
     expect(reconciliation.permitted).toBe(true);
-    expect(report.diff.acceptanceGaps).toEqual([]);
-    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+    expect(report.diff.acceptanceGaps).toHaveLength(1);
+    expect(isCloseOperationPermitted(report)).toEqual({
+      permitted: false,
+      reason: "acceptance-gap-remains",
+    });
   });
 
   test("実経路: 台帳登録済みの未回収一時資材が実物残存する場合は照合で検出し完了を拒否する", () => {
@@ -1665,30 +1757,32 @@ describe("検証用一時資材の照合・完了拒否・終了判定記録書�
     ).toBe(false);
   });
 
-  test("実経路: 終了判定記録をmain repo root固定の .agentdev/close-acceptance/issue-{NNNN}.json へ書き出す", () => {
+  test("実経路: 終了判定記録をreaderの4-field契約でmain repo rootへ書き出す", () => {
     const runner = fakeRunner({ issueBody: "- [x] 条件1\n", ledgerText: "[]" });
-    runCloseMechanicalSteps(
+    const report = runCloseMechanicalSteps(
       preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
       runner,
     );
+    expect(report.result.exitCategory).toBe("failure");
     const expectedPath = path.join("<repo>", ".agentdev", "close-acceptance", "issue-3931.json");
     const write = runner.writes.find((w) => w.absolutePath === expectedPath);
     expect(write).toBeDefined();
     const record = JSON.parse(write?.content ?? "{}") as {
       issueNumber: number;
-      judgedRevision: string;
+      targetRevision: string;
       generatedAt: string;
-      judgment: {
-        reconciliationPermitted: boolean;
-        acceptanceGapsRemaining: boolean;
-        closeOperationPermitted: boolean;
-      };
+      accepted: boolean;
     };
     expect(record.issueNumber).toBe(3931);
-    expect(record.judgedRevision).toBe("0275e2d7b1cd4517004a0e7b4a6fc0464de39416");
+    expect(record.targetRevision).toBe("2026-11-05T08:00:00Z");
     expect(Number.isNaN(Date.parse(record.generatedAt))).toBe(false);
-    expect(record.judgment.reconciliationPermitted).toBe(true);
-    expect(record.judgment.closeOperationPermitted).toBe(true);
+    expect(record.accepted).toBe(false);
+    expect(Object.keys(record).sort()).toEqual(["accepted", "generatedAt", "issueNumber", "targetRevision"]);
+    expect(report.diff.closeAcceptanceRecord).toMatchObject({
+      targetRevision: "2026-11-05T08:00:00Z",
+      accepted: false,
+      written: true,
+    });
   });
 
   test("実経路: 照合拒否の場合も終了判定記録を書き出し、判定内容に拒否とfindingsを記録する", () => {
@@ -1697,7 +1791,7 @@ describe("検証用一時資材の照合・完了拒否・終了判定記録書�
       ledgerText: JSON.stringify([ledgerEntryJson()]),
       dedicatedAreaEntries: ["<repo>/tmp-area/verify-clone"],
     });
-    runCloseMechanicalSteps(
+    const report = runCloseMechanicalSteps(
       preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
       runner,
     );
@@ -1706,35 +1800,44 @@ describe("検証用一時資材の照合・完了拒否・終了判定記録書�
     expect(write).toBeDefined();
     const record = JSON.parse(write?.content ?? "{}") as {
       issueNumber: number;
-      judgment: {
-        reconciliationPermitted: boolean;
-        closeOperationPermitted: boolean;
-        findings: readonly { code: string }[];
-      };
+      targetRevision: string;
+      accepted: boolean;
     };
-    expect(record.judgment.reconciliationPermitted).toBe(false);
-    expect(record.judgment.closeOperationPermitted).toBe(false);
-    expect(record.judgment.findings.some((f) => f.code === "residual-uncollected")).toBe(true);
+    expect(record.targetRevision).toBe("2026-11-05T08:00:00Z");
+    expect(record.accepted).toBe(false);
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      findings: readonly { code: string }[];
+    };
+    expect(reconciliation.findings.some((f) => f.code === "residual-uncollected")).toBe(true);
   });
 
   test("実経路: 終了判定記録を書き出せない場合はfail-closedで完了操作を拒否する", () => {
-    const runner = fakeRunner({ issueBody: "- [x] 条件1\n", ledgerText: "[]" });
+    const recordPath = path.join("<repo>", ".agentdev", "close-acceptance", "issue-3931.json");
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      previousAcceptanceRecord: JSON.stringify({
+        issueNumber: 3931,
+        targetRevision: "2026-11-05T08:00:00Z",
+        generatedAt: "2026-11-05T07:00:00Z",
+        accepted: true,
+      }),
+    });
     delete runner.writeTextFile;
     const report = runCloseMechanicalSteps(
       preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
       runner,
     );
-    const reconciliation = report.diff.verificationResourceReconciliation as {
-      acceptanceRecordWritten: boolean;
-      findings: readonly { code: string }[];
-    };
+    const acceptanceRecord = report.diff.closeAcceptanceRecord as { written: boolean; accepted: boolean };
 
-    expect(reconciliation.acceptanceRecordWritten).toBe(false);
-    expect(reconciliation.findings.some((finding) => finding.code === "inspection-unavailable")).toBe(true);
+    expect(acceptanceRecord.written).toBe(false);
+    expect(acceptanceRecord.accepted).toBe(false);
+    expect(runner.deletions).toContain(recordPath);
+    expect(runner.exists(recordPath)).toBe(false);
     expect(isCloseOperationPermitted(report).permitted).toBe(false);
   });
 
-  test("実filesystem: 終了判定記録はworktreeではなくmain repo rootへ書き出される", () => {
+  test("実filesystem: reader契約の終了判定記録はworktreeではなくmain repo rootへ書き出される", () => {
     const tempRoot = fs.mkdtempSync(
       path.join(REPO_ROOT, "src/common/skills/agentdev-workflow-case-close/scripts/.close-acceptance-test-"),
     );
@@ -1757,11 +1860,13 @@ describe("検証用一時資材の照合・完了拒否・終了判定記録書�
     expect(fs.existsSync(recordPath)).toBe(true);
     expect(JSON.parse(fs.readFileSync(recordPath, "utf-8"))).toMatchObject({
       issueNumber: 3931,
-      judgment: { closeOperationPermitted: true },
+      targetRevision: "2026-11-05T08:00:00Z",
+      accepted: false,
     });
-    expect(report.diff.verificationResourceReconciliation).toMatchObject({
-      acceptanceRecordPath: recordPath,
-      acceptanceRecordWritten: true,
+    expect(report.diff.closeAcceptanceRecord).toMatchObject({
+      path: recordPath,
+      written: true,
+      accepted: false,
     });
   });
 
@@ -1847,7 +1952,10 @@ describe("検証用一時資材の照合・完了拒否・終了判定記録書�
     };
     expect(reconciliation.permitted).toBe(true);
     expect(reconciliation.findings).toEqual([]);
-    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+    expect(isCloseOperationPermitted(report)).toEqual({
+      permitted: false,
+      reason: "acceptance-gap-remains",
+    });
   });
 
   test("実経路: 検査コマンドの失敗（非ゼロ終了）は検査器の異常としてfail-closedで完了を拒否する", () => {
@@ -1905,13 +2013,7 @@ describe("検証用一時資材の照合・完了拒否・終了判定記録書�
   test("実経路: 受入未達（機械検出も実行制限も成立しない作成経路の残存）を報告JSONへ出力し終了操作を許可しない", () => {
     const runner = fakeRunner({ issueBody: "- [x] 条件1\n", ledgerText: "[]" });
     const report = runCloseMechanicalSteps(
-      preMergeInput({
-        acceptanceVerdicts: [soundPass("AC-1")],
-        verificationResourceCheck: {
-          ...verificationResourceCheck(),
-          creationRouteControlConfirmations: [],
-        },
-      }),
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
       runner,
     );
     const gaps = report.diff.acceptanceGaps as readonly { code: string; route?: string }[];
@@ -2106,16 +2208,9 @@ describe("検証用一時資材照合の入力検証（検査設定の省略禁�
     expect(() => validateInput(broken as unknown)).toThrow(/unspecified-scope/);
   });
 
-  test("creationRouteControlConfirmations の形式違反（basis欠落）を拒否する", () => {
+  test("pre-mergeでIssue更新時刻が欠落する入力を拒否する", () => {
     const base = preMergeInput();
-    const baseCheck = base.verificationResourceCheck;
-    const broken = {
-      ...base,
-      verificationResourceCheck: {
-        ...baseCheck,
-        creationRouteControlConfirmations: [{ route: "arbitrary-path-creation", confirmedBy: "x" }],
-      },
-    };
-    expect(() => validateInput(broken as unknown)).toThrow(/basis/);
+    const broken = { ...base, issueUpdatedAt: undefined };
+    expect(() => validateInput(broken as unknown)).toThrow(/issue-updated-at/);
   });
 });

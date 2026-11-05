@@ -81,6 +81,7 @@ export interface MechanicalRunner {
   /** 台帳・終了判定記録の書出し（pre-merge 照合で使用）。未提供時は照合が成立しない。 */
   writeTextFile?(absolutePath: string, content: string): void;
   mkdirRecursive?(absolutePath: string): void;
+  removeFile?(absolutePath: string): void;
   /** メインrepo root 解決（worktree 非依存。メインrepo の .git 絶対パスを返す）。 */
   gitCommonDir?(): string;
 }
@@ -214,6 +215,8 @@ export interface CloseMechanicalInput {
   repoRoot: string;
   branch: string;
   prNumber: number;
+  /** Fresh issue_read revision (`updated_at`/Local frontmatter `updated_at`), never a git commit. */
+  issueUpdatedAt?: string;
   issueBodyPath?: string;
   epicBodyPath?: string;
   epicChildStatusUpdates?: readonly { issue: number; status: PersistedStatus }[];
@@ -478,6 +481,9 @@ export function validateInput(value: unknown): CloseMechanicalInput {
     if (typeof v.issueBodyPath !== "string" || (v.issueBodyPath as string).length === 0) {
       missing.push("issue-body-extraction");
     }
+    if (!isNonEmptyString(v.issueUpdatedAt)) {
+      missing.push("issue-updated-at");
+    }
     if (v.contractStateCheck == null) {
       missing.push("contract-state-residue-check");
     }
@@ -576,21 +582,6 @@ function validateVerificationResourceCheckInput(value: unknown): void {
       fail(
         "input.verificationResourceCheck.deletionConfirmations[].confirmedBy and .confirmedAt are required",
       );
-    }
-  }
-  if (!Array.isArray(v.creationRouteControlConfirmations)) {
-    fail("input.verificationResourceCheck.creationRouteControlConfirmations must be an array");
-  }
-  for (const confirmation of v.creationRouteControlConfirmations) {
-    const c = confirmation as Record<string, unknown>;
-    if (typeof confirmation !== "object" || confirmation === null || !isNonEmptyString(c.route)) {
-      fail("input.verificationResourceCheck.creationRouteControlConfirmations[].route is required");
-    }
-    if (!isNonEmptyString(c.basis)) {
-      fail("input.verificationResourceCheck.creationRouteControlConfirmations[].basis is required");
-    }
-    if (!isNonEmptyString(c.confirmedBy)) {
-      fail("input.verificationResourceCheck.creationRouteControlConfirmations[].confirmedBy is required");
     }
   }
   if (!Array.isArray(v.inspectionCommands) || v.inspectionCommands.length === 0) {
@@ -725,12 +716,7 @@ export const REQUIRED_INSPECTION_SCOPES = [
   "remote-absence-verification",
 ] as const;
 
-/**
- * 機械検出も実行制限も宣言された検出範囲に対して成立しない作成経路。
- * この経路は実行制限能力の消費確認実体（creationRouteControlConfirmations）が
- * 提供されるまで受入未達として報告され、終了操作を許可しない
- * （検出範囲の宣言と未達の機械的接続の規約）。
- */
+/** 機械検出も制限効果の独立観測もない作成経路を受入未達として扱う。 */
 export const CREATION_ROUTES_REQUIRING_CONTROL_CONFIRMATION = ["arbitrary-path-creation"] as const;
 
 /** 一時資材と正式成果物の役割分類値（ライフサイクル Design「正式成果物と一時資材の役割分類」節）。 */
@@ -754,13 +740,6 @@ export interface DeletionConfirmation {
   confirmedAt: string;
 }
 
-/** 実行制限能力の消費確認（外部の制限機構の実際の稼働・効果を確認した記録の所在）。 */
-export interface CreationRouteControlConfirmation {
-  route: string;
-  basis: string;
-  confirmedBy: string;
-}
-
 /** OS依存観測の検査コマンド仕様（scope 単位の JSON stdout 契約）。 */
 export interface InspectionCommandSpec {
   scope: string;
@@ -779,8 +758,6 @@ export interface VerificationResourceCheck {
   knownResidualEntries: readonly KnownResidualEntry[];
   /** 削除確認記録（回収済み記録で実物消失のエントリに対応する確認）。 */
   deletionConfirmations: readonly DeletionConfirmation[];
-  /** 実行制限能力の消費確認（Design「外部の実行制限能力の消費確認」節）。 */
-  creationRouteControlConfirmations: readonly CreationRouteControlConfirmation[];
   /** OS依存観測の検査コマンド仕様（scope 固定必須集合の被覆が必須）。 */
   inspectionCommands: readonly InspectionCommandSpec[];
   /** 検査実行が作成記録付きで書き出す特定実体のパス集合（除外根拠1の機械確認対象）。 */
@@ -867,16 +844,10 @@ export interface AcceptanceGap {
 
 export interface CloseAcceptanceRecord {
   issueNumber: number;
-  /** 判定対象版（close時点の対象を識別する版情報。issue_reopen 相当の再評価で新版で上書きされる）。 */
-  judgedRevision: string;
+  /** GitHub/Local issue_read が返す対象 Issue の updated_at。git commit SHAではない。 */
+  targetRevision: string;
   generatedAt: string;
-  judgment: {
-    reconciliationPermitted: boolean;
-    acceptanceGapsRemaining: boolean;
-    closeOperationPermitted: boolean;
-    findings: readonly ResourceReconciliationFinding[];
-    declaredDetectionScopes: readonly string[];
-  };
+  accepted: boolean;
 }
 
 export interface EntryPresenceObservation {
@@ -1291,25 +1262,12 @@ export function evaluateVerificationResourceReconciliation(
  * 成立しない作成経路が残る場合、当該経路を受入未達として報告し、終了操作の許可判定は
  * 受入不成立として扱う。申告された集合だけの検査を成立扱いにしない。
  */
-export function deriveAcceptanceGaps(
-  confirmations: readonly CreationRouteControlConfirmation[],
-): readonly AcceptanceGap[] {
-  const confirmedRoutes = new Set(
-    confirmations
-      .filter((c) => c.basis.trim().length > 0 && c.confirmedBy.trim().length > 0)
-      .map((c) => c.route),
-  );
-  const gaps: AcceptanceGap[] = [];
-  for (const route of CREATION_ROUTES_REQUIRING_CONTROL_CONFIRMATION) {
-    if (!confirmedRoutes.has(route)) {
-      gaps.push({
-        code: "creation-route-without-detection-or-enforcement",
-        route,
-        detail: `the creation route has neither mechanical detection nor enforcement capability (declared detection scopes: ${DECLARED_DETECTION_SCOPES.join(", ")}), and no control confirmation for consuming the external enforcement capability is provided`,
-      });
-    }
-  }
-  return gaps;
+export function deriveAcceptanceGaps(): readonly AcceptanceGap[] {
+  return CREATION_ROUTES_REQUIRING_CONTROL_CONFIRMATION.map((route) => ({
+    code: "creation-route-without-detection-or-enforcement",
+    route,
+    detail: `the route lacks an independently executed observation of the external control's actual effect (declared detection scopes: ${DECLARED_DETECTION_SCOPES.join(", ")}); caller-provided route, basis, or confirmer strings are not effect evidence`,
+  }));
 }
 
 /** 終了判定記録の保存場所（main repo root 固定・worktree 非依存）。 */
@@ -1319,12 +1277,94 @@ export function resolveCloseAcceptanceRecordPath(mainRepoRoot: string, issueNumb
   if (!Number.isInteger(issueNumber) || issueNumber < 1) {
     throw new MechanicalInputError("issueNumber must be a positive integer");
   }
-  return path.join(root, ".agentdev", "close-acceptance", `issue-${issueNumber}.json`);
+  return path.join(root, ".agentdev", "close-acceptance", `issue-${String(issueNumber).padStart(4, "0")}.json`);
 }
 
 /** 終了判定記録の直列化（Design 様式: 対象Issue番号・判定対象版・判定生成時刻・判定内容）。 */
 export function serializeCloseAcceptanceRecord(record: CloseAcceptanceRecord): string {
   return `${JSON.stringify(record, null, 2)}\n`;
+}
+
+interface CloseAcceptanceRecordWrite {
+  path: string | null;
+  record: CloseAcceptanceRecord | null;
+  written: boolean;
+  error: string | null;
+}
+
+function writeCloseAcceptanceRecord(
+  input: CloseMechanicalInput,
+  runner: MechanicalRunner,
+  accepted: boolean,
+): CloseAcceptanceRecordWrite {
+  const issueNumber = input.verificationResourceCheck?.issueNumber;
+  if (issueNumber === undefined) {
+    return {
+      path: null,
+      record: null,
+      written: false,
+      error: "the verification resource check has no target Issue number",
+    };
+  }
+  if (!isNonEmptyString(input.issueUpdatedAt)) {
+    return {
+      path: null,
+      record: null,
+      written: false,
+      error: "the current Issue updated_at revision is missing",
+    };
+  }
+  let record: CloseAcceptanceRecord | null = null;
+  let recordPath: string | null = null;
+  try {
+    const ledgerIo = requireRunnerLedgerIo(runner);
+    const mainRepoRoot = resolveMainRepoRoot(ledgerIo);
+    recordPath = resolveCloseAcceptanceRecordPath(mainRepoRoot, issueNumber);
+    record = {
+      issueNumber,
+      targetRevision: input.issueUpdatedAt,
+      generatedAt: new Date().toISOString(),
+      accepted,
+    };
+    ledgerIo.mkdirRecursive(path.dirname(recordPath));
+    ledgerIo.writeTextFile(recordPath, serializeCloseAcceptanceRecord(record));
+    return { path: recordPath, record, written: true, error: null };
+  } catch (error) {
+    let invalidationError: string | null = null;
+    if (!accepted && recordPath !== null) {
+      try {
+        if (runner.exists(recordPath)) {
+          if (runner.removeFile === undefined) {
+            throw new MechanicalInputError("runner does not provide removeFile to invalidate an old acceptance record");
+          }
+          runner.removeFile(recordPath);
+        }
+      } catch (removeError) {
+        invalidationError = `old acceptance record invalidation failed: ${String(removeError)}`;
+      }
+    }
+    return {
+      path: recordPath,
+      record,
+      written: false,
+      error: [
+        `close acceptance record ${accepted ? "finalization" : "invalidation"} failed: ${String(error)}`,
+        invalidationError,
+      ].filter((entry): entry is string => entry !== null).join("; "),
+    };
+  }
+}
+
+function isCloseAcceptanceReady(report: CloseMechanicalReport): boolean {
+  if (report.result.phase !== "pre-merge" || report.result.exitCategory !== "success") return false;
+  const evaluation = report.diff.acceptanceEvaluation as AcceptanceEvaluationReport | undefined;
+  if (evaluation?.determined !== true || evaluation.closeAllowed !== true) return false;
+  const reconciliation = report.diff.verificationResourceReconciliation as
+    | { permitted?: boolean }
+    | undefined;
+  if (reconciliation?.permitted !== true) return false;
+  const acceptanceGaps = report.diff.acceptanceGaps as readonly AcceptanceGap[] | undefined;
+  return acceptanceGaps !== undefined && acceptanceGaps.length === 0;
 }
 
 /**
@@ -1652,17 +1692,30 @@ export function isCloseOperationPermitted(
     return { permitted: false, reason: "acceptance-denied" };
   }
   const reconciliation = report.diff.verificationResourceReconciliation as
-    | { permitted?: boolean; acceptanceRecordWritten?: boolean }
+    | { permitted?: boolean }
     | undefined;
-  if (reconciliation === undefined || reconciliation.permitted !== true || reconciliation.acceptanceRecordWritten !== true) {
+  if (reconciliation === undefined || reconciliation.permitted !== true) {
     return { permitted: false, reason: "verification-resource-reconciliation-denied" };
   }
+  const failedOtherGate = report.result.steps.some(
+    (step) =>
+      step.status === "fail" &&
+      step.name !== "verification-resource-reconciliation" &&
+      step.name !== "close-acceptance-record",
+  );
+  if (failedOtherGate) return { permitted: false, reason: "mechanical-failure" };
   const acceptanceGaps = report.diff.acceptanceGaps as readonly AcceptanceGap[] | undefined;
   if (acceptanceGaps === undefined || acceptanceGaps.length > 0) {
     return { permitted: false, reason: "acceptance-gap-remains" };
   }
-  if (report.result.exitCategory === "failure") {
+  if (report.result.exitCategory !== "success") {
     return { permitted: false, reason: "mechanical-failure" };
+  }
+  const record = report.diff.closeAcceptanceRecord as
+    | { accepted?: boolean; written?: boolean }
+    | undefined;
+  if (record?.accepted !== true || record.written !== true) {
+    return { permitted: false, reason: "close-acceptance-record-not-accepted" };
   }
   return { permitted: true };
 }
@@ -1840,16 +1893,11 @@ function executeVerificationResourceReconciliation(
   ledgerIo: LedgerIo,
 ): {
   step: StepRecord;
-  diff: VerificationResourceReconciliationEvaluation & {
-    judgedRevision: string;
-    acceptanceRecordPath: string | null;
-    acceptanceRecordWritten: boolean;
-  };
+  diff: VerificationResourceReconciliationEvaluation;
   gaps: readonly AcceptanceGap[];
 } {
   const earlyFindings: ResourceReconciliationFinding[] = [];
   const observationFailures: { scope: string; reason: string; exitCode?: number }[] = [];
-  const worktreeCwd = path.resolve(input.repoRoot, input.worktreeRoot);
 
   let mainRepoRoot: string | null;
   try {
@@ -1876,23 +1924,6 @@ function executeVerificationResourceReconciliation(
     }
   }
 
-  const revision = runner.run({ command: "git", args: ["rev-parse", "HEAD"], cwd: worktreeCwd });
-  let judgedRevision = "";
-  if (revision.exitCode !== 0) {
-    observationFailures.push({
-      scope: "judged-revision-resolution",
-      reason: `git rev-parse HEAD failed: ${revision.stderr.trim()}`,
-      exitCode: revision.exitCode,
-    });
-  } else {
-    judgedRevision = revision.stdout.trim();
-    if (judgedRevision.length === 0) {
-      observationFailures.push({
-        scope: "judged-revision-resolution",
-        reason: "git rev-parse HEAD returned an empty value",
-      });
-    }
-  }
   const remotesResult = runner.run({ command: "git", args: ["remote", "-v"], cwd: input.repoRoot });
   if (remotesResult.exitCode !== 0) {
     observationFailures.push({
@@ -2083,52 +2114,16 @@ function executeVerificationResourceReconciliation(
           check,
         )
       : null;
-  const gaps = deriveAcceptanceGaps(check.creationRouteControlConfirmations);
+  const gaps = deriveAcceptanceGaps();
   const mergedFindings: ResourceReconciliationFinding[] = [
     ...earlyFindings,
     ...(evaluation?.findings ?? []),
   ];
 
-  const acceptanceRecordPath = mainRepoRoot === null
-    ? null
-    : resolveCloseAcceptanceRecordPath(mainRepoRoot, check.issueNumber);
-  let acceptanceRecordWritten = false;
-  if (acceptanceRecordPath !== null) {
-    try {
-      ledgerIo.mkdirRecursive(path.dirname(acceptanceRecordPath));
-      ledgerIo.writeTextFile(
-        acceptanceRecordPath,
-        serializeCloseAcceptanceRecord({
-          issueNumber: check.issueNumber,
-          judgedRevision,
-          generatedAt: new Date().toISOString(),
-          judgment: {
-            reconciliationPermitted: mergedFindings.length === 0,
-            acceptanceGapsRemaining: gaps.length > 0,
-            closeOperationPermitted: mergedFindings.length === 0 && gaps.length === 0,
-            findings: mergedFindings,
-            declaredDetectionScopes: [...DECLARED_DETECTION_SCOPES],
-          },
-        }),
-      );
-      acceptanceRecordWritten = true;
-    } catch (error) {
-      mergedFindings.push({
-        code: "inspection-unavailable",
-        detail: `close acceptance record writing failed: ${String(error)}`,
-      });
-    }
-  } else {
-    mergedFindings.push({
-      code: "inspection-unavailable",
-      detail: "close acceptance record writing skipped because the main repository root could not be resolved",
-    });
-  }
-
   const permitted = mergedFindings.length === 0;
   const step: StepRecord = {
     name: "verification-resource-reconciliation",
-    status: permitted && gaps.length === 0 && acceptanceRecordWritten ? "pass" : "fail",
+    status: permitted && gaps.length === 0 ? "pass" : "fail",
     detail: {
       ledgerState: ledger.state,
       ledgerPath,
@@ -2138,9 +2133,6 @@ function executeVerificationResourceReconciliation(
       findings: mergedFindings,
       permitted,
       gaps,
-      judgedRevision,
-      acceptanceRecordPath,
-      acceptanceRecordWritten,
       declaredDetectionScopes: [...DECLARED_DETECTION_SCOPES],
     },
   };
@@ -2154,9 +2146,6 @@ function executeVerificationResourceReconciliation(
     terminationUnitBlocked: evaluation?.terminationUnitBlocked ?? false,
     excludedObservations: evaluation?.excludedObservations ?? [],
     knownResidualStillPresent: evaluation?.knownResidualStillPresent ?? [],
-    judgedRevision,
-    acceptanceRecordPath,
-    acceptanceRecordWritten,
   };
   return { step, diff, gaps };
 }
@@ -2209,6 +2198,35 @@ export function runCloseMechanicalSteps(
   const diff: Record<string, unknown> = {};
   const proposal: Record<string, string> = {};
   const worktreeCwd = path.resolve(input.repoRoot, input.worktreeRoot);
+  let provisionalAcceptanceRecord: CloseAcceptanceRecordWrite | null = null;
+  let acceptanceRecordStep: StepRecord | null = null;
+
+  if (input.phase === "pre-merge") {
+    provisionalAcceptanceRecord = writeCloseAcceptanceRecord(input, runner, false);
+    acceptanceRecordStep = {
+      name: "close-acceptance-record",
+      status: provisionalAcceptanceRecord.written ? "pass" : "fail",
+      detail: {
+        path: provisionalAcceptanceRecord.path,
+        targetRevision: provisionalAcceptanceRecord.record?.targetRevision ?? null,
+        accepted: false,
+        written: provisionalAcceptanceRecord.written,
+        error: provisionalAcceptanceRecord.error,
+      },
+    };
+    steps.push(acceptanceRecordStep);
+    diff.closeAcceptanceRecord = {
+      path: provisionalAcceptanceRecord.path,
+      issueNumber: provisionalAcceptanceRecord.record?.issueNumber ?? null,
+      targetRevision: provisionalAcceptanceRecord.record?.targetRevision ?? null,
+      generatedAt: provisionalAcceptanceRecord.record?.generatedAt ?? null,
+      accepted: false,
+      written: provisionalAcceptanceRecord.written,
+    };
+    if (!provisionalAcceptanceRecord.written) {
+      warnings.push(provisionalAcceptanceRecord.error ?? "close acceptance record invalidation failed");
+    }
+  }
 
   if (input.phase === "pre-merge") {
     for (const spec of [...(input.integrityGates ?? []), input.generateIndexesGate, input.traceabilityGate, input.textlintGate]) {
@@ -2524,7 +2542,39 @@ export function runCloseMechanicalSteps(
     if (!cleanupOk) warnings.push("worktree/branch cleanup did not fully complete (要判断)");
   }
 
-  return assembleReport(input.phase, steps, diff, warnings, proposal);
+  let report = assembleReport(input.phase, steps, diff, warnings, proposal);
+  if (input.phase === "pre-merge" && provisionalAcceptanceRecord !== null && acceptanceRecordStep !== null) {
+    let finalAcceptanceRecord = provisionalAcceptanceRecord;
+    if (isCloseAcceptanceReady(report)) {
+      const acceptedWrite = writeCloseAcceptanceRecord(input, runner, true);
+      finalAcceptanceRecord = acceptedWrite.written
+        ? acceptedWrite
+        : writeCloseAcceptanceRecord(input, runner, false);
+      acceptanceRecordStep.status = acceptedWrite.written ? "pass" : "fail";
+      if (!acceptedWrite.written) {
+        warnings.push(acceptedWrite.error ?? "close acceptance record finalization failed");
+      }
+    }
+    const accepted = finalAcceptanceRecord.written && finalAcceptanceRecord.record?.accepted === true;
+    acceptanceRecordStep.detail = {
+      path: finalAcceptanceRecord.path,
+      targetRevision: finalAcceptanceRecord.record?.targetRevision ?? input.issueUpdatedAt ?? null,
+      generatedAt: finalAcceptanceRecord.record?.generatedAt ?? null,
+      accepted,
+      written: finalAcceptanceRecord.written,
+      error: finalAcceptanceRecord.error,
+    };
+    diff.closeAcceptanceRecord = {
+      path: finalAcceptanceRecord.path,
+      issueNumber: finalAcceptanceRecord.record?.issueNumber ?? input.verificationResourceCheck?.issueNumber ?? null,
+      targetRevision: finalAcceptanceRecord.record?.targetRevision ?? input.issueUpdatedAt ?? null,
+      generatedAt: finalAcceptanceRecord.record?.generatedAt ?? null,
+      accepted,
+      written: finalAcceptanceRecord.written,
+    };
+    report = assembleReport(input.phase, steps, diff, warnings, proposal);
+  }
+  return report;
 }
 
 function main(): void {
@@ -2576,6 +2626,9 @@ function main(): void {
       },
       mkdirRecursive(absolutePath) {
         fs.mkdirSync(absolutePath, { recursive: true });
+      },
+      removeFile(absolutePath) {
+        fs.rmSync(absolutePath, { force: true });
       },
       gitCommonDir() {
         const result = spawnSync(
