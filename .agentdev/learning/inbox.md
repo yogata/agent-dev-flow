@@ -3,6 +3,40 @@
 このドキュメントは、開発過程で得た教訓や失敗から学んだことを記録する。
 まだ整理されていない学びを一時的に保存し、十分な数が溜まったら分類、整理して永続的なドキュメントに移動する。
 
+## [2026-11-06T01:12+09:00][learning_candidate][REQ-118 全件 traceability check の missing 系 3 fail は base 既出][Case #3928]
+- 検知: PR #3941（#3940）の traceability check で REQ-118 全件を対象とする check の missing 系 3 fail（missing-design / missing-implementation / missing-verification）を観測。base HEAD 19a58179f（main）でも同様に発生することを確認（本 PR 変更起因ではなく base 既出）。対象行（REQ-118-001/004/005/008 + REQ-032-043/044 + REQ-052-018）の行レベル check は 11 pass / 0 fail で完備。
+- 対処: 本 boundary（Wave-3 #3940 子Issue クローズ）では base 既出として記録のみ。REQ-118 の行レベル対応完備性の棚卸しは Epic #3928 最終 close 時の判断対象。
+- 学び: corpus 完全性の計数（missing 系件数）は到達目標状態の診断指標であり lifecycle gate の判定には使わない。対象行限定 check と corpus 全件 check の結果が乖離する場合は、対象行の完備確認を先に機械確定してから corpus 分を診断指標として扱う。
+- 出典: PR #3941 本文「Findings/ Capture候補」（learning 第1項）・親検証コメント 6662744844
+- 関連: Case #3928・REQ-118・traceability/v4-traceability-model Design「completeness の 2 層」節
+- タグ: #learning-capture #traceability #baseline #case-close
+
+## [2026-11-06T01:12+09:00][learning_candidate][配布依存境界 checker の base 既出 concrete-id 検出][Case #3928]
+- 検知: PR #3941（#3940）の配布依存境界 checker 全件走査（500 ファイル）で `agentdev-workflow-phase-transition/scripts/lib/identity.ts:4` の concrete-id（REQ-111）が検出。本 PR 変更ファイル外で、base HEAD 19a58179f に同内容が存在する既出分。本 PR 変更由来の新規違反は 0 件。
+- 対処: 本 boundary では base 既出として記録のみ。baseline 扱い（恒常承認一覧への登録要否）は Epic #3928 最終 close 時の判断対象。
+- 学び: 配布依存境界 checker の全件走査では変更ファイル由来の新規違反と base 既出分を区別して報告するのが実務的。base 既出分の baseline 扱い判断は個別 PR で散発的に行わず、まとまった docs 変更 Case で一括判断する候補。
+- 出典: PR #3941 本文「Findings/ Capture候補」（learning 第2項）・PR 本文品質メトリクス checker 実行記録
+- 関連: Case #3928・IR-{NNN} check_distribution_boundary.ts・agentdev-workflow-phase-transition/scripts/lib/identity.ts
+- タグ: #learning-capture #distribution-boundary #baseline #case-close
+
+## [2026-11-06T01:12+09:00][design_promotion_candidate][未記録 entity 検出の正の存在証拠限定判定表][Case #3928]
+- 検知: PR #3941（#3940）の Design確定候補。未記録 entity 検出（evaluateObservationEntityConsumption）の検出対象は正の存在証拠（alive=true / listening=true / remote 不存在確認が confirmed-absent でない）に限定し、消滅済み観測値（alive=false / listening=false / confirmed-absent）は残存資材として報告しない判定表。
+- 対処: 本 boundary では記録のみ（JSDoc と Design「実物側網羅列挙と未記録entityの検出対象性」に記載済み・merge 済み）。Epic #3928 最終 close 時の Design 反映最終確認。
+- 出典: PR #3941 本文「Design確定候補」第1項
+- 関連: Case #3928・docs/designs/workflows/verification-resource-lifecycle.md・close_mechanical_steps.ts evaluateObservationEntityConsumption JSDoc
+
+## [2026-11-06T01:12+09:00][design_promotion_candidate][作成先確認の許容基準と案件識別子の桁境界判定][Case #3928]
+- 検知: PR #3941（#3940）の Design確定候補。パス形所在の許容基準は (1) 環境指定TEMP配下、(2) 案件識別子をパス要素に含む repo 外ディレクトリのいずれかのみ。識別子の桁境界は数字境界で判定（`case-3928` は許容、`139285` は非許容）。リポジトリ内部・相対パス・その他任意パスは拒否。
+- 対処: 本 boundary では記録のみ（verification-resources-ledger.ts evaluateCreationDestination に実装済み・merge 済み）。Epic #3928 最終 close 時の Design 反映候補。
+- 出典: PR #3941 本文「Design確定候補」第2項
+- 関連: Case #3928・docs/designs/workflows/verification-resource-lifecycle.md（専用領域節への反映候補）・verification-resources-ledger.ts evaluateCreationDestination
+
+## [2026-11-06T01:12+09:00][design_promotion_candidate][OS 依存観測コマンドの正規形・不正規形対応表][Case #3928]
+- 検知: PR #3941（#3940）の Design確定候補。全プロセス CommandLine/cwd/開始時刻の網羅列挙（例: Get-CimInstance Win32_Process）、全リスナー列挙（例: Get-NetTCPConnection -State Listen）、外部 repo の網羅列挙と不存在確認（例: gh repo list --json）を正規形とし、tasklist 等の名前照合・PID 個別照会（cwd・CommandLine を観測できない）を不正規形とする対応表。
+- 対処: 本 boundary では記録のみ（case-close SKILL.md「OS 依存観測コマンド正規形」節に記載済み・merge 済み。Design 正本から参照可能）。Epic #3928 最終 close 時の Design 反映最終確認。
+- 出典: PR #3941 本文「Design確定候補」第3項
+- 関連: Case #3928・src/common/skills/agentdev-workflow-case-close/SKILL.md・docs/designs/workflows/verification-resource-lifecycle.md
+
 ## [2026-11-05T21:23+09:00][learning_candidate][fail-first 申告が module-absence 失敗だった場合の mutation-based RED 感度検証による補完][Case #3928]
 - 検知: PR #3937（#3934）本文の fail-first 申告（RED 確認後 GREEN）の実体が新規モジュール不在時の module-absence 失敗であり、repo 規約（Epic 実現方針: テスト失敗は要求の拒否＝assertion 成立であることを確認し、import/構文/依存の失敗を拒否成立の証拠にしない）が要求する assertion-level RED の証跡がなかった。
 - 対処: #3933 クローズで確立した手法と同一の手順で新規感度証拠を追加生成した。検証対象境界を一時無効化（REQ-118-007 読み戻し拒否境界・REQ-118-009 targetIds 完全一致照合境界）して assertion-level RED（expect().toThrow の期待不成立）を観測し、バイト等価復元（sha256 一致・git status porcelain 空）を確認してからフルスイート再実行（214 pass / 0 fail）で GREEN を再確認。履歴の書き換えはせず新規証拠として完了記録へ正直に記録した。
