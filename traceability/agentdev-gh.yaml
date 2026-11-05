@@ -1,5 +1,17 @@
 component: agentdev-gh
 implementation:
+  src/common/tools/agentdev-gh/local/runner-local.ts:
+    - REQ-011-024
+    - REQ-011-025
+    - REQ-011-026
+    - REQ-011-027
+    - REQ-011-030
+    - REQ-083-001
+    - REQ-009-015
+    - REQ-099-008
+    - REQ-099-009
+    - REQ-006-112
+    - REQ-052-018
   src/common/tools/agentdev-gh/contracts.ts:
     - REQ-011-022
     - REQ-011-030
@@ -8,11 +20,14 @@ implementation:
     - REQ-114-010
     - REQ-114-016
   src/common/tools/agentdev-gh/engine.ts:
+    - REQ-052-018
     - REQ-011-028
     - REQ-011-029
   src/common/tools/agentdev-gh/index.ts:
     - REQ-114-010
   src/common/tools/agentdev-gh/runner-cli.ts:
+    - REQ-052-018
+    - REQ-032-046
     - REQ-011-025
     - REQ-011-026
     - REQ-011-027
@@ -24,6 +39,7 @@ implementation:
     - REQ-114-010
     - REQ-114-016
   src/common/tools/agentdev-gh/specs-issue.ts:
+    - REQ-052-018
     - REQ-011-022
     - REQ-011-025
     - REQ-011-026
@@ -38,7 +54,17 @@ implementation:
     - REQ-100-001
   src/common/tools/agentdev-gh/local/case-schema/rules/status.yaml:
     - REQ-006-112
+  src/common/tools/agentdev-gh/close-acceptance.ts:
+    - REQ-052-018
+    - REQ-032-046
 verification:
+  src/common/tools/agentdev-gh/tests/close-acceptance.test.ts:
+    - REQ-052-018
+  src/common/tools/agentdev-gh/tests/close-runner-boundary.test.ts:
+    - REQ-052-018
+    - REQ-032-046
+  src/common/tools/agentdev-gh/tests/four-combination-shared.ts:
+    - REQ-052-018
   src/common/tools/agentdev-gh/local/case-schema/case-file.md:
     - REQ-100-001
   src/common/tools/agentdev-gh/tests/contracts.test.ts:
@@ -52,6 +78,7 @@ verification:
     - REQ-011-028
     - REQ-011-029
   src/common/tools/agentdev-gh/tests/runner-cli.test.ts:
+    - REQ-052-018
     - REQ-011-025
     - REQ-011-026
     - REQ-011-027
