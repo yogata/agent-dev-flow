@@ -3,6 +3,26 @@
 このドキュメントは、開発過程で得た教訓や失敗から学んだことを記録する。
 まだ整理されていない学びを一時的に保存し、十分な数が溜まったら分類、整理して永続的なドキュメントに移動する。
 
+## [2026-11-06T04:35+09:00][design_promotion_candidate][REQ-118-005 の REQ 行文言は文字変更不要・実行制限の定義接続は Design レベルで完結する判断][Case #3928]
+- 検知: PR #3945（#3944）の Design確定候補。deriveAcceptanceGaps の現行合意4制御構成への正規訂正で、REQ-118-005 の文字変更は不要と判断した（REQ ファイル変更なし）。REQ-118-005 の「機械検出も実行制限も成立しない作成経路が残る場合は未達として報告」は現行合意の制御構成では「制御の接続不備 = gap」として Design レベルで意味整合し、「実行制限」の定義（作成入口の作成先拒否 + 終了操作の機械拒否）への接続は verification-resource-lifecycle.md の Design レベルで完結。撤回済みの Windows汎用隔離前提は REQ 文面に存在しない（Design 側の記述のみ）。
+- 対処: 本 boundary（Wave-5 #3944 子Issue クローズ）では REQ 変更なしを完了条件3の合格として記録し、REQ レベルの再検討点を PR 本文 Design確定候補へ記録。REQ 行文言の追加訂正が必要と判断する場合は blocked-input として再検討（Epic #3928 最終 close 時の Design 確定判断材料）。
+- 出典: PR #3945 本文「Design確定候補」・PR #3945 完了記録コメント 6667201585 判定根拠3
+- 関連: Case #3928・REQ-118-005・docs/designs/workflows/verification-resource-lifecycle.md（検出範囲の宣言と未達の機械的接続節・作成入口の作成先拒否の接続確認節）
+
+## [2026-11-06T04:35+09:00][design_promotion_candidate][受入未達gapの6系統gap code と4制御観測構造（AcceptanceControlConnectionObservation）][Case #3928]
+- 検知: PR #3945（#3944）の Design確定候補。deriveAcceptanceGaps の新導出構造: 4制御の実際の接続状態の機械観測（AcceptanceControlConnectionObservation: ledgerState・creationDestinationRejections・declaredInspectionScopes・unavailableObservationScopes・reclamationUncoveredEntries・terminationRecord系3項）から6系統の gap code（creation-entry-rejection-disconnected / observation-scope-coverage-disconnected / observation-unavailable / reclamation-reconciliation-disconnected / termination-boundary-disconnected / ledger-uninspectable）を制御別に個別導出する。呼出元の文字列申告（basis・confirmedBy・targetRevision 等の creationRouteControlConfirmations）は型として受付ない。旧定数 CREATION_ROUTES_REQUIRING_CONTROL_CONFIRMATION（arbitrary-path-creation 固定gap・撤回済み前提の残存）は廃止し、旧前提テスト3件は申告無影響・台帳不在検査不能の負例へ意味継承。
+- 対処: 本 boundary（Wave-5 #3944 子Issue クローズ）では実装済み（merge c6935a61a）として記録。Epic #3928 最終 close 時の Design 反映最終確認（ライフサイクル Design「検出範囲の宣言と未達の機械的接続」節の現行実装との突合）。
+- 出典: PR #3945 本文「変更概要」gap code 表・「Design確定候補」・src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts deriveAcceptanceGaps
+- 関連: Case #3928・docs/designs/workflows/verification-resource-lifecycle.md・REQ-118-005
+
+## [2026-11-06T04:35+09:00][learning_candidate][observationFailures の findings と gap の二重チャネル報告は fail-closed 設計として意図的][Case #3928]
+- 検知: PR #3945（#3944）の Findings。executeVerificationResourceReconciliation の observationFailures が findings（inspection-unavailable）と gap（observation-unavailable）の両チャネルで報告される。拒否方向で一貫しており重複は弱体化ではない。
+- 対処: 本 boundary では設計意図（未達を複数チャネルで確実に報告する fail-closed 設計・REQ-118-005 の未達報告義務の Design レベル解釈）として記録のみ。
+- 学び: 検査不能の報告を findings と gap の2経路で持つと、完了拒否判定（isCloseOperationPermitted は gap を見る）と照合 findings 集計（reconciliation.permitted は findings を見る）の両方の判定経路で同一の検査不能が捕捉される。報告冗長性が運用で問題になる場合の統合は将来判断候補（統合時は両判定経路の被覆を壊さない）。
+- 出典: PR #3945 本文「Findings/ Capture候補」第2項
+- 関連: Case #3928・close_mechanical_steps.ts executeVerificationResourceReconciliation・deriveAcceptanceGaps
+- タグ: #learning-capture #case-close #fail-closed #報告冗長性
+
 ## [2026-11-06T02:31+09:00][learning_candidate][worktree 内での lsp_diagnostics ツール タイムアウトと正式 gate の tsc --noEmit 優先][Case #3928]
 - 検知: lsp_diagnostics ツールが worktree（.worktrees/3942-feature）内の対象ファイル（close_mechanical_steps.ts・close_mechanical_steps.test.ts の2ファイルとも）でタイムアウトした（3000ms 制限）。パッケージ正式 gate の tsc --noEmit は exit 0 で本件検証への影響はなかった（PR #3943 実行担当の観測）。
 - 対処: 正規型検査を tsc --noEmit（case-close scripts tsconfig）で実施し合格を確認。LSP 診断への依存を検証記録に含めなかった。
