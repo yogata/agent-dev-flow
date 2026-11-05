@@ -26,6 +26,7 @@
 //
 
 import * as fs from "node:fs";
+import * as os from "node:os";
 import * as path from "node:path";
 import { spawnSync } from "node:child_process";
 import {
@@ -57,6 +58,7 @@ import {
 } from "./verification-resource-reclamation.ts";
 import { REQ_ROW_ID_LIST_PATTERN } from "../../../agentdev-workflow-case-open/scripts/lib/definition-traceability-gate.ts";
 import {
+  evaluateCreationDestination,
   readLedger,
   resolveLedgerPath,
   resolveMainRepoRoot,
@@ -864,9 +866,6 @@ export const REQUIRED_INSPECTION_SCOPES = [
   "remote-absence-verification",
 ] as const;
 
-/** 機械検出も制限効果の独立観測もない作成経路を受入未達として扱う。 */
-export const CREATION_ROUTES_REQUIRING_CONTROL_CONFIRMATION = ["arbitrary-path-creation"] as const;
-
 /** 一時資材と正式成果物の役割分類値（ライフサイクル Design「正式成果物と一時資材の役割分類」節）。 */
 export type ResourceRole = "official-artifact" | "test-run-generated" | "undetermined";
 
@@ -984,8 +983,52 @@ export interface VerificationResourceReconciliationEvaluation {
   knownResidualStillPresent: readonly string[];
 }
 
+/** 受入未達gapの種別（4制御の実際の接続状態の観測から導出される接続不備の分類）。 */
+export type AcceptanceGapCode =
+  /** ①作成入口の作成先拒否（evaluateCreationDestination の台帳経路再評価で違反）。 */
+  | "creation-entry-rejection-disconnected"
+  /** ②宣言観測スコープの必須集合被覆欠落。 */
+  | "observation-scope-coverage-disconnected"
+  /** ②帰属付き独立観測の検査不能（観測実行失敗。空の観測集合に変換しない）。 */
+  | "observation-unavailable"
+  /** ③回収照合（回収済み実物消失エントリの削除確認被覆欠落）。 */
+  | "reclamation-reconciliation-disconnected"
+  /** ④終了判定記録の書出し経路（issue_close Tool境界前提検証の消費対象）の接続不備。 */
+  | "termination-boundary-disconnected"
+  /** 台帳不在による①②③の観測不能（作成物ゼロの根拠にしない）。 */
+  | "ledger-uninspectable";
+
+/** ①作成入口の作成先拒否の再評価で違反となった台帳経路の観測。 */
+export interface CreationDestinationRejectionObservation {
+  entryId: string;
+  route: string;
+  reason: string;
+}
+
+/** ③回収済み実物消失エントリのうち削除確認が識別情報を被覆しないものの観測。 */
+export interface ReclamationUncoveredEntryObservation {
+  entryId: string;
+  route: string;
+}
+
+/**
+ * 4制御（①作成入口の作成先拒否 ②帰属付き独立観測 ③回収照合 ④終了境界の接続）の
+ * 実際の接続状態の観測。呼出元の文字列申告は含まず、機械観測と実際の構成のみから組み立てる。
+ */
+export interface AcceptanceControlConnectionObservation {
+  ledgerState: "missing" | "present";
+  creationDestinationRejections: readonly CreationDestinationRejectionObservation[];
+  declaredInspectionScopes: readonly string[];
+  unavailableObservationScopes: readonly string[];
+  reclamationUncoveredEntries: readonly ReclamationUncoveredEntryObservation[];
+  terminationRecordIssueNumber: number | null;
+  terminationRecordPathResolvable: boolean;
+  terminationRecordWriteCapable: boolean;
+}
+
 export interface AcceptanceGap {
-  code: "creation-route-without-detection-or-enforcement";
+  code: AcceptanceGapCode;
+  /** gap の対象識別（台帳経路 location、観測スコープ集合、終了判定記録経路等の制御対象）。 */
   route: string;
   detail: string;
 }
@@ -1581,16 +1624,68 @@ export function evaluateVerificationResourceReconciliation(
 
 /**
  * 受入未達の集約判定（ライフサイクル Design「検出範囲の宣言と未達の機械的接続」節）。
- * 機械検出も実行制限も宣言された検出範囲に対して
- * 成立しない作成経路が残る場合、当該経路を受入未達として報告し、終了操作の許可判定は
- * 受入不成立として扱う。申告された集合だけの検査を成立扱いにしない。
+ * 4制御（①作成入口の作成先拒否 ②帰属付き独立観測 ③回収照合 ④終了境界の接続）の
+ * 実際の接続状態の機械観測から受入未達を導出する。呼出元の文字列申告は導出の入力にならず、
+ * 制御の接続不備・検査不能を未達として報告して終了操作の許可判定を受入不成立として扱う
+ * （未達報告・完了拒否の維持。正はライフサイクル Design の当該節）。
  */
-export function deriveAcceptanceGaps(): readonly AcceptanceGap[] {
-  return CREATION_ROUTES_REQUIRING_CONTROL_CONFIRMATION.map((route) => ({
-    code: "creation-route-without-detection-or-enforcement",
-    route,
-    detail: `the route lacks an independently executed observation of the external control's actual effect (declared detection scopes: ${DECLARED_DETECTION_SCOPES.join(", ")}); caller-provided route, basis, or confirmer strings are not effect evidence`,
-  }));
+export function deriveAcceptanceGaps(
+  observation: AcceptanceControlConnectionObservation,
+): readonly AcceptanceGap[] {
+  const gaps: AcceptanceGap[] = [];
+  if (observation.ledgerState === "missing") {
+    gaps.push({
+      code: "ledger-uninspectable",
+      route: "verification-resources-ledger",
+      detail:
+        "the ledger is missing; creation-entry destination rejection, attributed observation, and reclamation reconciliation cannot be inspected (a missing ledger is not treated as evidence of zero creation)",
+    });
+  }
+  for (const rejection of observation.creationDestinationRejections) {
+    gaps.push({
+      code: "creation-entry-rejection-disconnected",
+      route: rejection.route,
+      detail: `${rejection.entryId}: the registered route fails the creation-entry destination re-evaluation (${rejection.reason})`,
+    });
+  }
+  const missingScopes = REQUIRED_INSPECTION_SCOPES.filter(
+    (scope) => !observation.declaredInspectionScopes.includes(scope),
+  );
+  if (missingScopes.length > 0) {
+    gaps.push({
+      code: "observation-scope-coverage-disconnected",
+      route: "declared-detection-scopes",
+      detail: `the declared observation scopes do not cover the required inspection scopes: missing ${missingScopes.join(", ")}`,
+    });
+  }
+  const unavailableScopes = [...new Set(observation.unavailableObservationScopes)];
+  if (unavailableScopes.length > 0) {
+    gaps.push({
+      code: "observation-unavailable",
+      route: unavailableScopes.join(", "),
+      detail: `independent observation is unavailable for the scopes (inspection failures are not treated as an empty observation set): ${unavailableScopes.join(", ")}`,
+    });
+  }
+  for (const uncovered of observation.reclamationUncoveredEntries) {
+    gaps.push({
+      code: "reclamation-reconciliation-disconnected",
+      route: uncovered.route,
+      detail: `${uncovered.entryId}: the resource is absent after a recorded collection, without a deletion confirmation matching the recorded identifiers`,
+    });
+  }
+  if (
+    observation.terminationRecordIssueNumber === null ||
+    !observation.terminationRecordPathResolvable ||
+    !observation.terminationRecordWriteCapable
+  ) {
+    gaps.push({
+      code: "termination-boundary-disconnected",
+      route: "close-acceptance-record",
+      detail:
+        "the termination boundary is not connected: the close acceptance record path could not be resolved or the runner does not provide the write capabilities required by the issue_close pre-verification contract",
+    });
+  }
+  return gaps;
 }
 
 /** 終了判定記録の保存場所（main repo root 固定・worktree 非依存）。 */
@@ -2241,6 +2336,77 @@ function isJsonObject(value: unknown): value is Record<string, unknown> {
 }
 
 /**
+ * 4制御の実際の接続状態の観測を機械観測から組み立てる。
+ * ①は台帳登録経路の作成先再評価（evaluateCreationDestination の replay。登録入口と同じ
+ * 環境TEMP基準）、②は宣言観測スコープの集合と観測実行失敗、③は回収済み実物消失エントリの
+ * 削除確認被覆、④は終了判定記録のパス解決と書出し能力（判定対象版の有無を含む）である。
+ * 呼出元の文字列申告は消費しない。
+ */
+function buildAcceptanceControlObservation(
+  input: CloseMechanicalInput,
+  check: VerificationResourceCheck,
+  ledger: LedgerReadResult,
+  mainRepoRoot: string | null,
+  observationFailures: readonly { scope: string; reason: string; exitCode?: number }[],
+  resourceObservation: VerificationResourceObservation,
+  runner: MechanicalRunner,
+): AcceptanceControlConnectionObservation {
+  const creationDestinationRejections: CreationDestinationRejectionObservation[] = [];
+  const reclamationUncoveredEntries: ReclamationUncoveredEntryObservation[] = [];
+  if (ledger.state === "present" && mainRepoRoot !== null) {
+    const tempRoot = os.tmpdir();
+    for (const entry of ledger.entries) {
+      const destination = evaluateCreationDestination(entry.location, check.caseId, mainRepoRoot, tempRoot);
+      if (!destination.valid) {
+        creationDestinationRejections.push({
+          entryId: entry.id,
+          route: entry.location,
+          reason: destination.reason ?? "the creation-entry destination rejection did not accept the registered route",
+        });
+      }
+      const presence = deriveEntryPresence(entry, resourceObservation);
+      if (
+        entry.ownership === "child" &&
+        entry.childIssue === check.issueNumber &&
+        entry.collectedAt !== null &&
+        presence.presence === "absent"
+      ) {
+        const confirmation = check.deletionConfirmations.find((c) => c.entryId === entry.id);
+        if (confirmation === undefined || !deletionConfirmationCoversEntry(entry, confirmation)) {
+          reclamationUncoveredEntries.push({ entryId: entry.id, route: entry.location });
+        }
+      }
+    }
+  }
+  const terminationRecordIssueNumber =
+    typeof check.issueNumber === "number" && Number.isInteger(check.issueNumber) && check.issueNumber >= 1
+      ? check.issueNumber
+      : null;
+  let terminationRecordPathResolvable = false;
+  if (terminationRecordIssueNumber !== null && mainRepoRoot !== null) {
+    try {
+      resolveCloseAcceptanceRecordPath(mainRepoRoot, terminationRecordIssueNumber);
+      terminationRecordPathResolvable = true;
+    } catch {
+      terminationRecordPathResolvable = false;
+    }
+  }
+  return {
+    ledgerState: ledger.state,
+    creationDestinationRejections,
+    declaredInspectionScopes: check.inspectionCommands.map((command) => command.scope),
+    unavailableObservationScopes: observationFailures.map((failure) => failure.scope),
+    reclamationUncoveredEntries,
+    terminationRecordIssueNumber,
+    terminationRecordPathResolvable,
+    terminationRecordWriteCapable:
+      typeof runner.writeTextFile === "function" &&
+      typeof runner.mkdirRecursive === "function" &&
+      isNonEmptyString(input.issueUpdatedAt),
+  };
+}
+
+/**
  * 検証用一時資材の照合を実行し、照合 step・報告 diff・受入未達を組み立てる。
  * 観測は申告（台帳）と独立に git 列挙・検査コマンドで実行し、観測の欠落・不一致を
  * findings として検出する（Design「専用領域と作成経路の制限」節の観測手段 (a)〜(f)）。
@@ -2456,27 +2622,26 @@ function executeVerificationResourceReconciliation(
     })),
   ];
 
+  const resourceObservation: VerificationResourceObservation = {
+    exists: (absolutePath) => ledgerIo.exists(absolutePath),
+    remotes: parseGitRemotesListing(remotesResult.stdout),
+    worktrees: parseWorktreeListing(worktreeResult.stdout),
+    branches: parseBranchListing(branchResult.stdout),
+    processes,
+    listenPorts,
+    remoteAbsenceInputs,
+    observedEntries,
+    inspectionFailures: observationFailures,
+    excludedPaths,
+    resolveBase: input.repoRoot,
+  };
   const evaluation =
     earlyFindings.length === 0
-      ? evaluateVerificationResourceReconciliation(
-          ledger,
-          {
-            exists: (absolutePath) => ledgerIo.exists(absolutePath),
-            remotes: parseGitRemotesListing(remotesResult.stdout),
-            worktrees: parseWorktreeListing(worktreeResult.stdout),
-            branches: parseBranchListing(branchResult.stdout),
-            processes,
-            listenPorts,
-            remoteAbsenceInputs,
-            observedEntries,
-            inspectionFailures: observationFailures,
-            excludedPaths,
-            resolveBase: input.repoRoot,
-          },
-          check,
-        )
+      ? evaluateVerificationResourceReconciliation(ledger, resourceObservation, check)
       : null;
-  const gaps = deriveAcceptanceGaps();
+  const gaps = deriveAcceptanceGaps(
+    buildAcceptanceControlObservation(input, check, ledger, mainRepoRoot, observationFailures, resourceObservation, runner),
+  );
   const mergedFindings: ResourceReconciliationFinding[] = [
     ...earlyFindings,
     ...(evaluation?.findings ?? []),
@@ -2790,7 +2955,9 @@ export function runCloseMechanicalSteps(
       warnings.push("verification-resource reconciliation failed; close operation is denied");
     }
     if (reconciliation.gaps.length > 0) {
-      warnings.push("creation routes remain without verified detection or enforcement; close operation is denied");
+      warnings.push(
+        "acceptance gaps remain from the control connection observation; close operation is denied",
+      );
     }
 
     // 契約状態記録・未追跡残存検査（完了判定工程）。検証範囲は
