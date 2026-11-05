@@ -145,6 +145,7 @@ function fakeRunner(overrides: {
   ledgerText?: string;
   ledgerMissing?: boolean;
   previousAcceptanceRecord?: string;
+  acceptanceRecordIssueNumber?: number;
   remotesText?: string;
   worktreeListingText?: string;
   branchesText?: string;
@@ -164,7 +165,12 @@ function fakeRunner(overrides: {
   const writes: { absolutePath: string; content: string }[] = [];
   const deletions: string[] = [];
   const files = new Map<string, string>();
-  const acceptanceRecordPath = path.join("<repo>", ".agentdev", "close-acceptance", "issue-3931.json");
+  const acceptanceRecordPath = path.join(
+    "<repo>",
+    ".agentdev",
+    "close-acceptance",
+    `issue-${overrides.acceptanceRecordIssueNumber ?? 3931}.json`,
+  );
   if (overrides.previousAcceptanceRecord !== undefined) {
     files.set(acceptanceRecordPath, overrides.previousAcceptanceRecord);
   }
@@ -1168,6 +1174,75 @@ describe("pre-merge 機械工程の実行（品質ゲート省略なし・報告
       (c) => c.command === "bun" && c.cwd === "<repo>/.worktrees/100-case",
     );
     expect(traceCall).toBeDefined();
+  });
+});
+
+describe("pre-merge-local-state-check の機械自己出力の特定実体除外（除外根拠(1)・REQ-032-043/044）", () => {
+  function mainRootPreMergeInput(): CloseMechanicalInput {
+    return preMergeInput({
+      worktreeRoot: ".",
+      verificationResourceCheck: { ...verificationResourceCheck(), issueNumber: 3942 },
+    });
+  }
+
+  test("main-root 構成で機械自身の終了判定記録書出しのみ dirty の場合、pre-merge-local-state-check は pass する", () => {
+    const recordRelativePath = ".agentdev/close-acceptance/issue-3942.json";
+    const runner = fakeRunner({
+      worktreeStatus: `?? ${recordRelativePath}\n`,
+      issueBody: "- [x] A\n",
+      acceptanceRecordIssueNumber: 3942,
+    });
+    const report = runCloseMechanicalSteps(mainRootPreMergeInput(), runner);
+    const check = report.result.steps.find((s) => s.name === "pre-merge-local-state-check");
+    expect(check?.status).toBe("pass");
+    const detail = check?.detail as {
+      worktreeDirty?: boolean;
+      excludedSelfAcceptanceRecordPath?: string | null;
+      excludedSelfRecordEntries?: string[];
+    };
+    expect(detail.worktreeDirty).toBe(false);
+    expect(detail.excludedSelfAcceptanceRecordPath).toBe(recordRelativePath);
+    expect(detail.excludedSelfRecordEntries).toEqual([`?? ${recordRelativePath}`]);
+    expect(report.warnings.join("\n")).not.toContain("worktree has uncommitted changes");
+  });
+
+  test("main-root 構成でも終了判定記録以外の dirty は fail を維持する", () => {
+    const runner = fakeRunner({
+      worktreeStatus: " M docs/x.md\n",
+      issueBody: "- [x] A\n",
+      acceptanceRecordIssueNumber: 3942,
+    });
+    const report = runCloseMechanicalSteps(mainRootPreMergeInput(), runner);
+    const check = report.result.steps.find((s) => s.name === "pre-merge-local-state-check");
+    expect(check?.status).toBe("fail");
+    expect(report.warnings.join("\n")).toContain("worktree has uncommitted changes");
+  });
+
+  test("除外は特定実体に限定され、台帳パス等の他実体は継続 fail する", () => {
+    const runner = fakeRunner({
+      worktreeStatus:
+        "?? .agentdev/close-acceptance/issue-3942.json\n?? .agentdev/tmp/verification-resources/3928.json\n",
+      issueBody: "- [x] A\n",
+      acceptanceRecordIssueNumber: 3942,
+    });
+    const report = runCloseMechanicalSteps(mainRootPreMergeInput(), runner);
+    const check = report.result.steps.find((s) => s.name === "pre-merge-local-state-check");
+    expect(check?.status).toBe("fail");
+    const detail = check?.detail as { excludedSelfRecordEntries?: string[] };
+    expect(detail.excludedSelfRecordEntries).toEqual(["?? .agentdev/close-acceptance/issue-3942.json"]);
+    expect(report.warnings.join("\n")).toContain("worktree has uncommitted changes");
+  });
+
+  test("対象番号と異なる終了判定記録ファイルは除外対象にならない", () => {
+    const runner = fakeRunner({
+      worktreeStatus: "?? .agentdev/close-acceptance/issue-3931.json\n",
+      issueBody: "- [x] A\n",
+      acceptanceRecordIssueNumber: 3942,
+    });
+    const report = runCloseMechanicalSteps(mainRootPreMergeInput(), runner);
+    const check = report.result.steps.find((s) => s.name === "pre-merge-local-state-check");
+    expect(check?.status).toBe("fail");
+    expect(report.warnings.join("\n")).toContain("worktree has uncommitted changes");
   });
 });
 

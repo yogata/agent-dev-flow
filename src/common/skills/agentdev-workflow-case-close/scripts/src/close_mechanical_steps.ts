@@ -1603,6 +1603,43 @@ export function resolveCloseAcceptanceRecordPath(mainRepoRoot: string, issueNumb
   return path.join(root, ".agentdev", "close-acceptance", `issue-${String(issueNumber).padStart(4, "0")}.json`);
 }
 
+/**
+ * pre-merge-local-state-check における機械自身の終了判定記録の特定実体除外
+ * （検証用一時資材のライフサイクル Design「検査対象の除外根拠(1)」。
+ * verification-resource-reconciliation の excludedPaths〔close-acceptance-record-itself〕と同一契約）。
+ * 書出し元と同一の解決（resolveMainRepoRoot + resolveCloseAcceptanceRecordPath）で
+ * 対象 Issue の記録パスを導出し、worktree 相対・`/` 正規化で返す（porcelain 表記との完全一致判定用）。
+ * worktreeRoot==main root 構成（Epic 最終close等）でのみ porcelain に現れる自己出力による
+ * dirty 循環を除去するものであり、解決不能な場合（対象 Issue 番号の不正・gitCommonDir 未提供・
+ * 解決失敗・worktree 外の記録）は除外を適用しない（fail-closed。他の未コミット検出は緩めない）。
+ */
+function resolveSelfAcceptanceRecordForLocalStateCheck(
+  input: CloseMechanicalInput,
+  runner: MechanicalRunner,
+  worktreeCwd: string,
+): string | null {
+  const issueNumber = input.verificationResourceCheck?.issueNumber;
+  if (typeof issueNumber !== "number" || !Number.isInteger(issueNumber) || issueNumber < 1) {
+    return null;
+  }
+  let recordPath: string;
+  try {
+    recordPath = resolveCloseAcceptanceRecordPath(resolveMainRepoRoot(requireRunnerLedgerIo(runner)), issueNumber);
+  } catch {
+    return null;
+  }
+  const relative = path.relative(worktreeCwd, recordPath).replace(/\\/g, "/");
+  if (relative.length === 0 || relative === ".." || relative.startsWith("../")) {
+    return null;
+  }
+  return relative;
+}
+
+/** porcelain 行（`XY <path>` 形）からパス部分を取り出す。 */
+function porcelainEntryPath(line: string): string {
+  return line.length > 3 ? line.slice(3) : "";
+}
+
 /** 終了判定記録の直列化（Design 様式: 対象Issue番号・判定対象版・判定生成時刻・判定内容）。 */
 export function serializeCloseAcceptanceRecord(record: CloseAcceptanceRecord): string {
   return `${JSON.stringify(record, null, 2)}\n`;
@@ -2675,12 +2712,31 @@ export function runCloseMechanicalSteps(
 
     const status = runner.run({ command: "git", args: ["status", "--porcelain"], cwd: worktreeCwd });
     const branch = runner.run({ command: "git", args: ["branch", "--show-current"], cwd: worktreeCwd });
-    const dirty = status.stdout.trim().length > 0;
+    const selfAcceptanceRecordPath = resolveSelfAcceptanceRecordForLocalStateCheck(input, runner, worktreeCwd);
+    const retainedEntries: string[] = [];
+    const excludedSelfRecordEntries: string[] = [];
+    for (const entry of status.stdout
+      .split("\n")
+      .map((line) => line.replace(/\r$/, ""))
+      .filter((line) => line.length > 0)) {
+      if (selfAcceptanceRecordPath !== null && porcelainEntryPath(entry) === selfAcceptanceRecordPath) {
+        excludedSelfRecordEntries.push(entry);
+      } else {
+        retainedEntries.push(entry);
+      }
+    }
+    const dirty = retainedEntries.length > 0;
     const branchOk = branch.stdout.trim() === input.branch;
     steps.push({
       name: "pre-merge-local-state-check",
       status: dirty || !branchOk ? "fail" : "pass",
-      detail: { worktreeDirty: dirty, currentBranch: branch.stdout.trim(), expectedBranch: input.branch },
+      detail: {
+        worktreeDirty: dirty,
+        currentBranch: branch.stdout.trim(),
+        expectedBranch: input.branch,
+        excludedSelfAcceptanceRecordPath: selfAcceptanceRecordPath,
+        excludedSelfRecordEntries,
+      },
     });
     if (dirty) warnings.push("worktree has uncommitted changes before squash merge");
     if (!branchOk) warnings.push("worktree is not on the expected branch");
