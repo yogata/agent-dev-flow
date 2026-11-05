@@ -302,3 +302,11 @@
 - 出典: PR #3924 本文 `## Findings/ Capture候補`（修正候補: 同文言の正規文言への pin 更新または期待の再確認）、QG-4 機械検証の実行証跡（split1.stderr・main-relied-diff 再現ログ・C:/WINDOWS/TEMP/opencode/qg4-3918/）
 - 関連: 分割① REQ-110-041（phase_adoption_record_contract・別系統の pre-existing fail・同一分割で観測）、Case #3919（同一 2 fail の計上記録・comment 6631838809）
 - タグ: #learning-capture #traceability #relied-diff #pin期待文言 #pre-existing
+
+## [2026-11-05][learning_candidate][隔離検証セッション実行側の中間メッセージ中国語出力][Epic #3909]
+- 検知: TS-606 能力1（直接入力）の新規隔離実行セッション C1（/agentdev/req-define・4096 HTTP 投入・main 1cfc5ee56 投影）で、実行側セッションの STEP-5 中間メッセージに中国語出力「关键事实」が 1 箇所観測された（supplement-3909-ts606.md §7-6）。機能観測（STEP-6 決定的組立・STEP-9 読戻し検査合格）への影響なし。
+- 対処: 記録のみ（観測時点では処置せず・親判断により本 learning として回収）。
+- 学び（再発防止の観点）: 言語規律（基本言語は日本語・中国語での出力を禁止）は隔離検証環境・fixture 実行側セッションでも適用対象。隔離実行の観測項目に実行側中間メッセージの言語確認を含め、規律から外れた出力を検知したら機能影響の有無と分けて記録する。発生要因（投入言語・モデル側の言語選択条件）は本観測では特定できておらず、再観測時に要因の切り分けを要する。
+- 出典: セッション C1 SID ses_e5815631fffeIfGrF6N69ZHDUw・対象版 1cfc5ee56（ts606-r1 隔離投影）・supplement-3909-ts606.md §7-6・中間証拠 C:/WINDOWS/TEMP/opencode/ts606-r1/evidence/（C1 dispatch-meta.json・messages.json）
+- 関連: Epic #3909（TS-606 検証）・supplement-3909-ts606.md・Epic #3909 close SSoT コメント 6645168558（capture 判断記録）
+- タグ: #learning-capture #language-discipline #隔離検証 #セッション観測
