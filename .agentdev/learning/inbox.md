@@ -3,6 +3,28 @@
 このドキュメントは、開発過程で得た教訓や失敗から学んだことを記録する。
 まだ整理されていない学びを一時的に保存し、十分な数が溜まったら分類、整理して永続的なドキュメントに移動する。
 
+## [2026-11-06T02:31+09:00][learning_candidate][worktree 内での lsp_diagnostics ツール タイムアウトと正式 gate の tsc --noEmit 優先][Case #3928]
+- 検知: lsp_diagnostics ツールが worktree（.worktrees/3942-feature）内の対象ファイル（close_mechanical_steps.ts・close_mechanical_steps.test.ts の2ファイルとも）でタイムアウトした（3000ms 制限）。パッケージ正式 gate の tsc --noEmit は exit 0 で本件検証への影響はなかった（PR #3943 実行担当の観測）。
+- 対処: 正規型検査を tsc --noEmit（case-close scripts tsconfig）で実施し合格を確認。LSP 診断への依存を検証記録に含めなかった。
+- 学び: 2026-11-05T21:23 の Deno LSP 診断不応の学び（LSP サーバ選定 × scripts tsconfig の環境依存）に加え、ハーネス側 lsp_diagnostics ツールも worktree 環境で LSP サーバ起動の応答性によりタイムアウトし得る。LSP 系診断が沈黙・タイムアウトした場合は tsc --noEmit の実行結果を型検査の正式証跡とする運用が両観察で一貫して有効。
+- 出典: PR #3943 本文「Findings/ Capture候補」第1項
+- 関連: Case #3928・2026-11-05T21:23 の同系学び（Deno LSP 診断不応）・src/common/skills/agentdev-workflow-case-close/scripts/tsconfig.json
+- タグ: #learning-capture #lsp #typecheck #worktree #tsc
+
+## [2026-11-06T02:31+09:00][learning_candidate][PR 本文作成時の実行基盤不一致な署名混入と本文更新での是正][Case #3928]
+- 検知: PR #3943 本文初回作成時に、実行基盤と不一致な「🤖 Generated with Claude Code」署名が Tool 側の付与と思われる形で記録された（PR #3943 実行担当の観測）。
+- 対処: PR 本文更新で署名を削除し、実行基盤と不一致な表示を是正した。
+- 学び: PR 作成 Tool が本文へ署名等の装飾を自動付与する場合、実行基盤の申告と不一致な表示が成果物へ混入し得る。本文作成後の初回読み戻しで署名・装飾の有無を確認し、不一致分は本文更新で除去するのが実務的。
+- 出典: PR #3943 本文「Findings/ Capture候補」第2項
+- 関連: Case #3928・PR #3943 本文更新履歴
+- タグ: #learning-capture #pr-body #harness #署名
+
+## [2026-11-06T02:31+09:00][design_promotion_candidate][pre-merge-local-state-check の特定実体除外の実装詳細][Case #3928]
+- 検知: PR #3943（#3942）の Design確定候補。verification-resource-lifecycle Design「検査対象の除外根拠(1)」の case-close 機械工程（pre-merge-local-state-check）への適用詳細: (a) porcelain 行パースは `XY <path>` 形の先頭3文字切り出しで、quoted パス（非 ASCII 時の core.quotepath 出力）は対応しない（終了判定記録パスは機械生成の純 ASCII で quote 不成立、万一带に quote 形で現れた場合は一致せず dirty のまま検出される fail-closed 側に倒れる）。(b) 記録パスが worktree 相対で `../` 形になる構成では porcelain に現れないため除外対象外。(c) 除外の透明性は step detail の excludedSelfAcceptanceRecordPath / excludedSelfRecordEntries で担保。
+- 対処: 本 boundary（Wave-4 #3942 子Issue クローズ）では記録のみ（実装は merge 済み）。Epic #3928 最終 close 時の Design 反映最終確認。
+- 出典: PR #3943 本文「Design確定候補」
+- 関連: Case #3928・docs/designs/workflows/verification-resource-lifecycle.md（検査対象の除外根拠(1)節）・close_mechanical_steps.ts resolveSelfAcceptanceRecordForLocalStateCheck
+
 ## [2026-11-06T01:12+09:00][learning_candidate][REQ-118 全件 traceability check の missing 系 3 fail は base 既出][Case #3928]
 - 検知: PR #3941（#3940）の traceability check で REQ-118 全件を対象とする check の missing 系 3 fail（missing-design / missing-implementation / missing-verification）を観測。base HEAD 19a58179f（main）でも同様に発生することを確認（本 PR 変更起因ではなく base 既出）。対象行（REQ-118-001/004/005/008 + REQ-032-043/044 + REQ-052-018）の行レベル check は 11 pass / 0 fail で完備。
 - 対処: 本 boundary（Wave-3 #3940 子Issue クローズ）では base 既出として記録のみ。REQ-118 の行レベル対応完備性の棚卸しは Epic #3928 最終 close 時の判断対象。
