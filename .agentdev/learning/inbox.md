@@ -318,3 +318,12 @@
 - 出典: Case #3928 設計PR #3929（c4780cd28 初回実行で検出・4d4ad2da2 で修正）、PR #3929 本文検証欄、traceability/sidecar-and-policy.md「inline 宣言行の記述形式（ID 列挙のみ）」節
 - 関連: Case #3928 STEP-4、REQ-052-018、agentdev-workflow-case-open references/definition-pr-and-idempotency.md の traceability gate 判定仕様
 - タグ: #learning-capture #traceability #ADF-COVERS #inline宣言 #missing-design
+
+
+## [2026-11-05][learning_candidate][case-open targeted 検査経由では計測日収束 (b) が発火せず frontmatter updated 未追随のまま Definition PR が merge 可能になる][Case #3928]
+- 検知: case-ready merge 前品質検査の frontmatter updated 再実測（IR-072 規約: updated = 最終内容変更 commit の author date、frontmatter のみの変更 commit は除外）で、変更を伴う docs 8ファイルのうち6ファイル（case-close.md、req-health-metrics.md、custom-tool-contracts.md、v4-delegation-contracts.md、REQ-032.md、REQ-052.md）が 2026-11-05 の内容変更 commit を持ちながら updated が旧日付（2026-10-16〜11-04）のままだった。
+- 対処: frontmatter のみの追随補正 commit（6ed481996、明示パス指定6ファイル）を設計PR branch へ追加し、再実測で全件一致を確認してから merge した。
+- 学び: case-open の PR 準備で実行していた targeted check_changed_docs（--workflow case-run）は IR-072 req-updated-freshness を含まない（本検査クラスは check_integrity full audit 側）。計測日収束 machine step（prepare_definition_pr measurement-convergence）の trigger 条件も check_integrity 報告の計測日不整合・req-updated-freshness NG であるため、full audit 未実行の Case では (b) が発火せず、case-ready の merge 前再実測が最後の検出点になる。再発防止候補: Definition PR で docs の内容変更を行う Case では、PR branch HEAD で IR-072 相当の突合（git log --format=%as と frontmatter updated の比較、frontmatter のみの変更 commit の除外を含む）を case-open 側で機械実行する。
+- 出典: Case #3928 設計PR #3929（受入検査で検出・6ed481996 で補正）、.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts の IR-072 実装、agentdev-workflow-case-open references/definition-pr-and-idempotency.md 計測日収束節
+- 関連: Case #3928 STEP-1、REQ-010-068（IR-072 根拠 REQ）
+- タグ: #learning-capture #frontmatter-updated #IR-072 #definition-pr #case-ready
