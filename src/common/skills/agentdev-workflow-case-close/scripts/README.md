@@ -4,7 +4,7 @@ case-close の機械工程 script（`scripts/src/close_mechanical_steps.ts`）�
 
 ## I/O 契約
 
-- 入力: `--input`（機械工程入力 JSON ファイル。phase〔pre-merge / post-merge〕、worktreeRoot、repoRoot、branch、prNumber、pre-mergeで必須のissueUpdatedAt（GitHub Issue `updated_at` / Local Issue frontmatter `updated_at` を対象Issueから独立取得した値）、品質ゲート実行仕様、契約状態記録検査入力等）、`--validate-input`（検証専用経路。後述）
+- 入力: `--input`（機械工程入力 JSON ファイル。phase〔pre-merge / post-merge〕、worktreeRoot、repoRoot、branch、prNumber、pre-mergeで必須のissueUpdatedAt（GitHub Issue `updated_at` / Local Issue frontmatter `updated_at` を対象Issueから独立取得した値）、品質ゲート実行仕様、契約状態記録検査入力、一時資材の削除確認チェック入力〔deletionConfirmationCheck: 台帳パス・利用者確認記録・削除実行直前の対象観測。省略時は deletion-confirmation-check step を実行しない〕等）、`--validate-input`（検証専用経路。後述）
 - 出力: stdout に報告 JSON
 - 終了コード: 通常実行は成功 0、要判断 2、失敗 1。`--validate-input` は合格 0 / 不合格 1
 

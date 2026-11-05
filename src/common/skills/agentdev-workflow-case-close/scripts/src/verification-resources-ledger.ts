@@ -34,6 +34,22 @@ export const VERIFICATION_RESOURCE_OWNERSHIPS = ["parent", "child", "common"] as
 
 export type VerificationResourceOwnership = (typeof VERIFICATION_RESOURCE_OWNERSHIPS)[number];
 
+/**
+ * 削除確認の記録（利用者の明示確認の台帳追跡実体）。
+ * source は user-explicit のみを許容する（実行担当が生成した approval 等の
+ * 機械可読値は利用者確認として台帳へ記録しない）。
+ */
+export interface DeletionConfirmationRecord {
+  /** 確認の発生源。user-explicit 固定。 */
+  source: "user-explicit";
+  /** 確認主体の識別。 */
+  confirmedBy: string;
+  /** 確認時刻（ISO 8601）。 */
+  confirmedAt: string;
+  /** 確認時点の識別情報スナップショット（台帳エントリの識別情報と突合する）。 */
+  identifiers: Record<string, string>;
+}
+
 /** 台帳エントリ（Design 台帳データモデルの対応実体）。 */
 export interface VerificationResourceEntry {
   /** 台帳内で一意の登録 ID（vr-{案件識別子}-{連番}）。 */
@@ -56,8 +72,10 @@ export interface VerificationResourceEntry {
   recordedBy: string;
   /** 作成時刻（ISO 8601）。 */
   createdAt: string;
-  /** 回収済み時刻（未回収は null）。 */
+  /** 回収済み時刻（未回収は null）。削除実行は回収記録（collectedAt）と削除確認記録（deletionConfirmation）の対で扱う。 */
   collectedAt: string | null;
+  /** 削除確認の記録（回収が削除を伴う場合の利用者明示確認。記録がない場合は省略または null。旧形式の台帳との互換のため省略可能）。 */
+  deletionConfirmation?: DeletionConfirmationRecord | null;
 }
 
 /** 登録入力（入口の実行処理から台帳へ渡す実体。boolean 申告ではなく記録実体）。 */
@@ -125,6 +143,49 @@ function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
+/**
+ * 削除確認記録フィールドの解析。キー不在は undefined（旧形式の台帳との互換）、
+ * null は明示的な記録なしとして許容する。値が存在する場合は必須項目と列挙値を
+ * 検査し、違反は LedgerFormatError（fail-closed）。
+ */
+function parseDeletionConfirmation(value: unknown): DeletionConfirmationRecord | null | undefined {
+  if (value === undefined) return undefined;
+  if (value === null) return null;
+  if (typeof value !== "object" || Array.isArray(value)) {
+    throw new LedgerFormatError("ledger entry.deletionConfirmation must be an object or null");
+  }
+  const v = value as Record<string, unknown>;
+  if (v.source !== "user-explicit") {
+    throw new LedgerFormatError(
+      "ledger entry.deletionConfirmation.source must be user-explicit (machine-readable values are not recorded as user confirmation)",
+    );
+  }
+  if (!isNonEmptyString(v.confirmedBy)) {
+    throw new LedgerFormatError("ledger entry.deletionConfirmation.confirmedBy is required");
+  }
+  if (!isNonEmptyString(v.confirmedAt)) {
+    throw new LedgerFormatError("ledger entry.deletionConfirmation.confirmedAt is required");
+  }
+  const identifiers = v.identifiers;
+  if (
+    typeof identifiers !== "object" ||
+    identifiers === null ||
+    Array.isArray(identifiers) ||
+    Object.keys(identifiers).length === 0 ||
+    !Object.values(identifiers).every((identifierValue) => typeof identifierValue === "string")
+  ) {
+    throw new LedgerFormatError(
+      "ledger entry.deletionConfirmation.identifiers must be a non-empty object of string values",
+    );
+  }
+  return {
+    source: "user-explicit",
+    confirmedBy: v.confirmedBy as string,
+    confirmedAt: v.confirmedAt as string,
+    identifiers: identifiers as Record<string, string>,
+  };
+}
+
 function parseEntry(raw: unknown, seenIds: Set<string>): VerificationResourceEntry {
   if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
     throw new LedgerFormatError("ledger entry must be a JSON object");
@@ -178,6 +239,7 @@ function parseEntry(raw: unknown, seenIds: Set<string>): VerificationResourceEnt
   if (collectedAt !== null && !isNonEmptyString(collectedAt)) {
     throw new LedgerFormatError("ledger entry.collectedAt must be a non-empty string or null");
   }
+  const deletionConfirmation = parseDeletionConfirmation(v.deletionConfirmation);
   return {
     id,
     caseId,
@@ -190,6 +252,7 @@ function parseEntry(raw: unknown, seenIds: Set<string>): VerificationResourceEnt
     recordedBy,
     createdAt,
     collectedAt: collectedAt as string | null,
+    ...(deletionConfirmation !== undefined ? { deletionConfirmation } : {}),
   };
 }
 
@@ -416,4 +479,113 @@ export function evaluateParentTerminationUnit(
     uncollectedByOwnership,
     terminationUnitComplete: uncollected === 0,
   };
+}
+
+/** 削除確認記録付与の入力違反。 */
+function validateDeletionConfirmationRecordInput(record: unknown): DeletionConfirmationRecord {
+  if (typeof record !== "object" || record === null || Array.isArray(record)) {
+    throw new LedgerInputError("deletion confirmation record must be an object");
+  }
+  const v = record as Record<string, unknown>;
+  if (v.source !== "user-explicit") {
+    throw new LedgerInputError(
+      "deletion confirmation record.source must be user-explicit (machine-readable values are not recorded as user confirmation)",
+    );
+  }
+  if (!isNonEmptyString(v.confirmedBy)) {
+    throw new LedgerInputError("deletion confirmation record.confirmedBy is required");
+  }
+  if (!isNonEmptyString(v.confirmedAt)) {
+    throw new LedgerInputError("deletion confirmation record.confirmedAt is required");
+  }
+  const identifiers = v.identifiers;
+  if (
+    typeof identifiers !== "object" ||
+    identifiers === null ||
+    Array.isArray(identifiers) ||
+    Object.keys(identifiers).length === 0 ||
+    !Object.values(identifiers).every((identifierValue) => typeof identifierValue === "string")
+  ) {
+    throw new LedgerInputError(
+      "deletion confirmation record.identifiers must be a non-empty object of string values",
+    );
+  }
+  return {
+    source: "user-explicit",
+    confirmedBy: (v.confirmedBy as string).trim(),
+    confirmedAt: (v.confirmedAt as string).trim(),
+    identifiers: identifiers as Record<string, string>,
+  };
+}
+
+/**
+ * 台帳エントリへの削除確認記録の付与。機械可読値のみの確認（source が
+ * user-explicit 以外）は台帳へ記録せず拒否する。既に削除確認記録があるエントリ
+ * への再付与は記録の上書きになるため拒否する（fail-closed）。台帳不在・対象
+ * エントリ不在も LedgerInputError で拒否する。
+ */
+export function recordDeletionConfirmation(
+  io: LedgerIo,
+  mainRepoRoot: string,
+  caseId: string,
+  entryId: string,
+  record: unknown,
+): { ok: true; ledgerPath: string; entryId: string } {
+  if (!isNonEmptyString(entryId)) throw new LedgerInputError("entryId is required");
+  const validated = validateDeletionConfirmationRecordInput(record);
+  const ledgerPath = resolveLedgerPath(mainRepoRoot, caseId);
+  const read = readLedger(io, ledgerPath);
+  if (read.state === "missing") {
+    throw new LedgerInputError(`ledger for case ${caseId} does not exist (recording to a missing ledger is refused)`);
+  }
+  const target = read.entries.find((entry) => entry.id === entryId);
+  if (target === undefined) {
+    throw new LedgerInputError(`ledger entry not found: ${entryId}`);
+  }
+  if (target.deletionConfirmation !== undefined && target.deletionConfirmation !== null) {
+    throw new LedgerInputError(`ledger entry already has a deletion confirmation record: ${entryId}`);
+  }
+  const entries = read.entries.map((entry) =>
+    entry.id === entryId ? { ...entry, deletionConfirmation: validated } : entry,
+  );
+  io.writeTextFile(ledgerPath, serializeLedger(entries));
+  return { ok: true, ledgerPath, entryId };
+}
+
+/**
+ * 台帳エントリへの回収（削除実行）記録の付与。削除確認記録（deletionConfirmation）
+ * のないエントリへの付与は、削除確認なしの回収記録になるため拒否する（fail-closed）。
+ * collectedAt の再付与（上書き）も拒否する。
+ */
+export function markEntryCollected(
+  io: LedgerIo,
+  mainRepoRoot: string,
+  caseId: string,
+  entryId: string,
+  collectedAt: string,
+): { ok: true; ledgerPath: string; entryId: string } {
+  if (!isNonEmptyString(entryId)) throw new LedgerInputError("entryId is required");
+  if (!isNonEmptyString(collectedAt)) throw new LedgerInputError("collectedAt is required");
+  const ledgerPath = resolveLedgerPath(mainRepoRoot, caseId);
+  const read = readLedger(io, ledgerPath);
+  if (read.state === "missing") {
+    throw new LedgerInputError(`ledger for case ${caseId} does not exist (recording to a missing ledger is refused)`);
+  }
+  const target = read.entries.find((entry) => entry.id === entryId);
+  if (target === undefined) {
+    throw new LedgerInputError(`ledger entry not found: ${entryId}`);
+  }
+  if (target.deletionConfirmation === undefined || target.deletionConfirmation === null) {
+    throw new LedgerInputError(
+      `ledger entry has no deletion confirmation record (collected without confirmation is refused): ${entryId}`,
+    );
+  }
+  if (target.collectedAt !== null) {
+    throw new LedgerInputError(`ledger entry is already collected: ${entryId} (collectedAt=${target.collectedAt})`);
+  }
+  const entries = read.entries.map((entry) =>
+    entry.id === entryId ? { ...entry, collectedAt: collectedAt.trim() } : entry,
+  );
+  io.writeTextFile(ledgerPath, serializeLedger(entries));
+  return { ok: true, ledgerPath, entryId };
 }

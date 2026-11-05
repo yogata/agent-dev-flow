@@ -42,6 +42,11 @@ import {
   type CrossObligation,
   type SubjectKind,
 } from "./final-acceptance.ts";
+import {
+  evaluateDeletionConfirmationFromLedgerText,
+  type DeletionTargetObservation,
+  type UserDeletionConfirmation,
+} from "./deletion-confirmation.ts";
 import { REQ_ROW_ID_LIST_PATTERN } from "../../../agentdev-workflow-case-open/scripts/lib/definition-traceability-gate.ts";
 import {
   readLedger,
@@ -236,6 +241,17 @@ export interface CloseMechanicalInput {
   contractStateCheck?: ContractStateCheck;
   /** pre-merge（完了判定工程）で必須の検証用一時資材照合の入力（case-close 実行契約の照合規定）。 */
   verificationResourceCheck?: VerificationResourceCheck;
+  /**
+   * 一時資材回収の削除確認チェック（削除実行の確認境界の判定材料）。
+   * ledgerPath はメインrepo root 基準の台帳ファイル絶対パス。省略時は
+   * deletion-confirmation-check step を実行しない（削除対象の存在検出は
+   * 照合・完了拒否の本体側が所有する）。
+   */
+  deletionConfirmationCheck?: {
+    ledgerPath: string;
+    confirmations: readonly UserDeletionConfirmation[];
+    observations: readonly DeletionTargetObservation[];
+  };
 }
 
 export interface StepRecord {
@@ -527,6 +543,51 @@ export function validateInput(value: unknown): CloseMechanicalInput {
   }
   if (v.verificationResourceCheck != null) {
     validateVerificationResourceCheckInput(v.verificationResourceCheck);
+  }
+  const deletionConfirmationCheck = v.deletionConfirmationCheck;
+  if (deletionConfirmationCheck !== undefined && deletionConfirmationCheck !== null) {
+    if (typeof deletionConfirmationCheck !== "object" || Array.isArray(deletionConfirmationCheck)) {
+      fail("input.deletionConfirmationCheck must be an object");
+    }
+    const check = deletionConfirmationCheck as {
+      ledgerPath?: unknown;
+      confirmations?: unknown;
+      observations?: unknown;
+    };
+    if (typeof check.ledgerPath !== "string" || (check.ledgerPath as string).trim().length === 0) {
+      fail("input.deletionConfirmationCheck.ledgerPath is required");
+    }
+    const isConfirmation = (value: unknown) =>
+      typeof value === "object" &&
+      value !== null &&
+      typeof (value as { entryId?: unknown }).entryId === "string" &&
+      ((value as { entryId: string }).entryId).trim().length > 0 &&
+      ((value as { source?: unknown }).source === "user-explicit" ||
+        (value as { source?: unknown }).source === "machine-issued") &&
+      ((value as { purpose?: unknown }).purpose === "deletion" ||
+        (value as { purpose?: unknown }).purpose === "residue-allowance") &&
+      typeof (value as { confirmedAt?: unknown }).confirmedAt === "string" &&
+      ((value as { confirmedAt: string }).confirmedAt).trim().length > 0 &&
+      typeof (value as { identifiers?: unknown }).identifiers === "object" &&
+      (value as { identifiers?: unknown }).identifiers !== null;
+    if (!Array.isArray(check.confirmations) || !check.confirmations.every(isConfirmation)) {
+      fail("input.deletionConfirmationCheck.confirmations must be an array of deletion confirmation records");
+    }
+    const isObservation = (value: unknown) =>
+      typeof value === "object" &&
+      value !== null &&
+      typeof (value as { entryId?: unknown }).entryId === "string" &&
+      ((value as { entryId: string }).entryId).trim().length > 0 &&
+      typeof (value as { location?: unknown }).location === "string" &&
+      ((value as { location: string }).location).trim().length > 0 &&
+      typeof (value as { kind?: unknown }).kind === "string" &&
+      ((value as { kind: string }).kind).trim().length > 0 &&
+      typeof (value as { identifiers?: unknown }).identifiers === "object" &&
+      (value as { identifiers?: unknown }).identifiers !== null &&
+      typeof (value as { exists?: unknown }).exists === "boolean";
+    if (!Array.isArray(check.observations) || !check.observations.every(isObservation)) {
+      fail("input.deletionConfirmationCheck.observations must be an array of pre-deletion target observations");
+    }
   }
   return input;
 }
@@ -2392,6 +2453,71 @@ export function runCloseMechanicalSteps(
       warnings.push(
         `untracked residue with undeterminable attribution requires human confirmation before completion judgment: ${residue.humanConfirmationItems.join(", ")}`,
       );
+    }
+
+    // 一時資材回収の削除確認（削除実行の確認境界）。台帳に未回収対象が残る場合、
+    // 利用者の明示確認と削除実行直前の識別情報照合（所在・種別・識別情報の完全一致）
+    // が成立しない対象の削除は拒否として報告し、回収済み対象に削除確認記録が
+    // 欠落している場合は削除確認の不存在として完了拒否の材料にする。機械可読値
+    // （実行担当生成の approval 等）だけの確認は利用者確認として成立しない。
+    // 台帳不在（記録欠落）は作成物なしの根拠にせず照合本体に委ねる（空状態の区別）。
+    const deletionCheck = input.deletionConfirmationCheck;
+    if (deletionCheck !== undefined && deletionCheck !== null) {
+      let deletionOutcome: { state: "missing" | "present"; evaluation: ReturnType<typeof evaluateDeletionConfirmationFromLedgerText>["evaluation"] };
+      try {
+        const ledgerText = runner.exists(deletionCheck.ledgerPath)
+          ? runner.readTextFile(deletionCheck.ledgerPath)
+          : null;
+        deletionOutcome = evaluateDeletionConfirmationFromLedgerText(
+          ledgerText,
+          deletionCheck.confirmations,
+          deletionCheck.observations,
+        );
+      } catch (error) {
+        deletionOutcome = {
+          state: "present",
+          evaluation: {
+            permitted: false,
+            evaluatedCount: 0,
+            confirmedIds: [],
+            refusals: [
+              {
+                entryId: "(ledger)",
+                code: "deletion-confirmation-record-missing",
+                detail: `ledger could not be evaluated (fail-closed): ${String(error)}`,
+              },
+            ],
+          },
+        };
+      }
+      const deletionFailed =
+        deletionOutcome.state === "present" && deletionOutcome.evaluation.permitted !== true;
+      steps.push({
+        name: "deletion-confirmation-check",
+        status: deletionFailed ? "fail" : "pass",
+        detail: {
+          ledgerPath: deletionCheck.ledgerPath,
+          state: deletionOutcome.state,
+          permitted: deletionOutcome.evaluation.permitted,
+          evaluatedCount: deletionOutcome.evaluation.evaluatedCount,
+          confirmedIds: deletionOutcome.evaluation.confirmedIds,
+          refusals: deletionOutcome.evaluation.refusals,
+        },
+      });
+      diff.deletionConfirmation = {
+        state: deletionOutcome.state,
+        permitted: deletionOutcome.evaluation.permitted,
+        evaluatedCount: deletionOutcome.evaluation.evaluatedCount,
+        confirmedIds: deletionOutcome.evaluation.confirmedIds,
+        refusals: deletionOutcome.evaluation.refusals,
+      };
+      if (deletionFailed) {
+        warnings.push(
+          `deletion confirmation boundary refused ${deletionOutcome.evaluation.refusals.length} target(s); deletion without explicit user confirmation and identifier matching is not executed: ${deletionOutcome.evaluation.refusals
+            .map((refusal) => `${refusal.entryId}(${refusal.code})`)
+            .join(", ")}`,
+        );
+      }
     }
 
     if (input.generateIndexesGate) {

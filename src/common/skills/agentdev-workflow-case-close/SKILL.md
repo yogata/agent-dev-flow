@@ -71,7 +71,7 @@ gate 違反時は両ルートとも PR マージを停止する。
 
 ### 機械工程の script 呼び出しと内蔵ツール使用規律
 
-- **機械工程の script 呼び出し**: mergeable ポーリング、squash merge 前後のローカル状態検査、Epic 実行構成表の解析と状態更新（解析・現在 Wave 特定・状態更新適用の決定的部分。Epic 本文書込みはモデルが agentdev_gh 経由で行う）、完了条件チェックボックス評価の機械的抽出（評価はモデルが担当）、契約状態記録の commit 済み検証と未追跡残存検査（contract-state-residue-check step。決定的判定 `evaluateContractStateResidue`。対応関係は repository top-level `traceability/` 配下 sidecar を参照）、AUTOGEN 再生成差分検出、full integrity suite の起動と結果集約、textlint 最終検査、worktree/branch クリーンアップは、工程別 script `scripts/src/close_mechanical_steps.ts`（phase: pre-merge / post-merge）の呼び出しで実行する。PR merge 本体（pr_merge）、Issue 本文更新、issue_close は Custom Tool `agentdev_gh` の境界を維持する（case-close Design「機械工程の script 呼び出し契約」節）。報告 JSON（実行結果・差分・警告・提案本文）の意味レビュー（警告の重要度評価、Design 確定判断、未達判定の確定）はモデルが担当する
+- **機械工程の script 呼び出し**: mergeable ポーリング、squash merge 前後のローカル状態検査、Epic 実行構成表の解析と状態更新（解析・現在 Wave 特定・状態更新適用の決定的部分。Epic 本文書込みはモデルが agentdev_gh 経由で行う）、完了条件チェックボックス評価の機械的抽出（評価はモデルが担当）、契約状態記録の commit 済み検証と未追跡残存検査（contract-state-residue-check step。決定的判定 `evaluateContractStateResidue`。対応関係は repository top-level `traceability/` 配下 sidecar を参照）、一時資材回収の削除確認境界（deletion-confirmation-check step。削除提案の識別情報付与と削除実行の確認境界の決定的判定）、AUTOGEN 再生成差分検出、full integrity suite の起動と結果集約、textlint 最終検査、worktree/branch クリーンアップは、工程別 script `scripts/src/close_mechanical_steps.ts`（phase: pre-merge / post-merge）の呼び出しで実行する。PR merge 本体（pr_merge）、Issue 本文更新、issue_close は Custom Tool `agentdev_gh` の境界を維持する（case-close Design「機械工程の script 呼び出し契約」節）。報告 JSON（実行結果・差分・警告・提案本文）の意味レビュー（警告の重要度評価、Design 確定判断、未達判定の確定）はモデルが担当する
 - **内蔵ツール使用規律**: ファイル検索・内容検索・ディレクトリ列挙は実行基盤の内蔵ツール（ファイル検索、内容検索、読み取り）を使用し、bash 内蔵コマンド（grep、ls 等）を標準手順としない。bash 実行が本来必要な処理（script 呼び出し、git 操作等）は本規律の対象外とする（workflow-skill-model Design「workflow skill 本文における内蔵ツール使用規律」節）
 
 ### 終了条件（termination）
@@ -79,7 +79,7 @@ gate 違反時は両ルートとも PR マージを停止する。
 - 正常終了: 単一 Issue ルートはクリーンアップ・Capture 回収・永続化 STEP の完了報告まで。Epic Wave ルートは最終 Wave 判定（Epic クローズ または 残 Wave 通知）まで
 - 一時ファイル残存: 単一 Issue ルートの正常終了の前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（STEP-6-6 で確認。一時ファイル cleanup 規定（workflow 側で生成した `.agentdev/tmp/` 一時ファイルは当該実行内で削除する。Custom Tool 内部の一時ファイルは Tool が操作ごとに自動削除する））
 - 一時成果物残留（Epic Wave ルート）: Epic Wave クローズの正常終了の前提として、当該 Wave スコープの一時成果物（draft、RU、検出事項等のドメイン状態）残留と当該実行で `.agentdev/tmp/` に作成した一時ファイルの残存がないこと（E6-1 で確認。残留時は当該 Wave を完了扱いにしない）
-- 停止終了: 未達チェックボックス残存（構造化エラー）、QG-4 不合格、SSoT コメント不在の verify-only closure または SSoT コメントに検証結果の記載が欠落している verify-only closure（verify-only closure の QG-4 完了抑止）、対象要件行の Design 対応・implementation 対応・required 行 verification 対応の欠落（QG-4 完全性検査の完了阻止条件）、契約状態記録の未コミット・未追跡残存（承認一覧対象外・帰属不能残存を含む）の検出（contract-state-residue-check step の失敗。帰属不能検出は人間確認事項として完了判定の前に報告し確認なしに完了判定へ進めない）、配布依存境界 最終 gate 違反、mergeable ポーリング上限超過、Level 1 rebase 失敗（case-auto エスカレーション）
+- 停止終了: 未達チェックボックス残存（構造化エラー）、QG-4 不合格、SSoT コメント不在の verify-only closure または SSoT コメントに検証結果の記載が欠落している verify-only closure（verify-only closure の QG-4 完了抑止）、対象要件行の Design 対応・implementation 対応・required 行 verification 対応の欠落（QG-4 完全性検査の完了阻止条件）、契約状態記録の未コミット・未追跡残存（承認一覧対象外・帰属不能残存を含む）の検出（contract-state-residue-check step の失敗。帰属不能検出は人間確認事項として完了判定の前に報告し確認なしに完了判定へ進めない）、一時資材の削除確認の不存在または識別情報不一致（deletion-confirmation-check step の失敗。識別情報付き削除提案の利用者明示確認なしに回収対象の削除を通さず、削除確認記録なしの消失は完了拒否の材料）、配布依存境界 最終 gate 違反、mergeable ポーリング上限超過、Level 1 rebase 失敗（case-auto エスカレーション）
 
 ### 完了判定の契約状態記録・未追跡残存検証（トレーサビリティ sidecar 参照）
 
@@ -90,6 +90,21 @@ gate 違反時は両ルートとも PR マージを停止する。
 - **評価範囲**: 正規契約から導出した全状態記録パスとリポジトリ全体の未追跡対象であり、変更ファイルのみの確認で達成としない
 - **帰属不能検出の人間確認（完了阻止）**: 状態記録パス配下でも承認一覧対象でもない検出は帰属が機械判定できないため、人間確認事項として完了判定の前に報告する。報告された確認事項の確認（`contractStateCheck.humanConfirmedPaths` の path と確認根拠 basis の実体）なしに完了判定へ進めない（fail-closed）。検出時は当該 step を失敗とし、`isCloseOperationPermitted` が終了操作（issue_close、Epic 終了・Wave クローズ）を抑止する
 - 検証対象 git コマンドの実行不能は検査不能として fail-closed で扱い、完了判定へ進まない
+
+### 一時資材回収の削除確認（HITL 停止手順）
+
+完了判定工程で、機械工程（`scripts/src/close_mechanical_steps.ts` の deletion-confirmation-check step）により、台帳に登録された一時資材の回収（削除）について次の確認境界を検証する。様式の正は 検証用一時資材のライフサイクル Design「削除確認」節である。
+
+- **削除の確認境界**: 回収の削除は、利用者の明示確認と対象の正確な識別情報（所在、種別、内容の識別。同名別物、PID再利用、symlink/junctionの参照先を含む）との対応が確認できた場合だけ実行する。削除提案には所在・種別・内容識別・PIDとコマンドライン・URLの識別情報を付与して利用者へ提示する
+- **削除しない場合**: 確認なし、削除提案からの対象の追加変更（識別情報不一致）、別物への入替え時は削除しない。実行担当が生成した approval 等の機械可読値だけを利用者確認として扱わない。確認済み識別情報との対応を残置許容の例外として流用しない
+- **削除確認記録の台帳追跡**: 利用者の明示確認（source が user-explicit の記録のみ。機械可読値の記録は拒否）は台帳エントリの削除確認記録として残し、削除実行の回収記録（collectedAt）と対で扱う。削除確認記録のないエントリへの回収記録付与は機械的に拒否する。台帳登録済み資材が削除確認記録なしに消失した場合は削除確認の不存在として検出し、完了扱いとしない
+- **HITL 停止手順（削除確認を要する対象を検出した場合の完了順序）**:
+  1. **確認提示**: case-close が識別情報付きの削除提案（台帳エントリ由来の所在・種別・内容識別・PIDとコマンドライン・URL）を利用者へ提示し、close を停止する
+  2. **利用者判断**: 利用者が対象の正確な識別情報との対応を確認して明示承認する（機械可読値の生成・転記を利用者確認の代用にしない）
+  3. **監督側削除実行**: 承認を受けた監督側が削除を実行する（case-close は本手順内で削除を実行しない）
+  4. **実不存在確認**: 削除後に対象が実在しないことを確認する（所在・識別情報の観測で消滅を検証する）
+  5. **close 再実行**: 台帳へ削除確認記録と回収記録（collectedAt）を付与したうえで close を再実行する
+- 拒否対象の削除確認記録・識別情報照合の不一致検出時は deletion-confirmation-check step が失敗し、`isCloseOperationPermitted` が終了操作（issue_close、Epic 終了・Wave クローズ）を抑止する。台帳不在（記録欠落）は作成物なしの根拠にせず、照合・完了拒否の本体側の検査に委ねる
 
 ## 主要 Capability Skill 連携
 
