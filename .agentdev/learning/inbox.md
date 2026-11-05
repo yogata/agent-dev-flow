@@ -310,3 +310,11 @@
 - 出典: セッション C1 SID ses_e5815631fffeIfGrF6N69ZHDUw・対象版 1cfc5ee56（ts606-r1 隔離投影）・supplement-3909-ts606.md §7-6・中間証拠 C:/WINDOWS/TEMP/opencode/ts606-r1/evidence/（C1 dispatch-meta.json・messages.json）
 - 関連: Epic #3909（TS-606 検証）・supplement-3909-ts606.md・Epic #3909 close SSoT コメント 6645168558（capture 判断記録）
 - タグ: #learning-capture #language-discipline #隔離検証 #セッション観測
+
+## [2026-11-05][learning_candidate][ADF-COVERS inline 宣言の ID 列挙はかっこ付き説明で黙示切断される][Case #3928]
+- 検知: case-open 設計PR 準備機械工程（prepare_definition_pr）の traceability gate で REQ-052-018 のみ missing-design fail。design 対応宣言は custom-tool-contracts.md の既存かっこ付き宣言行（REQ-052-016/017 形式）の末尾へ `, REQ-052-018（説明）` として追加済みであり、宣言行自体は worktree 内に存在していた。coverage --req の単行実測で REQ-052-016/017 は抽出されるのに REQ-052-018 だけ抽出されないことが判明。
+- 対処: 既存先例（case-close Design の REQ-032-040/041 形式）に従い、かっこ付き説明を独立した 1 行宣言（`<!-- ADF-COVERS(design): REQ-052-018（説明） -->`）として別行へ分離し、増分修正 commit（4d4ad2da2）で script 再実行して missing-design 0 件を確認。
+- 学び: inline 宣言の解析（agentdev-traceability scripts/lib/declarations.ts）は ID 列挙のカンマ連結のみを受理し、既存 ID のかっこ付き説明の後に続けた ID は黙示に切断される（malformed-declarations には検出されず missing-design だけが現れるため原因箇所の特定に実測が必要）。かっこ付き説明を持つ ID は既存行への連結ではなく独立行の宣言として追加する。coverage --req の単行実測（抽出されない ID の比較）が原因特定に有効。
+- 出典: Case #3928 設計PR #3929（c4780cd28 初回実行で検出・4d4ad2da2 で修正）、PR #3929 本文検証欄、traceability/sidecar-and-policy.md「inline 宣言行の記述形式（ID 列挙のみ）」節
+- 関連: Case #3928 STEP-4、REQ-052-018、agentdev-workflow-case-open references/definition-pr-and-idempotency.md の traceability gate 判定仕様
+- タグ: #learning-capture #traceability #ADF-COVERS #inline宣言 #missing-design

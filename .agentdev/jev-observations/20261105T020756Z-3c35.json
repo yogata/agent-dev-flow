@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261105T020756Z-3c35",
+  "workflow": "req-define",
+  "evaluationKind": "requirement-classification-design-split",
+  "subject": "検証用一時資材是正要件の最終分類・Design分離",
+  "sourceRevision": "ca370440f8fd69c87ad3df17b65d85163256a8c2",
+  "durationMs": 756,
+  "inputTokens": 2646,
+  "inputs": {
+    "requestDigest": "8ad644ef5e98a4acab027d0811588146629faec94298030bf5e5038c72f1d963",
+    "references": [
+      {
+        "digest": "84770f3b5a437a36af97533d40f2bab5c12269c3abd68f7fc15035960851ebf8",
+        "label": "REQ-032（APPEND 先の実構造）",
+        "path": "docs/requirements/REQ-032.md"
+      },
+      {
+        "digest": "e213ad57bb64ae48fb42f47425a593ce3066bf73dcde08e57800b9685bbef5cd",
+        "label": "case-close Design（更新対象節の現行本文）",
+        "path": "docs/designs/commands/case-close.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-registry-model-classification",
+      "questionForm": "choice",
+      "value": "Design行",
+      "probabilityDistribution": {
+        "REQ行": 0,
+        "Design行": 1
+      }
+    },
+    {
+      "questionId": "q2-lifecycle-outcome-classification",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 1,
+        "Design行": 0
+      }
+    },
+    {
+      "questionId": "q3-close-gate-classification",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.98,
+        "Design行": 0.02
+      }
+    },
+    {
+      "questionId": "q4-design-split-required",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.93,
+        "false": 0.06999999999999995
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-registry-model-classification",
+        "value": "Design行"
+      },
+      {
+        "questionId": "q2-lifecycle-outcome-classification",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q3-close-gate-classification",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q4-design-split-required",
+        "value": true
+      }
+    ]
+  }
+}
