@@ -514,3 +514,26 @@
 - 出典: PR #3938 close 完了コメント（検証差分節・comment 6658435822）・bun check_distribution_boundary.ts 実行記録（main 468 files exit 1 / worktree 468 files exit 1 / 親側申告 b047a5805 462 files exit 0）
 - 関連: Case #3928・Wave-2 #3932・同 inbox の intake_candidate（配布依存境界 phase-transition identity.ts の既存REQ識別子コメント・#3931 記録分）
 - タグ: #learning-capture #配布依存境界 #scan-coverage #証跡突合
+
+## [2026-11-06T05:19+09:00][learning_candidate][adapter SKILL.md の作成先文言が修正後境界（案件番号非根拠・repo-regular-temp-area 新設）と不整合][Case #3928]
+- 検知: Wave-6 #3946 close の PR #3947 本文 Findings で、agentdev-case-run-execution-adapter/SKILL.md（検証用一時資材の作成報告節・L94 付近）の「パス形の作成先は環境指定TEMPまたは案件専用領域（案件識別子をパス要素に含むrepo外ディレクトリ）に限られる」文言が、修正後の実装境界（案件番号セグメント非根拠・プロジェクト内正規一時領域 repo-regular-temp-area の許可・case-dedicated-area basis 廃止）と不整合のまま残存していることが判明。
+- 対処: 本 boundary（Wave-6 #3946 子Issue クローズ）では SKILL.md が対象変更ファイル一覧外のため未修正。文言整合は別件での処置候補（intake/learning-promote での分類確定対象）。
+- 学び: 実装境界の変更（basis 値の置換・判定根拠の削除）を伴う Case では、同一境界を参照する SKILL 契約行の文言整合を対象変更ファイル一覧に含めるか、不整合を Findings として確実に記録する。実装と SKILL 文言の不整合は、作成入口の確認報告が旧文言に従う事故の起点になり得る。
+- 出典: PR #3947 本文 Findings / Capture候補 第1項・src/common/skills/agentdev-case-run-execution-adapter/SKILL.md 検証用一時資材の作成報告節
+- 関連: Case #3928・Wave-6 #3946・docs/designs/workflows/verification-resource-lifecycle.md（修正後境界の Design 正本）
+- タグ: #learning-capture #case-run-execution-adapter #作成先境界 #SKILL文言不整合
+
+## [2026-11-06T05:19+09:00][learning_candidate][作成先判定の repo-regular-temp-area 境界は mainRepoRoot 基準で REQ-018-008(b) の worktree root 相対文言と解釈差が残る][Case #3928]
+- 検知: Wave-6 #3946 の PR #3947 本文 Findings で、REQ-018-008(b) が worktree root 相対の `.agentdev/tmp/` を正規一時領域と定義する一方、evaluateCreationDestination の実装は mainRepoRoot 基準の `.agentdev/tmp/` を境界とする（シグネチャに worktreeRoot を持たない既存契約を維持）ことが記録された。worktree root（`<mainRepoRoot>/.worktrees/{N}-{type}/`）配下の `.agentdev/tmp/` は本判定では invalid になる。実運用の台帳・作成ヘルパーはメイン root 基準で呼ばれるため現行合意の範囲内。
+- 対処: 本 boundary では既存契約の維持（記録のみ）。worktree ローカルの退避を評価対象にする場合の拡張余地は Design 反映判断（Epic 最終 close 時）の材料。
+- 学び: 正規一時領域の定義文言（REQ-018-008(b) worktree root 相対）と実装の境界基準（mainRepoRoot）の解釈差は、worktree コンテキストから作成ヘルパーを呼ぶ利用者が直感に反する invalid 判定を受ける潜在経路になる。文言側の基準明確化（mainRepoRoot 基準を正と明記）または実装側の worktreeRoot 受理が将来の整合候補。
+- 出典: PR #3947 本文 Findings / Capture候補 第3項・verification-resources-ledger.ts evaluateCreationDestination
+- 関連: Case #3928・Wave-6 #3946・REQ-018-008(b)・docs/designs/workflows/verification-resource-lifecycle.md
+- タグ: #learning-capture #作成先境界 #REQ-018-008 #worktree #正規一時領域
+
+## [2026-11-06T05:19+09:00][design_promotion_candidate][作成先境界の判定アルゴリズムと basis 値契約（case-dedicated-area 廃止）の Design 確定][Case #3928]
+- 検知: PR #3947（#3946）の Design確定候補として、作成先境界の判定アルゴリズム（node:path resolve による解決 → path.relative による包含判定・Windows case-insensitivity は path.relative の win32 実装に依存・ドライブレター系テストは test.skipIf(process.platform !== "win32") 分岐）と basis 値の契約（env-temp-area / repo-regular-temp-area / non-path-location・case-dedicated-area は廃止）が申告された。verification-resource-lifecycle.md の専用領域節・作成入口の作成先拒否の接続確認節への最小文言整合は本 PR で merge 済み。
+- 対処: 本 boundary（Wave-6 #3946 子Issue クローズ）では記録のみ。Design 確定判断（棚卸し制）は Epic #3928 最終 close 時に行う。
+- 出典: PR #3947 本文 Design確定候補セクション
+- 関連: Case #3928・docs/designs/workflows/verification-resource-lifecycle.md（PR #3947 で文言整合済み）・verification-resources-ledger.ts
+- タグ: #design-promotion-candidate #case-close #作成先境界 #basis契約
