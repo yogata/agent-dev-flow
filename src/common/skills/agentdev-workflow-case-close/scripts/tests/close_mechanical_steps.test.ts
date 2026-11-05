@@ -5,6 +5,7 @@ import * as path from "path";
 import {
   applyEpicChildStatusUpdates,
   assembleReport,
+  classifyResourceRole,
   decideExitCode,
   deriveAcceptancePopulation,
   deriveCurrentWave,
@@ -1439,6 +1440,49 @@ describe("受入評価の実経路接続（final-acceptance-evaluation step と�
     expect(step2).toContain("evaluateFinalAcceptance");
     expect(step5).toContain("受入評価結果の確認");
     expect(step2).toContain("completion-checkbox-extraction");
+  });
+});
+
+describe("一時資材と正式成果物の役割分類（REQ-118-003）", () => {
+  test("根拠付きの正式成果物は回収対象外に分類する", () => {
+    expect(
+      classifyResourceRole({
+        fileName: "test-data.json",
+        extension: ".json",
+        isGitTracked: true,
+        roleBasis: { role: "official-artifact", basis: "repository artifact registry" },
+      }),
+    ).toEqual({ role: "official-artifact", basis: "repository artifact registry" });
+  });
+
+  test("根拠付きの実行時生成物は回収対象に分類する", () => {
+    expect(
+      classifyResourceRole({
+        fileName: "expected-output.json",
+        extension: ".json",
+        isGitTracked: false,
+        roleBasis: { role: "test-run-generated", basis: "test-run artifact record" },
+      }),
+    ).toEqual({ role: "test-run-generated", basis: "test-run artifact record" });
+  });
+
+  test("拡張子・test名・git追跡状態だけでは役割を確定しない", () => {
+    expect(
+      classifyResourceRole({
+        fileName: "test-output.log",
+        extension: ".log",
+        isGitTracked: true,
+      }),
+    ).toEqual({ role: "undetermined", basis: null });
+  });
+
+  test("空の根拠は役割を確定せず未判定のまま扱う", () => {
+    expect(
+      classifyResourceRole({
+        fileName: "procedure.md",
+        roleBasis: { role: "official-artifact", basis: "  " },
+      }),
+    ).toEqual({ role: "undetermined", basis: null });
   });
 });
 
