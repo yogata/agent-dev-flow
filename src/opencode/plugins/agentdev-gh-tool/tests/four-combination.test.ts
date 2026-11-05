@@ -16,9 +16,13 @@ import { createAgentdevGhToolDefinition, type ToolContext } from "../plugin.ts";
 import { createCliRunner } from "../../../../common/tools/agentdev-gh/runner-cli.ts";
 import {
   createGitHubStub,
+  localIssueUpdatedAt,
+  makeCloseAcceptanceFixture,
   mainOperationSequence,
+  runCaseIssueCloseRoute,
   toStepResult,
   type StepOutcome,
+  type StepResult,
 } from "../../../../common/tools/agentdev-gh/tests/four-combination-shared.ts";
 
 const CANONICAL_LOCAL_RUNNER = path.resolve(
@@ -136,5 +140,97 @@ describe("TS-003 OpenCode×ローカルIssue（投影検出 → LocalRunner に�
     const commentList = outcomes.find((o) => o.step.operation === "comment_list")?.result.payload as Record<string, unknown>;
     expect((commentList?.comments as unknown[]).length).toBe(1);
     fs.rmSync(worktree, { recursive: true, force: true });
+  });
+});
+
+describe("TS-007 終了経路シナリオ（issue_close の終了前提検証・公開Tool表面）", () => {
+  function expectRefused(
+    outcomes: { label: string; result: StepResult; stateAfterRefusal?: unknown }[],
+    label: string,
+    kind: string,
+  ): void {
+    const refused = outcomes.find((o) => o.label === label);
+    expect(refused).toBeDefined();
+    expect(refused?.result.ok).toBe(false);
+    expect(refused?.result.failure?.kind).toBe(kind);
+    expect(refused?.stateAfterRefusal).toBe("open");
+  }
+
+  test("公開Toolへの直接呼出し経路: GitHub バックエンドで機械受理不成立時の終了操作が実行されない", async () => {
+    const worktree = makeWorktree();
+    const tempDir = makeWorktree();
+    const fixture = makeCloseAcceptanceFixture("ts007-mainroot-gh-");
+    const stub = createGitHubStub();
+    const def = createAgentdevGhToolDefinition({
+      resolveRepo: () => "owner/repo",
+      createRunner: () => createCliRunner({ repo: "owner/repo", tempDir, exec: stub.exec, closeAcceptanceIo: fixture.io }),
+      closeAcceptanceIo: fixture.io,
+    });
+    const outcomes = await runCaseIssueCloseRoute(async (step) => {
+      const result = await def.execute(
+        { request: { operation: step.operation, ...step.args } },
+        makeContext(worktree),
+      );
+      return toStepResult(step.operation, JSON.parse(result.output));
+    }, fixture, () => stub.issues[0]?.updated_at ?? "2026-10-01T00:00:00Z");
+    expect(outcomes.map((o) => o.label)).toEqual([
+      "起票(case)",
+      "〔1〕記録なし拒否",
+      "〔2〕形式不正拒否",
+      "〔3〕対象不一致拒否",
+      "〔4〕判定不成立拒否",
+      "〔5〕判定対象版不一致（過去の合格結果の再利用）拒否",
+      "検証成立時の終了",
+      "読み戻し(closed)",
+    ]);
+    for (const label of [
+      "〔1〕記録なし拒否",
+      "〔2〕形式不正拒否",
+      "〔3〕対象不一致拒否",
+      "〔4〕判定不成立拒否",
+      "〔5〕判定対象版不一致（過去の合格結果の再利用）拒否",
+    ]) {
+      expectRefused(outcomes, label, "verification-incomplete");
+    }
+    const closed = outcomes.find((o) => o.label === "検証成立時の終了");
+    expect(closed?.result.ok).toBe(true);
+    const read = outcomes.find((o) => o.label === "読み戻し(closed)");
+    expect((read?.result.payload as Record<string, unknown> | null)?.state).toBe("closed");
+    expect(stub.issues[0]?.labels).toContain("feature");
+    fs.rmSync(worktree, { recursive: true, force: true });
+    fs.rmSync(tempDir, { recursive: true, force: true });
+    fs.rmSync(fixture.mainRoot, { recursive: true, force: true });
+  });
+
+  test("ローカル版実装経路: 投影検出 → LocalRunner で機械受理不成立時の終了操作が実行されない", async () => {
+    const worktree = makeWorktree();
+    writeLocalRunnerProjection(worktree);
+    const fixture = makeCloseAcceptanceFixture("ts007-mainroot-local-");
+    const def = createAgentdevGhToolDefinition({
+      resolveRepo: () => "local/issues",
+      closeAcceptanceIo: fixture.io,
+    });
+    const outcomes = await runCaseIssueCloseRoute(async (step) => {
+      const result = await def.execute(
+        { request: { operation: step.operation, ...step.args } },
+        makeContext(worktree),
+      );
+      return toStepResult(step.operation, JSON.parse(result.output));
+    }, fixture, () => localIssueUpdatedAt(path.join(worktree, ".agentdev", "issues"), 1));
+    for (const label of [
+      "〔1〕記録なし拒否",
+      "〔2〕形式不正拒否",
+      "〔3〕対象不一致拒否",
+      "〔4〕判定不成立拒否",
+      "〔5〕判定対象版不一致（過去の合格結果の再利用）拒否",
+    ]) {
+      expectRefused(outcomes, label, "verification-incomplete");
+    }
+    const closed = outcomes.find((o) => o.label === "検証成立時の終了");
+    expect(closed?.result.ok).toBe(true);
+    const issueFile = path.join(worktree, ".agentdev", "issues", "issue-0001.md");
+    expect(fs.readFileSync(issueFile, "utf8")).toContain("status: closed");
+    fs.rmSync(worktree, { recursive: true, force: true });
+    fs.rmSync(fixture.mainRoot, { recursive: true, force: true });
   });
 });

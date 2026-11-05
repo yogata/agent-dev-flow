@@ -32,6 +32,7 @@ import {
   REPO_ENV,
   type RepoResolution,
 } from "../../../common/tools/agentdev-gh/repo-resolution.ts";
+import type { CloseAcceptanceIo } from "../../../common/tools/agentdev-gh/close-acceptance.ts";
 import type { GhRunner } from "../../../common/tools/agentdev-gh/runner.ts";
 
 // 公開名・公開型は旧 plugin 定義名のまま維持（既存の参照・テスト互換）。
@@ -70,19 +71,21 @@ export interface AgentdevGhToolDeps {
   readonly resolveRepo?: () => string | RepoResolution | null;
   /** 実行の構築。既定は投影パスの Local 実装検出 → GitHub 実装。 */
   readonly createRunner?: (worktree: string, repo: string) => GhRunner | Promise<GhRunner>;
+  /** issue_close の終了前提検証が読み取る判定記録 I/O（省略時は既定の node 実装）。 */
+  readonly closeAcceptanceIo?: CloseAcceptanceIo;
   readonly now?: () => Date;
 }
 
 const LOCAL_RUNNER_PROJECTION = path.join(".opencode", "tools", "agentdev-gh", "runner-local.ts");
 
-async function defaultCreateRunner(worktree: string, repo: string): Promise<GhRunner> {
+async function defaultCreateRunner(worktree: string, repo: string, closeAcceptanceIo?: CloseAcceptanceIo): Promise<GhRunner> {
   const localPath = path.join(worktree, LOCAL_RUNNER_PROJECTION);
   if (fs.existsSync(localPath)) {
     const mod = (await import(pathToFileURL(localPath).href)) as {
-      createLocalRunner?: (options: { issuesDir: string }) => GhRunner;
+      createLocalRunner?: (options: { issuesDir: string; closeAcceptanceIo?: CloseAcceptanceIo }) => GhRunner;
     };
     if (typeof mod.createLocalRunner === "function") {
-      return mod.createLocalRunner({ issuesDir: path.join(worktree, ".agentdev", "issues") });
+      return mod.createLocalRunner({ issuesDir: path.join(worktree, ".agentdev", "issues"), ...(closeAcceptanceIo !== undefined ? { closeAcceptanceIo } : {}) });
     }
     // 破損した Local 実装投影は GitHub 実装へ暗黙 fallback させず fail-closed する（必須能力不足の暗黙吸収禁止）。
     throw new Error(
@@ -90,7 +93,7 @@ async function defaultCreateRunner(worktree: string, repo: string): Promise<GhRu
         `the Local backend selection is broken and must not silently fall back to the GitHub implementation`,
     );
   }
-  return createCliRunner({ repo, tempDir: os.tmpdir() });
+  return createCliRunner({ repo, tempDir: os.tmpdir(), workspaceRoot: worktree, ...(closeAcceptanceIo !== undefined ? { closeAcceptanceIo } : {}) });
 }
 
 function describeOperations(): string {
@@ -126,7 +129,7 @@ export function createAgentdevGhToolDefinition(deps: AgentdevGhToolDeps = {}): {
       }
       return { error: detail };
     }
-    const create = deps.createRunner ?? defaultCreateRunner;
+    const create = deps.createRunner ?? ((worktree: string, repo: string) => defaultCreateRunner(worktree, repo, deps.closeAcceptanceIo));
     let runner: GhRunner;
     try {
       runner = await create(worktree, repo);
@@ -181,7 +184,12 @@ export function createAgentdevGhToolDefinition(deps: AgentdevGhToolDeps = {}): {
           metadata: { ok: false, operation },
         };
       }
-      const result = await runAgentdevGhOperation(env.env, raw);
+      const result = await runAgentdevGhOperation(env.env, raw, {
+        cwd: context.worktree,
+        ...(deps.closeAcceptanceIo !== undefined
+          ? { closeAcceptanceIo: deps.closeAcceptanceIo }
+          : {}),
+      });
       const ok = result.ok;
       return {
         title: ok
