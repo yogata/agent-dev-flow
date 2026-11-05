@@ -9,7 +9,7 @@ updated: "2026-10-22"
 <!-- ADF-COVERS(design): REQ-021-018, REQ-021-025, REQ-021-027 -->
 <!-- ADF-COVERS(design): REQ-032-007, REQ-032-013 -->
 <!-- ADF-COVERS(design): REQ-032-001, REQ-032-002, REQ-032-003, REQ-032-004, REQ-032-005, REQ-032-006, REQ-032-008, REQ-032-009, REQ-032-010, REQ-032-011, REQ-032-012, REQ-032-014, REQ-032-015, REQ-032-016, REQ-032-017, REQ-032-018, REQ-032-019, REQ-032-020, REQ-032-021, REQ-032-022, REQ-032-023, REQ-032-024, REQ-032-025, REQ-032-026, REQ-032-027 -->
-<!-- ADF-COVERS(design): REQ-032-042 -->
+<!-- ADF-COVERS(design): REQ-032-042, REQ-032-043, REQ-032-044, REQ-032-045, REQ-032-046 -->
 <!-- ADF-COVERS(implementation): REQ-032-001, REQ-032-002, REQ-032-003, REQ-032-004, REQ-032-005, REQ-032-006, REQ-032-007, REQ-032-008, REQ-032-009, REQ-032-010, REQ-032-011, REQ-032-012, REQ-032-013, REQ-032-014, REQ-032-015, REQ-032-016, REQ-032-017, REQ-032-018, REQ-032-019, REQ-032-020, REQ-032-021, REQ-032-022 -->
 <!-- ADF-COVERS(implementation): REQ-035-001, REQ-035-003, REQ-035-009, REQ-035-010 -->
 <!-- ADF-COVERS(implementation): REQ-003-015, REQ-003-016, REQ-003-019, REQ-003-026, REQ-006-105, REQ-032-001, REQ-032-002, REQ-032-003, REQ-032-004, REQ-032-005, REQ-032-007, REQ-032-008, REQ-032-010, REQ-032-012, REQ-032-013, REQ-032-014, REQ-032-015, REQ-032-016, REQ-032-017, REQ-032-018, REQ-032-019, REQ-032-020, REQ-032-021 -->
@@ -159,6 +159,7 @@ Epic Issue 本文の `## 完了条件` セクションを読み込み、全完�
 - full integrity suite 実行（QG-4 合格基準）: bun test 実行形態は 3 cwd 分割正規形に従う（① integrity suite、② src 側 skill script テスト、③ repo ルート系 guard テストの3分割。各実行の cwd はリポジトリルートに統一、`./` prefix 付きの対象ディレクトリ明示指定、分割② 前の依存パッケージ前置、N/M 件数突合、固定値の期待値化なし、カレントディレクトリトリビアな実行の禁止）。実行形態契約の正は agentdev-quality-gates Design「full integrity suite 合格基準（QG-4）における bun test 実行形態契約」と同スキル references/qg-4-final-acceptance.md が所有する
 - 配布物変更を含む case の3検査結果確認: case-close の最終 gate で配布物変更を含む case を検証する場合、配布依存境界・IR-055・traceability の3検査の実行結果（case-run での commit 前実行記録）を確認する。case-run で3検査が実行されていない配布物変更を検出した場合は、検査を実行して新規違反 0 件を確認してからマージに進む。base 既知違反と新規違反の分離突合を省略せず、baseline 既知違反の無断削除・隠蔽を受け入れない
 - tmp 残存確認: 単一 Issue ルートの正常終了を前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないことをクリーンアップ工程で確認する。Epic Wave ルートでは、当該 Wave スコープの一時成果物（draft、RU、検出事項等の未消化ドメイン状態）の残留と `.agentdev/tmp/` 一時ファイルの残存がないことを確認し、残留時は当該 Wave を完了扱いにしない
+- 検証用一時資材の照合と回収: 完了判定工程は、当該 Case 実行の登録済み一時資材（検証用remote、clone、bare repository、退避ログ、補助スクリプト、専用server・process等。登録契約は検証用一時資材のライフサイクル Design）の生成記録と実物を照合する。検査対象はローカル、remote、分岐、process、listen、および gitignore 対象の一時出力とし、評価範囲は登録契約から導出する（REQ-032-043）。未登録・残存・削除確認の不存在または識別情報の不一致、検査不能、検査器の異常を検出した場合は完了扱いとせず、必要な検証結果が本体 Issue/PR へ保存され、確認された一時資材の回収が確認できた場合だけ終了を許可する（REQ-032-044）。remote 上の対象の不存在判定は HTTP 404 単独で行わず、認証・可視性・対象 ID を確認しても判断できない場合は終了を拒否する（REQ-032-045）
 
 #### 保存済み検証証跡の解析と再実行条件の適用
 
@@ -341,7 +342,7 @@ QG-4 最終完了判定における受け入れ義務保存の実行時投影。
 
 ## 機械工程の script 呼び出し契約（RU-0162）
 
-case-close の機械工程（mergeable ポーリング、squash merge 前後のローカル状態検査、Epic 実行構成表の解析と状態更新、完了条件チェックボックス評価の機械的抽出、AUTOGEN 再生成差分検出、full integrity suite の起動と結果集約、worktree/branch クリーンアップ）は、工程別 script 1 回の呼び出しに束ねる。GitHub I/O（pr_merge、issue_close、Issue 本文更新）は Custom Tool agentdev_gh の境界を維持する。
+case-close の機械工程（mergeable ポーリング、squash merge 前後のローカル状態検査、Epic 実行構成表の解析と状態更新、完了条件チェックボックス評価の機械的抽出、AUTOGEN 再生成差分検出、full integrity suite の起動と結果集約、検証用一時資材の生成記録と実物の照合および回収、worktree/branch クリーンアップ）は、工程別 script 1 回の呼び出しに束ねる。GitHub I/O（pr_merge、issue_close、Issue 本文更新）は Custom Tool agentdev_gh の境界を維持する。
 
 - 入力 JSON / 報告 JSON / 終了コードの契約、品質ゲートの script 内実行（省略禁止）、final-acceptance.ts・inspect_cross_dependencies.ts と同じ作り（共通基盤不作成）、意味判断（警告の重要度評価、Design 確定判断、未達判定の確定）のモデル担当は、case-open Design「機械工程の script 呼び出し契約（RU-0162）」節と同一の規律に従う
 - 報告 JSON にはマージ・検証・クリーンアップの各結果、差分、警告、提案するコメント本文を含める
