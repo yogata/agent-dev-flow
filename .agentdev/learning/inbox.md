@@ -3,6 +3,54 @@
 このドキュメントは、開発過程で得た教訓や失敗から学んだことを記録する。
 まだ整理されていない学びを一時的に保存し、十分な数が溜まったら分類、整理して永続的なドキュメントに移動する。
 
+## [2026-11-05T21:23+09:00][learning_candidate][fail-first 申告が module-absence 失敗だった場合の mutation-based RED 感度検証による補完][Case #3928]
+- 検知: PR #3937（#3934）本文の fail-first 申告（RED 確認後 GREEN）の実体が新規モジュール不在時の module-absence 失敗であり、repo 規約（Epic 実現方針: テスト失敗は要求の拒否＝assertion 成立であることを確認し、import/構文/依存の失敗を拒否成立の証拠にしない）が要求する assertion-level RED の証跡がなかった。
+- 対処: #3933 クローズで確立した手法と同一の手順で新規感度証拠を追加生成した。検証対象境界を一時無効化（REQ-118-007 読み戻し拒否境界・REQ-118-009 targetIds 完全一致照合境界）して assertion-level RED（expect().toThrow の期待不成立）を観測し、バイト等価復元（sha256 一致・git status porcelain 空）を確認してからフルスイート再実行（214 pass / 0 fail）で GREEN を再確認。履歴の書き換えはせず新規証拠として完了記録へ正直に記録した。
+- 学び: fail-first の申告品質は検証差分へ実体（どの failure が RED か）まで記録しないと判別できない。module-absence 型の RED しかない場合は、mutation-based RED 感度検証（境界無効化 → assertion-level RED 観測 → バイト等価復元 → 再GREEN）で感度証拠を補完できる。無効化対象は「テストが検証している境界そのもの」を選び、復元のバイト等価性をハッシュで機械確認する。
+- 出典: Issue #3934 完了記録コメント（検証証拠、2026-11-05）・PR #3937 本文検証差分（fail-first 申告の実体）
+- 関連: Case #3928・Epic 実現方針（fail-first 規約）・#3933 クローズの同一手法前例
+- タグ: #learning-capture #fail-first #mutation-testing #test-sensitivity #case-close
+
+## [2026-11-05T21:23+09:00][learning_candidate][worktree bun test の依存整備手段1は main 側 node_modules が空ディレクトリだと成立しない][Case #3928]
+- 検知: worktree-operations.md「bun test 実行の環境前提」の依存整備手段1（main 側 node_modules への junction）を、main 側当該 scripts 配下の node_modules が空ディレクトリの環境で試したところ、junction 自体は張れても依存解決しなかった（PR #3937 実行担当の観測）。
+- 対処: 手段2（worktree 内 bun install）で依存を整備して typecheck・suite を完走した。
+- 学び: 手段1の前提は「main 側 node_modules が依存解決可能な実体であること」であり、空ディレクトリでは成立しない。手順書側に前提条件の明示化が必要（改善候補）。probe test で依存の要否を先に確定してから手段を選ぶ既存学び（Case #3902、2026-11-04）と組み合わせるのが実務的。
+- 出典: PR #3937 本文「Findings / Capture候補」
+- 関連: Case #3928・Case #3902（worktree での bun test 実行の関連学び）・src/common/skills/agentdev-git-worktree/references/worktree-operations.md
+- タグ: #learning-capture #worktree #bun-test #node_modules #junction
+
+## [2026-11-05T21:23+09:00][learning_candidate][Windows worktree での Deno LSP 診断不応と tsc --noEmit への正規型検査切替][Case #3928]
+- 検知: 本環境（Windows worktree）で Deno LSP が bun/node tsconfig ベース TypeScript プロジェクトの診断を提供せず、diagnostics 要求が3回タイムアウトした（PR #3937 実行時）。
+- 対処: 正規型検査を tsc --noEmit（case-close scripts tsconfig）で実施し、エラー 0 件を確認した。
+- 学び: エージェント実行環境の LSP サーバ選定と scripts 配下 tsconfig の組み合わせは環境依存で、LSP 診断が沈黙する場合がある。型検査の証跡は LSP 診断ではなく正規型検査コマンド（tsc --noEmit）の実行結果で記録するのが確実。LSP サーバ選定と scripts 配下 tsconfig の組み合わせの環境学習候補。
+- 出典: PR #3937 本文「Findings / Capture候補」
+- 関連: Case #3928・src/common/skills/agentdev-workflow-case-close/scripts/tsconfig.json
+- タグ: #learning-capture #lsp #typecheck #windows #tsc
+
+## [2026-11-05T21:23+09:00][design_promotion_candidate][close 機械工程入力の回収指定構造（CloseMechanicalInput.reclamation）][Case #3928]
+- 検知: PR #3937（#3934）の Design確定候補。ledger（mainRepoRoot・caseId・confirmation）と closeAcceptanceRecord（recordPath・terminalOperationCompleted）の2セクション構造。判定記録の配置基準（repo root か worktree root か）を Design テキストは固定していないため、recordPath を機械工程入力で受け取る構造とした。
+- 対処: 本 boundary（Wave-2 #3934 子Issue クローズ）では記録のみ。Epic #3928 最終 close 時の Design 反映候補（case-close Design）。
+- 出典: PR #3937 本文「Design確定候補」
+- 関連: Case #3928・case-close Design「機械工程の script 呼び出し契約」節への反映候補
+
+## [2026-11-05T21:23+09:00][design_promotion_candidate][台帳回収の収束材料様式（verification-resource-ledger-final:v1）][Case #3928]
+- 検知: PR #3937（#3934）の Design確定候補。センチネル + 案件・確認情報 + 記録テーブル（ID／種別／所在／識別情報／所有区分／子Issue／作成時刻／回収時刻）の様式。
+- 対処: 本 boundary では記録のみ。Epic #3928 最終 close 時の Design 反映候補（本体 Issue/PR 記載様式は agentdev-workflow-templates Design 側への反映候補）。
+- 出典: PR #3937 本文「Design確定候補」
+- 関連: Case #3928・agentdev-workflow-templates Design
+
+## [2026-11-05T21:23+09:00][design_promotion_candidate][証跡材料のセンチネル形式と7要素材料行形式（verification-evidence:v1）][Case #3928]
+- 検知: PR #3937（#3934）の Design確定候補。センチネル形式（verification-evidence:v1）と7要素材料行形式（`- 要素: 値`、継続行は2スペースインデント、失敗・訂正なしは「なし」記載）。
+- 対処: 本 boundary では記録のみ。Epic #3928 最終 close 時の Design 反映候補（検証差分・SSoT コメントへの7要素記載の具体形式候補）。
+- 出典: PR #3937 本文「Design確定候補」
+- 関連: Case #3928・agentdev-workflow-templates Design（検証差分記録規約）・workflows/issue-lifecycle-records Design（SSoTコメント様式）
+
+## [2026-11-05T21:23+09:00][design_promotion_candidate][判定記録回収の保持期間契約の実行面表現（terminalOperationCompleted）][Case #3928]
+- 検知: PR #3937（#3934）の Design確定候補。terminalOperationCompleted の boolean 申告による保持期間契約の実行面表現。false の回収要求は retained を返し削除しない。
+- 対処: 本 boundary では記録のみ。Epic #3928 最終 close 時の Design 反映候補。
+- 出典: PR #3937 本文「Design確定候補」
+- 関連: Case #3928・docs/designs/workflows/verification-resource-lifecycle.md（照合（close時）と全終了経路節への反映候補）
+
 ## [2026-11-05T20:57+09:00][learning_candidate][Wave 先行 merge 後の後続レイヤー テスト fixture 再適合][Case #3928]
 - 検知: PR #3936（#3933）の Level 1 rebase（origin/main a3dec8cda 起点）で、競合解消（close_mechanical_steps.ts・scripts/README.md・traceability sidecar の3ファイル。#3931 レイヤーとの隣接追加で層分離設計どおりに解消）後の suite 実行で 4 fail が発生。先行 merge した #3931 レイヤーが pre-merge 入力契約へ issueUpdatedAt・verificationResourceCheck を必須化し MechanicalRunner を拡張したため、#3931 merge 前に書かれた #3933 側テスト fixture（baseInput・fakeRunner）が旧契約のままだった。
 - 対処: #3931 の production semantics は無変更のまま、#3933 自身のテスト fixture を統合後契約へ適合（検査コマンド仕様5 scope の被覆・MechanicalRunner 完全実装）し、176 pass / 0 fail・tsc --noEmit 0 で再検証してから push・マージ。
