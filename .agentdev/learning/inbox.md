@@ -3,6 +3,14 @@
 このドキュメントは、開発過程で得た教訓や失敗から学んだことを記録する。
 まだ整理されていない学びを一時的に保存し、十分な数が溜まったら分類、整理して永続的なドキュメントに移動する。
 
+## [2026-11-05T17:45+09:00][learning_candidate][検証用一時資材 台帳モジュール運用][Case #3928]
+- 検知: 作成ヘルパー（verification-resource-register.ts）を worktree 内から `--main-repo-root` 未指定で実行すると、worktree-context 独立解決（git-common-dir 導出）により**メインリポジトリの台帳**（.agentdev/tmp/verification-resources/）へ登録される。smoke 実行時に実観測（設計どおりの動作）。
+- 対処: 検証・試験目的で worktree から実行する場合は `--main-repo-root .` で worktree 側へ限定する運用を採用し、smoke の台帳ファイルは実行後に削除して後片付け済み。
+- 学び: main repo root 固定解決は本件の設計契約（並列Case分離・worktree 非依存）どおりだが、検証実行の局所化には `--main-repo-root` 明示が必須。台帳を扱う試験・smoke の手順書にはこの区別を明記すべき改善候補。
+- 出典: PR #3935 本文「Findings / Capture候補」（Wave-1 #3930 実行担当の実観測）
+- 関連: Case #3928・REQ-118-001/004・docs/designs/workflows/verification-resource-lifecycle.md
+- タグ: #learning-capture #verification-resources-ledger #worktree #main-repo-root
+
 ## [2026-10-27T07:20+09:00][workflow_deviation][case-open STEP-4][Case #3866]
 - 検知: prepare_definition_pr.ts の DefinitionEdit 行区切り保全契約（newText は oldText の行区切りを保全し行の追加のみ許可・行の削除・統合を拒否）により、REQ 表の空行削除（REQ-108 表統合・ACT-REQ-002）や行移動〔行数減少を伴う分割編集〕を DefinitionEdit で表現できなかった（--validate-input が行構造事前確認で fail-closed 拒否）。
 - 対処: REQ-108 空行削除を REQ-117.md 新規作成と同一の前段配置経路（worktree 内への node writeFileSync UTF-8 明示・oldText 一意性検証つき・stagePaths 経由 commit）で適用し、逸脱として PR #3867 本文へ記録。行移動（REQ-010-080）は12行ブロックの行数同数並べ替え（1 edit）で DefinitionEdit 契約内に収めた。
