@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261105T020358Z-274b",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "検証用一時資材是正要件（登録・照合・全経路強制）のREQ帰属判断",
+  "sourceRevision": "ca370440f8fd69c87ad3df17b65d85163256a8c2",
+  "durationMs": 1909,
+  "inputTokens": 2942,
+  "inputs": {
+    "requestDigest": "8f04cc202eca6ad14795b0ee0189c36ad9c4c4335ee75072dae271ede39559af",
+    "references": [
+      {
+        "label": "REQ-032（case-close 実行契約。帰属候補本文）",
+        "path": "docs/requirements/REQ-032.md",
+        "digest": "84770f3b5a437a36af97533d40f2bab5c12269c3abd68f7fc15035960851ebf8"
+      },
+      {
+        "label": "case-close Design（tmp 残存確認節・機械工程 script 呼出契約の現行規範）",
+        "path": "docs/designs/commands/case-close.md",
+        "digest": "e213ad57bb64ae48fb42f47425a593ce3066bf73dcde08e57800b9685bbef5cd"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-lifecycle-req-matching",
+      "questionForm": "choice",
+      "value": "CREATE",
+      "probabilityDistribution": {
+        "CREATE": 0.99,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 0,
+        "保留": 0.01
+      }
+    },
+    {
+      "questionId": "q2-close-reconcile-req-matching",
+      "questionForm": "choice",
+      "value": "CREATE",
+      "probabilityDistribution": {
+        "CREATE": 0.63,
+        "APPEND": 0.29,
+        "UPDATE": 0.03,
+        "REQ操作なし": 0,
+        "保留": 0.05
+      }
+    },
+    {
+      "questionId": "q3-no-bypass-req-matching",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0.09,
+        "APPEND": 0.73,
+        "UPDATE": 0.12,
+        "REQ操作なし": 0.01,
+        "保留": 0.05
+      }
+    },
+    {
+      "questionId": "q4-confidence-required",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.26,
+        "false": 0.74
+      }
+    }
+  ],
+  "confidence": 0.99,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-lifecycle-req-matching",
+        "value": "CREATE"
+      },
+      {
+        "questionId": "q2-close-reconcile-req-matching",
+        "value": "APPEND",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q3-no-bypass-req-matching",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "q4-confidence-required",
+        "value": false
+      }
+    ]
+  }
+}
