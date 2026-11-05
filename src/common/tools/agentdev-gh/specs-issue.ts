@@ -1,10 +1,20 @@
 // Issue 系・Comment 系操作のスペック実装。
 //
-// 各スペックは操作ごとの差分（入力検証、runner 要求の組立て、応答解釈、
+// 各スペックは操作ごとの差分（入力検証、前提検証、runner 要求の組立て、応答解釈、
 // 読み戻し照合）のみを所有する。fail-closed の制御順序は engine.ts が所有する。
 // runner への要求・応答の接合形状（payload フィールド）は本ファイルと
 // runner 実装間の契約である。issue_update / issue_reopen の応答 payload は
 // 実行前状態（before）を運び、VERIFY の追跡軸保持照合の基準とする。
+// issue_read の応答 payload は updatedAt（対象 Issue の版。GitHub REST の
+// updated_at、ローカル版 frontmatter の updated_at）を運び、issue_close の
+// 終了前提検証（判定対象版の照合）の基準とする。GitHub 版と Local 版の
+// 両 runner へ同時に反映する内部契約である。
+//
+// issue_close の前提検証（precondition）は、対象が Case Issue（case role）である
+// 場合に、case-close 機械工程が生成した機械受理の終了判定記録を呼出元の申告に
+// よらず自ら読み取り検証する（Design custom-tool-contracts「issue_close の終了前提
+// （Case Issue）」節）。検証不成立時は終了の副作用を実行せず
+// 構造化失敗を返す（fail-closed）。追跡Issue（tracking role）には適用しない。
 
 
 import {
@@ -15,7 +25,8 @@ import {
   type IssueListItem,
 } from "./contracts.ts";
 import type { GhRunner, GhRunnerRequest } from "./runner.ts";
-import type { InputContractError, OperationSpec, ValidateOutcome } from "./engine.ts";
+import type { InputContractError, OperationDeps, OperationSpec, PreconditionFailure, ValidateOutcome } from "./engine.ts";
+import { verifyCloseAcceptanceForClose } from "./close-acceptance.ts";
 import {
   deriveCloseReason,
   deriveRole,
@@ -244,7 +255,8 @@ function parseIssueRead(payload: unknown, number: number): GhToolSuccess | null 
   const title = str(payload.title);
   const body = str(payload.body);
   const state = str(payload.state);
-  if (title === null || body === null) return null;
+  const updatedAt = str(payload.updatedAt);
+    if (title === null || body === null) return null;
   if (state !== "open" && state !== "closed") return null;
   if (positiveInt(payload.number) !== number) return null;
   const meta = parseTrackingMeta(payload);
@@ -260,6 +272,7 @@ function parseIssueRead(payload: unknown, number: number): GhToolSuccess | null 
     labels,
     role: meta.role,
     closeReason: meta.closeReason,
+    ...(updatedAt !== null ? { updatedAt } : {}),
   };
 }
 
@@ -411,6 +424,53 @@ const issueUpdateSpec: OperationSpec = {
 
 const issueCloseSpec: OperationSpec = {
   operation: "issue_close",
+  async precondition(runner, request, deps: OperationDeps): Promise<PreconditionFailure | null> {
+    const req = request as Extract<GhToolRequest, { operation: "issue_close" }>;
+    const reply = await runner.run({ operation: "issue_read", args: { number: req.number } });
+    if (!reply.ok) {
+      return {
+        kind: reply.failureClass,
+        retryable: true,
+        detail: `issue_close precondition could not read the target issue ${req.number}: ${reply.error}`,
+      };
+    }
+    const issue = isRecord(reply.payload) ? reply.payload : null;
+    if (issue === null || positiveInt(issue.number) !== req.number) {
+      return {
+        kind: "operation-failed",
+        retryable: true,
+        detail: `issue_close precondition could not read the target issue ${req.number}`,
+      };
+    }
+    const meta = parseTrackingMeta(issue);
+    if (meta === null) {
+      return {
+        kind: "operation-failed",
+        retryable: true,
+        detail: `issue_close precondition could not interpret the tracking metadata of issue ${req.number}`,
+      };
+    }
+    // 追跡Issue（tracking role）の終了には終了前提を適用しない。
+    if (meta.role !== "case") return null;
+    const currentRevision = str(issue.updatedAt);
+    if (currentRevision === null || currentRevision.length === 0) {
+      return {
+        kind: "verification-incomplete",
+        retryable: false,
+        detail:
+          `issue_close precondition could not read the current revision (updatedAt) of case issue ${req.number}; ` +
+          `the acceptance record cannot be bound to the target version`,
+      };
+    }
+    const outcome = verifyCloseAcceptanceForClose(
+      deps.closeAcceptanceIo,
+      deps.cwd ?? process.cwd(),
+      req.number,
+      currentRevision,
+    );
+    if (outcome.ok) return null;
+    return { kind: outcome.kind, retryable: false, detail: outcome.detail };
+  },
   validate(raw): ValidateOutcome {
     if (!isRecord(raw)) return missingFieldOutcome("issue_close", "operation");
     const unknown = checkUnknownFields(raw, ["operation", "number", "reason"]);

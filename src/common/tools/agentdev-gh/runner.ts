@@ -26,6 +26,8 @@ export interface GhRunnerRequest {
 export type GhRunnerFailureClass =
   | "operation-failed"
   | "invalid-input"
+  | "verification-incomplete"
+  | "path-unresolvable"
   | "enforcement-crashed";
 
 /**
