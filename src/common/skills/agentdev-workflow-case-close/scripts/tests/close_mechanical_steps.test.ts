@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { afterAll, describe, expect, test } from "bun:test";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -20,6 +20,8 @@ import {
   type IntegrityFailureOrigin,
   type IntegrityMachineAcceptanceRecord,
   type MechanicalRunner,
+  type InspectionCommandSpec,
+  type VerificationResourceCheck,
 } from "../src/close_mechanical_steps";
 import type { ConditionPopulation, ConditionVerdict } from "../src/final-acceptance";
 
@@ -35,6 +37,13 @@ function findRepoRoot(start: string): string {
 }
 
 const REPO_ROOT = findRepoRoot(import.meta.dir);
+const testDirectories: string[] = [];
+
+afterAll(() => {
+  for (const directory of testDirectories) {
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
+});
 
 function gate(name: string, cwd = "<repo>/.worktrees/100-case"): GateCommandSpec {
   return { name, command: "bun", args: ["./checker.ts", name], cwd, timeoutMs: 60000 };
@@ -56,6 +65,70 @@ function preMergeInput(overrides: Partial<CloseMechanicalInput> = {}): CloseMech
       contractStatePaths: [".agentdev/jev-observations", ".agentdev/learning/inbox.md"],
       approvalEntries: [],
     },
+    verificationResourceCheck: {
+      caseId: "3928",
+      issueNumber: 3931,
+      knownResidualEntries: [],
+      deletionConfirmations: [],
+      creationRouteControlConfirmations: [
+        {
+          route: "arbitrary-path-creation",
+          basis: "実行制限能力の消費確認記録の所在（Epic #3928 実現方針の enforcement 記録）",
+          confirmedBy: "case-close-model",
+        },
+      ],
+      inspectionCommands: [
+        inspectionCommand("dedicated-area-listing"),
+        inspectionCommand("os-temp-area-scan"),
+        inspectionCommand("process-liveness"),
+        inspectionCommand("listen-port-check"),
+        inspectionCommand("remote-absence-verification"),
+      ],
+    },
+    ...overrides,
+  };
+}
+
+function verificationResourceCheck(input: CloseMechanicalInput = preMergeInput()): VerificationResourceCheck {
+  if (input.verificationResourceCheck === undefined) {
+    throw new Error("test input must include verification resource reconciliation settings");
+  }
+  return input.verificationResourceCheck;
+}
+
+/** 検査コマンド仕様の標本（scope 名を args に含め、fakeRunner が scope 単位で応答する）。 */
+function inspectionCommand(scope: string): InspectionCommandSpec & Pick<GateCommandSpec, "name"> {
+  return {
+    name: `verification-inspection-${scope}`,
+    scope,
+    command: "bun",
+    args: ["./inspector.ts", scope],
+    cwd: "<repo>",
+  };
+}
+
+/** 台帳エントリの標本（verification-resources-ledger.ts の parseEntry 契約に準拠）。 */
+function ledgerEntryJson(overrides: Partial<{
+  id: string;
+  kind: string;
+  location: string;
+  identifiers: Record<string, string>;
+  ownership: string;
+  childIssue: number | null;
+  collectedAt: string | null;
+}> = {}): Record<string, unknown> {
+  return {
+    id: "vr-3928-1",
+    caseId: "3928",
+    kind: "clone",
+    location: "<repo>/tmp-area/verify-clone",
+    identifiers: { path: "<repo>/tmp-area/verify-clone", repo: "example/verify-target" },
+    collector: "case-run-delegation",
+    ownership: "child",
+    childIssue: 3931,
+    recordedBy: "verification-resource-register",
+    createdAt: "2026-11-05T09:00:00.000Z",
+    collectedAt: null,
     ...overrides,
   };
 }
@@ -67,15 +140,38 @@ function fakeRunner(overrides: {
   contractStateStatusExit?: number;
   untrackedOutput?: string;
   untrackedExit?: number;
+  gitignoredOutput?: string;
   currentBranch?: string;
   issueBody?: string;
   epicBody?: string;
   integrityExitCodes?: Record<string, number>;
-} = {}): MechanicalRunner & { calls: { command: string; args: readonly string[]; cwd: string }[] } {
+  ledgerText?: string;
+  ledgerMissing?: boolean;
+  headCommit?: string;
+  remotesText?: string;
+  worktreeListingText?: string;
+  branchesText?: string;
+  dedicatedAreaEntries?: readonly string[];
+  osTempAreaMatches?: readonly string[];
+  processLiveness?: Record<string, { alive: boolean; commandLine: string | null }>;
+  listenPorts?: Record<string, { listening: boolean }>;
+  remoteAbsenceInputs?: Record<string, unknown>;
+  inspectionExitCodes?: Record<string, number>;
+  missingPaths?: readonly string[];
+} = {}): MechanicalRunner & {
+  calls: { command: string; args: readonly string[]; cwd: string }[];
+  writes: { absolutePath: string; content: string }[];
+} {
   const calls: { command: string; args: readonly string[]; cwd: string }[] = [];
+  const writes: { absolutePath: string; content: string }[] = [];
   return {
     calls,
-    exists() {
+    writes,
+    exists(absolutePath) {
+      if (absolutePath.includes("verification-resources") && overrides.ledgerMissing === true) {
+        return false;
+      }
+      if (overrides.missingPaths?.includes(absolutePath)) return false;
       return true;
     },
     run(spec) {
@@ -90,18 +186,45 @@ function fakeRunner(overrides: {
           : (overrides.worktreeStatus ?? "");
         if (spec.args.includes("--")) result.exitCode = overrides.contractStateStatusExit ?? 0;
       }
-      if (spec.command === "git" && spec.args[0] === "ls-files") {
+      if (spec.command === "git" && spec.args[0] === "ls-files" && !spec.args.includes("-i")) {
         result.stdout = overrides.untrackedOutput ?? "";
         result.exitCode = overrides.untrackedExit ?? 0;
+      }
+      if (spec.command === "git" && spec.args[0] === "ls-files" && spec.args.includes("-i")) {
+        result.stdout = overrides.gitignoredOutput ?? "";
       }
       if (spec.command === "git" && spec.args[0] === "branch" && spec.args[1] === "--show-current") {
         result.stdout = overrides.currentBranch ?? "case-100";
       }
       if (spec.command === "git" && spec.args[0] === "branch" && spec.args[1] === "--list") {
-        result.stdout = "";
+        result.stdout = spec.args.includes("--all") ? (overrides.branchesText ?? "") : "";
       }
       if (spec.command === "git" && spec.args[0] === "diff") {
         result.stdout = "";
+      }
+      if (spec.command === "git" && spec.args[0] === "remote") {
+        result.stdout = overrides.remotesText ?? "";
+      }
+      if (spec.command === "git" && spec.args[0] === "worktree") {
+        result.stdout = overrides.worktreeListingText ?? "";
+      }
+      if (spec.command === "git" && spec.args[0] === "rev-parse") {
+        result.stdout = `${overrides.headCommit ?? "0275e2d7b1cd4517004a0e7b4a6fc0464de39416"}\n`;
+      }
+      if (spec.args.includes("dedicated-area-listing")) {
+        result.stdout = JSON.stringify({ entries: overrides.dedicatedAreaEntries ?? [] });
+      }
+      if (spec.args.includes("os-temp-area-scan")) {
+        result.stdout = JSON.stringify({ matches: overrides.osTempAreaMatches ?? [] });
+      }
+      if (spec.args.includes("process-liveness")) {
+        result.stdout = JSON.stringify(overrides.processLiveness ?? {});
+      }
+      if (spec.args.includes("listen-port-check")) {
+        result.stdout = JSON.stringify(overrides.listenPorts ?? {});
+      }
+      if (spec.args.includes("remote-absence-verification")) {
+        result.stdout = JSON.stringify(overrides.remoteAbsenceInputs ?? {});
       }
       if (spec.args.includes("check_autogen_freshness")) {
         result.stdout = JSON.stringify({ compared: 4, changed: 0 });
@@ -109,12 +232,23 @@ function fakeRunner(overrides: {
       for (const [gateName, exitCode] of Object.entries(overrides.integrityExitCodes ?? {})) {
         if (spec.args.includes(gateName)) result.exitCode = exitCode;
       }
+      for (const [scope, exitCode] of Object.entries(overrides.inspectionExitCodes ?? {})) {
+        if (spec.args.includes(scope)) result.exitCode = exitCode;
+      }
       return result;
     },
     readTextFile(absolutePath) {
+      if (absolutePath.includes("verification-resources")) return overrides.ledgerText ?? "[]";
       if (absolutePath.endsWith("issue-body.md")) return overrides.issueBody ?? "";
       if (absolutePath.endsWith("epic-body.md")) return overrides.epicBody ?? "";
       return "";
+    },
+    writeTextFile(absolutePath, content) {
+      writes.push({ absolutePath, content });
+    },
+    mkdirRecursive() {},
+    gitCommonDir() {
+      return "<repo>/.git";
     },
     sleep() {},
   };
@@ -237,7 +371,7 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
       ".agentdev/learning/inbox.md",
     ]);
     const untrackedCall = runner.calls.find(
-      (c) => c.command === "git" && c.args[0] === "ls-files",
+      (c) => c.command === "git" && c.args[0] === "ls-files" && !c.args.includes("-i"),
     );
     expect(untrackedCall?.cwd).toBe("<repo>");
     expect(untrackedCall?.args).toEqual(["ls-files", "--others", "--exclude-standard"]);
@@ -1305,5 +1439,639 @@ describe("受入評価の実経路接続（final-acceptance-evaluation step と�
     expect(step2).toContain("evaluateFinalAcceptance");
     expect(step5).toContain("受入評価結果の確認");
     expect(step2).toContain("completion-checkbox-extraction");
+  });
+});
+
+describe("検証用一時資材の照合・完了拒否・終了判定記録書出し（REQ-032-043/044/045/046）", () => {
+  test("実経路: クリーン構成（台帳記録ゼロ・観測ゼロ・制限確認あり）では照合が成立し完了操作を許可する", () => {
+    const runner = fakeRunner({ issueBody: "- [x] 条件1\n", ledgerText: "[]" });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const step = report.result.steps.find((s) => s.name === "verification-resource-reconciliation");
+    expect(step?.status).toBe("pass");
+    const reconciliation = report.diff.verificationResourceReconciliation as { permitted: boolean };
+    expect(reconciliation.permitted).toBe(true);
+    expect(report.diff.acceptanceGaps).toEqual([]);
+    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+  });
+
+  test("実経路: 台帳登録済みの未回収一時資材が実物残存する場合は照合で検出し完了を拒否する", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([ledgerEntryJson()]),
+      dedicatedAreaEntries: ["<repo>/tmp-area/verify-clone"],
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const step = report.result.steps.find((s) => s.name === "verification-resource-reconciliation");
+    expect(step?.status).toBe("fail");
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(reconciliation.findings.some((f) => f.code === "residual-uncollected")).toBe(true);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: 台帳不在は記録欠落として拒否する（不在を作成物なしの根拠にしない）", () => {
+    const runner = fakeRunner({ issueBody: "- [x] 条件1\n", ledgerMissing: true });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const step = report.result.steps.find((s) => s.name === "verification-resource-reconciliation");
+    expect(step?.status).toBe("fail");
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      ledgerState: string;
+      findings: readonly { code: string }[];
+    };
+    expect(reconciliation.ledgerState).toBe("missing");
+    expect(reconciliation.findings.some((f) => f.code === "ledger-missing")).toBe(true);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: 導入時既知残存リスト記載の旧検証資材（RU-0255〜0260由来）が存在する限り拒否理由となり、リスト外の実在物は未登録として検出する", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      osTempAreaMatches: [
+        "<repo>/tmp-verify/adf-3928-ru-0255-remote-clone",
+        "<repo>/tmp-verify/adf-3928-ru-0256-bare",
+        "<repo>/tmp-verify/adf-3928-unlisted-residual",
+      ],
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: {
+          ...baseCheck,
+          knownResidualEntries: [
+            {
+              location: "<repo>/tmp-verify/adf-3928-ru-0255-remote-clone",
+              identifiers: { path: "<repo>/tmp-verify/adf-3928-ru-0255-remote-clone" },
+            },
+            {
+              location: "<repo>/tmp-verify/adf-3928-ru-0256-bare",
+              identifiers: { path: "<repo>/tmp-verify/adf-3928-ru-0256-bare" },
+            },
+          ],
+        },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      knownResidualStillPresent: readonly string[];
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(reconciliation.knownResidualStillPresent).toEqual([
+      "<repo>/tmp-verify/adf-3928-ru-0255-remote-clone",
+      "<repo>/tmp-verify/adf-3928-ru-0256-bare",
+    ]);
+    expect(reconciliation.findings.some((f) => f.code === "known-residual-still-present")).toBe(true);
+    expect(
+      reconciliation.findings.some(
+        (f) =>
+          f.code === "unregistered-resource" &&
+          f.detail.includes("adf-3928-unlisted-residual"),
+      ),
+    ).toBe(true);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: 正規のgitignore運用領域（.agentdev/integrity/reports/ 等）に本件由来の未登録の実行時出力を置いた反例で検出・完了拒否される", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      gitignoredOutput: [
+        ".agentdev/integrity/reports/adf-3928-run-output.txt",
+        "notes/unrelated-cache.txt",
+      ].join("\n"),
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(
+      reconciliation.findings.some(
+        (f) =>
+          f.code === "unregistered-resource" &&
+          f.detail.includes(".agentdev/integrity/reports/adf-3928-run-output.txt"),
+      ),
+    ).toBe(true);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: 台帳・終了判定記録自身と当該検査実行が作成記録付きで書き出す特定実体を未登録残存として誤検出しない", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      gitignoredOutput: [
+        ".agentdev/tmp/verification-resources/3928.json",
+        ".agentdev/close-acceptance/issue-3931.json",
+        ".agentdev/integrity/reports/inspector-stderr-3928.txt",
+        ".agentdev/integrity/reports/adf-3928-unregistered.txt",
+      ].join("\n"),
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: {
+          ...baseCheck,
+          inspectionArtifactPaths: [".agentdev/integrity/reports/inspector-stderr-3928.txt"],
+        },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      excludedObservations: readonly { path: string; basis: string }[];
+      findings: readonly { code: string; detail: string }[];
+    };
+    const excludedPaths = reconciliation.excludedObservations.map((o) => o.path);
+    expect(excludedPaths).toContain(".agentdev/tmp/verification-resources/3928.json");
+    expect(excludedPaths).toContain(".agentdev/close-acceptance/issue-3931.json");
+    expect(excludedPaths).toContain(".agentdev/integrity/reports/inspector-stderr-3928.txt");
+    expect(
+      reconciliation.findings.some(
+        (f) =>
+          f.code === "unregistered-resource" &&
+          f.detail.includes(".agentdev/integrity/reports/adf-3928-unregistered.txt"),
+      ),
+    ).toBe(true);
+    expect(
+      reconciliation.findings.some(
+        (f) =>
+          f.code === "unregistered-resource" &&
+          f.detail.includes("inspector-stderr-3928.txt"),
+      ),
+    ).toBe(false);
+  });
+
+  test("実経路: 終了判定記録をmain repo root固定の .agentdev/close-acceptance/issue-{NNNN}.json へ書き出す", () => {
+    const runner = fakeRunner({ issueBody: "- [x] 条件1\n", ledgerText: "[]" });
+    runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const expectedPath = path.join("<repo>", ".agentdev", "close-acceptance", "issue-3931.json");
+    const write = runner.writes.find((w) => w.absolutePath === expectedPath);
+    expect(write).toBeDefined();
+    const record = JSON.parse(write?.content ?? "{}") as {
+      issueNumber: number;
+      judgedRevision: string;
+      generatedAt: string;
+      judgment: {
+        reconciliationPermitted: boolean;
+        acceptanceGapsRemaining: boolean;
+        closeOperationPermitted: boolean;
+      };
+    };
+    expect(record.issueNumber).toBe(3931);
+    expect(record.judgedRevision).toBe("0275e2d7b1cd4517004a0e7b4a6fc0464de39416");
+    expect(Number.isNaN(Date.parse(record.generatedAt))).toBe(false);
+    expect(record.judgment.reconciliationPermitted).toBe(true);
+    expect(record.judgment.closeOperationPermitted).toBe(true);
+  });
+
+  test("実経路: 照合拒否の場合も終了判定記録を書き出し、判定内容に拒否とfindingsを記録する", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([ledgerEntryJson()]),
+      dedicatedAreaEntries: ["<repo>/tmp-area/verify-clone"],
+    });
+    runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const expectedPath = path.join("<repo>", ".agentdev", "close-acceptance", "issue-3931.json");
+    const write = runner.writes.find((w) => w.absolutePath === expectedPath);
+    expect(write).toBeDefined();
+    const record = JSON.parse(write?.content ?? "{}") as {
+      issueNumber: number;
+      judgment: {
+        reconciliationPermitted: boolean;
+        closeOperationPermitted: boolean;
+        findings: readonly { code: string }[];
+      };
+    };
+    expect(record.judgment.reconciliationPermitted).toBe(false);
+    expect(record.judgment.closeOperationPermitted).toBe(false);
+    expect(record.judgment.findings.some((f) => f.code === "residual-uncollected")).toBe(true);
+  });
+
+  test("実経路: 終了判定記録を書き出せない場合はfail-closedで完了操作を拒否する", () => {
+    const runner = fakeRunner({ issueBody: "- [x] 条件1\n", ledgerText: "[]" });
+    delete runner.writeTextFile;
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      acceptanceRecordWritten: boolean;
+      findings: readonly { code: string }[];
+    };
+
+    expect(reconciliation.acceptanceRecordWritten).toBe(false);
+    expect(reconciliation.findings.some((finding) => finding.code === "inspection-unavailable")).toBe(true);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実filesystem: 終了判定記録はworktreeではなくmain repo rootへ書き出される", () => {
+    const tempRoot = fs.mkdtempSync(
+      path.join(REPO_ROOT, "src/common/skills/agentdev-workflow-case-close/scripts/.close-acceptance-test-"),
+    );
+    testDirectories.push(tempRoot);
+    const runner = fakeRunner({ issueBody: "- [x] 条件1\n", ledgerText: "[]" });
+    runner.gitCommonDir = () => path.join(tempRoot, ".git");
+    runner.mkdirRecursive = (absolutePath) => fs.mkdirSync(absolutePath, { recursive: true });
+    runner.writeTextFile = (absolutePath, content) => fs.writeFileSync(absolutePath, content, "utf-8");
+
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        repoRoot: tempRoot,
+        worktreeRoot: "nested-worktree",
+        acceptanceVerdicts: [soundPass("AC-1")],
+      }),
+      runner,
+    );
+    const recordPath = path.join(tempRoot, ".agentdev", "close-acceptance", "issue-3931.json");
+
+    expect(fs.existsSync(recordPath)).toBe(true);
+    expect(JSON.parse(fs.readFileSync(recordPath, "utf-8"))).toMatchObject({
+      issueNumber: 3931,
+      judgment: { closeOperationPermitted: true },
+    });
+    expect(report.diff.verificationResourceReconciliation).toMatchObject({
+      acceptanceRecordPath: recordPath,
+      acceptanceRecordWritten: true,
+    });
+  });
+
+  test("実経路: 台帳のremote一時資材がremote列挙に現れない場合、認証・可視性・対象ID確認後も判断できないなら終了を拒否する（HTTP 404単独の不存在判定をしない）", () => {
+    const remoteUrl = "https://github.com/example/adf-3928-verify-target";
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      missingPaths: ["<repo>/tmp-area/verify-clone"],
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({
+          id: "vr-3928-2",
+          kind: "remote",
+          location: remoteUrl,
+          identifiers: { url: remoteUrl },
+        }),
+      ]),
+      remoteAbsenceInputs: {
+        [remoteUrl]: {
+          httpStatus404Observed: true,
+          authenticationConfirmed: true,
+          visibilityConfirmed: true,
+          targetIdConfirmed: true,
+        },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(reconciliation.findings.some((f) => f.code === "remote-absence-undetermined")).toBe(true);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: 認証・可視性・対象ID確認後の確定的不存在根拠が揃ったremote不存在は、回収確認（collectedAtと削除確認記録）が揃った場合に限り受理する", () => {
+    const remoteUrl = "https://github.com/example/adf-3928-verify-target";
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      missingPaths: ["<repo>/tmp-area/verify-clone"],
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({
+          id: "vr-3928-2",
+          kind: "remote",
+          location: remoteUrl,
+          identifiers: { url: remoteUrl },
+          collectedAt: "2026-11-05T10:00:00.000Z",
+        }),
+      ]),
+      remoteAbsenceInputs: {
+        [remoteUrl]: {
+          httpStatus404Observed: false,
+          authenticationConfirmed: true,
+          visibilityConfirmed: true,
+          targetIdConfirmed: true,
+          confirmedAbsenceEvidence: "gh repo view で不存在確認（認証・可視性・対象ID確認済み）",
+        },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: {
+          ...verificationResourceCheck(),
+          deletionConfirmations: [
+            {
+              entryId: "vr-3928-2",
+              identifiers: { url: remoteUrl },
+              confirmedBy: "利用者明示確認",
+              confirmedAt: "2026-11-05T11:00:00.000Z",
+            },
+          ],
+        },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+    };
+    expect(reconciliation.permitted).toBe(true);
+    expect(reconciliation.findings).toEqual([]);
+    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+  });
+
+  test("実経路: 検査コマンドの失敗（非ゼロ終了）は検査器の異常としてfail-closedで完了を拒否する", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      inspectionExitCodes: { "process-liveness": 128 },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "inspection-unavailable" && f.detail.includes("process-liveness"),
+      ),
+    ).toBe(true);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: remote不存在確認の検査コマンド失敗（認証失敗相当）も検査器の異常として完了を拒否する", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({
+          id: "vr-3928-2",
+          kind: "remote",
+          location: "https://github.com/example/adf-3928-verify-target",
+          identifiers: { url: "https://github.com/example/adf-3928-verify-target" },
+        }),
+      ]),
+      inspectionExitCodes: { "remote-absence-verification": 128 },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "inspection-unavailable" && f.detail.includes("remote-absence-verification"),
+      ),
+    ).toBe(true);
+  });
+
+  test("実経路: 受入未達（機械検出も実行制限も成立しない作成経路の残存）を報告JSONへ出力し終了操作を許可しない", () => {
+    const runner = fakeRunner({ issueBody: "- [x] 条件1\n", ledgerText: "[]" });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: {
+          ...verificationResourceCheck(),
+          creationRouteControlConfirmations: [],
+        },
+      }),
+      runner,
+    );
+    const gaps = report.diff.acceptanceGaps as readonly { code: string; route?: string }[];
+    expect(
+      gaps.some(
+        (g) =>
+          g.code === "creation-route-without-detection-or-enforcement" &&
+          g.route === "arbitrary-path-creation",
+      ),
+    ).toBe(true);
+    expect(isCloseOperationPermitted(report)).toEqual({
+      permitted: false,
+      reason: "acceptance-gap-remains",
+    });
+  });
+
+  test("実経路: 台帳登録済み資材が削除確認記録なしに消失した場合に削除確認の不存在として完了を拒否する", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      missingPaths: ["<repo>/tmp-area/verify-clone"],
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({ collectedAt: "2026-11-05T10:00:00.000Z" }),
+      ]),
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string }[];
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(reconciliation.findings.some((f) => f.code === "deletion-confirmation-missing")).toBe(true);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: 削除確認記録の識別情報が台帳エントリと一致しない場合は有効な削除確認として受理しない", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      missingPaths: ["<repo>/tmp-area/verify-clone"],
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({ collectedAt: "2026-11-05T10:00:00.000Z" }),
+      ]),
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: {
+          ...verificationResourceCheck(),
+          deletionConfirmations: [
+            {
+              entryId: "vr-3928-1",
+              identifiers: { path: "<repo>/tmp-area/different-clone" },
+              confirmedBy: "利用者明示確認",
+              confirmedAt: "2026-11-05T11:00:00.000Z",
+            },
+          ],
+        },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string }[];
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(reconciliation.findings.some((f) => f.code === "deletion-confirmation-missing")).toBe(true);
+  });
+
+  test("実経路: 台帳登録済み資材の実物の識別情報（PID・コマンドライン）が台帳記録と一致しない場合に識別情報の不一致として完了を拒否する", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({
+          kind: "dedicated-process",
+          location: "process:pid=4321",
+          identifiers: { pid: "4321", commandLine: "bun run verify-server.ts --port 4321" },
+        }),
+      ]),
+      processLiveness: {
+        "4321": { alive: true, commandLine: "bun run verify-server.ts --port 9999" },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string }[];
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(reconciliation.findings.some((f) => f.code === "identifier-mismatch")).toBe(true);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: 台帳記録PIDの生存とlistenポートの生存を残存として検出する", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({
+          kind: "dedicated-server",
+          location: "process:pid=4321",
+          identifiers: { pid: "4321", commandLine: "bun run verify-server.ts --port 4321", listenPort: "4321" },
+        }),
+      ]),
+      processLiveness: {
+        "4321": { alive: true, commandLine: "bun run verify-server.ts --port 4321" },
+      },
+      listenPorts: {
+        "4321": { listening: true },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string }[];
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(reconciliation.findings.some((f) => f.code === "residual-uncollected")).toBe(true);
+  });
+
+  test("実経路: 台帳のremote・分岐の実物残存をremote列挙・branch列挙との突合で検出する", () => {
+    const remoteUrl = "https://github.com/example/adf-3928-verify-target";
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({
+          id: "vr-3928-2",
+          kind: "remote",
+          location: remoteUrl,
+          identifiers: { url: remoteUrl },
+        }),
+      ]),
+      remotesText: `origin\thttps://github.com/example/agent-dev-flow.git (fetch)\nverify-target\t${remoteUrl} (fetch)\n`,
+      branchesText: "verify-target/adf-3928-verification\n",
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string }[];
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(reconciliation.findings.some((f) => f.code === "residual-uncollected")).toBe(true);
+  });
+});
+
+describe("検証用一時資材照合の入力検証（検査設定の省略禁止・検出範囲の解除不可）", () => {
+  test("pre-merge で verificationResourceCheck の省略を拒否する（検査設定の解除でゼロ扱いにできない）", () => {
+    const base = preMergeInput() as unknown as Record<string, unknown>;
+    expect(() => validateInput({ ...base, verificationResourceCheck: undefined })).toThrow(
+      /verification/,
+    );
+  });
+
+  test("inspectionCommands の必須scope被覆欠落を拒否する", () => {
+    const base = preMergeInput();
+    const baseCheck = base.verificationResourceCheck;
+    const broken = {
+      ...base,
+      verificationResourceCheck: {
+        ...baseCheck,
+        inspectionCommands: [
+          inspectionCommand("dedicated-area-listing"),
+          inspectionCommand("process-liveness"),
+        ],
+      },
+    };
+    expect(() => validateInput(broken as unknown)).toThrow(/os-temp-area-scan/);
+  });
+
+  test("inspectionCommands の未知scopeを拒否する", () => {
+    const base = preMergeInput();
+    const baseCheck = base.verificationResourceCheck;
+    const broken = {
+      ...base,
+      verificationResourceCheck: {
+        ...baseCheck,
+        inspectionCommands: [
+          ...baseCheck?.inspectionCommands ?? [],
+          inspectionCommand("unspecified-scope"),
+        ],
+      },
+    };
+    expect(() => validateInput(broken as unknown)).toThrow(/unspecified-scope/);
+  });
+
+  test("creationRouteControlConfirmations の形式違反（basis欠落）を拒否する", () => {
+    const base = preMergeInput();
+    const baseCheck = base.verificationResourceCheck;
+    const broken = {
+      ...base,
+      verificationResourceCheck: {
+        ...baseCheck,
+        creationRouteControlConfirmations: [{ route: "arbitrary-path-creation", confirmedBy: "x" }],
+      },
+    };
+    expect(() => validateInput(broken as unknown)).toThrow(/basis/);
   });
 });
