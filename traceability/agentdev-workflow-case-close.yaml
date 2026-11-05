@@ -4,6 +4,7 @@ implementation:
     - REQ-118-001
     - REQ-118-002
     - REQ-118-004
+    - REQ-118-005
     - REQ-118-006
     - REQ-118-008
   src/common/skills/agentdev-workflow-case-close/scripts/src/deletion-confirmation.ts:
@@ -102,6 +103,7 @@ verification:
     - REQ-118-001
     - REQ-118-002
     - REQ-118-004
+    - REQ-118-005
     - REQ-118-008
   src/common/skills/agentdev-workflow-case-close/scripts/tests/verification-resource-register.test.ts:
     - REQ-118-001

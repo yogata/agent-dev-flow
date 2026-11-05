@@ -5,6 +5,7 @@ import * as path from "node:path";
 import {
   appendEntry,
   evaluateChildCompletion,
+  evaluateCreationDestination,
   evaluateParentTerminationUnit,
   isConfirmedEmptyBasis,
   LedgerFormatError,
@@ -45,8 +46,8 @@ function validInput(overrides: Partial<VerificationResourceRegistrationInput> = 
   return {
     caseId: "3928",
     kind: "clone",
-    location: "C:/tmp/case-3928/verification-clone",
-    identifiers: { path: "C:/tmp/case-3928/verification-clone", repoIdentity: "agent-dev-flow#issue-3930" },
+    location: "C:/repo/main/.agentdev/tmp/verification-clone",
+    identifiers: { path: "C:/repo/main/.agentdev/tmp/verification-clone", repoIdentity: "agent-dev-flow#issue-3930" },
     collector: "case-run:3930",
     ownership: "child",
     childIssue: 3930,
@@ -130,7 +131,7 @@ describe("検証用一時資材 台帳モジュール（生成記録）", () => 
       const { entry } = appendEntry([], validated);
       expect(entry.caseId).toBe("3928");
       expect(entry.kind).toBe("clone");
-      expect(entry.location).toBe("C:/tmp/case-3928/verification-clone");
+      expect(entry.location).toBe("C:/repo/main/.agentdev/tmp/verification-clone");
       expect(entry.identifiers.repoIdentity).toBe("agent-dev-flow#issue-3930");
       expect(entry.collector).toBe("case-run:3930");
       expect(entry.ownership).toBe("child");
@@ -280,7 +281,7 @@ describe("検証用一時資材 台帳モジュール（生成記録）", () => 
       const result = registerResource(
         io,
         "C:/repo/main",
-        validInput({ kind: "capture-log", location: "C:/tmp/case-3928/verification.log" }),
+        validInput({ kind: "capture-log", location: "C:/repo/main/.agentdev/tmp/verification.log" }),
         { tempRoot: "C:/Users/verify/AppData/Local/Temp" },
       );
       const parsed = parseLedgerText(io.written[0]!.content);
@@ -296,7 +297,7 @@ describe("検証用一時資材 台帳モジュール（生成記録）", () => 
     });
   });
 
-  describe("作成先確認（環境指定TEMPまたは案件専用領域への制限）", () => {
+  describe("作成先確認（環境指定TEMPまたはプロジェクト内正規一時領域への制限）", () => {
     const tempRoot = "C:/Users/verify/AppData/Local/Temp";
 
     test("作成先が環境指定TEMP配下の絶対パスの場合は登録する", () => {
@@ -312,14 +313,10 @@ describe("検証用一時資材 台帳モジュール（生成記録）", () => 
       expect(io.written.length).toBe(1);
     });
 
-    test("作成先が案件識別子をパス要素に含む案件専用領域（repo外）の場合は登録する", () => {
+    test("作成先がプロジェクト内正規一時領域（.agentdev/tmp/）配下の絶対パスの場合は登録する（REQ-018-008(b)）", () => {
       const io = fakeIo({ existingLedgerText: null });
-      const result = registerResource(
-        io,
-        "C:/repo/main",
-        validInput({ location: "D:/adf-cases/case-3928/verify-clone" }),
-        { tempRoot },
-      );
+      const location = "C:/repo/main/.agentdev/tmp/verify-clone";
+      const result = registerResource(io, "C:/repo/main", validInput({ location }), { tempRoot });
       expect(result.ok).toBe(true);
       expect(io.written.length).toBe(1);
     });
@@ -338,11 +335,11 @@ describe("検証用一時資材 台帳モジュール（生成記録）", () => 
       expect(result.ok).toBe(true);
     });
 
-    test("プロジェクト親ディレクトリ等の案件識別子を含まない作成先違反は機械拒否し、台帳を書換えない", () => {
+    test("プロジェクト親ディレクトリ等の repo外パスは案件番号セグメントの有無にかかわらず機械拒否し、台帳を書換えない（REQ-118-005）", () => {
       const io = fakeIo({ existingLedgerText: null });
       for (const location of [
         "C:/work/adf-ru0255-github-verify",
-        "C:/work/verify-RU0258-public/env",
+        "D:/adf-cases/case-3928/verify-clone",
         tempRoot.replace(/\/$/, "") + "..",
       ]) {
         expect(() =>
@@ -352,13 +349,13 @@ describe("検証用一時資材 台帳モジュール（生成記録）", () => 
       expect(io.written.length).toBe(0);
     });
 
-    test("リポジトリ内部（プロジェクトディレクトリ配下）の作成先は案件専用領域でないため拒否する", () => {
+    test("リポジトリ内部でも正規一時領域（.agentdev/tmp/）以外の領域は拒否し、台帳を書換えない", () => {
       const io = fakeIo({ existingLedgerText: null });
       expect(() =>
         registerResource(
           io,
           "C:/repo/main",
-          validInput({ location: "C:/repo/main/.agentdev/tmp/verify-clone" }),
+          validInput({ location: "C:/repo/main/src/verify-clone" }),
           { tempRoot },
         ),
       ).toThrow(LedgerInputError);
@@ -373,6 +370,143 @@ describe("検証用一時資材 台帳モジュール（生成記録）", () => 
         }),
       ).toThrow(LedgerInputError);
       expect(io.written.length).toBe(0);
+    });
+  });
+
+  describe("作成先判定の現行合意反例（Issue #3946 監督確定反例3件）", () => {
+    const tempRoot = "C:/Users/verify/AppData/Local/Temp";
+    const mainRepoRoot = "C:/repo/main";
+
+    test("反例1: プロジェクト親ディレクトリ配下の案件番号セグメント付きパスは、案件番号セグメントを許可根拠にしないため invalid になる（REQ-118-005）", () => {
+      const projectParent = path.dirname(mainRepoRoot);
+      const location = path.join(projectParent, "issue-3928-probe", "probe");
+      const evaluation = evaluateCreationDestination(location, mainRepoRoot, tempRoot);
+      expect(evaluation.valid).toBe(false);
+      expect(evaluation.basis).toBeNull();
+      expect(evaluation.reason).toContain("case identifier");
+    });
+
+    test("反例2: プロジェクト内正規一時領域（.agentdev/tmp/）配下の作成先は REQ-018-008(b) 契約により valid になる", () => {
+      const location = path.join(mainRepoRoot, ".agentdev/tmp/verification-resources/3928/probe");
+      const evaluation = evaluateCreationDestination(location, mainRepoRoot, tempRoot);
+      expect(evaluation.valid).toBe(true);
+      expect(evaluation.basis).toBe("repo-regular-temp-area");
+      expect(evaluation.reason).toBeNull();
+    });
+
+    test("反例3: 環境指定TEMPの境界外への `..` による親移動は invalid になる（文字列prefix一致を許可根拠にしない）", () => {
+      const location = `${tempRoot}/../outside/probe`;
+      const evaluation = evaluateCreationDestination(location, mainRepoRoot, tempRoot);
+      expect(evaluation.valid).toBe(false);
+      expect(evaluation.basis).toBeNull();
+    });
+  });
+
+  describe("作成先判定のパス境界正規化（node:path 標準API。Windows パス前提）", () => {
+    const tempRoot = "C:/Users/verify/AppData/Local/Temp";
+    const mainRepoRoot = "C:/repo/main";
+
+    test.skipIf(process.platform !== "win32")(
+      "大文字小文字の差（Windows case-insensitivity）で判定が一意に決まる",
+      () => {
+        const upperTemp = evaluateCreationDestination(
+          "C:/USERS/VERIFY/APPDATA/LOCAL/TEMP/adf-3928/x.log",
+          mainRepoRoot,
+          tempRoot,
+        );
+        expect(upperTemp.valid).toBe(true);
+        expect(upperTemp.basis).toBe("env-temp-area");
+        const upperRepoTemp = evaluateCreationDestination(
+          "C:/REPO/MAIN/.AGENTDEV/TMP/verify-clone",
+          mainRepoRoot,
+          tempRoot,
+        );
+        expect(upperRepoTemp.valid).toBe(true);
+        expect(upperRepoTemp.basis).toBe("repo-regular-temp-area");
+      },
+    );
+
+    test("バックスラッシュとスラッシュの混在で判定が一意に決まる", () => {
+      const mixedTemp = evaluateCreationDestination(
+        "C:\\Users\\verify\\AppData\\Local\\Temp/adf-3928/x.log",
+        mainRepoRoot,
+        tempRoot,
+      );
+      expect(mixedTemp.valid).toBe(true);
+      expect(mixedTemp.basis).toBe("env-temp-area");
+      const mixedRepoTemp = evaluateCreationDestination(
+        "C:\\repo\\main\\.agentdev\\tmp\\verify-clone",
+        mainRepoRoot,
+        tempRoot,
+      );
+      expect(mixedRepoTemp.valid).toBe(true);
+      expect(mixedRepoTemp.basis).toBe("repo-regular-temp-area");
+    });
+
+    test("親移動（..）で境界外へ出る入力は invalid、境界内に収まる入力は valid", () => {
+      expect(
+        evaluateCreationDestination(`${tempRoot}/../outside/probe`, mainRepoRoot, tempRoot).valid,
+      ).toBe(false);
+      const staysInsideTemp = evaluateCreationDestination(
+        `${tempRoot}/adf-3928/../adf-3928/x.log`,
+        mainRepoRoot,
+        tempRoot,
+      );
+      expect(staysInsideTemp.valid).toBe(true);
+      expect(staysInsideTemp.basis).toBe("env-temp-area");
+      const staysInsideRepoTemp = evaluateCreationDestination(
+        `${mainRepoRoot}/.agentdev/tmp/../tmp/verify-clone`,
+        mainRepoRoot,
+        tempRoot,
+      );
+      expect(staysInsideRepoTemp.valid).toBe(true);
+      expect(staysInsideRepoTemp.basis).toBe("repo-regular-temp-area");
+    });
+
+    test("末尾セパレータの有無で判定が変わらない", () => {
+      const withTrailingTemp = evaluateCreationDestination(
+        `${tempRoot}/adf-3928/`,
+        mainRepoRoot,
+        tempRoot,
+      );
+      expect(withTrailingTemp.valid).toBe(true);
+      expect(withTrailingTemp.basis).toBe("env-temp-area");
+      const withTrailingRepoTemp = evaluateCreationDestination(
+        `${mainRepoRoot}/.agentdev/tmp/verify-clone/`,
+        mainRepoRoot,
+        tempRoot,
+      );
+      expect(withTrailingRepoTemp.valid).toBe(true);
+      expect(withTrailingRepoTemp.basis).toBe("repo-regular-temp-area");
+    });
+
+    test.skipIf(process.platform !== "win32")(
+      "ドライブレターの大文字小文字差で判定が変わらない",
+      () => {
+        const lowerDrive = evaluateCreationDestination(
+          "c:/repo/main/.agentdev/tmp/verify-clone",
+          mainRepoRoot,
+          tempRoot,
+        );
+        expect(lowerDrive.valid).toBe(true);
+        expect(lowerDrive.basis).toBe("repo-regular-temp-area");
+        const lowerDriveOutside = evaluateCreationDestination(
+          "c:/repo/main/src/verify-clone",
+          mainRepoRoot,
+          tempRoot,
+        );
+        expect(lowerDriveOutside.valid).toBe(false);
+      },
+    );
+
+    test("repo内でも正規一時領域（.agentdev/tmp/）以外の領域は拒否される", () => {
+      const evaluation = evaluateCreationDestination(
+        `${mainRepoRoot}/src/verify-clone`,
+        mainRepoRoot,
+        tempRoot,
+      );
+      expect(evaluation.valid).toBe(false);
+      expect(evaluation.basis).toBeNull();
     });
   });
 
@@ -403,7 +537,8 @@ describe("検証用一時資材 台帳モジュール（生成記録）", () => 
       expect(readLedger(nodeIo, ledgerPath).state).toBe("missing");
       expect(isConfirmedEmptyBasis(readLedger(nodeIo, ledgerPath))).toBe(false);
       // 登録と往復。
-      const result = registerResource(nodeIo, mainRoot, validInput());
+      const location = path.join(mainRoot, ".agentdev", "tmp", "verification-clone");
+      const result = registerResource(nodeIo, mainRoot, validInput({ location, identifiers: { path: location } }));
       const after = readLedger(nodeIo, ledgerPath);
       expect(after.state).toBe("present");
       expect(after.entries.length).toBe(1);
