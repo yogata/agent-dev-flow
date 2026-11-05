@@ -4,7 +4,11 @@ implementation:
     - REQ-118-001
     - REQ-118-002
     - REQ-118-004
+    - REQ-118-006
     - REQ-118-008
+  src/common/skills/agentdev-workflow-case-close/scripts/src/deletion-confirmation.ts:
+    - REQ-118-006
+    - REQ-032-044
   src/common/skills/agentdev-workflow-case-close/scripts/src/verification-resource-register.ts:
     - REQ-118-001
     - REQ-118-004
@@ -72,6 +76,7 @@ implementation:
     - REQ-032-042
     - REQ-118-003
     - REQ-118-005
+    - REQ-118-006
     - REQ-032-043
     - REQ-032-044
     - REQ-032-045
@@ -81,7 +86,12 @@ implementation:
     - REQ-108-010
     - REQ-032-042
     - REQ-108-020
+    - REQ-118-006
+    - REQ-032-044
 verification:
+  src/common/skills/agentdev-workflow-case-close/scripts/tests/deletion-confirmation.test.ts:
+    - REQ-118-006
+    - REQ-032-044
   src/common/skills/agentdev-workflow-case-close/scripts/tests/verification-resources-ledger.test.ts:
     - REQ-118-001
     - REQ-118-002
