@@ -3,6 +3,38 @@
 このドキュメントは、開発過程で得た教訓や失敗から学んだことを記録する。
 まだ整理されていない学びを一時的に保存し、十分な数が溜まったら分類、整理して永続的なドキュメントに移動する。
 
+## [2026-11-05T20:57+09:00][learning_candidate][Wave 先行 merge 後の後続レイヤー テスト fixture 再適合][Case #3928]
+- 検知: PR #3936（#3933）の Level 1 rebase（origin/main a3dec8cda 起点）で、競合解消（close_mechanical_steps.ts・scripts/README.md・traceability sidecar の3ファイル。#3931 レイヤーとの隣接追加で層分離設計どおりに解消）後の suite 実行で 4 fail が発生。先行 merge した #3931 レイヤーが pre-merge 入力契約へ issueUpdatedAt・verificationResourceCheck を必須化し MechanicalRunner を拡張したため、#3931 merge 前に書かれた #3933 側テスト fixture（baseInput・fakeRunner）が旧契約のままだった。
+- 対処: #3931 の production semantics は無変更のまま、#3933 自身のテスト fixture を統合後契約へ適合（検査コマンド仕様5 scope の被覆・MechanicalRunner 完全実装）し、176 pass / 0 fail・tsc --noEmit 0 で再検証してから push・マージ。
+- 学び: マージ順序を事前記録した Wave 重複許容では、層分離設計でも production code の競合は隣接追加で解消できる一方、後続ブランチのテスト fixture は先行レイヤーの契約追加で壊れる前提で Level 1 rebase 手順に「fixture の統合後契約適合 → suite 再実行」を組込むのが正。競合ゼロのファイルでも fixture 由来の fail は起こり得る。同一面上の後続子 Issue（#3934）の rebase 時にも同様の適合が必要になる見込み。
+- 出典: PR #3936 Level 1 rebase 実行記録（Wave-2 #3933 子Issue クローズの検証差分）
+- 関連: Case #3928・Wave-2 #3931（先行レイヤー）・#3934（同一面上の後続 rebase 対象候補）
+- タグ: #learning-capture #wave-layering #rebase #test-fixture #case-close
+
+## [2026-11-05T20:57+09:00][design_promotion_candidate][台帳の削除確認記録様式と回収記録契約][Case #3928]
+- 検知: PR #3936（#3933）の Design確定候補。entry.deletionConfirmation（省略可・null 許容、source: user-explicit 固定、confirmedBy/confirmedAt/identifiers 必須）、recordDeletionConfirmation（記録上書き禁止）、markEntryCollected（削除確認記録なしの回収記録付与禁止・collectedAt 再付与禁止）の契約。
+- 対処: 本 boundary（Wave-2 #3933 子Issue クローズ）では記録のみ。Design適用判断は Epic #3928 最終 close 時に行う。
+- 出典: PR #3936 本文「Design確定候補」
+- 関連: Case #3928・docs/designs/workflows/verification-resource-lifecycle.md（台帳（生成記録）・削除確認節への反映候補）
+
+## [2026-11-05T20:57+09:00][design_promotion_candidate][削除確認拒否コード系統と判定順序の固定][Case #3928]
+- 検知: PR #3936（#3933）の Design確定候補。8系統の拒否コード enum（confirmation-missing・machine-confirmation-not-accepted・confirmation-purpose-not-deletion・confirmation-target-mismatch・observation-missing・target-missing・identifier-mismatch・deletion-confirmation-record-missing）と判定順序（回収済み対象は削除確認記録の有無のみ検査 → 未回収対象に確認境界を適用）の固定。
+- 対処: 本 boundary では記録のみ。Epic #3928 最終 close 時の Design 反映候補。
+- 出典: PR #3936 本文「Design確定候補」
+- 関連: Case #3928・docs/designs/workflows/verification-resource-lifecycle.md（削除確認節への反映候補）
+
+## [2026-11-05T20:57+09:00][design_promotion_candidate][台帳不在と削除確認不存在の責務分離][Case #3928]
+- 検知: PR #3936（#3933）の Design確定候補。台帳不在（記録欠落）を削除確認不存在の検出対象外とし照合・完了拒否の本体（#3931 base extension）へ委ねる責務分離。統合時の step 接続位置（deletion-confirmation-check step と照合 step の隣接配置）を含む。
+- 対処: 本 boundary では記録のみ。Epic #3928 最終 close 時の Design 反映候補。
+- 出典: PR #3936 本文「Design確定候補」
+- 関連: Case #3928・case-close Design・docs/designs/workflows/verification-resource-lifecycle.md
+
+## [2026-11-05T20:57+09:00][design_promotion_candidate][case-close SKILL.md の HITL 削除確認完了順序][Case #3928]
+- 検知: PR #3936（#3933）の Design確定候補。確認提示 → 利用者判断 → 監督側削除実行 → 実不存在確認 → close 再実行 の5段完了順序（case-close は本手順内で削除を実行しない。機械可読値のみの確認不受理、残置許容例外への流用禁止、削除確認記録なし消失の完了拒否を明記）。
+- 対処: 本 boundary では記録のみ（SKILL.md 接続分は merge 済み）。Epic #3928 最終 close 時の Design 反映候補。
+- 出典: PR #3936 本文「Design確定候補」
+- 関連: Case #3928・src/common/skills/agentdev-workflow-case-close/SKILL.md（一時資材回収の削除確認（HITL 停止手順）節）
+
 ## [2026-11-05T17:45+09:00][learning_candidate][検証用一時資材 台帳モジュール運用][Case #3928]
 - 検知: 作成ヘルパー（verification-resource-register.ts）を worktree 内から `--main-repo-root` 未指定で実行すると、worktree-context 独立解決（git-common-dir 導出）により**メインリポジトリの台帳**（.agentdev/tmp/verification-resources/）へ登録される。smoke 実行時に実観測（設計どおりの動作）。
 - 対処: 検証・試験目的で worktree から実行する場合は `--main-repo-root .` で worktree 側へ限定する運用を採用し、smoke の台帳ファイルは実行後に削除して後片付け済み。
