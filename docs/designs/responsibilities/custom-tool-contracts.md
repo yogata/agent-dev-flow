@@ -2,11 +2,12 @@
 title: Custom Tool 操作契約
 status: accepted
 created: 2026-08-24
-updated: "2026-10-27"
+updated: "2026-11-05"
 ---
 <!-- ADF-COVERS(design): REQ-090-001, REQ-090-002, REQ-090-003, REQ-090-004, REQ-090-009, REQ-090-010, REQ-090-011, REQ-090-012, REQ-090-013, REQ-090-014, REQ-090-015, REQ-090-016, REQ-090-017, REQ-090-018, REQ-090-019, REQ-090-020, REQ-090-021, REQ-090-022, REQ-090-023, REQ-090-024, REQ-090-025, REQ-090-026, REQ-090-027, REQ-090-028, REQ-090-029, REQ-011-022, REQ-011-025, REQ-011-026, REQ-011-033 -->
 <!-- ADF-COVERS(design): REQ-009-051, REQ-052-012, REQ-052-013, REQ-052-014, REQ-052-015 -->
 <!-- ADF-COVERS(design): REQ-052-016, REQ-052-017（障害局面の書込み経路限定と診断手順分類の操作契約設計） -->
+<!-- ADF-COVERS(design): REQ-052-018（issue_close の終了前提の Tool 実行境界設計） -->
 <!-- ADF-COVERS(implementation): REQ-103-007, REQ-103-008, REQ-103-009, REQ-103-010, REQ-103-011（REQ-103 障害時契約の Tool 呼出側契約面の実装対応。runtime・durable state 面は各 foundations Design） -->
 <!-- ADF-COVERS(implementation): REQ-011-001, REQ-011-002, REQ-011-003, REQ-011-005, REQ-011-008, REQ-011-009, REQ-011-013, REQ-011-014, REQ-011-015, REQ-011-020, REQ-011-021, REQ-011-022, REQ-011-023, REQ-011-024, REQ-011-025, REQ-011-026, REQ-011-031, REQ-011-032, REQ-052-001, REQ-052-002, REQ-052-003, REQ-052-004, REQ-052-005, REQ-052-008, REQ-052-009, REQ-052-010, REQ-052-011 -->
 
@@ -98,6 +99,11 @@ GitHub版 / Local版等価性:
 - 旧派生状態の除去: recordState、outcome、llmTreatment、unchanged/corrected、finalizedBy、direct-finalization marker、fallback reason、not_configured/invalid_input observation を正規観測契約から除去する（REQ-090-017）。既存の v1 観測（1 Workflow 実行 = 1 JSON、部分レコード/完成レコード形式）は履歴として保持し、migration・変換・読み取り互換を要求しない。v1 観測を新契約の現行 observation として解釈しない。
 - 操作構成の自由度: operation カタログ（evaluate、観測の永続化と final result 反映の操作分割の有無）、観測 JSON の field 名、filename、完了状態の物理表現は実装設計時の自由度とし、本節の意味契約（一次事実、evaluation 単位 confidence、中断耐性、fail-open）を変更しない範囲で定める。provider 返却の score 値から定義済み scale level への正規化の写像方法も、連続値を canonical result として残さない限りにおいて実装設計時の自由度とする（REQ-090-014）。
 - 配布境界: ADF 汎用の Tool として配布対象とする（REQ-052-006）。正式名称 `agentdev_jev`、物理配置 Tool 本体 `src/opencode/tools/agentdev-jev/`、Cloudflare adapter パッケージ（`src/opencode/tools/agentdev-jev/` 配下。Cloudflare AI Gateway 接続。物理ディレクトリ名は repository 規約に従う。評価 SDK・HTTP 依存はこの adapter パッケージに閉じる）、Plugin 登録配線 `src/opencode/plugins/agentdev-jev-tool/`。
+
+### issue_close の終了前提（Case Issue）
+
+issue_close は、対象が Case Issue（case role の Issue）である場合、終了操作の前提として機械受理の判定記録を検証する。判定記録は case-close 機械工程が生成し、決定的な保存場所（メイン repo root の `.agentdev/close-acceptance/issue-{NNNN}.json`）に置かれる。Tool は呼出元の申告を受け取らず、自ら記録を読み取り、対象 Issue 番号と判定対象版（close 時点の対象を識別する版情報。様式はライフサイクル Design が所有）への束縛と判定内容（検証用一時資材の照合を含む機械受理の成立）を検証してから副作用を実行する。記録が存在しない、読み取れない、対象 Issue または対象版と一致しない（過去の合格結果の再利用を含む）、判定が不成立のいずれかの場合は副作用を実行せず構造化失敗を返す（fail-closed、REQ-052-004 と同型）。追跡Issue（tracking role）の終了には本前提を適用しない。記録の保存場所はメイン repo root に固定し、Tool は worktree コンテキストから呼び出された場合も main repo root 側の保存場所へ解決する（呼出側の cwd に依存しない単一の決定的解決規則。agentdev_jev 観測と同一の内部解決）。判定記録の様式・保存場所・回収は検証用一時資材のライフサイクル Design が所有する。同一マシン上の呼出元による判定記録の偽造防止は本契約の対象外（事故的迂回と規律欠落の抑止を対象とする）とし、生 gh WRITE の迂回検出は REQ-052-002 の既存 Plugin/Hook guard が担う。
+
 
 ## ローカル版実装差し替え
 
