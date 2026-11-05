@@ -190,6 +190,21 @@ describe("検証用一時資材 作成ヘルパー（verification-resource-regis
       expect(out.stderr.startsWith("error: ")).toBe(true);
       expect(io.written.length).toBe(0);
     });
+
+    test("作成先違反（案件識別子を含まないプロジェクト親ディレクトリ等）の登録は stderr へ構造化した error を出力し終了コード 1 で拒否する", () => {
+      const io = fakeIo();
+      const out = outBuffer();
+      const exitCode = runRegisterCli(
+        baseArgs(["--location", "C:/work/adf-ru0255-github-verify", "--identifier", "path=C:/work/adf-ru0255-github-verify"]),
+        io,
+        () => FIXED_NOW,
+        out,
+      );
+      expect(exitCode).toBe(1);
+      expect(out.stderr.startsWith("error: ")).toBe(true);
+      expect(out.stderr).toContain("creation destination");
+      expect(io.written.length).toBe(0);
+    });
   });
 });
 

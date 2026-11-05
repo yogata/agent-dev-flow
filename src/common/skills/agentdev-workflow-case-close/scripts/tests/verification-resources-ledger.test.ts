@@ -277,7 +277,12 @@ describe("検証用一時資材 台帳モジュール（生成記録）", () => 
     test("既存台帳への登録は追記になり、既存記録を壊さない", () => {
       const existing = serializeLedger([appendEntry([], validateRegistrationInput(validInput())).entry]);
       const io = fakeIo({ existingLedgerText: existing });
-      const result = registerResource(io, "C:/repo/main", validInput({ kind: "capture-log", location: "C:/tmp/log.txt" }));
+      const result = registerResource(
+        io,
+        "C:/repo/main",
+        validInput({ kind: "capture-log", location: "C:/tmp/case-3928/verification.log" }),
+        { tempRoot: "C:/Users/verify/AppData/Local/Temp" },
+      );
       const parsed = parseLedgerText(io.written[0]!.content);
       expect(parsed.length).toBe(2);
       expect(parsed[0]!.id).not.toBe(parsed[1]!.id);
@@ -287,6 +292,86 @@ describe("検証用一時資材 台帳モジュール（生成記録）", () => 
     test("必須項目欠落の入力は台帳を書換えずに拒否する（fail-closed）", () => {
       const io = fakeIo({ existingLedgerText: "[]" });
       expect(() => registerResource(io, "C:/repo/main", validInput({ identifiers: {} }))).toThrow(LedgerInputError);
+      expect(io.written.length).toBe(0);
+    });
+  });
+
+  describe("作成先確認（環境指定TEMPまたは案件専用領域への制限）", () => {
+    const tempRoot = "C:/Users/verify/AppData/Local/Temp";
+
+    test("作成先が環境指定TEMP配下の絶対パスの場合は登録する", () => {
+      const io = fakeIo({ existingLedgerText: null });
+      const location = `${tempRoot}/adf-3928-verify/verification.log`;
+      const result = registerResource(
+        io,
+        "C:/repo/main",
+        validInput({ location, identifiers: { path: location } }),
+        { tempRoot },
+      );
+      expect(result.ok).toBe(true);
+      expect(io.written.length).toBe(1);
+    });
+
+    test("作成先が案件識別子をパス要素に含む案件専用領域（repo外）の場合は登録する", () => {
+      const io = fakeIo({ existingLedgerText: null });
+      const result = registerResource(
+        io,
+        "C:/repo/main",
+        validInput({ location: "D:/adf-cases/case-3928/verify-clone" }),
+        { tempRoot },
+      );
+      expect(result.ok).toBe(true);
+      expect(io.written.length).toBe(1);
+    });
+
+    test("URL形の所在（remote種別）は作成先確認の対象外として登録する", () => {
+      const io = fakeIo({ existingLedgerText: null });
+      const result = registerResource(
+        io,
+        "C:/repo/main",
+        validInput({
+          kind: "remote",
+          location: "https://github.com/example/adf-3928-verify-target.git",
+        }),
+        { tempRoot },
+      );
+      expect(result.ok).toBe(true);
+    });
+
+    test("プロジェクト親ディレクトリ等の案件識別子を含まない作成先違反は機械拒否し、台帳を書換えない", () => {
+      const io = fakeIo({ existingLedgerText: null });
+      for (const location of [
+        "C:/work/adf-ru0255-github-verify",
+        "C:/work/verify-RU0258-public/env",
+        tempRoot.replace(/\/$/, "") + "..",
+      ]) {
+        expect(() =>
+          registerResource(io, "C:/repo/main", validInput({ location }), { tempRoot }),
+        ).toThrow(LedgerInputError);
+      }
+      expect(io.written.length).toBe(0);
+    });
+
+    test("リポジトリ内部（プロジェクトディレクトリ配下）の作成先は案件専用領域でないため拒否する", () => {
+      const io = fakeIo({ existingLedgerText: null });
+      expect(() =>
+        registerResource(
+          io,
+          "C:/repo/main",
+          validInput({ location: "C:/repo/main/.agentdev/tmp/verify-clone" }),
+          { tempRoot },
+        ),
+      ).toThrow(LedgerInputError);
+      expect(io.written.length).toBe(0);
+    });
+
+    test("相対パスの作成先は絶対パスを要求して拒否する", () => {
+      const io = fakeIo({ existingLedgerText: null });
+      expect(() =>
+        registerResource(io, "C:/repo/main", validInput({ location: "./verify-clone" }), {
+          tempRoot,
+        }),
+      ).toThrow(LedgerInputError);
       expect(io.written.length).toBe(0);
     });
   });

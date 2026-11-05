@@ -6,6 +6,7 @@ import {
   applyEpicChildStatusUpdates,
   assembleReport,
   classifyResourceRole,
+  DECLARED_DETECTION_SCOPES,
   decideExitCode,
   deriveAcceptancePopulation,
   deriveCurrentWave,
@@ -2165,6 +2166,309 @@ describe("検証用一時資材の照合・完了拒否・終了判定記録書�
     };
     expect(reconciliation.permitted).toBe(false);
     expect(reconciliation.findings.some((f) => f.code === "residual-uncollected")).toBe(true);
+  });
+});
+
+describe("検証用一時資材の未記録entity消費・検査不能明示・既知残存識別情報消費（REQ-118-004/005/008・REQ-032-043/044 の実装完全化）", () => {
+  // 旧専用process 3件と外部remote repo の実在事例を fixture 化したもの（実物の作成・観測は行わない）。
+  const legacyProcessFixtures = {
+    "37940": {
+      alive: true,
+      commandLine: "bun run verify-server.ts --port 4097",
+      cwd: "C:/work/adf-ru0255-github-verify",
+      startedAt: "2026-11-03T21:22:30Z",
+    },
+    "38944": {
+      alive: true,
+      commandLine: "bun run verify-server.ts --port 4099",
+      cwd: "C:/work/adf-stage2-prep/verify-RU0258-public/env",
+      startedAt: "2026-11-04T04:43:44Z",
+    },
+    "47140": {
+      alive: true,
+      commandLine: "bun run verify-server.ts --port 4212",
+      cwd: "C:/work/adf-ru0255-local-verify",
+      startedAt: "2026-11-04T09:15:00Z",
+    },
+  };
+  const legacyListenPortFixtures = {
+    "4097": { listening: true },
+    "4099": { listening: true },
+    "4212": { listening: true },
+  };
+
+  test("実経路: 観測結果に入った台帳未記録の旧専用process 3件相当（PID・コマンドライン・listenポート）を未登録資材として検出し完了を拒否する", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      processLiveness: legacyProcessFixtures,
+      listenPorts: legacyListenPortFixtures,
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const step = report.result.steps.find((s) => s.name === "verification-resource-reconciliation");
+    expect(step?.status).toBe("fail");
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+    };
+    expect(reconciliation.permitted).toBe(false);
+    for (const pid of ["37940", "38944", "47140"]) {
+      expect(
+        reconciliation.findings.some(
+          (f) => f.code === "unregistered-resource" && f.detail.includes(`pid ${pid}`),
+        ),
+      ).toBe(true);
+    }
+    for (const port of ["4097", "4099", "4212"]) {
+      expect(
+        reconciliation.findings.some(
+          (f) =>
+            f.code === "unregistered-resource" &&
+            f.detail.includes("listening port") &&
+            f.detail.includes(port),
+        ),
+      ).toBe(true);
+    }
+    const processFinding = reconciliation.findings.find(
+      (f) => f.code === "unregistered-resource" && f.detail.includes("pid 37940"),
+    );
+    expect(processFinding?.detail).toContain("adf-ru0255-github-verify");
+    expect(processFinding?.detail).toContain("2026-11-03T21:22:30Z");
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: 台帳未記録の外部remote repo（URL・対象ID）のうち不存在確認が成立しない対象を未登録資材として検出し、確定的不存在は検出しない", () => {
+    const confirmedAbsentUrl = "https://github.com/yogata/adf-ru0254-removed-verify";
+    const remainingUrl = "https://github.com/yogata/adf-ru0255-github-verify";
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      remoteAbsenceInputs: {
+        [confirmedAbsentUrl]: {
+          httpStatus404Observed: true,
+          authenticationConfirmed: true,
+          visibilityConfirmed: true,
+          targetIdConfirmed: true,
+          confirmedAbsenceEvidence: "gh repo list の全件列挙に対象IDが現れず不存在確認済み",
+        },
+        [remainingUrl]: {
+          httpStatus404Observed: false,
+          authenticationConfirmed: true,
+          visibilityConfirmed: true,
+          targetIdConfirmed: true,
+        },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes(remainingUrl),
+      ),
+    ).toBe(true);
+    expect(
+      reconciliation.findings.some((f) => f.detail.includes(confirmedAbsentUrl)),
+    ).toBe(false);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: 台帳不在時に process/listen/remote 3スコープが検査不能として明示報告され、空オブジェクト黙過にならない", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerMissing: true,
+      processLiveness: {
+        "37940": legacyProcessFixtures["37940"]!,
+      },
+      listenPorts: { "4097": { listening: true } },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const step = report.result.steps.find((s) => s.name === "verification-resource-reconciliation");
+    expect(step?.status).toBe("fail");
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      ledgerState: string;
+      findings: readonly { code: string; detail: string }[];
+    };
+    expect(reconciliation.ledgerState).toBe("missing");
+    expect(reconciliation.findings.some((f) => f.code === "ledger-missing")).toBe(true);
+    for (const scope of ["process-liveness", "listen-port-check", "remote-absence-verification"]) {
+      expect(
+        reconciliation.findings.some(
+          (f) => f.code === "inspection-unavailable" && f.detail.includes(scope),
+        ),
+      ).toBe(true);
+    }
+    expect(reconciliation.permitted).toBe(false);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: 既知残存リストのpid・listenPort・branch識別情報を観測結果と照合し、生存確認と識別情報不一致を検出する", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      processLiveness: {
+        "37940": { alive: true, commandLine: "別プログラムがPIDを再利用して起動中" },
+        "47140": { alive: false, commandLine: null },
+      },
+      listenPorts: { "4099": { listening: true } },
+      branchesText: "verify-target/adf-ru0258-verification\n",
+      remoteAbsenceInputs: {
+        "https://github.com/yogata/adf-ru0255-github-verify": {
+          httpStatus404Observed: false,
+          authenticationConfirmed: true,
+          visibilityConfirmed: true,
+          targetIdConfirmed: true,
+        },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: {
+          ...baseCheck,
+          knownResidualEntries: [
+            {
+              location: "process:pid=37940",
+              identifiers: { pid: "37940", commandLine: "bun run verify-server.ts --port 4097" },
+              note: "RU-0255 由来の旧専用process（導入時既知残存）",
+            },
+            {
+              location: "listen:port=4099",
+              identifiers: { listenPort: "4099" },
+              note: "RU-0258 由来の旧listenポート",
+            },
+            {
+              location: "branch:verify-target/adf-ru0258-verification",
+              identifiers: { branch: "verify-target/adf-ru0258-verification" },
+            },
+            {
+              location: "https://github.com/yogata/adf-ru0255-github-verify",
+              identifiers: { url: "https://github.com/yogata/adf-ru0255-github-verify" },
+            },
+            {
+              location: "process:pid=47140",
+              identifiers: { pid: "47140" },
+              note: "既に終了済みの旧専用process",
+            },
+          ],
+        },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      knownResidualStillPresent: readonly string[];
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(reconciliation.knownResidualStillPresent).toEqual([
+      "process:pid=37940",
+      "listen:port=4099",
+      "branch:verify-target/adf-ru0258-verification",
+      "https://github.com/yogata/adf-ru0255-github-verify",
+    ]);
+    expect(
+      reconciliation.findings.filter((f) => f.code === "known-residual-still-present").length,
+    ).toBe(4);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "identifier-mismatch" && f.detail.includes("commandLine"),
+      ),
+    ).toBe(true);
+    expect(
+      reconciliation.findings.some((f) => f.detail.includes("pid 47140")),
+    ).toBe(false);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: 台帳記録PIDと既知残存PIDに一致する観測entityは未登録二重検出しない", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({
+          kind: "dedicated-process",
+          location: "process:pid=4321",
+          identifiers: { pid: "4321", commandLine: "bun run verify-server.ts --port 4321" },
+        }),
+      ]),
+      processLiveness: {
+        "4321": { alive: true, commandLine: "bun run verify-server.ts --port 4321" },
+        "37940": { alive: true, commandLine: "bun run verify-server.ts --port 4097" },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 4321"),
+      ),
+    ).toBe(false);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 37940"),
+      ),
+    ).toBe(true);
+  });
+
+  test("宣言と実装の整合: process-liveness-commandline 宣言とentity系スコープの消費が対応し、検出範囲宣言の実物側網羅列挙が Design 正本に存在する", () => {
+    expect(DECLARED_DETECTION_SCOPES).toContain("process-liveness-commandline");
+    expect(DECLARED_DETECTION_SCOPES).toContain("known-residual-list");
+    const lifecycle = fs.readFileSync(
+      path.join(REPO_ROOT, "docs", "designs", "workflows", "verification-resource-lifecycle.md"),
+      "utf-8",
+    );
+    expect(lifecycle).toContain("実物側網羅列挙");
+    expect(lifecycle).toContain("照合されないentityも検出対象");
+    expect(lifecycle).toContain("実装完全化");
+  });
+
+  test("case-close SKILL.md の OS 依存観測コマンド正規形の契約行が存在する", () => {
+    const skill = fs.readFileSync(
+      path.join(REPO_ROOT, "src", "common", "skills", "agentdev-workflow-case-close", "SKILL.md"),
+      "utf-8",
+    );
+    expect(skill).toContain("OS 依存観測コマンド正規形");
+    expect(skill).toContain("Get-CimInstance Win32_Process");
+    expect(skill).toContain("Get-NetTCPConnection");
+    expect(skill).toContain("gh repo list");
+    expect(skill).toContain("tasklist");
+    expect(skill).toContain("不正規形");
+  });
+
+  test("作成入口の作成先確認接続の契約行が case-open・case-run・adapter の各 SKILL.md に存在する", () => {
+    for (const skillName of [
+      "agentdev-workflow-case-open",
+      "agentdev-workflow-case-run",
+      "agentdev-case-run-execution-adapter",
+    ]) {
+      const skill = fs.readFileSync(
+        path.join(REPO_ROOT, "src", "common", "skills", skillName, "SKILL.md"),
+        "utf-8",
+      );
+      expect(skill).toContain("作成先確認");
+      expect(skill).toContain("環境指定TEMP");
+    }
   });
 });
 

@@ -106,6 +106,18 @@ gate 違反時は両ルートとも PR マージを停止する。
   5. **close 再実行**: 台帳へ削除確認記録と回収記録（collectedAt）を付与したうえで close を再実行する
 - 拒否対象の削除確認記録・識別情報照合の不一致検出時は deletion-confirmation-check step が失敗し、`isCloseOperationPermitted` が終了操作（issue_close、Epic 終了・Wave クローズ）を抑止する。台帳不在（記録欠落）は作成物なしの根拠にせず、照合・完了拒否の本体側の検査に委ねる
 
+### 検証用一時資材照合の OS 依存観測コマンド正規形
+
+完了判定工程の検証用一時資材照合（verification-resource-reconciliation step）で呼出側が組み立てる OS 依存観測の検査コマンド（`inspectionCommands`）は、次の正規形に従う。観測は申告（台帳・既知残存リスト）と独立の実物側網羅列挙であり、台帳記録値だけを個別照会する方式は未記録entityを観測結果へ入れないため正規形としない。様式の正は 検証用一時資材のライフサイクル Design「専用領域と作成経路の制限」節（観測手段 (a)〜(f) と「実物側網羅列挙と未記録entityの検出対象性」の記述）である。
+
+| scope | 正規形 | 不正規形（採用しない） |
+|---|---|---|
+| process-liveness | 全プロセスの CommandLine・cwd・開始時刻の網羅列挙（例: PowerShell の `Get-CimInstance Win32_Process` による ProcessId・CommandLine・CreationDate の全件取得。cwd はプロセスごとに取得可能な経路で取得する） | `tasklist` 等の名前照合・PID 個別照会（cwd・CommandLine を観測できず、同名別物・PID再利用を識別できないため不正規形） |
+| listen-port-check | 全リスナーの網羅列挙（例: PowerShell の `Get-NetTCPConnection -State Listen` による LocalPort・OwningProcess の全件取得） | 台帳記録ポートだけの個別照会（未記録ポートを観測結果へ入れないため不正規形） |
+| remote-absence-verification | 外部 repo の網羅列挙と不存在確認（例: `gh repo list <owner> --json name,id,url` による全件列挙と対象ID・認証・可視性の確認） | 台帳記録 URL だけの個別照会（未記録の外部 repo を観測結果へ入れないため不正規形） |
+
+検査コマンドは scope 単位の JSON stdout 契約（機械工程の入力契約）に従い、観測できなかった項目は JSON 側で省略または null として報告する。観測コマンド自体の失敗は検査不能として fail-closed で完了を拒否する。
+
 ## 主要 Capability Skill 連携
 
 本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
