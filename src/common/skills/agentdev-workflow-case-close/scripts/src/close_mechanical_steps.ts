@@ -1179,9 +1179,13 @@ function isUrlLocation(location: string): boolean {
 /**
  * 観測プロセスの startedAt をミリ秒へパースする（欠落・パース不能は null）。
  * 自己子孫閉包の時系列検証の fail-closed 入力とする。
+ * Microsoft JSON datetime（/Date(epoch-ms)/、PowerShell ConvertTo-Json 出力）は
+ * epoch ミリ秒として厳密に解釈し、それ以外は Date.parse（ISO 等）に委ねる。
  */
 function parseObservationStartedAtMillis(proc: { startedAt?: string }): number | null {
   if (proc.startedAt === undefined) return null;
+  const microsoftJsonDateMatch = /^\/Date\((\d+)\)\/$/.exec(proc.startedAt);
+  if (microsoftJsonDateMatch !== null) return Number(microsoftJsonDateMatch[1]);
   const parsed = Date.parse(proc.startedAt);
   return Number.isNaN(parsed) ? null : parsed;
 }

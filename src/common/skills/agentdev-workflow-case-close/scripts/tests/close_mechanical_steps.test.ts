@@ -3992,6 +3992,73 @@ describe("自己子孫閉包の時系列検証とcwd単独帰属の不成立（R
     expect(reconciliation.permitted).toBe(false);
   });
 
+  test("実経路: Microsoft JSON日時形式のstartedAtを解析し、時系列順の正当な自己子孫を自己除外する", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      processId: 5000,
+      processLiveness: {
+        "5000": { alive: true, commandLine: "close-mechanical-steps inspection runner", startedAt: "/Date(1793949637187)/" },
+        "7000": { alive: true, commandLine: "python unrelated-worker.py", startedAt: "/Date(1793949638187)/", parentPid: "5000" },
+      },
+      listenPorts: {},
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("verified-conditions")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      findings: readonly { code: string; detail: string }[];
+      excludedObservations: readonly { path: string; basis: string }[];
+    };
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 7000"),
+      ),
+    ).toBe(false);
+    expect(
+      reconciliation.excludedObservations.some(
+        (e) => e.path === "process:pid=7000" && e.basis === "inspection-execution-runtime-process-self",
+      ),
+    ).toBe(true);
+    expect(
+      reconciliation.excludedObservations.some(
+        (e) => e.path === "process:pid=5000" && e.basis === "inspection-execution-runtime-process-self",
+      ),
+    ).toBe(true);
+  });
+
+  test("実経路: Microsoft JSON日時形式でも子のstartedAtが親より早ければ自己子孫として除外しない", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      processId: 5000,
+      processLiveness: {
+        "5000": { alive: true, commandLine: "close-mechanical-steps inspection runner", startedAt: "/Date(1793949637187)/" },
+        "7002": { alive: true, commandLine: "python unrelated-worker.py", startedAt: "/Date(1793949636187)/", parentPid: "5000" },
+      },
+      listenPorts: {},
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("verified-conditions")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      findings: readonly { code: string; detail: string }[];
+      excludedObservations: readonly { path: string; basis: string }[];
+    };
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 7002"),
+      ),
+    ).toBe(true);
+    expect(
+      reconciliation.excludedObservations.some(
+        (e) => e.path === "process:pid=7002" && e.basis === "inspection-execution-runtime-process-self",
+      ),
+    ).toBe(false);
+  });
+
   test("実経路: 台帳記録pidがchurnしたentityはcwd一致だけでは帰属させず、commandLine・startedAtが観測できないentityは未登録検出を維持する（欠陥2の負例引き継ぎ・synthetic-E相当）", () => {
     const runner = fakeRunner({
       issueBody: "- [x] 条件1\n",
