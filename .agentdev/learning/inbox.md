@@ -537,3 +537,26 @@
 - 出典: PR #3947 本文 Design確定候補セクション
 - 関連: Case #3928・docs/designs/workflows/verification-resource-lifecycle.md（PR #3947 で文言整合済み）・verification-resources-ledger.ts
 - タグ: #design-promotion-candidate #case-close #作成先境界 #basis契約
+
+## [2026-11-06T10:57+09:00][learning_candidate][git-bash の TMPDIR/TEMP=/tmp は Windows ネイティブプロセスの os.tmpdir() に反映されない][Case #3928]
+- 検知: Wave-7 #3948 の実装検証で、Windows git-bash セッションの `TMPDIR=/tmp`・`TEMP=/tmp` は Windows ネイティブプロセス（node `os.tmpdir()`）には反映されず `C:\WINDOWS\TEMP` に解像されることを実測した。環境変数の解像差により「現在実行環境の env 解像 TEMP」がプロセス実効値基準で異なり得る事実であり、Hermes env-TEMP（`C:/Users/ogatay/AppData/Local/hermes/cache/scratch`）と OpenCode 実効 TEMP（`C:\WINDOWS\TEMP`）の差異の観測記録。
+- 対処: 本実装（新規作成判定と既存物照合の区別・close_mechanical_steps.ts）は `os.tmpdir()` 標準解像のみを消費するため対処不要。環境差の検証資材として記録する。
+- 学び: git-bash の環境変数設定はシェルプロセス内でのみ有効で、Windows ネイティブの子プロセスには伝播しない（TMPDIR は POSIX 系変数で Windows ランタイムの temp 解像に使われない）。env 解像 TEMP を境界とする判定（作成先許可・既存物照合の区別）を検証する際は、検証対象プロセス自身が観測する `os.tmpdir()` 値を用い、シェル側の TMPDIR 値を根拠にしない。
+- 出典: PR #3951 本文 Findings / Capture候補 第1項・case-run #3948 実測（os.tmpdir() = C:\WINDOWS\TEMP）
+- 関連: Case #3928・Wave-7 #3948・REQ-032-043（新規作成判定と既存物照合の区別）・docs/designs/workflows/verification-resource-lifecycle.md
+- タグ: #learning-capture #os-tmpdir #Windows #環境変数解像差 #env-temp
+
+## [2026-11-06T10:57+09:00][learning_candidate][worktree で scripts 配下 typecheck を実行するには bun install --frozen-lockfile が前提][Case #3928]
+- 検知: Wave-7 #3948 の worktree（.worktrees/3948-feature）での typecheck 実行で、worktree 構造的制約（node_modules 未伝播）により scripts 配下の tsc が起動できないことを確認。scripts 配下で `bun install --frozen-lockfile` を実行した後、`bun run typecheck`（tsc --noEmit）が exit 0 で通過（typescript 5.9.3 生成・package.json と bun.lock は変更なし）。
+- 対処: bun.lock 変更なしを確認の上で scripts 配下の依存生成のみを実施し、worktree の git 状態を汚さず typecheck を成立させた。post-merge main では node_modules 既存のため再実行不要を確認。
+- 学び: git worktree は node_modules を共有しないため、scripts package（bun.lock 管理の独立依存）を持つ skill 配下の typecheck・test は worktree 内では bun install --frozen-lockfile が前提手順になる。--frozen-lockfile の指定により lockfile 不変を機械保証でき、worktree 側の依存生成が main 側の版固定へ影響しない。
+- 出典: PR #3951 本文 Findings / Capture候補 第2項・case-close #3948 post-merge main 実測（bun install v1.3.6・Checked 5 installs across 6 packages (no changes)）
+- 関連: Case #3928・Wave-7 #3948・agentdev-workflow-case-close scripts package・docs/knowledge/windows-powershell-bulk-io-corruption.md（Windows 環境の標準手段規律とは別件）
+- タグ: #learning-capture #worktree #bun-install #frozen-lockfile #typecheck
+
+## [2026-11-06T10:57+09:00][design_promotion_candidate][porcelain 省略形除外・grounds 消費・registrationBasis 旧形式互換の Design 確定][Case #3928]
+- 検知: PR #3951（#3948）の Design確定候補として4項が申告された。① deriveAcceptanceGaps は grounds 入力を消費しない（gap は4制御の接続状態の観測であり、観測内の除外消費不足は findings・permitted=false で表現される。grounds 欠落を gap 化すると接続不備と観測不足の2概念が混在する。Issue 指示への判断回答）。② 台帳 registered 一致は silent continue の現契約を維持（diff.excludedObservations には grounds 由来のみ記録）。③ registrationBasis の旧形式互換既定値（不在=creation-time-machine-registration。後追い入口は必ず書くため不在＝旧形式の安全側読み替え）。④ resolveSelfAcceptanceRecordForLocalStateCheck の返却を relative+absolute に変更（省略形の実在確認に絶対パスが必要。detail 契約〔relative〕と既存テスト期待値は維持）。
+- 対処: ③④の文言整合（registrationBasis 追記・後追い記録入口契約・除外根拠(2)(3)機械消費条件・新規作成判定と既存物照合の区別）は PR #3951 で merge 済み。①②は契約維持の判断回答として記録。本 boundary（Wave-7 #3948 子Issue クローズ）では記録のみ。Design 確定判断（棚卸し制）は Epic #3928 最終 close 時に行う。
+- 出典: PR #3951 本文 Design確定候補セクション
+- 関連: Case #3928・docs/designs/workflows/verification-resource-lifecycle.md（PR #3951 で文言整合済み）・close_mechanical_steps.ts・verification-resources-ledger.ts
+- タグ: #design-promotion-candidate #case-close #porcelain省略形 #grounds消費 #registrationBasis
