@@ -3,6 +3,13 @@
 このドキュメントは、開発過程で得た教訓や失敗から学んだことを記録する。
 まだ整理されていない学びを一時的に保存し、十分な数が溜まったら分類、整理して永続的なドキュメントに移動する。
 
+## [2026-11-06T21:37+09:00][workflow_deviation][RED 検証時の git stash 一時使用は worktree 手順違反・記録と原状確認で対応][Case #3928]
+- 検知: Wave-10 #3954（PR #3955）の datetime境界 RED 検証で、実行担当が src 修正を git stash で一時退避して pre-fix 状態のテストを実行した。worktree 手順（AGENTS.md・agentdev-git-worktree worktree-operations reference）は stash 使用を禁止しており手順逸脱。親側で refs/stash の状態を確認し、元 stash 6af8faf9941be8695270522a0f9c77eb455dd46e は無傷（喪失なし）を確認済み。listing に現れた別 stash f8e8a73e0bfcd455a956d94607f60fc49ec83dfe は当該実行で作成されたものと確認できないため新規材料・削除対象に分類しない（触れない）。
+- 対処: 逸脱として完了記録コメントの判断メモへ明示記録（PR #3955 完了記録 6684910277）。refs/stash の実在確認で元 stash への影響なしを検証済み。正規手順では RED 検証は stash を使わず行う（修正前 commit の checkout・別 worktree・git apply/revert 系の手順が代替候補）。
+- 出典: PR #3955 本文検証差分（datetime境界 修正前 RED・git stash 記載）・完了記録コメント 6684910277 判断メモ
+- 関連: Case #3928・AGENTS.md・src/common/skills/agentdev-git-worktree/references/worktree-operations.md
+- タグ: #workflow-deviation #worktree #git-stash #procedure
+
 ## [2026-11-06T04:35+09:00][design_promotion_candidate][REQ-118-005 の REQ 行文言は文字変更不要・実行制限の定義接続は Design レベルで完結する判断][Case #3928]
 - 検知: PR #3945（#3944）の Design確定候補。deriveAcceptanceGaps の現行合意4制御構成への正規訂正で、REQ-118-005 の文字変更は不要と判断した（REQ ファイル変更なし）。REQ-118-005 の「機械検出も実行制限も成立しない作成経路が残る場合は未達として報告」は現行合意の制御構成では「制御の接続不備 = gap」として Design レベルで意味整合し、「実行制限」の定義（作成入口の作成先拒否 + 終了操作の機械拒否）への接続は verification-resource-lifecycle.md の Design レベルで完結。撤回済みの Windows汎用隔離前提は REQ 文面に存在しない（Design 側の記述のみ）。
 - 対処: 本 boundary（Wave-5 #3944 子Issue クローズ）では REQ 変更なしを完了条件3の合格として記録し、REQ レベルの再検討点を PR 本文 Design確定候補へ記録。REQ 行文言の追加訂正が必要と判断する場合は blocked-input として再検討（Epic #3928 最終 close 時の Design 確定判断材料）。
