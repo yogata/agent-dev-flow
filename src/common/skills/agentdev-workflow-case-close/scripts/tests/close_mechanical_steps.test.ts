@@ -4081,3 +4081,193 @@ describe("自己子孫閉包の時系列検証とcwd単独帰属の不成立（R
     expect(reconciliation.permitted).toBe(false);
   });
 });
+
+describe("commandLine属性値へのFS正規化不適用（反例6679155719・#3954）", () => {
+  test("実経路: 属性識別根拠のcommandLine値にFS正規化を適用せず、末尾/の有無が異なる引数値のentityを誤消費しない（--label=case/ と --label=case の負例）", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      processLiveness: {
+        "9000": { alive: true, commandLine: "node worker.js --label=case" },
+      },
+      listenPorts: {},
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("verified-conditions")],
+        verificationResourceCheck: {
+          ...baseCheck,
+          observationExclusionGrounds: [
+            {
+              path: "process:commandLine=node worker.js --label=case/",
+              kind: "attribution",
+              basis: "本件外共有 worker の帰属根拠（機械確認可能な記録参照）",
+            },
+          ],
+        },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      excludedObservations: readonly { path: string; basis: string }[];
+    };
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 9000"),
+      ),
+    ).toBe(true);
+    expect(
+      reconciliation.excludedObservations.some(
+        (e) => e.basis === "unrelated-shared-resource-attribution",
+      ),
+    ).toBe(false);
+    expect(reconciliation.permitted).toBe(false);
+  });
+
+  test("実経路: 属性識別根拠のcommandLine値と観測値は末尾/の有無まで含めてverbatim一致のみ消費する（根拠が/なし・観測が/ありの逆方向負例）", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      processLiveness: {
+        "9001": { alive: true, commandLine: "node worker.js --label=case/" },
+      },
+      listenPorts: {},
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("verified-conditions")],
+        verificationResourceCheck: {
+          ...baseCheck,
+          observationExclusionGrounds: [
+            {
+              path: "process:commandLine=node worker.js --label=case",
+              kind: "attribution",
+              basis: "本件外共有 worker の帰属根拠（機械確認可能な記録参照）",
+            },
+          ],
+        },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      excludedObservations: readonly { path: string; basis: string }[];
+    };
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 9001"),
+      ),
+    ).toBe(true);
+    expect(
+      reconciliation.excludedObservations.some(
+        (e) => e.basis === "unrelated-shared-resource-attribution",
+      ),
+    ).toBe(false);
+    expect(reconciliation.permitted).toBe(false);
+  });
+
+  test("実経路: 属性識別根拠のcommandLine値が観測値とverbatim一致するentityは従来どおり消費する（正当な属性消費の維持）", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      processLiveness: {
+        "9002": { alive: true, commandLine: "node worker.js --label=case/" },
+        "9003": { alive: true, commandLine: "node worker.js --label=other" },
+      },
+      listenPorts: {},
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("verified-conditions")],
+        verificationResourceCheck: {
+          ...baseCheck,
+          observationExclusionGrounds: [
+            {
+              path: "process:commandLine=node worker.js --label=case/",
+              kind: "attribution",
+              basis: "本件外共有 worker の帰属根拠（機械確認可能な記録参照）",
+            },
+          ],
+        },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      excludedObservations: readonly { path: string; basis: string }[];
+    };
+    expect(
+      reconciliation.excludedObservations.some(
+        (e) => e.path === "process:pid=9002" && e.basis === "unrelated-shared-resource-attribution",
+      ),
+    ).toBe(true);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 9002"),
+      ),
+    ).toBe(false);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 9003"),
+      ),
+    ).toBe(true);
+    expect(reconciliation.permitted).toBe(false);
+  });
+
+  test("実経路: 台帳帰属のcommandLine比較にもFS正規化を適用せず、末尾/の有無が異なる引数値のentityを誤帰属しない（両消費経路で同一の属性種別比較）", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({
+          id: "vr-3954-cl-1",
+          kind: "dedicated-process",
+          location: "<repo>/tmp-area/verify-server-g",
+          identifiers: {
+            path: "<repo>/tmp-area/verify-server-g",
+            pid: "100",
+            commandLine: "node worker.js --label=case/",
+            cwd: "<repo>/tmp-area/verify-server-g",
+            startedAt: "2026-11-06T05:00:00.000Z",
+          },
+        }),
+      ]),
+      missingPaths: ["<repo>/tmp-area/verify-server-g"],
+      processLiveness: {
+        "9004": {
+          alive: true,
+          commandLine: "node worker.js --label=case",
+          cwd: "<repo>/tmp-area/verify-server-g",
+          startedAt: "2026-11-06T05:00:00.000Z",
+        },
+      },
+      listenPorts: {},
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("verified-conditions")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      excludedObservations: readonly { path: string; basis: string }[];
+    };
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 9004"),
+      ),
+    ).toBe(true);
+    expect(
+      reconciliation.excludedObservations.some(
+        (e) => e.basis === "ledger-entry-attribute-attribution",
+      ),
+    ).toBe(false);
+    expect(reconciliation.permitted).toBe(false);
+  });
+});
