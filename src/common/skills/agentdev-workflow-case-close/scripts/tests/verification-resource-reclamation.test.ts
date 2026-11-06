@@ -92,6 +92,7 @@ function entry(id: string, childIssue: number, collectedAt: string | null): Veri
     childIssue,
     recordedBy: "case-run",
     createdAt: "2026-11-05T12:00:00.000Z",
+    registrationBasis: "creation-time-machine-registration",
     collectedAt,
   };
 }

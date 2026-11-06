@@ -58,6 +58,7 @@ function ledgerEntry(overrides: Partial<VerificationResourceEntry> = {}): Verifi
     childIssue: 3930,
     recordedBy: "case-run",
     createdAt: "2026-11-05T10:00:00.000Z",
+    registrationBasis: "creation-time-machine-registration",
     collectedAt: null,
     ...overrides,
   };

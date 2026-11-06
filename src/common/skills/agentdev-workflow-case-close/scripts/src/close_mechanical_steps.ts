@@ -762,6 +762,32 @@ function validateVerificationResourceCheckInput(value: unknown): void {
       fail("input.verificationResourceCheck.inspectionArtifactPaths must be an array of non-empty strings");
     }
   }
+  if (v.observationExclusionGrounds !== undefined) {
+    if (!Array.isArray(v.observationExclusionGrounds)) {
+      fail("input.verificationResourceCheck.observationExclusionGrounds must be an array");
+    }
+    for (const ground of v.observationExclusionGrounds) {
+      const g = ground as Record<string, unknown>;
+      if (typeof ground !== "object" || ground === null || !isNonEmptyString(g.path)) {
+        fail("input.verificationResourceCheck.observationExclusionGrounds[].path is required");
+      }
+      if (g.kind !== "role" && g.kind !== "attribution") {
+        fail(
+          "input.verificationResourceCheck.observationExclusionGrounds[].kind must be one of: role, attribution",
+        );
+      }
+      if (typeof g.basis !== "string" || g.basis.trim().length === 0) {
+        fail(
+          "input.verificationResourceCheck.observationExclusionGrounds[].basis is required (a concrete record reference; bulk exclusion without basis is not permitted)",
+        );
+      }
+      if (g.kind === "role" && g.role !== "official-artifact") {
+        fail(
+          "input.verificationResourceCheck.observationExclusionGrounds[].role must be official-artifact (only official artifacts are excluded by role; other roles are collection targets)",
+        );
+      }
+    }
+  }
 }
 
 /**
@@ -909,6 +935,8 @@ export interface VerificationResourceCheck {
   inspectionCommands: readonly InspectionCommandSpec[];
   /** 検査実行が作成記録付きで書き出す特定実体のパス集合（除外根拠1の機械確認対象）。 */
   inspectionArtifactPaths?: readonly string[];
+  /** 観測実在物の除外根拠入力（除外根拠(2) 正式成果物・(3) 本件外共有資材。実体一致付き）。 */
+  observationExclusionGrounds?: readonly ObservationExclusionGround[];
 }
 
 export interface RemoteAbsenceJudgementInput {
@@ -919,6 +947,24 @@ export interface RemoteAbsenceJudgementInput {
   targetIdConfirmed: boolean;
   /** 認証・可視性・対象ID確認後に取得した、404 によらない確定的不存在根拠の記録参照。 */
   confirmedAbsenceEvidence?: string;
+}
+
+/**
+ * 観測実在物の除外根拠入力（Design 除外根拠(2) 正式成果物・(3) 本件外共有資材の入力表現）。
+ * 根拠は具体的根拠（機械確認可能な記録の参照。非空必須）と実体識別（path）の組で渡し、
+ * 正規化後パスの完全一致でのみ消費する。prefix・ディレクトリ一致での消費はしない
+ * （広い path/prefix だけでの正式成果物の除外をしない）。根拠入力のない実在物は
+ * 根拠なしのまま（未知の一括除外をしない）。
+ */
+export interface ObservationExclusionGround {
+  /** 対象実体の所在パス（観測の resolveBase 基準で解決し、正規化後の完全一致でのみ消費）。 */
+  path: string;
+  /** 根拠種別（role=正式成果物の役割根拠、attribution=本件外共有資材の帰属根拠）。 */
+  kind: "role" | "attribution";
+  /** 役割（kind="role" のとき必須。正式成果物のみ除外根拠になる）。 */
+  role?: ResourceRole;
+  /** 具体的根拠（機械確認可能な記録の参照。非空必須）。 */
+  basis: string;
 }
 
 export interface ObservedTemporaryResource {
@@ -1270,6 +1316,42 @@ function deletionConfirmationCoversEntry(
   return Object.entries(entry.identifiers).every(
     ([key, value]) => confirmation.identifiers[key] === value,
   );
+}
+
+/**
+ * 観測実在物への除外根拠入力の投影（実体一致）。根拠入力は正規化後パスの完全一致でのみ
+ * 消費し、prefix・ディレクトリ一致では消費しない（広い path/prefix だけでの正式成果物の
+ * 除外をしない）。根拠入力のない実在物は根拠なしのまま（未知の一括除外をしない）。
+ * 役割根拠は official-artifact の場合だけ除外根拠（消費側 evaluateUnregisteredObservations）に
+ * なる。帰属根拠は既知残存リスト・台帳の照合（先に実行される拒否経路）を上書きしない。
+ */
+export function attachObservationExclusionGrounds(
+  observedEntries: readonly ObservedTemporaryResource[],
+  grounds: readonly ObservationExclusionGround[] | undefined,
+  resolveBase: string,
+): readonly ObservedTemporaryResource[] {
+  if (grounds === undefined || grounds.length === 0) return observedEntries;
+  const normalizedGrounds = grounds.map((ground) => ({
+    ground,
+    normalized: normalizeObservationPath(resolveObservationPath(ground.path, resolveBase)),
+  }));
+  return observedEntries.map((observed) => {
+    const normalized = normalizeObservationPath(resolveObservationPath(observed.path, resolveBase));
+    const roleGround = normalizedGrounds.find(
+      (entry) => entry.ground.kind === "role" && entry.normalized === normalized,
+    );
+    const attributionGround = normalizedGrounds.find(
+      (entry) => entry.ground.kind === "attribution" && entry.normalized === normalized,
+    );
+    if (roleGround === undefined && attributionGround === undefined) return observed;
+    return {
+      ...observed,
+      ...(roleGround !== undefined
+        ? { roleBasis: { role: roleGround.ground.role as ResourceRole, basis: roleGround.ground.basis } }
+        : {}),
+      ...(attributionGround !== undefined ? { attributionBasis: attributionGround.ground.basis } : {}),
+    };
+  });
 }
 
 /**
@@ -1703,7 +1785,8 @@ export function resolveCloseAcceptanceRecordPath(mainRepoRoot: string, issueNumb
  * （検証用一時資材のライフサイクル Design「検査対象の除外根拠(1)」。
  * verification-resource-reconciliation の excludedPaths〔close-acceptance-record-itself〕と同一契約）。
  * 書出し元と同一の解決（resolveMainRepoRoot + resolveCloseAcceptanceRecordPath）で
- * 対象 Issue の記録パスを導出し、worktree 相対・`/` 正規化で返す（porcelain 表記との完全一致判定用）。
+ * 対象 Issue の記録パスを導出し、worktree 相対・`/` 正規化の relative と
+ * porcelain 省略形の実在確認に使う絶対パス absolute を返す。
  * worktreeRoot==main root 構成（Epic 最終close等）でのみ porcelain に現れる自己出力による
  * dirty 循環を除去するものであり、解決不能な場合（対象 Issue 番号の不正・gitCommonDir 未提供・
  * 解決失敗・worktree 外の記録）は除外を適用しない（fail-closed。他の未コミット検出は緩めない）。
@@ -1712,7 +1795,7 @@ function resolveSelfAcceptanceRecordForLocalStateCheck(
   input: CloseMechanicalInput,
   runner: MechanicalRunner,
   worktreeCwd: string,
-): string | null {
+): { relative: string; absolute: string } | null {
   const issueNumber = input.verificationResourceCheck?.issueNumber;
   if (typeof issueNumber !== "number" || !Number.isInteger(issueNumber) || issueNumber < 1) {
     return null;
@@ -1727,7 +1810,30 @@ function resolveSelfAcceptanceRecordForLocalStateCheck(
   if (relative.length === 0 || relative === ".." || relative.startsWith("../")) {
     return null;
   }
-  return relative;
+  return { relative, absolute: recordPath };
+}
+
+/**
+ * porcelain エントリと自己終了判定記録の一致判定（ファイル形とディレクトリ省略形の双方）。
+ * 実 git の porcelain は完全未追跡ディレクトリを `?? dir/`（省略形）で出力するため、
+ * ファイル形の完全一致だけでは実行時に一致しない。省略形行は、正規化した記録パスが
+ * 省略形ディレクトリの subtree に含まれ、かつ記録が実在する場合に限り同一実体の観測として
+ * 扱う（実在確認のない省略形の包含除外をしない fail-closed）。
+ */
+function matchesSelfAcceptanceRecordEntry(
+  entry: string,
+  selfAcceptanceRecord: { relative: string; absolute: string },
+  existsRecord: (absolutePath: string) => boolean,
+): boolean {
+  const rawEntryPath = porcelainEntryPath(entry);
+  const entryPath = normalizeObservationPath(rawEntryPath);
+  if (entryPath.length === 0) return false;
+  if (entryPath === selfAcceptanceRecord.relative) return true;
+  if (!rawEntryPath.endsWith("/")) return false;
+  return (
+    selfAcceptanceRecord.relative.startsWith(`${entryPath}/`) &&
+    existsRecord(selfAcceptanceRecord.absolute)
+  );
 }
 
 /** porcelain 行（`XY <path>` 形）からパス部分を取り出す。 */
@@ -2356,13 +2462,19 @@ function buildAcceptanceControlObservation(
   if (ledger.state === "present" && mainRepoRoot !== null) {
     const tempRoot = os.tmpdir();
     for (const entry of ledger.entries) {
-      const destination = evaluateCreationDestination(entry.location, mainRepoRoot, tempRoot);
-      if (!destination.valid) {
-        creationDestinationRejections.push({
-          entryId: entry.id,
-          route: entry.location,
-          reason: destination.reason ?? "the creation-entry destination rejection did not accept the registered route",
-        });
+      // 新規作成判定と既存物照合の区別。後追いの発生事実記録（evidenced-occurrence-record）
+      // は作成入口（作成時機械登録）を経由していないため、現在実行環境の作成先基準の
+      // 再評価（新規作成の作成先拒否の接続確認）の違断対象にしない。既存実在物は
+      // 台帳記録の照合と既知残存リストの読取照合で扱われる（記録後も回収義務は残る）。
+      if (entry.registrationBasis !== "evidenced-occurrence-record") {
+        const destination = evaluateCreationDestination(entry.location, mainRepoRoot, tempRoot);
+        if (!destination.valid) {
+          creationDestinationRejections.push({
+            entryId: entry.id,
+            route: entry.location,
+            reason: destination.reason ?? "the creation-entry destination rejection did not accept the registered route",
+          });
+        }
       }
       const presence = deriveEntryPresence(entry, resourceObservation);
       if (
@@ -2601,11 +2713,16 @@ function executeVerificationResourceReconciliation(
       ? gitignoredResult.stdout.split("\n").map((line) => line.trim()).filter((line) => line.length > 0)
       : [];
   // gitignore 対象出力は案件識別子の有無で除外せず、台帳・既知残存・明示除外根拠と突合する。
-  const observedEntries: ObservedTemporaryResource[] = [
+  const rawObservedEntries: ObservedTemporaryResource[] = [
     ...dedicatedEntries.map((entry) => ({ path: entry, source: "dedicated-area" as const })),
     ...osTempMatches.map((entry) => ({ path: entry, source: "os-temp-area" as const })),
     ...gitignoredOutputs.map((entry) => ({ path: entry, source: "gitignored-output" as const })),
   ];
+  const observedEntries = attachObservationExclusionGrounds(
+    rawObservedEntries,
+    check.observationExclusionGrounds,
+    input.repoRoot,
+  );
 
   const excludedPaths = [
     {
@@ -2877,14 +2994,18 @@ export function runCloseMechanicalSteps(
 
     const status = runner.run({ command: "git", args: ["status", "--porcelain"], cwd: worktreeCwd });
     const branch = runner.run({ command: "git", args: ["branch", "--show-current"], cwd: worktreeCwd });
-    const selfAcceptanceRecordPath = resolveSelfAcceptanceRecordForLocalStateCheck(input, runner, worktreeCwd);
+    const selfAcceptanceRecord = resolveSelfAcceptanceRecordForLocalStateCheck(input, runner, worktreeCwd);
+    const selfAcceptanceRecordPath = selfAcceptanceRecord?.relative ?? null;
     const retainedEntries: string[] = [];
     const excludedSelfRecordEntries: string[] = [];
     for (const entry of status.stdout
       .split("\n")
       .map((line) => line.replace(/\r$/, ""))
       .filter((line) => line.length > 0)) {
-      if (selfAcceptanceRecordPath !== null && porcelainEntryPath(entry) === selfAcceptanceRecordPath) {
+      if (
+        selfAcceptanceRecord !== null &&
+        matchesSelfAcceptanceRecordEntry(entry, selfAcceptanceRecord, (absolutePath) => runner.exists(absolutePath))
+      ) {
         excludedSelfRecordEntries.push(entry);
       } else {
         retainedEntries.push(entry);

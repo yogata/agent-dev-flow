@@ -117,6 +117,9 @@ function ledgerEntryJson(overrides: Partial<{
   ownership: string;
   childIssue: number | null;
   collectedAt: string | null;
+  recordedBy: string;
+  createdAt: string;
+  registrationBasis: string;
 }> = {}): Record<string, unknown> {
   return {
     id: "vr-3928-1",
@@ -1238,6 +1241,77 @@ describe("pre-merge-local-state-check の機械自己出力の特定実体除外
     const report = runCloseMechanicalSteps(mainRootPreMergeInput(), runner);
     const check = report.result.steps.find((s) => s.name === "pre-merge-local-state-check");
     expect(check?.status).toBe("fail");
+    expect(report.warnings.join("\n")).toContain("worktree has uncommitted changes");
+  });
+
+  test("実porcelain: 完全未追跡ディレクトリの省略形（?? .agentdev/close-acceptance/）でも自己記録は実行時に除外される（実git出力形式）", () => {
+    // 実git観測（2026-11-06・test-scoped temp repo での実測）:
+    // `git status --porcelain` は完全未追跡ディレクトリを `?? .agentdev/close-acceptance/`
+    // （ディレクトリ省略形）で出力し、`git status --porcelain -uall` はファイル形
+    // `?? .agentdev/close-acceptance/issue-3948.json` を出力する。実行時不一致の再現入力。
+    const runner = fakeRunner({
+      worktreeStatus: "?? .agentdev/close-acceptance/\n",
+      issueBody: "- [x] A\n",
+      acceptanceRecordIssueNumber: 3942,
+    });
+    const report = runCloseMechanicalSteps(mainRootPreMergeInput(), runner);
+    const check = report.result.steps.find((s) => s.name === "pre-merge-local-state-check");
+    expect(check?.status).toBe("pass");
+    const detail = check?.detail as {
+      worktreeDirty?: boolean;
+      excludedSelfAcceptanceRecordPath?: string | null;
+      excludedSelfRecordEntries?: string[];
+    };
+    expect(detail.worktreeDirty).toBe(false);
+    expect(detail.excludedSelfAcceptanceRecordPath).toBe(".agentdev/close-acceptance/issue-3942.json");
+    expect(detail.excludedSelfRecordEntries).toEqual(["?? .agentdev/close-acceptance/"]);
+    expect(report.warnings.join("\n")).not.toContain("worktree has uncommitted changes");
+  });
+
+  test("実porcelain: .agentdev 全体が未追跡のトップレベル省略形（?? .agentdev/）でも自己記録を含む省略形は実行時に除外される", () => {
+    const runner = fakeRunner({
+      worktreeStatus: "?? .agentdev/\n",
+      issueBody: "- [x] A\n",
+      acceptanceRecordIssueNumber: 3942,
+    });
+    const report = runCloseMechanicalSteps(mainRootPreMergeInput(), runner);
+    const check = report.result.steps.find((s) => s.name === "pre-merge-local-state-check");
+    expect(check?.status).toBe("pass");
+    const detail = check?.detail as { worktreeDirty?: boolean; excludedSelfRecordEntries?: string[] };
+    expect(detail.worktreeDirty).toBe(false);
+    expect(detail.excludedSelfRecordEntries).toEqual(["?? .agentdev/"]);
+  });
+
+  test("実porcelain: 省略形ディレクトリに自己記録が実在しない構成では除外せず継続 fail する（実在確認のない包含除外をしない）", () => {
+    const runner = fakeRunner({
+      worktreeStatus: "?? .agentdev/close-acceptance/\n",
+      issueBody: "- [x] A\n",
+      acceptanceRecordIssueNumber: 3942,
+    });
+    // 異常構成（書出し済みのはずの自己記録が実在しない）では、省略形の包含除外をしない。
+    const originalExists = runner.exists.bind(runner);
+    runner.exists = (absolutePath: string) => {
+      const normalized = absolutePath.replace(/\\/g, "/");
+      if (normalized.endsWith(".agentdev/close-acceptance/issue-3942.json")) return false;
+      return originalExists(absolutePath);
+    };
+    const report = runCloseMechanicalSteps(mainRootPreMergeInput(), runner);
+    const check = report.result.steps.find((s) => s.name === "pre-merge-local-state-check");
+    expect(check?.status).toBe("fail");
+    expect(report.warnings.join("\n")).toContain("worktree has uncommitted changes");
+  });
+
+  test("実porcelain: 自己記録を含まない省略形ディレクトリ（subtree外）は除外しない", () => {
+    const runner = fakeRunner({
+      worktreeStatus: "?? docs/untracked-area/\n",
+      issueBody: "- [x] A\n",
+      acceptanceRecordIssueNumber: 3942,
+    });
+    const report = runCloseMechanicalSteps(mainRootPreMergeInput(), runner);
+    const check = report.result.steps.find((s) => s.name === "pre-merge-local-state-check");
+    expect(check?.status).toBe("fail");
+    const detail = check?.detail as { excludedSelfRecordEntries?: string[] };
+    expect(detail.excludedSelfRecordEntries).toEqual([]);
     expect(report.warnings.join("\n")).toContain("worktree has uncommitted changes");
   });
 });
@@ -2633,6 +2707,57 @@ describe("検証用一時資材照合の入力検証（検査設定の省略禁�
     const broken = { ...base, issueUpdatedAt: undefined };
     expect(() => validateInput(broken as unknown)).toThrow(/issue-updated-at/);
   });
+
+  test("observationExclusionGrounds の根拠が空の入力は一括除外の根拠なしとして拒否する", () => {
+    const base = preMergeInput();
+    const baseCheck = base.verificationResourceCheck;
+    const broken = {
+      ...base,
+      verificationResourceCheck: {
+        ...baseCheck,
+        observationExclusionGrounds: [
+          { path: "docs/x.md", kind: "role", role: "official-artifact", basis: "   " },
+        ],
+      },
+    };
+    expect(() => validateInput(broken as unknown)).toThrow(/basis is required/);
+  });
+
+  test("observationExclusionGrounds の未知 kind と非正式成果物の role を拒否する", () => {
+    const base = preMergeInput();
+    const baseCheck = base.verificationResourceCheck;
+    const brokenKind = {
+      ...base,
+      verificationResourceCheck: {
+        ...baseCheck,
+        observationExclusionGrounds: [{ path: "docs/x.md", kind: "unspecified", basis: "root" }],
+      },
+    };
+    expect(() => validateInput(brokenKind as unknown)).toThrow(/kind must be one of/);
+    const brokenRole = {
+      ...base,
+      verificationResourceCheck: {
+        ...baseCheck,
+        observationExclusionGrounds: [
+          { path: "docs/x.md", kind: "role", role: "test-run-generated", basis: "root" },
+        ],
+      },
+    };
+    expect(() => validateInput(brokenRole as unknown)).toThrow(/role must be official-artifact/);
+  });
+
+  test("observationExclusionGrounds の対象パス欠落を拒否する", () => {
+    const base = preMergeInput();
+    const baseCheck = base.verificationResourceCheck;
+    const broken = {
+      ...base,
+      verificationResourceCheck: {
+        ...baseCheck,
+        observationExclusionGrounds: [{ path: "  ", kind: "attribution", basis: "root" }],
+      },
+    };
+    expect(() => validateInput(broken as unknown)).toThrow(/path is required/);
+  });
 });
 
 describe("検証用一時資材の回収実行面（Wave-2: 台帳回収・終了判定記録回収）", () => {
@@ -3021,5 +3146,234 @@ describe("終了判定記録の契約参照 pin（custom-tool-contracts・verifi
     expect(lifecycle).toContain("終了判定記録の様式は対象 Issue 番号、判定対象版（close 時点の対象を識別する版情報）、判定生成時刻、判定内容を含み");
     expect(lifecycle).toContain("issue_reopen は当該 Issue の終了判定記録を無効化する");
     expect(lifecycle).toContain("issue_close は、Case Issue（case role）への終了操作について、呼出元の申告によらず自ら終了判定記録を読み取り検証し");
+  });
+});
+
+describe("観測の除外根拠入力表現と機械消費（除外根拠(2)(3)・REQ-118-005）", () => {
+  /** 実git形式の gitignore 対象列挙（git ls-files -i --exclude-standard の相対パス出力形式）。 */
+  const realGitIgnoreListing = [
+    "docs/designs/workflows/verification-resource-lifecycle.md",
+    "node_modules/shared-lib/index.js",
+    "node_modules/unrelated-pkg/index.js",
+  ].join("\n");
+
+  function groundsInput(
+    grounds: readonly {
+      path: string;
+      kind: string;
+      role?: string;
+      basis: string;
+    }[],
+  ): CloseMechanicalInput {
+    return {
+      ...preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      issueUpdatedAt: "2026-11-05T08:00:00Z",
+      verificationResourceCheck: {
+        ...verificationResourceCheck(),
+        observationExclusionGrounds: grounds,
+      },
+    } as unknown as CloseMechanicalInput;
+  }
+
+  test("実観測: 役割根拠（正式成果物）・帰属根拠（本件外共有資材）の実体一致付き入力で機械層の除外消費が成立し、根拠のない実在物は未登録のまま維持される", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      gitignoredOutput: `${realGitIgnoreListing}\n`,
+    });
+    const report = runCloseMechanicalSteps(
+      groundsInput([
+        {
+          path: "docs/designs/workflows/verification-resource-lifecycle.md",
+          kind: "role",
+          role: "official-artifact",
+          basis: "正式成果物: Design 正本文書（document-type-responsibilities の配置・git 追跡実体）",
+        },
+        {
+          path: "node_modules/shared-lib/index.js",
+          kind: "attribution",
+          basis: "本件外共有資材: 共有 infra（Epic #3928 検証証拠 (iii) protected-shared 分類・帰属記録の実体一致）",
+        },
+      ]),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      excludedObservations: readonly { path: string; basis: string }[];
+    };
+    expect(reconciliation.excludedObservations).toEqual([
+      { path: "docs/designs/workflows/verification-resource-lifecycle.md", basis: "official-artifact-role-basis" },
+      { path: "node_modules/shared-lib/index.js", basis: "unrelated-shared-resource-attribution" },
+    ]);
+    expect(
+      reconciliation.findings.filter((finding) => finding.code === "unregistered-resource"),
+    ).toEqual([
+      {
+        code: "unregistered-resource",
+        detail:
+          "no ledger record or exclusion basis for the observed temporary resource: node_modules/unrelated-pkg/index.js (source: gitignored-output)",
+      },
+    ]);
+    expect(reconciliation.permitted).toBe(false);
+  });
+
+  test("実観測: 全実在物が根拠付きで被覆された構成では機械受理が成立する（実git/実観測の入力形式での正例）", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      gitignoredOutput: "docs/designs/workflows/verification-resource-lifecycle.md\nnode_modules/shared-lib/index.js\n",
+    });
+    const report = runCloseMechanicalSteps(
+      groundsInput([
+        {
+          path: "docs/designs/workflows/verification-resource-lifecycle.md",
+          kind: "role",
+          role: "official-artifact",
+          basis: "正式成果物: Design 正本文書（document-type-responsibilities の配置・git 追跡実体）",
+        },
+        {
+          path: "node_modules/shared-lib/index.js",
+          kind: "attribution",
+          basis: "本件外共有資材: 共有 infra（Epic #3928 検証証拠 (iii) protected-shared 分類・帰属記録の実体一致）",
+        },
+      ]),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string }[];
+      excludedObservations: readonly { path: string; basis: string }[];
+    };
+    expect(reconciliation.permitted).toBe(true);
+    expect(reconciliation.findings).toHaveLength(0);
+    expect(reconciliation.excludedObservations).toEqual([
+      { path: "docs/designs/workflows/verification-resource-lifecycle.md", basis: "official-artifact-role-basis" },
+      { path: "node_modules/shared-lib/index.js", basis: "unrelated-shared-resource-attribution" },
+    ]);
+  });
+
+  test("実観測: 根拠入力は正規化後パスの完全一致でのみ消費され、prefix（ディレクトリ）一致では消費しない（広いpath/prefixだけでの正式成果物の除外をしない）", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      gitignoredOutput: `${realGitIgnoreListing}\n`,
+    });
+    const report = runCloseMechanicalSteps(
+      groundsInput([
+        {
+          path: "docs/designs/workflows",
+          kind: "role",
+          role: "official-artifact",
+          basis: "正式成果物のディレクトリ指定（prefix での一括指定は消費されない）",
+        },
+      ]),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string }[];
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(
+      reconciliation.findings.some((finding) => finding.code === "unregistered-resource"),
+    ).toBe(true);
+  });
+
+  test("実観測: 帰属根拠は既知残存リストの照合を上書きせず、既知残存の存在は継続して拒否理由となる（拒否負例の維持）", () => {
+    const knownLocation = "C:/Users/ogatay/work/adf-ru0255-residual-clone";
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      osTempAreaMatches: [knownLocation],
+    });
+    const input = {
+      ...preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      issueUpdatedAt: "2026-11-05T08:00:00Z",
+      verificationResourceCheck: {
+        ...verificationResourceCheck(),
+        knownResidualEntries: [
+          {
+            location: knownLocation,
+            identifiers: { path: knownLocation, note: "RU-0255〜0260 era clone（導入時既知残存リスト）" },
+          },
+        ],
+        observationExclusionGrounds: [
+          {
+            path: knownLocation,
+            kind: "attribution",
+            basis: "帰属申告（既知残存リストの記載と衝突する申告は照合を上書きしない）",
+          },
+        ],
+      },
+    } as unknown as CloseMechanicalInput;
+    const report = runCloseMechanicalSteps(input, runner);
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string }[];
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(
+      reconciliation.findings.some((finding) => finding.code === "known-residual-still-present"),
+    ).toBe(true);
+    expect(
+      reconciliation.findings.some((finding) => finding.code === "unregistered-resource"),
+    ).toBe(false);
+  });
+});
+
+describe("新規作成判定と既存物照合の区別（REQ-118-005・REQ-032-043/044）", () => {
+  test("実経路: 後追いの発生事実記録（evidenced-occurrence-record）の既存実在物は現在実行環境の作成先基準で違断せず、台帳記録の照合で消費される", () => {
+    // 別実行環境（Hermes env-TEMP 相当の TMPDIR=C:/Users/ogatay/AppData/Local/hermes/cache/scratch）
+    // で過去に作られた実在物の台帳記録。現在実行環境の env 解決 TEMP（node os.tmpdir()・
+    // 本実行環境では C:\WINDOWS\TEMP 相当）の配下ではない別領域の所在であることを
+    // 模擬パスで表現する（固定模擬パスの既存先例: verification-resources-ledger.test.ts）。
+    const hermesTempLocation =
+      "C:/Users/ogatay/AppData/Local/hermes/cache/scratch/case-3948/verification-cleanup-work-area";
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({
+          location: hermesTempLocation,
+          identifiers: { path: hermesTempLocation, inode: "47569271066421197" },
+          recordedBy: "epic-final-close-observation-record",
+          createdAt: "2026-11-05T12:00:00.000Z",
+          registrationBasis: "evidenced-occurrence-record",
+        }),
+      ]),
+      osTempAreaMatches: [hermesTempLocation],
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const gaps = report.diff.acceptanceGaps as readonly { code: string; route: string }[];
+    expect(gaps.some((gap) => gap.code === "creation-entry-rejection-disconnected")).toBe(false);
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string }[];
+    };
+    expect(reconciliation.findings.some((finding) => finding.code === "unregistered-resource")).toBe(false);
+    expect(reconciliation.findings.some((finding) => finding.code === "residual-uncollected")).toBe(true);
+  });
+
+  test("実経路: 作成時機械登録（creation-time-machine-registration）のエントリの作成先違反は既存どおり受入gapとして報告される（作成入口接続確認の維持）", () => {
+    const outsideLocation = path.join(path.dirname(tmpdir()), "adf-3948-creation-time-violation");
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({
+          location: outsideLocation,
+          identifiers: { path: outsideLocation },
+          registrationBasis: "creation-time-machine-registration",
+        }),
+      ]),
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const gaps = report.diff.acceptanceGaps as readonly { code: string; route: string }[];
+    expect(gaps.some((gap) => gap.code === "creation-entry-rejection-disconnected")).toBe(true);
   });
 });

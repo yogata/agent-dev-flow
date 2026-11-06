@@ -12,6 +12,7 @@ import {
   LedgerInputError,
   parseLedgerText,
   readLedger,
+  recordOccurrenceFact,
   registerResource,
   resolveLedgerPath,
   resolveMainRepoRoot,
@@ -197,6 +198,7 @@ describe("検証用一時資材 台帳モジュール（生成記録）", () => 
       childIssue: 3930,
       recordedBy: "case-open",
       createdAt: "2026-11-05T10:00:00.000Z",
+      registrationBasis: "creation-time-machine-registration",
       collectedAt: null,
     };
     const childCollected: VerificationResourceEntry = { ...childUncollected, id: "vr-3928-2", collectedAt: "2026-11-05T11:00:00.000Z" };
@@ -371,6 +373,121 @@ describe("検証用一時資材 台帳モジュール（生成記録）", () => 
       ).toThrow(LedgerInputError);
       expect(io.written.length).toBe(0);
     });
+  });
+
+  describe("新規作成判定と既存物照合の区別・発生事実記録（REQ-118-005・REQ-118-008・REQ-032-043/044）", () => {
+    const hermesTempArea = "C:/Users/ogatay/AppData/Local/hermes/cache/scratch";
+
+    test("台帳記録は作成時機械登録と後追いの発生事実記録を registrationBasis で区別し、旧形式の台帳（記述のない行）は作成時機械登録として読む", () => {
+      const legacy = parseLedgerText(JSON.stringify([ledgerEntryJsonRaw()]));
+      expect(legacy[0]!.registrationBasis).toBe("creation-time-machine-registration");
+      const occurrence = parseLedgerText(
+        JSON.stringify([
+          { ...ledgerEntryJsonRaw(), registrationBasis: "evidenced-occurrence-record" },
+        ]),
+      );
+      expect(occurrence[0]!.registrationBasis).toBe("evidenced-occurrence-record");
+    });
+
+    test("registrationBasis の許容列挙外の値は fail-closed で拒否する", () => {
+      expect(() =>
+        parseLedgerText(
+          JSON.stringify([{ ...ledgerEntryJsonRaw(), registrationBasis: "post-hoc" }]),
+        ),
+      ).toThrow(LedgerFormatError);
+    });
+
+    test("後追いの発生事実記録（recordOccurrenceFact）は台帳不在の案件で新規台帳を作成して追記し、作成時機械登録のあった形で記録しない", () => {
+      const io = fakeIo({ existingLedgerText: null });
+      const result = recordOccurrenceFact(io, "C:/repo/main", validInput());
+      expect(result.ok).toBe(true);
+      expect(io.written.length).toBe(1);
+      const parsed = parseLedgerText(io.written[0]!.content);
+      expect(parsed).toHaveLength(1);
+      expect(parsed[0]!.registrationBasis).toBe("evidenced-occurrence-record");
+      expect(parsed[0]!.recordedBy).toBe("case-run");
+      expect(parsed[0]!.createdAt).toBe("2026-11-05T12:00:00.000Z");
+    });
+
+    test("後追いの発生事実記録は現在の作成先確認（新規作成の作成先拒否）を実施せず、別実行環境の env-TEMP 配下にある既存実在物の所在記録を受理する", () => {
+      const io = fakeIo({ existingLedgerText: null });
+      const hermesLocation = `${hermesTempArea}/case-3948/verification-cleanup-work-area`;
+      const result = recordOccurrenceFact(
+        io,
+        "C:/repo/main",
+        validInput({
+          location: hermesLocation,
+          identifiers: { path: hermesLocation, inode: "47569271066421197" },
+          recordedBy: "epic-final-close-observation-record",
+        }),
+      );
+      expect(result.ok).toBe(true);
+      const parsed = parseLedgerText(io.written[0]!.content);
+      expect(parsed[0]!.location).toBe(hermesLocation);
+      expect(parsed[0]!.registrationBasis).toBe("evidenced-occurrence-record");
+    });
+
+    test("後追いの発生事実記録の既存台帳への追記は連番を採番し、既存の作成時機械登録記録を壊さない", () => {
+      const existing = serializeLedger([
+        appendEntry([], validateRegistrationInput(validInput()), "creation-time-machine-registration").entry,
+      ]);
+      const io = fakeIo({ existingLedgerText: existing });
+      const result = recordOccurrenceFact(io, "C:/repo/main", validInput());
+      expect(result.entryId).toBe("vr-3928-2");
+      const parsed = parseLedgerText(io.written[0]!.content);
+      expect(parsed).toHaveLength(2);
+      expect(parsed[0]!.registrationBasis).toBe("creation-time-machine-registration");
+      expect(parsed[1]!.registrationBasis).toBe("evidenced-occurrence-record");
+    });
+
+    test("新規作成の作成時機械登録（registerResource）は registrationBasis を作成時機械登録として記録する", () => {
+      const io = fakeIo({ existingLedgerText: null });
+      const location = "C:/Users/verify/AppData/Local/Temp/adf-3948-verify/work-item";
+      registerResource(io, "C:/repo/main", validInput({ location, identifiers: { path: location } }), {
+        tempRoot: "C:/Users/verify/AppData/Local/Temp",
+      });
+      const parsed = parseLedgerText(io.written[0]!.content);
+      expect(parsed[0]!.registrationBasis).toBe("creation-time-machine-registration");
+    });
+
+    test("新規作成の作成先確認は渡された現在実行環境の env 解像 TEMP を基準とし、同一所在が環境ごとに許可・拒否される", () => {
+      const hermesLocation = `${hermesTempArea}/case-3948/new-work-item`;
+      const hermesEnvRoot = fakeIo({ existingLedgerText: null });
+      registerResource(
+        hermesEnvRoot,
+        "C:/repo/main",
+        validInput({ location: hermesLocation, identifiers: { path: hermesLocation } }),
+        { tempRoot: hermesTempArea },
+      );
+      expect(hermesEnvRoot.written.length).toBe(1);
+      const windowsTempRoot = fakeIo({ existingLedgerText: null });
+      expect(() =>
+        registerResource(
+          windowsTempRoot,
+          "C:/repo/main",
+          validInput({ location: hermesLocation, identifiers: { path: hermesLocation } }),
+          { tempRoot: "C:/WINDOWS/TEMP" },
+        ),
+      ).toThrow(LedgerInputError);
+      expect(windowsTempRoot.written.length).toBe(0);
+    });
+
+    /** parseEntry 契約に準拠した台帳エントリ JSON（registrationBasis 記述なしの旧形式）。 */
+    function ledgerEntryJsonRaw(): Record<string, unknown> {
+      return {
+        id: "vr-3928-1",
+        caseId: "3928",
+        kind: "clone",
+        location: "C:/repo/main/.agentdev/tmp/verification-clone",
+        identifiers: { path: "C:/repo/main/.agentdev/tmp/verification-clone" },
+        collector: "case-run:3930",
+        ownership: "child",
+        childIssue: 3930,
+        recordedBy: "case-run",
+        createdAt: "2026-11-05T12:00:00.000Z",
+        collectedAt: null,
+      };
+    }
   });
 
   describe("作成先判定の現行合意反例（Issue #3946 監督確定反例3件）", () => {
