@@ -538,6 +538,30 @@
 - 関連: Case #3928・docs/designs/workflows/verification-resource-lifecycle.md（PR #3947 で文言整合済み）・verification-resources-ledger.ts
 - タグ: #design-promotion-candidate #case-close #作成先境界 #basis契約
 
+## [2026-11-06T11:14+09:00][learning_candidate][bun 1.3.6 の fs.rmSync は maxRetries/retryDelay オプションを無視する][Case #3928]
+- 検知: Issue #3949 の retry 有効性実測実験（PR #3950 本文 Findings 第1項）。別プロセス cwd 保持で EBUSY 誘発時に、`fs.rmSync` の `maxRetries`/`retryDelay` オプション指定でも elapsed 1ms で即失敗・retry しない。Node 標準オプションに依存した retry 前提のコードは Bun/Windows で無効。
+- 対処: 標準 rmSync の反復呼び出し + Atomics.wait 待機（既存慣行 runner-local.ts と同一パターン）で bounded retry（10回 × 100ms）を自前実装（walk_enumeration_contract.test.ts afterAll）。EBUSY 競合が窓内に解消した場合は 2 試行目（elapsed 216ms）で回復、窓超過の持続競合（>1s）は失敗を正しく返すことを実測。実装は merge 10fd8ddb3、post-merge main で 11 pass・新規 fixture root 残存 0 を再現。
+- 学び: Bun の標準 API オプションは Node 標準仕様どおりの挙動を仮定せず、実動確認で根拠を確定する。「オプションを渡した」と「retry が実際に起こった」を分けて実測する。retry の成立記述は実測根拠のみで行い、最初から改善成立と書かない。
+- 出典: PR #3950 本文「Findings/ Capture候補」第1項・検証差分行4（retry 有効性の実測）
+- 関連: Case #3928・Wave-8 #3949・walk_enumeration_contract.test.ts afterAll・既存慣行 runner-local.ts（Atomics.wait パターン）
+- タグ: #learning-capture #bun #fs-rmsync #retry #windows
+
+## [2026-11-06T11:14+09:00][learning_candidate][bun test で process.on("exit") ハンドラが正常終了でも実行されない][Case #3928]
+- 検知: Issue #3949 修正前 RED 実測（PR #3950 本文 Findings 第2項）。process.on("exit") 内 rmSync は bun test 正常終了（11 pass / exit 0）でも発火せず、fixture root 11/11 が全数残存。Windows TEMP 既存 9,471 件残存の完全形メカニズムと整合する実測。
+- 対処: bun:test afterAll への回収移行で修正（merge 10fd8ddb3）。修正前 RED 11/11 全残存 → 修正後 GREEN 0 残存を同一固定環境手順で実測し、post-merge main でも新規残存 0 を再現。
+- 学び: bun test のテストファイルでは終了依存清掃（process.on("exit")）を使わず、bun:test afterAll 等のランナー契約を使う。exit ハンドラの発火は正常終了時を含め実動で確認するまで成立と書かない。失敗の握りつぶし（catch-all）は清掃欠陥を不可視化するため、清掃失敗はテスト失敗として伝達する構造にする。
+- 出典: PR #3950 本文「Findings/ Capture候補」第2項・検証差分行1（修正前 RED・残存 11/11）・検証証拠コメント 6674572192
+- 関連: Case #3928・Wave-8 #3949・walk_enumeration_contract.test.ts・REQ-118-005・REQ-118-003
+- タグ: #learning-capture #bun-test #process-exit #fixture-残存 #afterAll
+
+## [2026-11-06T11:14+09:00][learning_candidate][repo-agentdev-integrity scripts 配下の worktree 型検査は bun install 後に成立（既存学びの再確認）][Case #3928]
+- 検知: Issue #3949 検証（PR #3950 本文 Findings 第3項）。worktree 内 scripts の `bun run typecheck` は node_modules 未伝播で tsc 不在となり失敗。scripts 配下 `bun install`（bun.lock 存在）後に `tsc --noEmit -p tsconfig.distribution-boundary.json` が成立（exit 0 確認）。
+- 対処: 記録のみ。既存知識（2026-11-06T10:57 の bun install --frozen-lockfile 前提学び・2026-11-05T21:23 の worktree bun test 依存整備学び）と同系統の再確認素材であり、新規の対処は不要。
+- 学び: worktree 構造的制約（node_modules 未伝播）は agentdev-workflow-case-close scripts 配下に限らず repo-agentdev-integrity scripts 配下でも同様に成立する。別 package で観測が重複した場合は、learning-promote の統合判定で既存エントリへの集約候補。
+- 出典: PR #3950 本文「Findings/ Capture候補」第3項
+- 関連: Case #3928・Wave-8 #3949・同 inbox の bun install --frozen-lockfile 学び（2026-11-06T10:57）・.opencode/skills/repo-agentdev-integrity/scripts/package.json
+- タグ: #learning-capture #worktree #bun-install #typecheck #再確認
+
 ## [2026-11-06T10:57+09:00][learning_candidate][git-bash の TMPDIR/TEMP=/tmp は Windows ネイティブプロセスの os.tmpdir() に反映されない][Case #3928]
 - 検知: Wave-7 #3948 の実装検証で、Windows git-bash セッションの `TMPDIR=/tmp`・`TEMP=/tmp` は Windows ネイティブプロセス（node `os.tmpdir()`）には反映されず `C:\WINDOWS\TEMP` に解像されることを実測した。環境変数の解像差により「現在実行環境の env 解像 TEMP」がプロセス実効値基準で異なり得る事実であり、Hermes env-TEMP（`C:/Users/ogatay/AppData/Local/hermes/cache/scratch`）と OpenCode 実効 TEMP（`C:\WINDOWS\TEMP`）の差異の観測記録。
 - 対処: 本実装（新規作成判定と既存物照合の区別・close_mechanical_steps.ts）は `os.tmpdir()` 標準解像のみを消費するため対処不要。環境差の検証資材として記録する。
