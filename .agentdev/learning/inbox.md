@@ -584,3 +584,11 @@
 - 出典: PR #3951 本文 Design確定候補セクション
 - 関連: Case #3928・docs/designs/workflows/verification-resource-lifecycle.md（PR #3951 で文言整合済み）・close_mechanical_steps.ts・verification-resources-ledger.ts
 - タグ: #design-promotion-candidate #case-close #porcelain省略形 #grounds消費 #registrationBasis
+
+## [2026-11-06T15:05+09:00][learning_candidate][台帳エントリの kind 契約違反は ledger read fail となり観測系の検出が消える][Case #3928]
+- 検知: Wave-9 #3952 のテスト作成時 RED 検証（PR #3953 本文 Findings / Capture候補 learning）。テストの台帳 fixture に契約外の `kind: "process"` を書くと readLedger が `ledger entry.kind must be one of: remote, clone, bare-repository, capture-log, helper-script, dedicated-server, dedicated-process, temporary-output` で fail し、ledger-unavailable として観測系検出（unregistered 検出等）が全て実行されない。テスト構造は形式的に成立するため fail 理由が契約違反と気づきにくい。
+- 対処: 台帳 fixture は許容 kind 集合から選ぶ。PR #3953 のテストは許容 kind で構成済み（merge f2dd454b3・post-merge main で suite 288 pass / 0 fail / 926 expect を再現確認済み）。
+- 学び: 台帳系テストの fixture は契約 enum の許容値から選ぶ。観測系の「検出 0 件」は「正常に検出して何もなかった」と「検査自体が不能（ledger-unavailable）」を区別せず通るため、検出消失を fixture 契約違反が隠す構造に注意する。検出ゼロを合格根拠に使う前に、観測系が実際に実行された根拠（positive control の検出など）を確認する。
+- 出典: PR #3953 本文「Findings/ Capture候補」learning 項
+- 関連: Case #3928・Wave-9 #3952・close_mechanical_steps.ts readLedger・docs/designs/workflows/verification-resource-lifecycle.md
+- タグ: #learning-capture #台帳 #kind契約 #ledger-unavailable #fail-closed
