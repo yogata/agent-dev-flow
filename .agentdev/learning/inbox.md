@@ -592,3 +592,10 @@
 - 出典: PR #3953 本文「Findings/ Capture候補」learning 項
 - 関連: Case #3928・Wave-9 #3952・close_mechanical_steps.ts readLedger・docs/designs/workflows/verification-resource-lifecycle.md
 - タグ: #learning-capture #台帳 #kind契約 #ledger-unavailable #fail-closed
+## [2026-11-06T15:20+09:00][learning_candidate][中断セッションのワークフロー一時ファイルは .agentdev/ 直下に残り通常の tmp 検査から漏れる][Case #3928]
+- 検知: Epic #3928 最終close子の /abort 後、durable state 実測で `.agentdev/tmp-issue-3928-body-update.json` が repo の `.agentdev/` 直下（正規 `.agentdev/tmp/` の外）に残存しているのを監督が発見（記録 6675731983）。本文更新の JSON payload を正規 tmp 配下でなく `.agentdev/` 直下に作成した上、abort で清掃経路が走らなかった。
+- 対処: 事前実在は orchestrator の独立観測記録（b30）で確定済み。orchestrator が workflow 一時ファイル当該実行内削除規律（REQ-018-008(b)）に基づき `rm -f` で清掃（ユーザー許可不関与・rm 成功のみから元実在を推測せず事前実在記録と対で証拠化）。逸脱3点（作成置き場・abort 残存・rm 証拠特性）を本体記録として保存済み。
+- 学び: 大容量本文の部分更新は正本読出し→組立→送信の3段で行い、中間 payload は正規一時領域（`.agentdev/tmp/`）に置く。中断セッションの残存検査は repo 直下と `.agentdev/` 直下の両方を見る（通常の `.agentdev/tmp/` 検査だけでは漏れる）。中断後の durable state 実測に未追跡ファイルの全パス列挙を含める。
+- 出典: Epic #3928 コメント 6675731983・6675962969（位置誤記訂正）・b30 圧縮記録（m0658 実測）
+- 関連: Case #3928・REQ-018-008(b)・m0729/m0731 Epic本文破壊・復旧事案（プレースホルダ送信事故）と同根の大容量本文更新規律
+- タグ: #learning-capture #一時ファイル #abort残存 #agentdev-tmp #durable-state
