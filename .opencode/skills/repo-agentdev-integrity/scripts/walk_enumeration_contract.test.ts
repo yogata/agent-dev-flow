@@ -17,7 +17,7 @@
  * - 列挙結果は正規化後パスの sort 順で決定的
  */
 
-import { describe, expect, test } from "bun:test";
+import { afterAll, describe, expect, test } from "bun:test";
 import * as path from "path";
 import * as fs from "fs";
 import * as os from "os";
@@ -306,12 +306,35 @@ describe("再帰列挙契約: check_test_impact のテストファイル発見",
   });
 });
 
-process.on("exit", () => {
-  for (const r of ROOTS) {
-    try {
-      fs.rmSync(r, { recursive: true, force: true });
-    } catch {
-      // tmp クリーンアップはベストエフォート
+// 実行時 fixture の回収（REQ-118-003）: 清掃失敗は握りつぶさずテスト失敗として伝達する。
+// bun 1.3.6 の fs.rmSync は maxRetries/retryDelay を無視するため、標準 rmSync を反復して
+// retry する（Issue #3949 実測。待機は runner-local.ts と同一の Atomics.wait パターン）。
+const CLEANUP_MAX_RETRIES = 10;
+const CLEANUP_RETRY_DELAY_MS = 100;
+
+afterAll(() => {
+  const failures: string[] = [];
+  for (const root of ROOTS) {
+    let lastError: unknown;
+    for (let attempt = 0; attempt <= CLEANUP_MAX_RETRIES; attempt++) {
+      try {
+        fs.rmSync(root, { recursive: true, force: true });
+        lastError = undefined;
+        break;
+      } catch (error) {
+        lastError = error;
+        if (attempt < CLEANUP_MAX_RETRIES) {
+          Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, CLEANUP_RETRY_DELAY_MS);
+        }
+      }
     }
+    if (lastError !== undefined) {
+      failures.push(`${root}: ${lastError instanceof Error ? lastError.message : String(lastError)}`);
+    }
+  }
+  if (failures.length > 0) {
+    throw new Error(
+      `fixture cleanup failed (${failures.length}/${ROOTS.length} roots):\n${failures.join("\n")}`,
+    );
   }
 });
