@@ -101,6 +101,8 @@ export interface MechanicalRunner {
   gitCommonDir?(): string;
   /** 回収実行面（台帳回収・終了判定記録回収）で使用するファイル削除。未提供時は回収ステップを fail で報告する。 */
   deleteFile?(absolutePath: string): void;
+  /** 機械工程自身の process id（検査実行実行時プロセスの自己除外の特定実体導出に使用）。未提供時は自己除外を適用しない。 */
+  processId?(): number;
 }
 
 export interface GateCommandSpec {
@@ -985,7 +987,10 @@ export interface VerificationResourceObservation {
   /** (b) branch列挙。 */
   branches: readonly string[];
   /** (c) プロセス生存観測結果（実物側網羅列挙の観測値。cwd・開始時刻は正規形の観測で取得できた場合に保持）。 */
-  processes: Record<string, { alive: boolean; commandLine: string | null; cwd?: string; startedAt?: string }>;
+  processes: Record<
+    string,
+    { alive: boolean; commandLine: string | null; cwd?: string; startedAt?: string; parentPid?: string }
+  >;
   /** listenポート確認結果。 */
   listenPorts: Record<string, { listening: boolean }>;
   /** (b) remote不存在判定入力（URLごと。remote列挙に現れない台帳remoteの不存在判定に使用）。 */
@@ -1186,13 +1191,88 @@ export function evaluateIdentifierMatch(
 }
 
 /**
+ * 台帳エントリと観測プロセスの帰属確認に使用できる観測取得済み属性キー
+ * （deriveEntryPresence が観測から記録する識別属性集合と同一。parentPid は親配下一括
+ * 除外の反例（6677451423）により帰属確認属性に含めない）。
+ */
+const PROCESS_ATTRIBUTION_KEYS = ["commandLine", "cwd", "startedAt"] as const;
+
+/**
+ * 台帳エントリと観測プロセスの属性帰属確認（PID churn 耐性）。観測に台帳記録の pid が
+ * 存在しない（または生存しない）エントリについて、pid 以外の取得済み属性
+ * （commandLine・cwd・startedAt）の正規化後値完全一致で観測 entity を一意に帰属させる。
+ * 比較は観測に取得できたキーのみで行う（evaluateIdentifierMatch の「観測に存在するキー
+ * のみ比較」契約と同一。commandLine null 等の観測不能キーは他の取得済み属性で帰属確認を
+ * 試みる。比較可能なキーがない場合は帰属させない）。候補が 0 または 2 以上、1つの観測
+ * entity に複数エントリが一致する場合は一意に帰属できず帰属させない（per-entity の一意
+ * 帰属。確認不能なら拒否維持の fail-closed・一括除外なし）。
+ * 返却値は台帳エントリ id → 帰属先の観測 pid の対応（pid 以外の経路には使用しない）。
+ */
+export function deriveLedgerProcessAttribution(
+  observation: Pick<VerificationResourceObservation, "processes">,
+  entries: readonly VerificationResourceEntry[],
+): ReadonlyMap<string, string> {
+  const pending: { entryId: string; matchedPid: string }[] = [];
+  for (const entry of entries) {
+    const recordedPid = entry.identifiers.pid;
+    if (recordedPid === undefined) continue;
+    const directlyObserved = observation.processes[recordedPid];
+    if (directlyObserved !== undefined && directlyObserved.alive) continue;
+    const attributionKeys = PROCESS_ATTRIBUTION_KEYS.filter(
+      (key): key is (typeof PROCESS_ATTRIBUTION_KEYS)[number] =>
+        typeof entry.identifiers[key] === "string" && entry.identifiers[key]!.length > 0,
+    );
+    if (attributionKeys.length === 0) continue;
+    const matchedPids: string[] = [];
+    for (const [pid, proc] of Object.entries(observation.processes)) {
+      if (!proc.alive) continue;
+      // 観測に取得できたキーのみ比較する（evaluateIdentifierMatch の「観測に存在するキー
+      // のみ比較」契約と同一。commandLine null 等の観測不能キーは他の取得済み属性で
+      // 帰属確認を試みる。比較可能なキーがない entity は曖昧として帰属させない）。
+      const comparableKeys = attributionKeys.filter((key) => {
+        const actual = proc[key];
+        return actual !== undefined && actual !== null;
+      });
+      if (comparableKeys.length === 0) continue;
+      const covered = comparableKeys.every((key) => {
+        const actual = proc[key];
+        const recorded: string | undefined = entry.identifiers[key];
+        if (actual === undefined || actual === null || recorded === undefined) return false;
+        return normalizeObservationPath(actual) === normalizeObservationPath(recorded);
+      });
+      if (covered) matchedPids.push(pid);
+    }
+    const soleMatch = matchedPids.length === 1 ? matchedPids[0] : undefined;
+    if (soleMatch !== undefined) pending.push({ entryId: entry.id, matchedPid: soleMatch });
+  }
+  const attribution = new Map<string, string>();
+  const claimsByObservedPid = new Map<string, string[]>();
+  for (const claim of pending) {
+    const claimants = claimsByObservedPid.get(claim.matchedPid) ?? [];
+    claimants.push(claim.entryId);
+    claimsByObservedPid.set(claim.matchedPid, claimants);
+  }
+  for (const [pid, claimants] of claimsByObservedPid) {
+    const soleClaimant = claimants.length === 1 ? claimants[0] : undefined;
+    if (soleClaimant !== undefined) attribution.set(soleClaimant, pid);
+  }
+  return attribution;
+}
+
+/**
  * 台帳エントリの実物観測状態の導出。remote URL 形・パス形の location 判定に
  * identifiers ベースの PID・listen 観測を結合する。remote 不存在判定が
  * undetermined の場合は照合自体が成立しないため undetermined を優先する。
+ * processAttribution（deriveLedgerProcessAttribution の帰属結果。省略時は pid 完全照合のみ）
+ * が当該エントリへの帰属を示す場合、記録 pid が観測に存在しない・生存しない状態でも
+ * 属性一致の観測 entity に帰属して生存扱いとする（PID churn 正規乖離として
+ * identifier-mismatch を出さない。observedIdentifiers には帰属根拠となった観測属性を記録し、
+ * churn した pid は記録しない）。
  */
 export function deriveEntryPresence(
   entry: VerificationResourceEntry,
   observation: VerificationResourceObservation,
+  processAttribution?: ReadonlyMap<string, string>,
 ): EntryPresenceObservation {
   const observedIdentifiers: Record<string, string> = {};
   let presentEvidence = "";
@@ -1236,11 +1316,34 @@ export function deriveEntryPresence(
   const pid = entry.identifiers.pid;
   if (pid !== undefined) {
     const processObservation = observation.processes[pid];
-    if (processObservation === undefined) {
-      unavailableEvidence = unavailableEvidence === ""
-        ? `process liveness observation does not cover the recorded pid: ${pid}`
-        : unavailableEvidence;
-    } else if (processObservation.alive) {
+    const attributedPid =
+      processAttribution === undefined ? undefined : processAttribution.get(entry.id);
+    if (processObservation === undefined || !processObservation.alive) {
+      if (attributedPid !== undefined) {
+        const attributed = observation.processes[attributedPid];
+        presentEvidence =
+          presentEvidence === ""
+            ? `the recorded pid is not directly observed (${processObservation === undefined ? "not covered by the liveness observation" : "not alive"}); the entry is attributed to the live process ${attributedPid} by exact attribute match of the recorded identifiers (commandLine/cwd/startedAt), consistent with a regenerated pid`
+            : presentEvidence;
+        if (attributed !== undefined) {
+          if (attributed.commandLine !== null && attributed.commandLine !== undefined) {
+            observedIdentifiers.commandLine = attributed.commandLine;
+          }
+          if (attributed.cwd !== undefined) {
+            observedIdentifiers.cwd = attributed.cwd;
+          }
+          if (attributed.startedAt !== undefined) {
+            observedIdentifiers.startedAt = attributed.startedAt;
+          }
+        }
+      } else if (processObservation === undefined) {
+        unavailableEvidence = unavailableEvidence === ""
+          ? `process liveness observation does not cover the recorded pid: ${pid}`
+          : unavailableEvidence;
+      } else {
+        missingEvidence = missingEvidence === "" ? `the recorded pid is not alive: ${pid}` : missingEvidence;
+      }
+    } else {
       presentEvidence = presentEvidence === "" ? `the recorded pid is alive: ${pid}` : presentEvidence;
       observedIdentifiers.pid = pid;
       if (processObservation.commandLine !== null && processObservation.commandLine !== undefined) {
@@ -1252,8 +1355,6 @@ export function deriveEntryPresence(
       if (processObservation.startedAt !== undefined) {
         observedIdentifiers.startedAt = processObservation.startedAt;
       }
-    } else {
-      missingEvidence = missingEvidence === "" ? `the recorded pid is not alive: ${pid}` : missingEvidence;
     }
   }
 
@@ -1443,12 +1544,22 @@ export function evaluateObservationEntityConsumption(
   entries: readonly VerificationResourceEntry[],
   knownResidualEntries: readonly KnownResidualEntry[],
   knownResidualReportedLocations: readonly string[],
+  options: {
+    /** entity 形（process:pid=… / listen:port=… / process:<attr>=…）の観測除外根拠入力（FS 実体とは別に、正規化後の完全一致でのみ消費する）。 */
+    observationExclusionGrounds?: readonly ObservationExclusionGround[];
+    /** 機械工程自身の process id（検査実行実行時プロセスの自己除外の起点。未指定時は自己除外を適用しない）。 */
+    selfProcessId?: number;
+    /** deriveLedgerProcessAttribution の帰属結果（台帳エントリ id → 帰属先の観測 pid）。帰属済み観測 entity は未登録検出から除外する。 */
+    processAttribution?: ReadonlyMap<string, string>;
+  } = {},
 ): {
   findings: readonly ResourceReconciliationFinding[];
   knownResidualStillPresent: readonly string[];
+  excludedObservations: readonly { path: string; basis: string }[];
 } {
   const findings: ResourceReconciliationFinding[] = [];
   const knownResidualStillPresent: string[] = [];
+  const excludedObservations: { path: string; basis: string }[] = [];
   const reportedLocations = new Set(knownResidualReportedLocations);
   const ledgerPids = new Set(
     entries.map((entry) => entry.identifiers.pid).filter((pid): pid is string => pid !== undefined),
@@ -1459,6 +1570,84 @@ export function evaluateObservationEntityConsumption(
       .filter((listenPort): listenPort is string => listenPort !== undefined),
   );
   const ledgerUrls = new Set(entries.map((entry) => entry.location));
+  // entity 形根拠（process:pid=… / listen:port=… / process:<attr>=…）の正規化。疑似スキーマ
+  // 所在は FS パスでないため resolve せず正規化のみで完全一致照合する（FS 実体の根拠は
+  // attachObservationExclusionGrounds が resolveBase で解決する。消費条件は FS と同一:
+  // role は official-artifact のみ、attribution は非空根拠）。
+  const normalizedEntityGrounds = (options.observationExclusionGrounds ?? []).map((ground) => ({
+    ground,
+    normalized: normalizeObservationPath(ground.path),
+  }));
+  // 属性識別形（process:<attr>=<value>）の解析。attr は帰属確認属性（commandLine・cwd・
+  // startedAt）に限る。値は最初の = 以降全体を取り、正規化後値の完全一致で観測 entity を
+  // 特定する。一致 entity が一意に 1 つのときだけ消費し、0・2 以上は曖昧として消費しない
+  // （per-entity・一括除外なしの fail-closed。ground の pid 指定 process:pid=… は完全一致
+  // 経路が処理し、attr=pid はこの解析の対象外）。
+  const parseEntityAttributeGround = (
+    normalized: string,
+  ): { attr: (typeof PROCESS_ATTRIBUTION_KEYS)[number]; value: string } | null => {
+    if (!normalized.startsWith("process:")) return null;
+    const separator = normalized.indexOf("=", "process:".length);
+    if (separator === -1) return null;
+    const attr = normalized.slice("process:".length, separator);
+    if (!(PROCESS_ATTRIBUTION_KEYS as readonly string[]).includes(attr)) return null;
+    return { attr: attr as (typeof PROCESS_ATTRIBUTION_KEYS)[number], value: normalized.slice(separator + 1) };
+  };
+  const findEntityGroundExclusion = (entityPath: string): string | null => {
+    const normalized = normalizeObservationPath(entityPath);
+    const roleGround = normalizedEntityGrounds.find(
+      (entry) => entry.ground.kind === "role" && entry.normalized === normalized,
+    );
+    if (roleGround !== undefined && roleGround.ground.role === "official-artifact" && roleGround.ground.basis.trim().length > 0) {
+      return "official-artifact-role-basis";
+    }
+    const attributionGround = normalizedEntityGrounds.find(
+      (entry) => entry.ground.kind === "attribution" && entry.normalized === normalized,
+    );
+    if (attributionGround !== undefined && attributionGround.ground.basis.trim().length > 0) {
+      return "unrelated-shared-resource-attribution";
+    }
+    for (const entry of normalizedEntityGrounds) {
+      if (entry.ground.basis.trim().length === 0) continue;
+      const attributeGround = parseEntityAttributeGround(entry.normalized);
+      if (attributeGround === null) continue;
+      const matchingPids: string[] = [];
+      for (const [pid, proc] of Object.entries(observation.processes)) {
+        if (!proc.alive) continue;
+        const actual = proc[attributeGround.attr];
+        if (actual === undefined || actual === null) continue;
+        if (normalizeObservationPath(actual) === attributeGround.value) matchingPids.push(pid);
+      }
+      if (matchingPids.length !== 1) continue;
+      if (matchingPids[0] !== normalizeObservationPath(entityPath).replace(/^process:pid=/, "")) continue;
+      if (entry.ground.kind === "role" && entry.ground.role === "official-artifact") {
+        return "official-artifact-role-basis";
+      }
+      if (entry.ground.kind === "attribution") {
+        return "unrelated-shared-resource-attribution";
+      }
+    }
+    return null;
+  };
+  // 検査実行自身の実行時プロセスの自己除外（検査実行の書出し実体＝除外根拠(1)。終了判定
+  // 記録の特定実体除外と同一契約の特定実体除外であって汎用除外ではない）。機械工程自身の
+  // pid と、観測された親子関係からその子孫として機械導出される実体に限り適用する（観測に
+  // parentPid がなく子孫を導出できない pid は除外しない fail-closed）。
+  const selfProcessIds = new Set<string>();
+  if (typeof options.selfProcessId === "number") {
+    selfProcessIds.add(String(options.selfProcessId));
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const [pid, proc] of Object.entries(observation.processes)) {
+        if (selfProcessIds.has(pid)) continue;
+        if (proc.parentPid !== undefined && selfProcessIds.has(proc.parentPid)) {
+          selfProcessIds.add(pid);
+          changed = true;
+        }
+      }
+    }
+  }
   const knownPids = new Set<string>();
   const knownListenPorts = new Set<string>();
   const knownUrls = new Set<string>();
@@ -1536,9 +1725,25 @@ export function evaluateObservationEntityConsumption(
     }
   }
 
+  // 台帳エントリへの属性帰属が成立した観測 entity は台帳記録分として消費する
+  // （PID churn 耐性。deriveLedgerProcessAttribution の一意帰属のみ。曖昧帰属は消費しない）。
+  const attributedObservedPids = new Set(options.processAttribution?.values() ?? []);
   for (const [pid, processObservation] of Object.entries(observation.processes)) {
     if (ledgerPids.has(pid) || knownPids.has(pid)) continue;
     if (!processObservation.alive) continue;
+    if (attributedObservedPids.has(pid)) {
+      excludedObservations.push({ path: `process:pid=${pid}`, basis: "ledger-entry-attribute-attribution" });
+      continue;
+    }
+    if (selfProcessIds.has(pid)) {
+      excludedObservations.push({ path: `process:pid=${pid}`, basis: "inspection-execution-runtime-process-self" });
+      continue;
+    }
+    const entityExclusion = findEntityGroundExclusion(`process:pid=${pid}`);
+    if (entityExclusion !== null) {
+      excludedObservations.push({ path: `process:pid=${pid}`, basis: entityExclusion });
+      continue;
+    }
     const detailParts = [`pid ${pid}`];
     if (processObservation.commandLine !== null && processObservation.commandLine !== undefined) {
       detailParts.push(`commandLine: ${processObservation.commandLine}`);
@@ -1557,6 +1762,11 @@ export function evaluateObservationEntityConsumption(
   for (const [port, portObservation] of Object.entries(observation.listenPorts)) {
     if (ledgerListenPorts.has(port) || knownListenPorts.has(port)) continue;
     if (!portObservation.listening) continue;
+    const entityExclusion = findEntityGroundExclusion(`listen:port=${port}`);
+    if (entityExclusion !== null) {
+      excludedObservations.push({ path: `listen:port=${port}`, basis: entityExclusion });
+      continue;
+    }
     findings.push({
       code: "unregistered-resource",
       detail: `no ledger record or known residual entry covers the observed listening port: ${port}`,
@@ -1571,7 +1781,7 @@ export function evaluateObservationEntityConsumption(
       detail: `no ledger record or known residual entry covers the observed remote target and its absence could not be confirmed: ${url} (${judgement.basis})`,
     });
   }
-  return { findings, knownResidualStillPresent };
+  return { findings, knownResidualStillPresent, excludedObservations };
 }
 
 /**
@@ -1583,6 +1793,7 @@ export function evaluateVerificationResourceReconciliation(
   ledger: LedgerReadResult,
   observation: VerificationResourceObservation,
   check: VerificationResourceCheck,
+  options: { selfProcessId?: number } = {},
 ): VerificationResourceReconciliationEvaluation {
   const findings: ResourceReconciliationFinding[] = [];
   const uncollectedParentOrCommon: { id: string; ownership: VerificationResourceOwnership }[] = [];
@@ -1618,8 +1829,12 @@ export function evaluateVerificationResourceReconciliation(
     }
   }
 
+  // 台帳エントリと観測プロセスの属性帰属（PID churn 耐性）を1箇所で計算し、
+  // 実物観測状態の導出と entity 消費の両経路へ同一の帰属結果を供給する
+  // （エントリ間排他と観測 entity への一意割当ての機械強制）。
+  const processAttribution = deriveLedgerProcessAttribution(observation, ledger.entries);
   for (const entry of childEntries) {
-    const presence = deriveEntryPresence(entry, observation);
+    const presence = deriveEntryPresence(entry, observation, processAttribution);
     if (presence.presence === "undetermined") {
       findings.push({
         code: "remote-absence-undetermined",
@@ -1685,6 +1900,11 @@ export function evaluateVerificationResourceReconciliation(
     ledger.entries,
     check.knownResidualEntries,
     unregistered.knownResidualReportedLocations,
+    {
+      observationExclusionGrounds: check.observationExclusionGrounds,
+      selfProcessId: options.selfProcessId,
+      processAttribution,
+    },
   );
   findings.push(...entityConsumption.findings);
 
@@ -1696,7 +1916,10 @@ export function evaluateVerificationResourceReconciliation(
     uncollectedParentOrCommon,
     terminationUnitBlocked: uncollectedParentOrCommon.length > 0,
     permitted: findings.length === 0,
-    excludedObservations: unregistered.excludedObservations,
+    excludedObservations: [
+      ...unregistered.excludedObservations,
+      ...entityConsumption.excludedObservations,
+    ],
     knownResidualStillPresent: [
       ...unregistered.knownResidualStillPresent,
       ...entityConsumption.knownResidualStillPresent,
@@ -2663,6 +2886,7 @@ function executeVerificationResourceReconciliation(
             commandLine: typeof value.commandLine === "string" ? value.commandLine : null,
             ...(typeof value.cwd === "string" ? { cwd: value.cwd } : {}),
             ...(typeof value.startedAt === "string" ? { startedAt: value.startedAt } : {}),
+            ...(typeof value.parentPid === "string" ? { parentPid: value.parentPid } : {}),
           };
         }
       }
@@ -2754,7 +2978,9 @@ function executeVerificationResourceReconciliation(
   };
   const evaluation =
     earlyFindings.length === 0
-      ? evaluateVerificationResourceReconciliation(ledger, resourceObservation, check)
+      ? evaluateVerificationResourceReconciliation(ledger, resourceObservation, check, {
+          selfProcessId: runner.processId?.(),
+        })
       : null;
   const gaps = deriveAcceptanceGaps(
     buildAcceptanceControlObservation(input, check, ledger, mainRepoRoot, observationFailures, resourceObservation, runner),
@@ -3461,6 +3687,9 @@ function main(): void {
       },
       sleep(ms) {
         Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+      },
+      processId() {
+        return process.pid;
       },
     };
     const report = runCloseMechanicalSteps(normalized, runner);

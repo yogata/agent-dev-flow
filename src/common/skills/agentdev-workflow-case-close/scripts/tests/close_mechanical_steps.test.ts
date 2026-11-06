@@ -158,11 +158,15 @@ function fakeRunner(overrides: {
   branchesText?: string;
   dedicatedAreaEntries?: readonly string[];
   osTempAreaMatches?: readonly string[];
-  processLiveness?: Record<string, { alive: boolean; commandLine: string | null }>;
+  processLiveness?: Record<
+    string,
+    { alive: boolean; commandLine: string | null; parentPid?: string; startedAt?: string; cwd?: string }
+  >;
   listenPorts?: Record<string, { listening: boolean }>;
   remoteAbsenceInputs?: Record<string, unknown>;
   inspectionExitCodes?: Record<string, number>;
   missingPaths?: readonly string[];
+  processId?: number;
 } = {}): MechanicalRunner & {
   calls: { command: string; args: readonly string[]; cwd: string }[];
   writes: { absolutePath: string; content: string }[];
@@ -275,6 +279,7 @@ function fakeRunner(overrides: {
       return "<repo>/.git";
     },
     sleep() {},
+    ...(overrides.processId !== undefined ? { processId: (): number => overrides.processId as number } : {}),
   };
 }
 
@@ -2505,6 +2510,141 @@ describe("検証用一時資材の未記録entity消費・検査不能明示・�
     expect(isCloseOperationPermitted(report).permitted).toBe(false);
   });
 
+  test("実経路: entity 形根拠（process:pid=…/listen:port=…）を正規化後完全一致で消費し、根拠のない実体は拒否を維持する", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      processLiveness: {
+        "37940": { alive: true, commandLine: "外部共有 runtime process（根拠付き）" },
+        "38944": { alive: true, commandLine: "根拠のない外部 process" },
+      },
+      listenPorts: { "4097": { listening: true }, "4099": { listening: true } },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("verified-conditions")],
+        verificationResourceCheck: {
+          ...baseCheck,
+          observationExclusionGrounds: [
+            { path: "process:pid=37940", kind: "attribution", basis: "本件外共有 runtime process の帰属根拠（機械確認可能な記録参照）" },
+            { path: "listen:port=4097", kind: "attribution", basis: "本件外共有 listener の帰属根拠（機械確認可能な記録参照）" },
+          ],
+        },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      excludedObservations: readonly { path: string; basis: string }[];
+    };
+    expect(
+      reconciliation.excludedObservations.some(
+        (e) => e.path === "process:pid=37940" && e.basis === "unrelated-shared-resource-attribution",
+      ),
+    ).toBe(true);
+    expect(
+      reconciliation.excludedObservations.some(
+        (e) => e.path === "listen:port=4097" && e.basis === "unrelated-shared-resource-attribution",
+      ),
+    ).toBe(true);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 38944"),
+      ),
+    ).toBe(true);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("listening port") && f.detail.includes("4099"),
+      ),
+    ).toBe(true);
+    expect(reconciliation.permitted).toBe(false);
+  });
+
+  test("実経路: entity 形根拠は別 pid の根拠と非正式成果物の role を消費せず拒否を維持する", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      processLiveness: { "37940": { alive: true, commandLine: "対象 process" } },
+      listenPorts: {},
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("verified-conditions")],
+        verificationResourceCheck: {
+          ...baseCheck,
+          observationExclusionGrounds: [
+            { path: "process:pid=99999", kind: "attribution", basis: "別 pid の根拠" },
+            { path: "process:pid=37940", kind: "role", role: "test-run-generated", basis: "非正式成果物の役割根拠は除外にならない" },
+          ],
+        },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      excludedObservations: readonly { path: string; basis: string }[];
+    };
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 37940"),
+      ),
+    ).toBe(true);
+    expect(reconciliation.excludedObservations.length).toBe(0);
+    expect(reconciliation.permitted).toBe(false);
+  });
+
+  test("実経路: 検査実行自身の実行時プロセス（機械工程 pid とその観測子孫）を自己除外し、祖先と無関係プロセスは拒否を維持する", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      processId: 4242,
+      processLiveness: {
+        "4": { alive: true, commandLine: "System", parentPid: "0" },
+        "4242": { alive: true, commandLine: "機械工程自身", parentPid: "4" },
+        "5000": { alive: true, commandLine: "観測コマンド本体", parentPid: "4242" },
+        "5001": { alive: true, commandLine: "観測の子プロセス", parentPid: "5000" },
+        "38944": { alive: true, commandLine: "無関係な外部 process", parentPid: "777" },
+      },
+      listenPorts: {},
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("verified-conditions")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      excludedObservations: readonly { path: string; basis: string }[];
+    };
+    for (const pid of ["4242", "5000", "5001"]) {
+      expect(
+        reconciliation.findings.some(
+          (f) => f.code === "unregistered-resource" && f.detail.includes(`pid ${pid}`),
+        ),
+      ).toBe(false);
+      expect(
+        reconciliation.excludedObservations.some(
+          (e) => e.path === `process:pid=${pid}` && e.basis === "inspection-execution-runtime-process-self",
+        ),
+      ).toBe(true);
+    }
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 38944"),
+      ),
+    ).toBe(true);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 4"),
+      ),
+    ).toBe(true);
+    expect(reconciliation.permitted).toBe(false);
+  });
+
   test("実経路: 既知残存リストのpid・listenPort・branch識別情報を観測結果と照合し、生存確認と識別情報不一致を検出する", () => {
     const baseCheck = verificationResourceCheck();
     const runner = fakeRunner({
@@ -3375,5 +3515,402 @@ describe("新規作成判定と既存物照合の区別（REQ-118-005・REQ-032-
     );
     const gaps = report.diff.acceptanceGaps as readonly { code: string; route: string }[];
     expect(gaps.some((gap) => gap.code === "creation-entry-rejection-disconnected")).toBe(true);
+  });
+});
+
+describe("観測entity消費の識別経路拡張と自己除外の正規化（REQ-118-005・REQ-032-043/044・反例6677451423）", () => {
+  test("実経路: 反例6677451423構成（pid100共有親/pid101検査自身/pid102無関係Case-worker）で自己除外は検査自身とその観測子孫に限られ、共有親と無関係兄弟はunregistered検出として残る", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      processId: 101,
+      processLiveness: {
+        "100": { alive: true, commandLine: "shared parent shell (unrelated to this case)", parentPid: "1" },
+        "101": { alive: true, commandLine: "close-mechanical-steps inspection runner", parentPid: "100" },
+        "102": { alive: true, commandLine: "unrelated Case-worker process", parentPid: "100" },
+        "1010": { alive: true, commandLine: "inspection child process spawned by the runner", parentPid: "101" },
+      },
+      listenPorts: {},
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("verified-conditions")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      excludedObservations: readonly { path: string; basis: string }[];
+    };
+    for (const pid of ["101", "1010"]) {
+      expect(
+        reconciliation.findings.some(
+          (f) => f.code === "unregistered-resource" && f.detail.includes(`pid ${pid}`),
+        ),
+      ).toBe(false);
+      expect(
+        reconciliation.excludedObservations.some(
+          (e) => e.path === `process:pid=${pid}` && e.basis === "inspection-execution-runtime-process-self",
+        ),
+      ).toBe(true);
+    }
+    for (const pid of ["100", "102"]) {
+      expect(
+        reconciliation.findings.some(
+          (f) => f.code === "unregistered-resource" && f.detail.includes(`pid ${pid}`),
+        ),
+      ).toBe(true);
+      expect(
+        reconciliation.excludedObservations.some((e) => e.path === `process:pid=${pid}`),
+      ).toBe(false);
+    }
+    expect(reconciliation.permitted).toBe(false);
+  });
+
+  test("実経路: processId未提供時は自己除外を適用せず検査自身もunregistered検出する（未提供時の無根拠除外をしないfail-closed）", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      processLiveness: {
+        "101": { alive: true, commandLine: "close-mechanical-steps inspection runner" },
+      },
+      listenPorts: {},
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("verified-conditions")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      excludedObservations: readonly { path: string; basis: string }[];
+    };
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 101"),
+      ),
+    ).toBe(true);
+    expect(
+      reconciliation.excludedObservations.some((e) => e.basis === "inspection-execution-runtime-process-self"),
+    ).toBe(false);
+    expect(reconciliation.permitted).toBe(false);
+  });
+
+  test("実経路: 台帳記録pidがchurnしたtransient entityをcommandLine完全一致のper-entity帰属で消費し、PID不一致で未登録検出せずidentifier-mismatchも出さない（実体生存の回収拒否は維持）", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({
+          id: "vr-3928-churn-1",
+          kind: "dedicated-process",
+          location: "<repo>/tmp-area/verify-server",
+          identifiers: {
+            path: "<repo>/tmp-area/verify-server",
+            pid: "1234",
+            commandLine: "verify-server --port 4097",
+          },
+        }),
+      ]),
+      missingPaths: ["<repo>/tmp-area/verify-server"],
+      processLiveness: {
+        "5678": { alive: true, commandLine: "verify-server --port 4097", startedAt: "2026-11-06T05:00:00.000Z" },
+        "5679": { alive: true, commandLine: "an unrelated process with a different command line" },
+      },
+      listenPorts: {},
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("verified-conditions")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      excludedObservations: readonly { path: string; basis: string }[];
+    };
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 5678"),
+      ),
+    ).toBe(false);
+    expect(
+      reconciliation.excludedObservations.some(
+        (e) => e.path === "process:pid=5678" && e.basis === "ledger-entry-attribute-attribution",
+      ),
+    ).toBe(true);
+    expect(reconciliation.findings.some((f) => f.code === "identifier-mismatch")).toBe(false);
+    expect(
+      reconciliation.findings.some((f) => f.code === "residual-uncollected" && f.detail.includes("vr-3928-churn-1")),
+    ).toBe(true);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 5679"),
+      ),
+    ).toBe(true);
+    expect(reconciliation.permitted).toBe(false);
+  });
+
+  test("実経路: commandLineを観測できなかったentityは他の取得済み属性（startedAt）の完全一致で帰属確認を試み、一意に一致する場合は消費する", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({
+          id: "vr-3928-churn-2",
+          kind: "dedicated-process",
+          location: "<repo>/tmp-area/verify-server-2",
+          identifiers: {
+            path: "<repo>/tmp-area/verify-server-2",
+            pid: "1234",
+            commandLine: "verify-server --port 4098",
+            startedAt: "2026-11-06T05:00:00.000Z",
+          },
+        }),
+      ]),
+      missingPaths: ["<repo>/tmp-area/verify-server-2"],
+      processLiveness: {
+        "5678": { alive: true, commandLine: null, startedAt: "2026-11-06T05:00:00.000Z" },
+      },
+      listenPorts: {},
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("verified-conditions")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      excludedObservations: readonly { path: string; basis: string }[];
+    };
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 5678"),
+      ),
+    ).toBe(false);
+    expect(
+      reconciliation.excludedObservations.some(
+        (e) => e.path === "process:pid=5678" && e.basis === "ledger-entry-attribute-attribution",
+      ),
+    ).toBe(true);
+    expect(reconciliation.permitted).toBe(false);
+  });
+
+  test("実経路: commandLineがnullで比較可能な他属性もないentityは帰属できずunregistered検出を維持する（確認不能なら拒否維持のfail-closed）", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({
+          id: "vr-3928-nullcl-1",
+          kind: "dedicated-process",
+          location: "<repo>/tmp-area/verify-server-3",
+          identifiers: {
+            path: "<repo>/tmp-area/verify-server-3",
+            pid: "1234",
+            commandLine: "verify-server --port 4099",
+          },
+        }),
+      ]),
+      missingPaths: ["<repo>/tmp-area/verify-server-3"],
+      processLiveness: {
+        "5678": { alive: true, commandLine: null },
+      },
+      listenPorts: {},
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("verified-conditions")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      excludedObservations: readonly { path: string; basis: string }[];
+    };
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 5678"),
+      ),
+    ).toBe(true);
+    expect(
+      reconciliation.excludedObservations.some(
+        (e) => e.basis === "ledger-entry-attribute-attribution",
+      ),
+    ).toBe(false);
+    expect(reconciliation.permitted).toBe(false);
+  });
+
+  test("実経路: 同一commandLineのentityが複数ある場合は一意に帰属できず両方ともunregistered検出を維持する（曖昧帰属の拒否）", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({
+          id: "vr-3928-ambiguous-1",
+          kind: "dedicated-process",
+          location: "<repo>/tmp-area/verify-worker",
+          identifiers: {
+            path: "<repo>/tmp-area/verify-worker",
+            pid: "1234",
+            commandLine: "verify-worker",
+          },
+        }),
+      ]),
+      missingPaths: ["<repo>/tmp-area/verify-worker"],
+      processLiveness: {
+        "5678": { alive: true, commandLine: "verify-worker" },
+        "5679": { alive: true, commandLine: "verify-worker" },
+      },
+      listenPorts: {},
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("verified-conditions")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      excludedObservations: readonly { path: string; basis: string }[];
+    };
+    for (const pid of ["5678", "5679"]) {
+      expect(
+        reconciliation.findings.some(
+          (f) => f.code === "unregistered-resource" && f.detail.includes(`pid ${pid}`),
+        ),
+      ).toBe(true);
+    }
+    expect(
+      reconciliation.excludedObservations.some(
+        (e) => e.basis === "ledger-entry-attribute-attribution",
+      ),
+    ).toBe(false);
+    expect(reconciliation.permitted).toBe(false);
+  });
+
+  test("実経路: 同一属性を記録した台帳エントリが複数ある場合はどちらにも帰属せずunregistered検出を維持する（台帳エントリ間の排他帰属）", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({
+          id: "vr-3928-exclusive-a",
+          kind: "dedicated-process",
+          location: "<repo>/tmp-area/verify-worker-a",
+          identifiers: { path: "<repo>/tmp-area/verify-worker-a", pid: "1234", commandLine: "verify-worker" },
+        }),
+        ledgerEntryJson({
+          id: "vr-3928-exclusive-b",
+          kind: "dedicated-process",
+          location: "<repo>/tmp-area/verify-worker-b",
+          identifiers: { path: "<repo>/tmp-area/verify-worker-b", pid: "9999", commandLine: "verify-worker" },
+        }),
+      ]),
+      missingPaths: ["<repo>/tmp-area/verify-worker-a", "<repo>/tmp-area/verify-worker-b"],
+      processLiveness: {
+        "5678": { alive: true, commandLine: "verify-worker" },
+      },
+      listenPorts: {},
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("verified-conditions")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      excludedObservations: readonly { path: string; basis: string }[];
+    };
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 5678"),
+      ),
+    ).toBe(true);
+    expect(
+      reconciliation.excludedObservations.some(
+        (e) => e.basis === "ledger-entry-attribute-attribution",
+      ),
+    ).toBe(false);
+    expect(reconciliation.permitted).toBe(false);
+  });
+
+  test("実経路: entity形根拠の属性識別（process:commandLine=…）は正規化後値完全一致かつ一意一致のentityのみ消費し、不一致entityはunregistered検出を維持する", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      processLiveness: {
+        "37940": { alive: true, commandLine: "外部共有 runtime process（根拠付き）" },
+        "38944": { alive: true, commandLine: "根拠のない外部 process" },
+      },
+      listenPorts: {},
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("verified-conditions")],
+        verificationResourceCheck: {
+          ...baseCheck,
+          observationExclusionGrounds: [
+            {
+              path: "process:commandLine=外部共有 runtime process（根拠付き）",
+              kind: "attribution",
+              basis: "本件外共有 runtime process の帰属根拠（機械確認可能な記録参照）",
+            },
+          ],
+        },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      excludedObservations: readonly { path: string; basis: string }[];
+    };
+    expect(
+      reconciliation.excludedObservations.some(
+        (e) => e.path === "process:pid=37940" && e.basis === "unrelated-shared-resource-attribution",
+      ),
+    ).toBe(true);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 38944"),
+      ),
+    ).toBe(true);
+    expect(reconciliation.permitted).toBe(false);
+  });
+
+  test("実経路: entity形根拠の属性識別は一致entityが複数では消費せず両方ともunregistered検出を維持する（属性一括除外の拒否）", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      processLiveness: {
+        "5678": { alive: true, commandLine: "dup-worker" },
+        "5679": { alive: true, commandLine: "dup-worker" },
+      },
+      listenPorts: {},
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("verified-conditions")],
+        verificationResourceCheck: {
+          ...baseCheck,
+          observationExclusionGrounds: [
+            { path: "process:commandLine=dup-worker", kind: "attribution", basis: "本件外共有 worker の帰属根拠" },
+          ],
+        },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      excludedObservations: readonly { path: string; basis: string }[];
+    };
+    for (const pid of ["5678", "5679"]) {
+      expect(
+        reconciliation.findings.some(
+          (f) => f.code === "unregistered-resource" && f.detail.includes(`pid ${pid}`),
+        ),
+      ).toBe(true);
+    }
+    expect(
+      reconciliation.excludedObservations.some(
+        (e) => e.basis === "unrelated-shared-resource-attribution",
+      ),
+    ).toBe(false);
+    expect(reconciliation.permitted).toBe(false);
   });
 });
