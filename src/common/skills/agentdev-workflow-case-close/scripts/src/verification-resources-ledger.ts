@@ -37,6 +37,19 @@ export const VERIFICATION_RESOURCE_OWNERSHIPS = ["parent", "child", "common"] as
 export type VerificationResourceOwnership = (typeof VERIFICATION_RESOURCE_OWNERSHIPS)[number];
 
 /**
+ * 台帳記録の基準（記録がどの契約経路で成立したかの区別）。
+ * "creation-time-machine-registration" は作成入口（作成ヘルパー）の作成時機械登録。
+ * "evidenced-occurrence-record" は既存実在物の実証された発生事実としての後追い記録
+ * （作成時機械登録があった形で表示しない）。
+ */
+export const REGISTRATION_BASES = [
+  "creation-time-machine-registration",
+  "evidenced-occurrence-record",
+] as const;
+
+export type RegistrationBasis = (typeof REGISTRATION_BASES)[number];
+
+/**
  * 削除確認の記録（利用者の明示確認の台帳追跡実体）。
  * source は user-explicit のみを許容する（実行担当が生成した approval 等の
  * 機械可読値は利用者確認として台帳へ記録しない）。
@@ -74,6 +87,8 @@ export interface VerificationResourceEntry {
   recordedBy: string;
   /** 作成時刻（ISO 8601）。 */
   createdAt: string;
+  /** 台帳記録の基準（作成時機械登録 / 既存実在物の発生事実としての後追い記録）。 */
+  registrationBasis: RegistrationBasis;
   /** 回収済み時刻（未回収は null）。削除実行は回収記録（collectedAt）と削除確認記録（deletionConfirmation）の対で扱う。 */
   collectedAt: string | null;
   /** 削除確認の記録（回収が削除を伴う場合の利用者明示確認。記録がない場合は省略または null。旧形式の台帳との互換のため省略可能）。 */
@@ -237,6 +252,17 @@ function parseEntry(raw: unknown, seenIds: Set<string>): VerificationResourceEnt
   }
   const recordedBy = requiredString("recordedBy");
   const createdAt = requiredString("createdAt");
+  const registrationBasis = v.registrationBasis;
+  if (registrationBasis === undefined) {
+    // 旧形式の台帳（registrationBasis 記述のない既存行）は作成時機械登録入口経由の
+    // 記録として読む（後追い記録入口は registrationBasis を必ず書くため、不在＝旧形式）。
+  } else if (
+    !(REGISTRATION_BASES as readonly string[]).includes(registrationBasis as string)
+  ) {
+    throw new LedgerFormatError(
+      `ledger entry.registrationBasis must be one of: ${REGISTRATION_BASES.join(", ")} (got: ${String(registrationBasis)})`,
+    );
+  }
   const collectedAt = v.collectedAt;
   if (collectedAt !== null && !isNonEmptyString(collectedAt)) {
     throw new LedgerFormatError("ledger entry.collectedAt must be a non-empty string or null");
@@ -253,6 +279,10 @@ function parseEntry(raw: unknown, seenIds: Set<string>): VerificationResourceEnt
     childIssue,
     recordedBy,
     createdAt,
+    registrationBasis:
+      registrationBasis === undefined
+        ? "creation-time-machine-registration"
+        : (registrationBasis as RegistrationBasis),
     collectedAt: collectedAt as string | null,
     ...(deletionConfirmation !== undefined ? { deletionConfirmation } : {}),
   };
@@ -453,6 +483,7 @@ export function validateRegistrationInput(input: unknown): VerificationResourceR
 export function appendEntry(
   entries: readonly VerificationResourceEntry[],
   input: VerificationResourceRegistrationInput,
+  registrationBasis: RegistrationBasis = "creation-time-machine-registration",
 ): { entry: VerificationResourceEntry; entries: VerificationResourceEntry[] } {
   const existingIds = new Set(entries.map((entry) => entry.id));
   let seq = entries.length + 1;
@@ -472,9 +503,31 @@ export function appendEntry(
     childIssue: input.childIssue,
     recordedBy: input.recordedBy,
     createdAt: input.createdAt,
+    registrationBasis,
     collectedAt: null,
   };
   return { entry, entries: [...entries, entry] };
+}
+
+/**
+ * 過去生成物の実証された発生事実としての台帳追記（後追い記録入口）。
+ * 既存実在物の所在記録であり新規作成ではないため、作成先確認（新規作成の作成先拒否）は
+ * 実施しない。registrationBasis は固定で evidenced-occurrence-record を付与し、
+ * 作成時機械登録があった形での記録をしない（発生事実の誠実な表現）。
+ * 台帳不在の案件では新規台帳を作成して追記する（registerResource と同一の保存先契約）。
+ */
+export function recordOccurrenceFact(
+  io: LedgerIo,
+  mainRepoRoot: string,
+  input: VerificationResourceRegistrationInput,
+): { ok: true; ledgerPath: string; entryId: string; entryCount: number } {
+  const validated = validateRegistrationInput(input);
+  const ledgerPath = resolveLedgerPath(mainRepoRoot, validated.caseId);
+  const read = readLedger(io, ledgerPath);
+  const { entry, entries } = appendEntry(read.entries, validated, "evidenced-occurrence-record");
+  io.mkdirRecursive(path.dirname(ledgerPath));
+  io.writeTextFile(ledgerPath, serializeLedger(entries));
+  return { ok: true, ledgerPath, entryId: entry.id, entryCount: entries.length };
 }
 
 /**
@@ -502,7 +555,11 @@ export function registerResource(
   }
   const ledgerPath = resolveLedgerPath(mainRepoRoot, validated.caseId);
   const read = readLedger(io, ledgerPath);
-  const { entry, entries } = appendEntry(read.entries, validated);
+  const { entry, entries } = appendEntry(
+    read.entries,
+    validated,
+    "creation-time-machine-registration",
+  );
   io.mkdirRecursive(path.dirname(ledgerPath));
   io.writeTextFile(ledgerPath, serializeLedger(entries));
   return { ok: true, ledgerPath, entryId: entry.id, entryCount: entries.length };
