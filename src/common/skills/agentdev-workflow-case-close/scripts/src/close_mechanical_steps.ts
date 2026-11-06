@@ -1176,6 +1176,28 @@ function isUrlLocation(location: string): boolean {
   return ABSOLUTE_URL_LOCATION_PATTERN.test(location) || SCP_LIKE_URL_LOCATION_PATTERN.test(location);
 }
 
+/** ECMAScript Date が表現できる最大時刻の絶対値（±8640000000000000 ms）。 */
+const MAX_REPRESENTABLE_DATE_MILLIS = 8640000000000000;
+
+/**
+ * 観測プロセスの startedAt をミリ秒へパースする（欠落・パース不能・日時として無効は null）。
+ * 自己子孫閉包の時系列検証の fail-closed 入力とする。
+ * Microsoft JSON datetime（/Date(epoch-ms)/、PowerShell ConvertTo-Json 出力）は
+ * epoch ミリ秒として厳密に解釈し、非有限または ECMAScript Date 表現可能範囲外の値は
+ * 有効な日時と解釈せず null を返す（fail-closed）。それ以外は Date.parse（ISO 等）に委ねる。
+ */
+function parseObservationStartedAtMillis(proc: { startedAt?: string }): number | null {
+  if (proc.startedAt === undefined) return null;
+  const microsoftJsonDateMatch = /^\/Date\((\d+)\)\/$/.exec(proc.startedAt);
+  if (microsoftJsonDateMatch !== null) {
+    const millis = Number(microsoftJsonDateMatch[1]);
+    if (!Number.isFinite(millis) || Math.abs(millis) > MAX_REPRESENTABLE_DATE_MILLIS) return null;
+    return millis;
+  }
+  const parsed = Date.parse(proc.startedAt);
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
 /** 台帳エントリの識別情報と観測識別情報の交差突合（観測に存在するキーのみ比較）。 */
 export function evaluateIdentifierMatch(
   entryIdentifiers: Record<string, string>,
@@ -1196,6 +1218,26 @@ export function evaluateIdentifierMatch(
  * 除外の反例（6677451423）により帰属確認属性に含めない）。
  */
 const PROCESS_ATTRIBUTION_KEYS = ["commandLine", "cwd", "startedAt"] as const;
+
+/**
+ * 帰属確認属性のうち FS パスとして扱う属性。cwd のみ FS パス属性とし、FS 正規化
+ * （normalizeObservationPath）を適用した比較を維持する。commandLine と startedAt は
+ * FS パスでないため値を正規化せず verbatim 比較する（反例6679155719: commandLine 引数値
+ * `--label=case/` と `--label=case` を FS 正規化で同一視すると、引数値が異なる別 entity を
+ * 誤消費・誤帰属して未登録検出を取りこぼす。台帳帰属と属性識別根拠消費の両経路で
+ * 同一の属性種別ごとの比較を適用する）。
+ */
+const PATH_KIND_ATTRIBUTION_KEYS: ReadonlySet<string> = new Set(["cwd"]);
+
+/** 属性種別に応じた値の正規化（FS パス属性のみ FS 正規化、それ以外は verbatim）。 */
+function normalizeAttributionValue(attributeKey: string, value: string): string {
+  return PATH_KIND_ATTRIBUTION_KEYS.has(attributeKey) ? normalizeObservationPath(value) : value;
+}
+
+/** 属性種別に応じた値の一致判定（FS パス属性は正規化後比較、それ以外は verbatim 完全一致）。 */
+function attributionValuesEqual(attributeKey: string, left: string, right: string): boolean {
+  return normalizeAttributionValue(attributeKey, left) === normalizeAttributionValue(attributeKey, right);
+}
 
 /**
  * 台帳エントリと観測プロセスの属性帰属確認（PID churn 耐性）。観測に台帳記録の pid が
@@ -1234,11 +1276,18 @@ export function deriveLedgerProcessAttribution(
         return actual !== undefined && actual !== null;
       });
       if (comparableKeys.length === 0) continue;
+      // cwd 単独の比較可能キーでは帰属させない（cwd は共有リソースで一意帰属の根拠に
+      // ならない。同一 cwd の無関係プロセスへ誤帰属する反例〔6678971153・synthetic-E相当〕
+      // により、観測できない属性の欠落を cwd での合格へ置換しない fail-closed）。
+      if (comparableKeys.every((key) => key === "cwd")) continue;
       const covered = comparableKeys.every((key) => {
         const actual = proc[key];
         const recorded: string | undefined = entry.identifiers[key];
         if (actual === undefined || actual === null || recorded === undefined) return false;
-        return normalizeObservationPath(actual) === normalizeObservationPath(recorded);
+        // 属性種別ごとの比較（cwd は FS 正規化後比較、commandLine・startedAt は verbatim
+        // 完全一致。FS 正規化を commandLine 引数値へ適用すると末尾 / 等が剥がれて別引数値の
+        // 別 entity を同一視する反例6679155719を、属性識別根拠消費経路と同一の比較で避ける）。
+        return attributionValuesEqual(key, actual, recorded);
       });
       if (covered) matchedPids.push(pid);
     }
@@ -1545,7 +1594,7 @@ export function evaluateObservationEntityConsumption(
   knownResidualEntries: readonly KnownResidualEntry[],
   knownResidualReportedLocations: readonly string[],
   options: {
-    /** entity 形（process:pid=… / listen:port=… / process:<attr>=…）の観測除外根拠入力（FS 実体とは別に、正規化後の完全一致でのみ消費する）。 */
+    /** entity 形（process:pid=… / listen:port=… / process:<attr>=…）の観測除外根拠入力（FS 実体とは別に、pid・listen 指定は正規化後の完全一致、属性識別形は生値解析と属性種別ごとの比較でのみ消費する）。 */
     observationExclusionGrounds?: readonly ObservationExclusionGround[];
     /** 機械工程自身の process id（検査実行実行時プロセスの自己除外の起点。未指定時は自己除外を適用しない）。 */
     selfProcessId?: number;
@@ -1570,28 +1619,32 @@ export function evaluateObservationEntityConsumption(
       .filter((listenPort): listenPort is string => listenPort !== undefined),
   );
   const ledgerUrls = new Set(entries.map((entry) => entry.location));
-  // entity 形根拠（process:pid=… / listen:port=… / process:<attr>=…）の正規化。疑似スキーマ
-  // 所在は FS パスでないため resolve せず正規化のみで完全一致照合する（FS 実体の根拠は
-  // attachObservationExclusionGrounds が resolveBase で解決する。消費条件は FS と同一:
-  // role は official-artifact のみ、attribution は非空根拠）。
+  // entity 形根拠（process:pid=… / listen:port=… / process:<attr>=…）の正規化。pid・listen
+  // 指定の疑似スキーマ所在と FS 実体の根拠は正規化後の完全一致で照合する（FS パスでないため
+  // resolve せず正規化のみ。FS 実体の根拠は attachObservationExclusionGrounds が resolveBase
+  // で解決する。消費条件は FS と同一: role は official-artifact のみ、attribution は非空根拠）。
+  // 属性識別形（process:<attr>=<value>）は正規化せず生値から解析する（下記参照）。
   const normalizedEntityGrounds = (options.observationExclusionGrounds ?? []).map((ground) => ({
     ground,
     normalized: normalizeObservationPath(ground.path),
   }));
-  // 属性識別形（process:<attr>=<value>）の解析。attr は帰属確認属性（commandLine・cwd・
-  // startedAt）に限る。値は最初の = 以降全体を取り、正規化後値の完全一致で観測 entity を
-  // 特定する。一致 entity が一意に 1 つのときだけ消費し、0・2 以上は曖昧として消費しない
-  // （per-entity・一括除外なしの fail-closed。ground の pid 指定 process:pid=… は完全一致
-  // 経路が処理し、attr=pid はこの解析の対象外）。
+  // 属性識別形（process:<attr>=<value>）の解析。正規化前の生値から先に解析する（根拠文字列
+  // 全体や commandLine 値に FS 正規化を適用すると、引数値の末尾 / 等が剥がれて引数値の異なる
+  // 別 entity を同一視する反例6679155719を避ける）。attr は帰属確認属性（commandLine・cwd・
+  // startedAt）に限る。値は最初の = 以降全体を取り、比較は属性種別ごとの契約
+  // （attributionValuesEqual: cwd のみ FS 正規化後比較、commandLine・startedAt は verbatim
+  // 完全一致。台帳帰属経路と同一）で行う。一致 entity が一意に 1 つのときだけ消費し、0・
+  // 2 以上は曖昧として消費しない（per-entity・一括除外なしの fail-closed。ground の pid 指定
+  // process:pid=… は完全一致経路が処理し、attr=pid はこの解析の対象外）。
   const parseEntityAttributeGround = (
-    normalized: string,
+    raw: string,
   ): { attr: (typeof PROCESS_ATTRIBUTION_KEYS)[number]; value: string } | null => {
-    if (!normalized.startsWith("process:")) return null;
-    const separator = normalized.indexOf("=", "process:".length);
+    if (!raw.startsWith("process:")) return null;
+    const separator = raw.indexOf("=", "process:".length);
     if (separator === -1) return null;
-    const attr = normalized.slice("process:".length, separator);
+    const attr = raw.slice("process:".length, separator);
     if (!(PROCESS_ATTRIBUTION_KEYS as readonly string[]).includes(attr)) return null;
-    return { attr: attr as (typeof PROCESS_ATTRIBUTION_KEYS)[number], value: normalized.slice(separator + 1) };
+    return { attr: attr as (typeof PROCESS_ATTRIBUTION_KEYS)[number], value: raw.slice(separator + 1) };
   };
   const findEntityGroundExclusion = (entityPath: string): string | null => {
     const normalized = normalizeObservationPath(entityPath);
@@ -1607,23 +1660,24 @@ export function evaluateObservationEntityConsumption(
     if (attributionGround !== undefined && attributionGround.ground.basis.trim().length > 0) {
       return "unrelated-shared-resource-attribution";
     }
-    for (const entry of normalizedEntityGrounds) {
-      if (entry.ground.basis.trim().length === 0) continue;
-      const attributeGround = parseEntityAttributeGround(entry.normalized);
+    for (const { ground } of normalizedEntityGrounds) {
+      if (ground.basis.trim().length === 0) continue;
+      const attributeGround = parseEntityAttributeGround(ground.path);
       if (attributeGround === null) continue;
       const matchingPids: string[] = [];
       for (const [pid, proc] of Object.entries(observation.processes)) {
         if (!proc.alive) continue;
         const actual = proc[attributeGround.attr];
         if (actual === undefined || actual === null) continue;
-        if (normalizeObservationPath(actual) === attributeGround.value) matchingPids.push(pid);
+        if (!attributionValuesEqual(attributeGround.attr, actual, attributeGround.value)) continue;
+        matchingPids.push(pid);
       }
       if (matchingPids.length !== 1) continue;
       if (matchingPids[0] !== normalizeObservationPath(entityPath).replace(/^process:pid=/, "")) continue;
-      if (entry.ground.kind === "role" && entry.ground.role === "official-artifact") {
+      if (ground.kind === "role" && ground.role === "official-artifact") {
         return "official-artifact-role-basis";
       }
-      if (entry.ground.kind === "attribution") {
+      if (ground.kind === "attribution") {
         return "unrelated-shared-resource-attribution";
       }
     }
@@ -1632,7 +1686,13 @@ export function evaluateObservationEntityConsumption(
   // 検査実行自身の実行時プロセスの自己除外（検査実行の書出し実体＝除外根拠(1)。終了判定
   // 記録の特定実体除外と同一契約の特定実体除外であって汎用除外ではない）。機械工程自身の
   // pid と、観測された親子関係からその子孫として機械導出される実体に限り適用する（観測に
-  // parentPid がなく子孫を導出できない pid は除外しない fail-closed）。
+  // parentPid がなく子孫を導出できない pid は除外しない fail-closed）。子孫の追加は
+  // parentPid 一致に加えて時系列検証を要する（Microsoft Win32_Process では ParentProcessId は
+  // PID 再利用により別プロセスを指し得るため、CreationDate 比較が「親が子より後に作成された」
+  // 矛盾を検出できる）。親子双方の startedAt が取得でき親が子より後に起動していない
+  // （parentStartedAt <= childStartedAt）ときだけ子孫と認め、欠落・パース不能・矛盾
+  // （子が親より早い）は自己除外に通さない（parentPid 一致だけの閉包追加〔反例6678971153〕と
+  // 親配下一括除外〔反例6677451423〕の再採用を避ける）。
   const selfProcessIds = new Set<string>();
   if (typeof options.selfProcessId === "number") {
     selfProcessIds.add(String(options.selfProcessId));
@@ -1641,10 +1701,15 @@ export function evaluateObservationEntityConsumption(
       changed = false;
       for (const [pid, proc] of Object.entries(observation.processes)) {
         if (selfProcessIds.has(pid)) continue;
-        if (proc.parentPid !== undefined && selfProcessIds.has(proc.parentPid)) {
-          selfProcessIds.add(pid);
-          changed = true;
-        }
+        if (proc.parentPid === undefined || !selfProcessIds.has(proc.parentPid)) continue;
+        const parentProcess = observation.processes[proc.parentPid];
+        const parentStartedAt =
+          parentProcess === undefined ? null : parseObservationStartedAtMillis(parentProcess);
+        const childStartedAt = parseObservationStartedAtMillis(proc);
+        if (parentStartedAt === null || childStartedAt === null) continue;
+        if (parentStartedAt > childStartedAt) continue;
+        selfProcessIds.add(pid);
+        changed = true;
       }
     }
   }
