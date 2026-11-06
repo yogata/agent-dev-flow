@@ -101,6 +101,8 @@ export interface MechanicalRunner {
   gitCommonDir?(): string;
   /** 回収実行面（台帳回収・終了判定記録回収）で使用するファイル削除。未提供時は回収ステップを fail で報告する。 */
   deleteFile?(absolutePath: string): void;
+  /** 機械工程自身の process id（検査実行実行時プロセスの自己除外の特定実体導出に使用）。未提供時は自己除外を適用しない。 */
+  processId?(): number;
 }
 
 export interface GateCommandSpec {
@@ -985,7 +987,10 @@ export interface VerificationResourceObservation {
   /** (b) branch列挙。 */
   branches: readonly string[];
   /** (c) プロセス生存観測結果（実物側網羅列挙の観測値。cwd・開始時刻は正規形の観測で取得できた場合に保持）。 */
-  processes: Record<string, { alive: boolean; commandLine: string | null; cwd?: string; startedAt?: string }>;
+  processes: Record<
+    string,
+    { alive: boolean; commandLine: string | null; cwd?: string; startedAt?: string; parentPid?: string }
+  >;
   /** listenポート確認結果。 */
   listenPorts: Record<string, { listening: boolean }>;
   /** (b) remote不存在判定入力（URLごと。remote列挙に現れない台帳remoteの不存在判定に使用）。 */
@@ -1443,12 +1448,20 @@ export function evaluateObservationEntityConsumption(
   entries: readonly VerificationResourceEntry[],
   knownResidualEntries: readonly KnownResidualEntry[],
   knownResidualReportedLocations: readonly string[],
+  options: {
+    /** entity 形（process:pid=… / listen:port=…）の観測除外根拠入力（FS 実体とは別に、正規化後の完全一致でのみ消費する）。 */
+    observationExclusionGrounds?: readonly ObservationExclusionGround[];
+    /** 機械工程自身の process id（検査実行実行時プロセスの自己除外の起点。未指定時は自己除外を適用しない）。 */
+    selfProcessId?: number;
+  } = {},
 ): {
   findings: readonly ResourceReconciliationFinding[];
   knownResidualStillPresent: readonly string[];
+  excludedObservations: readonly { path: string; basis: string }[];
 } {
   const findings: ResourceReconciliationFinding[] = [];
   const knownResidualStillPresent: string[] = [];
+  const excludedObservations: { path: string; basis: string }[] = [];
   const reportedLocations = new Set(knownResidualReportedLocations);
   const ledgerPids = new Set(
     entries.map((entry) => entry.identifiers.pid).filter((pid): pid is string => pid !== undefined),
@@ -1459,6 +1472,49 @@ export function evaluateObservationEntityConsumption(
       .filter((listenPort): listenPort is string => listenPort !== undefined),
   );
   const ledgerUrls = new Set(entries.map((entry) => entry.location));
+  // entity 形根拠（process:pid=… / listen:port=…）の正規化。疑似スキーマ所在は FS パスで
+  // ないため resolve せず正規化のみで完全一致照合する（FS 実体の根拠は
+  // attachObservationExclusionGrounds が resolveBase で解決する。消費条件は FS と同一:
+  // role は official-artifact のみ、attribution は非空根拠）。
+  const normalizedEntityGrounds = (options.observationExclusionGrounds ?? []).map((ground) => ({
+    ground,
+    normalized: normalizeObservationPath(ground.path),
+  }));
+  const findEntityGroundExclusion = (entityPath: string): string | null => {
+    const normalized = normalizeObservationPath(entityPath);
+    const roleGround = normalizedEntityGrounds.find(
+      (entry) => entry.ground.kind === "role" && entry.normalized === normalized,
+    );
+    if (roleGround !== undefined && roleGround.ground.role === "official-artifact" && roleGround.ground.basis.trim().length > 0) {
+      return "official-artifact-role-basis";
+    }
+    const attributionGround = normalizedEntityGrounds.find(
+      (entry) => entry.ground.kind === "attribution" && entry.normalized === normalized,
+    );
+    if (attributionGround !== undefined && attributionGround.ground.basis.trim().length > 0) {
+      return "unrelated-shared-resource-attribution";
+    }
+    return null;
+  };
+  // 検査実行自身の実行時プロセスの自己除外（検査実行の書出し実体＝除外根拠(1)。終了判定
+  // 記録の特定実体除外と同一契約の特定実体除外であって汎用除外ではない）。機械工程自身の
+  // pid と、観測された親子関係からその子孫として機械導出される実体に限り適用する（観測に
+  // parentPid がなく子孫を導出できない pid は除外しない fail-closed）。
+  const selfProcessIds = new Set<string>();
+  if (typeof options.selfProcessId === "number") {
+    selfProcessIds.add(String(options.selfProcessId));
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const [pid, proc] of Object.entries(observation.processes)) {
+        if (selfProcessIds.has(pid)) continue;
+        if (proc.parentPid !== undefined && selfProcessIds.has(proc.parentPid)) {
+          selfProcessIds.add(pid);
+          changed = true;
+        }
+      }
+    }
+  }
   const knownPids = new Set<string>();
   const knownListenPorts = new Set<string>();
   const knownUrls = new Set<string>();
@@ -1539,6 +1595,15 @@ export function evaluateObservationEntityConsumption(
   for (const [pid, processObservation] of Object.entries(observation.processes)) {
     if (ledgerPids.has(pid) || knownPids.has(pid)) continue;
     if (!processObservation.alive) continue;
+    if (selfProcessIds.has(pid)) {
+      excludedObservations.push({ path: `process:pid=${pid}`, basis: "inspection-execution-runtime-process-self" });
+      continue;
+    }
+    const entityExclusion = findEntityGroundExclusion(`process:pid=${pid}`);
+    if (entityExclusion !== null) {
+      excludedObservations.push({ path: `process:pid=${pid}`, basis: entityExclusion });
+      continue;
+    }
     const detailParts = [`pid ${pid}`];
     if (processObservation.commandLine !== null && processObservation.commandLine !== undefined) {
       detailParts.push(`commandLine: ${processObservation.commandLine}`);
@@ -1557,6 +1622,11 @@ export function evaluateObservationEntityConsumption(
   for (const [port, portObservation] of Object.entries(observation.listenPorts)) {
     if (ledgerListenPorts.has(port) || knownListenPorts.has(port)) continue;
     if (!portObservation.listening) continue;
+    const entityExclusion = findEntityGroundExclusion(`listen:port=${port}`);
+    if (entityExclusion !== null) {
+      excludedObservations.push({ path: `listen:port=${port}`, basis: entityExclusion });
+      continue;
+    }
     findings.push({
       code: "unregistered-resource",
       detail: `no ledger record or known residual entry covers the observed listening port: ${port}`,
@@ -1571,7 +1641,7 @@ export function evaluateObservationEntityConsumption(
       detail: `no ledger record or known residual entry covers the observed remote target and its absence could not be confirmed: ${url} (${judgement.basis})`,
     });
   }
-  return { findings, knownResidualStillPresent };
+  return { findings, knownResidualStillPresent, excludedObservations };
 }
 
 /**
@@ -1583,6 +1653,7 @@ export function evaluateVerificationResourceReconciliation(
   ledger: LedgerReadResult,
   observation: VerificationResourceObservation,
   check: VerificationResourceCheck,
+  options: { selfProcessId?: number } = {},
 ): VerificationResourceReconciliationEvaluation {
   const findings: ResourceReconciliationFinding[] = [];
   const uncollectedParentOrCommon: { id: string; ownership: VerificationResourceOwnership }[] = [];
@@ -1685,6 +1756,10 @@ export function evaluateVerificationResourceReconciliation(
     ledger.entries,
     check.knownResidualEntries,
     unregistered.knownResidualReportedLocations,
+    {
+      observationExclusionGrounds: check.observationExclusionGrounds,
+      selfProcessId: options.selfProcessId,
+    },
   );
   findings.push(...entityConsumption.findings);
 
@@ -1696,7 +1771,10 @@ export function evaluateVerificationResourceReconciliation(
     uncollectedParentOrCommon,
     terminationUnitBlocked: uncollectedParentOrCommon.length > 0,
     permitted: findings.length === 0,
-    excludedObservations: unregistered.excludedObservations,
+    excludedObservations: [
+      ...unregistered.excludedObservations,
+      ...entityConsumption.excludedObservations,
+    ],
     knownResidualStillPresent: [
       ...unregistered.knownResidualStillPresent,
       ...entityConsumption.knownResidualStillPresent,
@@ -2663,6 +2741,7 @@ function executeVerificationResourceReconciliation(
             commandLine: typeof value.commandLine === "string" ? value.commandLine : null,
             ...(typeof value.cwd === "string" ? { cwd: value.cwd } : {}),
             ...(typeof value.startedAt === "string" ? { startedAt: value.startedAt } : {}),
+            ...(typeof value.parentPid === "string" ? { parentPid: value.parentPid } : {}),
           };
         }
       }
@@ -2754,7 +2833,9 @@ function executeVerificationResourceReconciliation(
   };
   const evaluation =
     earlyFindings.length === 0
-      ? evaluateVerificationResourceReconciliation(ledger, resourceObservation, check)
+      ? evaluateVerificationResourceReconciliation(ledger, resourceObservation, check, {
+          selfProcessId: runner.processId?.(),
+        })
       : null;
   const gaps = deriveAcceptanceGaps(
     buildAcceptanceControlObservation(input, check, ledger, mainRepoRoot, observationFailures, resourceObservation, runner),
@@ -3461,6 +3542,9 @@ function main(): void {
       },
       sleep(ms) {
         Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+      },
+      processId() {
+        return process.pid;
       },
     };
     const report = runCloseMechanicalSteps(normalized, runner);
