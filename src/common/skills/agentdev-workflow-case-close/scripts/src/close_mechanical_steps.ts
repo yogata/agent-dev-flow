@@ -1176,6 +1176,16 @@ function isUrlLocation(location: string): boolean {
   return ABSOLUTE_URL_LOCATION_PATTERN.test(location) || SCP_LIKE_URL_LOCATION_PATTERN.test(location);
 }
 
+/**
+ * 観測プロセスの startedAt をミリ秒へパースする（欠落・パース不能は null）。
+ * 自己子孫閉包の時系列検証の fail-closed 入力とする。
+ */
+function parseObservationStartedAtMillis(proc: { startedAt?: string }): number | null {
+  if (proc.startedAt === undefined) return null;
+  const parsed = Date.parse(proc.startedAt);
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
 /** 台帳エントリの識別情報と観測識別情報の交差突合（観測に存在するキーのみ比較）。 */
 export function evaluateIdentifierMatch(
   entryIdentifiers: Record<string, string>,
@@ -1234,6 +1244,10 @@ export function deriveLedgerProcessAttribution(
         return actual !== undefined && actual !== null;
       });
       if (comparableKeys.length === 0) continue;
+      // cwd 単独の比較可能キーでは帰属させない（cwd は共有リソースで一意帰属の根拠に
+      // ならない。同一 cwd の無関係プロセスへ誤帰属する反例〔6678971153・synthetic-E相当〕
+      // により、観測できない属性の欠落を cwd での合格へ置換しない fail-closed）。
+      if (comparableKeys.every((key) => key === "cwd")) continue;
       const covered = comparableKeys.every((key) => {
         const actual = proc[key];
         const recorded: string | undefined = entry.identifiers[key];
@@ -1632,7 +1646,13 @@ export function evaluateObservationEntityConsumption(
   // 検査実行自身の実行時プロセスの自己除外（検査実行の書出し実体＝除外根拠(1)。終了判定
   // 記録の特定実体除外と同一契約の特定実体除外であって汎用除外ではない）。機械工程自身の
   // pid と、観測された親子関係からその子孫として機械導出される実体に限り適用する（観測に
-  // parentPid がなく子孫を導出できない pid は除外しない fail-closed）。
+  // parentPid がなく子孫を導出できない pid は除外しない fail-closed）。子孫の追加は
+  // parentPid 一致に加えて時系列検証を要する（Microsoft Win32_Process では ParentProcessId は
+  // PID 再利用により別プロセスを指し得るため、CreationDate 比較が「親が子より後に作成された」
+  // 矛盾を検出できる）。親子双方の startedAt が取得でき親が子より後に起動していない
+  // （parentStartedAt <= childStartedAt）ときだけ子孫と認め、欠落・パース不能・矛盾
+  // （子が親より早い）は自己除外に通さない（parentPid 一致だけの閉包追加〔反例6678971153〕と
+  // 親配下一括除外〔反例6677451423〕の再採用を避ける）。
   const selfProcessIds = new Set<string>();
   if (typeof options.selfProcessId === "number") {
     selfProcessIds.add(String(options.selfProcessId));
@@ -1641,10 +1661,15 @@ export function evaluateObservationEntityConsumption(
       changed = false;
       for (const [pid, proc] of Object.entries(observation.processes)) {
         if (selfProcessIds.has(pid)) continue;
-        if (proc.parentPid !== undefined && selfProcessIds.has(proc.parentPid)) {
-          selfProcessIds.add(pid);
-          changed = true;
-        }
+        if (proc.parentPid === undefined || !selfProcessIds.has(proc.parentPid)) continue;
+        const parentProcess = observation.processes[proc.parentPid];
+        const parentStartedAt =
+          parentProcess === undefined ? null : parseObservationStartedAtMillis(parentProcess);
+        const childStartedAt = parseObservationStartedAtMillis(proc);
+        if (parentStartedAt === null || childStartedAt === null) continue;
+        if (parentStartedAt > childStartedAt) continue;
+        selfProcessIds.add(pid);
+        changed = true;
       }
     }
   }
