@@ -1176,16 +1176,24 @@ function isUrlLocation(location: string): boolean {
   return ABSOLUTE_URL_LOCATION_PATTERN.test(location) || SCP_LIKE_URL_LOCATION_PATTERN.test(location);
 }
 
+/** ECMAScript Date が表現できる最大時刻の絶対値（±8640000000000000 ms）。 */
+const MAX_REPRESENTABLE_DATE_MILLIS = 8640000000000000;
+
 /**
- * 観測プロセスの startedAt をミリ秒へパースする（欠落・パース不能は null）。
+ * 観測プロセスの startedAt をミリ秒へパースする（欠落・パース不能・日時として無効は null）。
  * 自己子孫閉包の時系列検証の fail-closed 入力とする。
  * Microsoft JSON datetime（/Date(epoch-ms)/、PowerShell ConvertTo-Json 出力）は
- * epoch ミリ秒として厳密に解釈し、それ以外は Date.parse（ISO 等）に委ねる。
+ * epoch ミリ秒として厳密に解釈し、非有限または ECMAScript Date 表現可能範囲外の値は
+ * 有効な日時と解釈せず null を返す（fail-closed）。それ以外は Date.parse（ISO 等）に委ねる。
  */
 function parseObservationStartedAtMillis(proc: { startedAt?: string }): number | null {
   if (proc.startedAt === undefined) return null;
   const microsoftJsonDateMatch = /^\/Date\((\d+)\)\/$/.exec(proc.startedAt);
-  if (microsoftJsonDateMatch !== null) return Number(microsoftJsonDateMatch[1]);
+  if (microsoftJsonDateMatch !== null) {
+    const millis = Number(microsoftJsonDateMatch[1]);
+    if (!Number.isFinite(millis) || Math.abs(millis) > MAX_REPRESENTABLE_DATE_MILLIS) return null;
+    return millis;
+  }
   const parsed = Date.parse(proc.startedAt);
   return Number.isNaN(parsed) ? null : parsed;
 }
