@@ -139,6 +139,7 @@ function ledgerEntryJson(overrides: Partial<{
 
 function fakeRunner(overrides: {
   ghMergeable?: string;
+  ghPrState?: string;
   worktreeStatus?: string;
   contractStateStatus?: string;
   contractStateStatusExit?: number;
@@ -202,7 +203,11 @@ function fakeRunner(overrides: {
       calls.push({ command: spec.command, args: spec.args, cwd: spec.cwd });
       const result: CommandResult = { exitCode: 0, stdout: "", stderr: "" };
       if (spec.command === "gh") {
-        result.stdout = JSON.stringify({ mergeable: overrides.ghMergeable ?? "MERGEABLE" });
+        const ghPayload: { mergeable: string; state?: string } = {
+          mergeable: overrides.ghMergeable ?? "MERGEABLE",
+        };
+        if (overrides.ghPrState !== undefined) ghPayload.state = overrides.ghPrState;
+        result.stdout = JSON.stringify(ghPayload);
       }
       if (spec.command === "git" && spec.args[0] === "status") {
         result.stdout = spec.args.includes("--")
@@ -4412,5 +4417,259 @@ describe("commandLine属性値へのFS正規化不適用（反例6679155719・#3
       ),
     ).toBe(false);
     expect(reconciliation.permitted).toBe(false);
+  });
+});
+
+describe("案件作成範囲の母集団宣言（caseCreationScope）と範囲外 attribution-unknown 報告", () => {
+  const caseScope = {
+    caseIdentifiers: ["3928", "ru0255"],
+    scopeAndLimits: "検出できる範囲と限界の宣言文（attribution-unknown 報告へそのまま記録される）",
+  };
+
+  test("実経路: 宣言時、案件識別子を含まない範囲外の未知（FS・process・listen・remote）は attribution-unknown 報告のみで完了拒否にならない", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      gitignoredOutput: [
+        "node_modules/shared-lib/cache.bin",
+        ".agentdev/cache/other-run-artifact.json",
+      ].join("\n"),
+      processLiveness: {
+        "800": { alive: true, commandLine: "C:\\Windows\\System32\\svchost.exe -k netsvcs" },
+        "801": { alive: true, commandLine: null },
+      },
+      listenPorts: { "5354": { listening: true } },
+      remoteAbsenceInputs: {
+        "https://github.com/example/unrelated-verify-target": {
+          httpStatus404Observed: true,
+          authenticationConfirmed: true,
+          visibilityConfirmed: true,
+          targetIdConfirmed: true,
+        },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: { ...baseCheck, caseCreationScope: caseScope },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string }[];
+      attributionUnknown: {
+        declared: boolean;
+        caseIdentifiers: readonly string[];
+        scopeAndLimits: string | null;
+        entries: readonly { source: string; count: number; examples: readonly string[] }[];
+      };
+    };
+    expect(reconciliation.permitted).toBe(true);
+    expect(reconciliation.findings).toHaveLength(0);
+    expect(reconciliation.attributionUnknown.declared).toBe(true);
+    expect(reconciliation.attributionUnknown.caseIdentifiers).toEqual(["3928", "ru0255"]);
+    expect(reconciliation.attributionUnknown.scopeAndLimits).toBe(caseScope.scopeAndLimits);
+    const counts = Object.fromEntries(
+      reconciliation.attributionUnknown.entries.map((entry) => [entry.source, entry.count]),
+    );
+    expect(counts).toEqual({
+      "gitignored-output": 2,
+      "process-liveness": 2,
+      "listen-port-check": 1,
+      "remote-absence-verification": 1,
+    });
+    const fsEntry = reconciliation.attributionUnknown.entries.find(
+      (entry) => entry.source === "gitignored-output",
+    );
+    expect(fsEntry?.examples[0]).toContain("node_modules/shared-lib/cache.bin");
+    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+  });
+
+  test("実経路: 宣言時でも、案件識別子を含む範囲内の未登録（FS・process・remote）は従来どおり unregistered findings で完了を拒否する", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      gitignoredOutput: ".agentdev/tmp/case-3928-unregistered-helper.js\n",
+      processLiveness: {
+        "900": { alive: true, commandLine: "node .agentdev/tmp/case-3928-unregistered-helper.js" },
+      },
+      listenPorts: {},
+      remoteAbsenceInputs: {
+        "https://github.com/yogata/adf-ru0255-unregistered-verify": {
+          httpStatus404Observed: true,
+          authenticationConfirmed: true,
+          visibilityConfirmed: true,
+          targetIdConfirmed: true,
+        },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: { ...baseCheck, caseCreationScope: caseScope },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      attributionUnknown: { declared: boolean; entries: readonly unknown[] };
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(reconciliation.findings.filter((f) => f.code === "unregistered-resource")).toHaveLength(3);
+    expect(
+      reconciliation.findings.some((f) => f.detail.includes("case-3928-unregistered-helper.js")),
+    ).toBe(true);
+    expect(reconciliation.findings.some((f) => f.detail.includes("pid 900"))).toBe(true);
+    expect(
+      reconciliation.findings.some((f) => f.detail.includes("adf-ru0255-unregistered-verify")),
+    ).toBe(true);
+    expect(reconciliation.attributionUnknown.declared).toBe(true);
+    expect(reconciliation.attributionUnknown.entries).toHaveLength(0);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: 宣言時でも台帳不在は記録欠落として拒否され、既知残存リスト記載の実在物は存在する限り拒否理由となる（維持）", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerMissing: true,
+      osTempAreaMatches: ["<repo>/tmp-verify/adf-3928-known-residual"],
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: {
+          ...baseCheck,
+          knownResidualEntries: [
+            {
+              location: "<repo>/tmp-verify/adf-3928-known-residual",
+              identifiers: { path: "<repo>/tmp-verify/adf-3928-known-residual" },
+            },
+          ],
+          caseCreationScope: caseScope,
+        },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      ledgerState: string;
+      findings: readonly { code: string }[];
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(reconciliation.ledgerState).toBe("missing");
+    expect(reconciliation.findings.some((f) => f.code === "ledger-missing")).toBe(true);
+    expect(reconciliation.findings.some((f) => f.code === "known-residual-still-present")).toBe(true);
+  });
+
+  test("実経路: 宣言なしでは範囲外の未知も現行どおり unregistered findings として完了を拒否する（現行動作の維持）", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      gitignoredOutput: "node_modules/shared-lib/cache.bin\n",
+      processLiveness: {
+        "800": { alive: true, commandLine: "C:\\Windows\\System32\\svchost.exe -k netsvcs" },
+      },
+      listenPorts: { "5354": { listening: true } },
+      remoteAbsenceInputs: {
+        "https://github.com/example/unrelated-verify-target": {
+          httpStatus404Observed: true,
+          authenticationConfirmed: true,
+          visibilityConfirmed: true,
+          targetIdConfirmed: true,
+        },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string }[];
+      attributionUnknown: { declared: boolean; entries: readonly unknown[] };
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(reconciliation.findings.filter((f) => f.code === "unregistered-resource")).toHaveLength(4);
+    expect(reconciliation.attributionUnknown.declared).toBe(false);
+    expect(reconciliation.attributionUnknown.entries).toHaveLength(0);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("入力検証: caseCreationScope の空識別子・空宣言文は fail-closed で拒否する", () => {
+    const baseCheck = verificationResourceCheck();
+    expect(() =>
+      validateInput(
+        preMergeInput({
+          verificationResourceCheck: {
+            ...baseCheck,
+            caseCreationScope: { caseIdentifiers: [], scopeAndLimits: "宣言" },
+          },
+        }),
+      ),
+    ).toThrow(/caseIdentifiers/);
+    expect(() =>
+      validateInput(
+        preMergeInput({
+          verificationResourceCheck: {
+            ...baseCheck,
+            caseCreationScope: { caseIdentifiers: ["3928"], scopeAndLimits: "   " },
+          },
+        }),
+      ),
+    ).toThrow(/scopeAndLimits/);
+    expect(() =>
+      validateInput(
+        preMergeInput({
+          verificationResourceCheck: {
+            ...baseCheck,
+            caseCreationScope: { caseIdentifiers: ["3928"], scopeAndLimits: "宣言" },
+          },
+        }),
+      ),
+    ).not.toThrow();
+  });
+
+  test("実経路: Epic最終close構成（対象PRが既にmerge済み・mergeable=UNKNOWN・state=MERGED）ではmerge前提成立として pass になり終了操作が許可される", () => {
+    const runner = fakeRunner({
+      ghMergeable: "UNKNOWN",
+      ghPrState: "MERGED",
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const polling = report.result.steps.find((s) => s.name === "mergeable-polling");
+    expect(polling?.status).toBe("pass");
+    expect(polling?.detail).toMatchObject({ mergeable: "UNKNOWN", state: "MERGED", attempts: 1 });
+    expect(report.result.exitCategory).toBe("success");
+    expect(report.warnings.join("\n")).not.toContain("mergeable state");
+    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+  });
+
+  test("実経路: 開いている PR の mergeable=UNKNOWN は従来どおり要判断（warn）で終了操作を許可しない", () => {
+    const runner = fakeRunner({
+      ghMergeable: "UNKNOWN",
+      ghPrState: "OPEN",
+      issueBody: "- [x] 条件1\n",
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        mergeablePolling: { intervalSeconds: 0, maxAttempts: 2 },
+      }),
+      runner,
+    );
+    const polling = report.result.steps.find((s) => s.name === "mergeable-polling");
+    expect(polling?.status).toBe("warn");
+    expect(polling?.detail).toMatchObject({ mergeable: "UNKNOWN", state: "OPEN", attempts: 3 });
+    expect(report.result.exitCategory).toBe("needs-judgment");
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
   });
 });
