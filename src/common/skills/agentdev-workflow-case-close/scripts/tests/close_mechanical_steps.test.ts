@@ -4673,3 +4673,208 @@ describe("案件作成範囲の母集団宣言（caseCreationScope）と範囲�
     expect(isCloseOperationPermitted(report).permitted).toBe(false);
   });
 });
+
+describe("案件作成範囲の導出訂正（専用領域・記録由来・識別子陽性シグナル。識別子の不在のみで範囲外へ認定しない）", () => {
+  const declaredScope = {
+    caseIdentifiers: ["3928", "ru0255"],
+    scopeAndLimits: "宣言文（専用領域・台帳記載所在は名前を問わず範囲内。範囲外は関係記録のない共有/OS実体の帰属不明報告のみ）",
+  };
+
+  test("実経路: 専用領域（dedicated-area 観測）内の任意名未登録物は宣言識別子に依存せず未登録 findings で完了を拒否する", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      dedicatedAreaEntries: ["<repo>/tmp-dedicated/arbitrary.tmp"],
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: { ...baseCheck, caseCreationScope: declaredScope },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      attributionUnknown: { entries: readonly { source: string; count: number }[] };
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("arbitrary.tmp"),
+      ),
+    ).toBe(true);
+    expect(reconciliation.attributionUnknown.entries).toHaveLength(0);
+  });
+
+  test("実経路: 宣言識別子が本件と無関係（zzz）でも専用領域内の任意名未登録物は未登録拒否のままである（宣言の識別子内容が拒否を免れさせない）", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      dedicatedAreaEntries: ["<repo>/tmp-dedicated/leftover.js"],
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: {
+          ...baseCheck,
+          caseCreationScope: {
+            caseIdentifiers: ["zzz"],
+            scopeAndLimits: "本件専用領域内は名前を問わず対象（無関係識別子宣言での消費経路確認）",
+          },
+        },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("leftover.js"),
+      ),
+    ).toBe(true);
+  });
+
+  test("実経路: 番号なしでも台帳記載所在を commandLine で参照するプロセスは記録対応から範囲内と導出し未登録拒否する", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({
+          id: "vr-3928-2",
+          ownership: "common",
+          childIssue: null,
+        }),
+      ]),
+      processLiveness: {
+        "900": { alive: true, commandLine: "node <repo>/tmp-area/verify-clone/no-number-helper.js" },
+      },
+      listenPorts: {},
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: { ...baseCheck, caseCreationScope: declaredScope },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      attributionUnknown: { entries: readonly { source: string; count: number }[] };
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(reconciliation.findings.some((f) => f.code === "unregistered-resource" && f.detail.includes("pid 900"))).toBe(true);
+    expect(reconciliation.attributionUnknown.entries).toHaveLength(0);
+  });
+
+  test("実経路: 台帳記載所在 subtree 内の任意名 FS 実在物（gitignored 観測）は範囲内として未登録拒否する", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({
+          id: "vr-3928-2",
+          ownership: "common",
+          childIssue: null,
+        }),
+      ]),
+      gitignoredOutput: "<repo>/tmp-area/verify-clone/no-number-run-output.tmp\n",
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: { ...baseCheck, caseCreationScope: declaredScope },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("no-number-run-output.tmp"),
+      ),
+    ).toBe(true);
+  });
+
+  test("入力検証: caseCreationScope.caseIdentifiers が caseId と無関係な場合は fail-closed で拒否する", () => {
+    const baseCheck = verificationResourceCheck();
+    expect(() =>
+      validateInput(
+        preMergeInput({
+          verificationResourceCheck: {
+            ...baseCheck,
+            caseCreationScope: { caseIdentifiers: ["zzz"], scopeAndLimits: "宣言" },
+          },
+        }),
+      ),
+    ).toThrow(/caseId/);
+    expect(() =>
+      validateInput(
+        preMergeInput({
+          verificationResourceCheck: {
+            ...baseCheck,
+            caseCreationScope: { caseIdentifiers: ["adf-3928", "ru0255"], scopeAndLimits: "宣言" },
+          },
+        }),
+      ),
+    ).not.toThrow();
+  });
+
+  test("実経路: 接頭辞のみで本件識別子を含まない OS TEMP 走査合致物は範囲外の帰属不明報告のみ（共有領域・接頭辞全件の自動認定をしない）", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      osTempAreaMatches: ["<repo>/tmp-scan-root/adf-unrelated-case-thing"],
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: { ...baseCheck, caseCreationScope: declaredScope },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string }[];
+      attributionUnknown: { entries: readonly { source: string; count: number }[] };
+    };
+    expect(reconciliation.permitted).toBe(true);
+    expect(reconciliation.findings).toHaveLength(0);
+    const osTempEntry = reconciliation.attributionUnknown.entries.find(
+      (entry) => entry.source === "os-temp-area",
+    );
+    expect(osTempEntry?.count).toBe(1);
+  });
+
+  test("実経路: 宣言時も対象の検査不能（観測コマンド失敗）は inspection-unavailable findings で完了を拒否する", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      inspectionExitCodes: { "process-liveness": 1 },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: { ...baseCheck, caseCreationScope: declaredScope },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string }[];
+    };
+    expect(reconciliation.permitted).toBe(false);
+    expect(reconciliation.findings.some((f) => f.code === "inspection-unavailable")).toBe(true);
+  });
+});

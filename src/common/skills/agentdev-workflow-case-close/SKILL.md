@@ -118,6 +118,15 @@ gate 違反時は両ルートとも PR マージを停止する。
 
 検査コマンドは scope 単位の JSON stdout 契約（機械工程の入力契約）に従い、観測できなかった項目は JSON 側で省略または null として報告する。観測コマンド自体の失敗は検査不能として fail-closed で完了を拒否する。
 
+### 検証用一時資材照合の案件作成範囲宣言（caseCreationScope）
+
+呼出側は `verificationResourceCheck.caseCreationScope`（`caseIdentifiers`・`scopeAndLimits`）で案件作成範囲の母集団を宣言できる（省略時は全観測が完了拒否対象のまま）。様式の正は 検証用一時資材のライフサイクル Design「専用領域と作成経路の制限」節（「実物側網羅列挙と未記録entityの検出対象性」「検査対象の除外根拠」の母集団宣言に関する記述）である。
+
+- **範囲内の導出**（宣言内容に依らず既存の作成先・専用領域・生成・実行記録から決まる）: 専用領域観測（dedicated-area-listing）の実在物、台帳記載所在の subtree とその参照（commandLine・cwd・URL による言及）、宣言識別子の含有、実行ランタイム記録（自己・子孫・入力根拠付き祖先）。いずれも任意名を含み、未登録・残存・検査不能は完了拒否のまま
+- **範囲外の報告区分**: 範囲導出に掛からず関係記録のない共有/OS 実体（repo gitignore 共有領域の無記録物・無関係 OS process・listen・remote・接頭辞のみの OS TEMP 項目）は帰属不明（attribution-unknown）として報告のみ（非ブロック）で記録される。検出保証の対象外である限界を `scopeAndLimits` 宣言文に明示する
+- **識別子の制約**: `caseIdentifiers` は caseId を含むこと（入力検証で拒否）。識別子の不在のみで範囲外へ認定しない。repo 共通語彙の接頭（裸の `adf-` 等）は他案件・共有由来の可能性があるため識別子に含めない。共有領域（repo の `.agentdev/tmp` ルート・OS TEMP ルート・接頭辞のみ・共有親プロセスの全子孫）を本件と自動認定する宣言・組立をしない
+- **listen の限界**: listen 観測は帰属確認属性を持たず、台帳・既知残存の識別情報照合のみ可能である。この限界を宣言文と報告へ明示する
+
 ## 主要 Capability Skill 連携
 
 本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。

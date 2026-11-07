@@ -809,6 +809,15 @@ function validateVerificationResourceCheckInput(value: unknown): void {
         "input.verificationResourceCheck.caseCreationScope.scopeAndLimits is required (the declared detection range and limits are recorded verbatim in the attribution-unknown report)",
       );
     }
+    const caseId = v.caseId;
+    if (
+      typeof caseId === "string" &&
+      !scope.caseIdentifiers.some((identifier) => identifier.includes(caseId))
+    ) {
+      fail(
+        "input.verificationResourceCheck.caseCreationScope.caseIdentifiers must include an identifier containing the caseId (a declaration unrelated to this case must not consume the population classification)",
+      );
+    }
   }
 }
 
@@ -961,25 +970,26 @@ export interface VerificationResourceCheck {
   observationExclusionGrounds?: readonly ObservationExclusionGround[];
   /**
    * 案件作成範囲の母集団宣言（「検出できる範囲と限界を明示し、本件に範囲を絞る是正」の
-   * 入力表現）。宣言時、案件識別子を含まない観測実在物（共有領域・OS の無記録資材、
-   * OS process・listen・remote）は unregistered-resource findings から分離され、
-   * attribution-unknown として報告のみ（非ブロック）で記録される。識別子を含む実在物・
-   * 台帳/既知残存の照合結果・検査不能は従来どおり拒否 findings のまま
-   * （範囲内の未登録/残存/未確認/検査不能の拒否維持。範囲外の無記録資材の検出保証はない）。
-   * 未宣言時は現行どおり全件が findings となる（現行動作の維持）。
+   * 入力表現）。宣言時の範囲内導出は作成先・専用領域・生成・実行記録から行い
+   * （専用領域観測の実在物・台帳記載所在の subtree とその参照・宣言識別子の含有。
+   * いずれも任意名を含む）、範囲内の未登録/残存/未確認/検査不能は従来どおり拒否する。
+   * 範囲外（関係記録がなく案件範囲導出に掛からない共有/OS 実体）は attribution-unknown
+   * として報告のみ（非ブロック）で記録される。識別子の不在のみで範囲外へ認定せず、
+   * 共有領域（repo .agentdev/tmp ルート・OS TEMP ルート・接頭辞のみ・共有親プロセスの
+   * 全子孫）を本件と自動認定しない。未宣言時は現行どおり全件が findings となる。
    */
   caseCreationScope?: CaseCreationScope;
 }
 
 /**
  * 案件作成範囲の母集団宣言。識別子は観測パス・commandLine・cwd・URL に現れる
- * 当該 Case の識別子（例: Epic/Case番号、RU識別子）とし、repo 共通語彙の接頭
- * （裸の adf- 等は他案件・共有由来の可能性がある）は識別子に含めないこと。
- * 識別子の照合は与えられた候補文字列の大文字小文字を無視した部分一致で行う
- * （範囲内寄りの保守的分類。識別子を含む実在物は範囲内＝拒否対象のまま）。
+ * 当該 Case の識別子（例: Epic/Case番号、RU識別子）で、caseId を含むこと
+ * （入力検証で拒否）。識別子の照合は範囲内の陽性シグナルとしてのみ扱い、
+ * 識別子を含まないことのみで範囲外へ認定しない。repo 共通語彙の接頭
+ * （裸の adf- 等は他案件・共有由来の可能性がある）は識別子に含めない。
  */
 export interface CaseCreationScope {
-  /** 案件識別子（非空必須。空配列は宣言として受理しない fail-closed）。 */
+  /** 案件識別子（非空必須・caseId を含むこと。空配列は宣言として受理しない fail-closed）。 */
   caseIdentifiers: readonly string[];
   /** 検出できる範囲と限界の宣言（attribution-unknown 報告へそのまま記録。非空必須）。 */
   scopeAndLimits: string;
@@ -998,26 +1008,42 @@ export interface AttributionUnknownReport {
 }
 
 /**
- * 案件作成範囲の母集団宣言に基づく範囲外判定。宣言なしは常に false
- * （範囲外分類なし＝現行どおり全件 findings）。識別子空も false
- * （全件範囲内扱い＝拒否維持の fail-closed。空宣言で範囲外へ分類しない）。
- * 照合は候補文字列（正規化パス・commandLine・cwd・URL 等）の大文字小文字を
- * 無視した部分一致で行い、1つでも識別子が現れれば範囲内とする。
+ * 案件作成範囲の母集団宣言に基づく範囲外判定。範囲内は「作成先・専用領域・生成・実行記録」
+ * から導出し、識別子の不在のみで範囲外へ認定しない:
+ * - 宣言なしは常に false（範囲外分類なし＝現行どおり全件 findings）
+ * - inScopeByConstruction（専用領域観測など宣言内容に依らず案件スコープと構成から決まる観測）は false
+ * - 識別子の含有（大文字小文字無視の部分一致）は範囲内の陽性シグナル
+ * - 台帳記載所在（recordedLocationBases）の参照（FS は subtree・commandLine/cwd/URL は文字列含有）は記録対応による範囲内
+ * - 識別子空配列は全件範囲内扱い（拒否維持の fail-closed。空宣言で範囲外へ分類しない）
+ * 共有領域（repo .agentdev/tmp ルート・OS TEMP ルート・接頭辞のみ・共有親プロセスの全子孫）を
+ * 本件と自動認定する判定は行わない。
  */
 export function isOutsideCaseCreationPopulation(
   scope: CaseCreationScope | undefined,
   candidates: readonly (string | null | undefined)[],
+  options: {
+    /** 観測構成上つねに案件スコープと決まる実在物（dedicated-area 観測）。宣言内容に依らない。 */
+    inScopeByConstruction?: boolean;
+    /** 台帳記載所在（正規化済み）。FS は subtree 一致、commandLine/cwd/URL は含有一致で参照判定する。 */
+    recordedLocationBases?: readonly string[];
+  } = {},
 ): boolean {
   if (scope === undefined) return false;
+  if (options.inScopeByConstruction === true) return false;
   const identifiers = scope.caseIdentifiers
     .map((identifier) => identifier.toLowerCase())
     .filter((identifier) => identifier.length > 0);
   if (identifiers.length === 0) return false;
-  const haystack = candidates
+  const normalizedCandidates = candidates
     .filter((value): value is string => typeof value === "string" && value.length > 0)
-    .map((value) => value.toLowerCase())
-    .join("\n");
-  return !identifiers.some((identifier) => haystack.includes(identifier));
+    .map((value) => normalizeObservationPath(value).toLowerCase());
+  const haystack = normalizedCandidates.join("\n");
+  const identifierBearing = identifiers.some((identifier) => haystack.includes(identifier));
+  const bases = (options.recordedLocationBases ?? [])
+    .map((base) => normalizeObservationPath(base).toLowerCase())
+    .filter((base) => base.length > 0);
+  const referencesRecordedLocation = bases.some((base) => haystack.includes(base));
+  return !identifierBearing && !referencesRecordedLocation;
 }
 
 /** attribution-unknown の全件リストを source 別の実数件数と先頭5件の例へ集約する。 */
@@ -1678,7 +1704,12 @@ export function evaluateUnregisteredObservations(
       excludedObservations.push({ path: observed.path, basis: "unrelated-shared-resource-attribution" });
       continue;
     }
-    if (isOutsideCaseCreationPopulation(caseCreationScope, [normalized])) {
+    if (
+      isOutsideCaseCreationPopulation(caseCreationScope, [normalized], {
+        inScopeByConstruction: observed.source === "dedicated-area",
+        recordedLocationBases: normalizedLedgerLocations.map((entry) => entry.normalized),
+      })
+    ) {
       attributionUnknownEntries.push({ path: observed.path, source: observed.source });
       continue;
     }
@@ -1708,7 +1739,7 @@ export function evaluateUnregisteredObservations(
 export function evaluateObservationEntityConsumption(
   observation: Pick<
     VerificationResourceObservation,
-    "processes" | "listenPorts" | "remoteAbsenceInputs" | "remotes" | "branches"
+    "processes" | "listenPorts" | "remoteAbsenceInputs" | "remotes" | "branches" | "resolveBase"
   >,
   entries: readonly VerificationResourceEntry[],
   knownResidualEntries: readonly KnownResidualEntry[],
@@ -1842,6 +1873,21 @@ export function evaluateObservationEntityConsumption(
   const knownListenPorts = new Set<string>();
   const knownUrls = new Set<string>();
 
+  // 台帳記載所在の正規化参照形（記録対応による範囲内導出の基準）。絶対形に加え
+  // resolveBase（repo root）相対形も含め、commandLine が相対パスで言及する場合も
+  // 参照判定できるようにする。URL 形 location は commandLine/URL からの参照として
+  // そのまま用いる。疑似スキーマ所在（process:pid=… 等）は参照判定で一致しない。
+  const recordedLocationBases: string[] = [];
+  for (const entry of entries) {
+    const resolved = resolveObservationPath(entry.location, observation.resolveBase);
+    const normalizedResolved = normalizeObservationPath(resolved);
+    recordedLocationBases.push(normalizedResolved);
+    const normalizedBase = normalizeObservationPath(observation.resolveBase);
+    if (normalizedResolved.startsWith(`${normalizedBase}/`)) {
+      recordedLocationBases.push(normalizedResolved.slice(normalizedBase.length + 1));
+    }
+  }
+
   for (const known of knownResidualEntries) {
     if (reportedLocations.has(normalizeObservationPath(known.location))) continue;
     const observedIdentifiers: Record<string, string> = {};
@@ -1948,7 +1994,7 @@ export function evaluateObservationEntityConsumption(
       isOutsideCaseCreationPopulation(options.caseCreationScope, [
         processObservation.commandLine ?? undefined,
         processObservation.cwd,
-      ])
+      ], { recordedLocationBases })
     ) {
       attributionUnknownEntries.push({ path: `process:pid=${pid}`, source: "process-liveness" });
       continue;
@@ -1967,9 +2013,10 @@ export function evaluateObservationEntityConsumption(
       continue;
     }
     // listen は観測に帰属確認属性（commandLine・cwd 等）を持たないため、台帳・既知残存の
-    // 識別情報照合が範囲内の唯一の経路である。母集団宣言時、照合されない listen は本件との
-    // 確認された接続がなく attribution-unknown として報告のみへ分類する（範囲内の process は
-    // commandLine/cwd の識別子照合で従来どおり拒否される。宣言なしは現行どおり findings）。
+    // 識別情報照合が範囲内の唯一の経路である（限界は Design と宣言文で明示）。母集団宣言時、
+    // 照合されない listen は本件との確認された接続がなく attribution-unknown として報告のみへ
+    // 分類する（範囲内の process は識別子含有・台帳記載所在参照で従来どおり拒否される。
+    // 宣言なしは現行どおり findings）。
     if (isOutsideCaseCreationPopulation(options.caseCreationScope, [])) {
       attributionUnknownEntries.push({ path: `listen:port=${port}`, source: "listen-port-check" });
       continue;
@@ -1983,7 +2030,9 @@ export function evaluateObservationEntityConsumption(
     if (ledgerUrls.has(url) || knownUrls.has(url)) continue;
     const judgement = evaluateRemoteAbsenceJudgement(absenceInput);
     if (judgement.verdict === "confirmed-absent") continue;
-    if (isOutsideCaseCreationPopulation(options.caseCreationScope, [url])) {
+    if (
+      isOutsideCaseCreationPopulation(options.caseCreationScope, [url], { recordedLocationBases })
+    ) {
       attributionUnknownEntries.push({ path: url, source: "remote-absence-verification" });
       continue;
     }
