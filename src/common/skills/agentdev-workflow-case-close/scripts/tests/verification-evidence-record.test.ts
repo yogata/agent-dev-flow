@@ -57,7 +57,7 @@ describe("検証結果の証跡保存形式（保存と読み戻し）", () => {
         targetRevision: "main @ 0275e2d7b",
         operation: "ユニットテスト実行",
         actualResult: "71 pass / 1 fail",
-        failure: "台帳回収の単体テストが失敗（回収後の状態確認が不一致）",
+        failure: "検証用一時資材の回収の単体テストが失敗（回収後の状態確認が不一致）",
         correction: "回収後の状態確認をファイル不在の読み戻しで検証するよう修正",
         judgmentReason: "訂正後の再実行で全項目合格",
       });
@@ -97,9 +97,9 @@ describe("検証結果の証跡保存形式（保存と読み戻し）", () => {
 
     test("失敗・訂正ありは実内容を材料へ記録する", () => {
       const record = validRecord();
-      const withFailure = { ...record, failure: "回収後の台帳状態が不一致", correction: "確認経路を修正" };
+      const withFailure = { ...record, failure: "回収後の状態確認が不一致", correction: "確認経路を修正" };
       const material = serializeEvidenceMaterial(withFailure);
-      expect(material).toContain("- 失敗: 回収後の台帳状態が不一致");
+      expect(material).toContain("- 失敗: 回収後の状態確認が不一致");
       expect(material).toContain("- 訂正: 確認経路を修正");
     });
   });

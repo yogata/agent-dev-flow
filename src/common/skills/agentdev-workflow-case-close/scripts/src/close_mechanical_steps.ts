@@ -43,10 +43,6 @@ import {
   type SubjectKind,
 } from "./final-acceptance.ts";
 import { REQ_ROW_ID_LIST_PATTERN } from "../../../agentdev-workflow-case-open/scripts/lib/definition-traceability-gate.ts";
-import {
-  reclaimCloseAcceptanceRecord,
-  type CloseAcceptanceReclamationResult,
-} from "./verification-resource-reclamation.ts";
 
 const USAGE = `usage: bun ./src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts --input <input.json> [--validate-input]
   --input           機械工程入力 JSON（phase、worktree_root、PR番号、品質ゲート実行仕様等）
@@ -632,6 +628,40 @@ interface CloseAcceptanceRecordIo {
 /** 終了判定記録の回収実行面（削除を加えた I/O 注入）。 */
 interface CloseAcceptanceRecordReclamationIo extends CloseAcceptanceRecordIo {
   deleteFile(absolutePath: string): void;
+}
+
+/** 終了判定記録回収の結果。 */
+export interface CloseAcceptanceReclamationResult {
+  status: "reclaimed" | "record-missing" | "retained";
+  recordPath: string;
+}
+
+/**
+ * 終了判定記録を回収する（終了操作完了後の保持期間契約に従う）。完了申告なしの
+ * 回収要求は保持として返し削除しない（fail-closed）。回収対象は指定された判定
+ * 記録ファイルに限定し、存在しない記録への再回収は冪等に record-missing を返す。
+ */
+export function reclaimCloseAcceptanceRecord(
+  io: Pick<CloseAcceptanceRecordReclamationIo, "exists" | "deleteFile">,
+  input: { recordPath: string; terminalOperationCompleted: boolean },
+): CloseAcceptanceReclamationResult {
+  if (typeof input !== "object" || input === null) {
+    throw new MechanicalInputError("close acceptance reclamation input must be an object");
+  }
+  if (typeof input.recordPath !== "string" || input.recordPath.trim().length === 0) {
+    throw new MechanicalInputError("recordPath is required");
+  }
+  if (typeof input.terminalOperationCompleted !== "boolean") {
+    throw new MechanicalInputError("terminalOperationCompleted must be a boolean declaration of the terminal operation completion");
+  }
+  if (!input.terminalOperationCompleted) {
+    return { status: "retained", recordPath: input.recordPath };
+  }
+  if (!io.exists(input.recordPath)) {
+    return { status: "record-missing", recordPath: input.recordPath };
+  }
+  io.deleteFile(input.recordPath);
+  return { status: "reclaimed", recordPath: input.recordPath };
 }
 
 /**
@@ -1379,12 +1409,8 @@ function runReclamation(section: ReclamationSection, runner: MechanicalRunner): 
       warnings: [],
     };
   }
-  const io: CloseAcceptanceRecordReclamationIo = {
+  const io: Pick<CloseAcceptanceRecordReclamationIo, "exists" | "deleteFile"> = {
     exists: (absolutePath) => runner.exists(absolutePath),
-    readTextFile: (absolutePath) => runner.readTextFile(absolutePath),
-    writeTextFile: () => fail("close acceptance record write is not available through the mechanical runner (read/delete only)"),
-    mkdirRecursive: () => fail("close acceptance record directory creation is not available through the mechanical runner (read/delete only)"),
-    gitCommonDir: () => fail("git common dir resolution is not available through the mechanical runner"),
     deleteFile: (absolutePath) => runner.deleteFile?.(absolutePath),
   };
   const detail: Record<string, unknown> = {};
