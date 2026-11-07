@@ -26,7 +26,6 @@
 //
 
 import * as fs from "node:fs";
-import * as os from "node:os";
 import * as path from "node:path";
 import { spawnSync } from "node:child_process";
 import {
@@ -43,30 +42,11 @@ import {
   type CrossObligation,
   type SubjectKind,
 } from "./final-acceptance.ts";
-import {
-  evaluateDeletionConfirmationFromLedgerText,
-  type DeletionTargetObservation,
-  type UserDeletionConfirmation,
-} from "./deletion-confirmation.ts";
-import {
-  reclaimCloseAcceptanceRecord,
-  reclaimLedger,
-  type CloseAcceptanceReclamationResult,
-  type LedgerReclamationResult,
-  type ReclamationConfirmation,
-  type ReclamationIo,
-} from "./verification-resource-reclamation.ts";
 import { REQ_ROW_ID_LIST_PATTERN } from "../../../agentdev-workflow-case-open/scripts/lib/definition-traceability-gate.ts";
 import {
-  evaluateCreationDestination,
-  readLedger,
-  resolveLedgerPath,
-  resolveMainRepoRoot,
-  type LedgerIo,
-  type LedgerReadResult,
-  type VerificationResourceEntry,
-  type VerificationResourceOwnership,
-} from "./verification-resources-ledger.ts";
+  reclaimCloseAcceptanceRecord,
+  type CloseAcceptanceReclamationResult,
+} from "./verification-resource-reclamation.ts";
 
 const USAGE = `usage: bun ./src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts --input <input.json> [--validate-input]
   --input           機械工程入力 JSON（phase、worktree_root、PR番号、品質ゲート実行仕様等）
@@ -101,8 +81,6 @@ export interface MechanicalRunner {
   gitCommonDir?(): string;
   /** 回収実行面（台帳回収・終了判定記録回収）で使用するファイル削除。未提供時は回収ステップを fail で報告する。 */
   deleteFile?(absolutePath: string): void;
-  /** 機械工程自身の process id（検査実行実行時プロセスの自己除外の特定実体導出に使用）。未提供時は自己除外を適用しない。 */
-  processId?(): number;
 }
 
 export interface GateCommandSpec {
@@ -230,12 +208,6 @@ export interface ContractStateResidueEvaluation {
 
 /** 終了操作完了後の回収指定（post-merge のみ。pre-merge では入力検証で拒否する）。 */
 export interface ReclamationSection {
-  /** 台帳（追跡記録）自体の終了時回収。指定時のみ実行する。 */
-  ledger?: {
-    mainRepoRoot: string;
-    caseId: string;
-    confirmation: ReclamationConfirmation;
-  };
   /** 終了判定記録（.agentdev/close-acceptance/）の終了後回収。指定時のみ実行する。 */
   closeAcceptanceRecord?: {
     recordPath: string;
@@ -249,6 +221,8 @@ export interface CloseMechanicalInput {
   repoRoot: string;
   branch: string;
   prNumber: number;
+  /** 対象 Issue 番号（pre-merge で必須。終了判定記録の対象 Issue）。 */
+  issueNumber?: number;
   /** Fresh issue_read revision (`updated_at`/Local frontmatter `updated_at`), never a git commit. */
   issueUpdatedAt?: string;
   issueBodyPath?: string;
@@ -268,20 +242,7 @@ export interface CloseMechanicalInput {
   acceptanceEmptyBasis?: string;
   /** pre-merge（完了判定工程）で必須の契約状態記録・未追跡残存検査の入力。 */
   contractStateCheck?: ContractStateCheck;
-  /** pre-merge（完了判定工程）で必須の検証用一時資材照合の入力（case-close 実行契約の照合規定）。 */
-  verificationResourceCheck?: VerificationResourceCheck;
-  /**
-   * 一時資材回収の削除確認チェック（削除実行の確認境界の判定材料）。
-   * ledgerPath はメインrepo root 基準の台帳ファイル絶対パス。省略時は
-   * deletion-confirmation-check step を実行しない（削除対象の存在検出は
-   * 照合・完了拒否の本体側が所有する）。
-   */
-  deletionConfirmationCheck?: {
-    ledgerPath: string;
-    confirmations: readonly UserDeletionConfirmation[];
-    observations: readonly DeletionTargetObservation[];
-  };
-  /** post-merge での検証用一時資材の台帳回収・終了判定記録回収。pre-merge では指定できない。 */
+  /** post-merge での終了判定記録回収。pre-merge では指定できない。 */
   reclamation?: ReclamationSection;
 }
 
@@ -526,32 +487,6 @@ export function validateInput(value: unknown): CloseMechanicalInput {
       fail("input.reclamation must be an object");
     }
     const rec = reclamation as Record<string, unknown>;
-    if (rec.ledger != null) {
-      const ledger = rec.ledger;
-      if (typeof ledger !== "object" || Array.isArray(ledger)) {
-        fail("input.reclamation.ledger must be an object");
-      }
-      const l = ledger as Record<string, unknown>;
-      for (const field of ["mainRepoRoot", "caseId"] as const) {
-        if (typeof l[field] !== "string" || (l[field] as string).trim().length === 0) {
-          fail(`input.reclamation.ledger.${field} is required`);
-        }
-      }
-      const confirmation = l.confirmation;
-      if (typeof confirmation !== "object" || confirmation === null || Array.isArray(confirmation)) {
-        fail("input.reclamation.ledger.confirmation must be an object");
-      }
-      const c = confirmation as Record<string, unknown>;
-      if (typeof c.confirmedBy !== "string" || (c.confirmedBy as string).trim().length === 0) {
-        fail("input.reclamation.ledger.confirmation.confirmedBy is required");
-      }
-      if (typeof c.confirmedAt !== "string" || (c.confirmedAt as string).trim().length === 0) {
-        fail("input.reclamation.ledger.confirmation.confirmedAt is required");
-      }
-      if (!Array.isArray(c.targetIds) || !c.targetIds.every((id) => typeof id === "string" && id.trim().length > 0)) {
-        fail("input.reclamation.ledger.confirmation.targetIds must be an array of non-empty entry ids");
-      }
-    }
     if (rec.closeAcceptanceRecord != null) {
       const record = rec.closeAcceptanceRecord;
       if (typeof record !== "object" || Array.isArray(record)) {
@@ -580,11 +515,11 @@ export function validateInput(value: unknown): CloseMechanicalInput {
     if (!isNonEmptyString(v.issueUpdatedAt)) {
       missing.push("issue-updated-at");
     }
+    if (typeof v.issueNumber !== "number" || !Number.isInteger(v.issueNumber) || v.issueNumber < 1) {
+      missing.push("target-issue-number");
+    }
     if (v.contractStateCheck == null) {
       missing.push("contract-state-residue-check");
-    }
-    if (v.verificationResourceCheck == null) {
-      missing.push("verification-resource-reconciliation");
     }
     if (missing.length > 0) {
       fail(
@@ -621,205 +556,9 @@ export function validateInput(value: unknown): CloseMechanicalInput {
       }
     }
   }
-  if (v.verificationResourceCheck != null) {
-    validateVerificationResourceCheckInput(v.verificationResourceCheck);
-  }
-  const deletionConfirmationCheck = v.deletionConfirmationCheck;
-  if (deletionConfirmationCheck !== undefined && deletionConfirmationCheck !== null) {
-    if (typeof deletionConfirmationCheck !== "object" || Array.isArray(deletionConfirmationCheck)) {
-      fail("input.deletionConfirmationCheck must be an object");
-    }
-    const check = deletionConfirmationCheck as {
-      ledgerPath?: unknown;
-      confirmations?: unknown;
-      observations?: unknown;
-    };
-    if (typeof check.ledgerPath !== "string" || (check.ledgerPath as string).trim().length === 0) {
-      fail("input.deletionConfirmationCheck.ledgerPath is required");
-    }
-    const isConfirmation = (value: unknown) =>
-      typeof value === "object" &&
-      value !== null &&
-      typeof (value as { entryId?: unknown }).entryId === "string" &&
-      ((value as { entryId: string }).entryId).trim().length > 0 &&
-      ((value as { source?: unknown }).source === "user-explicit" ||
-        (value as { source?: unknown }).source === "machine-issued") &&
-      ((value as { purpose?: unknown }).purpose === "deletion" ||
-        (value as { purpose?: unknown }).purpose === "residue-allowance") &&
-      typeof (value as { confirmedAt?: unknown }).confirmedAt === "string" &&
-      ((value as { confirmedAt: string }).confirmedAt).trim().length > 0 &&
-      typeof (value as { identifiers?: unknown }).identifiers === "object" &&
-      (value as { identifiers?: unknown }).identifiers !== null;
-    if (!Array.isArray(check.confirmations) || !check.confirmations.every(isConfirmation)) {
-      fail("input.deletionConfirmationCheck.confirmations must be an array of deletion confirmation records");
-    }
-    const isObservation = (value: unknown) =>
-      typeof value === "object" &&
-      value !== null &&
-      typeof (value as { entryId?: unknown }).entryId === "string" &&
-      ((value as { entryId: string }).entryId).trim().length > 0 &&
-      typeof (value as { location?: unknown }).location === "string" &&
-      ((value as { location: string }).location).trim().length > 0 &&
-      typeof (value as { kind?: unknown }).kind === "string" &&
-      ((value as { kind: string }).kind).trim().length > 0 &&
-      typeof (value as { identifiers?: unknown }).identifiers === "object" &&
-      (value as { identifiers?: unknown }).identifiers !== null &&
-      typeof (value as { exists?: unknown }).exists === "boolean";
-    if (!Array.isArray(check.observations) || !check.observations.every(isObservation)) {
-      fail("input.deletionConfirmationCheck.observations must be an array of pre-deletion target observations");
-    }
-  }
   return input;
 }
 
-/**
- * 検証用一時資材照合入力の形式検証。検査コマンドの scope 宣言は固定必須集合の
- * 被覆を要求し（検査設定の省略禁止）、未知 scope・実行制限確認の実体欠落は
- * fail-closed で拒否する。
- */
-function validateVerificationResourceCheckInput(value: unknown): void {
-  if (typeof value !== "object" || value === null || Array.isArray(value)) {
-    fail("input.verificationResourceCheck must be an object");
-  }
-  const v = value as Record<string, unknown>;
-  if (!isNonEmptyString(v.caseId)) fail("input.verificationResourceCheck.caseId is required");
-  if (typeof v.issueNumber !== "number" || !Number.isInteger(v.issueNumber) || v.issueNumber < 1) {
-    fail("input.verificationResourceCheck.issueNumber must be a positive integer");
-  }
-  const isIdentifierRecord = (identifiers: unknown) =>
-    typeof identifiers === "object" &&
-    identifiers !== null &&
-    !Array.isArray(identifiers) &&
-    Object.keys(identifiers as Record<string, unknown>).length > 0 &&
-    Object.values(identifiers as Record<string, unknown>).every((entry) => typeof entry === "string");
-  if (!Array.isArray(v.knownResidualEntries)) {
-    fail("input.verificationResourceCheck.knownResidualEntries must be an array");
-  }
-  for (const entry of v.knownResidualEntries) {
-    const e = entry as Record<string, unknown>;
-    if (typeof entry !== "object" || entry === null || !isNonEmptyString(e.location)) {
-      fail("input.verificationResourceCheck.knownResidualEntries[].location is required");
-    }
-    if (!isIdentifierRecord(e.identifiers)) {
-      fail(
-        "input.verificationResourceCheck.knownResidualEntries[].identifiers must be a non-empty object of string values",
-      );
-    }
-  }
-  if (!Array.isArray(v.deletionConfirmations)) {
-    fail("input.verificationResourceCheck.deletionConfirmations must be an array");
-  }
-  for (const confirmation of v.deletionConfirmations) {
-    const c = confirmation as Record<string, unknown>;
-    if (typeof confirmation !== "object" || confirmation === null || !isNonEmptyString(c.entryId)) {
-      fail("input.verificationResourceCheck.deletionConfirmations[].entryId is required");
-    }
-    if (!isIdentifierRecord(c.identifiers)) {
-      fail(
-        "input.verificationResourceCheck.deletionConfirmations[].identifiers must be a non-empty object of string values",
-      );
-    }
-    if (!isNonEmptyString(c.confirmedBy) || !isNonEmptyString(c.confirmedAt)) {
-      fail(
-        "input.verificationResourceCheck.deletionConfirmations[].confirmedBy and .confirmedAt are required",
-      );
-    }
-  }
-  if (!Array.isArray(v.inspectionCommands) || v.inspectionCommands.length === 0) {
-    fail("input.verificationResourceCheck.inspectionCommands must be a non-empty array");
-  }
-  const declaredScopes = new Set<string>();
-  for (const command of v.inspectionCommands) {
-    const c = command as Record<string, unknown>;
-    if (typeof command !== "object" || command === null || !isNonEmptyString(c.scope)) {
-      fail("input.verificationResourceCheck.inspectionCommands[].scope is required");
-    }
-    if (!(REQUIRED_INSPECTION_SCOPES as readonly string[]).includes(c.scope as string)) {
-      fail(
-        `input.verificationResourceCheck.inspectionCommands[].scope must be one of: ${REQUIRED_INSPECTION_SCOPES.join(", ")} (got: ${c.scope as string})`,
-      );
-    }
-    if (!isNonEmptyString(c.command)) {
-      fail("input.verificationResourceCheck.inspectionCommands[].command is required");
-    }
-    if (!Array.isArray(c.args) || c.args.length === 0) {
-      fail("input.verificationResourceCheck.inspectionCommands[].args must be a non-empty array");
-    }
-    if (!isNonEmptyString(c.cwd)) {
-      fail("input.verificationResourceCheck.inspectionCommands[].cwd is required");
-    }
-    declaredScopes.add(c.scope as string);
-  }
-  const missingScopes = REQUIRED_INSPECTION_SCOPES.filter((scope) => !declaredScopes.has(scope));
-  if (missingScopes.length > 0) {
-    fail(
-      `input.verificationResourceCheck.inspectionCommands must cover all required inspection scopes (omission forbidden): missing ${missingScopes.join(", ")}`,
-    );
-  }
-  if (v.inspectionArtifactPaths !== undefined) {
-    const isPathList =
-      Array.isArray(v.inspectionArtifactPaths) &&
-      v.inspectionArtifactPaths.every((p) => typeof p === "string" && p.trim().length > 0);
-    if (!isPathList) {
-      fail("input.verificationResourceCheck.inspectionArtifactPaths must be an array of non-empty strings");
-    }
-  }
-  if (v.observationExclusionGrounds !== undefined) {
-    if (!Array.isArray(v.observationExclusionGrounds)) {
-      fail("input.verificationResourceCheck.observationExclusionGrounds must be an array");
-    }
-    for (const ground of v.observationExclusionGrounds) {
-      const g = ground as Record<string, unknown>;
-      if (typeof ground !== "object" || ground === null || !isNonEmptyString(g.path)) {
-        fail("input.verificationResourceCheck.observationExclusionGrounds[].path is required");
-      }
-      if (g.kind !== "role" && g.kind !== "attribution") {
-        fail(
-          "input.verificationResourceCheck.observationExclusionGrounds[].kind must be one of: role, attribution",
-        );
-      }
-      if (typeof g.basis !== "string" || g.basis.trim().length === 0) {
-        fail(
-          "input.verificationResourceCheck.observationExclusionGrounds[].basis is required (a concrete record reference; bulk exclusion without basis is not permitted)",
-        );
-      }
-      if (g.kind === "role" && g.role !== "official-artifact") {
-        fail(
-          "input.verificationResourceCheck.observationExclusionGrounds[].role must be official-artifact (only official artifacts are excluded by role; other roles are collection targets)",
-        );
-      }
-    }
-  }
-  if (v.caseCreationScope !== undefined) {
-    if (typeof v.caseCreationScope !== "object" || v.caseCreationScope === null || Array.isArray(v.caseCreationScope)) {
-      fail("input.verificationResourceCheck.caseCreationScope must be an object");
-    }
-    const scope = v.caseCreationScope as Record<string, unknown>;
-    if (
-      !Array.isArray(scope.caseIdentifiers) ||
-      scope.caseIdentifiers.length === 0 ||
-      !scope.caseIdentifiers.every((identifier) => isNonEmptyString(identifier))
-    ) {
-      fail(
-        "input.verificationResourceCheck.caseCreationScope.caseIdentifiers must be a non-empty array of non-empty strings (an empty declaration would classify every observation as out-of-population, which is not permitted)",
-      );
-    }
-    if (!isNonEmptyString(scope.scopeAndLimits)) {
-      fail(
-        "input.verificationResourceCheck.caseCreationScope.scopeAndLimits is required (the declared detection range and limits are recorded verbatim in the attribution-unknown report)",
-      );
-    }
-    const caseId = v.caseId;
-    if (
-      typeof caseId === "string" &&
-      !scope.caseIdentifiers.some((identifier) => identifier.includes(caseId))
-    ) {
-      fail(
-        "input.verificationResourceCheck.caseCreationScope.caseIdentifiers must include an identifier containing the caseId (a declaration unrelated to this case must not consume the population classification)",
-      );
-    }
-  }
-}
 
 /**
  * 完了条件チェックボックスの機械的抽出（評価はモデルが担当する）。
@@ -878,381 +617,60 @@ function isUnderPath(candidate: string, base: string): boolean {
   return candidate === base || candidate.startsWith(`${base}/`);
 }
 
-//
-// 検証用一時資材の照合（close時）・完了拒否・終了判定記録書出し。
-// 様式の正は検証用一時資材のライフサイクル Design「照合（close時）と全終了経路」
-// 「検査対象の除外根拠」「検出範囲の宣言と未達の機械的接続」節と case-close
-// Design「機械工程の script 呼び出し契約」節、case-close 実行契約の照合・
-// 拒否・remote 判定・全終了経路規定。台帳（生成記録）モジュールは Wave-1 の
-// verification-resources-ledger.ts を消費する。
-//
-
 /**
- * 観測手段 (a)〜(f) の検出範囲宣言（script 単一所有。入力側の検査設定の解除・
- * 未指定で対象外・作成物ゼロ扱いにできない）。
+ * 終了判定記録の書出し・回収に使用する I/O 注入（書込み・ディレクトリ作成・
+ * メインrepo root 解決を含む）。未提供時は書出しが成立しない。
  */
-export const DECLARED_DETECTION_SCOPES = [
-  "dedicated-area-diff",
-  "remote-worktree-branch-enumeration",
-  "process-liveness-commandline",
-  "os-temp-area-scan",
-  "gitignored-temporary-output",
-  "known-residual-list",
-] as const;
-
-/**
- * 台帳欠落時に照合不能として明示報告する entity 系スコープ（process・listen・remote）。
- * 台帳不在は空の観測集合の黙過ではなく検査不能として報告する（空状態の区別。正は
- * 検証用一時資材のライフサイクル Design「専用領域と作成経路の制限」節）。
- */
-export const ENTITY_RECONCILIATION_SCOPES = [
-  "process-liveness",
-  "listen-port-check",
-  "remote-absence-verification",
-] as const;
-
-/**
- * OS依存観測を検査コマンドとして呼出側が宣言する scope の固定必須集合。
- * 欠落は validateInput で拒否する（検査設定の省略禁止）。
- */
-export const REQUIRED_INSPECTION_SCOPES = [
-  "dedicated-area-listing",
-  "os-temp-area-scan",
-  "process-liveness",
-  "listen-port-check",
-  "remote-absence-verification",
-] as const;
-
-/** 一時資材と正式成果物の役割分類値（ライフサイクル Design「正式成果物と一時資材の役割分類」節）。 */
-export type ResourceRole = "official-artifact" | "test-run-generated" | "undetermined";
-
-export interface KnownResidualEntry {
-  /** 資材の所在（絶対パスまたは URL）。 */
-  location: string;
-  /** 識別情報（最低1項目）。 */
-  identifiers: Record<string, string>;
-  /** 由来メモ（導入時に既存した検証資材の識別）。 */
-  note?: string;
-}
-
-export interface DeletionConfirmation {
-  /** 台帳エントリ ID。 */
-  entryId: string;
-  /** 確認対象の識別情報（台帳エントリの識別情報を被覆する）。 */
-  identifiers: Record<string, string>;
-  confirmedBy: string;
-  confirmedAt: string;
-}
-
-/** OS依存観測の検査コマンド仕様（scope 単位の JSON stdout 契約）。 */
-export interface InspectionCommandSpec {
-  scope: string;
-  command: string;
-  args: readonly string[];
-  cwd: string;
-  timeoutMs?: number;
-}
-
-export interface VerificationResourceCheck {
-  /** 台帳解決の案件識別子（メインrepo root の .agentdev/tmp/verification-resources/{caseId}.json）。 */
-  caseId: string;
-  /** 評価単位の子 Issue 番号（子所有エントリの照合と終了判定記録の対象）。 */
-  issueNumber: number;
-  /** 導入時既知残存リスト（観測 (f)。記載資材は存在する限り拒否理由となる）。 */
-  knownResidualEntries: readonly KnownResidualEntry[];
-  /** 削除確認記録（回収済み記録で実物消失のエントリに対応する確認）。 */
-  deletionConfirmations: readonly DeletionConfirmation[];
-  /** OS依存観測の検査コマンド仕様（scope 固定必須集合の被覆が必須）。 */
-  inspectionCommands: readonly InspectionCommandSpec[];
-  /** 検査実行が作成記録付きで書き出す特定実体のパス集合（除外根拠1の機械確認対象）。 */
-  inspectionArtifactPaths?: readonly string[];
-  /** 観測実在物の除外根拠入力（除外根拠(2) 正式成果物・(3) 本件外共有資材。実体一致付き）。 */
-  observationExclusionGrounds?: readonly ObservationExclusionGround[];
-  /**
-   * 案件作成範囲の母集団宣言（「検出できる範囲と限界を明示し、本件に範囲を絞る是正」の
-   * 入力表現）。宣言時の範囲内導出は作成先・専用領域・生成・実行記録から行い
-   * （専用領域観測の実在物・台帳記載所在の subtree とその参照・宣言識別子の含有。
-   * いずれも任意名を含む）、範囲内の未登録/残存/未確認/検査不能は従来どおり拒否する。
-   * 範囲外（関係記録がなく案件範囲導出に掛からない共有/OS 実体）は attribution-unknown
-   * として報告のみ（非ブロック）で記録される。識別子の不在のみで範囲外へ認定せず、
-   * 照合の有効識別子集合は宣言識別子に本チェックの正規識別子（caseId・評価単位 Issue 番号）を
-   * 加えた集合とする（attribution-unknown 報告の識別子は宣言値のまま）。
-   * 共有領域（repo .agentdev/tmp ルート・OS TEMP ルート・接頭辞のみ・共有親プロセスの
-   * 全子孫）を本件と自動認定しない。未宣言時は現行どおり全件が findings となる。
-   */
-  caseCreationScope?: CaseCreationScope;
-}
-
-/**
- * 案件作成範囲の母集団宣言。識別子は観測パス・commandLine・cwd・URL に現れる
- * 当該 Case の識別子（例: Epic/Case番号、RU識別子）で、caseId を含むこと
- * （入力検証で拒否）。識別子の照合は範囲内の陽性シグナルとしてのみ扱い、
- * 識別子を含まないことのみで範囲外へ認定しない。repo 共通語彙の接頭
- * （裸の adf- 等は他案件・共有由来の可能性がある）は識別子に含めない。
- */
-export interface CaseCreationScope {
-  /** 案件識別子（非空必須・caseId を含むこと。空配列は宣言として受理しない fail-closed）。 */
-  caseIdentifiers: readonly string[];
-  /** 検出できる範囲と限界の宣言（attribution-unknown 報告へそのまま記録。非空必須）。 */
-  scopeAndLimits: string;
-}
-
-/** attribution-unknown 報告区分（範囲外の観測実在物の報告のみ・非ブロックの記録）。 */
-export interface AttributionUnknownReport {
-  /** 案件作成範囲の母集団宣言があったか。 */
-  declared: boolean;
-  /** 宣言された案件識別子（未宣言時は空）。 */
-  caseIdentifiers: readonly string[];
-  /** 検出できる範囲と限界の宣言文（未宣言時は null）。 */
-  scopeAndLimits: string | null;
-  /** source 別の実数件数と例（例は先頭5件。実数は全件の正確な件数）。 */
-  entries: readonly { source: string; count: number; examples: readonly string[] }[];
-}
-
-/**
- * 案件作成範囲の母集団宣言に基づく範囲外判定。範囲内は「作成先・専用領域・生成・実行記録」
- * から導出し、識別子の不在のみで範囲外へ認定しない:
- * - 宣言なしは常に false（範囲外分類なし＝現行どおり全件 findings）
- * - inScopeByConstruction（専用領域観測など宣言内容に依らず案件スコープと構成から決まる観測）は false
- * - 識別子の含有（大文字小文字無視の部分一致）は範囲内の陽性シグナル
- * - 台帳記載所在（recordedLocationBases）の参照は記録対応による範囲内。FS 候補
- *   （fsCandidates: 観測 FS 実在物・process cwd）は isUnderNormalizedPath のパス境界比較による
- *   実 subtree 一致（dedicated-run-other 等の兄弟・類似名の別所在を文字列含有で範囲内としない）。
- *   commandLine・URL 候補は所在名が直後の文字で引き延ばされていない発生だけを参照と認める
- *   （類似名別所在の部分一致を記録対応としない）
- * - 識別子空配列は全件範囲内扱い（拒否維持の fail-closed。空宣言で範囲外へ分類しない）
- * 共有領域（repo .agentdev/tmp ルート・OS TEMP ルート・接頭辞のみ・共有親プロセスの全子孫）を
- * 本件と自動認定する判定は行わない。
- */
-export function isOutsideCaseCreationPopulation(
-  scope: CaseCreationScope | undefined,
-  candidates: readonly (string | null | undefined)[],
-  options: {
-    /** 観測構成上つねに案件スコープと決まる実在物（dedicated-area 観測）。宣言内容に依らない。 */
-    inScopeByConstruction?: boolean;
-    /** 台帳記載所在（正規化済み）。FS 候補は subtree 一致、reference 候補は境界付き含有で参照判定する。 */
-    recordedLocationBases?: readonly string[];
-    /** FS パスとして照合する候補（観測 FS 実在物・process cwd）。台帳記載所在とはパス境界（subtree）で照合する。 */
-    fsCandidates?: readonly (string | null | undefined)[];
-  } = {},
-): boolean {
-  if (scope === undefined) return false;
-  if (options.inScopeByConstruction === true) return false;
-  const identifiers = scope.caseIdentifiers
-    .map((identifier) => identifier.toLowerCase())
-    .filter((identifier) => identifier.length > 0);
-  if (identifiers.length === 0) return false;
-  const normalizeCandidate = (value: string | null | undefined): string =>
-    typeof value === "string" && value.length > 0 ? normalizeObservationPath(value).toLowerCase() : "";
-  const normalizedFsCandidates = (options.fsCandidates ?? [])
-    .map(normalizeCandidate)
-    .filter((value) => value.length > 0);
-  const normalizedReferenceCandidates = candidates
-    .map(normalizeCandidate)
-    .filter((value) => value.length > 0);
-  const haystack = [...normalizedFsCandidates, ...normalizedReferenceCandidates].join("\n");
-  const identifierBearing = identifiers.some((identifier) => haystack.includes(identifier));
-  const bases = (options.recordedLocationBases ?? [])
-    .map((base) => normalizeObservationPath(base).toLowerCase())
-    .filter((base) => base.length > 0);
-  const fsUnderRecordedLocation = normalizedFsCandidates.some((candidate) =>
-    bases.some((base) => isUnderNormalizedPath(candidate, base)),
-  );
-  const referencesRecordedLocation = normalizedReferenceCandidates.some((candidate) =>
-    bases.some((base) => referencesRecordedLocationString(candidate, base)),
-  );
-  return !identifierBearing && !fsUnderRecordedLocation && !referencesRecordedLocation;
-}
-
-/**
- * reference 候補（commandLine・URL）内の台帳記載所在の発生のうち、直後が参照の終端または
- * 区切りであるものだけを参照と認める（dedicated-run-other 等の類似名別所在、dedicated-run別・
- * dedicated-run@other 等・FS 所在では dedicated-run#other 等の別名への引き延ばしを部分一致で
- * 記録対応としない。別名へ伸びた任意文字は非一致）。
- * 区切り文字は台帳記載所在の種別（isUrlLocation）で分岐する: URL 所在ではパス区切り・空白・
- * 引用符に加え query/fragment 開始（`?`・`#`）も区切り。FS 所在ではパス区切り・空白・引用符のみ
- * （`#`・`?` は Windows の正当なファイル名文字であり query/fragment 開始ではない。
- * 候補・所在とも `\`→`/` 正規化・小文字化済みのためパス区切りは `/` のみ有効）。
- */
-function referencesRecordedLocationString(candidate: string, base: string): boolean {
-  const delimiterChars = isUrlLocation(base) ? "/ \t\"'?#" : "/ \t\"'";
-  let index = candidate.indexOf(base);
-  while (index !== -1) {
-    const next = candidate.charAt(index + base.length);
-    if (next === "" || delimiterChars.includes(next)) return true;
-    index = candidate.indexOf(base, index + 1);
-  }
-  return false;
-}
-
-/** attribution-unknown の全件リストを source 別の実数件数と先頭5件の例へ集約する。 */
-export function aggregateAttributionUnknown(
-  scope: CaseCreationScope | undefined,
-  unknowns: readonly { path: string; source: string }[],
-): AttributionUnknownReport {
-  if (scope === undefined) {
-    return { declared: false, caseIdentifiers: [], scopeAndLimits: null, entries: [] };
-  }
-  const bySource = new Map<string, string[]>();
-  for (const unknown of unknowns) {
-    const paths = bySource.get(unknown.source) ?? [];
-    paths.push(unknown.path);
-    bySource.set(unknown.source, paths);
-  }
-  const entries = [...bySource.entries()]
-    .sort(([left], [right]) => left.localeCompare(right))
-    .map(([source, paths]) => ({ source, count: paths.length, examples: paths.slice(0, 5) }));
-  return {
-    declared: true,
-    caseIdentifiers: [...scope.caseIdentifiers],
-    scopeAndLimits: scope.scopeAndLimits,
-    entries,
-  };
-}
-
-export interface RemoteAbsenceJudgementInput {
-  /** HTTP 404 応答の観測（単独では不存在判定の根拠にならない）。 */
-  httpStatus404Observed: boolean;
-  authenticationConfirmed: boolean;
-  visibilityConfirmed: boolean;
-  targetIdConfirmed: boolean;
-  /** 認証・可視性・対象ID確認後に取得した、404 によらない確定的不存在根拠の記録参照。 */
-  confirmedAbsenceEvidence?: string;
-}
-
-/**
- * 観測実在物の除外根拠入力（Design 除外根拠(2) 正式成果物・(3) 本件外共有資材の入力表現）。
- * 根拠は具体的根拠（機械確認可能な記録の参照。非空必須）と実体識別（path）の組で渡し、
- * 正規化後パスの完全一致でのみ消費する。prefix・ディレクトリ一致での消費はしない
- * （広い path/prefix だけでの正式成果物の除外をしない）。根拠入力のない実在物は
- * 根拠なしのまま（未知の一括除外をしない）。
- */
-export interface ObservationExclusionGround {
-  /** 対象実体の所在パス（観測の resolveBase 基準で解決し、正規化後の完全一致でのみ消費）。 */
-  path: string;
-  /** 根拠種別（role=正式成果物の役割根拠、attribution=本件外共有資材の帰属根拠）。 */
-  kind: "role" | "attribution";
-  /** 役割（kind="role" のとき必須。正式成果物のみ除外根拠になる）。 */
-  role?: ResourceRole;
-  /** 具体的根拠（機械確認可能な記録の参照。非空必須）。 */
-  basis: string;
-}
-
-export interface ObservedTemporaryResource {
-  path: string;
-  source: "dedicated-area" | "os-temp-area" | "gitignored-output";
-  /** 役割根拠（機械確認可能な記録の参照を持つ場合のみ有効。申告単独では除外根拠にしない）。 */
-  roleBasis?: { role: ResourceRole; basis: string };
-  /** 帰属根拠（本件と無関係の共有資材の判別根拠。帰属が確認できない場合は検査対象のまま拒否）。 */
-  attributionBasis?: string;
-}
-
-export interface VerificationResourceObservation {
+interface CloseAcceptanceRecordIo {
   exists(absolutePath: string): boolean;
-  /** (b) remote列挙。 */
-  remotes: readonly { name: string; url: string }[];
-  /** (b) worktree列挙。 */
-  worktrees: readonly string[];
-  /** (b) branch列挙。 */
-  branches: readonly string[];
-  /** (c) プロセス生存観測結果（実物側網羅列挙の観測値。cwd・開始時刻は正規形の観測で取得できた場合に保持）。 */
-  processes: Record<
-    string,
-    { alive: boolean; commandLine: string | null; cwd?: string; startedAt?: string; parentPid?: string }
-  >;
-  /** listenポート確認結果。 */
-  listenPorts: Record<string, { listening: boolean }>;
-  /** (b) remote不存在判定入力（URLごと。remote列挙に現れない台帳remoteの不存在判定に使用）。 */
-  remoteAbsenceInputs: Record<string, RemoteAbsenceJudgementInput>;
-  /** (a)(d)(e) 観測の実在物一覧。 */
-  observedEntries: readonly ObservedTemporaryResource[];
-  /** 検査不能・検査器異常の記録。 */
-  inspectionFailures: readonly { scope: string; reason: string; exitCode?: number }[];
-  /** 除外根拠の機械確認対象パス集合（台帳・終了判定記録自身、検査実行の作成記録付き特定実体）。 */
-  excludedPaths: readonly { path: string; basis: string }[];
-  /** 相対パス観測の絶対化基準。 */
-  resolveBase: string;
+  readTextFile(absolutePath: string): string;
+  writeTextFile(absolutePath: string, content: string): void;
+  mkdirRecursive(absolutePath: string): void;
+  gitCommonDir(): string;
 }
 
-export type DetectionFindingCode =
-  | "ledger-missing"
-  | "ledger-unavailable"
-  | "residual-uncollected"
-  | "residual-after-collection"
-  | "deletion-confirmation-missing"
-  | "identifier-mismatch"
-  | "inspection-unavailable"
-  | "remote-absence-undetermined"
-  | "known-residual-still-present"
-  | "unregistered-resource";
-
-export interface ResourceReconciliationFinding {
-  code: DetectionFindingCode;
-  detail: string;
-}
-
-export interface VerificationResourceReconciliationEvaluation {
-  ledgerState: "missing" | "present";
-  entryCount: number;
-  childEntryCount: number;
-  findings: readonly ResourceReconciliationFinding[];
-  uncollectedParentOrCommon: readonly { id: string; ownership: VerificationResourceOwnership }[];
-  terminationUnitBlocked: boolean;
-  permitted: boolean;
-  excludedObservations: readonly { path: string; basis: string }[];
-  knownResidualStillPresent: readonly string[];
-  /** 案件作成範囲の母集団宣言時の範囲外 attribution-unknown 報告（報告のみ・非ブロック。未宣言時は declared: false）。 */
-  attributionUnknown: AttributionUnknownReport;
-}
-
-/** 受入未達gapの種別（4制御の実際の接続状態の観測から導出される接続不備の分類）。 */
-export type AcceptanceGapCode =
-  /** ①作成入口の作成先拒否（evaluateCreationDestination の台帳経路再評価で違反）。 */
-  | "creation-entry-rejection-disconnected"
-  /** ②宣言観測スコープの必須集合被覆欠落。 */
-  | "observation-scope-coverage-disconnected"
-  /** ②帰属付き独立観測の検査不能（観測実行失敗。空の観測集合に変換しない）。 */
-  | "observation-unavailable"
-  /** ③回収照合（回収済み実物消失エントリの削除確認被覆欠落）。 */
-  | "reclamation-reconciliation-disconnected"
-  /** ④終了判定記録の書出し経路（issue_close Tool境界前提検証の消費対象）の接続不備。 */
-  | "termination-boundary-disconnected"
-  /** 台帳不在による①②③の観測不能（作成物ゼロの根拠にしない）。 */
-  | "ledger-uninspectable";
-
-/** ①作成入口の作成先拒否の再評価で違反となった台帳経路の観測。 */
-export interface CreationDestinationRejectionObservation {
-  entryId: string;
-  route: string;
-  reason: string;
-}
-
-/** ③回収済み実物消失エントリのうち削除確認が識別情報を被覆しないものの観測。 */
-export interface ReclamationUncoveredEntryObservation {
-  entryId: string;
-  route: string;
+/** 終了判定記録の回収実行面（削除を加えた I/O 注入）。 */
+interface CloseAcceptanceRecordReclamationIo extends CloseAcceptanceRecordIo {
+  deleteFile(absolutePath: string): void;
 }
 
 /**
- * 4制御（①作成入口の作成先拒否 ②帰属付き独立観測 ③回収照合 ④終了境界の接続）の
- * 実際の接続状態の観測。呼出元の文字列申告は含まず、機械観測と実際の構成のみから組み立てる。
+ * メインrepo root を解決する（worktree cwd でもメインrepo の .git を指す
+ * gitCommonDir から導出）。worktree 非依存の終了判定記録配置に使用する。
  */
-export interface AcceptanceControlConnectionObservation {
-  ledgerState: "missing" | "present";
-  creationDestinationRejections: readonly CreationDestinationRejectionObservation[];
-  declaredInspectionScopes: readonly string[];
-  unavailableObservationScopes: readonly string[];
-  reclamationUncoveredEntries: readonly ReclamationUncoveredEntryObservation[];
-  terminationRecordIssueNumber: number | null;
-  terminationRecordPathResolvable: boolean;
-  terminationRecordWriteCapable: boolean;
+function resolveMainRepoRoot(io: CloseAcceptanceRecordIo): string {
+  const commonDir = io.gitCommonDir().trim();
+  if (!isNonEmptyString(commonDir)) {
+    throw new MechanicalInputError("git rev-parse --path-format=absolute --git-common-dir returned an empty value");
+  }
+  const root = path.dirname(commonDir);
+  if (root === commonDir) {
+    throw new MechanicalInputError(`could not derive main repo root from the git common dir: ${commonDir}`);
+  }
+  return root;
 }
 
-export interface AcceptanceGap {
-  code: AcceptanceGapCode;
-  /** gap の対象識別（台帳経路 location、観測スコープ集合、終了判定記録経路等の制御対象）。 */
-  route: string;
-  detail: string;
+/**
+ * porcelain エントリパスの正規化（区切り統一・先頭 ./ と末尾 / の除去）。
+ * 自己終了判定記録の一致判定で FS 正規化相当の比較に使用する。
+ */
+function normalizeObservationPath(value: string): string {
+  return value.replace(/\\/g, "/").replace(/^\.\//, "").replace(/\/+$/, "");
+}
+
+/**
+ * 必須完了条件の評価結果（変更後の正規完了判定。旧台帳照合の結果は含まない）。
+ * 終了判定記録の判定内容として書き出す。
+ */
+export interface CloseAcceptanceRecordJudgment {
+  /** 受入評価が確定したか。provisional 書出し（受理なし・前回記録無効化）は false。 */
+  determined: boolean;
+  /** close 可否（determined 時のみ確定する）。 */
+  closeAllowed?: boolean;
+  /** 受入評価の母集団の空状態区分。 */
+  populationState?: string;
+  /** close 拒否理由となった必須未達の条件 ID。 */
+  blockingUnmet?: readonly string[];
 }
 
 export interface CloseAcceptanceRecord {
@@ -1261,1063 +679,13 @@ export interface CloseAcceptanceRecord {
   targetRevision: string;
   generatedAt: string;
   accepted: boolean;
+  /** 判定内容（必須完了条件の評価結果）。 */
+  judgment: CloseAcceptanceRecordJudgment;
 }
 
-export interface EntryPresenceObservation {
-  presence: "present" | "absent" | "unavailable" | "undetermined";
-  observedIdentifiers?: Record<string, string>;
-  observationBasis: string;
-}
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
-}
-
-/**
- * 一時資材と正式成果物の役割分類。分類は役割根拠（機械確認可能な
- * 記録の参照を持つ roleBasis）で判定し、拡張子・testという名前・git追跡済みという
- * 事実単独では正式成果物（回収対象外）に分類しない。役割根拠のない候補は
- * undetermined（一時資材候補として検査対象）とする。
- */
-export function classifyResourceRole(candidate: {
-  fileName?: string;
-  extension?: string;
-  isGitTracked?: boolean;
-  roleBasis?: { role: ResourceRole; basis: string };
-}): { role: ResourceRole; basis: string | null } {
-  const basis = candidate.roleBasis;
-  if (
-    basis !== undefined &&
-    (basis.role === "official-artifact" || basis.role === "test-run-generated") &&
-    basis.basis.trim().length > 0
-  ) {
-    return { role: basis.role, basis: basis.basis };
-  }
-  return { role: "undetermined", basis: null };
-}
-
-/**
- * remote 上の対象の不存在判定（case-close 実行契約の remote 判定規定）。HTTP 404 単独では
- * 不存在と判定せず、認証・可視性・対象IDの確認を要求する。確認後も確定的不存在根拠が
- * 得られない場合は undetermined（終了拒否）とする。
- */
-export function evaluateRemoteAbsenceJudgement(
-  input: RemoteAbsenceJudgementInput,
-): { verdict: "confirmed-absent" | "undetermined"; basis: string } {
-  if (!input.authenticationConfirmed || !input.visibilityConfirmed || !input.targetIdConfirmed) {
-    return {
-      verdict: "undetermined",
-      basis: "authentication, visibility, or target-id confirmation is missing",
-    };
-  }
-  const evidence =
-    typeof input.confirmedAbsenceEvidence === "string" ? input.confirmedAbsenceEvidence.trim() : "";
-  if (evidence.length === 0) {
-    return {
-      verdict: "undetermined",
-      basis:
-        "the target remains undetermined after authentication, visibility and target-id confirmation (an HTTP 404 alone does not establish absence)",
-    };
-  }
-  return { verdict: "confirmed-absent", basis: evidence };
-}
-
-export function normalizeObservationPath(value: string): string {
-  return value.replace(/\\/g, "/").replace(/^\.\//, "").replace(/\/+$/, "");
-}
-
-function isUnderNormalizedPath(candidate: string, base: string): boolean {
-  return candidate === base || candidate.startsWith(`${base}/`);
-}
-
-function resolveObservationPath(value: string, base: string): string {
-  const normalizedValue = value.replace(/\\/g, "/");
-  const normalizedBase = base.replace(/\\/g, "/").replace(/\/+$/, "");
-  if (path.isAbsolute(value) || normalizedValue === normalizedBase || normalizedValue.startsWith(`${normalizedBase}/`)) {
-    return value;
-  }
-  if (/^<[^>]+>$/.test(normalizedBase)) return `${normalizedBase}/${normalizedValue.replace(/^\.\//, "")}`;
-  return path.resolve(base, value);
-}
-
-const ABSOLUTE_URL_LOCATION_PATTERN = /^[a-z][a-z0-9+.-]*:\/\//;
-const SCP_LIKE_URL_LOCATION_PATTERN = /^git@[^:]+:/;
-
-function isUrlLocation(location: string): boolean {
-  return ABSOLUTE_URL_LOCATION_PATTERN.test(location) || SCP_LIKE_URL_LOCATION_PATTERN.test(location);
-}
-
-/** ECMAScript Date が表現できる最大時刻の絶対値（±8640000000000000 ms）。 */
-const MAX_REPRESENTABLE_DATE_MILLIS = 8640000000000000;
-
-/**
- * 観測プロセスの startedAt をミリ秒へパースする（欠落・パース不能・日時として無効は null）。
- * 自己子孫閉包の時系列検証の fail-closed 入力とする。
- * Microsoft JSON datetime（/Date(epoch-ms)/、PowerShell ConvertTo-Json 出力）は
- * epoch ミリ秒として厳密に解釈し、非有限または ECMAScript Date 表現可能範囲外の値は
- * 有効な日時と解釈せず null を返す（fail-closed）。それ以外は Date.parse（ISO 等）に委ねる。
- */
-function parseObservationStartedAtMillis(proc: { startedAt?: string }): number | null {
-  if (proc.startedAt === undefined) return null;
-  const microsoftJsonDateMatch = /^\/Date\((\d+)\)\/$/.exec(proc.startedAt);
-  if (microsoftJsonDateMatch !== null) {
-    const millis = Number(microsoftJsonDateMatch[1]);
-    if (!Number.isFinite(millis) || Math.abs(millis) > MAX_REPRESENTABLE_DATE_MILLIS) return null;
-    return millis;
-  }
-  const parsed = Date.parse(proc.startedAt);
-  return Number.isNaN(parsed) ? null : parsed;
-}
-
-/** 台帳エントリの識別情報と観測識別情報の交差突合（観測に存在するキーのみ比較）。 */
-export function evaluateIdentifierMatch(
-  entryIdentifiers: Record<string, string>,
-  observed: Record<string, string>,
-): { matched: boolean; mismatchedKeys: readonly string[] } {
-  const mismatchedKeys: string[] = [];
-  for (const [key, expected] of Object.entries(entryIdentifiers)) {
-    const actual = observed[key];
-    if (actual === undefined) continue;
-    if (actual !== expected) mismatchedKeys.push(key);
-  }
-  return { matched: mismatchedKeys.length === 0, mismatchedKeys };
-}
-
-/**
- * 台帳エントリと観測プロセスの帰属確認に使用できる観測取得済み属性キー
- * （deriveEntryPresence が観測から記録する識別属性集合と同一。parentPid は親配下一括
- * 除外の反例（6677451423）により帰属確認属性に含めない）。
- */
-const PROCESS_ATTRIBUTION_KEYS = ["commandLine", "cwd", "startedAt"] as const;
-
-/**
- * 帰属確認属性のうち FS パスとして扱う属性。cwd のみ FS パス属性とし、FS 正規化
- * （normalizeObservationPath）を適用した比較を維持する。commandLine と startedAt は
- * FS パスでないため値を正規化せず verbatim 比較する（反例6679155719: commandLine 引数値
- * `--label=case/` と `--label=case` を FS 正規化で同一視すると、引数値が異なる別 entity を
- * 誤消費・誤帰属して未登録検出を取りこぼす。台帳帰属と属性識別根拠消費の両経路で
- * 同一の属性種別ごとの比較を適用する）。
- */
-const PATH_KIND_ATTRIBUTION_KEYS: ReadonlySet<string> = new Set(["cwd"]);
-
-/** 属性種別に応じた値の正規化（FS パス属性のみ FS 正規化、それ以外は verbatim）。 */
-function normalizeAttributionValue(attributeKey: string, value: string): string {
-  return PATH_KIND_ATTRIBUTION_KEYS.has(attributeKey) ? normalizeObservationPath(value) : value;
-}
-
-/** 属性種別に応じた値の一致判定（FS パス属性は正規化後比較、それ以外は verbatim 完全一致）。 */
-function attributionValuesEqual(attributeKey: string, left: string, right: string): boolean {
-  return normalizeAttributionValue(attributeKey, left) === normalizeAttributionValue(attributeKey, right);
-}
-
-/**
- * 台帳エントリと観測プロセスの属性帰属確認（PID churn 耐性）。観測に台帳記録の pid が
- * 存在しない（または生存しない）エントリについて、pid 以外の取得済み属性
- * （commandLine・cwd・startedAt）の正規化後値完全一致で観測 entity を一意に帰属させる。
- * 比較は観測に取得できたキーのみで行う（evaluateIdentifierMatch の「観測に存在するキー
- * のみ比較」契約と同一。commandLine null 等の観測不能キーは他の取得済み属性で帰属確認を
- * 試みる。比較可能なキーがない場合は帰属させない）。候補が 0 または 2 以上、1つの観測
- * entity に複数エントリが一致する場合は一意に帰属できず帰属させない（per-entity の一意
- * 帰属。確認不能なら拒否維持の fail-closed・一括除外なし）。
- * 返却値は台帳エントリ id → 帰属先の観測 pid の対応（pid 以外の経路には使用しない）。
- */
-export function deriveLedgerProcessAttribution(
-  observation: Pick<VerificationResourceObservation, "processes">,
-  entries: readonly VerificationResourceEntry[],
-): ReadonlyMap<string, string> {
-  const pending: { entryId: string; matchedPid: string }[] = [];
-  for (const entry of entries) {
-    const recordedPid = entry.identifiers.pid;
-    if (recordedPid === undefined) continue;
-    const directlyObserved = observation.processes[recordedPid];
-    if (directlyObserved !== undefined && directlyObserved.alive) continue;
-    const attributionKeys = PROCESS_ATTRIBUTION_KEYS.filter(
-      (key): key is (typeof PROCESS_ATTRIBUTION_KEYS)[number] =>
-        typeof entry.identifiers[key] === "string" && entry.identifiers[key]!.length > 0,
-    );
-    if (attributionKeys.length === 0) continue;
-    const matchedPids: string[] = [];
-    for (const [pid, proc] of Object.entries(observation.processes)) {
-      if (!proc.alive) continue;
-      // 観測に取得できたキーのみ比較する（evaluateIdentifierMatch の「観測に存在するキー
-      // のみ比較」契約と同一。commandLine null 等の観測不能キーは他の取得済み属性で
-      // 帰属確認を試みる。比較可能なキーがない entity は曖昧として帰属させない）。
-      const comparableKeys = attributionKeys.filter((key) => {
-        const actual = proc[key];
-        return actual !== undefined && actual !== null;
-      });
-      if (comparableKeys.length === 0) continue;
-      // cwd 単独の比較可能キーでは帰属させない（cwd は共有リソースで一意帰属の根拠に
-      // ならない。同一 cwd の無関係プロセスへ誤帰属する反例〔6678971153・synthetic-E相当〕
-      // により、観測できない属性の欠落を cwd での合格へ置換しない fail-closed）。
-      if (comparableKeys.every((key) => key === "cwd")) continue;
-      const covered = comparableKeys.every((key) => {
-        const actual = proc[key];
-        const recorded: string | undefined = entry.identifiers[key];
-        if (actual === undefined || actual === null || recorded === undefined) return false;
-        // 属性種別ごとの比較（cwd は FS 正規化後比較、commandLine・startedAt は verbatim
-        // 完全一致。FS 正規化を commandLine 引数値へ適用すると末尾 / 等が剥がれて別引数値の
-        // 別 entity を同一視する反例6679155719を、属性識別根拠消費経路と同一の比較で避ける）。
-        return attributionValuesEqual(key, actual, recorded);
-      });
-      if (covered) matchedPids.push(pid);
-    }
-    const soleMatch = matchedPids.length === 1 ? matchedPids[0] : undefined;
-    if (soleMatch !== undefined) pending.push({ entryId: entry.id, matchedPid: soleMatch });
-  }
-  const attribution = new Map<string, string>();
-  const claimsByObservedPid = new Map<string, string[]>();
-  for (const claim of pending) {
-    const claimants = claimsByObservedPid.get(claim.matchedPid) ?? [];
-    claimants.push(claim.entryId);
-    claimsByObservedPid.set(claim.matchedPid, claimants);
-  }
-  for (const [pid, claimants] of claimsByObservedPid) {
-    const soleClaimant = claimants.length === 1 ? claimants[0] : undefined;
-    if (soleClaimant !== undefined) attribution.set(soleClaimant, pid);
-  }
-  return attribution;
-}
-
-/**
- * 台帳エントリの実物観測状態の導出。remote URL 形・パス形の location 判定に
- * identifiers ベースの PID・listen 観測を結合する。remote 不存在判定が
- * undetermined の場合は照合自体が成立しないため undetermined を優先する。
- * processAttribution（deriveLedgerProcessAttribution の帰属結果。省略時は pid 完全照合のみ）
- * が当該エントリへの帰属を示す場合、記録 pid が観測に存在しない・生存しない状態でも
- * 属性一致の観測 entity に帰属して生存扱いとする（PID churn 正規乖離として
- * identifier-mismatch を出さない。observedIdentifiers には帰属根拠となった観測属性を記録し、
- * churn した pid は記録しない）。
- */
-export function deriveEntryPresence(
-  entry: VerificationResourceEntry,
-  observation: VerificationResourceObservation,
-  processAttribution?: ReadonlyMap<string, string>,
-): EntryPresenceObservation {
-  const observedIdentifiers: Record<string, string> = {};
-  let presentEvidence = "";
-  let missingEvidence = "";
-  let unavailableEvidence = "";
-  let remoteAbsenceUndetermined = false;
-
-  const remoteMatch = observation.remotes.find((remote) => remote.url === entry.location);
-  if (remoteMatch !== undefined) {
-    presentEvidence = `remote enumeration contains the recorded URL: ${entry.location}`;
-    observedIdentifiers.url = entry.location;
-  } else if (isUrlLocation(entry.location)) {
-    const absenceInput = observation.remoteAbsenceInputs[entry.location];
-    const judgement = absenceInput === undefined
-      ? {
-          verdict: "undetermined" as const,
-          basis: "no remote absence verification observation is provided for the recorded URL",
-        }
-      : evaluateRemoteAbsenceJudgement(absenceInput);
-    if (judgement.verdict === "confirmed-absent") {
-      missingEvidence = `remote absence confirmed after authentication, visibility and target-id verification: ${judgement.basis}`;
-    } else {
-      remoteAbsenceUndetermined = true;
-      unavailableEvidence = `remote absence could not be determined after verification: ${judgement.basis}`;
-    }
-  } else if (observation.exists(entry.location)) {
-    presentEvidence = `filesystem observation confirms the recorded location exists: ${entry.location}`;
-    observedIdentifiers.path = entry.location;
-  } else {
-    const worktreeMatch = observation.worktrees.some(
-      (worktree) => normalizeObservationPath(worktree) === normalizeObservationPath(entry.location),
-    );
-    if (worktreeMatch) {
-      presentEvidence = `git worktree enumeration contains the recorded location: ${entry.location}`;
-      observedIdentifiers.path = entry.location;
-    } else {
-      missingEvidence = `filesystem observation does not confirm the recorded location: ${entry.location}`;
-    }
-  }
-
-  const pid = entry.identifiers.pid;
-  if (pid !== undefined) {
-    const processObservation = observation.processes[pid];
-    const attributedPid =
-      processAttribution === undefined ? undefined : processAttribution.get(entry.id);
-    if (processObservation === undefined || !processObservation.alive) {
-      if (attributedPid !== undefined) {
-        const attributed = observation.processes[attributedPid];
-        presentEvidence =
-          presentEvidence === ""
-            ? `the recorded pid is not directly observed (${processObservation === undefined ? "not covered by the liveness observation" : "not alive"}); the entry is attributed to the live process ${attributedPid} by exact attribute match of the recorded identifiers (commandLine/cwd/startedAt), consistent with a regenerated pid`
-            : presentEvidence;
-        if (attributed !== undefined) {
-          if (attributed.commandLine !== null && attributed.commandLine !== undefined) {
-            observedIdentifiers.commandLine = attributed.commandLine;
-          }
-          if (attributed.cwd !== undefined) {
-            observedIdentifiers.cwd = attributed.cwd;
-          }
-          if (attributed.startedAt !== undefined) {
-            observedIdentifiers.startedAt = attributed.startedAt;
-          }
-        }
-      } else if (processObservation === undefined) {
-        unavailableEvidence = unavailableEvidence === ""
-          ? `process liveness observation does not cover the recorded pid: ${pid}`
-          : unavailableEvidence;
-      } else {
-        missingEvidence = missingEvidence === "" ? `the recorded pid is not alive: ${pid}` : missingEvidence;
-      }
-    } else {
-      presentEvidence = presentEvidence === "" ? `the recorded pid is alive: ${pid}` : presentEvidence;
-      observedIdentifiers.pid = pid;
-      if (processObservation.commandLine !== null && processObservation.commandLine !== undefined) {
-        observedIdentifiers.commandLine = processObservation.commandLine;
-      }
-      if (processObservation.cwd !== undefined) {
-        observedIdentifiers.cwd = processObservation.cwd;
-      }
-      if (processObservation.startedAt !== undefined) {
-        observedIdentifiers.startedAt = processObservation.startedAt;
-      }
-    }
-  }
-
-  const listenPort = entry.identifiers.listenPort;
-  if (listenPort !== undefined) {
-    const portObservation = observation.listenPorts[listenPort];
-    if (portObservation === undefined) {
-      unavailableEvidence = unavailableEvidence === ""
-        ? `listen port observation does not cover the recorded port: ${listenPort}`
-        : unavailableEvidence;
-    } else if (portObservation.listening) {
-      presentEvidence = presentEvidence === "" ? `the recorded listen port is active: ${listenPort}` : presentEvidence;
-      observedIdentifiers.listenPort = listenPort;
-    } else {
-      missingEvidence = missingEvidence === "" ? `the recorded listen port is not active: ${listenPort}` : missingEvidence;
-    }
-  }
-
-  const branch = entry.identifiers.branch;
-  if (branch !== undefined && presentEvidence === "") {
-    const branchMatch = observation.branches.some((name) => name === branch);
-    if (branchMatch) {
-      presentEvidence = `branch enumeration contains the recorded branch: ${branch}`;
-      observedIdentifiers.branch = branch;
-    }
-  }
-
-  if (remoteAbsenceUndetermined) {
-    return { presence: "undetermined", observationBasis: unavailableEvidence };
-  }
-  if (presentEvidence !== "") {
-    return { presence: "present", observedIdentifiers, observationBasis: presentEvidence };
-  }
-  if (unavailableEvidence !== "" && missingEvidence !== "") {
-    return {
-      presence: "unavailable",
-      observationBasis: `incomplete observation (${unavailableEvidence}; ${missingEvidence})`,
-    };
-  }
-  if (unavailableEvidence !== "") {
-    return { presence: "unavailable", observationBasis: unavailableEvidence };
-  }
-  if (missingEvidence !== "") {
-    return { presence: "absent", observationBasis: missingEvidence };
-  }
-  return {
-    presence: "unavailable",
-    observationBasis: "no observation basis covers the recorded location or identifiers",
-  };
-}
-
-/**
- * 削除確認記録が台帳エントリの識別情報を被覆し値一致する場合のみ有効な確認として
- * 受理する（同名別物・PID再利用の防止。確認済み識別情報との対応が確認の前提）。
- */
-function deletionConfirmationCoversEntry(
-  entry: VerificationResourceEntry,
-  confirmation: DeletionConfirmation,
-): boolean {
-  return Object.entries(entry.identifiers).every(
-    ([key, value]) => confirmation.identifiers[key] === value,
-  );
-}
-
-/**
- * 観測実在物への除外根拠入力の投影（実体一致）。根拠入力は正規化後パスの完全一致でのみ
- * 消費し、prefix・ディレクトリ一致では消費しない（広い path/prefix だけでの正式成果物の
- * 除外をしない）。根拠入力のない実在物は根拠なしのまま（未知の一括除外をしない）。
- * 役割根拠は official-artifact の場合だけ除外根拠（消費側 evaluateUnregisteredObservations）に
- * なる。帰属根拠は既知残存リスト・台帳の照合（先に実行される拒否経路）を上書きしない。
- */
-export function attachObservationExclusionGrounds(
-  observedEntries: readonly ObservedTemporaryResource[],
-  grounds: readonly ObservationExclusionGround[] | undefined,
-  resolveBase: string,
-): readonly ObservedTemporaryResource[] {
-  if (grounds === undefined || grounds.length === 0) return observedEntries;
-  const normalizedGrounds = grounds.map((ground) => ({
-    ground,
-    normalized: normalizeObservationPath(resolveObservationPath(ground.path, resolveBase)),
-  }));
-  return observedEntries.map((observed) => {
-    const normalized = normalizeObservationPath(resolveObservationPath(observed.path, resolveBase));
-    const roleGround = normalizedGrounds.find(
-      (entry) => entry.ground.kind === "role" && entry.normalized === normalized,
-    );
-    const attributionGround = normalizedGrounds.find(
-      (entry) => entry.ground.kind === "attribution" && entry.normalized === normalized,
-    );
-    if (roleGround === undefined && attributionGround === undefined) return observed;
-    return {
-      ...observed,
-      ...(roleGround !== undefined
-        ? { roleBasis: { role: roleGround.ground.role as ResourceRole, basis: roleGround.ground.basis } }
-        : {}),
-      ...(attributionGround !== undefined ? { attributionBasis: attributionGround.ground.basis } : {}),
-    };
-  });
-}
-
-/**
- * 観測実在物の未登録判定。除外根拠（台帳・終了判定記録自身、検査実行の作成記録付き
- * 特定実体、正式成果物の役割根拠、無関係共有資材の帰属根拠）と台帳・既知残存リストの
- * 突合を行い、根拠のない実在物を未登録として検出する。帰属が機械確認できない実体は
- * 検査対象のまま拒否する。
- */
-export function evaluateUnregisteredObservations(
-  observedEntries: readonly ObservedTemporaryResource[],
-  entries: readonly VerificationResourceEntry[],
-  knownResidualEntries: readonly KnownResidualEntry[],
-  excludedPaths: readonly { path: string; basis: string }[],
-  resolveBase: string,
-  caseCreationScope?: CaseCreationScope,
-): {
-  findings: readonly ResourceReconciliationFinding[];
-  excludedObservations: readonly { path: string; basis: string }[];
-  knownResidualStillPresent: readonly string[];
-  /** 正規化した既知残存リスト位置のうちパス突合で既に報告したもの（識別情報消費との重複報告防止に使用）。 */
-  knownResidualReportedLocations: readonly string[];
-  /** 案件作成範囲の母集団宣言時に範囲外へ分類した実在物の全件（集約前。宣言なしは空）。 */
-  attributionUnknownEntries: readonly { path: string; source: string }[];
-} {
-  const findings: ResourceReconciliationFinding[] = [];
-  const excludedObservations: { path: string; basis: string }[] = [];
-  const knownResidualStillPresent: string[] = [];
-  const knownResidualReportedLocations: string[] = [];
-  const attributionUnknownEntries: { path: string; source: string }[] = [];
-  const normalizedExcluded = excludedPaths.map((entry) => ({
-    ...entry,
-    normalized: normalizeObservationPath(resolveObservationPath(entry.path, resolveBase)),
-  }));
-  const normalizedLedgerLocations = entries.map((entry) => ({
-    id: entry.id,
-    normalized: normalizeObservationPath(resolveObservationPath(entry.location, resolveBase)),
-  }));
-  const normalizedKnown = knownResidualEntries.map((entry) => ({
-    ...entry,
-    normalized: normalizeObservationPath(resolveObservationPath(entry.location, resolveBase)),
-  }));
-  for (const observed of observedEntries) {
-    const normalized = normalizeObservationPath(resolveObservationPath(observed.path, resolveBase));
-    const exclusion = normalizedExcluded.find((entry) =>
-      isUnderNormalizedPath(normalized, entry.normalized),
-    );
-    if (exclusion !== undefined) {
-      excludedObservations.push({ path: observed.path, basis: exclusion.basis });
-      continue;
-    }
-    const registered = normalizedLedgerLocations.some((entry) => entry.normalized === normalized);
-    if (registered) continue;
-    const known = normalizedKnown.find((entry) => entry.normalized === normalized);
-    if (known !== undefined) {
-      knownResidualReportedLocations.push(known.normalized);
-      knownResidualStillPresent.push(observed.path);
-      findings.push({
-        code: "known-residual-still-present",
-        detail: `known residual list entry is still present: ${observed.path} (source: ${observed.source}${known.note !== undefined ? `, note: ${known.note}` : ""})`,
-      });
-      continue;
-    }
-    if (observed.roleBasis?.role === "official-artifact" && observed.roleBasis.basis.trim().length > 0) {
-      excludedObservations.push({ path: observed.path, basis: "official-artifact-role-basis" });
-      continue;
-    }
-    if (typeof observed.attributionBasis === "string" && observed.attributionBasis.trim().length > 0) {
-      excludedObservations.push({ path: observed.path, basis: "unrelated-shared-resource-attribution" });
-      continue;
-    }
-    if (
-      isOutsideCaseCreationPopulation(caseCreationScope, [], {
-        inScopeByConstruction: observed.source === "dedicated-area",
-        recordedLocationBases: normalizedLedgerLocations.map((entry) => entry.normalized),
-        fsCandidates: [normalized],
-      })
-    ) {
-      attributionUnknownEntries.push({ path: observed.path, source: observed.source });
-      continue;
-    }
-    findings.push({
-      code: "unregistered-resource",
-      detail: `no ledger record or exclusion basis for the observed temporary resource: ${observed.path} (source: ${observed.source})`,
-    });
-  }
-  return {
-    findings,
-    excludedObservations,
-    knownResidualStillPresent,
-    knownResidualReportedLocations,
-    attributionUnknownEntries,
-  };
-}
-
-/**
- * 観測結果に現れた実体（process・listen・remote）の消費経路（実装完全化）。
- * 台帳記録分の実体照合は deriveEntryPresence が消費するため、本関数は台帳に現れない
- * キーの消費と、既知残存リストの識別情報（pid・listenPort・url・branch）の消費を行う。
- * 台帳・既知残存リストのどちらにも照合されない実在entityは未登録資材として検出する
- * （正は検証用一時資材のライフサイクル Design「実物側網羅列挙と未記録entityの検出対象性」
- * の記述。検出対象は正の存在証拠〔生存process・listen中ポート・不存在確認が成立しない
- * remote〕に限り、消滅済みの観測値は残存資材として報告しない）。
- */
-export function evaluateObservationEntityConsumption(
-  observation: Pick<
-    VerificationResourceObservation,
-    "processes" | "listenPorts" | "remoteAbsenceInputs" | "remotes" | "branches" | "resolveBase"
-  >,
-  entries: readonly VerificationResourceEntry[],
-  knownResidualEntries: readonly KnownResidualEntry[],
-  knownResidualReportedLocations: readonly string[],
-  options: {
-    /** entity 形（process:pid=… / listen:port=… / process:<attr>=…）の観測除外根拠入力（FS 実体とは別に、pid・listen 指定は正規化後の完全一致、属性識別形は生値解析と属性種別ごとの比較でのみ消費する）。 */
-    observationExclusionGrounds?: readonly ObservationExclusionGround[];
-    /** 機械工程自身の process id（検査実行実行時プロセスの自己除外の起点。未指定時は自己除外を適用しない）。 */
-    selfProcessId?: number;
-    /** deriveLedgerProcessAttribution の帰属結果（台帳エントリ id → 帰属先の観測 pid）。帰属済み観測 entity は未登録検出から除外する。 */
-    processAttribution?: ReadonlyMap<string, string>;
-    /** 案件作成範囲の母集団宣言（宣言時に範囲外 entity を attribution-unknown 報告へ分類する）。 */
-    caseCreationScope?: CaseCreationScope;
-  } = {},
-): {
-  findings: readonly ResourceReconciliationFinding[];
-  knownResidualStillPresent: readonly string[];
-  excludedObservations: readonly { path: string; basis: string }[];
-  /** 案件作成範囲の母集団宣言時に範囲外へ分類した entity の全件（集約前。宣言なしは空）。 */
-  attributionUnknownEntries: readonly { path: string; source: string }[];
-} {
-  const findings: ResourceReconciliationFinding[] = [];
-  const knownResidualStillPresent: string[] = [];
-  const excludedObservations: { path: string; basis: string }[] = [];
-  const attributionUnknownEntries: { path: string; source: string }[] = [];
-  const reportedLocations = new Set(knownResidualReportedLocations);
-  const ledgerPids = new Set(
-    entries.map((entry) => entry.identifiers.pid).filter((pid): pid is string => pid !== undefined),
-  );
-  const ledgerListenPorts = new Set(
-    entries
-      .map((entry) => entry.identifiers.listenPort)
-      .filter((listenPort): listenPort is string => listenPort !== undefined),
-  );
-  const ledgerUrls = new Set(entries.map((entry) => entry.location));
-  // entity 形根拠（process:pid=… / listen:port=… / process:<attr>=…）の正規化。pid・listen
-  // 指定の疑似スキーマ所在と FS 実体の根拠は正規化後の完全一致で照合する（FS パスでないため
-  // resolve せず正規化のみ。FS 実体の根拠は attachObservationExclusionGrounds が resolveBase
-  // で解決する。消費条件は FS と同一: role は official-artifact のみ、attribution は非空根拠）。
-  // 属性識別形（process:<attr>=<value>）は正規化せず生値から解析する（下記参照）。
-  const normalizedEntityGrounds = (options.observationExclusionGrounds ?? []).map((ground) => ({
-    ground,
-    normalized: normalizeObservationPath(ground.path),
-  }));
-  // 属性識別形（process:<attr>=<value>）の解析。正規化前の生値から先に解析する（根拠文字列
-  // 全体や commandLine 値に FS 正規化を適用すると、引数値の末尾 / 等が剥がれて引数値の異なる
-  // 別 entity を同一視する反例6679155719を避ける）。attr は帰属確認属性（commandLine・cwd・
-  // startedAt）に限る。値は最初の = 以降全体を取り、比較は属性種別ごとの契約
-  // （attributionValuesEqual: cwd のみ FS 正規化後比較、commandLine・startedAt は verbatim
-  // 完全一致。台帳帰属経路と同一）で行う。一致 entity が一意に 1 つのときだけ消費し、0・
-  // 2 以上は曖昧として消費しない（per-entity・一括除外なしの fail-closed。ground の pid 指定
-  // process:pid=… は完全一致経路が処理し、attr=pid はこの解析の対象外）。
-  const parseEntityAttributeGround = (
-    raw: string,
-  ): { attr: (typeof PROCESS_ATTRIBUTION_KEYS)[number]; value: string } | null => {
-    if (!raw.startsWith("process:")) return null;
-    const separator = raw.indexOf("=", "process:".length);
-    if (separator === -1) return null;
-    const attr = raw.slice("process:".length, separator);
-    if (!(PROCESS_ATTRIBUTION_KEYS as readonly string[]).includes(attr)) return null;
-    return { attr: attr as (typeof PROCESS_ATTRIBUTION_KEYS)[number], value: raw.slice(separator + 1) };
-  };
-  const findEntityGroundExclusion = (entityPath: string): string | null => {
-    const normalized = normalizeObservationPath(entityPath);
-    const roleGround = normalizedEntityGrounds.find(
-      (entry) => entry.ground.kind === "role" && entry.normalized === normalized,
-    );
-    if (roleGround !== undefined && roleGround.ground.role === "official-artifact" && roleGround.ground.basis.trim().length > 0) {
-      return "official-artifact-role-basis";
-    }
-    const attributionGround = normalizedEntityGrounds.find(
-      (entry) => entry.ground.kind === "attribution" && entry.normalized === normalized,
-    );
-    if (attributionGround !== undefined && attributionGround.ground.basis.trim().length > 0) {
-      return "unrelated-shared-resource-attribution";
-    }
-    for (const { ground } of normalizedEntityGrounds) {
-      if (ground.basis.trim().length === 0) continue;
-      const attributeGround = parseEntityAttributeGround(ground.path);
-      if (attributeGround === null) continue;
-      const matchingPids: string[] = [];
-      for (const [pid, proc] of Object.entries(observation.processes)) {
-        if (!proc.alive) continue;
-        const actual = proc[attributeGround.attr];
-        if (actual === undefined || actual === null) continue;
-        if (!attributionValuesEqual(attributeGround.attr, actual, attributeGround.value)) continue;
-        matchingPids.push(pid);
-      }
-      if (matchingPids.length !== 1) continue;
-      if (matchingPids[0] !== normalizeObservationPath(entityPath).replace(/^process:pid=/, "")) continue;
-      if (ground.kind === "role" && ground.role === "official-artifact") {
-        return "official-artifact-role-basis";
-      }
-      if (ground.kind === "attribution") {
-        return "unrelated-shared-resource-attribution";
-      }
-    }
-    return null;
-  };
-  // 検査実行自身の実行時プロセスの自己除外（検査実行の書出し実体＝除外根拠(1)。終了判定
-  // 記録の特定実体除外と同一契約の特定実体除外であって汎用除外ではない）。機械工程自身の
-  // pid と、観測された親子関係からその子孫として機械導出される実体に限り適用する（観測に
-  // parentPid がなく子孫を導出できない pid は除外しない fail-closed）。子孫の追加は
-  // parentPid 一致に加えて時系列検証を要する（Microsoft Win32_Process では ParentProcessId は
-  // PID 再利用により別プロセスを指し得るため、CreationDate 比較が「親が子より後に作成された」
-  // 矛盾を検出できる）。親子双方の startedAt が取得でき親が子より後に起動していない
-  // （parentStartedAt <= childStartedAt）ときだけ子孫と認め、欠落・パース不能・矛盾
-  // （子が親より早い）は自己除外に通さない（parentPid 一致だけの閉包追加〔反例6678971153〕と
-  // 親配下一括除外〔反例6677451423〕の再採用を避ける）。
-  const selfProcessIds = new Set<string>();
-  if (typeof options.selfProcessId === "number") {
-    selfProcessIds.add(String(options.selfProcessId));
-    let changed = true;
-    while (changed) {
-      changed = false;
-      for (const [pid, proc] of Object.entries(observation.processes)) {
-        if (selfProcessIds.has(pid)) continue;
-        if (proc.parentPid === undefined || !selfProcessIds.has(proc.parentPid)) continue;
-        const parentProcess = observation.processes[proc.parentPid];
-        const parentStartedAt =
-          parentProcess === undefined ? null : parseObservationStartedAtMillis(parentProcess);
-        const childStartedAt = parseObservationStartedAtMillis(proc);
-        if (parentStartedAt === null || childStartedAt === null) continue;
-        if (parentStartedAt > childStartedAt) continue;
-        selfProcessIds.add(pid);
-        changed = true;
-      }
-    }
-  }
-  const knownPids = new Set<string>();
-  const knownListenPorts = new Set<string>();
-  const knownUrls = new Set<string>();
-
-  // 台帳記載所在の正規化参照形（記録対応による範囲内導出の基準）。絶対形に加え
-  // resolveBase（repo root）相対形も含め、commandLine が相対パスで言及する場合も
-  // 参照判定できるようにする。URL 形 location は commandLine/URL からの参照として
-  // そのまま用いる。疑似スキーマ所在（process:pid=… 等）は参照判定で一致しない。
-  // repo 相対形は複数セグメント（"/" を含む）のものだけを参照基準にする: 過去の
-  // 誤作成記録が repo 直下の単一セグメント所在（Users・WINDOWS 等）を持つことがあり、
-  // その相対形（users・windows）は含有一致で C:\Windows\… 等を含む無関係 OS process
-  // 全般を記録対応と誤認し、範囲外の帰属不明報告を無効化する（実測反例: vr-3928-17/18）。
-  const recordedLocationBases: string[] = [];
-  for (const entry of entries) {
-    const resolved = resolveObservationPath(entry.location, observation.resolveBase);
-    const normalizedResolved = normalizeObservationPath(resolved);
-    recordedLocationBases.push(normalizedResolved);
-    const normalizedBase = normalizeObservationPath(observation.resolveBase);
-    const relativeForm = normalizedResolved.slice(normalizedBase.length + 1);
-    if (normalizedResolved.startsWith(`${normalizedBase}/`) && relativeForm.includes("/")) {
-      recordedLocationBases.push(relativeForm);
-    }
-  }
-
-  for (const known of knownResidualEntries) {
-    if (reportedLocations.has(normalizeObservationPath(known.location))) continue;
-    const observedIdentifiers: Record<string, string> = {};
-    let survivalEvidence = "";
-    const pid = known.identifiers.pid;
-    if (pid !== undefined) {
-      knownPids.add(pid);
-      const processObservation = observation.processes[pid];
-      if (processObservation !== undefined && processObservation.alive) {
-        survivalEvidence = survivalEvidence === "" ? `the known residual pid is alive: ${pid}` : survivalEvidence;
-        observedIdentifiers.pid = pid;
-        if (processObservation.commandLine !== null && processObservation.commandLine !== undefined) {
-          observedIdentifiers.commandLine = processObservation.commandLine;
-        }
-        if (processObservation.cwd !== undefined) {
-          observedIdentifiers.cwd = processObservation.cwd;
-        }
-        if (processObservation.startedAt !== undefined) {
-          observedIdentifiers.startedAt = processObservation.startedAt;
-        }
-      }
-    }
-    const listenPort = known.identifiers.listenPort;
-    if (listenPort !== undefined) {
-      knownListenPorts.add(listenPort);
-      if (survivalEvidence === "") {
-        const portObservation = observation.listenPorts[listenPort];
-        if (portObservation !== undefined && portObservation.listening) {
-          survivalEvidence = `the known residual listen port is active: ${listenPort}`;
-          observedIdentifiers.listenPort = listenPort;
-        }
-      }
-    }
-    const knownUrl = known.identifiers.url ?? (isUrlLocation(known.location) ? known.location : undefined);
-    if (knownUrl !== undefined) {
-      knownUrls.add(knownUrl);
-      if (survivalEvidence === "") {
-        const remotePresent = observation.remotes.some((remote) => remote.url === knownUrl);
-        const absenceInput = observation.remoteAbsenceInputs[knownUrl];
-        if (remotePresent) {
-          survivalEvidence = `the known residual remote is present in the remote enumeration: ${knownUrl}`;
-          observedIdentifiers.url = knownUrl;
-        } else if (
-          absenceInput !== undefined &&
-          evaluateRemoteAbsenceJudgement(absenceInput).verdict === "undetermined"
-        ) {
-          survivalEvidence = `the known residual remote remains undetermined after the absence verification: ${knownUrl}`;
-          observedIdentifiers.url = knownUrl;
-        }
-      }
-    }
-    const branch = known.identifiers.branch;
-    if (branch !== undefined && observation.branches.some((name) => name === branch)) {
-      if (survivalEvidence === "") {
-        survivalEvidence = `the known residual branch is present in the branch enumeration: ${branch}`;
-      }
-      observedIdentifiers.branch = branch;
-    }
-    if (survivalEvidence === "") continue;
-    knownResidualStillPresent.push(known.location);
-    findings.push({
-      code: "known-residual-still-present",
-      detail: `known residual list entry is still present by identifier observation: ${known.location} (${survivalEvidence})`,
-    });
-    const match = evaluateIdentifierMatch(known.identifiers, observedIdentifiers);
-    if (!match.matched) {
-      findings.push({
-        code: "identifier-mismatch",
-        detail: `known residual entry identifiers differ from the observation (location: ${known.location}, keys: ${match.mismatchedKeys.join(", ")})`,
-      });
-    }
-  }
-
-  // 台帳エントリへの属性帰属が成立した観測 entity は台帳記録分として消費する
-  // （PID churn 耐性。deriveLedgerProcessAttribution の一意帰属のみ。曖昧帰属は消費しない）。
-  const attributedObservedPids = new Set(options.processAttribution?.values() ?? []);
-  for (const [pid, processObservation] of Object.entries(observation.processes)) {
-    if (ledgerPids.has(pid) || knownPids.has(pid)) continue;
-    if (!processObservation.alive) continue;
-    if (attributedObservedPids.has(pid)) {
-      excludedObservations.push({ path: `process:pid=${pid}`, basis: "ledger-entry-attribute-attribution" });
-      continue;
-    }
-    if (selfProcessIds.has(pid)) {
-      excludedObservations.push({ path: `process:pid=${pid}`, basis: "inspection-execution-runtime-process-self" });
-      continue;
-    }
-    const entityExclusion = findEntityGroundExclusion(`process:pid=${pid}`);
-    if (entityExclusion !== null) {
-      excludedObservations.push({ path: `process:pid=${pid}`, basis: entityExclusion });
-      continue;
-    }
-    const detailParts = [`pid ${pid}`];
-    if (processObservation.commandLine !== null && processObservation.commandLine !== undefined) {
-      detailParts.push(`commandLine: ${processObservation.commandLine}`);
-    }
-    if (processObservation.cwd !== undefined) {
-      detailParts.push(`cwd: ${processObservation.cwd}`);
-    }
-    if (processObservation.startedAt !== undefined) {
-      detailParts.push(`startedAt: ${processObservation.startedAt}`);
-    }
-    if (
-      isOutsideCaseCreationPopulation(options.caseCreationScope, [processObservation.commandLine ?? undefined], {
-        recordedLocationBases,
-        fsCandidates: [processObservation.cwd],
-      })
-    ) {
-      attributionUnknownEntries.push({ path: `process:pid=${pid}`, source: "process-liveness" });
-      continue;
-    }
-    findings.push({
-      code: "unregistered-resource",
-      detail: `no ledger record or known residual entry covers the observed live process: ${detailParts.join(", ")}`,
-    });
-  }
-  for (const [port, portObservation] of Object.entries(observation.listenPorts)) {
-    if (ledgerListenPorts.has(port) || knownListenPorts.has(port)) continue;
-    if (!portObservation.listening) continue;
-    const entityExclusion = findEntityGroundExclusion(`listen:port=${port}`);
-    if (entityExclusion !== null) {
-      excludedObservations.push({ path: `listen:port=${port}`, basis: entityExclusion });
-      continue;
-    }
-    // listen は観測に帰属確認属性（commandLine・cwd 等）を持たないため、台帳・既知残存の
-    // 識別情報照合が範囲内の唯一の経路である（限界は Design と宣言文で明示）。母集団宣言時、
-    // 照合されない listen は本件との確認された接続がなく attribution-unknown として報告のみへ
-    // 分類する（範囲内の process は識別子含有・台帳記載所在参照で従来どおり拒否される。
-    // 宣言なしは現行どおり findings）。
-    if (isOutsideCaseCreationPopulation(options.caseCreationScope, [])) {
-      attributionUnknownEntries.push({ path: `listen:port=${port}`, source: "listen-port-check" });
-      continue;
-    }
-    findings.push({
-      code: "unregistered-resource",
-      detail: `no ledger record or known residual entry covers the observed listening port: ${port}`,
-    });
-  }
-  for (const [url, absenceInput] of Object.entries(observation.remoteAbsenceInputs)) {
-    if (ledgerUrls.has(url) || knownUrls.has(url)) continue;
-    const judgement = evaluateRemoteAbsenceJudgement(absenceInput);
-    if (judgement.verdict === "confirmed-absent") continue;
-    if (
-      isOutsideCaseCreationPopulation(options.caseCreationScope, [url], { recordedLocationBases })
-    ) {
-      attributionUnknownEntries.push({ path: url, source: "remote-absence-verification" });
-      continue;
-    }
-    findings.push({
-      code: "unregistered-resource",
-      detail: `no ledger record or known residual entry covers the observed remote target and its absence could not be confirmed: ${url} (${judgement.basis})`,
-    });
-  }
-  return { findings, knownResidualStillPresent, excludedObservations, attributionUnknownEntries };
-}
-
-/**
- * 検証用一時資材の照合判定（case-close 実行契約の照合・完了拒否規定）。子 Issue の終了判定は子所有の
- * 一時資材のみを照合対象とし、親・共通の未回収は終了単位の全体未完了
- * （terminationUnitBlocked）として報告する（Design 台帳節「評価単位」）。
- */
-export function evaluateVerificationResourceReconciliation(
-  ledger: LedgerReadResult,
-  observation: VerificationResourceObservation,
-  check: VerificationResourceCheck,
-  options: { selfProcessId?: number } = {},
-): VerificationResourceReconciliationEvaluation {
-  const findings: ResourceReconciliationFinding[] = [];
-  const uncollectedParentOrCommon: { id: string; ownership: VerificationResourceOwnership }[] = [];
-
-  for (const failure of observation.inspectionFailures) {
-    findings.push({
-      code: "inspection-unavailable",
-      detail: `inspection is unavailable for scope ${failure.scope}: ${failure.reason}${failure.exitCode !== undefined ? ` (exitCode: ${failure.exitCode})` : ""}`,
-    });
-  }
-
-  if (ledger.state === "missing") {
-    findings.push({
-      code: "ledger-missing",
-      detail:
-        "the verification resources ledger is missing (a missing generation record is not treated as evidence of zero creations)",
-    });
-    for (const scope of ENTITY_RECONCILIATION_SCOPES) {
-      findings.push({
-        code: "inspection-unavailable",
-        detail: `inspection is unavailable for scope ${scope}: the ledger is missing, so scope observations cannot be reconciled against generation records (explicit unavailability, not an empty observation set)`,
-      });
-    }
-  }
-
-  const childEntries = ledger.entries.filter(
-    (entry) => entry.ownership === "child" && entry.childIssue === check.issueNumber,
-  );
-  for (const entry of ledger.entries) {
-    if (entry.ownership === "child" && entry.childIssue === check.issueNumber) continue;
-    if (entry.collectedAt === null) {
-      uncollectedParentOrCommon.push({ id: entry.id, ownership: entry.ownership });
-    }
-  }
-
-  // 台帳エントリと観測プロセスの属性帰属（PID churn 耐性）を1箇所で計算し、
-  // 実物観測状態の導出と entity 消費の両経路へ同一の帰属結果を供給する
-  // （エントリ間排他と観測 entity への一意割当ての機械強制）。
-  const processAttribution = deriveLedgerProcessAttribution(observation, ledger.entries);
-  for (const entry of childEntries) {
-    const presence = deriveEntryPresence(entry, observation, processAttribution);
-    if (presence.presence === "undetermined") {
-      findings.push({
-        code: "remote-absence-undetermined",
-        detail: `${entry.id}: ${presence.observationBasis}`,
-      });
-      continue;
-    }
-    if (presence.presence === "unavailable") {
-      findings.push({
-        code: "inspection-unavailable",
-        detail: `${entry.id}: ${presence.observationBasis}`,
-      });
-      continue;
-    }
-    if (presence.presence === "present") {
-      const match = evaluateIdentifierMatch(entry.identifiers, presence.observedIdentifiers ?? {});
-      if (!match.matched) {
-        findings.push({
-          code: "identifier-mismatch",
-          detail: `${entry.id}: observed identifiers differ from the ledger record (keys: ${match.mismatchedKeys.join(", ")})`,
-        });
-      }
-      if (entry.collectedAt === null) {
-        findings.push({
-          code: "residual-uncollected",
-          detail: `${entry.id}: the resource is still present and collection is not confirmed (${presence.observationBasis})`,
-        });
-      } else {
-        findings.push({
-          code: "residual-after-collection",
-          detail: `${entry.id}: the resource is still present although the ledger records it as collected`,
-        });
-      }
-      continue;
-    }
-    if (entry.collectedAt === null) {
-      findings.push({
-        code: "residual-uncollected",
-        detail: `${entry.id}: the resource is not observed and collection is not confirmed (${presence.observationBasis})`,
-      });
-    } else {
-      const confirmation = check.deletionConfirmations.find((c) => c.entryId === entry.id);
-      if (confirmation === undefined || !deletionConfirmationCoversEntry(entry, confirmation)) {
-        findings.push({
-          code: "deletion-confirmation-missing",
-          detail: `${entry.id}: the resource is absent after a recorded collection, without a deletion confirmation matching the recorded identifiers`,
-        });
-      }
-    }
-  }
-
-  // 母集団照合の有効識別子集合は宣言識別子に本チェックの正規識別子（caseId・評価単位
-  // Issue 番号）を加えた集合とする（正規識別子を含む観測は宣言漏れがあっても範囲内の
-  // 陽性シグナルとして拒否側に倒す。attribution-unknown 報告の識別子は宣言値のまま）。
-  const populationMatchingScope =
-    check.caseCreationScope === undefined
-      ? undefined
-      : {
-          ...check.caseCreationScope,
-          caseIdentifiers: [
-            ...new Set([
-              ...check.caseCreationScope.caseIdentifiers,
-              check.caseId,
-              String(check.issueNumber),
-            ]),
-          ],
-        };
-  const unregistered = evaluateUnregisteredObservations(
-    observation.observedEntries,
-    ledger.entries,
-    check.knownResidualEntries,
-    observation.excludedPaths,
-    observation.resolveBase,
-    populationMatchingScope,
-  );
-  findings.push(...unregistered.findings);
-
-  const entityConsumption = evaluateObservationEntityConsumption(
-    observation,
-    ledger.entries,
-    check.knownResidualEntries,
-    unregistered.knownResidualReportedLocations,
-    {
-      observationExclusionGrounds: check.observationExclusionGrounds,
-      selfProcessId: options.selfProcessId,
-      processAttribution,
-      caseCreationScope: populationMatchingScope,
-    },
-  );
-  findings.push(...entityConsumption.findings);
-
-  return {
-    ledgerState: ledger.state,
-    entryCount: ledger.entries.length,
-    childEntryCount: childEntries.length,
-    findings,
-    uncollectedParentOrCommon,
-    terminationUnitBlocked: uncollectedParentOrCommon.length > 0,
-    permitted: findings.length === 0,
-    excludedObservations: [
-      ...unregistered.excludedObservations,
-      ...entityConsumption.excludedObservations,
-    ],
-    knownResidualStillPresent: [
-      ...unregistered.knownResidualStillPresent,
-      ...entityConsumption.knownResidualStillPresent,
-    ],
-    attributionUnknown: aggregateAttributionUnknown(check.caseCreationScope, [
-      ...unregistered.attributionUnknownEntries,
-      ...entityConsumption.attributionUnknownEntries,
-    ]),
-  };
-}
-
-/**
- * 受入未達の集約判定（ライフサイクル Design「検出範囲の宣言と未達の機械的接続」節）。
- * 4制御（①作成入口の作成先拒否 ②帰属付き独立観測 ③回収照合 ④終了境界の接続）の
- * 実際の接続状態の機械観測から受入未達を導出する。呼出元の文字列申告は導出の入力にならず、
- * 制御の接続不備・検査不能を未達として報告して終了操作の許可判定を受入不成立として扱う
- * （未達報告・完了拒否の維持。正はライフサイクル Design の当該節）。
- */
-export function deriveAcceptanceGaps(
-  observation: AcceptanceControlConnectionObservation,
-): readonly AcceptanceGap[] {
-  const gaps: AcceptanceGap[] = [];
-  if (observation.ledgerState === "missing") {
-    gaps.push({
-      code: "ledger-uninspectable",
-      route: "verification-resources-ledger",
-      detail:
-        "the ledger is missing; creation-entry destination rejection, attributed observation, and reclamation reconciliation cannot be inspected (a missing ledger is not treated as evidence of zero creation)",
-    });
-  }
-  for (const rejection of observation.creationDestinationRejections) {
-    gaps.push({
-      code: "creation-entry-rejection-disconnected",
-      route: rejection.route,
-      detail: `${rejection.entryId}: the registered route fails the creation-entry destination re-evaluation (${rejection.reason})`,
-    });
-  }
-  const missingScopes = REQUIRED_INSPECTION_SCOPES.filter(
-    (scope) => !observation.declaredInspectionScopes.includes(scope),
-  );
-  if (missingScopes.length > 0) {
-    gaps.push({
-      code: "observation-scope-coverage-disconnected",
-      route: "declared-detection-scopes",
-      detail: `the declared observation scopes do not cover the required inspection scopes: missing ${missingScopes.join(", ")}`,
-    });
-  }
-  const unavailableScopes = [...new Set(observation.unavailableObservationScopes)];
-  if (unavailableScopes.length > 0) {
-    gaps.push({
-      code: "observation-unavailable",
-      route: unavailableScopes.join(", "),
-      detail: `independent observation is unavailable for the scopes (inspection failures are not treated as an empty observation set): ${unavailableScopes.join(", ")}`,
-    });
-  }
-  for (const uncovered of observation.reclamationUncoveredEntries) {
-    gaps.push({
-      code: "reclamation-reconciliation-disconnected",
-      route: uncovered.route,
-      detail: `${uncovered.entryId}: the resource is absent after a recorded collection, without a deletion confirmation matching the recorded identifiers`,
-    });
-  }
-  if (
-    observation.terminationRecordIssueNumber === null ||
-    !observation.terminationRecordPathResolvable ||
-    !observation.terminationRecordWriteCapable
-  ) {
-    gaps.push({
-      code: "termination-boundary-disconnected",
-      route: "close-acceptance-record",
-      detail:
-        "the termination boundary is not connected: the close acceptance record path could not be resolved or the runner does not provide the write capabilities required by the issue_close pre-verification contract",
-    });
-  }
-  return gaps;
 }
 
 /** 終了判定記録の保存場所（main repo root 固定・worktree 非依存）。 */
@@ -2331,9 +699,7 @@ export function resolveCloseAcceptanceRecordPath(mainRepoRoot: string, issueNumb
 }
 
 /**
- * pre-merge-local-state-check における機械自身の終了判定記録の特定実体除外
- * （検証用一時資材のライフサイクル Design「検査対象の除外根拠(1)」。
- * verification-resource-reconciliation の excludedPaths〔close-acceptance-record-itself〕と同一契約）。
+ * pre-merge-local-state-check における機械自身の終了判定記録の特定実体除外。
  * 書出し元と同一の解決（resolveMainRepoRoot + resolveCloseAcceptanceRecordPath）で
  * 対象 Issue の記録パスを導出し、worktree 相対・`/` 正規化の relative と
  * porcelain 省略形の実在確認に使う絶対パス absolute を返す。
@@ -2346,7 +712,7 @@ function resolveSelfAcceptanceRecordForLocalStateCheck(
   runner: MechanicalRunner,
   worktreeCwd: string,
 ): { relative: string; absolute: string } | null {
-  const issueNumber = input.verificationResourceCheck?.issueNumber;
+  const issueNumber = input.issueNumber;
   if (typeof issueNumber !== "number" || !Number.isInteger(issueNumber) || issueNumber < 1) {
     return null;
   }
@@ -2407,14 +773,15 @@ function writeCloseAcceptanceRecord(
   input: CloseMechanicalInput,
   runner: MechanicalRunner,
   accepted: boolean,
+  judgment: CloseAcceptanceRecordJudgment,
 ): CloseAcceptanceRecordWrite {
-  const issueNumber = input.verificationResourceCheck?.issueNumber;
-  if (issueNumber === undefined) {
+  const issueNumber = input.issueNumber;
+  if (typeof issueNumber !== "number" || !Number.isInteger(issueNumber) || issueNumber < 1) {
     return {
       path: null,
       record: null,
       written: false,
-      error: "the verification resource check has no target Issue number",
+      error: "input.issueNumber is missing or invalid",
     };
   }
   if (!isNonEmptyString(input.issueUpdatedAt)) {
@@ -2428,17 +795,18 @@ function writeCloseAcceptanceRecord(
   let record: CloseAcceptanceRecord | null = null;
   let recordPath: string | null = null;
   try {
-    const ledgerIo = requireRunnerLedgerIo(runner);
-    const mainRepoRoot = resolveMainRepoRoot(ledgerIo);
+    const recordIo = requireRunnerLedgerIo(runner);
+    const mainRepoRoot = resolveMainRepoRoot(recordIo);
     recordPath = resolveCloseAcceptanceRecordPath(mainRepoRoot, issueNumber);
     record = {
       issueNumber,
       targetRevision: input.issueUpdatedAt,
       generatedAt: new Date().toISOString(),
       accepted,
+      judgment,
     };
-    ledgerIo.mkdirRecursive(path.dirname(recordPath));
-    ledgerIo.writeTextFile(recordPath, serializeCloseAcceptanceRecord(record));
+    recordIo.mkdirRecursive(path.dirname(recordPath));
+    recordIo.writeTextFile(recordPath, serializeCloseAcceptanceRecord(record));
     return { path: recordPath, record, written: true, error: null };
   } catch (error) {
     let invalidationError: string | null = null;
@@ -2466,16 +834,23 @@ function writeCloseAcceptanceRecord(
   }
 }
 
+/**
+ * 終了判定記録の accepted 書出し条件（変更後の正規完了判定）。
+ * 受入評価（必須完了条件の評価結果）の確定・許可に加え、契約状態記録の
+ * コミット済み検査・未追跡残存検査（diff.contractStateResidue）の成立を
+ * 明示消費する。exitCategory success は全 step の pass を含むため residue
+ * step の fail も含めて拒否するが、residue 判定の消費はここで明示的に行う
+ * （契約状態記録・未追跡残存検査が終了判定記録の受理条件として失われない。対応関係は repository top-level traceability/ 配下 sidecar を参照）。
+ */
 function isCloseAcceptanceReady(report: CloseMechanicalReport): boolean {
   if (report.result.phase !== "pre-merge" || report.result.exitCategory !== "success") return false;
   const evaluation = report.diff.acceptanceEvaluation as AcceptanceEvaluationReport | undefined;
   if (evaluation?.determined !== true || evaluation.closeAllowed !== true) return false;
-  const reconciliation = report.diff.verificationResourceReconciliation as
-    | { permitted?: boolean }
+  const residue = report.diff.contractStateResidue as
+    | { committed?: boolean; humanConfirmationItems?: readonly string[] }
     | undefined;
-  if (reconciliation?.permitted !== true) return false;
-  const acceptanceGaps = report.diff.acceptanceGaps as readonly AcceptanceGap[] | undefined;
-  return acceptanceGaps !== undefined && acceptanceGaps.length === 0;
+  if (residue?.committed !== true || (residue.humanConfirmationItems?.length ?? 0) > 0) return false;
+  return true;
 }
 
 /**
@@ -2788,7 +1163,10 @@ export function evaluateIntegrityMachineAcceptance(
 /**
  * 報告 JSON から終了操作（issue_close、Epic 終了、Wave クローズ）の実行可否を
  * 決定的に判定する。既存終了経路（case-close STEP-5、E1〜E6）が消費する gate
- * であり、受入評価の拒否・未確定は終了操作の前提を満たさない。
+ * であり、受入評価の拒否・未確定は終了操作の前提を満たさない。判定は変更後の
+ * 正規完了判定（必須完了条件の評価結果）と契約状態記録・未追跡残存検査
+ * （diff.contractStateResidue）の明示消費で構成する（機械受理不成立時は
+ * permitted=false で終了操作を実行しない）。
  */
 export function isCloseOperationPermitted(
   report: CloseMechanicalReport,
@@ -2802,23 +1180,16 @@ export function isCloseOperationPermitted(
   if (evaluation.closeAllowed !== true) {
     return { permitted: false, reason: "acceptance-denied" };
   }
-  const reconciliation = report.diff.verificationResourceReconciliation as
-    | { permitted?: boolean }
+  const residue = report.diff.contractStateResidue as
+    | { committed?: boolean; humanConfirmationItems?: readonly string[] }
     | undefined;
-  if (reconciliation === undefined || reconciliation.permitted !== true) {
-    return { permitted: false, reason: "verification-resource-reconciliation-denied" };
+  if (residue?.committed !== true || (residue.humanConfirmationItems?.length ?? 0) > 0) {
+    return { permitted: false, reason: "contract-state-residue-unresolved" };
   }
   const failedOtherGate = report.result.steps.some(
-    (step) =>
-      step.status === "fail" &&
-      step.name !== "verification-resource-reconciliation" &&
-      step.name !== "close-acceptance-record",
+    (step) => step.status === "fail" && step.name !== "close-acceptance-record",
   );
   if (failedOtherGate) return { permitted: false, reason: "mechanical-failure" };
-  const acceptanceGaps = report.diff.acceptanceGaps as readonly AcceptanceGap[] | undefined;
-  if (acceptanceGaps === undefined || acceptanceGaps.length > 0) {
-    return { permitted: false, reason: "acceptance-gap-remains" };
-  }
   if (report.result.exitCategory !== "success") {
     return { permitted: false, reason: "mechanical-failure" };
   }
@@ -2923,7 +1294,7 @@ function runSpec(runner: MechanicalRunner, spec: GateCommandSpec): CommandResult
   return runner.run({ command: spec.command, args: spec.args, cwd: spec.cwd, timeoutMs: spec.timeoutMs });
 }
 
-function requireRunnerLedgerIo(runner: MechanicalRunner): LedgerIo {
+function requireRunnerLedgerIo(runner: MechanicalRunner): CloseAcceptanceRecordIo {
   const writeTextFile = runner.writeTextFile;
   const mkdirRecursive = runner.mkdirRecursive;
   const gitCommonDir = runner.gitCommonDir;
@@ -2953,401 +1324,6 @@ function requireRunnerLedgerIo(runner: MechanicalRunner): LedgerIo {
       return gitCommonDir();
     },
   };
-}
-
-function parseGitRemotesListing(text: string): { name: string; url: string }[] {
-  const seen = new Set<string>();
-  const result: { name: string; url: string }[] = [];
-  for (const line of text.split("\n")) {
-    const trimmed = line.trim();
-    if (trimmed.length === 0) continue;
-    const match = trimmed.match(/^(\S+)\t(\S+)/);
-    if (!match) continue;
-    const key = `${match[1]} ${match[2]}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    result.push({ name: match[1] ?? "", url: match[2] ?? "" });
-  }
-  return result;
-}
-
-function parseWorktreeListing(text: string): string[] {
-  const result: string[] = [];
-  for (const line of text.split("\n")) {
-    const trimmed = line.trim();
-    if (trimmed.startsWith("worktree ")) {
-      const value = trimmed.slice("worktree ".length).trim();
-      if (value.length > 0) result.push(value);
-    }
-  }
-  return result;
-}
-
-function parseBranchListing(text: string): string[] {
-  return text.split("\n").map((line) => line.trim()).filter((line) => line.length > 0);
-}
-
-function isJsonObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-/**
- * 4制御の実際の接続状態の観測を機械観測から組み立てる。
- * ①は台帳登録経路の作成先再評価（evaluateCreationDestination の replay。登録入口と同じ
- * 環境TEMP基準）、②は宣言観測スコープの集合と観測実行失敗、③は回収済み実物消失エントリの
- * 削除確認被覆、④は終了判定記録のパス解決と書出し能力（判定対象版の有無を含む）である。
- * 呼出元の文字列申告は消費しない。
- */
-function buildAcceptanceControlObservation(
-  input: CloseMechanicalInput,
-  check: VerificationResourceCheck,
-  ledger: LedgerReadResult,
-  mainRepoRoot: string | null,
-  observationFailures: readonly { scope: string; reason: string; exitCode?: number }[],
-  resourceObservation: VerificationResourceObservation,
-  runner: MechanicalRunner,
-): AcceptanceControlConnectionObservation {
-  const creationDestinationRejections: CreationDestinationRejectionObservation[] = [];
-  const reclamationUncoveredEntries: ReclamationUncoveredEntryObservation[] = [];
-  if (ledger.state === "present" && mainRepoRoot !== null) {
-    const tempRoot = os.tmpdir();
-    for (const entry of ledger.entries) {
-      // 新規作成判定と既存物照合の区別。後追いの発生事実記録（evidenced-occurrence-record）
-      // は作成入口（作成時機械登録）を経由していないため、現在実行環境の作成先基準の
-      // 再評価（新規作成の作成先拒否の接続確認）の違断対象にしない。既存実在物は
-      // 台帳記録の照合と既知残存リストの読取照合で扱われる（記録後も回収義務は残る）。
-      if (entry.registrationBasis !== "evidenced-occurrence-record") {
-        const destination = evaluateCreationDestination(entry.location, mainRepoRoot, tempRoot);
-        if (!destination.valid) {
-          creationDestinationRejections.push({
-            entryId: entry.id,
-            route: entry.location,
-            reason: destination.reason ?? "the creation-entry destination rejection did not accept the registered route",
-          });
-        }
-      }
-      const presence = deriveEntryPresence(entry, resourceObservation);
-      if (
-        entry.ownership === "child" &&
-        entry.childIssue === check.issueNumber &&
-        entry.collectedAt !== null &&
-        presence.presence === "absent"
-      ) {
-        const confirmation = check.deletionConfirmations.find((c) => c.entryId === entry.id);
-        if (confirmation === undefined || !deletionConfirmationCoversEntry(entry, confirmation)) {
-          reclamationUncoveredEntries.push({ entryId: entry.id, route: entry.location });
-        }
-      }
-    }
-  }
-  const terminationRecordIssueNumber =
-    typeof check.issueNumber === "number" && Number.isInteger(check.issueNumber) && check.issueNumber >= 1
-      ? check.issueNumber
-      : null;
-  let terminationRecordPathResolvable = false;
-  if (terminationRecordIssueNumber !== null && mainRepoRoot !== null) {
-    try {
-      resolveCloseAcceptanceRecordPath(mainRepoRoot, terminationRecordIssueNumber);
-      terminationRecordPathResolvable = true;
-    } catch {
-      terminationRecordPathResolvable = false;
-    }
-  }
-  return {
-    ledgerState: ledger.state,
-    creationDestinationRejections,
-    declaredInspectionScopes: check.inspectionCommands.map((command) => command.scope),
-    unavailableObservationScopes: observationFailures.map((failure) => failure.scope),
-    reclamationUncoveredEntries,
-    terminationRecordIssueNumber,
-    terminationRecordPathResolvable,
-    terminationRecordWriteCapable:
-      typeof runner.writeTextFile === "function" &&
-      typeof runner.mkdirRecursive === "function" &&
-      isNonEmptyString(input.issueUpdatedAt),
-  };
-}
-
-/**
- * 検証用一時資材の照合を実行し、照合 step・報告 diff・受入未達を組み立てる。
- * 観測は申告（台帳）と独立に git 列挙・検査コマンドで実行し、観測の欠落・不一致を
- * findings として検出する（Design「専用領域と作成経路の制限」節の観測手段 (a)〜(f)）。
- * 終了判定記録は permitted / denied の双方で書き出す（機械受理前提の消費対象）。
- */
-function executeVerificationResourceReconciliation(
-  input: CloseMechanicalInput,
-  check: VerificationResourceCheck,
-  runner: MechanicalRunner,
-  ledgerIo: LedgerIo,
-): {
-  step: StepRecord;
-  diff: VerificationResourceReconciliationEvaluation;
-  gaps: readonly AcceptanceGap[];
-} {
-  const earlyFindings: ResourceReconciliationFinding[] = [];
-  const observationFailures: { scope: string; reason: string; exitCode?: number }[] = [];
-
-  let mainRepoRoot: string | null;
-  try {
-    mainRepoRoot = resolveMainRepoRoot(ledgerIo);
-  } catch (error) {
-    mainRepoRoot = null;
-    earlyFindings.push({
-      code: "ledger-unavailable",
-      detail: `main repo root resolution failed: ${String(error)}`,
-    });
-  }
-
-  let ledger: LedgerReadResult = { state: "missing", entries: [] };
-  let ledgerPath: string | null = null;
-  if (earlyFindings.length === 0 && mainRepoRoot !== null) {
-    try {
-      ledgerPath = resolveLedgerPath(mainRepoRoot, check.caseId);
-      ledger = readLedger(ledgerIo, ledgerPath);
-    } catch (error) {
-      earlyFindings.push({
-        code: "ledger-unavailable",
-        detail: `ledger read failed: ${String(error)}`,
-      });
-    }
-  }
-
-  const remotesResult = runner.run({ command: "git", args: ["remote", "-v"], cwd: input.repoRoot });
-  if (remotesResult.exitCode !== 0) {
-    observationFailures.push({
-      scope: "remote-worktree-branch-enumeration",
-      reason: `git remote listing failed: ${remotesResult.stderr.trim()}`,
-      exitCode: remotesResult.exitCode,
-    });
-  }
-  const worktreeResult = runner.run({
-    command: "git",
-    args: ["worktree", "list", "--porcelain"],
-    cwd: input.repoRoot,
-  });
-  if (worktreeResult.exitCode !== 0) {
-    observationFailures.push({
-      scope: "remote-worktree-branch-enumeration",
-      reason: `git worktree listing failed: ${worktreeResult.stderr.trim()}`,
-      exitCode: worktreeResult.exitCode,
-    });
-  }
-  const branchResult = runner.run({
-    command: "git",
-    args: ["branch", "--list", "--all", "--format=%(refname:short)"],
-    cwd: input.repoRoot,
-  });
-  if (branchResult.exitCode !== 0) {
-    observationFailures.push({
-      scope: "remote-worktree-branch-enumeration",
-      reason: `git branch listing failed: ${branchResult.stderr.trim()}`,
-      exitCode: branchResult.exitCode,
-    });
-  }
-  const gitignoredResult = runner.run({
-    command: "git",
-    args: ["ls-files", "--others", "-i", "--exclude-standard"],
-    cwd: input.repoRoot,
-  });
-  if (gitignoredResult.exitCode !== 0) {
-    observationFailures.push({
-      scope: "gitignored-temporary-output",
-      reason: `gitignore 対象一時出力の列挙 failed: ${gitignoredResult.stderr.trim()}`,
-      exitCode: gitignoredResult.exitCode,
-    });
-  }
-
-  const dedicatedEntries: string[] = [];
-  const osTempMatches: string[] = [];
-  const processes: Record<string, { alive: boolean; commandLine: string | null }> = {};
-  const listenPorts: Record<string, { listening: boolean }> = {};
-  const remoteAbsenceInputs: Record<string, RemoteAbsenceJudgementInput> = {};
-  for (const spec of check.inspectionCommands) {
-    const result = runner.run({
-      command: spec.command,
-      args: spec.args,
-      cwd: spec.cwd,
-      timeoutMs: spec.timeoutMs,
-    });
-    if (result.exitCode !== 0) {
-      observationFailures.push({
-        scope: spec.scope,
-        reason: `inspection command failed: ${result.stderr.trim().slice(-200)}`,
-        exitCode: result.exitCode,
-      });
-      continue;
-    }
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(result.stdout);
-    } catch (error) {
-      observationFailures.push({
-        scope: spec.scope,
-        reason: `inspection output is not valid JSON: ${String(error)}`,
-      });
-      continue;
-    }
-    if (!isJsonObject(parsed)) {
-      observationFailures.push({
-        scope: spec.scope,
-        reason: "inspection output does not match the declared JSON contract shape",
-      });
-      continue;
-    }
-    let shapeOk = false;
-    if (spec.scope === "dedicated-area-listing" && Array.isArray(parsed.entries)) {
-      for (const entry of parsed.entries) {
-        if (isNonEmptyString(entry)) dedicatedEntries.push(entry);
-      }
-      shapeOk = true;
-    } else if (spec.scope === "os-temp-area-scan" && Array.isArray(parsed.matches)) {
-      for (const entry of parsed.matches) {
-        if (isNonEmptyString(entry)) osTempMatches.push(entry);
-      }
-      shapeOk = true;
-    } else if (spec.scope === "process-liveness") {
-      for (const [pid, value] of Object.entries(parsed)) {
-        if (isJsonObject(value) && typeof value.alive === "boolean") {
-          processes[pid] = {
-            alive: value.alive,
-            commandLine: typeof value.commandLine === "string" ? value.commandLine : null,
-            ...(typeof value.cwd === "string" ? { cwd: value.cwd } : {}),
-            ...(typeof value.startedAt === "string" ? { startedAt: value.startedAt } : {}),
-            ...(typeof value.parentPid === "string" ? { parentPid: value.parentPid } : {}),
-          };
-        }
-      }
-      shapeOk = true;
-    } else if (spec.scope === "listen-port-check") {
-      for (const [port, value] of Object.entries(parsed)) {
-        if (isJsonObject(value) && typeof value.listening === "boolean") {
-          listenPorts[port] = { listening: value.listening };
-        }
-      }
-      shapeOk = true;
-    } else if (spec.scope === "remote-absence-verification") {
-      let validRemoteObservations = true;
-      for (const [url, value] of Object.entries(parsed)) {
-        if (
-          !isJsonObject(value) ||
-          typeof value.httpStatus404Observed !== "boolean" ||
-          typeof value.authenticationConfirmed !== "boolean" ||
-          typeof value.visibilityConfirmed !== "boolean" ||
-          typeof value.targetIdConfirmed !== "boolean" ||
-          (value.confirmedAbsenceEvidence !== undefined && typeof value.confirmedAbsenceEvidence !== "string")
-        ) {
-          validRemoteObservations = false;
-          continue;
-        }
-        remoteAbsenceInputs[url] = {
-          httpStatus404Observed: value.httpStatus404Observed,
-          authenticationConfirmed: value.authenticationConfirmed,
-          visibilityConfirmed: value.visibilityConfirmed,
-          targetIdConfirmed: value.targetIdConfirmed,
-          ...(typeof value.confirmedAbsenceEvidence === "string"
-            ? { confirmedAbsenceEvidence: value.confirmedAbsenceEvidence }
-            : {}),
-        };
-      }
-      shapeOk = validRemoteObservations;
-    }
-    if (!shapeOk) {
-      observationFailures.push({
-        scope: spec.scope,
-        reason: "inspection output does not match the declared JSON contract shape",
-      });
-    }
-  }
-
-  const gitignoredOutputs =
-    gitignoredResult.exitCode === 0
-      ? gitignoredResult.stdout.split("\n").map((line) => line.trim()).filter((line) => line.length > 0)
-      : [];
-  // gitignore 対象出力は案件識別子の有無で除外せず、台帳・既知残存・明示除外根拠と突合する。
-  const rawObservedEntries: ObservedTemporaryResource[] = [
-    ...dedicatedEntries.map((entry) => ({ path: entry, source: "dedicated-area" as const })),
-    ...osTempMatches.map((entry) => ({ path: entry, source: "os-temp-area" as const })),
-    ...gitignoredOutputs.map((entry) => ({ path: entry, source: "gitignored-output" as const })),
-  ];
-  const observedEntries = attachObservationExclusionGrounds(
-    rawObservedEntries,
-    check.observationExclusionGrounds,
-    input.repoRoot,
-  );
-
-  const excludedPaths = [
-    {
-      path: path.join(mainRepoRoot ?? input.repoRoot, ".agentdev", "tmp", "verification-resources"),
-      basis: "ledger-itself",
-    },
-    {
-      path: path.join(mainRepoRoot ?? input.repoRoot, ".agentdev", "close-acceptance"),
-      basis: "close-acceptance-record-itself",
-    },
-    ...(check.inspectionArtifactPaths ?? []).map((entry) => ({
-      path: entry,
-      basis: "inspection-execution-recorded-artifact",
-    })),
-  ];
-
-  const resourceObservation: VerificationResourceObservation = {
-    exists: (absolutePath) => ledgerIo.exists(absolutePath),
-    remotes: parseGitRemotesListing(remotesResult.stdout),
-    worktrees: parseWorktreeListing(worktreeResult.stdout),
-    branches: parseBranchListing(branchResult.stdout),
-    processes,
-    listenPorts,
-    remoteAbsenceInputs,
-    observedEntries,
-    inspectionFailures: observationFailures,
-    excludedPaths,
-    resolveBase: input.repoRoot,
-  };
-  const evaluation =
-    earlyFindings.length === 0
-      ? evaluateVerificationResourceReconciliation(ledger, resourceObservation, check, {
-          selfProcessId: runner.processId?.(),
-        })
-      : null;
-  const gaps = deriveAcceptanceGaps(
-    buildAcceptanceControlObservation(input, check, ledger, mainRepoRoot, observationFailures, resourceObservation, runner),
-  );
-  const mergedFindings: ResourceReconciliationFinding[] = [
-    ...earlyFindings,
-    ...(evaluation?.findings ?? []),
-  ];
-
-  const permitted = mergedFindings.length === 0;
-  const attributionUnknown = evaluation?.attributionUnknown ?? aggregateAttributionUnknown(undefined, []);
-  const step: StepRecord = {
-    name: "verification-resource-reconciliation",
-    status: permitted && gaps.length === 0 ? "pass" : "fail",
-    detail: {
-      ledgerState: ledger.state,
-      ledgerPath,
-      mainRepoRoot: mainRepoRoot ?? "",
-      entryCount: ledger.entries.length,
-      childEntryCount: evaluation?.childEntryCount ?? 0,
-      findings: mergedFindings,
-      permitted,
-      gaps,
-      declaredDetectionScopes: [...DECLARED_DETECTION_SCOPES],
-      attributionUnknown,
-    },
-  };
-  const diff = {
-    ledgerState: ledger.state,
-    entryCount: ledger.entries.length,
-    childEntryCount: evaluation?.childEntryCount ?? 0,
-    findings: mergedFindings,
-    permitted,
-    uncollectedParentOrCommon: evaluation?.uncollectedParentOrCommon ?? [],
-    terminationUnitBlocked: evaluation?.terminationUnitBlocked ?? false,
-    excludedObservations: evaluation?.excludedObservations ?? [],
-    knownResidualStillPresent: evaluation?.knownResidualStillPresent ?? [],
-    attributionUnknown,
-  };
-  return { step, diff, gaps };
 }
 
 function runAcceptanceEvaluation(
@@ -3391,57 +1367,29 @@ function runAcceptanceEvaluation(
 interface ReclamationStepOutcome {
   status: "pass" | "warn" | "fail";
   detail: Record<string, unknown>;
-  convergenceMaterial: string | null;
   warnings: readonly string[];
 }
 
-/** 回収実行面（台帳回収・終了判定記録回収）を runner 注入で実行する。 */
+/** 終了判定記録の回収実行面を runner 注入で実行する。 */
 function runReclamation(section: ReclamationSection, runner: MechanicalRunner): ReclamationStepOutcome {
   if (runner.deleteFile === undefined) {
     return {
       status: "fail",
       detail: { error: "mechanical runner does not provide deleteFile; reclamation cannot execute (fail-closed)" },
-      convergenceMaterial: null,
       warnings: [],
     };
   }
-  const io: ReclamationIo = {
+  const io: CloseAcceptanceRecordReclamationIo = {
     exists: (absolutePath) => runner.exists(absolutePath),
     readTextFile: (absolutePath) => runner.readTextFile(absolutePath),
-    writeTextFile: () => fail("ledger write is not available through the mechanical runner (read/delete only)"),
-    mkdirRecursive: () => fail("ledger directory creation is not available through the mechanical runner (read/delete only)"),
+    writeTextFile: () => fail("close acceptance record write is not available through the mechanical runner (read/delete only)"),
+    mkdirRecursive: () => fail("close acceptance record directory creation is not available through the mechanical runner (read/delete only)"),
     gitCommonDir: () => fail("git common dir resolution is not available through the mechanical runner"),
     deleteFile: (absolutePath) => runner.deleteFile?.(absolutePath),
   };
   const detail: Record<string, unknown> = {};
   const warnings: string[] = [];
   let status: "pass" | "warn" | "fail" = "pass";
-  let convergenceMaterial: string | null = null;
-  if (section.ledger != null) {
-    const ledgerResult: LedgerReclamationResult = reclaimLedger(
-      io,
-      section.ledger.mainRepoRoot,
-      section.ledger.caseId,
-      section.ledger.confirmation,
-    );
-    detail.ledgerStatus = ledgerResult.status;
-    detail.ledgerPath = ledgerResult.ledgerPath;
-    detail.reclaimedEntryCount = ledgerResult.reclaimedEntryCount;
-    if (ledgerResult.status === "uncollected-entries") {
-      detail.uncollectedIds = ledgerResult.uncollectedIds;
-      status = "fail";
-      warnings.push(
-        `ledger reclamation refused: uncollected entries remain (termination unit incomplete): ${ledgerResult.uncollectedIds.join(", ")}`,
-      );
-    } else if (ledgerResult.status === "ledger-missing") {
-      status = "warn";
-      warnings.push(
-        `ledger reclamation found no ledger file (a missing ledger is a record gap, not a basis for zero creations): ${ledgerResult.ledgerPath}`,
-      );
-    } else if (ledgerResult.convergenceMaterial !== null) {
-      convergenceMaterial = ledgerResult.convergenceMaterial;
-    }
-  }
   if (section.closeAcceptanceRecord != null) {
     const recordResult: CloseAcceptanceReclamationResult = reclaimCloseAcceptanceRecord(io, section.closeAcceptanceRecord);
     detail.closeAcceptanceRecordStatus = recordResult.status;
@@ -3452,7 +1400,7 @@ function runReclamation(section: ReclamationSection, runner: MechanicalRunner): 
       );
     }
   }
-  return { status, detail, convergenceMaterial, warnings };
+  return { status, detail, warnings };
 }
 
 /** 機械工程を実行し、報告 JSON を返す（省略なし。失敗時は fail step を含める）。 */
@@ -3473,7 +1421,9 @@ export function runCloseMechanicalSteps(
   }
 
   if (input.phase === "pre-merge") {
-    provisionalAcceptanceRecord = writeCloseAcceptanceRecord(input, runner, false);
+    // 受理なし・前回記録無効化の provisional 書出し。issue_reopen 後の再 close で
+    // 過去の accepted 記録を再利用させない（issue_reopen による無効化の維持）。
+    provisionalAcceptanceRecord = writeCloseAcceptanceRecord(input, runner, false, { determined: false });
     acceptanceRecordStep = {
       name: "close-acceptance-record",
       status: provisionalAcceptanceRecord.written ? "pass" : "fail",
@@ -3625,25 +1575,6 @@ export function runCloseMechanicalSteps(
       steps,
     );
 
-    const verificationResourceCheck = input.verificationResourceCheck
-      ?? fail("input.verificationResourceCheck is required for pre-merge completion determination");
-    const reconciliation = executeVerificationResourceReconciliation(
-      input,
-      verificationResourceCheck,
-      runner,
-      requireRunnerLedgerIo(runner),
-    );
-    steps.push(reconciliation.step);
-    diff.verificationResourceReconciliation = reconciliation.diff;
-    diff.acceptanceGaps = reconciliation.gaps;
-    if (!reconciliation.diff.permitted) {
-      warnings.push("verification-resource reconciliation failed; close operation is denied");
-    }
-    if (reconciliation.gaps.length > 0) {
-      warnings.push(
-        "acceptance gaps remain from the control connection observation; close operation is denied",
-      );
-    }
 
     // 契約状態記録・未追跡残存検査（完了判定工程）。検証範囲は
     // 正規契約から導出した全状態記録パスとリポジトリ全体の未追跡対象であり、
@@ -3698,70 +1629,6 @@ export function runCloseMechanicalSteps(
       );
     }
 
-    // 一時資材回収の削除確認（削除実行の確認境界）。台帳に未回収対象が残る場合、
-    // 利用者の明示確認と削除実行直前の識別情報照合（所在・種別・識別情報の完全一致）
-    // が成立しない対象の削除は拒否として報告し、回収済み対象に削除確認記録が
-    // 欠落している場合は削除確認の不存在として完了拒否の材料にする。機械可読値
-    // （実行担当生成の approval 等）だけの確認は利用者確認として成立しない。
-    // 台帳不在（記録欠落）は作成物なしの根拠にせず照合本体に委ねる（空状態の区別）。
-    const deletionCheck = input.deletionConfirmationCheck;
-    if (deletionCheck !== undefined && deletionCheck !== null) {
-      let deletionOutcome: { state: "missing" | "present"; evaluation: ReturnType<typeof evaluateDeletionConfirmationFromLedgerText>["evaluation"] };
-      try {
-        const ledgerText = runner.exists(deletionCheck.ledgerPath)
-          ? runner.readTextFile(deletionCheck.ledgerPath)
-          : null;
-        deletionOutcome = evaluateDeletionConfirmationFromLedgerText(
-          ledgerText,
-          deletionCheck.confirmations,
-          deletionCheck.observations,
-        );
-      } catch (error) {
-        deletionOutcome = {
-          state: "present",
-          evaluation: {
-            permitted: false,
-            evaluatedCount: 0,
-            confirmedIds: [],
-            refusals: [
-              {
-                entryId: "(ledger)",
-                code: "deletion-confirmation-record-missing",
-                detail: `ledger could not be evaluated (fail-closed): ${String(error)}`,
-              },
-            ],
-          },
-        };
-      }
-      const deletionFailed =
-        deletionOutcome.state === "present" && deletionOutcome.evaluation.permitted !== true;
-      steps.push({
-        name: "deletion-confirmation-check",
-        status: deletionFailed ? "fail" : "pass",
-        detail: {
-          ledgerPath: deletionCheck.ledgerPath,
-          state: deletionOutcome.state,
-          permitted: deletionOutcome.evaluation.permitted,
-          evaluatedCount: deletionOutcome.evaluation.evaluatedCount,
-          confirmedIds: deletionOutcome.evaluation.confirmedIds,
-          refusals: deletionOutcome.evaluation.refusals,
-        },
-      });
-      diff.deletionConfirmation = {
-        state: deletionOutcome.state,
-        permitted: deletionOutcome.evaluation.permitted,
-        evaluatedCount: deletionOutcome.evaluation.evaluatedCount,
-        confirmedIds: deletionOutcome.evaluation.confirmedIds,
-        refusals: deletionOutcome.evaluation.refusals,
-      };
-      if (deletionFailed) {
-        warnings.push(
-          `deletion confirmation boundary refused ${deletionOutcome.evaluation.refusals.length} target(s); deletion without explicit user confirmation and identifier matching is not executed: ${deletionOutcome.evaluation.refusals
-            .map((refusal) => `${refusal.entryId}(${refusal.code})`)
-            .join(", ")}`,
-        );
-      }
-    }
 
     if (input.generateIndexesGate) {
       const gen = runSpec(runner, input.generateIndexesGate);
@@ -3875,13 +1742,10 @@ export function runCloseMechanicalSteps(
     if (input.reclamation != null) {
       const outcome = runReclamation(input.reclamation, runner);
       steps.push({
-        name: "verification-resource-reclamation",
+        name: "close-acceptance-reclamation",
         status: outcome.status,
         detail: outcome.detail,
       });
-      if (outcome.convergenceMaterial !== null) {
-        proposal.verification_resource_final_record = outcome.convergenceMaterial;
-      }
       for (const warning of outcome.warnings) warnings.push(warning);
       diff.reclamation = outcome.detail;
     }
@@ -3926,16 +1790,32 @@ export function runCloseMechanicalSteps(
 
   let report = assembleReport(input.phase, steps, diff, warnings, proposal);
   if (input.phase === "pre-merge" && provisionalAcceptanceRecord !== null && acceptanceRecordStep !== null) {
+    const acceptanceEvaluation = report.diff.acceptanceEvaluation as AcceptanceEvaluationReport | undefined;
+    const finalJudgment: CloseAcceptanceRecordJudgment = {
+      determined: acceptanceEvaluation?.determined === true,
+      ...(acceptanceEvaluation?.determined === true
+        ? {
+          closeAllowed: acceptanceEvaluation.closeAllowed === true,
+          populationState: acceptanceEvaluation.populationState,
+          blockingUnmet: acceptanceEvaluation.blockingUnmet ?? [],
+        }
+        : {}),
+    };
     let finalAcceptanceRecord = provisionalAcceptanceRecord;
     if (isCloseAcceptanceReady(report)) {
-      const acceptedWrite = writeCloseAcceptanceRecord(input, runner, true);
+      const acceptedWrite = writeCloseAcceptanceRecord(input, runner, true, finalJudgment);
       finalAcceptanceRecord = acceptedWrite.written
         ? acceptedWrite
-        : writeCloseAcceptanceRecord(input, runner, false);
+        : writeCloseAcceptanceRecord(input, runner, false, finalJudgment);
       acceptanceRecordStep.status = acceptedWrite.written ? "pass" : "fail";
       if (!acceptedWrite.written) {
         warnings.push(acceptedWrite.error ?? "close acceptance record finalization failed");
       }
+    } else if (finalJudgment.determined) {
+      // 受入評価は確定したが正規完了条件の未達がある場合も、判定内容（必須完了条件の
+      // 評価結果）込みで受理なしの最終記録へ上書きする（拒否結果の記録。過去の
+      // accepted 記録の再利用を許さない）。
+      finalAcceptanceRecord = writeCloseAcceptanceRecord(input, runner, false, finalJudgment);
     }
     const accepted = finalAcceptanceRecord.written && finalAcceptanceRecord.record?.accepted === true;
     acceptanceRecordStep.detail = {
@@ -3948,7 +1828,7 @@ export function runCloseMechanicalSteps(
     };
     diff.closeAcceptanceRecord = {
       path: finalAcceptanceRecord.path,
-      issueNumber: finalAcceptanceRecord.record?.issueNumber ?? input.verificationResourceCheck?.issueNumber ?? null,
+      issueNumber: finalAcceptanceRecord.record?.issueNumber ?? input.issueNumber ?? null,
       targetRevision: finalAcceptanceRecord.record?.targetRevision ?? input.issueUpdatedAt ?? null,
       generatedAt: finalAcceptanceRecord.record?.generatedAt ?? null,
       accepted,
@@ -4025,9 +1905,6 @@ function main(): void {
       },
       sleep(ms) {
         Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
-      },
-      processId() {
-        return process.pid;
       },
     };
     const report = runCloseMechanicalSteps(normalized, runner);
