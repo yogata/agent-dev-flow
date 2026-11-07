@@ -1,4 +1,5 @@
-// ADF-COVERS(verification): REQ-009-053
+// ADF-COVERS(implementation): REQ-119-003
+// ADF-COVERS(verification): REQ-009-053, REQ-119-003
 import { afterAll, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -20,6 +21,9 @@ import { runValidateInputOnly, validateInput } from "../../../../../src/common/s
 import { countReqRequirementLines } from "../generate_indexes.ts";
 import { extractCurrentReqRefs } from "../current_refs.ts";
 
+// 前提ディレクトリの自動作成（worktree 等 .agentdev 未整備環境での mkdtempSync ENOENT fail を解消する）。
+// 後片付け契約は現行のまま: rmSync 対象は mkdtempSync 自己生成物に限定し、親 .agentdev/tmp は削除しない。
+mkdirSync(join(process.cwd(), ".agentdev/tmp"), { recursive: true });
 const root = mkdtempSync(join(process.cwd(), ".agentdev/tmp/req-digit-roundtrip-"));
 afterAll(() => rmSync(root, { recursive: true, force: true }));
 const declaration = (id: string) => `<!-- ${["ADF", "COVERS"].join("-")}(design): ${id} -->`;

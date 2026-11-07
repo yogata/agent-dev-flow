@@ -659,26 +659,45 @@ export function runMeasurementDateConvergence(
   const commitDate = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
 
   const touchedPaths: string[] = [];
+  const alreadyConvergedTargets: string[] = [];
+  const unresolvedTargets: { target: string; reason: string }[] = [];
   if (freshnessTargets.length > 0) {
     for (const rel of freshnessTargets) {
       const abs = path.resolve(worktreeCwd, rel);
-      if (!runner.exists(abs)) continue;
+      if (!runner.exists(abs)) {
+        unresolvedTargets.push({ target: rel, reason: "file-missing" });
+        continue;
+      }
       const content = runner.readTextFile(abs);
       const m = content.match(/^updated: ?"?([0-9]{4}-[0-9]{2}-[0-9]{2})"?/m);
-      if (m === null || m[1] === undefined || m[1] === commitDate) continue;
+      if (m === null || m[1] === undefined) {
+        unresolvedTargets.push({ target: rel, reason: "frontmatter-updated-not-found" });
+        continue;
+      }
+      if (m[1] === commitDate) {
+        alreadyConvergedTargets.push(rel);
+        continue;
+      }
       const replaced = m[0].replace(m[1], commitDate);
       runner.writeTextFile(abs, content.replace(m[0], replaced));
       touchedPaths.push(rel);
     }
     steps.push({
       name: "measurement-convergence",
-      status: "pass",
+      status: unresolvedTargets.length > 0 ? "fail" : "pass",
       detail: {
         trigger: "req-updated-freshness",
         frontmatterUpdatedTargets: touchedPaths,
+        alreadyConvergedTargets,
+        unresolvedTargets,
         commitDate,
       },
     });
+    if (unresolvedTargets.length > 0) {
+      warnings.push(
+        `measurement convergence left NG-reported targets unapplied (fail-closed difference check): ${unresolvedTargets.map((u) => `${u.target} (${u.reason})`).join(", ")}`,
+      );
+    }
   }
   if (hasMeasurementDrift) {
     steps.push({
@@ -747,16 +766,19 @@ export function runMeasurementDateConvergence(
 
 /**
  * check_integrity 報告から req-updated-freshness NG の対象ファイル（repo root 相対）を
- * 抽出する。報告メッセージの「for <path>:」形式を機械解釈し、REQ 編集対象に限定せず
- * 報告された対象全体を返す（check_integrity が clean な対象は報告しないため過剰適用
- * にはならない）。
+ * 抽出する。報告行「- **[NG]** req-updated-freshness: ... for <target>: ... (<repo-relative-path>) → route:」
+ * の対象パス括弧を機械解釈し、REQ ファイル名のみ報告（「for REQ-NNN.md:」形式）とプレフィックス
+ * 付き報告の双方を括弧内の repo root 相対パスとして一律捕捉する。req-updated-freshness 以外の
+ * 報告行と clean な対象は補正対象に含めない（過剰適用にならない）。
  */
 export function extractFreshnessTargets(checkStdout: string): readonly string[] {
   const targets: string[] = [];
-  const re = /for ((?:docs|src|scripts)[^\s:]*\.md):/g;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(checkStdout)) !== null) {
-    if (m[1] !== undefined && !targets.includes(m[1])) targets.push(m[1]);
+  const lineRe = /- \*\*\[NG\]\*\* req-updated-freshness: .*\(((?:docs|src|scripts)[^\s:)]*\.md)\) → route:/;
+  for (const line of checkStdout.split("\n")) {
+    const m = lineRe.exec(line);
+    if (m !== null && m[1] !== undefined && !targets.includes(m[1])) {
+      targets.push(m[1]);
+    }
   }
   return targets;
 }

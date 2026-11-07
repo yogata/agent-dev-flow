@@ -1,4 +1,4 @@
-<!-- ADF-COVERS(implementation): REQ-001-025, REQ-001-026, REQ-001-028, REQ-001-065, REQ-001-069, REQ-052-012 -->
+<!-- ADF-COVERS(implementation): REQ-001-025, REQ-001-026, REQ-001-028, REQ-001-065, REQ-001-069, REQ-052-012, REQ-119-005 -->
 # Design インデックス
 
 Design ファイルは、REQ を満たすために現在採用している内部構造、内部動作、責務分担、データ構造、処理方式、規則、パラメータを記述する正規文書である（REQ-001）。
@@ -159,6 +159,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [workflows/issue-lifecycle-records.md](workflows/issue-lifecycle-records.md) | accepted | Case Issue 工程記録モデル | Case Issue 本文・コメント・Case Epic の工程記録の物理様式と運用プロトコルの正（本文構成、進行状態写像、記録契機、記録コメント項目、部分成功回復、Epic 反映と per-Epic 排他制御）。REQ-101 の design 対応 |
 | [workflows/v51-phase-driven-collaboration-model.md](workflows/v51-phase-driven-collaboration-model.md) | accepted | ADF v5.1 工程駆動コラボレーションモデル | 検討テーマの育成管理、外部AI検討の持出しと戻り受理、正規成果物への段階形成と工程全体像の再構成の利用契約（REQ-110、REQ-104-008 の design 対応） |
 | [workflows/v51-phase-transition-and-coexistence-model.md](workflows/v51-phase-transition-and-coexistence-model.md) | accepted | ADF v5.1 工程遷移・独立レビューと双経路併存モデル | 利用者判断による工程遷移、独立レビュー、有限作業からの実装・検証接続、変更駆動経路との併存（REQ-111 の design 対応） |
+| [workflows/verification-resource-lifecycle.md](workflows/verification-resource-lifecycle.md) | draft | 検証用一時資材のライフサイクル（登録・検出・照合・回収） | 検証用一時資材と正式成果物の分類（役割判定）、専用領域と作成経路の制限（作成ヘルパーによる作成時機械登録・作成先拒否）、close時の機械検出（6観測と実物側網羅列挙）、削除確認の識別情報照合、受入未達（gap）の機械的接続（REQ-118 の design 対応） |
 
 ### 基盤 Design 一覧（6 ドメイン配下）
 

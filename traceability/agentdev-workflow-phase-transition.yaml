@@ -49,6 +49,7 @@ implementation:
     - REQ-111-023
   src/common/skills/agentdev-workflow-phase-transition/scripts/lib/identity.ts:
     - REQ-111-023
+    - REQ-119-006
   src/common/skills/agentdev-workflow-phase-transition/scripts/lib/successor.ts:
     - REQ-111-004
 verification:

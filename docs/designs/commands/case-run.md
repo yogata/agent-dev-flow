@@ -6,6 +6,7 @@ updated: 2026-11-04
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-015, REQ-021-016, REQ-021-017, REQ-021-019, REQ-021-020, REQ-021-022, REQ-035-002 -->
+<!-- ADF-COVERS(implementation): REQ-119-004 -->
 <!-- ADF-COVERS(design): REQ-021-015, REQ-021-016, REQ-031-006, REQ-031-015, REQ-031-016, REQ-031-027, REQ-031-033, REQ-031-034, REQ-031-035, REQ-035-012, REQ-035-021 -->
 <!-- ADF-COVERS(design): REQ-031-036（委譲指示規律の docs 配下パス抽象化参照設計） -->
 <!-- ADF-COVERS(design): REQ-108-017, REQ-108-018, REQ-108-019, REQ-108-020（重要変更の通知と結果説明節。AG-001・003〜005 に対応） -->

@@ -1,7 +1,7 @@
 /**
  * Identity (現在工程の識別状態, .agentdev/phase/identity.yaml) parsing and
  * consistency check against a recorded transition. The identity file is a
- * read-side check target (REQ-111-023): this module never writes it.
+ * read-side check target for consistency verification: this module never writes it.
  */
 import { readFile } from "node:fs/promises";
 

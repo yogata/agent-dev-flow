@@ -11,8 +11,10 @@ import {
   buildKnownTraceabilityCheckSpec,
   buildKnownWorkflowIntegrityGateSpec,
   decideExitCode,
+  extractFreshnessTargets,
   preValidateGateSpec,
   runPrepareDefinitionPr,
+  runMeasurementDateConvergence,
   validateInput,
   type CommandResult,
   type DefinitionEdit,
@@ -618,5 +620,114 @@ describe("既知検査入力の事前検証と固定生成（不正入力は検�
     expect(evidence.stdout).toBe("report");
     expect(evidence.targetRevision).toBe("abc123");
     expect(evidence.executedCommand.timeoutMs).toBe(60000);
+  });
+});
+
+describe("extractFreshnessTargets（REQ ファイル名のみ報告形式の捕捉・後方互換）", () => {
+  // fixture は check_integrity 報告の実行形式（markdown NG 行・対象パス括弧・route 付与）を再現する。
+  // 括弧内パスは配布エンジンの docs 具体パス排除契約に従い repo 相対パスで表現する（抽出対象は
+  // 括弧内パスであり、REQ 配置知識をエンジン側が保持しない構造）。
+  const reqOnlyNgLine = "- **[NG]** req-updated-freshness: frontmatter updated (2026-10-01) does not match the last content-change commit date (2026-11-07) for REQ-105.md: REQ 変更時に frontmatter updated を変更日へ進行させる（patterns.md REQ frontmatter 規約） (src/common/requirements/REQ-105.md) → route: intake";
+  const prefixedNgLine = "- **[NG]** req-updated-freshness: frontmatter updated (2026-10-01) does not match the last content-change commit date (2026-11-07) for src/common/skills/agentdev-workflow-phase-tasks-create/SKILL.md: Design 変更時に frontmatter updated を変更日へ進行させる（patterns.md Design frontmatter 形式） (src/common/skills/agentdev-workflow-phase-tasks-create/SKILL.md) → route: intake";
+  const otherCheckNgLine = "- **[NG]** skill-description-length: description exceeds the limit (src/common/skills/agentdev-workflow-issue/SKILL.md) → route: intake";
+
+  test("REQ ファイル名のみ報告形式（for REQ-NNN.md:）を括弧内 repo 相対パスとして捕捉する", () => {
+    expect(extractFreshnessTargets(reqOnlyNgLine)).toEqual(["src/common/requirements/REQ-105.md"]);
+  });
+
+  test("プレフィックス付き報告形式（後方互換）を括弧内 repo 相対パスとして捕捉する", () => {
+    expect(extractFreshnessTargets(prefixedNgLine)).toEqual(["src/common/skills/agentdev-workflow-phase-tasks-create/SKILL.md"]);
+  });
+
+  test("両形式の混在報告を重複なく捕捉する", () => {
+    expect(extractFreshnessTargets([prefixedNgLine, reqOnlyNgLine, reqOnlyNgLine].join("\n"))).toEqual([
+      "src/common/skills/agentdev-workflow-phase-tasks-create/SKILL.md",
+      "src/common/requirements/REQ-105.md",
+    ]);
+  });
+
+  test("req-updated-freshness 以外の NG 報告行を補正対象に含めない", () => {
+    expect(extractFreshnessTargets([otherCheckNgLine, reqOnlyNgLine].join("\n"))).toEqual([
+      "src/common/requirements/REQ-105.md",
+    ]);
+  });
+});
+
+describe("runMeasurementDateConvergence（補正適用と差分検査 fail-closed）", () => {
+  function convergenceRunner(files: Record<string, string>): MechanicalRunner & { written: Record<string, string> } {
+    // path.resolve は OS 正規化（Windows ではバックスラッシュ区切り）を返すため、files 辞書の
+    // キー突合はフォワードスラッシュへ統一して行う。
+    const normalize = (p: string) => p.replaceAll("\\", "/");
+    const written: Record<string, string> = {};
+    return {
+      run() {
+        return { exitCode: 0, stdout: "", stderr: "" };
+      },
+      readTextFile(absolutePath) {
+        return files[normalize(absolutePath)] ?? "";
+      },
+      writeTextFile(absolutePath, content) {
+        written[normalize(absolutePath)] = content;
+      },
+      exists(absolutePath) {
+        return files[normalize(absolutePath)] !== undefined;
+      },
+      written,
+    };
+  }
+
+  function commitDateToday(): string {
+    const today = new Date();
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+  }
+
+  const convergenceCheckStdout = "- **[NG]** req-updated-freshness: frontmatter updated (2026-10-01) does not match the last content-change commit date (2026-11-07) for REQ-105.md: REQ 変更時に frontmatter updated を変更日へ進行させる（patterns.md REQ frontmatter 規約） (src/common/requirements/REQ-105.md) → route: intake";
+  const worktreeCwd = "C:/repo/.worktrees/10-definition";
+  const reqTargetRel = "src/common/requirements/REQ-105.md";
+
+  test("REQ ファイル名のみ報告形式を捕捉した freshness 補正が対象ファイルの frontmatter updated を commit date へ進める", () => {
+    const targetFile = `${worktreeCwd}/${reqTargetRel}`;
+    const runner = convergenceRunner({ [targetFile]: "---\ntitle: t\nupdated: \"2026-10-01\"\n---\n\n本文\n" });
+    const { steps } = runMeasurementDateConvergence(runner, input(), worktreeCwd, convergenceCheckStdout, "head-sha");
+    const step = steps.find((s) => s.name === "measurement-convergence" && s.status === "pass");
+    expect(step).toBeDefined();
+    expect(step?.detail.frontmatterUpdatedTargets).toEqual([reqTargetRel]);
+    expect(runner.written[targetFile]).toContain(`updated: "${commitDateToday()}"`);
+    expect(runner.written[targetFile]).not.toContain('updated: "2026-10-01"');
+  });
+
+  test("NG 報告対象が補正適用対象から漏れた場合（file-missing）に fail step と warning を出力する（fail-closed 差分検査）", () => {
+    const runner = convergenceRunner({});
+    const { steps, warnings } = runMeasurementDateConvergence(runner, input(), worktreeCwd, convergenceCheckStdout, "head-sha");
+    const step = steps.find((s) => s.name === "measurement-convergence");
+    expect(step?.status).toBe("fail");
+    expect(step?.detail.unresolvedTargets).toEqual([
+      { target: reqTargetRel, reason: "file-missing" },
+    ]);
+    expect(warnings.some((w) => w.includes("fail-closed difference check"))).toBe(true);
+    expect(Object.keys(runner.written)).toHaveLength(0);
+  });
+
+  test("frontmatter updated が見つからない対象を未解決として検出する（fail-closed 差分検査）", () => {
+    const targetFile = `${worktreeCwd}/${reqTargetRel}`;
+    const runner = convergenceRunner({ [targetFile]: "# 本文のみ（frontmatter 不在）\n" });
+    const { steps } = runMeasurementDateConvergence(runner, input(), worktreeCwd, convergenceCheckStdout, "head-sha");
+    const step = steps.find((s) => s.name === "measurement-convergence");
+    expect(step?.status).toBe("fail");
+    expect(step?.detail.unresolvedTargets).toEqual([
+      { target: reqTargetRel, reason: "frontmatter-updated-not-found" },
+    ]);
+  });
+
+  test("updated が既に commit date と一致する対象を収束済みとして記録し fail にしない", () => {
+    const targetFile = `${worktreeCwd}/${reqTargetRel}`;
+    const runner = convergenceRunner({ [targetFile]: `---\nupdated: "${commitDateToday()}"\n---\n\n本文\n` });
+    const { steps } = runMeasurementDateConvergence(runner, input(), worktreeCwd, convergenceCheckStdout, "head-sha");
+    const step = steps.find((s) => s.name === "measurement-convergence");
+    expect(step?.status).toBe("pass");
+    expect(step?.detail.alreadyConvergedTargets).toEqual([reqTargetRel]);
+    expect(step?.detail.frontmatterUpdatedTargets).toEqual([]);
+    expect(Object.keys(runner.written)).toHaveLength(0);
   });
 });
