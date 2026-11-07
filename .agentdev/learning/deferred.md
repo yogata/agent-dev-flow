@@ -342,6 +342,8 @@ deferred.md は append-only ではなく、以下のタイミングでエント�
 - **移動日**: 2026-07-03
 - **処分判定**: deferred（出現1件・影響小・運用回避済み。「スキーマ要件は所有者階層明示」規約は有効だが単発では具体性不足。スキーマ要件の解釈分岐再発時に再評価）
 
+
+〔2026-11-07 learning-promote 統合追記・inbox 1 件（REQ-018-008(b) worktree root 相対文言と実装 mainRepoRoot 基準の解釈差〔Case #3928 Wave-6〕）〕: REQ 文言と実装基準の解釈差クラスの追加出現。正規一時領域の定義文言（worktree root 相対）と実装境界基準（mainRepoRoot）の解釈差は、worktree コンテキストから作成ヘルパーを呼ぶ利用者が直感に反する invalid 判定を受ける潜在経路。「文言側の基準明確化（mainRepoRoot 基準を正と明記）または実装側の worktreeRoot 受理」を将来の整合候補として保持
 ---
 
 ## 限定的検査による「配布物参照境界達成」報告が包括的検査で覆る（Wave 1/2 → Wave 3）
@@ -2195,6 +2197,8 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **タグ**: #epic-wave #parallel-issues #fixture-dependency #integration-deferred
 - **移動日**: 2026-09-18
 
+
+〔2026-11-07 learning-promote 統合追記・inbox 1 件（Wave 先行 merge 後の後続レイヤー fixture 再適合〔Case #3928 Wave-2・PR #3936 Level 1 rebase〕）〕: 並行 Wave の fixture 適合クラスの追加出現。マージ順序を事前記録した Wave 重複許容では、層分離設計でも production code の競合は隣接追加で解消できる一方、後続ブランチのテスト fixture は先行レイヤーの契約追加で壊れる前提で、Level 1 rebase 手順に「fixture の統合後契約適合 → suite 再実行」を組込むのが正。競合ゼロのファイルでも fixture 由来の fail は起こり得る
 ---
 
 ## 2026-09-18: 検証対応要否カタログ（policy.yaml 移行元）に現行要件が存在しない欠番行 28 件が含まれていた
@@ -3908,6 +3912,10 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **移動日**: 2026-10-11
 - **処分判定**: deferred（適用済み。PR #3570 で inline 優先規則により集約済み。規律は既存。2026-10-11 自律確定）
 
+
+〔2026-11-07 learning-promote 統合追記・inbox 1 件（traceability sidecar 登録〔Case #3887・REQ-004-069〜075〕）〕: 同根（inline 宣言と sidecar の重複排除）の追加出現。sidecar 登録は inline 宣言との重複排除が前提で、duplicate-inconsistencies を必ず機械突合する。表記ゆれ（REQ 行 ID の桁・区切り）は機械検査でのみ発見でき手作業の目視照合に頼らない
+
+〔2026-11-07 learning-promote 統合追記・inbox 1 件（ADF-COVERS inline 宣言の ID 列挙かっこ付き説明黙示切断〔Case #3928〕）〕: inline 宣言記述規律クラスの失敗モード追加。ID 列挙のかっこ付き説明の後に続けた ID は黙示切断され、malformed-declarations には検出されず missing-design だけが現れる（coverage --req の単行実測で原因特定）。かっこ付き説明を持つ ID は既存行への連結ではなく独立行の宣言として追加する。sidecar-and-policy.md「inline 宣言行の記述形式（ID 列挙のみ）」節（恒久規定・L84-89 実測）への失敗モード注記は不在（2026-11-07 実測確定）
 ---
 
 ## 2026-10-11: traceability check の unknown-req-refs findings が一時的に非決定的計上を示す
@@ -3995,6 +4003,8 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **移動日**: 2026-10-11
 - **処分判定**: deferred（適用済み。PR #3599 roles.ts に実装注記を記録済み〔entry 自身が記載〕。frontmatter 消費 checker の実装規約は再発時に具体化。2026-10-11 自律確定）
 
+
+〔2026-11-07 learning-promote 統合追記・inbox 1 件（draft YAML plain-scalar コロン+空白パーサエラー・生成直後 safe_load 検証前置〔Case #3887・修正済み commit 87621f165〕）〕: draft 生成・解析の YAML 危険性クラスの追加変異（plain-scalar コロン+空白）。draft 本文から YAML frontmatter を生成・編集する経路では生成直後に safe_load での検証を前置し、検証なし保存を回避する
 ---
 
 ## 2026-10-11: 配布依存境界 checker の CLI 引数形式は --profile P <repoRoot> であり README への実行例追記が改善候補
@@ -4100,6 +4110,8 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **移動日**: 2026-10-11
 - **処分判定**: deferred（エントリ 24 と同型。fail-closed 機能中・即解消。2026-10-11 自律確定）
 
+
+〔2026-11-07 learning-promote 統合追記・inbox 1 件（design-basis --adopted の root 相対解決〔Case #3910 TS-701〕）〕: 同クラス（CLI 引数契約の解決基準が実行例不在で初回実行者が誤りやすい）の追加出現。--adopted 引数の解決基準は root 相対（cwd 相対と誤解しやすい）で、scripts README への解決基準明記が改善候補
 ---
 
 ## 2026-10-11: reference pin 検査の期待値は文面の step 名・関数名に依存し、実手順の記述を事前 grep して組み立てる
@@ -4383,6 +4395,8 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **タグ**: `#worktree` `#typecheck`
 - **移動日**: 2026-10-13
 
+
+〔2026-11-07 learning-promote 統合追記・inbox 2 件（worktree scripts typecheck は bun install --frozen-lockfile 前提〔Case #3928 Wave-7〕・repo-agentdev-integrity scripts 配下も同様〔再確認素材〕）〕: node_modules 未伝播 worktree の依存整備は scripts 配下 bun install --frozen-lockfile が前提手順になる。lockfile 不変の機械保証と worktree 側依存生成の汚染防止の観点で --frozen-lockfile 明記が worktree-operations.md に不在（2026-11-07 grep 実測・598 行全文）を確認済み（次回 promote 判定の実測前置を完了済み）
 ---
 
 ## worktree の .opencode 投影の skill 伝播が不均一で checker 実行経路が skill ごとに分岐する
@@ -4559,6 +4573,12 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 
 ---
 
+
+〔2026-11-07 learning-promote 統合追記・inbox 3 件（REQ-118 checker base 既出 concrete-id・Epic Wave クローズ 21 violations・identity.ts REQ 識別子コメント・Case #3928 系）〕: 同一問題クラス（配布物への識別子直記の checker 検出）の追加出現。恒久是正（識別子コメント除去）の処置判断は intake 系統での分類確定対象（エントリ自身が intake 分離申告）。baseline 扱い（恒常承認一覧への登録要否）は個別 PR で散発的に行わず、まとまった docs 変更 Case で一括判断する運用を継承
+
+〔2026-11-07 learning-promote 統合追記・inbox 3 件（REQ-118 checker base 既出 concrete-id・Epic Wave クローズ 21 violations・identity.ts REQ 識別子コメント・Case #3928 系）〕: 同一問題クラス（配布物への識別子直記の checker 検出）の追加出現。恒久是正（識別子コメント除去）の処置判断は intake 系統での分類確定対象（エントリ自身が intake 分離申告）。baseline 扱い（恒常承認一覧への登録要否）は個別 PR で散発的に行わず、まとまった docs 変更 Case で一括判断する運用を継承
+
+〔2026-11-07 learning-promote 統合追記・inbox 3 件（REQ-118 checker base 既出 concrete-id・Epic Wave クローズ 21 violations・identity.ts REQ 識別子コメント・Case #3928 系）〕: 同一問題クラス（配布物への識別子直記の checker 検出）の追加出現。恒久是正（識別子コメント除去）の処置判断は intake 系統での分類確定対象（エントリ自身が intake 分離申告）。baseline 扱い（恒常承認一覧への登録要否）は個別 PR で散発的に行わず、まとまった docs 変更 Case で一括判断する運用を継承
 ---
 
 - **統合追記（2026-10-27 learning-promote）**: duplicate 受理。2 件の同根出現を統合: (1) 実装 PR が配布物本文に concrete REQ-ID を 17 箇所直書きし case-close 正規形最終 gate で違反 17 件検出・case-run 側は別形式 CLI（check_distribution_boundary_cli.ts <worktree>）で violations 0 申告の乖離（Case #3841・是正 commit 2ac7e59ed）(2) Design 節本文の REQ ID（REQ-106、REQ-111-008）を phase-artifacts-update SKILL.md へ転記し checker source profile が 2 件検出（Root Case #3847・ID 除去表現へ書き直し再検証合格）。恒久被覆: harness-delegation.md L285-293 + distribution-concrete-id-placement.md + distribution-boundary.md「配布物本文の記述規則」（adversarial-review Stream B 実測）。残余観点: checker CLI 形式が case-run と case-close で分岐する点は L4988（スキャン集合 cwd 変動）と同系・正規形は reference 指定コマンド
@@ -4634,6 +4654,10 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 
 
 
+
+〔2026-11-07 learning-promote 統合追記・inbox 3 件（MSYS /tmp 仮想パス × bun fs 解釈差〔Case #3908〕・git-bash TMPDIR/TEMP は os.tmpdir() に反映されない〔Case #3928 Wave-7〕・MSYS clone 誤配置〔Case #3889 サブ〕）〕: 同一問題クラス（MSYS 仮想パス・環境変数解像差と Windows ネイティブプロセスの実効値乖離）の 3 変異（fs 操作対象パス・環境変数解像・clone 引数パス）を同クラス統合。共通規律: bash/MSYS 経由のパス・環境参照はネイティブプロセスの実効解像と乖離し得るため、検証対象プロセス自身が観測する値（os.tmpdir()・fs API）を根拠にする
+
+〔2026-11-07 learning-promote 統合追記・inbox 3 件（MSYS /tmp 仮想パス × bun fs 解釈差〔Case #3908〕・git-bash TMPDIR/TEMP は os.tmpdir() に反映されない〔Case #3928 Wave-7〕・MSYS clone 誤配置〔Case #3889 サブ〕）〕: 同一問題クラス（MSYS 仮想パス・環境変数解像差と Windows ネイティブプロセスの実効値乖離）の 3 変異（fs 操作対象パス・環境変数解像・clone 引数パス）を同クラス統合。共通規律: bash/MSYS 経由のパス・環境参照はネイティブプロセスの実効解像と乖離し得るため、検証対象プロセス自身が観測する値（os.tmpdir()・fs API）を根拠にする
 ## acceptance-checks の AUTOGEN 再生成差分検出は実行日を跨ぐ並列バッチで計測日 1 行差分の warn を毎回生む
 
 - **問題事象**: case-ready STEP-1 受入検査（acceptance-checks phase）の autogen-regeneration-diff step で、generate_indexes 再実行により docs/designs/quality/req-health-metrics.md の AUTOGEN 計測日行のみが 1 行差分として検出され、script が needs-judgment（exit 2）と「Regeneration diff must be resolved before merge」警告を返した。並列バッチの Case 実行が日付境界を跨ぐたびに同一の warn が再発し、毎回モデルの意味レビュー判断を要する
@@ -4651,6 +4675,8 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **タグ**: `#case-ready` `#script` `#autogen` `#計測日`
 - **移動日**: 2026-10-15
 
+
+〔2026-11-07 learning-promote 統合追記・inbox 1 件（case-ready STEP-1 acceptance-checks autogen 再生成差分〔Case #3907〕）〕: 実行順序規律の追加。generate_indexes 等の派生更新を手動先行実行した場合は script 実行前に必ず commit して working tree をクリーンにする（script の autogen step は working tree クリーン前提で差分検出し、未 commit の手動更新は restore で失われる）。case-ready reference（definition-acceptance.md）機械工程節への前提明記追加候補
 ## acceptance-checks の integrity gate が PR 非起因の既存債務で fail-closed 抑止すると後続ゲートの script 経由継続手段が不在になる
 
 - **問題事象**: case-ready STEP-1 受入検査（acceptance-checks phase）で check_integrity が PR 非起因の既存債務（IR-055 delta・IR-068・IR-072・expanded-readme-sync 計 16 NG。全て PR 差分外ファイルで #3675 / #3684 の処遇対象）で非ゼロ終了し、script が後続ゲート（overlap-cross-check・autogen-regeneration-diff・traceability-check）を実行せず early-return した。PR 自体の起因違反は 0 件（check_changed_docs は対象 4 ファイルで 0 失敗）だが、後続 3 ゲートを同一 script 呼出で継続する resume 手段が存在しない
@@ -4820,6 +4846,8 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 
 
 
+
+〔2026-11-07 learning-promote 統合追記・inbox 1 件（close full suite 機械受理の baseline 再現確認構成〔Case #3902〕）〕: baseline 再現確認の構成技法追加。「fail 全件の baseline 再現確認は、fail 対象の単独実行と全対象実行の組み合わせで 1 回ずつ実行すれば被覆できる・機械工程の受理入力は実測後に組み立てるのが実務的で、手動予備実行は『失敗由来分類』の正当理由に該当する」
 ## prepare_definition_pr の入力 JSON を段階構築した際 definitionEdits が重複し旧文不在 fail が発生する
 
 - **問題事象**: case-open STEP-4 で prepare_definition_pr.ts の入力 JSON を、updated 行編集のベース構築と draft 抽出による本文編集マージの 2 段階で構築したところ、同一行編集（frontmatter updated）が definitionEdits に二重に入り、2 回目の適用で旧文不在（not found）fail 5 件が報告され、script が stage・commit 前に停止した
@@ -4907,6 +4935,8 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **タグ**: `#bun` `#worktree` `#依存整備` `#lockfile`
 - **移動日**: 2026-10-15
 
+
+〔2026-11-07 learning-promote 統合追記〕: bun install --frozen-lockfile（lockfile 不変の機械保証）前提の統合追記は同 pool「node_modules 未伝播の worktree で tsc 型検査」エントリへ実施済み（2026-11-07）
 ## worktree での bun test 分割①は環境負荷で timeout 系テストが非決定的 fail し得る。由来分離は「timeout メッセージ確認 → ファイル単体再実行 → 分割全体の同一条件再実行」の順で行う
 
 - **問題事象**: Case #3719（DEL-3719-1）で、worktree での bun test 分割①（integrity suite）を変更直後に実行した際、5 秒 timeout を持つ fixture git init を伴う checker 起動テストが 6172ms 超過で 1 件非決定的 fail した。同一条件の再実行では 0 fail が再現
@@ -4961,6 +4991,10 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **タグ**: `#lsp` `#tsc` `#静的検査` `#タイムアウト`
 - **移動日**: 2026-10-15
 
+
+〔2026-11-07 learning-promote 統合追記・inbox 2 件（worktree 内 lsp_diagnostics timeout・Windows worktree Deno LSP 診断不応・Case #3928 系）〕: 同一問題クラス（LSP 診断の不応・タイムアウト時の tsc --noEmit 正規化）の追加出現。両観察（case-close scripts × repo-agentdev-integrity scripts）で一般化が一貫して有効。反映先（手順書明記）の恒久規定不在の実測は未了のため deferred 継続
+
+〔2026-11-07 learning-promote 統合追記・inbox 2 件（worktree 内 lsp_diagnostics timeout・Windows worktree Deno LSP 診断不応・Case #3928 系）〕: 同一問題クラス（LSP 診断の不応・タイムアウト時の tsc --noEmit 正規化）の追加出現。両観察（case-close scripts × repo-agentdev-integrity scripts）で一般化が一貫して有効。反映先（手順書明記）の恒久規定不在の実測は未了のため deferred 継続
 ---
 
 ## 一時 Git リポジトリ（テスト fixture）には親リポジトリの .gitattributes が継承されない
@@ -5042,6 +5076,8 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **処分判定**: deferred（learning-promote 2026-10-17 自律確定。実害なし・最終 gate が設計どおり検出・test-fix 修正済み。8軸 19/40・出現1件。実行 cwd・scanned 数の記録規定は未確認のため観点保持。再評価条件: 同種事前 gate 検出漏れの再発時、checker 実行記録規律の整備機会発生時）
 - **移動日**: 2026-10-17
 
+
+〔2026-11-07 learning-promote 統合追記・inbox 1 件（配布依存境界 gate の scan 対象集合変動〔Case #3928 Wave-2〕）〕: 同根の追加出現（実行コンテキスト差での判定分岐）。pre-recorded 証跡の採用前には gate の scan 対象集合（files 数）と検出件数の両方を記録・突合し、検出の変更起因性を独立確認する。worktree の junction 伝播は scan 集合を縮小させ得る
 ---
 
 ## 既存 Release の作業前記録を body を含まない正規化一覧で取得し遡及突合不能になる
@@ -5139,6 +5175,8 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **タグ**: `#DefinitionEdit` `#行構造事前確認` `#case-open`
 - **移動日**: 2026-10-20
 
+
+〔2026-11-07 learning-promote 統合追記・inbox 1 件（DefinitionEdit 行区切り保全で行削除型操作が表現できず前段配置経路へ事前割当て〔Case #3866 case-open STEP-4〕）〕: 行構造制約の回避構成クラス・2 出現目。行削除型（空行削除・行移動を伴う分割）は DefinitionEdit で表現できず、前段配置経路（worktree 内への node writeFileSync UTF-8 明示・oldText 一意性検証つき・stagePaths 経由 commit）への事前割当てが artifact_actions 適用計画段階で必要。prepare_definition_pr の validateInput 分離入口（REQ-117-010 実装対象）への前段配置対象明示は不在（2026-11-07 実測確定・次回 promote 判定の実測前置を完了済み）
 ---
 
 ## bun test 全件実行で textlint 並列系のみタイミング起因のフレークが観測され再実行で 0 fail になる
@@ -5438,3 +5476,367 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **タグ**: #dotnet #process #encoding #utf8 #子プロセス
 - **移動日**: 2026-10-27
 - **処分判定**: deferred（2026-10-27 自律確定。出現 1 件・修正済み（PR #3861）・.NET 経由の子プロセス取り込みは install.ps1 系に限定。実測: docs/knowledge/ への RedirectStandard/StandardOutputEncoding 記載 0 件。近縁 deferred L716（PowerShell エンコード化け）は別局面。再評価条件: 子プロセス読取破損の再発時・機械工程 script の .NET 取り込み経路拡張時）
+
+
+## [2026-11-07T14:52+09:00][learning_candidate][m1334 native spawn 単一起動で twin launcher 病理は解消・残る拒否原因は外部セッションの識別子含有シェル][Case #3928]
+- 検知: Epic #3928 最終close m1334 で、監督指示の起動条件変更（Python subprocess.Popen(shell=False, argv配列) による bun.exe 直接起動・preflight/composer/機械工程 各1回・同一 Python 親・nohup/bash -c/&&/& 連結なし）の下で機械工程を1回実行した結果、起動経路自体からの findings は 0件（m1320 の twin launcher shell findings 2件〔7560/42392〕は再現せず・旧 pid 自然消滅も実測）。機械判定は accepted=false だが失敗 step は verification-resource-reconciliation のみで findings 1件に減少。唯一の検出は監督セッション側の監視シェル（pid 22360・hermes-vault ledger.py/sse-watch.py を連結した bash.exe -lic・commandLine に監督指示文「#3928 …」を含む）で、識別子含有により範囲内導出され未登録として検出された（fail-closed 契約どおりの正当動作）。全 gate pass（final-acceptance closeAllowed=true・integrity machineAcceptance accepted=true・traceability pass=11 fail=0・textlint・contract-state・gaps 0件）。
+- 対処: m1320 記録の「二重実行病理を実証」表現を仮説へ降格（同一 commandLine＋近接 startedAt の bash 実体重複は bun 重複実行を証明しない。MSYS プロセス表現≠実コマンド重複）。旧 PID への除外根拠は追加しない。残る1件は監督側対応事項（当該監視シェルの終了）であり、Case 側の作成物残存・gaps・検出後退はない。機械判定記録は Issue #3928 コメント 6702921898・報告 JSON は .agentdev/integrity/reports/issue-3928/report-premerge-m1334.json・起動証跡は m1334-spawn-records.json。
+- 関連: Case #3928・close_mechanical_steps.ts executeVerificationResourceReconciliation（識別子含有による範囲内導出と grounds の pid 一致消費）・compose-input-population-w12.mjs buildExecutionRuntimeAncestorGrounds（識別子含有祖先のみの実祖先照合）
+- **処分判定**: deferred（Q38〔機械工程起動 twin・2 件統合〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## [2026-11-06T02:31+09:00][learning_candidate][PR 本文作成時の実行基盤不一致な署名混入と本文更新での是正][Case #3928]
+- 検知: PR #3943 本文初回作成時に、実行基盤と不一致な「🤖 Generated with Claude Code」署名が Tool 側の付与と思われる形で記録された（PR #3943 実行担当の観測）。
+- 対処: PR 本文更新で署名を削除し、実行基盤と不一致な表示を是正した。
+- 学び: PR 作成 Tool が本文へ署名等の装飾を自動付与する場合、実行基盤の申告と不一致な表示が成果物へ混入し得る。本文作成後の初回読み戻しで署名・装飾の有無を確認し、不一致分は本文更新で除去するのが実務的。
+- 出典: PR #3943 本文「Findings/ Capture候補」第2項
+- 関連: Case #3928・PR #3943 本文更新履歴
+- タグ: #learning-capture #pr-body #harness #署名
+- **処分判定**: deferred（Q20〔PR 本文署名混入〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## [2026-11-06T01:12+09:00][learning_candidate][REQ-118 全件 traceability check の missing 系 3 fail は base 既出][Case #3928]
+- 検知: PR #3941（#3940）の traceability check で REQ-118 全件を対象とする check の missing 系 3 fail（missing-design / missing-implementation / missing-verification）を観測。base HEAD 19a58179f（main）でも同様に発生することを確認（本 PR 変更起因ではなく base 既出）。対象行（REQ-118-001/004/005/008 + REQ-032-043/044 + REQ-052-018）の行レベル check は 11 pass / 0 fail で完備。
+- 対処: 本 boundary（Wave-3 #3940 子Issue クローズ）では base 既出として記録のみ。REQ-118 の行レベル対応完備性の棚卸しは Epic #3928 最終 close 時の判断対象。
+- 学び: corpus 完全性の計数（missing 系件数）は到達目標状態の診断指標であり lifecycle gate の判定には使わない。対象行限定 check と corpus 全件 check の結果が乖離する場合は、対象行の完備確認を先に機械確定してから corpus 分を診断指標として扱う。
+- 出典: PR #3941 本文「Findings/ Capture候補」（learning 第1項）・親検証コメント 6662744844
+- 関連: Case #3928・REQ-118・traceability/v4-traceability-model Design「completeness の 2 層」節
+- タグ: #learning-capture #traceability #baseline #case-close
+- **処分判定**: deferred（Q14〔traceability スコープ別実行と corpus 診断乖離〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## [2026-11-05T21:23+09:00][learning_candidate][fail-first 申告が module-absence 失敗だった場合の mutation-based RED 感度検証による補完][Case #3928]
+- 検知: PR #3937（#3934）本文の fail-first 申告（RED 確認後 GREEN）の実体が新規モジュール不在時の module-absence 失敗であり、repo 規約（Epic 実現方針: テスト失敗は要求の拒否＝assertion 成立であることを確認し、import/構文/依存の失敗を拒否成立の証拠にしない）が要求する assertion-level RED の証跡がなかった。
+- 対処: #3933 クローズで確立した手法と同一の手順で新規感度証拠を追加生成した。検証対象境界を一時無効化（REQ-118-007 読み戻し拒否境界・REQ-118-009 targetIds 完全一致照合境界）して assertion-level RED（expect().toThrow の期待不成立）を観測し、バイト等価復元（sha256 一致・git status porcelain 空）を確認してからフルスイート再実行（214 pass / 0 fail）で GREEN を再確認。履歴の書き換えはせず新規証拠として完了記録へ正直に記録した。
+- 学び: fail-first の申告品質は検証差分へ実体（どの failure が RED か）まで記録しないと判別できない。module-absence 型の RED しかない場合は、mutation-based RED 感度検証（境界無効化 → assertion-level RED 観測 → バイト等価復元 → 再GREEN）で感度証拠を補完できる。無効化対象は「テストが検証している境界そのもの」を選び、復元のバイト等価性をハッシュで機械確認する。
+- 出典: Issue #3934 完了記録コメント（検証証拠、2026-11-05）・PR #3937 本文検証差分（fail-first 申告の実体）
+- 関連: Case #3928・Epic 実現方針（fail-first 規約）・#3933 クローズの同一手法前例
+- タグ: #learning-capture #fail-first #mutation-testing #test-sensitivity #case-close
+- **処分判定**: deferred（Q31〔mutation-based RED 感度検証補完〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## [2026-11-05T17:45+09:00][learning_candidate][検証用一時資材 台帳モジュール運用][Case #3928]
+- 検知: 作成ヘルパー（verification-resource-register.ts）を worktree 内から `--main-repo-root` 未指定で実行すると、worktree-context 独立解決（git-common-dir 導出）により**メインリポジトリの台帳**（.agentdev/tmp/verification-resources/）へ登録される。smoke 実行時に実観測（設計どおりの動作）。
+- 対処: 検証・試験目的で worktree から実行する場合は `--main-repo-root .` で worktree 側へ限定する運用を採用し、smoke の台帳ファイルは実行後に削除して後片付け済み。
+- 学び: main repo root 固定解決は本件の設計契約（並列Case分離・worktree 非依存）どおりだが、検証実行の局所化には `--main-repo-root` 明示が必須。台帳を扱う試験・smoke の手順書にはこの区別を明記すべき改善候補。
+- 出典: PR #3935 本文「Findings / Capture候補」（Wave-1 #3930 実行担当の実観測）
+- 関連: Case #3928・REQ-118-001/004・docs/designs/workflows/verification-resource-lifecycle.md
+- タグ: #learning-capture #verification-resources-ledger #worktree #main-repo-root
+- **処分判定**: deferred（Q40〔台帳 --main-repo-root 明示〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## 2026-11-02T12:45+09:00 Case #3889（訂正 Case）Capture
+
+### 1. install.ps1 の LocalMode 検証には consumer レイアウト変換が必要
+
+- 問題クラス: workflow deviation / 環境構築
+- 内容: install.ps1 は consumer 専用公開入口であり、実行ディレクトリ直下に src/opencode/ が存在すると誤実行防止（REQ-050-006）で exit 1 する。本 repo（agent-dev-flow）を clone して -LocalMode の配置検証をする際は、clone 内で src/ を .agentdev-plugin/src/ へ移動し、textlint guard の vendor/（導入時生成依存・gitignore）を正規配置から読み取り専用複製する必要がある
+- 発生条件: TS-C003（Local 版 plugin 公開入口検証）の環境構築。実際に exit 1 を確認し、consumer レイアウト変換で解消（install apply/check とも ok）
+- 証跡: C:/WINDOWS/TEMP/opencode/ts3889-local/execution-log.md 第 0 節・install-apply.log
+
+### 2. MSYS パス変換による clone 誤配置の落とし穴
+
+- 問題クラス: implementation error / 環境依存
+- 内容: Git Bash（MSYS）で `git clone C:/... C:/WINDOWS/TEMP/...` 形式を使うと、一部コンテキストで先頭 / を持つ POSIX 風パスへ変換され C:\c\WINDOWS\... へ誤配置する場合がある。Windows 形式パス指定で再実行し、誤配置ツリーは配下のみを確認して削除した
+- 予防: MSYS から Windows 絶対パスを渡す引数は Windows 形式（バックスラッシュまたはドライブレター）で統一するか、MSYS_NO_PATHCONV 系の抑制を検討する
+- 発生条件: Case #3889 TS-C003 サブエージェントの clone 初回実行
+- 証跡: C:/WINDOWS/TEMP/opencode/ts3889-local/execution-log.md 第 0 節注記
+- **処分判定**: deferred（Q21〔install.ps1 consumer レイアウト変換〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## 2026-11-02T13:16+09:00 Case #3889（TS-C004 隔離検証・第2次訂正）Capture
+
+### 1. gh-write guard は説明文中の gh WRITE コマンド名も検出してコマンド全体をブロックする
+
+- 問題クラス: workflow deviation / guard 挙動
+- 内容: Bash コマンド文字列内に gh WRITE 系コマンド名（例: PR 作成の生コマンド名）が説明文・JSON 文言として含まれるだけでも、guard がコマンド全体を raw gh WRITE と判定してブロックする。heredoc によるファイル作成も含むため、ブロック時にファイル作成自体が行われない
+- 対処: コマンド文字列に gh WRITE コマンド名を直接書かない。Python の隣接文字列リテラル分割（"gh" + " pr " + "create" 等）や別表現（「PR 作成の生コマンド」等）で構築する
+- 発生条件: Case #3889 判定コメント訂正スクリプトの作成（実測 2026-11-02 13:09〜13:11）
+- 証拠: m0352〜m0355 のブロック応答 3 件と分割リテラルによる解消
+
+### 2. edit tool は workspace 外パスで fail-closed する
+
+- 問題クラス: 環境依存 / ツール境界
+- 内容: C:/WINDOWS/TEMP/ 配下のファイルを edit tool で編集すると「cannot read the current file content」で fail-closed する。AGENTS.md の write tool と同じ境界が edit にも適用される
+- 対処: temp 領域のファイル修正は bash（quoted heredoc によるスクリプト実行）で行う
+- 発生条件: 同上（fix-phrase.py の修正を edit で試行）
+- **処分判定**: deferred（Q22〔gh-write guard 説明文中コマンド名検出〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## 2026-11-03T02:40+09:00 Case #3890 case-close Capture
+
+### 1. 完了記録の確定前には観測の鮮度照合が必要（parked 時点スナップショットによる誤完了）
+
+- 問題事象: #3891 の case-close 完了記録が、質問待ち parked 時点（2026-11-02 22:53）の観測に基づく「不一致未立証・保留維持」で確定した。その後、試験内仮回答による完走観測で判定が「具体的不一致の成立」に変わるため、正規訂正経路（訂正記録）で完了記録の置き換えが必要になり、同一 Root Case 実行の親完了判定も中断された
+- 発生局面: case-close（#3891 クローズ 23:19 確定 → 23:27 訂正）
+- 検知方法: 完了記録確定後の完走観測と、case 側の会話・仮回答・成果物・条文の再照合による判定変化の検知
+- 根本原因: 完了記録の判定根拠とした観測が未完結状態（質問待ち）のスナップショットであり、「その後の観測完了で判定が変わり得るか」という観測鮮度の照合を完了判定の確認項目にしていなかった
+- 自律対応内容: 正規訂正経路で訂正記録を投稿（履歴保持・実敗の成功書き換えなし）、不足を親 #3890 が引き継ぎ条件付き経路（#3892）を活性化して完遂
+- ユーザー確認有無: なし
+- Decision/REQ/spec影響: なし（完了記録運用規律の問題。REQ/Decision 変更は伴わない）
+- 横展開観点: verify-only closure や並行観測を再利用する完了判定全般
+- 再発条件: 判定根拠の観測が未完結状態のスナップショットのまま完了記録を確定し、観測後に状態変化が起きる
+- 予防策候補: 完了記録の確定前に観測鮮度照合（判定根拠が中間状態スナップショットでないこと・観測確定後に状態変化がないこと）を確認項目に加える。観測が未完結の場合は完了記録を確定せず停止記録で保持する
+- 想定反映先: agentdev-workflow-case-close（STEP-2 QG-4 の判定根拠照合項目）
+- 関連: #3891 issuecomment-6579421173（旧完了記録）・issuecomment-6579654641（訂正記録）・#3890
+- タグ: `#case-close` `#完了記録` `#観測鮮度`
+
+### 2. Root Case 起票の参照前提となる契約状態記録は起票前に commit する（jev 観測前置 commit の後佳）
+
+- 問題事象: Root Case #3890 起票の前提となる jev 観測の追跡 commit（2ae252c7d）が Root Case 作成（2026-11-02 22:40:07）後に完了する順序逸脱があった
+- 発生局面: case-open（Case #3890 起票時）
+- 検知方法: git log の時系列照合（起票時刻と commit の前後関係）
+- 根本原因: 起票本文が参照する契約状態記録（.agentdev/ 配下の jev 観測）の commit 済み確認を case-open の前置項目に含めていなかった
+- 自律対応内容: commit を完了し git log で追跡状態を確認。Root Case 本文には commit hash を安定識別子として記録し遡及参照可能にした
+- ユーザー確認有無: なし
+- Decision/REQ/spec影響: なし（順序逸脱の記録。正規成果物の変更なし）
+- 横展開観点: 起票前に commit 済みであるべき .agentdev/ 状態記録全般（jev 観測・inbox 等）
+- 再発条件: 起票本文が参照する状態記録が未 commit のまま case-open が進行した場合
+- 予防策候補: case-open の前置確認に「本文が参照する契約状態記録の commit 済み確認」を加える（case-close の contract-state-residue-check 相当の確認を case-open 時点にも適用する候補）
+- 想定反映先: agentdev-workflow-case-open（起票前置確認項目）
+- 関連: #3890・commit 2ae252c7d
+- タグ: `#case-open` `#契約状態記録` `#順序逸脱`
+
+### 3. 委譲指示による実行構造逸脱（single-Standard case への子 Issue 作成）は逸脱として明示記録する
+
+- 問題事象: 単一 Standard Case（Epic 構成なし・work_type maintenance / scale standard）に対し、委譲指示により子実行 Issue（#3891・#3892）を作成した。skill の Standard 分岐原則（子 Issue を作らず Root 直下で実行する）からの逸脱。逸脱である旨の明示が実行構造の記録になかった
+- 発生局面: case-ready（Case #3890 の実行構造確定）
+- 検知方法: case-close 集約時の実行構造照合（検証単位・条件付き経路単位が子 Issue として存在）
+- 根本原因: 委譲指示（検証単位と条件付き経路単位の分離）が skill 原則より優先して適用され、逸脱明示の記録規律が不足していた
+- 自律対応内容: 子 Issue に親参照（親Epic: #3890）を付し系譜を追跡可能にした。本エントリで逸脱として記録
+- ユーザー確認有無: あり（委譲指示による。逸脱自体の判断は委譲側）
+- Decision/REQ/spec影響: なし（実行構造の運用逸脱。skill 原則の変更は伴わない）
+- 横展開観点: 委譲指示が skill の構造原則と競合する場合全般
+- 再発条件: 委譲側が構造原則と異なる実行構造を指示し、逸脱明示なしで構造が確定する
+- 予防策候補: 委譲指示による構造逸脱は、実行構造確定の記録（本文・工程記録）へ逸脱である旨と出所を明示する
+- 想定反映先: agentdev-workflow-case-ready（実行構造確定時の逸脱明示）
+- 関連: #3890・#3891・#3892
+- タグ: `#case-ready` `#実行構造` `#逸脱記録`
+
+### 4. 隔離試験の fixture 中立性検査にはディレクトリ名等の環境識別子を含める
+
+- 問題事象: 隔離検証の consumer ディレクトリ名（neutral-ac3 等の試験文脈を示唆しうる名称）から、実行側 LLM が trace reasoning 内で「試験 fixture の可能性」を推論していた。tracked 内容・commit メッセージの意図語スキャン範囲外の意図伝達経路であり、CREATE 判断への影響は分離不能
+- 発生局面: 検証環境構築・実行（ac3・fixverify）
+- 検知方法: trace reasoning の可読化照合（明示的推論の観測）
+- 根本原因: fixture 中立性検査を tracked ファイル内容・commit メッセージに限定し、ディレクトリ名等の環境識別子を対象に含めていなかった
+- 自律対応内容: 後続 fixture で中立名称（auditops-dev / auditops-prod-like）へ変更し選定根拠を ENVIRONMENT.md に記録。影響の分離不能性を限界として判定記録に明記
+- ユーザー確認有無: なし
+- Decision/REQ/spec影響: なし（検証手法の限界記録）
+- 横展開観点: LLM エージェントの隔離試験全般（環境識別子は文脈入力になり得る）
+- 再発条件: 試験文脈を示唆するディレクトリ名・環境識別子の下で LLM エージェントを実行する
+- 予防策候補: 隔離試験環境の中立性検査にディレクトリ名・環境識別子を含め、trace reasoning 内の文脈推論の有無を確認項目に加える
+- 想定反映先: 検証環境構築手順（case-run の隔離検証手順・ENVIRONMENT.md 記載規約）
+- 関連: #3890・#3891（訂正記録の限界 1）・#3892（iteration-1 検証記録のディレクトリ名選定根拠）
+- タグ: `#検証環境` `#fixture中立性` `#文脈リーク`
+- **処分判定**: deferred（Q24〔完了記録観測鮮度照合・サブに Q25/Q26/Q27 を含む〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## 2026-11-03T22:15+09:00 Case #3900 case-close Capture
+
+### 1. traceability-check の #3899 由来別検出は REQ-029 スコープ限定実行では findings に現れない
+
+- 問題クラス: workflow deviation / 検査範囲解釈
+- 内容: 配布 runtime script の inline ADF-COVERS と REQ-029 の矛盾（Issue #3899 対象）は、traceability check の --req REQ-029-001 スコープ限定実行では findings に現れず、フルスコープ実行でも REQ-029 関連 findings は 0 件であった。本 Case の合格条件から除外し、検出事実として記録済み。Issue #3899 の処置は別 Case 対象
+- 発生条件: Case #3900 case-run TS-R002（スコープ限定実行とフルスコープ補足実行の双方）
+- 証跡: PR #3901 本文検証差分セクション行5・6、Issue #3900 対応記録コメント（2026-11-03）
+
+### 2. フルスコープ traceability check の既存構造検出（missing-implementation 14件・missing-verification 16件）
+
+- 問題クラス: pre-existing / 検出事実の記録
+- 内容: フルスコープ traceability check（exit 2・pass 9 / fail 2）で REQ-029 非関連の missing-implementation 14件・missing-verification 16件を確認した。本 Case の変更起因ではなく対象外。corpus 完全性の診断指標（advisory・fail-open）として後続の処置判断材料に使える
+- 発生条件: Case #3900 case-run のフルスコープ補足実行（合格条件外・記録目的）
+- 証跡: PR #3901 本文検証差分セクション行6（要約転記。生データは一時退避のため保存しない）
+- **処分判定**: deferred（Q14〔traceability スコープ別実行と corpus 診断乖離〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## [2026-11-04T01:03+09:00][workflow_deviation][case-open STEP-4][Case #3902]
+- 問題事象: prepare_definition_pr.ts の `check_integrity` 入力に `check_changed_docs.ts --workflow case-run` を指定したため、script report の gate 名は pass でも full integrity check では REQ-106.md、agentdev-traceability.md、req-health-metrics.md の `req-updated-freshness` 3件が NG になった。script 提案本文の変更ファイル一覧も同一 Design パスを重複し、generate_indexes 派生物を含めなかった。
+- 発生局面: case-open STEP-4（Definition PR 準備と gate 設定）
+- 検知方法: `check_integrity.ts --root <definition worktree> --json` の全件実行と PR proposal のファイル一覧を実差分と突合して検知した。
+- 根本原因: GateCommandSpec の存在・引数検証だけで gate の意味を確認せず、`check_changed_docs.ts` を full `check_integrity.ts` と同じ役割に誤接続した。また、proposal の file list 生成が `editedPaths` の重複除去や generate_indexes 派生物の包含を行わない。
+- 自律対応内容: Definition 3文書の frontmatter `updated` を最終内容変更日 2026-11-04 に追随させ、計測日と派生物を明示パス commit した。generate_indexes を再実行して no changes、full integrity check を再実行して 951 ok / 0 ng / 0 warning を確認し、PR コメントに実 gate と実際の3ファイル差分を記録した。
+- ユーザー確認有無: なし
+- Decision/REQ/spec影響: なし（今回の Definition 変更内容は維持し、case-open workflow skill / script contract は更新していない）
+- 横展開観点: 機械工程へ caller 生成 GateCommandSpec を渡すすべての Workflow。validate-input pass は入力形式と gate 実体の存在を証明するが、指定 gate の意味的適合までは証明しない。
+- 再発条件: 類似名の検査スクリプトを gate に割り当て、実体の責務・入力・出力を確認せず proposal の gate 名だけから合格を解釈する。
+- 予防策候補: gate 設定前に正規 checker の CLI 契約を確認し、script 内 gate の名前と実行実体を evidence で照合する。PR 作成前に proposal の file list を最終 branch diff と突合し、重複・派生物漏れ・誤った gate 成功表現を確認する。
+- 想定反映先: agentdev-workflow-case-open の prepare_definition_pr 入力構成と STEP-4 proposal review 手順
+- 関連: Case #3902、PR #3903、Definition branch `definition/issue-3902`
+- タグ: `#case-open` `#gate-configuration` `#integrity` `#proposal-review`
+- **処分判定**: deferred（Q41〔case-open gate 誤接続〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## [2026-11-04T10:30+09:00][workflow_deviation][case-open STEP-4 measurement-convergence][Case #3910]
+- 問題事象: prepare_definition_pr.ts の measurement-convergence step が check_integrity 報告の req-updated-freshness 対象から REQ ファイルの報告形式（for REQ-105.md: 形式・docs/ プレフィックスなし）を捕捉できず、REQ-105.md の frontmatter updated 補正が script 内で完結せず script が fail 終了した（Case #3910・PR #3912 実測）。
+- 発生局面: 実装（case-open STEP-4 機械工程、REQ 行 APPEND を含む Definition PR）
+- 検知方法: script 報告 JSON の check_integrity step fail（5 new unmanaged NG）と convergence の frontmatterUpdatedTargets に REQ-105.md が含まれないことの突合
+- 根本原因: extractFreshnessTargets の正規表現 /for ((?:docs|src|scripts)[^s:]*.md):/g がプレフィックス付きパス形式のみに対応し、REQ freshness 報告のファイル名のみ形式と不一致
+- 自律対応内容: 手動 contingency で REQ-105.md frontmatter updated を commit author date に追随させ、req-metrics 派生物（req-health-metrics.md AUTOGEN 8→14）とともに明示パス指定補正 commit（20a6eb9e8）を作成。新 HEAD で check_integrity（0 new unmanaged NG）と traceability check（missing-design 0 件・対象行）を完了させ PR #3912 検証欄へ経緯を記録。修正対象は intake item 化済み（.agentdev/intake/inbox/2026-11-04-prepare-definition-pr-freshness-path-extraction.md）。
+- ユーザー確認有無: なし
+- Decision/REQ/spec影響: なし（既存契約の手動 contingency 経路の実施）
+- 横展開観点: REQ 行 APPEND を含む全 Definition PR で REQ ファイルの freshness 補正が同様に漏れ得る
+- 再発条件: REQ ファイル編集を含む Definition PR で measurement-convergence が発動し、REQ ファイルの freshness NG が初回 check_integrity で報告される場合
+- 予防策候補: extractFreshnessTargets の REQ ファイル形式対応と、NG 報告対象と補正適用対象の差分検査（補正漏れ検出）の script 組込み
+- 想定反映先: src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts、REQ-117 系機械工程堅牢化との突合
+- 関連: Case #3910、PR #3912 検証欄、.agentdev/intake/inbox/2026-11-04-prepare-definition-pr-freshness-path-extraction.md
+- タグ: #script-gap #measurement-convergence #case-open
+- **処分判定**: deferred（Q7〔measurement-convergence REQ frontmatter 収束欠落・3 件統合〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## [2026-11-04T10:30+09:00][workflow_deviation][case-open STEP-4 並行 case-open と measurement-convergence の補正混入][Case #3910]
+- 問題事象: measurement-convergence step の補正 commit（9e95df932）が本 Case の artifact_actions 宣言外ファイル（docs/designs/commands/case-revise.md、docs/designs/workflows/v51-phase-transition-and-coexistence-model.md〔並行兄弟 Case #3907/#3908/#3909 の変更対象共有ファイル〕）の frontmatter updated を含めて commit した。
+- 発生局面: 実装（case-open STEP-4 機械工程、並行 case-open 実行下）
+- 検知方法: convergence step detail の stagedPaths に宣言外 2 ファイルが含まれていることの差分確認
+- 根本原因: convergence step が REQ 編集対象に限定せず報告対象全体を補正する契約どおりに動作した結果、並行 Case の対象ファイルの main HEAD 起点の既存 freshness 債務が本 Case branch で解消された
+- 自律対応内容: 契約どおりの機械 step であることを確認し、PR #3912 検証欄へ補正対象・根拠・本変更起因の悪化 0 件を記録。共有ファイルの merge 順序接触は記録して解決しない（親判断は case-auto の decision_context へ委譲）。
+- ユーザー確認有無: なし
+- Decision/REQ/spec影響: なし
+- 横展開観点: 並行 case-open で measurement-convergence が発動する全 Case で宣言外ファイルの補正混入が起き得る
+- 再発条件: 並行 case-open 実行下で check_integrity の freshness 報告に他 Case 対象ファイルの既存債務が含まれる場合
+- 予防策候補: convergence の補正対象報告へ artifact_actions 宣言パスと main HEAD 既存債務パスの区分追加、または宣言外パス補正の別 commit 分離による PR diff の意味明確化
+- 想定反映先: prepare_definition_pr.ts の measurement-convergence step 報告詳細、case-open Design「並行 case-open の作業隔離規律」節の補正 commit 扱い明確化
+- 関連: Case #3910、PR #3912 検証欄、Case #3907/#3908/#3909（横断依存検査で共有ファイル重複を記録済み）
+- タグ: #workflow-deviation #parallel-case-open #measurement-convergence
+- **処分判定**: deferred（Q9〔並行 case-open の measurement-convergence 補正混入〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## [2026-11-04T10:30+09:00][learning_candidate][draft case_open_hints の宣言追随時期記述][Case #3910]
+- 問題事象: draft（req-draft-artifact-finalization-and-version-reconstruction）の wave_hints が ADF-COVERS(design/implementation) 宣言への REQ-105-009〜014 追加を実装の変更セットで行うと一括記述していた。case-open 契約の missing-design 0 件ゲート（設計PR作成前に design 役割の対応が必要・fail-closed）と矛盾し、hint を字義どおりに実行すると設計PRを作成できない。
+- 発生局面: 実装（case-open STEP-3/4 Definition Package 構成）
+- 検知方法: STEP-3 の宣言追随要否確認と missing-design 0 件ゲートの契約照合
+- 根本原因: wave_hints の記述が design 役割（設計PR時に必要）と implementation 役割（case-run 時に追加）の適用時期を区別せず一括で先送り記述していた
+- 自律対応内容: design 役割の宣言追随を設計PRの変更セットへ組込み（v4-operating-model.md: REQ-105-009〜014、document-type-responsibilities.md: REQ-105-011〜013）、implementation 役割の追加は case-run へ維持。区分の根拠を Root Case #3910 本文の構成上の注記へ記録し、traceability check で missing-design 0 件（対象行）を機械確認済み。
+- ユーザー確認有無: なし
+- Decision/REQ/spec影響: なし（case-open 契約の優先適用。draft hint の記述改善は req-define の case_open_hints 記述ガイダンス候補）
+- 横展開観点: REQ 行 APPEND を伴う draft の wave_hints で宣言追随時期を記述する場合、design/implementation 役割の適用時期を区別して記述する
+- 再発条件: REQ 行追加を伴い ADF-COVERS 宣言追随の先送りを wave_hints に記述する draft が case-open に入力される場合
+- 予防策候補: req-define 側の wave_hints 記述ガイダンスへ「design 役割宣言追随は設計PR変更セット、implementation 役割は実装変更セット」の区分記述を追加
+- 想定反映先: req-define の draft 生成ガイダンス（case_open_hints / wave_hints 記述規律）
+- 関連: Case #3910、PR #3912、draft .agentdev/drafts/req-draft-artifact-finalization-and-version-reconstruction.md wave_hints
+- タグ: #draft-hints #traceability-gate #case-open
+- **処分判定**: deferred（Q10〔draft wave_hints 宣言追随時期記述〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## [2026-11-04][learning_candidate][coverage 契約の役割語彙と REQ 成果物][Case #3910]
+- 問題事象: TS-701 事例 (a) の構築時、coverage 契約の role 語彙（decision / design / implementation / verification）に requirement 役割がなく、REQ 工程成果物（docs/requirements/ 配下）自身への covers 表現にどの役割を割り当てるか自明でないことを観測した。一時 sidecar では検証事例用に design 役割を使用した。
+- 発生局面: 検証（TS-701 事例 (a) の構築）
+- 検知方法: 要求成果物のみを対象に finalize --phase requirement の公開 CLI 事例を構成する際、対応役割の表現を確認した。
+- 根本原因: coverage 契約は成果物の機能上の役割を定義するが、工程で作成される REQ 文書自体を示す専用 role を定義していない。
+- 自律対応内容: 契約の拡張や規約化は本 Case の対象範囲外として行わず、検証用 sidecar による仮表現で事例を構成し、仮入力であることを PR Findings に記録した。
+- ユーザー確認有無: なし
+- Decision/REQ/spec影響: なし。判定器契約の拡張・REQ 工程成果物の coverage 表現規約化は対象範囲外。
+- 横展開観点: REQ 成果物そのものを coverage 対象として扱う検証や設計では、既存 role の意味と一時表現を正規規約と混同しない。
+- 再発条件: REQ 文書のみを対象に coverage 宣言を構成し、専用 role の不存在を無視して役割を決める場合。
+- 予防策候補: coverage 契約を変更または規約化する検討時に、REQ 工程成果物自身への covers 表現をどう扱うかを明示的に評価する。
+- 想定反映先: agentdev-traceability の coverage 契約検討。
+- 関連: PR #3923、TS-701 事例 (a)
+- タグ: #traceability #coverage #REQ
+- **処分判定**: deferred（Q11〔coverage 契約 role 語彙の requirement 役割不在〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## [2026-11-04T09:54+09:00][workflow_deviation][case-open STEP-4][Case #3909]
+- 問題事象: prepare_definition_pr.ts の measurement-convergence step が check_integrity の req-updated-freshness NG 6 件を trigger に発動したが、frontmatter updated の収束対象は Design 3 件（case-revise.md、v5-adopted-conventions、v51）のみで REQ 3 件（REQ-104/108/111）を収束しなかった。script 報告は stage「converged」を示しつつ exit 1 で終了し、REQ 分の NG 6 件のうち 3 件が残存した。
+- 発生局面: case-open STEP-4（機械工程 script 呼び出しと計測日収束）
+- 検知方法: script 報告 JSON の check_integrity step detail（stdout 全文・NG カウント 6 件）と measurement-convergence の frontmatterUpdatedTargets（Design 3 件のみ）の突合
+- 根本原因: measurement-convergence step の frontmatter updated 追随が Design targets のみを実装対象とし、REQ frontmatter（REQ frontmatter 規約〔patterns.md、IR-072〕の対象）を収束対象に含めていない。check_integrity の NG 検出は REQ も含むが追随 step が REQ を処理しない対象差が生じている
+- 自律対応内容: reference 既定の手動 contingency（REQ frontmatter updated の commit author date 2026-11-04 追随 + 明示パス指定補正 commit fdecf8180）で REQ 3 件を収束し、補正後 HEAD の check_integrity 再実行で NG 0 件（OK 951 / Warning 0）を確認。generate_indexes 派生物（req-health-metrics REQ 行数 AUTOGEN）は commit bf1402e4f で同一 PR 収束済み
+- ユーザー確認有無: なし
+- Decision/REQ/spec影響: なし（既存契約どおりの手動 contingency 経路の実施。script 契約・workflow 契約の変更なし）
+- 横展開観点: REQ 行 APPEND を伴う Definition 変更では、REQ ファイルの frontmatter updated 追随が measurement-convergence の機械対象外であるため、REQ APPEND の Case では常に手動 contingency の補正 commit が発生する
+- 再発条件: REQ 行 APPEND を含む DefinitionEdit で prepare_definition_pr を実行し、check_integrity が req-updated-freshness の REQ 分 NG を検出する場合
+- 予防策候補: prepare_definition_pr の definitionEdits 入力へ REQ frontmatter updated 追随を標準で組込む（stagePaths 含む）か、measurement-convergence step の収束対象へ REQ frontmatter を追加する。いずれも script 契約の変更候補
+- 想定反映先: prepare_definition_pr.ts の measurement-convergence step 実装、case-open Design「機械工程の script 呼び出し契約」節
+- 関連: Case #3909、PR #3913、Case #3902（同系統の gate 設定由来収束）、Case #3910（宣言外パス補正の区分問題）
+- タグ: #case-open #measurement-convergence #integrity #frontmatter-freshness
+- **処分判定**: deferred（Q7〔measurement-convergence REQ frontmatter 収束欠落・3 件統合〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## [2026-11-05][learning_candidate][traceability_relied_diff T6 の期待文言と v51 Design 実文言の不整合][Case #3918]
+- 検知: bun test 分割①（QG-4 フル suite）で `traceability_relied_diff.test.ts` T6「後続消費経路の文書接続が存在する」が fail。T6 が期待する v51 Design の `impact 拡張（差分候補）` 文言が実文言に不在。main（21df6658a・84491f816）で単独再実行し同一 fail 再現（pre-existing・PR #3924 の diff 11 files は期待対象行に触れないことを `git diff 21df6658a..5fcb369d9 --name-only` で確認）。
+- 対処: 未修正（本 Issue 対象範囲外・fail は fail のまま申告・合格への読み替えなし）。PR #3924 本文 Findings に記録済み。
+- 学び: 既存 pin/期待テストの文言期待は、対象文書の節更新と同期していないと pre-existing fail として滞留する。文言期待の pin は対象文書の正規文言への追随更新を対応 PR で行うか、期待の再確認を検証差分に記録する。類似の pre-existing fail（REQ-110-041 phase_adoption_record_contract・前回 #3919 から計上継続）と合わせ、integrity suite の fail 滞留の由来分類記録に baseline 再現確認を付ける運用が機能している。
+- 出典: PR #3924 本文 `## Findings/ Capture候補`（修正候補: 同文言の正規文言への pin 更新または期待の再確認）、QG-4 機械検証の実行証跡（split1.stderr・main-relied-diff 再現ログ・C:/WINDOWS/TEMP/opencode/qg4-3918/）
+- 関連: 分割① REQ-110-041（phase_adoption_record_contract・別系統の pre-existing fail・同一分割で観測）、Case #3919（同一 2 fail の計上記録・comment 6631838809）
+- タグ: #learning-capture #traceability #relied-diff #pin期待文言 #pre-existing
+- **処分判定**: deferred（Q13〔pin 期待文言滞留〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## [2026-11-05][learning_candidate][隔離検証セッション実行側の中間メッセージ中国語出力][Epic #3909]
+- 検知: TS-606 能力1（直接入力）の新規隔離実行セッション C1（/agentdev/req-define・4096 HTTP 投入・main 1cfc5ee56 投影）で、実行側セッションの STEP-5 中間メッセージに中国語出力「关键事实」が 1 箇所観測された（supplement-3909-ts606.md §7-6）。機能観測（STEP-6 決定的組立・STEP-9 読戻し検査合格）への影響なし。
+- 対処: 記録のみ（観測時点では処置せず・親判断により本 learning として回収）。
+- 学び（再発防止の観点）: 言語規律（基本言語は日本語・中国語での出力を禁止）は隔離検証環境・fixture 実行側セッションでも適用対象。隔離実行の観測項目に実行側中間メッセージの言語確認を含め、規律から外れた出力を検知したら機能影響の有無と分けて記録する。発生要因（投入言語・モデル側の言語選択条件）は本観測では特定できておらず、再観測時に要因の切り分けを要する。
+- 出典: セッション C1 SID ses_e5815631fffeIfGrF6N69ZHDUw・対象版 1cfc5ee56（ts606-r1 隔離投影）・supplement-3909-ts606.md §7-6・中間証拠 C:/WINDOWS/TEMP/opencode/ts606-r1/evidence/（C1 dispatch-meta.json・messages.json）
+- 関連: Epic #3909（TS-606 検証）・supplement-3909-ts606.md・Epic #3909 close SSoT コメント 6645168558（capture 判断記録）
+- タグ: #learning-capture #language-discipline #隔離検証 #セッション観測
+- **処分判定**: deferred（Q28〔隔離検証中国語出力観測〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## [2026-11-05][learning_candidate][case-open targeted 検査経由では計測日収束 (b) が発火せず frontmatter updated 未追随のまま Definition PR が merge 可能になる][Case #3928]
+- 検知: case-ready merge 前品質検査の frontmatter updated 再実測（IR-072 規約: updated = 最終内容変更 commit の author date、frontmatter のみの変更 commit は除外）で、変更を伴う docs 8ファイルのうち6ファイル（case-close.md、req-health-metrics.md、custom-tool-contracts.md、v4-delegation-contracts.md、REQ-032.md、REQ-052.md）が 2026-11-05 の内容変更 commit を持ちながら updated が旧日付（2026-10-16〜11-04）のままだった。
+- 対処: frontmatter のみの追随補正 commit（6ed481996、明示パス指定6ファイル）を設計PR branch へ追加し、再実測で全件一致を確認してから merge した。
+- 学び: case-open の PR 準備で実行していた targeted check_changed_docs（--workflow case-run）は IR-072 req-updated-freshness を含まない（本検査クラスは check_integrity full audit 側）。計測日収束 machine step（prepare_definition_pr measurement-convergence）の trigger 条件も check_integrity 報告の計測日不整合・req-updated-freshness NG であるため、full audit 未実行の Case では (b) が発火せず、case-ready の merge 前再実測が最後の検出点になる。再発防止候補: Definition PR で docs の内容変更を行う Case では、PR branch HEAD で IR-072 相当の突合（git log --format=%as と frontmatter updated の比較、frontmatter のみの変更 commit の除外を含む）を case-open 側で機械実行する。
+- 出典: Case #3928 設計PR #3929（受入検査で検出・6ed481996 で補正）、.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts の IR-072 実装、agentdev-workflow-case-open references/definition-pr-and-idempotency.md 計測日収束節
+- 関連: Case #3928 STEP-1、REQ-010-068（IR-072 根拠 REQ）
+- タグ: #learning-capture #frontmatter-updated #IR-072 #definition-pr #case-ready
+- **処分判定**: deferred（Q7〔measurement-convergence REQ frontmatter 収束欠落・3 件統合〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## [2026-11-06T11:14+09:00][learning_candidate][bun 1.3.6 の fs.rmSync は maxRetries/retryDelay オプションを無視する][Case #3928]
+- 検知: Issue #3949 の retry 有効性実測実験（PR #3950 本文 Findings 第1項）。別プロセス cwd 保持で EBUSY 誘発時に、`fs.rmSync` の `maxRetries`/`retryDelay` オプション指定でも elapsed 1ms で即失敗・retry しない。Node 標準オプションに依存した retry 前提のコードは Bun/Windows で無効。
+- 対処: 標準 rmSync の反復呼び出し + Atomics.wait 待機（既存慣行 runner-local.ts と同一パターン）で bounded retry（10回 × 100ms）を自前実装（walk_enumeration_contract.test.ts afterAll）。EBUSY 競合が窓内に解消した場合は 2 試行目（elapsed 216ms）で回復、窓超過の持続競合（>1s）は失敗を正しく返すことを実測。実装は merge 10fd8ddb3、post-merge main で 11 pass・新規 fixture root 残存 0 を再現。
+- 学び: Bun の標準 API オプションは Node 標準仕様どおりの挙動を仮定せず、実動確認で根拠を確定する。「オプションを渡した」と「retry が実際に起こった」を分けて実測する。retry の成立記述は実測根拠のみで行い、最初から改善成立と書かない。
+- 出典: PR #3950 本文「Findings/ Capture候補」第1項・検証差分行4（retry 有効性の実測）
+- 関連: Case #3928・Wave-8 #3949・walk_enumeration_contract.test.ts afterAll・既存慣行 runner-local.ts（Atomics.wait パターン）
+- タグ: #learning-capture #bun #fs-rmsync #retry #windows
+- **処分判定**: deferred（Q35〔bun 標準 API 実動確認規律・2 件統合〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## [2026-11-06T11:14+09:00][learning_candidate][bun test で process.on("exit") ハンドラが正常終了でも実行されない][Case #3928]
+- 検知: Issue #3949 修正前 RED 実測（PR #3950 本文 Findings 第2項）。process.on("exit") 内 rmSync は bun test 正常終了（11 pass / exit 0）でも発火せず、fixture root 11/11 が全数残存。Windows TEMP 既存 9,471 件残存の完全形メカニズムと整合する実測。
+- 対処: bun:test afterAll への回収移行で修正（merge 10fd8ddb3）。修正前 RED 11/11 全残存 → 修正後 GREEN 0 残存を同一固定環境手順で実測し、post-merge main でも新規残存 0 を再現。
+- 学び: bun test のテストファイルでは終了依存清掃（process.on("exit")）を使わず、bun:test afterAll 等のランナー契約を使う。exit ハンドラの発火は正常終了時を含め実動で確認するまで成立と書かない。失敗の握りつぶし（catch-all）は清掃欠陥を不可視化するため、清掃失敗はテスト失敗として伝達する構造にする。
+- 出典: PR #3950 本文「Findings/ Capture候補」第2項・検証差分行1（修正前 RED・残存 11/11）・検証証拠コメント 6674572192
+- 関連: Case #3928・Wave-8 #3949・walk_enumeration_contract.test.ts・REQ-118-005・REQ-118-003
+- タグ: #learning-capture #bun-test #process-exit #fixture-残存 #afterAll
+- **処分判定**: deferred（Q35〔bun 標準 API 実動確認規律・2 件統合〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## [2026-11-06T15:05+09:00][learning_candidate][台帳エントリの kind 契約違反は ledger read fail となり観測系の検出が消える][Case #3928]
+- 検知: Wave-9 #3952 のテスト作成時 RED 検証（PR #3953 本文 Findings / Capture候補 learning）。テストの台帳 fixture に契約外の `kind: "process"` を書くと readLedger が `ledger entry.kind must be one of: remote, clone, bare-repository, capture-log, helper-script, dedicated-server, dedicated-process, temporary-output` で fail し、ledger-unavailable として観測系検出（unregistered 検出等）が全て実行されない。テスト構造は形式的に成立するため fail 理由が契約違反と気づきにくい。
+- 対処: 台帳 fixture は許容 kind 集合から選ぶ。PR #3953 のテストは許容 kind で構成済み（merge f2dd454b3・post-merge main で suite 288 pass / 0 fail / 926 expect を再現確認済み）。
+- 学び: 台帳系テストの fixture は契約 enum の許容値から選ぶ。観測系の「検出 0 件」は「正常に検出して何もなかった」と「検査自体が不能（ledger-unavailable）」を区別せず通るため、検出消失を fixture 契約違反が隠す構造に注意する。検出ゼロを合格根拠に使う前に、観測系が実際に実行された根拠（positive control の検出など）を確認する。
+- 出典: PR #3953 本文「Findings/ Capture候補」learning 項
+- 関連: Case #3928・Wave-9 #3952・close_mechanical_steps.ts readLedger・docs/designs/workflows/verification-resource-lifecycle.md
+- タグ: #learning-capture #台帳 #kind契約 #ledger-unavailable #fail-closed
+- **処分判定**: deferred（Q43〔台帳 kind 契約違反で観測系検出消失〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## [2026-11-06T15:20+09:00][learning_candidate][中断セッションのワークフロー一時ファイルは .agentdev/ 直下に残り通常の tmp 検査から漏れる][Case #3928]
+- 検知: Epic #3928 最終close子の /abort 後、durable state 実測で `.agentdev/tmp-issue-3928-body-update.json` が repo の `.agentdev/` 直下（正規 `.agentdev/tmp/` の外）に残存しているのを監督が発見（記録 6675731983）。本文更新の JSON payload を正規 tmp 配下でなく `.agentdev/` 直下に作成した上、abort で清掃経路が走らなかった。
+- 対処: 事前実在は orchestrator の独立観測記録（b30）で確定済み。orchestrator が workflow 一時ファイル当該実行内削除規律（REQ-018-008(b)）に基づき `rm -f` で清掃（ユーザー許可不関与・rm 成功のみから元実在を推測せず事前実在記録と対で証拠化）。逸脱3点（作成置き場・abort 残存・rm 証拠特性）を本体記録として保存済み。
+- 学び: 大容量本文の部分更新は正本読出し→組立→送信の3段で行い、中間 payload は正規一時領域（`.agentdev/tmp/`）に置く。中断セッションの残存検査は repo 直下と `.agentdev/` 直下の両方を見る（通常の `.agentdev/tmp/` 検査だけでは漏れる）。中断後の durable state 実測に未追跡ファイルの全パス列挙を含める。
+- 出典: Epic #3928 コメント 6675731983・6675962969（位置誤記訂正）・b30 圧縮記録（m0658 実測）
+- 関連: Case #3928・REQ-018-008(b)・m0729/m0731 Epic本文破壊・復旧事案（プレースホルダ送信事故）と同根の大容量本文更新規律
+- タグ: #learning-capture #一時ファイル #abort残存 #agentdev-tmp #durable-state
+- **処分判定**: deferred（P-b〔大容量 Issue 本文部分更新の機械的照合規律・STEP-4 review で promote から deferred 変更・残 gap は送信前機械照合と残存検査範囲拡大〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## [2026-11-06T22:30+09:00][learning_candidate][大容量Issue本文の部分更新で破壊的事故×2 — 正本読出し→組立→送信の手順遵守とVERIFYの限界][Case #3928]
+- 検知: Epic #3928 本文の大容量部分更新で2回の本文破壊事故。1回目（m0729）: issue_update の body へ組立途中のリテラル「PLACEHOLDER-FULL-BODY」を送信し本文を破壊。2回目（m0787）: 正本ファイルを読まずに記憶から再構築した簡略版本文を送信（item1 checkbox を誤って [x] 化する誤り含む）。いずれも tool VERIFY は「送信内容との読戻し一致」で成功扱いとなり破壊を検出しなかった。直後の検出はいずれも正本との構造差・checkbox 不一致の人工比較によるもの。
+- 対処: 2回とも正本ファイルから全文を再送して復元（読戻し検証合格: rows=12・item1 状態・実現方針・全 sentinel 確認）。失敗履歴として正直報告（2回目は事故報告として実施）。教訓として「大容量本文の部分更新は正本読出し→組立→送信の3段手順（プレースホルダ段階送信・記憶再構築送信の禁止）」を確定したが、1回目の後に手順を意識化しただけで機械的確認を入れなかったため2回目を起こした。
+- 学び: tool の VERIFY は送信内容と読戻しの一致のみを検証し「意図した内容との一致」は検証しないため、破壊的な本文送信はゲートを通る。部分更新の正は正本ファイルとの差分比較で、送信前に本文の行数・主要 sentinel（checkbox 状態・行数・末尾構造）を正本と照合する機械的確認を入れる。教訓の意識化だけでは再発防止にならず、実行時点のチェックリスト化が必要。
+- 出典: m0729/m0731（1回目事故・復元）・m0787/m0792（2回目事故・復元）・2回目の正直報告記録
+- 関連: Case #3928・REQ-018-008(b)・先行 entry「中断セッションのワークフロー一時ファイルは .agentdev/ 直下に残り通常の tmp 検査から漏れる」（同根の大容量本文更新規律）
+- タグ: #learning-capture #issue_update #本文破壊 #正本 #VERIFY限界 #再発防止
+- **処分判定**: deferred（P-b〔大容量 Issue 本文部分更新の機械的照合規律・STEP-4 review で promote から deferred 変更・残 gap は送信前機械照合と残存検査範囲拡大〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
+
+## [2026-11-07T13:55+09:00][learning_candidate][detached起動コマンドの実行基盤二重/三重起動が機械工程のtwin検出を guaranteed 再現する][Case #3928]
+- 検知: Epic #3928 最終closeの detached nohup 起動（`bash -c "... date +%s > epoch && nohup bash -c 'echo $$ > pid; bun 機械工程...' & sleep 3; cat pid"`）が同一コマンドを0.3秒窓で複数実行した。m1297: outer 2 + inner 2（6701997630 補足記録の4 shell）。m1320: outer 1 + inner 3（13:39:38.338/.395/.412/.628 起動・report-premerge-m1320.json findings 2件の具体対象 7560/42392 + grounds 消費実測 35316/7512）。各 inner chain が compose と機械工程を並行実行し、各実行は「他 chain の生存 launcher shell」を in-scope（commandLine に案件識別子を含む）未登録として検出して拒否される。同一 commandLine の複数実体は属性一致でも曖昧消費しない fail-closed 契約のため、twin の grounds 化（現 run origin）だけでは並行 chain を被覆できず、起動時に未存在の twin は事前 grounds 化も不可能。
+- 対処: m1320 では無変更再実行を行わず、具体対象（pid・startedAt・commandLine）付きで正直記録（6702480374）。compose 時 ancestor grounds（自 chain の pid-exact）と記録済み shell の startedAt 属性 grounds は意図どおり機能した（findings 2,468→2）。
+- 学び: detached 起動は実行基盤の重複実行を構造的に含む。機械工程の起動は (i) 起動直後の重複実行検出（同一入力の bun プロセス数確認）と (ii) 二重起動が解消されない場合の起動経路変更（同期実行・単一 submission 保証付き経路）を前提に設計する。launcher shell の生存自体は in-scope 検出対象であるため、起動機構の衛生がそのまま機械受理の前提になる。
+- 出典: report-premerge-m1320.json findings 2件（pid 7560/42392・startedAt 実測）・compose-input-population-w12-generation-log.json（grounds [7512, 35316]）・6701997630 補足記録（m1297 2+2 twin）・6702480374（本記録）
+- 関連: Case #3928・close_mechanical_steps.ts evaluateObservationEntityConsumption（attr grounds の一意消費契約）・verify-resource-lifecycle Design
+- タグ: #learning-capture #detached起動 #二重実行 #launcher-shell #fail-closed #機械工程
+- **処分判定**: deferred（Q38〔機械工程起動 twin・2 件統合〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
+- **移動日**: 2026-11-07
