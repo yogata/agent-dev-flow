@@ -3,6 +3,11 @@
 このドキュメントは、開発過程で得た教訓や失敗から学んだことを記録する。
 まだ整理されていない学びを一時的に保存し、十分な数が溜まったら分類、整理して永続的なドキュメントに移動する。
 
+## [2026-11-07T14:52+09:00][learning_candidate][m1334 native spawn 単一起動で twin launcher 病理は解消・残る拒否原因は外部セッションの識別子含有シェル][Case #3928]
+- 検知: Epic #3928 最終close m1334 で、監督指示の起動条件変更（Python subprocess.Popen(shell=False, argv配列) による bun.exe 直接起動・preflight/composer/機械工程 各1回・同一 Python 親・nohup/bash -c/&&/& 連結なし）の下で機械工程を1回実行した結果、起動経路自体からの findings は 0件（m1320 の twin launcher shell findings 2件〔7560/42392〕は再現せず・旧 pid 自然消滅も実測）。機械判定は accepted=false だが失敗 step は verification-resource-reconciliation のみで findings 1件に減少。唯一の検出は監督セッション側の監視シェル（pid 22360・hermes-vault ledger.py/sse-watch.py を連結した bash.exe -lic・commandLine に監督指示文「#3928 …」を含む）で、識別子含有により範囲内導出され未登録として検出された（fail-closed 契約どおりの正当動作）。全 gate pass（final-acceptance closeAllowed=true・integrity machineAcceptance accepted=true・traceability pass=11 fail=0・textlint・contract-state・gaps 0件）。
+- 対処: m1320 記録の「二重実行病理を実証」表現を仮説へ降格（同一 commandLine＋近接 startedAt の bash 実体重複は bun 重複実行を証明しない。MSYS プロセス表現≠実コマンド重複）。旧 PID への除外根拠は追加しない。残る1件は監督側対応事項（当該監視シェルの終了）であり、Case 側の作成物残存・gaps・検出後退はない。機械判定記録は Issue #3928 コメント 6702921898・報告 JSON は .agentdev/integrity/reports/issue-3928/report-premerge-m1334.json・起動証跡は m1334-spawn-records.json。
+- 関連: Case #3928・close_mechanical_steps.ts executeVerificationResourceReconciliation（識別子含有による範囲内導出と grounds の pid 一致消費）・compose-input-population-w12.mjs buildExecutionRuntimeAncestorGrounds（識別子含有祖先のみの実祖先照合）
+
 ## [2026-11-06T21:37+09:00][workflow_deviation][RED 検証時の git stash 一時使用は worktree 手順違反・記録と原状確認で対応][Case #3928]
 - 検知: Wave-10 #3954（PR #3955）の datetime境界 RED 検証で、実行担当が src 修正を git stash で一時退避して pre-fix 状態のテストを実行した。worktree 手順（AGENTS.md・agentdev-git-worktree worktree-operations reference）は stash 使用を禁止しており手順逸脱。親側で refs/stash の状態を確認し、元 stash 6af8faf9941be8695270522a0f9c77eb455dd46e は無傷（喪失なし）を確認済み。listing に現れた別 stash f8e8a73e0bfcd455a956d94607f60fc49ec83dfe は当該実行で作成されたものと確認できないため新規材料・削除対象に分類しない（触れない）。
 - 対処: 逸脱として完了記録コメントの判断メモへ明示記録（PR #3955 完了記録 6684910277）。refs/stash の実在確認で元 stash への影響なしを検証済み。正規手順では RED 検証は stash を使わず行う（修正前 commit の checkout・別 worktree・git apply/revert 系の手順が代替候補）。
