@@ -109,7 +109,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [REQ-115](requirements/REQ-115.md) | case-run scripts 配下の型検査基盤導入方針 |
 | [REQ-116](requirements/REQ-116.md) | GitHub 版隔離検証環境の管理者事前準備常備方針 |
 | [REQ-117](requirements/REQ-117.md) | docs 整合・検査体系と機械工程の堅牢化（15 作業単位） |
-| [REQ-118](requirements/REQ-118.md) | 検証用一時資材の登録と回収のライフサイクル契約 |
+| [REQ-118](requirements/REQ-118.md) | 検証に伴う一時資材の取扱いと後片付け責任 |
 | [REQ-119](requirements/REQ-119.md) | backlog 一式 20261107T161204JST の整合是正と機械工程堅牢化（6 作業単位） |
 <!-- AUTOGEN:END -->
 
