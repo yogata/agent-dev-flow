@@ -4916,3 +4916,219 @@ describe("案件作成範囲の導出訂正（専用領域・記録由来・識�
     expect(reconciliation.findings.some((f) => f.code === "inspection-unavailable")).toBe(true);
   });
 });
+
+describe("台帳記載所在のパス境界（兄弟・類似名別所在の誤範囲内認定の訂正）", () => {
+  const boundaryScope = {
+    caseIdentifiers: ["3928"],
+    scopeAndLimits:
+      "台帳記載所在の実 subtree とその参照は名前を問わず範囲内。兄弟・類似名の別所在は範囲外（attribution-unknown 報告のみ）",
+  };
+  /** 台帳記載所在 <repo>/tmp-area/dedicated-run の台帳エントリ（回収済み・削除確認付きで findings を出さない）。 */
+  const boundaryLedgerEntry = () =>
+    ledgerEntryJson({
+      id: "vr-3928-root",
+      location: "<repo>/tmp-area/dedicated-run",
+      identifiers: { path: "<repo>/tmp-area/dedicated-run" },
+      collectedAt: "2026-11-05T10:00:00.000Z",
+      registrationBasis: "evidenced-occurrence-record",
+    });
+  const boundaryCheck = (baseCheck: VerificationResourceCheck): VerificationResourceCheck => ({
+    ...baseCheck,
+    deletionConfirmations: [
+      {
+        entryId: "vr-3928-root",
+        identifiers: { path: "<repo>/tmp-area/dedicated-run" },
+        confirmedBy: "user",
+        confirmedAt: "2026-11-05T10:01:00.000Z",
+      },
+    ],
+    caseCreationScope: boundaryScope,
+  });
+  const boundaryRunner = (observed: {
+    gitignoredOutput?: string;
+    processLiveness?: Record<
+      string,
+      { alive: boolean; commandLine: string | null; cwd?: string }
+    >;
+  }) =>
+    fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([boundaryLedgerEntry()]),
+      missingPaths: ["<repo>/tmp-area/dedicated-run"],
+      listenPorts: {},
+      ...observed,
+    });
+  const readReconciliation = (report: ReturnType<typeof runCloseMechanicalSteps>) =>
+    report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      attributionUnknown: {
+        declared: boolean;
+        entries: readonly { source: string; count: number; examples: readonly string[] }[];
+      };
+    };
+
+  test("実経路: 台帳記載所在の兄弟（dedicated-run-other）の gitignored 観測は範囲外の attribution-unknown 報告のみで完了拒否にしない（パス境界反例・FS）", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = boundaryRunner({
+      gitignoredOutput: "<repo>/tmp-area/dedicated-run-other/file.tmp\n",
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: boundaryCheck(baseCheck),
+      }),
+      runner,
+    );
+    const reconciliation = readReconciliation(report);
+    expect(reconciliation.permitted).toBe(true);
+    expect(reconciliation.findings).toHaveLength(0);
+    expect(reconciliation.attributionUnknown.declared).toBe(true);
+    const fsEntry = reconciliation.attributionUnknown.entries.find(
+      (entry) => entry.source === "gitignored-output",
+    );
+    expect(fsEntry?.count).toBe(1);
+    expect(fsEntry?.examples[0]).toContain("dedicated-run-other");
+    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+  });
+
+  test("実経路: 台帳記載所在の実 subtree 内の任意名未登録物（gitignored 観測）は範囲内として未登録拒否を維持する（パス境界反例・FS の逆方向）", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = boundaryRunner({
+      gitignoredOutput: "<repo>/tmp-area/dedicated-run/unregistered-artifact.tmp\n",
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: boundaryCheck(baseCheck),
+      }),
+      runner,
+    );
+    const reconciliation = readReconciliation(report);
+    expect(reconciliation.permitted).toBe(false);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("unregistered-artifact.tmp"),
+      ),
+    ).toBe(true);
+    expect(reconciliation.attributionUnknown.entries).toHaveLength(0);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: 台帳記載所在の兄弟を cwd とする番号なし process は範囲外の attribution-unknown 報告のみ（パス境界反例・cwd の文字列含有誤認の訂正）", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = boundaryRunner({
+      processLiveness: {
+        "700": { alive: true, commandLine: null, cwd: "<repo>/tmp-area/dedicated-run-other" },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: boundaryCheck(baseCheck),
+      }),
+      runner,
+    );
+    const reconciliation = readReconciliation(report);
+    expect(reconciliation.permitted).toBe(true);
+    expect(reconciliation.findings).toHaveLength(0);
+    const processEntry = reconciliation.attributionUnknown.entries.find(
+      (entry) => entry.source === "process-liveness",
+    );
+    expect(processEntry?.count).toBe(1);
+    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+  });
+
+  test("実経路: 台帳記載所在の兄弟を commandLine で参照する番号なし process は範囲外の attribution-unknown 報告のみ（類似名別所在の部分一致を記録対応としない）", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = boundaryRunner({
+      processLiveness: {
+        "701": { alive: true, commandLine: "node <repo>/tmp-area/dedicated-run-other/job.js" },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: boundaryCheck(baseCheck),
+      }),
+      runner,
+    );
+    const reconciliation = readReconciliation(report);
+    expect(reconciliation.permitted).toBe(true);
+    expect(reconciliation.findings).toHaveLength(0);
+    const processEntry = reconciliation.attributionUnknown.entries.find(
+      (entry) => entry.source === "process-liveness",
+    );
+    expect(processEntry?.count).toBe(1);
+    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+  });
+
+  test("実経路: 台帳記載所在の実 subtree を cwd とする process は範囲内として未登録拒否を維持する（cwd の逆方向）", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = boundaryRunner({
+      processLiveness: {
+        "702": { alive: true, commandLine: null, cwd: "<repo>/tmp-area/dedicated-run/worker" },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: boundaryCheck(baseCheck),
+      }),
+      runner,
+    );
+    const reconciliation = readReconciliation(report);
+    expect(reconciliation.permitted).toBe(false);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 702"),
+      ),
+    ).toBe(true);
+    expect(reconciliation.attributionUnknown.entries).toHaveLength(0);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: 宣言識別子に無くとも本チェックの正規識別子（評価単位 Issue 番号）を含む process は範囲内の陽性シグナルとして未登録拒否する", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([boundaryLedgerEntry()]),
+      missingPaths: ["<repo>/tmp-area/dedicated-run"],
+      listenPorts: {},
+      processLiveness: {
+        "703": { alive: true, commandLine: "node helper-for-issue-3931.js" },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: {
+          ...baseCheck,
+          deletionConfirmations: [
+            {
+              entryId: "vr-3928-root",
+              identifiers: { path: "<repo>/tmp-area/dedicated-run" },
+              confirmedBy: "user",
+              confirmedAt: "2026-11-05T10:01:00.000Z",
+            },
+          ],
+          caseCreationScope: {
+            caseIdentifiers: ["adf-3928"],
+            scopeAndLimits:
+              "宣言識別子は adf-3928。正規識別子（caseId・評価単位 Issue 番号）を含む観測も範囲内の陽性シグナル",
+          },
+        },
+      }),
+      runner,
+    );
+    const reconciliation = readReconciliation(report);
+    expect(reconciliation.permitted).toBe(false);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 703"),
+      ),
+    ).toBe(true);
+    expect(reconciliation.attributionUnknown.entries).toHaveLength(0);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+});

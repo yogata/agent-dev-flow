@@ -975,6 +975,8 @@ export interface VerificationResourceCheck {
    * いずれも任意名を含む）、範囲内の未登録/残存/未確認/検査不能は従来どおり拒否する。
    * 範囲外（関係記録がなく案件範囲導出に掛からない共有/OS 実体）は attribution-unknown
    * として報告のみ（非ブロック）で記録される。識別子の不在のみで範囲外へ認定せず、
+   * 照合の有効識別子集合は宣言識別子に本チェックの正規識別子（caseId・評価単位 Issue 番号）を
+   * 加えた集合とする（attribution-unknown 報告の識別子は宣言値のまま）。
    * 共有領域（repo .agentdev/tmp ルート・OS TEMP ルート・接頭辞のみ・共有親プロセスの
    * 全子孫）を本件と自動認定しない。未宣言時は現行どおり全件が findings となる。
    */
@@ -1013,7 +1015,11 @@ export interface AttributionUnknownReport {
  * - 宣言なしは常に false（範囲外分類なし＝現行どおり全件 findings）
  * - inScopeByConstruction（専用領域観測など宣言内容に依らず案件スコープと構成から決まる観測）は false
  * - 識別子の含有（大文字小文字無視の部分一致）は範囲内の陽性シグナル
- * - 台帳記載所在（recordedLocationBases）の参照（FS は subtree・commandLine/cwd/URL は文字列含有）は記録対応による範囲内
+ * - 台帳記載所在（recordedLocationBases）の参照は記録対応による範囲内。FS 候補
+ *   （fsCandidates: 観測 FS 実在物・process cwd）は isUnderNormalizedPath のパス境界比較による
+ *   実 subtree 一致（dedicated-run-other 等の兄弟・類似名の別所在を文字列含有で範囲内としない）。
+ *   commandLine・URL 候補は所在名が直後の文字で引き延ばされていない発生だけを参照と認める
+ *   （類似名別所在の部分一致を記録対応としない）
  * - 識別子空配列は全件範囲内扱い（拒否維持の fail-closed。空宣言で範囲外へ分類しない）
  * 共有領域（repo .agentdev/tmp ルート・OS TEMP ルート・接頭辞のみ・共有親プロセスの全子孫）を
  * 本件と自動認定する判定は行わない。
@@ -1024,8 +1030,10 @@ export function isOutsideCaseCreationPopulation(
   options: {
     /** 観測構成上つねに案件スコープと決まる実在物（dedicated-area 観測）。宣言内容に依らない。 */
     inScopeByConstruction?: boolean;
-    /** 台帳記載所在（正規化済み）。FS は subtree 一致、commandLine/cwd/URL は含有一致で参照判定する。 */
+    /** 台帳記載所在（正規化済み）。FS 候補は subtree 一致、reference 候補は境界付き含有で参照判定する。 */
     recordedLocationBases?: readonly string[];
+    /** FS パスとして照合する候補（観測 FS 実在物・process cwd）。台帳記載所在とはパス境界（subtree）で照合する。 */
+    fsCandidates?: readonly (string | null | undefined)[];
   } = {},
 ): boolean {
   if (scope === undefined) return false;
@@ -1034,16 +1042,45 @@ export function isOutsideCaseCreationPopulation(
     .map((identifier) => identifier.toLowerCase())
     .filter((identifier) => identifier.length > 0);
   if (identifiers.length === 0) return false;
-  const normalizedCandidates = candidates
-    .filter((value): value is string => typeof value === "string" && value.length > 0)
-    .map((value) => normalizeObservationPath(value).toLowerCase());
-  const haystack = normalizedCandidates.join("\n");
+  const normalizeCandidate = (value: string | null | undefined): string =>
+    typeof value === "string" && value.length > 0 ? normalizeObservationPath(value).toLowerCase() : "";
+  const normalizedFsCandidates = (options.fsCandidates ?? [])
+    .map(normalizeCandidate)
+    .filter((value) => value.length > 0);
+  const normalizedReferenceCandidates = candidates
+    .map(normalizeCandidate)
+    .filter((value) => value.length > 0);
+  const haystack = [...normalizedFsCandidates, ...normalizedReferenceCandidates].join("\n");
   const identifierBearing = identifiers.some((identifier) => haystack.includes(identifier));
   const bases = (options.recordedLocationBases ?? [])
     .map((base) => normalizeObservationPath(base).toLowerCase())
     .filter((base) => base.length > 0);
-  const referencesRecordedLocation = bases.some((base) => haystack.includes(base));
-  return !identifierBearing && !referencesRecordedLocation;
+  const fsUnderRecordedLocation = normalizedFsCandidates.some((candidate) =>
+    bases.some((base) => isUnderNormalizedPath(candidate, base)),
+  );
+  const referencesRecordedLocation = normalizedReferenceCandidates.some((candidate) =>
+    bases.some((base) => referencesRecordedLocationString(candidate, base)),
+  );
+  return !identifierBearing && !fsUnderRecordedLocation && !referencesRecordedLocation;
+}
+
+/** 台帳記載所在の最終セグメント名を引き延ばして類似名の別所在にする文字（候補・所在とも小文字化済み）。 */
+const LOCATION_NAME_CONTINUATION_PATTERN = /[a-z0-9._~+-]/;
+
+/**
+ * reference 候補（commandLine・URL）内の台帳記載所在の発生のうち、直後の文字が所在名の
+ * 続きになっていないものだけを参照と認める（dedicated-run-other 等の類似名別所在を部分一致で
+ * 記録対応としない。直後が終端・パス区切り・空白・引用符等なら所在自身またはその subtree への
+ * 参照と認める）。
+ */
+function referencesRecordedLocationString(candidate: string, base: string): boolean {
+  let index = candidate.indexOf(base);
+  while (index !== -1) {
+    const next = candidate.charAt(index + base.length);
+    if (next === "" || !LOCATION_NAME_CONTINUATION_PATTERN.test(next)) return true;
+    index = candidate.indexOf(base, index + 1);
+  }
+  return false;
 }
 
 /** attribution-unknown の全件リストを source 別の実数件数と先頭5件の例へ集約する。 */
@@ -1705,9 +1742,10 @@ export function evaluateUnregisteredObservations(
       continue;
     }
     if (
-      isOutsideCaseCreationPopulation(caseCreationScope, [normalized], {
+      isOutsideCaseCreationPopulation(caseCreationScope, [], {
         inScopeByConstruction: observed.source === "dedicated-area",
         recordedLocationBases: normalizedLedgerLocations.map((entry) => entry.normalized),
+        fsCandidates: [normalized],
       })
     ) {
       attributionUnknownEntries.push({ path: observed.path, source: observed.source });
@@ -1996,10 +2034,10 @@ export function evaluateObservationEntityConsumption(
       detailParts.push(`startedAt: ${processObservation.startedAt}`);
     }
     if (
-      isOutsideCaseCreationPopulation(options.caseCreationScope, [
-        processObservation.commandLine ?? undefined,
-        processObservation.cwd,
-      ], { recordedLocationBases })
+      isOutsideCaseCreationPopulation(options.caseCreationScope, [processObservation.commandLine ?? undefined], {
+        recordedLocationBases,
+        fsCandidates: [processObservation.cwd],
+      })
     ) {
       attributionUnknownEntries.push({ path: `process:pid=${pid}`, source: "process-liveness" });
       continue;
@@ -2151,13 +2189,29 @@ export function evaluateVerificationResourceReconciliation(
     }
   }
 
+  // 母集団照合の有効識別子集合は宣言識別子に本チェックの正規識別子（caseId・評価単位
+  // Issue 番号）を加えた集合とする（正規識別子を含む観測は宣言漏れがあっても範囲内の
+  // 陽性シグナルとして拒否側に倒す。attribution-unknown 報告の識別子は宣言値のまま）。
+  const populationMatchingScope =
+    check.caseCreationScope === undefined
+      ? undefined
+      : {
+          ...check.caseCreationScope,
+          caseIdentifiers: [
+            ...new Set([
+              ...check.caseCreationScope.caseIdentifiers,
+              check.caseId,
+              String(check.issueNumber),
+            ]),
+          ],
+        };
   const unregistered = evaluateUnregisteredObservations(
     observation.observedEntries,
     ledger.entries,
     check.knownResidualEntries,
     observation.excludedPaths,
     observation.resolveBase,
-    check.caseCreationScope,
+    populationMatchingScope,
   );
   findings.push(...unregistered.findings);
 
@@ -2170,7 +2224,7 @@ export function evaluateVerificationResourceReconciliation(
       observationExclusionGrounds: check.observationExclusionGrounds,
       selfProcessId: options.selfProcessId,
       processAttribution,
-      caseCreationScope: check.caseCreationScope,
+      caseCreationScope: populationMatchingScope,
     },
   );
   findings.push(...entityConsumption.findings);
