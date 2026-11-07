@@ -238,3 +238,75 @@
 - **タグ**: #worktree #git-worktree-remove #Windows #node_modules #後片付け
 
 ---
+
+## 2026-11-08: contractStateCheck.contractStatePaths に .agentdev/close-acceptance/ を含めると機械工程自身の終了判定記録が未コミット検出される（Case #3969・case-close pre-merge）
+
+- **問題事象**: pre-merge 機械工程の contract-state-residue-check に contractStatePaths へ `.agentdev/close-acceptance/` を含めて実行すると、同一実行内で機械工程が書き出した終了判定記録（`issue-{N}.json`）自身が `uncommittedStateRecords` として検出され step が fail した
+- **発生局面**: case-close pre-merge 機械工程（契約状態記録の範囲導出）
+- **検知方法**: 1回目機械工程の報告 JSON（contract-state-residue-check fail・uncommittedStateRecords [".agentdev/close-acceptance"]）
+- **根本原因**: `.agentdev/close-acceptance/` は git 履歴上で commit されたことがない管理対象外の終了判定記録配置（機械工程が書出し・終了判定に必要な期間だけ保護し post-merge で回収する契約）であり、「正規契約で git 管理対象と宣言される記録」の範囲導出に含めるべきでなかった
+- **自律対応内容**: 2回目実行で contractStatePaths から close-acceptance を除外し、自己記録 `issue-3969.json` を humanConfirmedPaths（ファイル単位パス・帰属根拠 basis 付き）で確認記録。contract-state-residue-check pass（committed=true・humanConfirmationItems 0）を取得
+- **ユーザー確認の有無**: なし（帰属は機械工程自身の書出し物として明確・確認根拠を basis に記録）
+- **REQ/Decision/Design影響**: なし（現行契約どおりの範囲導出の運用補正）
+- **横展開観点**: pre-merge 機械工程を実行する close の範囲導出は「git 管理対象と宣言される記録」に限定し、close-acceptance は範囲外とする。machineConfirmedPaths の機械側除外（excludedSelfAcceptanceRecordPath 相当）は worktree status 検査にのみ存在し contract-state-residue-check には存在しないため、呼出側の範囲導出が正確であることが前提
+- **再発条件**: 範囲導出ヒントに close-acceptance が列挙されたまま機械工程を実行する close
+- **予防策候補**: close_mechanical_steps.ts の contract-state-residue-check に自己終了判定記録の除外（pre-merge-local-state-check の excludedSelfAcceptanceRecordPath と同一機構）を追加
+- **想定反映先**: src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts・SKILL.md 契約状態記録検査節の範囲導出注記
+- **関連**: Case #3969・機械工程報告 JSON（pass1・pass2）
+- **タグ**: #contract-state-residue #close-acceptance #範囲導出 #humanConfirmedPaths #case-close
+
+---
+
+## 2026-11-08: post-merge 機械工程の reclamation は CLI runner が deleteFile を提供せず fail-closed 報告となり手動回収経路が現行正常系（Case #3969・再観測）
+
+- **問題事象**: post-merge 機械工程の close-acceptance-reclamation step が「mechanical runner does not provide deleteFile; reclamation cannot execute (fail-closed)」で fail 報告となった。CLI 直接実行形態の runner 実装は deleteFile を注入しないため回収ステップが常時 fail 報告になる
+- **発生局面**: case-close post-merge 機械工程（終了判定記録の回収）
+- **検知方法**: post-merge 報告 JSON（close-acceptance-reclamation fail・reclamation.error）
+- **根本原因**: close_mechanical_steps.ts の CLI runner 実装に deleteFile が未実装（インターフェイスでは optional・未提供時は fail で報告する契約）。回収の機械実行経路と手動回収経路の接続は契約上 fail-closed 報告が正
+- **自律対応内容**: 手動回収経路（現行正常系）で実施: 実在確認（`.agentdev/close-acceptance/issue-3969.json`）→ 証跡退避（機械工程報告 JSON の closeAcceptanceRecord〔targetRevision 2026-11-07T23:41:09Z・accepted true〕と完了記録コメントの機械工程 pass 記録）→ 明示パス削除 → 不存在確認
+- **ユーザー確認の有無**: なし（削除対象は自 Case が生成した終了判定記録・識別情報は path で明確・#3966/#3967 close で確立済みの現行正常系の適用）
+- **REQ/Decision/Design影響**: なし（REQ-118-008 の既存作業記録経路への報告で成立）
+- **横展開観点**: #3966・#3967 close で同一の fail-closed 報告と手動回収経路を観測済み（learning inbox 記録済み）。CLI runner への deleteFile 注入は旧機構撤去後の設計判断領域であり、手動回収経路の標準化が現行
+- **再発条件**: deleteFile 未提供の runner で post-merge reclamation を実行する全ての close
+- **予防策候補**: scripts/README.md に手動回収経路（実在確認→証跡退避→削除→不存在確認）の標準手順としての明記
+- **想定反映先**: src/common/skills/agentdev-workflow-case-close/scripts/README.md
+- **関連**: Case #3969・Case #3966・Case #3967・post-merge 報告 JSON
+- **タグ**: #reclamation #deleteFile #手動回収 #fail-closed #case-close #再観測
+
+---
+
+## 2026-11-08: worktree で textlint vendor 伝播済みでも git worktree remove が部分失敗し残骸掃除が必要（Case #3969・#3967 と同一パターン再観測）
+
+- **問題事象**: bun install を明示実施していない worktree（textlint vendor が main から伝播済み・node_modules 739 ファイル規模）でも post-merge 機械工程の git worktree remove が exit 255 で部分失敗し、unregister と branch 削除は成功したが src 配下の checkout 残骸（textlint node_modules を含む）が残存した
+- **発生局面**: case-close STEP-6-1（worktree 削除）
+- **検知方法**: post-merge 報告 JSON の cleanup-worktree-branch step warn（worktreeRemoveExitCode 255）と .worktrees/3969-feature 残骸の実在確認
+- **根本原因**: Windows 環境で node_modules の大量ファイルが remove の完全削除を妨げる（bun install の明示有無に依存せず vendor 伝播があると発生）
+- **自律対応内容**: 残骸の性質確認（.agentdev ドメイン状態混入なし・node_modules と checkout 残骸のみ・739 ファイル）を確認したうえで rm -rf で削除し、不存在確認まで実施（STEP-6-1 の remove 失敗時の掃除・再試行手順の適用）
+- **ユーザー確認の有無**: なし（自 Case の worktree checkout 残骸・識別情報は列挙で確定）
+- **REQ/Decision/Design影響**: なし
+- **横展開観点**: #3967 分の学び（bun install 実施済み worktree の remove 残骸）の対象条件を「vendor 伝播済み」まで拡張する知見。remove 失敗後の残骸掃除は標準コストとして織り込むのが安全
+- **再発条件**: textlint vendor が伝播した Windows 環境の worktree 削除全般
+- **予防策候補**: agentdev-git-worktree の remove 前退避ファイル掃除手順に node_modules 残骸掃除の注記追加（#3967 分の予防策候補と同一）
+- **想定反映先**: src/common/skills/agentdev-git-worktree/references/worktree-operations.md（remove 前退避ファイル掃除節）
+- **関連**: Case #3969・Case #3967・post-merge 報告 JSON
+- **タグ**: #worktree #git-worktree-remove #Windows #vendor伝播 #後片付け #再観測
+
+---
+
+## 2026-11-08: traceability check を MSYS 形式パス指定で bun 起動すると Module not found で中断する落とし穴の再観測（Case #3969・PR 本文 capture）
+
+- **問題事象**: 前回委譲 DEL-3969-1 が traceability check を MSYS 形式パス（`/c/Users/...`）指定で bun 起動し Module not found で中断した残留記録を観測
+- **発生局面**: case-run 実行委譲内（agentdev-traceability check 実行）
+- **検知方法**: DEL-3969-2（回収委譲）冒頭の残留変更・一時ファイル確認（`.agentdev/tmp-traceability-check-3969.json` 検証失敗記録）
+- **根本原因**: Windows 実行環境では `--root` に Windows 形式絶対パス（forward slash 記法推奨）を指定する前提に対し MSYS 形式を渡した。MSYS 形式は Windows プログラム側のパス解決で実在しない root として扱われ fail-closed 契約により検査対象が見かけ上全件欠落する
+- **自律対応内容**: 回収委譲では残留一時ファイル（失敗記録）を実質確認のうえ削除し、検証経路を worktree 内 script パス（Windows 形式絶対パス指定）へ切り替えて完了。既存知識 `windows-checker-msys-path-argument.md` の対象領域に近い落とし穴の再観測として記録
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし
+- **横展開観点**: 既存知識の適用例であり、恒常化の追加要否は promote 判断で評価する
+- **再発条件**: 委譲先サブエージェントが bash のパス展開結果（MSYS 形式）を checker 引数へそのまま渡す場合
+- **予防策候補**: 委譲 prompt に checker パス引数の Windows 形式絶対パス指定の注意を明記するか、既存知識への参照を委譲契約に組み込む
+- **想定反映先**: docs/knowledge/windows-checker-msys-path-argument.md（再観測としての追記判断）・agentdev-workflow-case-run 委譲契約
+- **関連**: Case #3969・PR #3975 本文 Findings/Capture候補・DEL-3969-1 残留記録
+- **タグ**: #MSYSパス #traceability-check #委譲 #fail-closed #再観測
+
+---
