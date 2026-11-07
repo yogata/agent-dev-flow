@@ -101,6 +101,24 @@
         "operation_unit": "OU-006",
         "実行単位": "未確定"
       }
+    },
+    "stage5確定": {
+      "確定日時": "2026-11-07T23:20:00+09:00",
+      "説明": "stage 5 case-auto（v4標準モード・Standard flow・要件doc明示指定）の実行結果確定。要件doc・RU は stage 2 case-ready で削除済み（commit 90842e944）。要件内容は Root Case #3961 本文および canonical Definition（docs/REQ/REQ-119.md・REQ-117-011 行更新）へ確定済み。",
+      "Root_Case": "#3961（Standard flow・Epicなし・単一 execution unit・closed 2026-11-07T23:15:16+09:00）",
+      "REQ採番": "REQ-119（REQ-119-001〜007）",
+      "設計PR": "#3962（definition/issue-3961・merged・origin/main 6361a10e8・Definition適用4commit: f8a76bd63 / a44cd63ae / d7eb17d6b / 1f3c883db）",
+      "実装PR": "#3963（fix/issue-3961・merge commit 6c6a4bd14・実装commit 0e7e48a3d + 3845f6db9 + 是正87829d9d4・22files +176/−28）",
+      "RU対応": {
+        "RU-0263": "REQ-119-001（OU-001・テスト期待文言整合・実装 0e7e48a3d）",
+        "RU-0264": "REQ-119-002（OU-002・extractFreshnessTargets 報告形式対応+fail-closed 補正漏れ検出・実装 0e7e48a3d・テスト8件追加）",
+        "RU-0265": "REQ-119-003（OU-003・setup で .agentdev/tmp 自動作成・実装 0e7e48a3d）",
+        "RU-0266": "対象外（不採用判断記録・REQ-119 目的節に恒久記録・初期状態どおり）",
+        "RU-0267": "REQ-119-004（FD-01: frontmatter updated 5ファイル・design段階達成 a44cd63ae+1f3c883db・実装で宣言行追従 3845f6db9）+ REQ-119-005（FD-02: designs/README.md 索引行・実装 0e7e48a3d）（OU-004）",
+        "RU-0268": "REQ-119-006（OU-005・identity.ts 機能的記述へ置換・実装 0e7e48a3d）",
+        "RU-0269": "REQ-119-007（OU-006・SKILL.md 作成先文言 Design 正本追随・実装 0e7e48a3d）"
+      },
+      "case-close": "全STEP完了（QG-4 pass・Design確定=見送り判断〔extractFreshnessTargets 構造は既存 Design 増分として表現整合〕・capture learning 4entries commit d36ace95c・検証資材回収承認 Q-CLOSE-3961-DEL=全削除・台帳回収済み・worktree 3961-fix/baseline-90842e944-close・branch fix/issue-3961 削除済み）"
     }
   },
   "基準点情報": {
@@ -116,7 +134,7 @@
   "進捗": {
     "整理サイクル": "完了（stage1 inspect-docs 検出16件 commit 7528a03ea / stage2 3系統並列 learning 1369b9338・intake 121521f9d・inspect deaf41a0c・jev整理 fbe672e9 / stage3 backlog-review RU-0263〜0269 生成 commit ccf669829・HITL承認 Q-BR-20261107-01=A）",
     "stage4_要件定義": "完了（2026-11-07 単一 req-define 実行・入力 RU-0263〜0269 明示列挙・壁打ち HITL 1回（4問）回答反映・要件doc 439行 auto_ready:true 確定・commit fd3834516）",
-    "stage5_実行": "blocked停止（2026-11-07T17:47起動・Root Case issue_create 直前で停止）。原因: 現行 opencode プロセスの環境変数 AGENTDEV_GH_REPO=local/issues（旧値・Local版向け）を repo 解決（repo-resolution.ts・プロセス環境変数を直接読取・上書経路なし）が採用し GitHub 操作が全て 404 失敗。Windows ユーザー環境変数は yogata/agent-dev-flow に修正済みのため opencode 再起動のみで解消見込。HITL Q-CASEAUTO-ENV-1 回答=A（opencode再起動→backlog-auto再実行）。再開: backlog-auto 再実行で set-state から stage 5 を再構成（Root Case 未作成のため case-auto は stage 1 から・REQ-119 採番・冪等検出・preflight は冪等再実行）。要件doc は確定済み（stage 4 完了・fd3834516）のため req-define 再実行不要",
+    "stage5_実行": "完了（2026-11-07 再開実行: 環境変数 blocker 解消後 Q-CASEAUTO-ENV-1 回答A どおり set-state から冪等再開。単一 case-auto・要件doc明示指定・v4標準モード。stage1 case-open pass〔Root Case #3961・REQ-119 採番・設計PR #3962 merged 6361a10e8〕・stage2 case-ready pass〔execution contract・Standard flow 確定・ready遷移・Q-GIT-3961 回答b rebase で分岐解消・draft/RU 削除 commit 90842e944〕・stage3 case-run pass〔DEL-3961-1 result=completed-pr・PR #3963〕・stage4 case-close pass〔merge 6c6a4bd14・QG-4 pass・Design確定見送り判断・capture commit d36ace95c・検証資材回収 Q-CLOSE-3961-DEL=全削除・Issue #3961 closed〕・クリーンアップ検証ゲート合格。全工程 2026-11-07T23:15:16+09:00 完了）",
     "stage6_全体完了判定": "未着手",
     "stage7_リリース": "未着手"
   },
