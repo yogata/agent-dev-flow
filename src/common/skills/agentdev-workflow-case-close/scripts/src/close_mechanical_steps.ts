@@ -790,6 +790,26 @@ function validateVerificationResourceCheckInput(value: unknown): void {
       }
     }
   }
+  if (v.caseCreationScope !== undefined) {
+    if (typeof v.caseCreationScope !== "object" || v.caseCreationScope === null || Array.isArray(v.caseCreationScope)) {
+      fail("input.verificationResourceCheck.caseCreationScope must be an object");
+    }
+    const scope = v.caseCreationScope as Record<string, unknown>;
+    if (
+      !Array.isArray(scope.caseIdentifiers) ||
+      scope.caseIdentifiers.length === 0 ||
+      !scope.caseIdentifiers.every((identifier) => isNonEmptyString(identifier))
+    ) {
+      fail(
+        "input.verificationResourceCheck.caseCreationScope.caseIdentifiers must be a non-empty array of non-empty strings (an empty declaration would classify every observation as out-of-population, which is not permitted)",
+      );
+    }
+    if (!isNonEmptyString(scope.scopeAndLimits)) {
+      fail(
+        "input.verificationResourceCheck.caseCreationScope.scopeAndLimits is required (the declared detection range and limits are recorded verbatim in the attribution-unknown report)",
+      );
+    }
+  }
 }
 
 /**
@@ -939,6 +959,90 @@ export interface VerificationResourceCheck {
   inspectionArtifactPaths?: readonly string[];
   /** 観測実在物の除外根拠入力（除外根拠(2) 正式成果物・(3) 本件外共有資材。実体一致付き）。 */
   observationExclusionGrounds?: readonly ObservationExclusionGround[];
+  /**
+   * 案件作成範囲の母集団宣言（「検出できる範囲と限界を明示し、本件に範囲を絞る是正」の
+   * 入力表現）。宣言時、案件識別子を含まない観測実在物（共有領域・OS の無記録資材、
+   * OS process・listen・remote）は unregistered-resource findings から分離され、
+   * attribution-unknown として報告のみ（非ブロック）で記録される。識別子を含む実在物・
+   * 台帳/既知残存の照合結果・検査不能は従来どおり拒否 findings のまま
+   * （範囲内の未登録/残存/未確認/検査不能の拒否維持。範囲外の無記録資材の検出保証はない）。
+   * 未宣言時は現行どおり全件が findings となる（現行動作の維持）。
+   */
+  caseCreationScope?: CaseCreationScope;
+}
+
+/**
+ * 案件作成範囲の母集団宣言。識別子は観測パス・commandLine・cwd・URL に現れる
+ * 当該 Case の識別子（例: Epic/Case番号、RU識別子）とし、repo 共通語彙の接頭
+ * （裸の adf- 等は他案件・共有由来の可能性がある）は識別子に含めないこと。
+ * 識別子の照合は与えられた候補文字列の大文字小文字を無視した部分一致で行う
+ * （範囲内寄りの保守的分類。識別子を含む実在物は範囲内＝拒否対象のまま）。
+ */
+export interface CaseCreationScope {
+  /** 案件識別子（非空必須。空配列は宣言として受理しない fail-closed）。 */
+  caseIdentifiers: readonly string[];
+  /** 検出できる範囲と限界の宣言（attribution-unknown 報告へそのまま記録。非空必須）。 */
+  scopeAndLimits: string;
+}
+
+/** attribution-unknown 報告区分（範囲外の観測実在物の報告のみ・非ブロックの記録）。 */
+export interface AttributionUnknownReport {
+  /** 案件作成範囲の母集団宣言があったか。 */
+  declared: boolean;
+  /** 宣言された案件識別子（未宣言時は空）。 */
+  caseIdentifiers: readonly string[];
+  /** 検出できる範囲と限界の宣言文（未宣言時は null）。 */
+  scopeAndLimits: string | null;
+  /** source 別の実数件数と例（例は先頭5件。実数は全件の正確な件数）。 */
+  entries: readonly { source: string; count: number; examples: readonly string[] }[];
+}
+
+/**
+ * 案件作成範囲の母集団宣言に基づく範囲外判定。宣言なしは常に false
+ * （範囲外分類なし＝現行どおり全件 findings）。識別子空も false
+ * （全件範囲内扱い＝拒否維持の fail-closed。空宣言で範囲外へ分類しない）。
+ * 照合は候補文字列（正規化パス・commandLine・cwd・URL 等）の大文字小文字を
+ * 無視した部分一致で行い、1つでも識別子が現れれば範囲内とする。
+ */
+export function isOutsideCaseCreationPopulation(
+  scope: CaseCreationScope | undefined,
+  candidates: readonly (string | null | undefined)[],
+): boolean {
+  if (scope === undefined) return false;
+  const identifiers = scope.caseIdentifiers
+    .map((identifier) => identifier.toLowerCase())
+    .filter((identifier) => identifier.length > 0);
+  if (identifiers.length === 0) return false;
+  const haystack = candidates
+    .filter((value): value is string => typeof value === "string" && value.length > 0)
+    .map((value) => value.toLowerCase())
+    .join("\n");
+  return !identifiers.some((identifier) => haystack.includes(identifier));
+}
+
+/** attribution-unknown の全件リストを source 別の実数件数と先頭5件の例へ集約する。 */
+export function aggregateAttributionUnknown(
+  scope: CaseCreationScope | undefined,
+  unknowns: readonly { path: string; source: string }[],
+): AttributionUnknownReport {
+  if (scope === undefined) {
+    return { declared: false, caseIdentifiers: [], scopeAndLimits: null, entries: [] };
+  }
+  const bySource = new Map<string, string[]>();
+  for (const unknown of unknowns) {
+    const paths = bySource.get(unknown.source) ?? [];
+    paths.push(unknown.path);
+    bySource.set(unknown.source, paths);
+  }
+  const entries = [...bySource.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([source, paths]) => ({ source, count: paths.length, examples: paths.slice(0, 5) }));
+  return {
+    declared: true,
+    caseIdentifiers: [...scope.caseIdentifiers],
+    scopeAndLimits: scope.scopeAndLimits,
+    entries,
+  };
 }
 
 export interface RemoteAbsenceJudgementInput {
@@ -1032,6 +1136,8 @@ export interface VerificationResourceReconciliationEvaluation {
   permitted: boolean;
   excludedObservations: readonly { path: string; basis: string }[];
   knownResidualStillPresent: readonly string[];
+  /** 案件作成範囲の母集団宣言時の範囲外 attribution-unknown 報告（報告のみ・非ブロック。未宣言時は declared: false）。 */
+  attributionUnknown: AttributionUnknownReport;
 }
 
 /** 受入未達gapの種別（4制御の実際の接続状態の観測から導出される接続不備の分類）。 */
@@ -1516,17 +1622,21 @@ export function evaluateUnregisteredObservations(
   knownResidualEntries: readonly KnownResidualEntry[],
   excludedPaths: readonly { path: string; basis: string }[],
   resolveBase: string,
+  caseCreationScope?: CaseCreationScope,
 ): {
   findings: readonly ResourceReconciliationFinding[];
   excludedObservations: readonly { path: string; basis: string }[];
   knownResidualStillPresent: readonly string[];
   /** 正規化した既知残存リスト位置のうちパス突合で既に報告したもの（識別情報消費との重複報告防止に使用）。 */
   knownResidualReportedLocations: readonly string[];
+  /** 案件作成範囲の母集団宣言時に範囲外へ分類した実在物の全件（集約前。宣言なしは空）。 */
+  attributionUnknownEntries: readonly { path: string; source: string }[];
 } {
   const findings: ResourceReconciliationFinding[] = [];
   const excludedObservations: { path: string; basis: string }[] = [];
   const knownResidualStillPresent: string[] = [];
   const knownResidualReportedLocations: string[] = [];
+  const attributionUnknownEntries: { path: string; source: string }[] = [];
   const normalizedExcluded = excludedPaths.map((entry) => ({
     ...entry,
     normalized: normalizeObservationPath(resolveObservationPath(entry.path, resolveBase)),
@@ -1568,12 +1678,22 @@ export function evaluateUnregisteredObservations(
       excludedObservations.push({ path: observed.path, basis: "unrelated-shared-resource-attribution" });
       continue;
     }
+    if (isOutsideCaseCreationPopulation(caseCreationScope, [normalized])) {
+      attributionUnknownEntries.push({ path: observed.path, source: observed.source });
+      continue;
+    }
     findings.push({
       code: "unregistered-resource",
       detail: `no ledger record or exclusion basis for the observed temporary resource: ${observed.path} (source: ${observed.source})`,
     });
   }
-  return { findings, excludedObservations, knownResidualStillPresent, knownResidualReportedLocations };
+  return {
+    findings,
+    excludedObservations,
+    knownResidualStillPresent,
+    knownResidualReportedLocations,
+    attributionUnknownEntries,
+  };
 }
 
 /**
@@ -1600,15 +1720,20 @@ export function evaluateObservationEntityConsumption(
     selfProcessId?: number;
     /** deriveLedgerProcessAttribution の帰属結果（台帳エントリ id → 帰属先の観測 pid）。帰属済み観測 entity は未登録検出から除外する。 */
     processAttribution?: ReadonlyMap<string, string>;
+    /** 案件作成範囲の母集団宣言（宣言時に範囲外 entity を attribution-unknown 報告へ分類する）。 */
+    caseCreationScope?: CaseCreationScope;
   } = {},
 ): {
   findings: readonly ResourceReconciliationFinding[];
   knownResidualStillPresent: readonly string[];
   excludedObservations: readonly { path: string; basis: string }[];
+  /** 案件作成範囲の母集団宣言時に範囲外へ分類した entity の全件（集約前。宣言なしは空）。 */
+  attributionUnknownEntries: readonly { path: string; source: string }[];
 } {
   const findings: ResourceReconciliationFinding[] = [];
   const knownResidualStillPresent: string[] = [];
   const excludedObservations: { path: string; basis: string }[] = [];
+  const attributionUnknownEntries: { path: string; source: string }[] = [];
   const reportedLocations = new Set(knownResidualReportedLocations);
   const ledgerPids = new Set(
     entries.map((entry) => entry.identifiers.pid).filter((pid): pid is string => pid !== undefined),
@@ -1819,6 +1944,15 @@ export function evaluateObservationEntityConsumption(
     if (processObservation.startedAt !== undefined) {
       detailParts.push(`startedAt: ${processObservation.startedAt}`);
     }
+    if (
+      isOutsideCaseCreationPopulation(options.caseCreationScope, [
+        processObservation.commandLine ?? undefined,
+        processObservation.cwd,
+      ])
+    ) {
+      attributionUnknownEntries.push({ path: `process:pid=${pid}`, source: "process-liveness" });
+      continue;
+    }
     findings.push({
       code: "unregistered-resource",
       detail: `no ledger record or known residual entry covers the observed live process: ${detailParts.join(", ")}`,
@@ -1832,6 +1966,14 @@ export function evaluateObservationEntityConsumption(
       excludedObservations.push({ path: `listen:port=${port}`, basis: entityExclusion });
       continue;
     }
+    // listen は観測に帰属確認属性（commandLine・cwd 等）を持たないため、台帳・既知残存の
+    // 識別情報照合が範囲内の唯一の経路である。母集団宣言時、照合されない listen は本件との
+    // 確認された接続がなく attribution-unknown として報告のみへ分類する（範囲内の process は
+    // commandLine/cwd の識別子照合で従来どおり拒否される。宣言なしは現行どおり findings）。
+    if (isOutsideCaseCreationPopulation(options.caseCreationScope, [])) {
+      attributionUnknownEntries.push({ path: `listen:port=${port}`, source: "listen-port-check" });
+      continue;
+    }
     findings.push({
       code: "unregistered-resource",
       detail: `no ledger record or known residual entry covers the observed listening port: ${port}`,
@@ -1841,12 +1983,16 @@ export function evaluateObservationEntityConsumption(
     if (ledgerUrls.has(url) || knownUrls.has(url)) continue;
     const judgement = evaluateRemoteAbsenceJudgement(absenceInput);
     if (judgement.verdict === "confirmed-absent") continue;
+    if (isOutsideCaseCreationPopulation(options.caseCreationScope, [url])) {
+      attributionUnknownEntries.push({ path: url, source: "remote-absence-verification" });
+      continue;
+    }
     findings.push({
       code: "unregistered-resource",
       detail: `no ledger record or known residual entry covers the observed remote target and its absence could not be confirmed: ${url} (${judgement.basis})`,
     });
   }
-  return { findings, knownResidualStillPresent, excludedObservations };
+  return { findings, knownResidualStillPresent, excludedObservations, attributionUnknownEntries };
 }
 
 /**
@@ -1957,6 +2103,7 @@ export function evaluateVerificationResourceReconciliation(
     check.knownResidualEntries,
     observation.excludedPaths,
     observation.resolveBase,
+    check.caseCreationScope,
   );
   findings.push(...unregistered.findings);
 
@@ -1969,6 +2116,7 @@ export function evaluateVerificationResourceReconciliation(
       observationExclusionGrounds: check.observationExclusionGrounds,
       selfProcessId: options.selfProcessId,
       processAttribution,
+      caseCreationScope: check.caseCreationScope,
     },
   );
   findings.push(...entityConsumption.findings);
@@ -1989,6 +2137,10 @@ export function evaluateVerificationResourceReconciliation(
       ...unregistered.knownResidualStillPresent,
       ...entityConsumption.knownResidualStillPresent,
     ],
+    attributionUnknown: aggregateAttributionUnknown(check.caseCreationScope, [
+      ...unregistered.attributionUnknownEntries,
+      ...entityConsumption.attributionUnknownEntries,
+    ]),
   };
 }
 
@@ -3056,6 +3208,7 @@ function executeVerificationResourceReconciliation(
   ];
 
   const permitted = mergedFindings.length === 0;
+  const attributionUnknown = evaluation?.attributionUnknown ?? aggregateAttributionUnknown(undefined, []);
   const step: StepRecord = {
     name: "verification-resource-reconciliation",
     status: permitted && gaps.length === 0 ? "pass" : "fail",
@@ -3069,6 +3222,7 @@ function executeVerificationResourceReconciliation(
       permitted,
       gaps,
       declaredDetectionScopes: [...DECLARED_DETECTION_SCOPES],
+      attributionUnknown,
     },
   };
   const diff = {
@@ -3081,6 +3235,7 @@ function executeVerificationResourceReconciliation(
     terminationUnitBlocked: evaluation?.terminationUnitBlocked ?? false,
     excludedObservations: evaluation?.excludedObservations ?? [],
     knownResidualStillPresent: evaluation?.knownResidualStillPresent ?? [],
+    attributionUnknown,
   };
   return { step, diff, gaps };
 }
@@ -3257,6 +3412,7 @@ export function runCloseMechanicalSteps(
     }
     const polling = input.mergeablePolling ?? { intervalSeconds: 10, maxAttempts: 30 };
     let mergeable = "UNKNOWN";
+    let prState: string | null = null;
     let attempts = 0;
     for (; attempts < polling.maxAttempts; attempts++) {
       const view = runner.run({
@@ -3268,18 +3424,25 @@ export function runCloseMechanicalSteps(
         steps.push({ name: "mergeable-polling", status: "fail", detail: { error: view.stderr.trim() } });
         return assembleReport(input.phase, steps, diff, warnings, proposal);
       }
-      const parsed = JSON.parse(view.stdout) as { mergeable?: string };
+      const parsed = JSON.parse(view.stdout) as { mergeable?: string; state?: string };
       mergeable = parsed.mergeable ?? "UNKNOWN";
-      if (mergeable === "MERGEABLE") break;
+      prState = typeof parsed.state === "string" ? parsed.state : null;
+      // 既merge PR は mergeable 算出の対象外（GitHub API は merged PR に UNKNOWN を返すため
+      // ポーリングで変化しない）。state=MERGED は merge 前提が成立済みであることの実観測であり、
+      // Epic 最終close構成（worktreeRoot==main root・対象PRは既にmerge済み）の false-positive
+      // 要判断を除去する。開いている PR の MERGEABLE/CONFLICTING/UNKNOWN 判定は従来どおり。
+      const mergePrerequisiteSatisfied = mergeable === "MERGEABLE" || prState === "MERGED";
+      if (mergePrerequisiteSatisfied) break;
       if (mergeable === "CONFLICTING") break;
       runner.sleep(polling.intervalSeconds * 1000);
     }
+    const mergePrerequisiteSatisfied = mergeable === "MERGEABLE" || prState === "MERGED";
     steps.push({
       name: "mergeable-polling",
-      status: mergeable === "MERGEABLE" ? "pass" : "warn",
-      detail: { mergeable, attempts: attempts + 1 },
+      status: mergePrerequisiteSatisfied ? "pass" : "warn",
+      detail: { mergeable, state: prState, attempts: attempts + 1 },
     });
-    if (mergeable !== "MERGEABLE") {
+    if (!mergePrerequisiteSatisfied) {
       warnings.push(`mergeable state is ${mergeable} after polling (要判断)`);
     }
 
