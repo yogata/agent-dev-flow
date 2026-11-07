@@ -71,7 +71,7 @@ gate 違反時は両ルートとも PR マージを停止する。
 
 ### 機械工程の script 呼び出しと内蔵ツール使用規律
 
-- **機械工程の script 呼び出し**: mergeable ポーリング、squash merge 前後のローカル状態検査、Epic 実行構成表の解析と状態更新（解析・現在 Wave 特定・状態更新適用の決定的部分。Epic 本文書込みはモデルが agentdev_gh 経由で行う）、完了条件チェックボックス評価の機械的抽出（評価はモデルが担当）、契約状態記録の commit 済み検証と未追跡残存検査（contract-state-residue-check step。決定的判定 `evaluateContractStateResidue`。対応関係は repository top-level `traceability/` 配下 sidecar を参照）、一時資材回収の削除確認境界（deletion-confirmation-check step。削除提案の識別情報付与と削除実行の確認境界の決定的判定）、AUTOGEN 再生成差分検出、full integrity suite の起動と結果集約、textlint 最終検査、worktree/branch クリーンアップは、工程別 script `scripts/src/close_mechanical_steps.ts`（phase: pre-merge / post-merge）の呼び出しで実行する。PR merge 本体（pr_merge）、Issue 本文更新、issue_close は Custom Tool `agentdev_gh` の境界を維持する（case-close Design「機械工程の script 呼び出し契約」節）。報告 JSON（実行結果・差分・警告・提案本文）の意味レビュー（警告の重要度評価、Design 確定判断、未達判定の確定）はモデルが担当する
+- **機械工程の script 呼び出し**: mergeable ポーリング、squash merge 前後のローカル状態検査、Epic 実行構成表の解析と状態更新（解析・現在 Wave 特定・状態更新適用の決定的部分。Epic 本文書込みはモデルが agentdev_gh 経由で行う）、完了条件チェックボックス評価の機械的抽出（評価はモデルが担当）、契約状態記録の commit 済み検証と未追跡残存検査（contract-state-residue-check step。決定的判定 `evaluateContractStateResidue`。対応関係は repository top-level `traceability/` 配下 sidecar を参照）、終了判定記録（`.agentdev/close-acceptance/`）の書出し・無効化・回収、AUTOGEN 再生成差分検出、full integrity suite の起動と結果集約、textlint 最終検査、worktree/branch クリーンアップは、工程別 script `scripts/src/close_mechanical_steps.ts`（phase: pre-merge / post-merge）の呼び出しで実行する。PR merge 本体（pr_merge）、Issue 本文更新、issue_close は Custom Tool `agentdev_gh` の境界を維持する（case-close Design「機械工程の script 呼び出し契約」節）。報告 JSON（実行結果・差分・警告・提案本文）の意味レビュー（警告の重要度評価、Design 確定判断、未達判定の確定）はモデルが担当する
 - **内蔵ツール使用規律**: ファイル検索・内容検索・ディレクトリ列挙は実行基盤の内蔵ツール（ファイル検索、内容検索、読み取り）を使用し、bash 内蔵コマンド（grep、ls 等）を標準手順としない。bash 実行が本来必要な処理（script 呼び出し、git 操作等）は本規律の対象外とする（workflow-skill-model Design「workflow skill 本文における内蔵ツール使用規律」節）
 
 ### 終了条件（termination）
@@ -79,7 +79,7 @@ gate 違反時は両ルートとも PR マージを停止する。
 - 正常終了: 単一 Issue ルートはクリーンアップ・Capture 回収・永続化 STEP の完了報告まで。Epic Wave ルートは最終 Wave 判定（Epic クローズ または 残 Wave 通知）まで
 - 一時ファイル残存: 単一 Issue ルートの正常終了の前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（STEP-6-6 で確認。一時ファイル cleanup 規定（workflow 側で生成した `.agentdev/tmp/` 一時ファイルは当該実行内で削除する。Custom Tool 内部の一時ファイルは Tool が操作ごとに自動削除する））
 - 一時成果物残留（Epic Wave ルート）: Epic Wave クローズの正常終了の前提として、当該 Wave スコープの一時成果物（draft、RU、検出事項等のドメイン状態）残留と当該実行で `.agentdev/tmp/` に作成した一時ファイルの残存がないこと（E6-1 で確認。残留時は当該 Wave を完了扱いにしない）
-- 停止終了: 未達チェックボックス残存（構造化エラー）、QG-4 不合格、SSoT コメント不在の verify-only closure または SSoT コメントに検証結果の記載が欠落している verify-only closure（verify-only closure の QG-4 完了抑止）、対象要件行の Design 対応・implementation 対応・required 行 verification 対応の欠落（QG-4 完全性検査の完了阻止条件）、契約状態記録の未コミット・未追跡残存（承認一覧対象外・帰属不能残存を含む）の検出（contract-state-residue-check step の失敗。帰属不能検出は人間確認事項として完了判定の前に報告し確認なしに完了判定へ進めない）、一時資材の削除確認の不存在または識別情報不一致（deletion-confirmation-check step の失敗。識別情報付き削除提案の利用者明示確認なしに回収対象の削除を通さず、削除確認記録なしの消失は完了拒否の材料）、配布依存境界 最終 gate 違反、mergeable ポーリング上限超過、Level 1 rebase 失敗（case-auto エスカレーション）
+- 停止終了: 未達チェックボックス残存（構造化エラー）、QG-4 不合格、SSoT コメント不在の verify-only closure または SSoT コメントに検証結果の記載が欠落している verify-only closure（verify-only closure の QG-4 完了抑止）、対象要件行の Design 対応・implementation 対応・required 行 verification 対応の欠落（QG-4 完全性検査の完了阻止条件）、契約状態記録の未コミット・未追跡残存（承認一覧対象外・帰属不能残存を含む）の検出（contract-state-residue-check step の失敗。帰属不能検出は人間確認事項として完了判定の前に報告し確認なしに完了判定へ進めない）、一時資材の後片付けの未達・確認不能（実行担当が返した後片付けの実施結果・確認根拠・未処理事項の評価で回収または引継ぎが立証できない検出。完了扱いにしない）、配布依存境界 最終 gate 違反、mergeable ポーリング上限超過、Level 1 rebase 失敗（case-auto エスカレーション）
 
 ### 完了判定の契約状態記録・未追跡残存検証（トレーサビリティ sidecar 参照）
 
@@ -91,42 +91,15 @@ gate 違反時は両ルートとも PR マージを停止する。
 - **帰属不能検出の人間確認（完了阻止）**: 状態記録パス配下でも承認一覧対象でもない検出は帰属が機械判定できないため、人間確認事項として完了判定の前に報告する。報告された確認事項の確認（`contractStateCheck.humanConfirmedPaths` の path と確認根拠 basis の実体）なしに完了判定へ進めない（fail-closed）。検出時は当該 step を失敗とし、`isCloseOperationPermitted` が終了操作（issue_close、Epic 終了・Wave クローズ）を抑止する
 - 検証対象 git コマンドの実行不能は検査不能として fail-closed で扱い、完了判定へ進まない
 
-### 一時資材回収の削除確認（HITL 停止手順）
+### 一時資材の後片付け評価
 
-完了判定工程で、機械工程（`scripts/src/close_mechanical_steps.ts` の deletion-confirmation-check step）により、台帳に登録された一時資材の回収（削除）について次の確認境界を検証する。様式の正は 検証用一時資材のライフサイクル Design「削除確認」節である。
+完了判定工程で、実行担当が既存の作業記録経路（PR 本文・Issue コメント・SSoT コメント等）へ返した後片付けの実施結果、確認根拠、未処理事項を、提示された証拠とともに受入評価へ接続して評価する。様式の正は検証に伴う一時資材の取扱いと後片付け責任 Design「実行結果の報告と完了評価」節である（対応関係は repository top-level `traceability/` 配下 sidecar を参照）。機械工程は終了判定記録（`.agentdev/close-acceptance/`）を書き出し、受理した記録は終了判定に必要な期間保護した後、post-merge で回収する。
 
-- **削除の確認境界**: 回収の削除は、利用者の明示確認と対象の正確な識別情報（所在、種別、内容の識別。同名別物、PID再利用、symlink/junctionの参照先を含む）との対応が確認できた場合だけ実行する。削除提案には所在・種別・内容識別・PIDとコマンドライン・URLの識別情報を付与して利用者へ提示する
-- **削除しない場合**: 確認なし、削除提案からの対象の追加変更（識別情報不一致）、別物への入替え時は削除しない。実行担当が生成した approval 等の機械可読値だけを利用者確認として扱わない。確認済み識別情報との対応を残置許容の例外として流用しない
-- **削除確認記録の台帳追跡**: 利用者の明示確認（source が user-explicit の記録のみ。機械可読値の記録は拒否）は台帳エントリの削除確認記録として残し、削除実行の回収記録（collectedAt）と対で扱う。削除確認記録のないエントリへの回収記録付与は機械的に拒否する。台帳登録済み資材が削除確認記録なしに消失した場合は削除確認の不存在として検出し、完了扱いとしない
-- **HITL 停止手順（削除確認を要する対象を検出した場合の完了順序）**:
-  1. **確認提示**: case-close が識別情報付きの削除提案（台帳エントリ由来の所在・種別・内容識別・PIDとコマンドライン・URL）を利用者へ提示し、close を停止する
-  2. **利用者判断**: 利用者が対象の正確な識別情報との対応を確認して明示承認する（機械可読値の生成・転記を利用者確認の代用にしない）
-  3. **監督側削除実行**: 承認を受けた監督側が削除を実行する（case-close は本手順内で削除を実行しない）
-  4. **実不存在確認**: 削除後に対象が実在しないことを確認する（所在・識別情報の観測で消滅を検証する）
-  5. **close 再実行**: 台帳へ削除確認記録と回収記録（collectedAt）を付与したうえで close を再実行する
-- 拒否対象の削除確認記録・識別情報照合の不一致検出時は deletion-confirmation-check step が失敗し、`isCloseOperationPermitted` が終了操作（issue_close、Epic 終了・Wave クローズ）を抑止する。台帳不在（記録欠落）は作成物なしの根拠にせず、照合・完了拒否の本体側の検査に委ねる
-
-### 検証用一時資材照合の OS 依存観測コマンド正規形
-
-完了判定工程の検証用一時資材照合（verification-resource-reconciliation step）で呼出側が組み立てる OS 依存観測の検査コマンド（`inspectionCommands`）は、次の正規形に従う。観測は申告（台帳・既知残存リスト）と独立の実物側網羅列挙であり、台帳記録値だけを個別照会する方式は未記録entityを観測結果へ入れないため正規形としない。様式の正は 検証用一時資材のライフサイクル Design「専用領域と作成経路の制限」節（観測手段 (a)〜(f) と「実物側網羅列挙と未記録entityの検出対象性」の記述）である。
-
-| scope | 正規形 | 不正規形（採用しない） |
-|---|---|---|
-| process-liveness | 全プロセスの CommandLine・cwd・開始時刻の網羅列挙（例: PowerShell の `Get-CimInstance Win32_Process` による ProcessId・CommandLine・CreationDate の全件取得。cwd はプロセスごとに取得可能な経路で取得する） | `tasklist` 等の名前照合・PID 個別照会（cwd・CommandLine を観測できず、同名別物・PID再利用を識別できないため不正規形） |
-| listen-port-check | 全リスナーの網羅列挙（例: PowerShell の `Get-NetTCPConnection -State Listen` による LocalPort・OwningProcess の全件取得） | 台帳記録ポートだけの個別照会（未記録ポートを観測結果へ入れないため不正規形） |
-| remote-absence-verification | 外部 repo の網羅列挙と不存在確認（例: `gh repo list <owner> --json name,id,url` による全件列挙と対象ID・認証・可視性の確認） | 台帳記録 URL だけの個別照会（未記録の外部 repo を観測結果へ入れないため不正規形） |
-
-検査コマンドは scope 単位の JSON stdout 契約（機械工程の入力契約）に従い、観測できなかった項目は JSON 側で省略または null として報告する。観測コマンド自体の失敗は検査不能として fail-closed で完了を拒否する。
-
-### 検証用一時資材照合の案件作成範囲宣言（caseCreationScope）
-
-呼出側は `verificationResourceCheck.caseCreationScope`（`caseIdentifiers`・`scopeAndLimits`）で案件作成範囲の母集団を宣言できる（省略時は全観測が完了拒否対象のまま）。様式の正は 検証用一時資材のライフサイクル Design「専用領域と作成経路の制限」節（「実物側網羅列挙と未記録entityの検出対象性」「検査対象の除外根拠」の母集団宣言に関する記述）である。
-
-- **範囲内の導出**（宣言内容に依らず既存の作成先・専用領域・生成・実行記録から決まる）: 専用領域観測（dedicated-area-listing）の実在物、台帳記載所在の subtree とその参照（commandLine・cwd・URL による言及）、宣言識別子の含有、実行ランタイム記録（自己・子孫・入力根拠付き祖先）。いずれも任意名を含み、未登録・残存・検査不能は完了拒否のまま
-- **範囲外の報告区分**: 範囲導出に掛からず関係記録のない共有/OS 実体（repo gitignore 共有領域の無記録物・無関係 OS process・listen・remote・接頭辞のみの OS TEMP 項目）は帰属不明（attribution-unknown）として報告のみ（非ブロック）で記録される。検出保証の対象外である限界を `scopeAndLimits` 宣言文に明示する
-- **識別子の制約**: `caseIdentifiers` は caseId を含むこと（入力検証で拒否）。識別子の不在のみで範囲外へ認定しない。repo 共通語彙の接頭（裸の `adf-` 等）は他案件・共有由来の可能性があるため識別子に含めない。共有領域（repo の `.agentdev/tmp` ルート・OS TEMP ルート・接頭辞のみ・共有親プロセスの全子孫）を本件と自動認定する宣言・組立をしない
-- **listen の限界**: listen 観測は帰属確認属性を持たず、台帳・既知残存の識別情報照合のみ可能である。この限界を宣言文と報告へ明示する
-
+- **申告のみでの受理禁止**: 実行したという申告だけを後片付けの成立根拠にしない。確認可能な具体的な資材については、提示された証拠が回収または引継ぎを実際に立証しているかを評価する
+- **回収・引継ぎの立証評価**: 回収直前の同一性・範囲確認（同名別物、識別子の再利用、共有物、リンク先の保護）、常備環境の利用終了条件への適合、受け手・対象・状態・残る処置の確認を、提示された証拠に基づいて評価する
+- **未達の区別**: 証拠不足、回収失敗、引継ぎ不成立、確認不能を区別して報告する。ADF が管理・観測していない任意の資材について機械的に不存在を完全証明することは終了の条件にしない（fail-open な不存在証明の要求をしない）
+- **未達時の完了抑止**: 必須の後片付けが未完了・確認不能である場合、または既知の残存、回収失敗、証拠不足、引継ぎ不成立を検出した場合は完了扱いとせず、対応対象、不足事項、再開条件を確認したうえで受入評価を拒否する（`isCloseOperationPermitted` が終了操作を抑止する）
+- **検証の成功と後片付けの区別**: 検証の成功と後片付けの未達を区別して報告する。中止・失敗・異常終了は既存の停止・再開経路で扱い、作業の中止と後片付けを含む全責任の完遂を混同しない
 ## 主要 Capability Skill 連携
 
 本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。

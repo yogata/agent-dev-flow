@@ -99,7 +99,7 @@ v5 有限実行モード（case-auto workflow 実装本体「v5 有限実行モ�
 - `agentdev-workflow-templates`: 工程記録コメントテンプレート（記録種別別3種）の選定と様式
 - `agentdev-traceability`: トレーサビリティ能力（coverage、check。委譲内の対応関係確認と PR 作成前検査。fail-open）
 - integrity checker skill（リポジトリ固有・配布対象外）: check_changed_docs.ts（targeted docs guard）、check_extensions.ts（IR-{NNN}）、check_distribution_boundary.ts（配布依存境界、source / link 両 profile）、generate_indexes.ts（AUTOGEN 索引再生成）
-- 検証用一時資材の台帳モジュール・作成ヘルパー（`agentdev-workflow-case-close` scripts 配下 `verification-resources-ledger.ts`、`verification-resource-register.ts`）: STEP-S4 委譲の専用領域作成義務・作成報告義務の接続と、STEP-S5 作成報告受領時の台帳登録（「共通制約」の検証用一時資材の節参照）
+- 検証用一時資材の後片付け責任（検証に伴う一時資材の取扱いと後片付け責任 Design）: STEP-S4 委譲の作成・利用・回収の義務接続と、STEP-S5 委譲結果受領時の後片付けの実施結果・確認根拠・未処理事項の報告受領（「共通制約」の検証用一時資材の節参照）
 
 ## トレーサビリティ能力の利用
 
@@ -147,7 +147,7 @@ case-run は、実行担当サブエージェントへの委譲契約に重要�
 - **工程記録の取りまとめ反映**: 委譲 result 受領時・途中報告受領時は「工程記録の取りまとめ反映（記録契機）」節に従い、記録コメント投稿と本文進行状況・結果セクション更新を実行する（手順詳細は references/delegation-and-result.md）
 - **Findings / Design確定候補**: 実行担当サブエージェントが PR 本文の `## Findings / Capture候補` と `## Design確定候補` に記録する（別セクション、混在させない）。case-run の capture 責務は記録のみ
 - **外部実行ハーネスの中間成果物**: plan artifact 等を AgentDevFlow の永続成果物として扱わず、最終結果は PR URL で受領する
-- **検証用一時資材の作成・報告義務の委譲と台帳登録接続**: STEP-S4 の委譲 prompt には、検証用一時資材の作成に関する専用領域作成義務と作成報告義務を含める（v4-delegation-contracts Design「検証用一時資材の作成・報告義務」節。委譲先は一時資材を案件スコープの専用領域へ作成し、作成した資材の種別・所在・識別情報を委譲元の実行処理へ報告する。専用領域外への作成は委譲制約とし、報告のない作成物は未登録資材として close 時照合の検出対象になる）。STEP-S5 で作成報告を受領した場合、報告内容（案件・種別・所在・識別情報・所有区分〔親/子/共通〕）を作成ヘルパー（`agentdev-workflow-case-close` scripts 配下の `verification-resource-register.ts`）で台帳へ登録する。登録様式・台帳の保存場所・空状態区別は検証用一時資材のライフサイクル Design「台帳（生成記録）」節に従う。case-open・case-run 自身が検証用一時資材を作成する場合も同様に作成と同時に台帳へ登録する。PR本文への自由文自己申告や終了時の抽出で登録を代替しない。作成先確認は作成ヘルパーの機械検査に接続されており、作成先は環境指定TEMPまたは案件専用領域（案件識別子をパス要素に含むrepo外ディレクトリ）に限られる。プロジェクト親ディレクトリ等の作成先違反は機械拒否され、違反の所在では台帳は書換えられない。STEP-S4 の委譲 prompt にも作成先確認の制約（環境指定TEMPまたは案件専用領域のみ許可）を含める
+- **検証用一時資材の作成・報告義務の委譲と後片付け結果の受領**: STEP-S4 の委譲 prompt には、一時資材の作成・利用・回収に関する義務を含める（v4-delegation-contracts Design「検証用一時資材の作成・報告義務」節。委譲先は既存の配置規則と権限に従う標準的な一時領域・リポジトリ内の作業領域・許可された外部環境で作成・利用し、利用終了時に安全条件が成立する範囲で回収する。継続利用する資材は引継ぎ事項として報告する）。STEP-S5 で委譲結果を受領した場合、検証結果に加え、後片付けの実施結果、確認根拠、未処理事項（未回収・確認不能・引継ぎ）が既存の報告経路で返されていることを確認する。必要な副作用が許可範囲を超える場合は既存の停止・判断経路を利用する（許可境界の正は委譲時の判断・承認・副作用境界の REQ。対応関係は repository top-level `traceability/` 配下 sidecar を参照）
 - **L2 タイムスタンプ**: worktree 設定、実行担当サブエージェント実行、worktree クリーンアップの各開始・終了時刻（JST）を計測し、完了報告の L2 内訳に含める（case-auto の L1 内訳の入力）
 
 ## See Also

@@ -1,6 +1,6 @@
 ---
 title: 検証に伴う一時資材の取扱いと後片付け責任
-status: draft
+status: accepted
 created: 2026-11-05
 updated: 2026-11-08
 ---
