@@ -56,15 +56,28 @@ implementation:
     - REQ-006-112
   src/common/tools/agentdev-gh/close-acceptance.ts:
     - REQ-052-018
+    - REQ-032-044
     - REQ-032-046
+    - REQ-118-008
+    - REQ-118-009
 verification:
   src/common/tools/agentdev-gh/tests/close-acceptance.test.ts:
     - REQ-052-018
+    - REQ-032-044
+    - REQ-032-046
+    - REQ-118-008
+    - REQ-118-009
   src/common/tools/agentdev-gh/tests/close-runner-boundary.test.ts:
     - REQ-052-018
     - REQ-032-046
+    - REQ-118-008
+    - REQ-118-009
   src/common/tools/agentdev-gh/tests/four-combination-shared.ts:
     - REQ-052-018
+    - REQ-032-044
+    - REQ-032-046
+    - REQ-118-008
+    - REQ-118-009
   src/common/tools/agentdev-gh/local/case-schema/case-file.md:
     - REQ-100-001
   src/common/tools/agentdev-gh/tests/contracts.test.ts:

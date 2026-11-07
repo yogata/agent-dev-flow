@@ -302,9 +302,11 @@ export interface CaseCloseRouteOutcome {
 /**
  * Case Issue の終了経路シナリオ（TS-007）。
  * 起票 → 記録なし拒否 → 形式不正拒否 → 対象不一致拒否 → 判定不成立拒否 →
- * 判定対象版不一致（過去の合格結果の再利用）拒否 → 検証成立時の終了 → 読み戻し、
- * の順に実行する。記録の書出しは判定対象版（currentRevision の観測値）を用いて
- * 各拒否ケースごとに差し替える。
+ * 判定対象版不一致（過去の合格結果の再利用）拒否 → 旧様式（台帳照合結果のみ）の
+ * 受理なし拒否 → 検証成立時の終了 → 読み戻し、の順に実行する。記録の書出しは
+ * 判定対象版（currentRevision の観測値）を用いて各拒否ケースごとに差し替える。
+ * 〔6〕は旧台帳照合の結果のみを含み、判定内容（accepted・必須完了条件の評価結果）
+ * を含まない旧様式相当の記録が様式不正として受理されないことを対照検証する。
  */
 export async function runCaseIssueCloseRoute(
   execute: (step: OperationStep) => Promise<StepResult>,
@@ -356,6 +358,15 @@ export async function runCaseIssueCloseRoute(
     accepted: true,
   });
   await run("〔5〕判定対象版不一致（過去の合格結果の再利用）拒否", close());
+  // 旧様式相当: 旧台帳照合の結果のみを含み、判定内容（accepted）を含まない記録は
+  // 様式不正として受理しない（旧台帳照合結果による終了は通過しない）。
+  writeCloseAcceptanceRecord(fixture, issueNumber, {
+    issueNumber,
+    targetRevision: currentRevision(),
+    generatedAt: "2026-11-05T00:00:00Z",
+    verificationResources: { state: "confirmed-empty", entries: [] },
+  });
+  await run("〔6〕旧様式（台帳照合結果のみ）の受理なし拒否", close());
   writeCloseAcceptanceRecord(fixture, issueNumber, {
     issueNumber,
     targetRevision: currentRevision(),
