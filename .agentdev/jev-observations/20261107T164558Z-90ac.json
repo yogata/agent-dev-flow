@@ -1,0 +1,427 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261107T164558Z-90ac",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0270 検証資材ライフサイクル簡素化に伴う対象13 REQ の操作分類（CREATE/APPEND/UPDATE/REQ操作なし/保留）",
+  "sourceRevision": "00d1214d4bf1214d54d12064e46a9531c30b8c05",
+  "durationMs": 1241,
+  "inputTokens": 5362,
+  "inputs": {
+    "requestDigest": "bae4b86bba4d62b43d5795b41052a3453d57ce669dba2346109468d9aa595c47",
+    "references": [
+      {
+        "label": "RU-0270 (入力RU)",
+        "path": ".agentdev/backlog/req-units/RU-0270.md",
+        "digest": "c16f8b3103a4c0931e6625ef346fdc218ab33b2beab7f27a3a023f75ddc028a4"
+      },
+      {
+        "label": "REQ-118 (再構成対象)",
+        "path": "docs/requirements/REQ-118.md",
+        "digest": "1d1146dc207a89748323fddb73bd492bfb89ab6c8a3a6461871d9040c4968462"
+      },
+      {
+        "label": "REQ-032 (行置換対象)",
+        "path": "docs/requirements/REQ-032.md",
+        "digest": "09e442216050bf9e57e2f91956321217bf02f930a1bcab8a0ed8fa15dfcc76d0"
+      },
+      {
+        "label": "REQ-003 (追加候補)",
+        "path": "docs/requirements/REQ-003.md",
+        "digest": "2abe6c4be0e64b150b0eadcd833dda7cdc975ebb10e32568f031743600751567"
+      },
+      {
+        "label": "REQ-017 (追加候補)",
+        "path": "docs/requirements/REQ-017.md",
+        "digest": "ee47037a96546d165de607022b4f16ca9679ed5b5b7cec8ae0bbce4bf8be3d1f"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q01-req118",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 1,
+        "REQ操作なし": 0,
+        "保留": 0
+      }
+    },
+    {
+      "questionId": "q01b-req118",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.07,
+        "false": 0.9299999999999999
+      }
+    },
+    {
+      "questionId": "q02-req032",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 1,
+        "REQ操作なし": 0,
+        "保留": 0
+      }
+    },
+    {
+      "questionId": "q02b-req032",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.09,
+        "false": 0.91
+      }
+    },
+    {
+      "questionId": "q03-req003",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 1,
+        "UPDATE": 0,
+        "REQ操作なし": 0,
+        "保留": 0
+      }
+    },
+    {
+      "questionId": "q03b-req003",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.11,
+        "false": 0.89
+      }
+    },
+    {
+      "questionId": "q04-req017",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 1,
+        "UPDATE": 0,
+        "REQ操作なし": 0,
+        "保留": 0
+      }
+    },
+    {
+      "questionId": "q04b-req017",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.12,
+        "false": 0.88
+      }
+    },
+    {
+      "questionId": "q05-req052",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1,
+        "保留": 0
+      }
+    },
+    {
+      "questionId": "q05b-req052",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.07,
+        "false": 0.9299999999999999
+      }
+    },
+    {
+      "questionId": "q06-req018",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1,
+        "保留": 0
+      }
+    },
+    {
+      "questionId": "q06b-req018",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.08,
+        "false": 0.92
+      }
+    },
+    {
+      "questionId": "q07-req055",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1,
+        "保留": 0
+      }
+    },
+    {
+      "questionId": "q07b-req055",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.08,
+        "false": 0.92
+      }
+    },
+    {
+      "questionId": "q08-req116",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1,
+        "保留": 0
+      }
+    },
+    {
+      "questionId": "q08b-req116",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.09,
+        "false": 0.91
+      }
+    },
+    {
+      "questionId": "q09-req007",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1,
+        "保留": 0
+      }
+    },
+    {
+      "questionId": "q09b-req007",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.06,
+        "false": 0.94
+      }
+    },
+    {
+      "questionId": "q10-req101",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1,
+        "保留": 0
+      }
+    },
+    {
+      "questionId": "q10b-req101",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.07,
+        "false": 0.9299999999999999
+      }
+    },
+    {
+      "questionId": "q11-req030",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1,
+        "保留": 0
+      }
+    },
+    {
+      "questionId": "q11b-req030",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.08,
+        "false": 0.92
+      }
+    },
+    {
+      "questionId": "q12-req119",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1,
+        "保留": 0
+      }
+    },
+    {
+      "questionId": "q12b-req119",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.08,
+        "false": 0.92
+      }
+    },
+    {
+      "questionId": "q13-req010",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1,
+        "保留": 0
+      }
+    },
+    {
+      "questionId": "q13b-req010",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.07,
+        "false": 0.9299999999999999
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q01-req118",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "q01b-req118",
+        "value": false
+      },
+      {
+        "questionId": "q02-req032",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "q02b-req032",
+        "value": false
+      },
+      {
+        "questionId": "q03-req003",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "q03b-req003",
+        "value": false
+      },
+      {
+        "questionId": "q04-req017",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "q04b-req017",
+        "value": false
+      },
+      {
+        "questionId": "q05-req052",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q05b-req052",
+        "value": false
+      },
+      {
+        "questionId": "q06-req018",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q06b-req018",
+        "value": false
+      },
+      {
+        "questionId": "q07-req055",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q07b-req055",
+        "value": false
+      },
+      {
+        "questionId": "q08-req116",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q08b-req116",
+        "value": false
+      },
+      {
+        "questionId": "q09-req007",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q09b-req007",
+        "value": false
+      },
+      {
+        "questionId": "q10-req101",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q10b-req101",
+        "value": false
+      },
+      {
+        "questionId": "q11-req030",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q11b-req030",
+        "value": false
+      },
+      {
+        "questionId": "q12-req119",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q12b-req119",
+        "value": false
+      },
+      {
+        "questionId": "q13-req010",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q13b-req010",
+        "value": false
+      }
+    ]
+  }
+}
