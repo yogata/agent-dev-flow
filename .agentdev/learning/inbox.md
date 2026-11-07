@@ -112,3 +112,129 @@
 - **タグ**: #計測日収束 #機械工程 #表記差異 #trigger漏れ #case-open
 
 ---
+## 2026-11-08: case-close の Issue 本文更新（結果セクション）が終了判定記録の targetRevision を無効化し issue_close が fail-closed 拒否される（Case #3966）
+
+- **問題事象**: STEP-5 で完了記録コメント投稿と本文結果セクション更新（issue_update）を行った後の issue_close が、Custom Tool agentdev_gh の終了前提検証で拒否された（verification-incomplete: 終了判定記録の targetRevision 2026-11-07T20:48:00Z ≠ 現行 Issue revision 2026-11-07T21:15:33Z。過去 accepted 記録の再利用拒否）。判定確定後に Issue 本文へ書込みを行う工程順序は、本文更新のたびに updated_at が進み、acceptance 記録の再生成（機械工程の再実行）を必ず要する
+- **発生局面**: case-close STEP-5（完了記録の反映と Issue クローズ）
+- **検知方法**: issue_close の Tool VERIFY 失敗応答（fail-closed 正規経路。誤クローズは発生せず）
+- **根本原因**: 終了判定記録の targetRevision は対象 Issue の issue_read revision（updated_at）であり、判定確定後の本文更新（進行状況・結果セクション）が revision を進める。STEP-5 の手順順序（記録コメント → 本文更新 → issue_close）がこの再生成を前提にしていない
+- **自律対応内容**: 判定入力（判定区分・母集団）は不変のまま、issueUpdatedAt を新 revision 2026-11-07T21:15:33Z へ更新した機械工程の冪等再実行で accepted 記録を再書出しし、issue_close を再実行して成功（exitCategory success・全 step pass の同一結果を再確認）
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（終了判定記録の様式・再利用防止契約は REQ-118/Design どおり機能。issue_reopen による無効化の維持も含め意図どおりの fail-closed）
+- **横展開観点**: case-close の STEP-5 手順は「本文更新を判定確定の前に配置する」か「issue_close 前の機械工程再実行（1回）を標準コストとして織り込む」かを手順側で明示すると、再実行の発生を計画化できる。targetRevision を判定確定時点で凍結する代替様式は、過去 accepted 記録再利用防止（issue_reopen 無効化）とのトレードオフ
+- **再発条件**: 判定確定後に本文・ラベル等の Issue 更新を行ってから issue_close する全ての close で発生し得る（ Tool 側で機械検出・拒否されるため誤完了には至らない）
+- **予防策候補**: close_mechanical_steps.ts の README/手順に「Issue 本文更新後の再実行が標準経路」であることの明記、または issue_close 前提検証のエラー応答への回復手順（入力契約の issueUpdatedAt 更新と冪等再実行）の案内追記
+- **想定反映先**: src/common/skills/agentdev-workflow-case-close/scripts/README.md・references/cleanup-and-capture.md（STEP-5 手順注記）
+- **関連**: .agentdev/integrity/reports/issue-3966/mechanical-report-judged.stdout.txt（再実行報告）・Case #3966・PR #3976
+- **タグ**: #case-close #終了判定記録 #targetRevision #fail-closed #手順順序
+
+---
+
+## 2026-11-08: close_mechanical_steps.ts の CLI runner が deleteFile を提供せず post-merge の reclamation step が常に fail-closed 報告になる（Case #3966）
+
+- **問題事象**: post-merge 機械工程で reclamation.closeAcceptanceRecord を指定したところ、reclamation step が「mechanical runner does not provide deleteFile; reclamation cannot execute (fail-closed)」で fail（終了コード 1）。CLI 実行経路の MechanicalRunner には deleteFile が実装されておらず、CLI からは回収を実行できない。cleanup-worktree-branch は pass（worktree 削除・branch -d 成功）
+- **発生局面**: case-close STEP-6（post-merge 機械工程の終了判定記録回収）
+- **検知方法**: post-merge 報告 JSON の close-acceptance-reclamation step fail と終了コード 1
+- **根本原因**: CLI main() の runner 構築（writeTextFile・mkdirRecursive・removeFile・gitCommonDir・sleep まで実装）に deleteFile が欠落しており、reclamation 指定時の回収実行面が CLI から恒常的に到達不能。回収実行の主体は case-close（モデル）であるため手動回収で回復可能だが、script 側の入力契約と runner 実装の不一致が毎回の fail-closed 報告として現れる
+- **自律対応内容**: 記録の実在・内容確認（issueNumber・targetRevision・accepted・judgment の実測）→ 証跡退避（evidence dir）→ 明示パス削除 → 実不存在確認（ls で消滅検証）→ 報告。回収記録は対応記録コメントへ記録済み
+- **ユーザー確認の有無**: なし（対象は機械工程自身が書出した自己終了判定記録。様式の正は検証用一時資材のライフサイクル Design「削除確認」節の自己記録区分）
+- **REQ/Decision/Design影響**: なし（fail-closed どおりの動作。回収は設計どおり成立）
+- **横展開観点**: runner の提供メソッド一覧と入力契約（reclamation 指定可否）の対応は、実サンプル実行（post-merge input fixture）で固定するテストがあると不一致を導入時に検出できる
+- **再発条件**: CLI で reclamation.closeAcceptanceRecord を指定する全ての post-merge 実行で発生する（設計どおりの fail-closed 報告。回収自体は手動経路で完遂可能）
+- **予防策候補**: CLI runner への deleteFile 実装追加、または validateInput / README で CLI 実行時の reclamation 非指定と手動回収手順を明示
+- **想定反映先**: src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts（main の runner 構築）と scripts/README.md
+- **関連**: .agentdev/integrity/reports/issue-3966/mechanical-postmerge-report.stdout.txt・Case #3966・PR #3976
+- **タグ**: #case-close #機械工程 #reclamation #runner実装差 #fail-closed
+
+---
+---
+
+## 2026-11-08: git / bun への POSIX 風パス渡しの解釈差異（Windows 環境）で git worktree add が C:/tmp へ作成され bun install --cwd が ENOENT（Case #3967）
+
+- **問題事象**: bash の $TEMP（/tmp）を git worktree add に渡すと git（Windows バイナリ）は C:	mp へ作成し、bun install --cwd は ENOENT で失敗する。bash のパス解釈と Windows バイナリのパス解釈の差異が一時 worktree 作成を破壊する
+- **発生局面**: case-run QG-4 baseline 再現確認（detached worktree・TEMP 配下）
+- **検知方法**: bun install の ENOENT エラーと git worktree list での意図しない作成先
+- **根本原因**: bash の $TEMP は POSIX パス（/tmp）に展開されるが、git・bun（Windows バイナリ）は POSIX パスを C:	mp として解釈する。cygpath 変換なしの直接渡しが破綻
+- **自律対応内容**: 誤作成領域（C:	mp・C:c）を削除し、git・bun には cygpath -m による mixed 形式（C:/WINDOWS/TEMP/...）の Windows パスを渡し、bash 内部操作は POSIX パスを使い分ける標準手順へ修正
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし
+- **横展開観点**: QG-4 baseline 再現確認（detached worktree・TEMP 配下）の実行手順に前置知見として有用。bash スクリプト内で Windows バイナリへパスを渡す全経路に適用可能
+- **再発条件**: Windows 環境で bash の TEMP/POSIX パスを git・bun へ直接渡す全ての実行
+- **予防策候補**: baseline 再現確認手順テンプレートへ cygpath -m 変換の前置を明記
+- **想定反映先**: agentdev-quality-gates の QG-4 checker 実測手順（baseline 再現確認の実行手順）
+- **関連**: PR #3973 本文・Findings/Capture候補・Case #3967
+- **タグ**: #Windows #パス解釈 #git #bun #baseline再現
+
+---
+
+## 2026-11-08: close_mechanical_steps.test.ts pin テストの baseline fail は Design 文言との読点差由来で、書出し側 Issue（#3966）merge で解消した（Case #3967）
+
+- **問題事象**: 分割②（bun test ./src/common/skills/）で「終了判定記録の様式…契約行がライフサイクル Design に存在する」pin 期待値が Design 現行文言と読点差（様式は対象 Issue 番号、… vs 様式は、対象 Issue 番号、…）で不一致し baseline で fail（Case #3967 の検証時は pre-existing として由来分類）
+- **発生局面**: case-run QG-4 full integrity suite 分割②
+- **検知方法**: baseline 776805a25 detached worktree での単独再現確認（同一 fail 再現・変更由来でないことの実測）
+- **根本原因**: pin テストの期待値が Design 本文の読点位置に依存しており、読み取り検証側（#3967）と書出し側（#3966・RA-001）が並列実行中のため期待値更新を自分の PR で行えなかった
+- **自律対応内容**: 本 PR では pin 期待値を変更せず pre-existing 由来分類を記録。case-close で #3966 merge 後の fresh HEAD 再実測により 0 fail を確認し由来分類を撤回（解消確認として検証差分へ記録）
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし
+- **横展開観点**: 並列 Wave の兄弟 Issue が同一テストファイルを対象とする場合、fail の由来分類は「merge 後の fresh HEAD 再実測で解消確認してから撤回する」運用が有効。pin 期待値は Design 文言の句読点に依存しない書き方（正規化比較）にすると pin が安定する
+- **再発条件**: 並列 Wave で Design 文言 pin テストの期待値が他 Issue の変更対象と重複する場合
+- **予防策候補**: pin 期待値の正規化比較（句読点除去）への改修は書出し側 RA の対象範囲。依存する場合は対応宣言で明示
+- **想定反映先**: src/common/skills/agentdev-workflow-case-close/scripts/tests/close_mechanical_steps.test.ts（書出し側の対象領域）
+- **関連**: PR #3973 本文・Findings/Capture候補・Case #3967・Case #3966
+- **タグ**: #pinテスト #読点差 #並列Wave #pre-existing #由来分類
+
+---
+
+## 2026-11-08: 配布依存境界 source profile の対象は src/common/{commands,skills,tools}/** と src/opencode/plugins/** であり tools/** を含む（Case #3967・case-close STEP-3）
+
+- **問題事象**: PR 本文の品質メトリクス申告が「配布依存境界: 該当変更なし〔src/common/{commands,skills}/** に該当変更なし〕」としていたが、本 PR は src/common/tools/agentdev-gh/** を変更しており、source profile の正確な対象集合（lib/distribution-boundary-fs.ts の projection semantics: source/archive は src/common/{commands,skills,tools}/** + src/opencode/plugins/**）に含まれるため申告が見落としだった
+- **発生局面**: case-close STEP-3（配布依存境界 最終 gate の trigger 判定）
+- **検知方法**: STEP-3 実行時の detector 対象集合確認（distribution-boundary-fs.ts の projection 定義実読）
+- **根本原因**: source profile の対象集合の理解が commands・skills に限定されていた（tools を含まない誤解）
+- **自律対応内容**: case-close 側で gate を実行（check_distribution_boundary.ts --profile source・worktree HEAD 指定）し ok true・failures 0・rules ok を確認。検証差分（対応記録コメント）に申告の修正済みを記録
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（gate は合格・申告の見落としは工程間検証差分で補正済み）
+- **横展開観点**: case-run の STEP-S5（配布依存境界 gate trigger 判定）でも同一の見落としが起き得る。trigger 判定は PR 変更ファイルと source profile 対象集合の交差で機械的に判定する（集合は lib の projection 定義が正）のが安全
+- **再発条件**: src/common/tools/**・src/opencode/plugins/** を変更する PR で配布依存境界 gate をスキップ申告する case-run
+- **予防策候補**: PR テンプレートの品質メトリクス申告欄に source profile 対象集合の注記（tools・plugins 含む）を追加、または trigger 判定の機械化
+- **想定反映先**: agentdev-workflow-case-run SKILL・PR テンプレート（検証差分セクションの注記）・case-close references/docs-and-design-promotion.md
+- **関連**: PR #3973・対応記録コメント（検証差分行1）・Case #3967
+- **タグ**: #配布依存境界 #source-profile #trigger判定 #case-close #case-run
+
+---
+
+## 2026-11-08: bun test の件数サマリー・fail 明細は stderr 出力のため機械工程報告 JSON に含まれず、fail 由来分類には stderr 分離退避付きの script 外直接実行が必須（Case #3967）
+
+- **問題事象**: close_mechanical_steps.ts の full-integrity-suite step は integrityResults に stdout のみを保持するため、bun test の fail 明細と件数サマリー（Ran N tests across M files）が報告 JSON から取得できない。fail 由来分類（IntegrityMachineAcceptanceRecord）の組み立てには 1 回目の実行だけでは fail 識別子が得られない
+- **発生局面**: case-close pre-merge 機械工程（fail 由来分類の組み立て）
+- **検知方法**: 1 回目の報告 JSON で failures 配列が空（fail 件数が不明）の実測
+- **根本原因**: bun test は結果サマリーと fail 詳細を stderr へ出力する。機械工程の spawnSync は stderr を内部捕捉して捨てる（reference「機械工程 script 呼び出し自体のリダイレクトラップは bun test の stderr を内部捕捉するため証跡成立手段にならない」どおり）
+- **自律対応内容**: script 外直接実行（stderr 分離退避・2> 常時付与）で 3 分割と file-level split を再実行し、fail 明細・N/M 件数を退避ファイルから取得して由来分類を組み立て、2 回目の機械工程実行で機械受理判定を確定。機械工程は（1）gates 実測・fail 観測（2）分類込み確定の 2 段階で実行した
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（reference の stderr 分離退避契約どおりの運用）
+- **横展開観点**: 機械工程の 2 段階実行（1回目 gates 実測で fail 件数観測・2回目 integrityMachineAcceptance 込み）は fail がある Case の標準手順になる。機械工程は resume-idempotent なため再実行で契約整合を保てる
+- **再発条件**: full integrity suite に fail が存在する全ての close 実行
+- **予防策候補**: close_mechanical_steps.ts の integrityResults へ stderr の併せ持ち、または README へ 2 段階実行手順の明記
+- **想定反映先**: src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts・scripts/README.md
+- **関連**: Case #3967・機械工程報告 JSON（pass1〜pass4）
+- **タグ**: #bun-test #stderr #機械工程 #fail由来分類 #2段階実行
+
+---
+
+## 2026-11-08: bun install 実施済み worktree の git worktree remove が部分失敗し unregister 完了後にディレクトリ残骸が残る（Windows・Case #3967）
+
+- **問題事象**: textlint vendor 生成のため bun install を実施した worktree（.worktrees/3967-feature・node_modules 1437+ ファイル）で post-merge 機械工程の git worktree remove が exit 255 で部分失敗。unregister と branch 削除は成功したがディレクトリが途中まで削除された状態で残存（.git ファイル消失・src 配下 node_modules 残骸）
+- **発生局面**: case-close STEP-6-1（worktree 削除・post-merge 機械工程 cleanup）
+- **検知方法**: post-merge 報告 JSON の cleanup-worktree-branch step warn（worktreeRemoveExitCode 255）と残存ディレクトリの実在確認
+- **根本原因**: Windows 環境で node_modules の大量ファイル（ロック・長パス）が remove の完全削除を妨げる。unregister は完了するため worktree list から消えるが、実ディレクトリの残骸が残る
+- **自律対応内容**: 残骸の完全列挙（1437 ファイル・textlint-guard node_modules 由来＋checkout 残骸・.agentdev ドメイン状態混入なし・worktree は clean と機械工程が事前確認済み）を確認したうえで rm -rf で残骸を削除し、不存在確認まで実施（STEP-6-1 の remove 失敗時の掃除・再試行手順の適用）
+- **ユーザー確認の有無**: なし（対象は自 Case が生成した依存実体と worktree checkout 残骸。削除対象の識別情報は列挙で確定）
+- **REQ/Decision/Design影響**: なし
+- **横展開観点**: worktree で bun install を実行する Case（依存パッケージ前置・vendor 生成）では、remove 前に worktree root 相対の node_modules 掃除を前置するか、remove 失敗後の残骸削除手順を標準コストとして織り込むのが安全
+- **再発条件**: worktree 内で bun install・vendor 生成を実施した全ての Windows 環境 close
+- **予防策候補**: agentdev-git-worktree の remove 前退避ファイル掃除手順に node_modules 残骸掃除の注記を追加
+- **想定反映先**: src/common/skills/agentdev-git-worktree/references/worktree-operations.md（remove 前退避ファイル掃除節）
+- **関連**: Case #3967・post-merge 報告 JSON
+- **タグ**: #worktree #git-worktree-remove #Windows #node_modules #後片付け
+
+---

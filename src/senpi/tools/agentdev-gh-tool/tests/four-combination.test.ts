@@ -174,6 +174,7 @@ describe("TS-007 終了経路シナリオ（issue_close の終了前提検証・
       "〔3〕対象不一致拒否",
       "〔4〕判定不成立拒否",
       "〔5〕判定対象版不一致（過去の合格結果の再利用）拒否",
+      "〔6〕旧様式（台帳照合結果のみ）の受理なし拒否",
     ]) {
       expectRefused(outcomes, label, "verification-incomplete");
     }
@@ -207,6 +208,7 @@ describe("TS-007 終了経路シナリオ（issue_close の終了前提検証・
       "〔3〕対象不一致拒否",
       "〔4〕判定不成立拒否",
       "〔5〕判定対象版不一致（過去の合格結果の再利用）拒否",
+      "〔6〕旧様式（台帳照合結果のみ）の受理なし拒否",
     ]) {
       expectRefused(outcomes, label, "verification-incomplete");
     }

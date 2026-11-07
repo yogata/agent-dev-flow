@@ -5,8 +5,8 @@
 //   から呼び出された場合も main repo root 側へ解決する（呼出側 cwd に依存しない
 //   単一の決定的解決規則。git-common-dir 導出。agentdev_jev 観測と同一の内部解決）。
 // - Tool は呼出元の申告を受け取らず、自ら記録を読み取り、対象 Issue 番号と
-//   判定対象版（判定時点の対象 Issue updated_at）への束縛と判定内容
-//   （機械受理の成立）を検証する。
+//   判定対象版（close 時点の対象を識別する版情報。対象 Issue の updated_at）への
+//   束縛と判定内容（変更後の正規完了判定に基づく機械受理の成立）を検証する。
 // - 記録が存在しない、読み取れない、対象と一致しない、判定が不成立のいずれかの
 //   場合は終了の副作用を実行せず構造化失敗を返す（fail-closed）。
 //   記録不在を「正当な空（作成物ゼロ）」の根拠にしない。
@@ -53,11 +53,11 @@ export function defaultCloseAcceptanceIo(): CloseAcceptanceIo {
 export interface CloseAcceptanceRecord {
   /** 対象 Issue 番号。 */
   readonly issueNumber: number;
-  /** 判定対象版（判定時点の対象 Issue updated_at。過去の合格結果の再利用を拒否する束縛）。 */
+  /** 判定対象版（close 時点の対象を識別する版情報。対象 Issue の updated_at。過去の合格結果の再利用を拒否する束縛）。 */
   readonly targetRevision: string;
   /** 判定生成時刻（ISO 8601）。 */
   readonly generatedAt: string;
-  /** 判定内容（機械受理の成立。検証用一時資材の照合を含む）。 */
+  /** 判定内容（変更後の正規完了判定に基づく機械受理の成立: 必須完了条件の評価結果。旧台帳照合の結果は含まない）。 */
   readonly accepted: boolean;
 }
 
@@ -154,7 +154,10 @@ export function parseCloseAcceptanceRecord(
   if (typeof v.accepted !== "boolean") {
     return {
       ok: false,
-      detail: "the close acceptance record requires a boolean accepted (the judgment content)",
+      detail:
+        "the close acceptance record requires a boolean accepted " +
+        "(the judgment content: the evaluation result of the mandatory completion criteria; " +
+        "a legacy verification-resources ledger result is not part of the format)",
     };
   }
   return {
