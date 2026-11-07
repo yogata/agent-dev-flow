@@ -4856,6 +4856,44 @@ describe("案件作成範囲の導出訂正（専用領域・記録由来・識�
     expect(osTempEntry?.count).toBe(1);
   });
 
+  test("実経路: 台帳の repo 直下単一セグメント所在（誤作成記録 Users・WINDOWS 等）を参照基準に使わず、C:\\Windows\\… を含む無関係 OS process は帰属不明報告のままにする", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({
+          id: "vr-3928-2",
+          location: "<repo>/WINDOWS",
+          identifiers: { path: "<repo>/WINDOWS" },
+          ownership: "common",
+          childIssue: null,
+        }),
+      ]),
+      processLiveness: {
+        "800": { alive: true, commandLine: "C:\\Windows\\System32\\svchost.exe -k netsvcs" },
+      },
+      listenPorts: {},
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: { ...baseCheck, caseCreationScope: declaredScope },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      attributionUnknown: { entries: readonly { source: string; count: number }[] };
+    };
+    expect(reconciliation.permitted).toBe(true);
+    expect(reconciliation.findings).toHaveLength(0);
+    const processEntry = reconciliation.attributionUnknown.entries.find(
+      (entry) => entry.source === "process-liveness",
+    );
+    expect(processEntry?.count).toBe(1);
+  });
+
   test("実経路: 宣言時も対象の検査不能（観測コマンド失敗）は inspection-unavailable findings で完了を拒否する", () => {
     const baseCheck = verificationResourceCheck();
     const runner = fakeRunner({

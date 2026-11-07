@@ -1877,14 +1877,19 @@ export function evaluateObservationEntityConsumption(
   // resolveBase（repo root）相対形も含め、commandLine が相対パスで言及する場合も
   // 参照判定できるようにする。URL 形 location は commandLine/URL からの参照として
   // そのまま用いる。疑似スキーマ所在（process:pid=… 等）は参照判定で一致しない。
+  // repo 相対形は複数セグメント（"/" を含む）のものだけを参照基準にする: 過去の
+  // 誤作成記録が repo 直下の単一セグメント所在（Users・WINDOWS 等）を持つことがあり、
+  // その相対形（users・windows）は含有一致で C:\Windows\… 等を含む無関係 OS process
+  // 全般を記録対応と誤認し、範囲外の帰属不明報告を無効化する（実測反例: vr-3928-17/18）。
   const recordedLocationBases: string[] = [];
   for (const entry of entries) {
     const resolved = resolveObservationPath(entry.location, observation.resolveBase);
     const normalizedResolved = normalizeObservationPath(resolved);
     recordedLocationBases.push(normalizedResolved);
     const normalizedBase = normalizeObservationPath(observation.resolveBase);
-    if (normalizedResolved.startsWith(`${normalizedBase}/`)) {
-      recordedLocationBases.push(normalizedResolved.slice(normalizedBase.length + 1));
+    const relativeForm = normalizedResolved.slice(normalizedBase.length + 1);
+    if (normalizedResolved.startsWith(`${normalizedBase}/`) && relativeForm.includes("/")) {
+      recordedLocationBases.push(relativeForm);
     }
   }
 
