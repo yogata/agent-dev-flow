@@ -1,0 +1,428 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261107T165121Z-8a79",
+  "workflow": "req-define",
+  "evaluationKind": "requirement-classification",
+  "subject": "RU-0270 要件展開候 pervade15単位の最終分類（REQ行/Design行）と Design 分離要否",
+  "sourceRevision": "00d1214d4bf1214d54d12064e46a9531c30b8c05",
+  "durationMs": 779,
+  "inputTokens": 5646,
+  "inputs": {
+    "requestDigest": "5db18b09bcf1c61ee000504a2eb2dc6eb4784a1a15e28175d134329ae275f02c",
+    "references": [
+      {
+        "digest": "c16f8b3103a4c0931e6625ef346fdc218ab33b2beab7f27a3a023f75ddc028a4",
+        "label": "RU-0270 (入力RU)",
+        "path": ".agentdev/backlog/req-units/RU-0270.md"
+      },
+      {
+        "digest": "1d1146dc207a89748323fddb73bd492bfb89ab6c8a3a6461871d9040c4968462",
+        "label": "REQ-118 (再構成対象)",
+        "path": "docs/requirements/REQ-118.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q01-u01",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 1,
+        "Design行": 0
+      }
+    },
+    {
+      "questionId": "q01b-u01",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.1,
+        "false": 0.9
+      }
+    },
+    {
+      "questionId": "q02-u02",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 1,
+        "Design行": 0
+      }
+    },
+    {
+      "questionId": "q02b-u02",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.12,
+        "false": 0.88
+      }
+    },
+    {
+      "questionId": "q03-u03",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 1,
+        "Design行": 0
+      }
+    },
+    {
+      "questionId": "q03b-u03",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.78,
+        "false": 0.21999999999999997
+      }
+    },
+    {
+      "questionId": "q04-u04",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 1,
+        "Design行": 0
+      }
+    },
+    {
+      "questionId": "q04b-u04",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.18,
+        "false": 0.8200000000000001
+      }
+    },
+    {
+      "questionId": "q05-u05",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 1,
+        "Design行": 0
+      }
+    },
+    {
+      "questionId": "q05b-u05",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.79,
+        "false": 0.20999999999999996
+      }
+    },
+    {
+      "questionId": "q06-u06",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 1,
+        "Design行": 0
+      }
+    },
+    {
+      "questionId": "q06b-u06",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.14,
+        "false": 0.86
+      }
+    },
+    {
+      "questionId": "q07-u07",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 1,
+        "Design行": 0
+      }
+    },
+    {
+      "questionId": "q07b-u07",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.23,
+        "false": 0.77
+      }
+    },
+    {
+      "questionId": "q08-u08",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.99,
+        "Design行": 0.01
+      }
+    },
+    {
+      "questionId": "q08b-u08",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.71,
+        "false": 0.29000000000000004
+      }
+    },
+    {
+      "questionId": "q09-u09",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 1,
+        "Design行": 0
+      }
+    },
+    {
+      "questionId": "q09b-u09",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.12,
+        "false": 0.88
+      }
+    },
+    {
+      "questionId": "q10-u10",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 1,
+        "Design行": 0
+      }
+    },
+    {
+      "questionId": "q10b-u10",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.31,
+        "false": 0.69
+      }
+    },
+    {
+      "questionId": "q11-u11",
+      "questionForm": "choice",
+      "value": "Design行",
+      "probabilityDistribution": {
+        "REQ行": 0,
+        "Design行": 1
+      }
+    },
+    {
+      "questionId": "q11b-u11",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.66,
+        "false": 0.33999999999999997
+      }
+    },
+    {
+      "questionId": "q12-u12",
+      "questionForm": "choice",
+      "value": "Design行",
+      "probabilityDistribution": {
+        "REQ行": 0,
+        "Design行": 1
+      }
+    },
+    {
+      "questionId": "q12b-u12",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.83,
+        "false": 0.17000000000000004
+      }
+    },
+    {
+      "questionId": "q13-u13",
+      "questionForm": "choice",
+      "value": "Design行",
+      "probabilityDistribution": {
+        "REQ行": 0,
+        "Design行": 1
+      }
+    },
+    {
+      "questionId": "q13b-u13",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.83,
+        "false": 0.17000000000000004
+      }
+    },
+    {
+      "questionId": "q14-u14",
+      "questionForm": "choice",
+      "value": "Design行",
+      "probabilityDistribution": {
+        "REQ行": 0,
+        "Design行": 1
+      }
+    },
+    {
+      "questionId": "q14b-u14",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.28,
+        "false": 0.72
+      }
+    },
+    {
+      "questionId": "q15-u15",
+      "questionForm": "choice",
+      "value": "Design行",
+      "probabilityDistribution": {
+        "REQ行": 0.01,
+        "Design行": 0.99
+      }
+    },
+    {
+      "questionId": "q15b-u15",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.68,
+        "false": 0.31999999999999995
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q01-u01",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q01b-u01",
+        "value": false
+      },
+      {
+        "questionId": "q02-u02",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q02b-u02",
+        "value": false
+      },
+      {
+        "questionId": "q03-u03",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q03b-u03",
+        "value": false,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q04-u04",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q04b-u04",
+        "value": false
+      },
+      {
+        "questionId": "q05-u05",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q05b-u05",
+        "value": false,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q06-u06",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q06b-u06",
+        "value": false
+      },
+      {
+        "questionId": "q07-u07",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q07b-u07",
+        "value": false
+      },
+      {
+        "questionId": "q08-u08",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q08b-u08",
+        "value": false,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q09-u09",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q09b-u09",
+        "value": false
+      },
+      {
+        "questionId": "q10-u10",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q10b-u10",
+        "value": false
+      },
+      {
+        "questionId": "q11-u11",
+        "value": "Design行"
+      },
+      {
+        "questionId": "q11b-u11",
+        "value": true
+      },
+      {
+        "questionId": "q12-u12",
+        "value": "Design行"
+      },
+      {
+        "questionId": "q12b-u12",
+        "value": true
+      },
+      {
+        "questionId": "q13-u13",
+        "value": "Design行"
+      },
+      {
+        "questionId": "q13b-u13",
+        "value": true
+      },
+      {
+        "questionId": "q14-u14",
+        "value": "Design行"
+      },
+      {
+        "questionId": "q14b-u14",
+        "value": false
+      },
+      {
+        "questionId": "q15-u15",
+        "value": "Design行"
+      },
+      {
+        "questionId": "q15b-u15",
+        "value": true
+      }
+    ]
+  }
+}
