@@ -1,0 +1,260 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261107T071743Z-f1fe",
+  "workflow": "agentdev-workflow-intake-promote",
+  "evaluationKind": "item-review-assessment",
+  "subject": "intake inbox 5件の Review 観点別評価（妥当性・影響・緊急度）",
+  "sourceRevision": "7528a03eafb4008e332fa7369e0ac887f378f513",
+  "durationMs": 1928,
+  "inputTokens": 3539,
+  "inputs": {
+    "requestDigest": "6f9e30d584446bfce2ea6f871b2ac5306ee4a9162581f6138f7eecc0c92643d0",
+    "references": [
+      {
+        "digest": "698fcefd0ca7225c2ad36a676ea389a55fc732299755143c3b4011e52f606c58",
+        "label": "item1",
+        "path": ".agentdev/intake/inbox/2026-11-04-phase-adoption-template-wording-mismatch.md"
+      },
+      {
+        "digest": "f209b2d517854f6cdeb95504539b089cab6c3bd1c37e0cf1a4c210e390aa3e02",
+        "label": "item2",
+        "path": ".agentdev/intake/inbox/2026-11-04-prepare-definition-pr-freshness-path-extraction.md"
+      },
+      {
+        "digest": "599502d2356797b61bdf7cecdece679700a23f65986950990b7c52864ce96316",
+        "label": "item3",
+        "path": ".agentdev/intake/inbox/2026-11-04-worktree-agentdev-tmp-test-premise.md"
+      },
+      {
+        "digest": "9c35d05b3f86c33ca4828a57e3984ed3cf4c4fa4cc131b1f7d536503762b3c34",
+        "label": "item4",
+        "path": ".agentdev/intake/inbox/2026-11-05-pr3925-phase-route-findings.md"
+      },
+      {
+        "digest": "c4c3c65d8d36c92788c9f1f8b66c65c2cd0f6ad678115b44055eefaab0078c6f",
+        "label": "item5",
+        "path": ".agentdev/intake/inbox/2026-11-07-pr3959-recorded-location-reference-boundary-findings.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "i1-validity",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0.01,
+        "中": 0.07,
+        "高": 0.92
+      }
+    },
+    {
+      "questionId": "i1-impact",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0.01,
+        "中": 0.13,
+        "高": 0.86
+      }
+    },
+    {
+      "questionId": "i1-urgency",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0.04,
+        "中": 0.4,
+        "高": 0.56
+      }
+    },
+    {
+      "questionId": "i2-validity",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0,
+        "中": 0.12,
+        "高": 0.88
+      }
+    },
+    {
+      "questionId": "i2-impact",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0,
+        "中": 0.3,
+        "高": 0.7
+      }
+    },
+    {
+      "questionId": "i2-urgency",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0,
+        "中": 0.35,
+        "高": 0.65
+      }
+    },
+    {
+      "questionId": "i3-validity",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0.01,
+        "中": 0.35,
+        "高": 0.64
+      }
+    },
+    {
+      "questionId": "i3-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.04,
+        "中": 0.7,
+        "高": 0.26
+      }
+    },
+    {
+      "questionId": "i3-urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.04,
+        "中": 0.66,
+        "高": 0.3
+      }
+    },
+    {
+      "questionId": "i4-validity",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.04,
+        "中": 0.55,
+        "高": 0.41
+      }
+    },
+    {
+      "questionId": "i4-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.31,
+        "中": 0.63,
+        "高": 0.06
+      }
+    },
+    {
+      "questionId": "i4-urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.25,
+        "中": 0.71,
+        "高": 0.04
+      }
+    },
+    {
+      "questionId": "i5-validity",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "低": 0.01,
+        "中": 0.17,
+        "高": 0.82
+      }
+    },
+    {
+      "questionId": "i5-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.12,
+        "中": 0.74,
+        "高": 0.14
+      }
+    },
+    {
+      "questionId": "i5-urgency",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "低": 0.3,
+        "中": 0.67,
+        "高": 0.03
+      }
+    }
+  ],
+  "confidence": 0.86,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "i1-validity",
+        "value": 2
+      },
+      {
+        "questionId": "i1-impact",
+        "value": 2
+      },
+      {
+        "questionId": "i1-urgency",
+        "value": 2
+      },
+      {
+        "questionId": "i2-validity",
+        "value": 2
+      },
+      {
+        "questionId": "i2-impact",
+        "value": 2
+      },
+      {
+        "questionId": "i2-urgency",
+        "value": 2
+      },
+      {
+        "questionId": "i3-validity",
+        "value": 2
+      },
+      {
+        "questionId": "i3-impact",
+        "value": 1
+      },
+      {
+        "questionId": "i3-urgency",
+        "value": 1
+      },
+      {
+        "questionId": "i4-validity",
+        "value": 1
+      },
+      {
+        "questionId": "i4-impact",
+        "value": 1
+      },
+      {
+        "questionId": "i4-urgency",
+        "value": 1
+      },
+      {
+        "questionId": "i5-validity",
+        "value": 2
+      },
+      {
+        "questionId": "i5-impact",
+        "value": 1
+      },
+      {
+        "questionId": "i5-urgency",
+        "value": 1
+      }
+    ]
+  }
+}

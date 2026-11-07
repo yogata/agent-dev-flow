@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261107T071920Z-4ab5",
+  "workflow": "agentdev-workflow-intake-promote",
+  "evaluationKind": "adversarial-review-trigger",
+  "subject": "adversarial-review 発動条件判定（暫定分類 採用4件・却下1件 の後続評価）",
+  "sourceRevision": "7528a03eafb4008e332fa7369e0ac887f378f513",
+  "durationMs": 599,
+  "inputTokens": 838,
+  "inputs": {
+    "requestDigest": "39b74905d65d81fc4f3a81f39d5495409cac6fb20d1845f490802c3f9eeb12a3",
+    "references": [
+      {
+        "digest": "698fcefd0ca7225c2ad36a676ea389a55fc732299755143c3b4011e52f606c58",
+        "label": "item1",
+        "path": ".agentdev/intake/inbox/2026-11-04-phase-adoption-template-wording-mismatch.md"
+      },
+      {
+        "digest": "f209b2d517854f6cdeb95504539b089cab6c3bd1c37e0cf1a4c210e390aa3e02",
+        "label": "item2",
+        "path": ".agentdev/intake/inbox/2026-11-04-prepare-definition-pr-freshness-path-extraction.md"
+      },
+      {
+        "digest": "599502d2356797b61bdf7cecdece679700a23f65986950990b7c52864ce96316",
+        "label": "item3",
+        "path": ".agentdev/intake/inbox/2026-11-04-worktree-agentdev-tmp-test-premise.md"
+      },
+      {
+        "digest": "9c35d05b3f86c33ca4828a57e3984ed3cf4c4fa4cc131b1f7d536503762b3c34",
+        "label": "item4",
+        "path": ".agentdev/intake/inbox/2026-11-05-pr3925-phase-route-findings.md"
+      },
+      {
+        "digest": "c4c3c65d8d36c92788c9f1f8b66c65c2cd0f6ad678115b44055eefaab0078c6f",
+        "label": "item5",
+        "path": ".agentdev/intake/inbox/2026-11-07-pr3959-recorded-location-reference-boundary-findings.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "trigger",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.91,
+        "false": 0.08999999999999997
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "trigger",
+        "value": true
+      }
+    ]
+  }
+}
