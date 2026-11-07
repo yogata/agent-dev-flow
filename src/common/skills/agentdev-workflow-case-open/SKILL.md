@@ -77,7 +77,7 @@ case-open workflow は次の6 STEP で構成する。
 - `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ（capture 成果物の git 永続化）
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 - 横断依存検査エンジン（本スキル配下 `scripts/src/inspect_cross_dependencies.ts`）: STEP-5 横断依存検査の機械的比較の単一実装。case-ready トレーサビリティ完全性ゲートも同一実装を共有する（比較手続きの重複実装禁止）
-- 検証用一時資材の台帳モジュール・作成ヘルパー（`agentdev-workflow-case-close` scripts 配下 `verification-resources-ledger.ts`、`verification-resource-register.ts`）: 検証用一時資材の作成と同時の台帳登録（「検証用一時資材の作成・登録接続」参照）
+- 検証用一時資材の後片付け責任（検証に伴う一時資材の取扱いと後片付け責任 Design）: Root Case 確立に伴う一時資材作成時の作成・利用・回収義務と後片付け報告（「検証用一時資材の作成・回収義務」参照）
 
 ## トレーサビリティ能力の利用
 
@@ -104,7 +104,7 @@ case-open は、上流工程（req-define）で確定した対象要件を実行
 - **実行識別情報の非記録（Issue 本文）**: Issue 本文には実行識別情報セクションを設けない（agentdev-workflow-templates Design「実行識別情報・検証差分のテンプレートセクション形式」節）。Case・実行単位・前工程確定事項は Definition Package・設計PR・canonical 成果物関係から相関でき、本文へ一覧化しない。実行識別情報セクションは PR テンプレートのみが持つ
 - **Root Case タイトル**: Root Case の起票時のタイトル書式は `<workflows/issue-title-policy>` Design（Issue タイトル記述規則）を参照する（Root Case は Case 接頭辞書式。合意済みの対象・目的から主題を生成する）。本スキルは書式を複製しない
 - **本文 verbatim**: Root Case 本文、PR 本文は Custom Tool `agentdev_gh` の操作引数としてそのまま渡す（文字コード・一時ファイルの実装詳細は Tool 内部）（`POL-gh-io-delegation`）
-- **検証用一時資材の作成・登録接続**: Root Case 確立に伴い検証用remote、clone、bare repository、退避ログ、補助スクリプト、専用server・process等の検証用一時資材を作成する場合、案件スコープの専用領域へ作成し、作成と同時に作成ヘルパー（`agentdev-workflow-case-close` scripts 配下の `verification-resource-register.ts`）で台帳（生成記録）へ登録する。登録項目（案件・種別・所在・識別情報・回収担当〔記録した入口の識別〕・所有区分〔親/子/共通〕・作成経路・作成時刻）と台帳の保存場所・空状態区別は検証用一時資材のライフサイクル Design「台帳（生成記録）」節に従う。PR本文への自由文自己申告や終了時の抽出で登録を代替しない。専用領域外への作成は行わない。作成を委譲する場合は委譲契約へ専用領域作成義務・作成報告義務を含める（v4-delegation-contracts Design「検証用一時資材の作成・報告義務」節）。作成先確認は作成ヘルパーの機械検査に接続されており、作成先は環境指定TEMPまたは案件専用領域（案件識別子をパス要素に含むrepo外ディレクトリ）に限られる。プロジェクト親ディレクトリ等の作成先違反は機械拒否され、違反の所在では台帳は書換えられない
+- **検証用一時資材の作成・回収義務**: Root Case 確立に伴い検証用remote、clone、bare repository、退避ログ、補助スクリプト、専用server・process等の検証用一時資材を作成する場合、既存の配置規則と権限に従う標準的な一時領域・リポジトリ内の作業領域（`.agentdev/tmp/` 等の配置分類）・許可された外部環境で作成・利用し、利用終了時に安全条件（当該作業が作成した専用資材であることの確認、回収対象範囲の特定、正式な成果物・必要な証拠・他の作業や利用者が管理する資材の保護、既存の副作用・承認境界への適合）が成立する範囲で回収する。安全条件と配置規則の詳細は検証に伴う一時資材の取扱いと後片付け責任 Design が所有する（対応関係は repository top-level `traceability/` 配下 sidecar を参照）。作成を委譲する場合は委譲契約へ一時資材の作成・利用・回収義務を含める（v4-delegation-contracts Design「検証用一時資材の作成・報告義務」節）。後片付けの実施結果、確認根拠、未処理事項（未回収・確認不能・引継ぎ）を既存の作業記録経路へ返す
 
 ## See Also
 
