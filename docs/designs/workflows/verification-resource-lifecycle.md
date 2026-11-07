@@ -2,7 +2,7 @@
 title: 検証用一時資材のライフサイクル（登録・検出・照合・回収）
 status: draft
 created: 2026-11-05
-updated: 2026-11-06
+updated: 2026-11-07
 ---
 
 <!-- ADF-COVERS(design): REQ-118-001, REQ-118-002, REQ-118-003, REQ-118-004, REQ-118-005, REQ-118-006, REQ-118-007, REQ-118-008, REQ-118-009 -->
