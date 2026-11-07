@@ -96,6 +96,8 @@ implementation:
     - REQ-118-006
     - REQ-032-044
 verification:
+  src/common/skills/agentdev-workflow-case-close/scripts/src/verification-resources-ledger.ts:
+    - REQ-119-007
   src/common/skills/agentdev-workflow-case-close/scripts/tests/deletion-confirmation.test.ts:
     - REQ-118-006
     - REQ-032-044

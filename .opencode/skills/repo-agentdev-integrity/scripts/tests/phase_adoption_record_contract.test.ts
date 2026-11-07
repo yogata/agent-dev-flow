@@ -1,4 +1,5 @@
-// ADF-COVERS(verification): REQ-110-040, REQ-110-041, REQ-111-020
+// ADF-COVERS(implementation): REQ-119-001
+// ADF-COVERS(verification): REQ-110-040, REQ-110-041, REQ-111-020, REQ-119-001
 //
 // 直接採用の採否記録の保存先契約（REQ-110-040）と領域契約文書の配布テンプレート
 // 非破壊実体化（REQ-110-041）、終端遷移後の保存状態の参照専用保持（REQ-111-020）
@@ -116,7 +117,7 @@ describe("領域契約文書の配布テンプレート非破壊実体化（REQ-
       );
       expect(sec.length, `${skillName} の非破壊実体化節が存在すること`).toBeGreaterThan(0);
       expect(sec).toContain("存在しない場合のみ");
-      expect(sec).toContain("`templates/phase-readme.md`");
+      expect(sec).toContain("`.opencode/skills/agentdev-phase-theme-collaboration/templates/phase-readme.md`");
       expect(sec).toContain("上書きしない");
       expect(sec).toContain("テンプレートと一致させる");
       expect(sec).toContain("検査失敗として扱わない");

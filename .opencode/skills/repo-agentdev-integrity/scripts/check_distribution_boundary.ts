@@ -1,5 +1,6 @@
 // ADF-COVERS(verification): REQ-001-031
 // ADF-COVERS(verification): REQ-002-011, REQ-002-027
+// ADF-COVERS(verification): REQ-119-006
 // ADF-COVERS(verification): REQ-009-012
 // ADF-COVERS(implementation): REQ-010-060, REQ-029-010
 // ADF-COVERS(verification): REQ-010-001
