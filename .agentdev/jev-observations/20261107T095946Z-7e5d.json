@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261107T095946Z-7e5d",
+  "workflow": "case-ready",
+  "evaluationKind": "scope-overlap-detection",
+  "subject": "Root Case #3961 と既存オープン Issue 群のスコープ重複判定（検出源実測: open tracking 0 件・open case は自己のみ・キーワード照合候補 0 件）",
+  "sourceRevision": "31e6bc4de0b09050172ca62f4fb0b135473970fc",
+  "durationMs": 1117,
+  "inputTokens": 1344,
+  "inputs": {
+    "requestDigest": "1cc4e45a8b3b7bde49d47ab915071ac92bb10b955b2ef091bcfcd32d328bde7d",
+    "references": [
+      {
+        "digest": "72162a644704c2db4fa93fecd757b2a5307c61e5d1d8c19b4f4521a08a013357",
+        "label": "req_draft",
+        "path": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261107T161204JST.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-overlap",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.06,
+        "false": 0.94
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-overlap",
+        "value": false
+      }
+    ]
+  }
+}
