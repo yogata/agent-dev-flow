@@ -2,7 +2,7 @@
 title: Custom Tool 操作契約
 status: accepted
 created: 2026-08-24
-updated: "2026-11-05"
+updated: "2026-11-08"
 ---
 <!-- ADF-COVERS(design): REQ-090-001, REQ-090-002, REQ-090-003, REQ-090-004, REQ-090-009, REQ-090-010, REQ-090-011, REQ-090-012, REQ-090-013, REQ-090-014, REQ-090-015, REQ-090-016, REQ-090-017, REQ-090-018, REQ-090-019, REQ-090-020, REQ-090-021, REQ-090-022, REQ-090-023, REQ-090-024, REQ-090-025, REQ-090-026, REQ-090-027, REQ-090-028, REQ-090-029, REQ-011-022, REQ-011-025, REQ-011-026, REQ-011-033 -->
 <!-- ADF-COVERS(design): REQ-009-051, REQ-052-012, REQ-052-013, REQ-052-014, REQ-052-015 -->
@@ -102,7 +102,7 @@ GitHub版 / Local版等価性:
 
 ### issue_close の終了前提（Case Issue）
 
-issue_close は、対象が Case Issue（case role の Issue）である場合、終了操作の前提として機械受理の判定記録を検証する。判定記録は case-close 機械工程が生成し、決定的な保存場所（メイン repo root の `.agentdev/close-acceptance/issue-{NNNN}.json`）に置かれる。Tool は呼出元の申告を受け取らず、自ら記録を読み取り、対象 Issue 番号と判定対象版（close 時点の対象を識別する版情報。様式はライフサイクル Design が所有）への束縛と判定内容（検証用一時資材の照合を含む機械受理の成立）を検証してから副作用を実行する。記録が存在しない、読み取れない、対象 Issue または対象版と一致しない（過去の合格結果の再利用を含む）、判定が不成立のいずれかの場合は副作用を実行せず構造化失敗を返す（fail-closed、REQ-052-004 と同型）。追跡Issue（tracking role）の終了には本前提を適用しない。記録の保存場所はメイン repo root に固定し、Tool は worktree コンテキストから呼び出された場合も main repo root 側の保存場所へ解決する（呼出側の cwd に依存しない単一の決定的解決規則。agentdev_jev 観測と同一の内部解決）。判定記録の様式・保存場所・回収は検証用一時資材のライフサイクル Design が所有する。同一マシン上の呼出元による判定記録の偽造防止は本契約の対象外（事故的迂回と規律欠落の抑止を対象とする）とし、生 gh WRITE の迂回検出は REQ-052-002 の既存 Plugin/Hook guard が担う。
+issue_close は、対象が Case Issue（case role の Issue）である場合、終了操作の前提として機械受理の判定記録を検証する。判定記録は case-close 機械工程が生成し、決定的な保存場所（メイン repo root の `.agentdev/close-acceptance/issue-{NNNN}.json`）に置かれる。Tool は呼出元の申告を受け取らず、自ら記録を読み取り、対象 Issue 番号と判定対象版（close 時点の対象を識別する版情報。様式はライフサイクル Design が所有）への束縛と判定内容（変更後の正規完了判定に基づく機械受理の成立）を検証してから副作用を実行する。記録が存在しない、読み取れない、対象 Issue または対象版と一致しない（過去の合格結果の再利用を含む）、判定が不成立のいずれかの場合は副作用を実行せず構造化失敗を返す（fail-closed、REQ-052-004 と同型）。追跡Issue（tracking role）の終了には本前提を適用しない。記録の保存場所はメイン repo root に固定し、Tool は worktree コンテキストから呼び出された場合も main repo root 側の保存場所へ解決する（呼出側の cwd に依存しない単一の決定的解決規則。agentdev_jev 観測と同一の内部解決）。判定記録の様式・保存場所・回収は検証に伴う一時資材の取扱いと後片付け責任 Design が所有する。同一マシン上の呼出元による判定記録の偽造防止は本契約の対象外（事故的迂回と規律欠落の抑止を対象とする）とし、生 gh WRITE の迂回検出は REQ-052-002 の既存 Plugin/Hook guard が担う。
 
 
 ## ローカル版実装差し替え
