@@ -1064,20 +1064,26 @@ export function isOutsideCaseCreationPopulation(
   return !identifierBearing && !fsUnderRecordedLocation && !referencesRecordedLocation;
 }
 
-/** 台帳記載所在の最終セグメント名を引き延ばして類似名の別所在にする文字（候補・所在とも小文字化済み）。 */
-const LOCATION_NAME_CONTINUATION_PATTERN = /[a-z0-9._~+-]/;
+/**
+ * reference 候補（commandLine・URL）内で台帳記載所在の発生の直後に来て参照の区切りとなる文字
+ * （パス区切り・空白・引用符・URL の query/fragment 開始。候補・所在とも `\`→`/` 正規化・
+ * 小文字化済みのためパス区切りは `/` のみ有効）。これら以外の文字が直後に来る場合、所在名を
+ * 引き延ばす別名（dedicated-run-other・dedicated-run別・dedicated-run@other 等）として
+ * 参照と認めない。
+ */
+const LOCATION_REFERENCE_DELIMITER_CHARS = "/ \t\"'?#";
 
 /**
- * reference 候補（commandLine・URL）内の台帳記載所在の発生のうち、直後の文字が所在名の
- * 続きになっていないものだけを参照と認める（dedicated-run-other 等の類似名別所在を部分一致で
- * 記録対応としない。直後が終端・パス区切り・空白・引用符等なら所在自身またはその subtree への
- * 参照と認める）。
+ * reference 候補（commandLine・URL）内の台帳記載所在の発生のうち、直後が参照の終端または
+ * 区切り（パス区切り・空白・引用符・URL の query/fragment 開始）であるものだけを参照と
+ * 認める（dedicated-run-other 等の類似名別所在、dedicated-run別・dedicated-run@other 等
+ * の別名への引き延ばしを部分一致で記録対応としない。別名へ伸びた任意文字は非一致）。
  */
 function referencesRecordedLocationString(candidate: string, base: string): boolean {
   let index = candidate.indexOf(base);
   while (index !== -1) {
     const next = candidate.charAt(index + base.length);
-    if (next === "" || !LOCATION_NAME_CONTINUATION_PATTERN.test(next)) return true;
+    if (next === "" || LOCATION_REFERENCE_DELIMITER_CHARS.includes(next)) return true;
     index = candidate.indexOf(base, index + 1);
   }
   return false;

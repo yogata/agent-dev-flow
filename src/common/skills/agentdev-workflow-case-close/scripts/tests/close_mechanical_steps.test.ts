@@ -5063,6 +5063,87 @@ describe("台帳記載所在のパス境界（兄弟・類似名別所在の誤�
     expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
   });
 
+  test("実経路: 台帳記載所在の実 subtree を commandLine で参照する番号なし process は範囲内として未登録拒否を維持する（パス区切り直後の subtree 参照・commandLine）", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = boundaryRunner({
+      processLiveness: {
+        "704": { alive: true, commandLine: "node <repo>/tmp-area/dedicated-run/server.js" },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: boundaryCheck(baseCheck),
+      }),
+      runner,
+    );
+    const reconciliation = readReconciliation(report);
+    expect(reconciliation.permitted).toBe(false);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 704"),
+      ),
+    ).toBe(true);
+    expect(reconciliation.attributionUnknown.entries).toHaveLength(0);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: 台帳記載所在の別名（dedicated-run別）を commandLine で参照する番号なし process は範囲外の attribution-unknown 報告のみ（日本語名への引き延ばしを記録対応としない）", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = boundaryRunner({
+      processLiveness: {
+        "705": {
+          alive: true,
+          commandLine: "node <repo>/tmp-area/dedicated-run別/server.js",
+          cwd: "C:/other",
+        },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: boundaryCheck(baseCheck),
+      }),
+      runner,
+    );
+    const reconciliation = readReconciliation(report);
+    expect(reconciliation.permitted).toBe(true);
+    expect(reconciliation.findings).toHaveLength(0);
+    const processEntry = reconciliation.attributionUnknown.entries.find(
+      (entry) => entry.source === "process-liveness",
+    );
+    expect(processEntry?.count).toBe(1);
+    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+  });
+
+  test("実経路: 台帳記載所在の別名（dedicated-run@other）を commandLine で参照する番号なし process は範囲外の attribution-unknown 報告のみ（記号を含む名への引き延ばしを記録対応としない）", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = boundaryRunner({
+      processLiveness: {
+        "706": {
+          alive: true,
+          commandLine: "node <repo>/tmp-area/dedicated-run@other/server.js",
+          cwd: "C:/other",
+        },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: boundaryCheck(baseCheck),
+      }),
+      runner,
+    );
+    const reconciliation = readReconciliation(report);
+    expect(reconciliation.permitted).toBe(true);
+    expect(reconciliation.findings).toHaveLength(0);
+    const processEntry = reconciliation.attributionUnknown.entries.find(
+      (entry) => entry.source === "process-liveness",
+    );
+    expect(processEntry?.count).toBe(1);
+    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+  });
+
   test("実経路: 台帳記載所在の実 subtree を cwd とする process は範囲内として未登録拒否を維持する（cwd の逆方向）", () => {
     const baseCheck = verificationResourceCheck();
     const runner = boundaryRunner({
