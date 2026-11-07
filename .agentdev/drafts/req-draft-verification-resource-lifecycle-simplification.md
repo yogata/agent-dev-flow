@@ -23,8 +23,9 @@ summary: >-
   Decision は新規作成しない（DEC-001 決定1〜4・DEC-036 維持分・DEC-038 決定(3)・DEC-048 決定(2)(4) の適用として
   architecture-advisory が2026-11-08に確定。ブロッカー・未決事項なし）。実装層（機械工程の縮小改編、台帳系
   モジュール・テストの撤去、agentdev_gh 両実装の判定内容適合、adapter SKILL 文言、knowledge 返却条件、索引追随）は
-  realization_actions（RA-001〜RA-006）として構造化し、AC-01〜AC-11 と検証方針・判定の原則を test_strategy
-  （TS-001〜TS-012）へ投影した（文言の省略・弱化・反転なし）。
+  realization_actions（RA-001〜RA-006）として構造化し、AC-01〜AC-11 と検証方針・判定の原則・完遂条件を test_strategy
+  （TS-001〜TS-013）へ投影し、REQ-119 系の影響評価（AG-012）と REQ-030-004・019〜021 の投影契約への対応を case_open_hints へ
+  記録した（文言の省略・弱化・反転なし）。
 
 auto_gate:
   auto_ready: true
@@ -103,20 +104,31 @@ agreed_items:
       正式成果物と一時資材の役割分類と証跡保存の維持。正式な成果物（実装、テストコード、必要なテストデータ・期待結果・
       環境再現スクリプト、正式な手順文書）は対象repoに登録して維持し、テスト実行で生成したデータ、clone、検証用remote、
       ログ、専用process等は一時資材として回収対象に分類する。拡張子、testという名前、git追跡済みという事実だけで
-      分類しない。検証の必要な結果（入力、対象版、操作、実結果、失敗、訂正、判定理由）は本体Issue/PRへ保存し、回収した
+      分類しない。検証の必要な結果（入力、対象版、操作、実結果、失敗、訂正、判定理由）は本体Issue/PR（GitHub版・Local版の正規記録を含む）へ保存し、回収した
       一時資材へのアクセスなしで読み戻して理解できる。全生ログ、環境一式、Git bundleを別保管庫へ移して恒久保持する方式は
       採らず、機械判定のためにローカル生ログの永久保持を要求しない。
   - id: AG-010
     content: >-
-      委譲時の副作用境界と許可された一時検証環境の整合。REQ-003 の委譲時の副作用の許可境界について、作業ツリー外変更の
-      禁止は正式な成果物への変更を対象とするものであり、既存の配置規則と権限に従う一時的な検証資材の作成・利用、
-      許可された外部検証環境の使用をそれ自体で禁止しないことを明確化する。必要な副作用が許可範囲を超える場合は、
-      既存の停止・判断経路を利用し、許可範囲を独断で拡張しない。
+      委譲時の副作用境界と許可された一時検証環境の整合。REQ-003-011 の委譲禁止事項「作業ツリー外変更」の禁止は維持したまま、
+      既存の配置規則と権限に従う一時的な検証資材（当該作業が作成した寿命限定の作業専用領域内の資材に限る）の作成・利用・
+      安全な回収、および許可された外部検証環境の使用を、当該禁止の適用から明示的に除外する例外として明確化する。
+      禁止対象を正式な成果物への変更へ限定する読み替えなど、禁止の一般的な縮小は行わない。必要な副作用が例外の範囲を
+      超える場合は、既存の停止・判断経路を利用し、許可範囲を独断で拡張しない。
   - id: AG-011
     content: >-
       実行契約における検証義務・必須手段の保持と未指定手段の裁量。実行契約へ、合意された検証義務、証明水準、権限、
       および利用者等が必須と指定した検証手段を保持する。一方、必須指定のない内部手順や環境の具体化は、許可範囲内で
       実行担当が選べるようにする。現行の検証方法をすべて永久に固定する方針ではない。
+  - id: AG-012
+    content: >-
+      REQ-119 系の影響評価と安全条件の維持。REQ-119-003 のテスト清掃の安全条件（削除対象は自己生成物に限定し、
+      親 .agentdev/tmp 自体は削除しない）は、新方針の安全条件（正式な成果物・必要な証拠・他の作業や利用者が管理する資材の
+      保護）と整合する有効な規律として維持し、撤去・緩和の対象としない。REQ-119-004・005 は完了済みの履歴作業単位として
+      行変更しないが、verification-resource-lifecycle.md の改稿に伴う README 横断 Design 一覧のタイトル列等の索引追随は
+      実装範囲で担う。REQ-119-007 は完了時点の検証（adapter SKILL の作成先文言と当時の Design 正本・作成ヘルパーの機械検査基準との
+      整合）を履歴として維持する。本件は当該前提（作成ヘルパー verification-resources-ledger.ts の evaluateCreationDestination・
+      作成先拒否と旧作成先境界）を撤去するため、adapter SKILL の文言は新Design境界への再整合として実装範囲（RA-004）が
+      引き継ぎ、REQ-119-007 の行自体は履歴記録として改訂しない。
 
 artifact_actions:
   - id: ACT-REQ-001
@@ -142,14 +154,14 @@ artifact_actions:
       | REQ-118-004 | 通常の短命な一時ファイルやディレクトリは、原則として実行環境の標準的な一時領域に作業専用の領域を確保して利用すること。必要な場合は、既存の配置規則と権限に従い、リポジトリ内の作業領域や許可された外部環境を利用できること。具体的なファイル名、作業用ディレクトリ名、削除コマンド、内部的な管理方法を事前に確定することを一律に要求しないこと（AG-003、AG-004） |
       | REQ-118-005 | 利用終了時に不要な資材を回収すること。安全な自動回収は、当該作業が作成した専用資材であることを確認できること、回収対象の範囲を特定できること、正式な成果物、必要な証拠、他の作業や利用者が管理する資材を失わないこと、回収操作が既存の副作用・承認境界に適合することの各条件が成立する範囲に限定すること。回収直前に具体的対象の同一性・範囲を確認し、同名別物、識別子の再利用、共有物、リンク先、正式な成果物と証拠を保護すること。判断できないものは削除しないこと。条件が不明確な既存資材、共有資材、管理者が常備する環境は自動削除しないこと。作業専用一時資材の回収に利用者の都度承認を一律に要求しないこと（AG-005） |
       | REQ-118-006 | 管理者が常備する検証環境は個別作業の終了時に環境全体を削除せず、定められた利用終了・状態復旧・返却条件を満たすこと。新しい外部資材の作成・削除は既存の許可境界に従うこと。引継ぎは、受け手、対象、状態、残る処置、権限と、受領または既存の常設受入条件への適合を確認して成立させること。管理者への通知だけを移転成立と扱わず、管理者の後続処置が残ることと実行担当の返却責任が成立することを区別すること。新しい確認フォームや毎回の人間の応答を一律に要求しないこと（AG-006） |
-      | REQ-118-007 | 検証の必要な結果（入力、対象版、操作、実結果、失敗、訂正、判定理由）は本体Issue/PRへ保存し、回収した一時資材へのアクセスなしで読み戻して理解できること。全生ログ、環境一式、Git bundleを別保管庫へ移して恒久保持する方式を採らないこと。機械判定のためにローカル生ログの永久保持を要求しないこと（AG-009） |
+      | REQ-118-007 | 検証の必要な結果（入力、対象版、操作、実結果、失敗、訂正、判定理由）は本体Issue/PR（GitHub版・Local版の正規記録を含む）へ保存し、回収した一時資材へのアクセスなしで読み戻して理解できること。全生ログ、環境一式、Git bundleを別保管庫へ移して恒久保持する方式を採らないこと。機械判定のためにローカル生ログの永久保持を要求しないこと（AG-009） |
       | REQ-118-008 | 実行担当は、検証結果に加え、必要な後片付けの実施結果、確認根拠、未処理事項を既存の作業記録経路へ返すこと。ADFは、既存の受け入れ評価を通じて、検証義務と後片付け義務の成立を確認すること。実行したという申告だけで、要求された後片付けの成立を認めないこと。確認可能な具体的な資材については、提示された証拠が回収または引継ぎを実際に立証しているかを評価すること。一方、ADFが管理・観測していない任意の資材について、機械的に不存在を完全証明することまでは要求しないこと。証拠不足、回収失敗、引継ぎ不成立、確認不能を区別し、必須条件が未達の場合は完全完了としないこと。中止・失敗・異常終了は既存の停止・再開経路で扱い、作業の中止と後片付けを含む全責任の完遂を混同しないこと。子Issueと親Caseの責任範囲は区別し、親が引き受けた横断的な後処理義務だけを理由に、条件を満たした子Issueの完了を禁止しないこと。終了操作後にしか実施できないADF自身の後処理については、終了前の受理判定と区別し、後処理失敗が残る場合はワークフロー全体の完遂を報告しないこと（AG-007） |
       | REQ-118-009 | 一時資材の作成・回収を実行担当へ委ねる方針に合わせ、すべての検証用一時資材を対象とした詳細台帳、作成操作を制御しない登録処理による機械的作成保証、OS全域のプロセス・待受ポート等の探索、資材名やプロセス属性等からの案件帰属推測、未登録資材の完全検出を前提とする終了拒否、作業専用一時資材への一律の利用者削除承認、および上記の機構を維持するためだけの除外・補正・重複照合処理を、作成・維持しないこと。ただし、ADF自身が管理する資材の回収、外部副作用の権限制御、受け入れ条件に基づく終了操作の機械的な安全境界は維持すること。既存機構の撤去に伴い不要となる文書、参照、状態、試験、実装を整理すること。削除する実装が別の有効な要件を担っている場合は、その責務を失わせず、必要な部分を維持または既存機構へ統合すること。旧機構が存在しないことを理由に、新たな資材管理基盤やOS全域監視を追加しないこと（AG-008） |
 
       ## 適用範囲
 
       - 対象: ADFの管理する作業に伴う一時的な副作用の共通取扱い（後片付け責任の伝達、資材の作成・利用・回収・引継ぎ、常備検証環境の返却、実行結果と回収結果の報告、完了評価との接続、中断・異常終了・回収失敗時の未処理責任の扱い、既存の一時資材管理機構の簡素化・撤去）
-      - 対象外: 完了判定工程での評価条件と終了拒否（case-close実行契約 REQ-032）、worktree構造上の一時ファイル配置分類とworktree削除手順（worktree構造的制約 REQ-018）、検証証跡の必須要素と保存様式の一般契約（REQ-007、REQ-101）、委譲時の判断・承認・副作用の許可境界（REQ-003）、未追跡残存の恒常checkerと承認一覧（自己監査コマンド REQ-010）、検証水準の一般原則（REQ-055）、管理者が常備する検証環境の用意方針（REQ-116）、ADF独自の汎用資材管理基盤の新設、すべてのファイル・ディレクトリ・プロセスの個別登録、OS全域の常時監視や一時資材の完全捕捉、任意の外部コマンドによる全副作用の機械的制御、個々の一時資材のファイル名・作成順序・削除コマンドの固定、ハーネス固有の実装・内部状態管理への介入、新規のGitHubリポジトリ作成操作の追加や既存の書込み制限の緩和、既存の検証義務・証明水準の引下げ、過去に残存した資材の個別削除実行
+      - 対象外: 完了判定工程での評価条件と終了拒否（case-close実行契約 REQ-032）、worktree構造上の一時ファイル配置分類とworktree削除手順（worktree構造的制約 REQ-018）、検証証跡の必須要素と保存様式の一般契約（REQ-007、REQ-101）、委譲時の判断・承認・副作用の許可境界（REQ-003）、未追跡残存の恒常checkerと承認一覧（自己監査コマンド REQ-010）、検証水準の一般原則（REQ-055）、管理者が常備する検証環境の用意方針（REQ-116）、ADF独自の汎用資材管理基盤の新設、すべてのファイル・ディレクトリ・プロセスの個別登録、OS全域の常時監視や一時資材の完全捕捉、任意の外部コマンドによる全副作用の機械的制御、個々の一時資材のファイル名・作成順序・削除コマンドの固定、ハーネス固有の実装・内部状態管理への介入、新規のGitHubリポジトリ作成操作の追加や既存の書込み制限の緩和、既存の検証義務・証明水準の引下げ、今回の再設計と無関係な機能・品質改善、過去に残存した資材の個別削除実行
   - id: ACT-REQ-002
     artifact: req
     operation: update
@@ -159,14 +171,14 @@ artifact_actions:
       REQ-032-043・REQ-032-044 の置換（他行は変更しない。置換後の全文行）:
 
       | REQ-032-043 | case-close は完了判定工程で、当該 Case 実行に伴う一時資材の後片付けの成立を評価すること。評価対象は実行担当が既存の作業記録経路へ返した後片付けの実施結果、確認根拠、未処理事項と提示された証拠とし、確認可能な具体的な資材については提示された証拠が回収または引継ぎを実際に立証しているかを評価すること。評価範囲は一時資材の共通取扱い契約（REQ-118）と実行契約に反映された条件から導出すること。実行したという申告だけを後片付けの成立根拠にしないこと（AG-007、AG-008） |
-      | REQ-032-044 | case-close は、必須の後片付けが未完了・確認不能である場合、または既知の残存、回収失敗、証拠不足、引継ぎ不成立を検出した場合に、完了扱いとしないこと。検証の成功と後片付けの未達を区別して報告し、対応対象、不足事項、再開条件を確認できること。必要な検証結果が本体 Issue/PR へ保存され、確認された一時資材の回収または引継ぎが確認できた場合だけ終了を許可すること。ただし ADF が管理・観測していない任意の資材の不存在を機械的に完全証明することを、終了の条件にしないこと（AG-007、AG-008） |
+      | REQ-032-044 | case-close は、必須の後片付けが未完了・確認不能である場合、または既知の残存、回収失敗、証拠不足、引継ぎ不成立を検出した場合に、完了扱いとしないこと。検証の成功と後片付けの未達を区別して報告し、対応対象、不足事項、再開条件を確認できること。必要な検証結果が本体 Issue/PR（GitHub版・Local版の正規記録を含む）へ保存され、確認された一時資材の回収または引継ぎが確認できた場合だけ終了を許可すること。ただし ADF が管理・観測していない任意の資材の不存在を機械的に完全証明することを、終了の条件にしないこと（AG-007、AG-008） |
   - id: ACT-REQ-003
     artifact: req
     operation: append
     target: docs/requirements/REQ-003.md
     source_items: [AG-010]
     content: |-
-      新要件行（付与番号は保存時の採番規則に従う）: 委譲時の副作用の境界は、正式な成果物への変更を作業ツリー（または当該実行に割り当てられた作業領域）の外へ及ぼすことを禁止するものであり、既存の配置規則と権限に従う一時的な検証資材（当該作業が作成した寿命限定の作業専用領域内の資材を含む）の作成・利用・回収、および許可された外部検証環境の使用をそれ自体で禁止しないこと。安全な回収の条件と配置規則は一時資材の共通取扱い契約（REQ-118）が、許可された外部環境の用意方針は REQ-116 が所有する。必要な副作用が許可範囲を超える場合は、既存の停止・判断経路を利用し、許可範囲を独断で拡張しないこと（AG-010）
+      新要件行（付与番号は保存時の採番規則に従う）: REQ-003-011 の委譲禁止事項「作業ツリー外変更」の禁止は維持すること。ただし、既存の配置規則と権限に従う一時的な検証資材（当該作業が作成した寿命限定の作業専用領域内の資材に限る）の作成・利用・安全な回収、および許可された外部検証環境の使用は、当該禁止の適用から明示的に除外する例外として扱うこと。例外は一時資材の安全条件（REQ-118-005）と許可された外部環境の用意方針（REQ-116）に従い、必要な副作用が例外の範囲を超える場合は、既存の停止・判断経路を利用し、許可範囲を独断で拡張しないこと（AG-010）
   - id: ACT-REQ-004
     artifact: req
     operation: append
@@ -223,19 +235,19 @@ artifact_actions:
 
       ## 実行結果の報告と完了評価
 
-      - 実行担当は、検証結果に加え、必要な後片付けの実施結果、確認根拠、未処理事項を既存の作業記録経路（PR本文、Issue コメント、SSoT コメント等）へ返す
+      - 実行担当は、検証結果に加え、必要な後片付けの実施結果、確認根拠、未処理事項を既存の作業記録経路（PR本文、Issue コメント、SSoT コメント、Local版の正規記録等）へ返す
       - ADFは既存の受け入れ評価（case-close の完了判定）を通じて、検証義務と後片付け義務の成立を確認する。実行したという申告だけで要求された後片付けの成立を認めない。確認可能な具体的な資材については、提示された証拠が回収または引継ぎを実際に立証しているかを評価する
       - ADFが管理・観測していない任意の資材について、機械的に不存在を完全証明することまでは要求しない。証拠不足、回収失敗、引継ぎ不成立、確認不能を区別する
       - 中止・失敗・異常終了は既存の停止・再開経路で扱う。作業の中止と、後片付けを含む全責任の完遂を混同しない。中断前に作成された資材は、取得可能な実行記録や実際の作業状態に基づいて回収の要否を再評価する
       - 子Issueと親Caseの責任範囲は区別する（子の終了判定は子が負う必須条件で判定し、親の横断的後処理義務は Epic または Root Case の最終終了時に評価する。REQ-032-038）
       - 終了操作後にしか実施できないADF自身の後処理（終了判定記録の回収、worktree の削除等）については、終了前の受理判定と区別する。後処理失敗が残る場合はワークフロー全体の完遂を報告しない
-      - 証跡の保存と読み戻し: 検証の必要な結果（入力、対象版、操作、実結果、失敗、訂正、判定理由）は本体Issue/PRへ保存し、回収した一時資材へのアクセスなしで読み戻して理解できることを保存形式の要件とする（REQ-118-007）。全生ログ、環境一式、Git bundleを別保管庫へ移して恒久保持する方式は採らない。機械判定のためにローカル生ログの永久保持を要求しない
+      - 証跡の保存と読み戻し: 検証の必要な結果（入力、対象版、操作、実結果、失敗、訂正、判定理由）は本体Issue/PR（GitHub版・Local版の正規記録を含む）へ保存し、回収した一時資材へのアクセスなしで読み戻して理解できることを保存形式の要件とする（REQ-118-007）。全生ログ、環境一式、Git bundleを別保管庫へ移して恒久保持する方式は採らない。機械判定のためにローカル生ログの永久保持を要求しない
 
       ## 終了操作の安全境界と終了判定記録（維持機構）
 
       - 終了操作の前提条件としての機械受理の判定と、agentdev_gh の issue_close の Tool 境界検証（REQ-052-018）は維持する。機械受理不成立（変更後の正規完了条件の未達）時は終了操作そのものが実行されない（REQ-032-046）
       - 機械工程は終了判定記録を `.agentdev/close-acceptance/issue-{NNNN}.json` へ書き出す。終了判定記録の様式は、対象 Issue 番号、判定対象版（close 時点の対象を識別する版情報）、判定生成時刻、判定内容（変更後の正規完了判定: 必須完了条件の評価結果。旧台帳照合の結果は含まない）を含み、issue_reopen は当該 Issue の終了判定記録を無効化する（過去の合格結果の再利用を許さない）
-      - 終了判定記録もローカル実行環境状態として終了後に回収する。回収結果は報告へ含め、回収失敗はワークフロー全体の完遂から区別して報告する
+      - 終了判定記録は終了操作に必要な期間保護し、終了後にローカル実行環境状態として回収する。回収結果は報告へ含め、回収失敗はワークフロー全体の完遂から区別して報告する
       - 生gh WRITEの迂回は既存のPlugin/Hook guard（gh-write系、REQ-052-002）が担う。同一マシン上の呼出元による終了判定記録の偽造防止は本契約の対象外（事故的迂回と規律欠落の抑止を対象とする）
       - 一般的な未追跡・状態記録検査（REQ-032-042 の状態記録コミット済み検証・未追跡残存検査、REQ-010-084 の承認一覧付き恒常checker）は別責務として維持し、本変更で撤去しない
       - remote 上の対象の不存在判定で HTTP 404 単独で判断せず、認証・可視性・対象 ID を確認する規律（REQ-032-045）は維持する
@@ -293,7 +305,36 @@ artifact_actions:
     target_area: "### full integrity suite 実行と tmp 残存確認"
     source_items: [AG-007, AG-008]
     content: |-
+      ### full integrity suite 実行と tmp 残存確認
+
+      - full integrity suite 実行（QG-4 合格基準）: bun test 実行形態は 3 cwd 分割正規形に従う（① integrity suite、② src 側 skill script テスト、③ repo ルート系 guard テストの3分割。各実行の cwd はリポジトリルートに統一、`./` prefix 付きの対象ディレクトリ明示指定、分割② 前の依存パッケージ前置、N/M 件数突合、固定値の期待値化なし、カレントディレクトリトリビアな実行の禁止）。実行形態契約の正は agentdev-quality-gates Design「full integrity suite 合格基準（QG-4）における bun test 実行形態契約」と同スキル references/qg-4-final-acceptance.md が所有する
+      - 配布物変更を含む case の3検査結果確認: case-close の最終 gate で配布物変更を含む case を検証する場合、配布依存境界・IR-055・traceability の3検査の実行結果（case-run での commit 前実行記録）を確認する。case-run で3検査が実行されていない配布物変更を検出した場合は、検査を実行して新規違反 0 件を確認してからマージに進む。base 既知違反と新規違反の分離突合を省略せず、baseline 既知違反の無断削除・隠蔽を受け入れない
+      - tmp 残存確認: 単一 Issue ルートの正常終了を前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないことをクリーンアップ工程で確認する。Epic Wave ルートでは、当該 Wave スコープの一時成果物（draft、RU、検出事項等の未消化ドメイン状態）の残留と `.agentdev/tmp/` 一時ファイルの残存がないことを確認し、残留時は当該 Wave を完了扱いにしない
       - 一時資材の後片付けの評価: 完了判定工程は、当該 Case 実行に伴う一時資材の後片付けの成立を、実行担当が作業記録経路へ返した実施結果、確認根拠、未処理事項と提示された証拠に基づいて評価する。評価範囲は一時資材の共通取扱い契約（REQ-118）と実行契約に反映された条件から導出し（REQ-032-043）、実行したという申告だけを成立根拠にせず、確認可能な具体的な資材については提示された証拠が回収または引継ぎを実際に立証しているかを評価する。必須の後片付けが未完了・確認不能である場合、既知の残存、回収失敗、証拠不足、引継ぎ不成立を検出した場合は完了扱いとせず、検証の成功と後片付けの未達を区別して報告する（REQ-032-044）。ただし ADF が管理・観測していない任意の資材の不存在を機械的に完全証明することを終了の条件にしない。remote 上の対象の不存在判定は HTTP 404 単独で行わず、認証・可視性・対象 ID を確認しても判断できない場合は終了を拒否する（REQ-032-045）
+
+      #### 保存済み検証証跡の解析と再実行条件の適用
+
+      - 検証結果の件数、失敗明細、サマリーの表示変更は、保存済み証跡（退避ファイル、PR 本文検証差分セクション、SSoT コメント）から行う。同一情報の取得だけを目的とした full suite や checker の再実行をしない（REQ-007-014）
+      - 再実行の正当理由（変更後検証、環境変更、失敗由来分類、非決定的失敗の再現確認、必須独立検査、証跡欠落）と証跡の必須要素の正は agentdev-quality-gates Design「QG-4 検証証拠の再利用と再実行条件」が所有し、本 Design は再規定しない
+      - close の最終検証（full integrity suite、配布物変更を含む case の3検査結果確認、QG-4 checker 実測）は origin/main 取り込み済み・マージ直前の branch HEAD で実行する既存契約を維持し、case-run の保存結果だけによる省略を行わない。verify-only closure の SSoT コメント参照判定も維持する
+      - textlint 共通基盤によるファイル単位結果の再利用（同一性条件付きの規則実行省略）は検査基盤内部の実行形態であり、close の最終検査の実行義務の省略を構成しない。close の最終検査は対象全件の列挙・全文取得と現在入力との照合を伴う検査基盤の実行を毎回行い、その内部で同一性が機械検証できた対象の規則実行省略が許容される
+
+      #### verify-only closure の QG-4 達成判定（SSoT コメント参照）
+
+      verify-only closure（PR も carrier commit も存在しない Issue 完了）の QG-4 達成判定では、
+      case-run が記録した SSoT コメント（Issue コメント）を実行コマンド列・検証結果の
+      判定根拠として参照する。PR が存在しないため PR 本文の検証差分セクションは存在せず、
+      SSoT コメントが検証証跡の恒久記録の正となる。
+
+      - 参照手順: SSoT コメントから (1) 3検査（配布依存境界・IR-055・traceability）の実行記録と
+        新規違反 0 件確認、(2) integrity suite の N/M 件数突合と直前実績比較、(3) 実行コマンド列の
+        再実行可能性（実行 cwd・実行形態の記載）を確認する
+      - 完了抑止: SSoT コメントが存在しない verify-only closure、または SSoT コメントに
+        検証結果の記載が欠落している場合は QG-4 不合格として完了扱いにしない
+      - capture 回収の N/A: verify-only closure では PR 本文が存在しないため
+        capture 回収（REQ-032-005 の PR 本文入力源）は N/A とする。SSoT コメントを
+        capture 入力源として扱わない（SSoT コメントは検証証跡チャネルであり
+        capture チャネルではない）
   - id: ACT-DESIGN-004
     artifact: design
     operation: update
@@ -315,6 +356,16 @@ artifact_actions:
     target_area: "## 受け入れ義務の実行構成への投影完全性（REQ-061-041/042、REQ-017-021〜023、RU-20261004-08）"
     source_items: [AG-003, AG-011]
     content: |-
+      ## 受け入れ義務の実行構成への投影完全性（REQ-061-041/042、REQ-017-021〜023、RU-20261004-08）
+
+      Definition 受入と実行構成確定における受け入れ義務保存の実行時投影。
+
+      - 設計PR受入の忠実性確認は、req-define での最新合意内容との照合を含む。必須受け入れ義務の欠落・縮小・反転を検出した場合は merge しない。
+      - 実行契約・実行構成の確定時、対象要件行と受け入れ義務が各実行単位（Standard Case では対象 Case、Epic では各 Child 実行単位または Epic 横断最終検証義務）のいずれかに対応付けられていることを確認する。対応先のない義務が存在する場合は投影不完全として実行準備完了（ready 遷移）としない。
+      - 完了条件は各条件について検証義務（何を証明するか、どの範囲で成立するか、いかなる反例で不合格か）と検証手段（具体的なテスト・コマンド等）を区別して Issue 本文へ確定する。
+      - 実行契約を生成した合意の変更が発生し影響する場合は、当該実行契約への反映と読み戻し確認が成立するまで、旧実行契約に基づく新規 dispatch または最終受け入れを行わない。
+      - Case / Issue / PR 本文の書込み前に、適用対象の workflow extension rules を解決・適用する必須前置工程を持つ（REQ-017-024）。投稿後の検査を前置規律の代替にしない。
+
       - 完了条件・実現方針への投影は、合意された検証義務、必要な証明水準、権限、および利用者等が必須と指定した検証手段を保持する。必須指定のない内部手順や検証環境の具体化は、許可範囲内で実行担当が選択できる裁量として扱い、実行契約で固定しない（REQ-017 の新要件行、RU-0270）
       - 予見された検証環境の必要条件（環境の種別、検証範囲、利用上の制約、後片付け責任）は、通常と異なる環境を必要とする Case で完了条件・実現方針へ反映する。通常の小規模変更に特殊な検証環境の計画や管理記録を一律に要求しない（RU-0270）
 
@@ -350,9 +401,11 @@ conflict_resolutions:
       REQ-003-011 の委譲禁止事項「作業ツリー外変更」と、許可された一時検証環境（標準一時領域、repo内作業領域、
       許可された外部環境）の使用の解釈の衝突。
     resolution: >-
-      禁止対象は正式な成果物への変更であることを明確化する新行を REQ-003 へ追加する。advisory 推定事項1
-      （DEC-039 の authority 格子との整合）を踏まえ、裁量の対象を既存の配置規則と権限に従う寿命限定の作業専用領域内の
-      資材に限定する文言とし、必要な副作用が許可範囲を超える場合は既存の停止・判断経路を利用する（RU 対象表 REQ-003 行）。
+      REQ-003-011 の禁止は文言どおり維持し、禁止の一般的縮小（禁止対象を正式な成果物への変更へ限定する読み替え）は
+      行わない。既存の配置規則と権限に従う寿命限定の作業専用領域内の資材の作成・利用・安全な回収と許可された外部検証環境の
+      使用のみを、当該禁止の適用から明示的に除外する例外として新行で正規化する（advisory 推定事項1の DEC-039 authority 格子との
+      整合を踏まえ、例外対象を当該作業が作成した寿命限定の専用資材に限定する）。例外の範囲を超える副作用は既存の停止・判断経路を
+      利用する（RU 対象表 REQ-003 行。整合確認の範囲内での補完であり、RU の承認範囲を超えない）。
 
 operation_units:
   - ou_id: OU-001
@@ -486,7 +539,8 @@ test_strategy:
       変更対象の REQ・Design・Skill・Script・Tool・試験・参照関係を照合し、旧機構（詳細台帳、作成時機械登録と作成先拒否、
       OS全域走査、帰属推測、未登録完全検出前提の終了拒否、一律の利用者削除承認、維持のためだけの除外・補正・重複照合）の
       実行経路と参照残存を機械的検索（rg 等）で確認する。検索の網羅範囲は docs/（docs/reports/ は履歴記録領域として除外）、
-      src/、.opencode/、traceability/ とし、修正対象列挙と一致させる（See Also 等の参照行は検出対象外と明示する）。
+      src/、.opencode/、traceability/ とする。See Also 等の参照行を検出対象から除外せず、廃止した契約・旧機構への参照は
+      参照行を含めて検出し修正対象とする。網羅範囲と修正対象列挙の一致確認は、参照行を修正対象に含む構成で実施する。
       さらに GitHub版・Local版のうち影響を受ける正規終了経路で、必須条件未達時の終了拒否と条件成立時の正常終了を実行確認する。
       各証拠の対象版・入口・受渡し・証明範囲を照合し、未観測部分は未確認として扱う（AC-09）。
     pass_criteria: |-
@@ -534,6 +588,18 @@ test_strategy:
       必須条件に未達や証拠不足が残る場合は全体完遂としないこと。
     on_failure: |-
       fix-and-reverify。
+  - id: TS-013
+    target_item: AG-008
+    verification: |-
+      TS-001〜TS-012 の判定結果（AC-01〜AC-11 の評価）、関連する既存 REQ・Design・実行契約・実装の整合確認、および
+      旧機構の正規利用経路からの撤去確認（TS-009）を統合し、RU-0270 の完遂条件を単一の完遂判定として確認する
+      （RU 完遂条件節。一部の成功だけでは完遂としない判定を含む）。
+    pass_criteria: |-
+      「AC-01〜AC-11 の要求範囲が必要な証拠で確認され、関連する既存 REQ・Design・実行契約・実装の整合が成立し、
+      不要な旧機構が正規利用経路から撤去された状態」が全て成立すること。機能の追加、旧機構の撤去、委譲契約の更新、
+      個別試験の成功のいずれか一つだけでは完遂としないこと。
+    on_failure: |-
+      fix-and-reverify。未達要素を特定して修正・再検証したうえで、完遂判定をやり直す。
 
 realization_actions:
   - id: RA-001
@@ -559,7 +625,9 @@ realization_actions:
       verification-resource-reclamation.ts、deletion-confirmation.ts と、それぞれのテスト（verification-resources-ledger.test.ts、
       verification-resource-register.test.ts、verification-resource-reclamation.test.ts、deletion-confirmation.test.ts）を撤去する。
       撤去した実装が別の有効な要件を担う部分（REQ-118-003 の役割分類に関わる検査等）は維持または既存機構へ統合する。
-      台帳格納領域（.agentdev/tmp/verification-resources/）の残存状態の整理を含む。
+      REQ-119-003 のテスト清掃の安全条件（削除対象は自己生成物に限定し、親 .agentdev/tmp 自体は削除しない）は維持し撤去対象と
+      しない。REQ-119-007 が前提とした作成ヘルパー（verification-resources-ledger.ts の evaluateCreationDestination と旧作成先境界）の
+      撤去を明示する。台帳格納領域（.agentdev/tmp/verification-resources/）の残存状態の整理を含む。
     ownership_hints:
       - src/common/skills/agentdev-workflow-case-close/scripts/src/verification-resources-ledger.ts
       - src/common/skills/agentdev-workflow-case-close/scripts/src/verification-resource-register.ts
@@ -569,7 +637,7 @@ realization_actions:
       - src/common/skills/agentdev-workflow-case-close/scripts/tests/deletion-confirmation.test.ts
     intent: RU-0270 5.6（撤去対象の機構と維持のためだけの処理の除去）の実現面。
     verification_refs: [TS-009]
-    source_items: [AG-008]
+    source_items: [AG-008, AG-012]
   - id: RA-003
     concern: agentdev_gh issue_close 前提検証の判定内容適合（GitHub版・Local版）
     responsibility: >-
@@ -598,8 +666,10 @@ realization_actions:
       - src/common/skills/agentdev-case-run-execution-adapter/SKILL.md
       - docs/designs/workflows/v4-delegation-contracts.md
     intent: AC-01（委譲先への義務伝達）の実現面。REQ-119 の知見（実装境界変更時の文言整合の対象一覧化）を適用する。
+      REQ-119-007 の文言整合義務（adapter SKILL の作成先文言と Design 正本・作成ヘルパーの機械検査基準との整合）は、
+      本件が当該ヘルパーと旧作成先境界を撤去するため、新Design境界への再整合として本アクションが引き継ぐ。
     verification_refs: [TS-001, TS-003]
-    source_items: [AG-001, AG-010]
+    source_items: [AG-001, AG-010, AG-012]
   - id: RA-005
     concern: 常備検証環境の返却条件の文書整合
     responsibility: >-
@@ -617,7 +687,8 @@ realization_actions:
       REQ-118 の frontmatter title 変更に伴う README 索引（AUTOGEN）の再生成、docs/designs/README.md 横断 Design 一覧の
       タイトル列更新（verification-resource-lifecycle.md の H1 変更に伴う）、verification-resource-lifecycle.md ヘッダの
       ADF-COVERS 宣言ブロックの更新（design 対応 REQ-118-001〜009 の維持、implementation covers REQ-119-004 の履歴対応としての
-      整理。inline と sidecar の両方向一致の維持）、撤去テストの削除と維持テストの整理を行う。
+      整理。inline と sidecar の両方向一致の維持）、撤去テストの削除と維持テストの整理を行う。REQ-119-004・005 は完了済みの
+      履歴作業単位として行変更しないが、当該索引追随は本アクションが担う。
     ownership_hints:
       - docs/requirements/REQ-118.md
       - docs/designs/README.md
@@ -627,7 +698,7 @@ realization_actions:
       - traceability/
     intent: 撤去に伴う参照・索引の整理（RU 5.6）と AC-09（参照残存なし）の実現面。
     verification_refs: [TS-009]
-    source_items: [AG-008, AG-009]
+    source_items: [AG-008, AG-009, AG-012]
 
 review_dispositions:
   - id: RD-001
@@ -650,7 +721,8 @@ review_dispositions:
     reason_code: adopted
     reason: |-
       AC-01〜AC-11 を TS-001〜TS-011 へ、検証方針と判定の原則（not applicable の限定、3類型と2版の組合せ抑制、証拠の回収前
-      保存と正規記録からの読み戻し、RU-0254 の別在庫扱い）を TS-005・TS-009・TS-010・TS-012 へ投影した。
+      保存と正規記録からの読み戻し、RU-0254 の別在庫扱い）を TS-005・TS-009・TS-010・TS-012 へ、完遂条件（一部成功では完遂と
+      しない判定を含む）を TS-013 へ投影した。
     evidence:
       path: .agentdev/backlog/req-units/RU-0270.md
       section: 決定的受け入れ条件
@@ -685,6 +757,21 @@ review_dispositions:
       section: 依存関係
       checked_at_commit: null
     related_removed_items: []
+  - id: RD-005
+    source_ru: RU-0270
+    source_item: "対象（主な変更対象候補: REQ-119-003〜005・007）"
+    disposition: covered
+    reason_code: adopted
+    reason: |-
+      REQ-119-003 のテスト清掃の安全条件（自己生成物限定削除・親 .agentdev/tmp 保護）は維持し撤去対象としない。
+      REQ-119-004・005 は履歴作業単位として行変更せず、索引追随を実装範囲（RA-006）で担う。REQ-119-007 は完了時点の検証を
+      履歴として維持し、本件が撤去する作成ヘルパーと旧作成先境界に対する adapter SKILL 文言の再整合を RA-004 が引き継ぐ。
+      行自体は改訂しない（AG-012）。
+    evidence:
+      path: docs/requirements/REQ-119.md
+      section: 要件
+      checked_at_commit: null
+    related_removed_items: []
 
 assembly_evidence:
   - target_file: docs/requirements/REQ-032.md
@@ -699,12 +786,12 @@ assembly_evidence:
   - target_file: docs/requirements/REQ-032.md
     target_content_sha256: 09e442216050bf9e57e2f91956321217bf02f930a1bcab8a0ed8fa15dfcc76d0
     check_scope: { heading: "## 要件", start_line: 15, end_line: 65 }
-    execution_conditions: { operation: replace, edit_sha256: 71463df10ac7be829437cd48e38f2ef79ed7dd9fc67206d0caa331b3ec00595a, expected_old_count: 1 }
+    execution_conditions: { operation: replace, edit_sha256: c29f2d2c7cc4c0a4e513ffe6a99dab0f415d8a50f88d71ee50c58d930e2990c2, expected_old_count: 1 }
     checker: { name: assemble-draft-section, version: 0.2.0, settings: { heading_match: exact-after-normalization, old_text_count_check: true } }
     result_affecting_references: { heading_match_rule: "search-target-area.ts compatible: normalizeTargetArea + exact match only + code-fence-aware scan", scan_scope: "target section only" }
     checks_summary: { pre: { count: 3, all_ok: true }, post: { count: 3, all_ok: true } }
     diff_compact: { changed_lines_count: 1, added: 1, removed: 1 }
-    executed_at: "2026-11-07T17:07:34.685Z"
+    executed_at: "2026-11-07T17:33:12.210Z"
   - target_file: docs/designs/workflows/v4-delegation-contracts.md
     target_content_sha256: 024f718c2067f2e8674c68346210559547b19d341c5a31d222fcbf92966bb90e
     check_scope: { heading: "### 検証用一時資材の作成・報告義務", start_line: 86, end_line: 93 }
@@ -717,12 +804,12 @@ assembly_evidence:
   - target_file: docs/designs/commands/case-close.md
     target_content_sha256: 286bc26e94eb96471787539839ad04165f746a629b1427663b2f54c2c5dff153
     check_scope: { heading: "### full integrity suite 実行と tmp 残存確認", start_line: 157, end_line: 187 }
-    execution_conditions: { operation: replace, edit_sha256: 01defc8d566782ee6c580fb97cb6c2b44254a443efbd6e6212d0dee8bd91fe11, expected_old_count: 1 }
+    execution_conditions: { operation: replace, edit_sha256: 374c6b4f2708a71c5d05fd15c9e06b4c92c8fea375be04fb263e86ea471d2e9c, expected_old_count: 1 }
     checker: { name: assemble-draft-section, version: 0.2.0, settings: { heading_match: exact-after-normalization, old_text_count_check: true } }
     result_affecting_references: { heading_match_rule: "search-target-area.ts compatible: normalizeTargetArea + exact match only + code-fence-aware scan", scan_scope: "target section only" }
     checks_summary: { pre: { count: 3, all_ok: true }, post: { count: 3, all_ok: true } }
     diff_compact: { changed_lines_count: 1, added: 1, removed: 1 }
-    executed_at: "2026-11-07T17:07:34.849Z"
+    executed_at: "2026-11-07T17:29:14.930Z"
   - target_file: docs/designs/responsibilities/custom-tool-contracts.md
     target_content_sha256: 4c289220b5e7a25e1c9618a4a313144c0438f3cbe0e541be5907e156a04e53d3
     check_scope: { heading: "### issue_close の終了前提（Case Issue）", start_line: 103, end_line: 107 }
@@ -735,12 +822,12 @@ assembly_evidence:
   - target_file: docs/designs/commands/case-ready.md
     target_content_sha256: ad4ee010fe2a9f733419dfbfdfea1648fb3e4035b092b38fb4b707f067260050
     check_scope: { heading: "## 受け入れ義務の実行構成への投影完全性（REQ-061-041/042、REQ-017-021〜023、RU-20261004-08）", start_line: 69, end_line: 78 }
-    execution_conditions: { operation: append, edit_sha256: 4c61789b00c3daa6600165f234b8d0d1fed445c3bbabb1d7bd1b66d6727bdeba, expected_old_count: null }
+    execution_conditions: { operation: append, edit_sha256: 796d8584e5325de040075a1708ca8211a53452de8f254fd478338217afe33225, expected_old_count: null }
     checker: { name: assemble-draft-section, version: 0.2.0, settings: { heading_match: exact-after-normalization, old_text_count_check: true } }
     result_affecting_references: { heading_match_rule: "search-target-area.ts compatible: normalizeTargetArea + exact match only + code-fence-aware scan", scan_scope: "target section only" }
     checks_summary: { pre: { count: 2, all_ok: true }, post: { count: 2, all_ok: true } }
-    diff_compact: { changed_lines_count: 3, added: 3, removed: 0 }
-    executed_at: "2026-11-07T17:07:35.010Z"
+    diff_compact: { changed_lines_count: 4, added: 4, removed: 0 }
+    executed_at: "2026-11-07T17:32:53.447Z"
 
 case_open_hints:
   epic_needed: true
@@ -749,11 +836,15 @@ case_open_hints:
     一体適用する（REQ-032-043/044 の新評価条件は REQ-118 の共通取扱い契約を評価範囲の導出元として参照し、委譲契約節は
     再構成後の Design を所有契約の正として参照するため、OU-002/OU-003 は OU-001 に必須依存する）。custom-tool-contracts.md
     の更新は OU-002 と同じ完了判定系の関心として同時に適用する。実装層（RA-001〜RA-006）は Definition 確定後の子 Issue 群へ
-    構成する。実経路検証（TS-001〜TS-012、AC-01〜AC-11・3類型・2版）は最終段で実行する。
+    構成する。実経路検証（TS-001〜TS-013、AC-01〜AC-11・3類型・2版）は最終段で実行する。本 draft の case-open による投影は、
+    REQ-030-004（合意済み入力の反映）と REQ-030-019〜021（必須受け入れ義務の欠落・縮小・反転の排除、元の義務の意味・評価範囲・
+    禁止事項の保持、投影不備の正規差し戻し）の投影契約に従う。投影義務の対象集合は AG-001〜AG-012、TS-001〜TS-013、完遂条件
+    （AC-01〜AC-11 の必要な証拠での確認・関連正規成果物の整合・旧機構の正規利用経路からの撤去の全成立）であり、
+    対応付けられない義務は投影不完全として扱う。
   wave_hints:
     - "Wave 1: 規範・Design 一括適用（OU-001〜OU-004、単一設計PR）"
     - "Wave 2: 実装・試験（RA-001〜RA-006: 機械工程の縮小改編、台帳系モジュールとテストの撤去、agentdev_gh 両実装の判定内容適合、adapter SKILL と委譲文言の再整合、knowledge 返却条件、索引・frontmatter・covers の追随）"
-    - "Wave 3: 実経路検証と完了評価（TS-001〜TS-012。AC-05 は隔離環境の準備状況で当該検証のみ blocked 保留可）"
+    - "Wave 3: 実経路検証と完了評価（TS-001〜TS-013。AC-05 は隔離環境の準備状況で当該検証のみ blocked 保留可）"
 ```
 
 # summary
@@ -765,3 +856,5 @@ Decision は新規作成しない。architecture-advisory（2026-11-08）は、�
 adversarial-review（2系統の独立チャレンジ、convergence audit 実施）は本質的破綻を検出せず、追加実測（REQ-118 行IDの外部参照の機械検査）は docs 側が改稿対象2ファイルに閉じ、src 側が撤去・改編対象テストに閉じることを確認した（TS-009・RA-006 で完了後に検証）。Jev 先行評価2件（既存REQ照合判断・要件展開の最終分類、観測 20261107T164558Z-90ac・20261107T165121Z-8a79）はいずれも呼出側の最終判断と一致した（boolean 3件のみ意味判断で是正し差異理由 semantic_disagreement を記録済み）。
 
 重要変更の通知記録: 本 draft は既存正規成果物（REQ-118、REQ-032-043/044、REQ-003、REQ-017、Design 5件）への重要変更を含む。変更の理由・内容・影響は RU-0270（2026-11-08 利用者承認済み）の主な変更対象候補表と要件化の方向に由来し、利用者が当該変更の意味を保存前に承認済みであることは RU 本文の依存関係節・Source Summary の正規記録から確認できる。実行上の事前通知（保存前の実行出力）は本実行では完了報告の提示段階（保存後）の出力となったため、ここにその旨を記録する（保存後の初回提示を事前通知として扱わない規律どおり、事前通知の代替とはしない）。未決のまま残る影響: なし（advisory ブロッカーなし、auto_gate の unresolved なし）。
+
+監督による定義案忠実性ゲートの指摘（2026-11-08）に基づく修正記録: (1) TS-009 の検出範囲から See Also 参照行の除外を撤回し、廃止した契約・旧機構への参照は参照行を含めて検出・修正対象とした。(2) ACT-DESIGN-003・ACT-DESIGN-005 の content を対象節の全文へ修正した（REQ-030-024 準拠。既存規定は対象ファイルからの機械合成で保持し、合成結果との機械照合で転記ドリフト（「配布依頼境界」→「配布依存境界」1件）を検出・修正済み）。組立検査は case-close を全文置換（replace）で、case-ready を追加差分（append。全文 content と対象ファイルからの機械合成結果の一致を別途機械照合で確認済み）で検証した。(3) REQ-118 適用範囲（対象外）へ「今回の再設計と無関係な機能・品質改善」を追加した。(4) REQ-119-003〜005・007 の扱いを AG-012・RD-005・RA-002/004/006 で明示した。(5) REQ-003-011 の「作業ツリー外変更」の禁止を維持したまま、寿命限定の作業専用領域等を明示的例外とする構成へ修正した（禁止の一般的縮小は行わない）。(6) 完遂条件を TS-013 で単一追跡可能とし、Local版の正規記録を保存先に明記し、終了判定記録の期間保護を明記し、REQ-030-004・019〜021 の投影契約への対応を case_open_hints へ記録した。修正後に組立検査（該当3操作）・読み戻し完結性確認・adversarial 再確認を実施した。
