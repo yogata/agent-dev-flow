@@ -11,30 +11,6 @@
 
 ## 検出事項リスト
 
-### FD-01: Design frontmatter updated 鮮度違反 5件（IR-072 機械 NG・新規 delta 確認済み）
-- id: FD-01
-- category: DRIFT（Design frontmatter 鮮度・IR-072）
-- target: `docs/designs/commands/case-auto.md:5`、`docs/designs/commands/case-run.md:5`、`docs/designs/commands/req-define.md:5`、`docs/designs/workflows/v51-phase-transition-and-coexistence-model.md:5`、`docs/designs/workflows/verification-resource-lifecycle.md:5`
-- evidence: check_integrity.ts（IR-072）の新規 unmanaged NG 5件。commit diff で5件とも frontmatter のみでない実質内容変更を確認: (a)(b) case-auto/case-run は 17f61810d（2026-11-04）が「採用規約の解決の実行経路接続（REQ-104）」節を実質追加、(c) req-define は同 commit が同題の節を実質追加、(d) v51 は 877a25d80（2026-11-05）が「実行接続の実装所在（反映確認）」段落を実質追加、(e) verification-resource-lifecycle は 5ff18764e（2026-11-07）が2 bullet を実質改訂。frontmatter updated はいずれも旧（2026-10-24 / 2026-10-24 / 2026-11-02 / 2026-11-04 / 2026-11-06）
-- severity: medium
-- confidence: high
-- source_of_truth: `docs/designs/integrity/rules/IR-072-req-updated-freshness.md`（Design ファイルも同一基準検査と明文化）
-- recommended_route: docs-check（updated を最終内容変更 commit 日〔author date〕へ機械的進行。metadata のみの変更で意味変更なし）
-- ng_classification: 今回修正対象
-- notes: commit 6ed481996（2026-11-05）が同種是正を他4ファイル（case-close・req-health-metrics・custom-tool-contracts・v4-delegation-contracts）へ適用済みで、本5ファイルが追随漏れ。REQ-117-011 計測日収束 step の trigger 条件の検討材料（観察記録 O5 と関連）
-
-### FD-02: docs/designs/README.md 横断 Design 一覧への verification-resource-lifecycle 行欠落
-- id: FD-02
-- category: README 索引診断（Design status 追跡情報源の網羅性）
-- target: `docs/designs/README.md`（横断 Design 一覧表・該当行不存在）/ `docs/designs/workflows/verification-resource-lifecycle.md`（未登録実体）
-- evidence: grep で designs/README.md に verification-resource-lifecycle 表記は0件。同表の該当領域は v51-phase-transition で終わり、window 内新規作成（2026-11-05、c4780cd28）の本 Design が未登録。README 自身の規定「新規 Design の保存完了直後に該当一覧表へ行を登録する。登録漏れを docs-check で検出する」「本ファイルが Design status を視認する単一の追跡情報源」に反し、`status: draft`（当該ファイル :3）が status 追跡から漏れる。親の機械検証（リンク切れ0件）は行欠落を捉えない（逆方向の不整合）
-- severity: medium
-- confidence: high
-- source_of_truth: docs/designs/README.md「Design status 追跡情報源」「新規 Design 追加時の index 登録手順」
-- recommended_route: intake（横断 Design 一覧へ行追加。FD-04 の昇格判断と同一 wave で実施推奨）
-- ng_classification: 今回修正対象
-- notes: docs-check の未登録 Design 検出が本パターン（workflows/ 直下・表行欠落）を捉えなかった経緯は docs-check 検出ルール強化候補（STEP-3-2 route 候補に記載）
-
 ### FD-03: draft Design への現行権威指定（v5 採用規約機構）
 - id: FD-03
 - category: Design 意味診断（draft status の権威参照）
@@ -70,18 +46,6 @@
 - recommended_route: intake（現行根拠 REQ-031-029 への参照差し替え、または REQ-006-021 の移転先〔REQ-030-011〕とともに歴史痕である旨を明記。削除のみは変更経緯の追跡性を損なうため非推奨）
 - ng_classification: pre-existing（2026-08-20 commit 5111aac36 由来、delta 外）
 - notes: 同一ファイルの REQ-006-105〜108 引用群は現行実在行への有効引用で誤検出対象外
-
-### FD-06: REQ-006-021 変更経緯注記（低優先）
-- id: FD-06
-- category: REQ 参照ID整合性（変更経緯注記）
-- target: `docs/designs/workflows/capture-boundaries.md:63,98`
-- evidence: 「case-close への委譲を廃止（REQ-006-021）」。REQ-006-021 は不存在（FD-05 と同根拠）だが、こちらは変更経緯の注記として文脈が自然で、当該規約の現行の正は REQ-030-011（docs/requirements/REQ-030.md:30。REQ-006-021 改訂内容と同一文の分割移転先、実在確認済み）として追跡可能
-- severity: low
-- confidence: high（不存在事実）/ low〜medium（要更新度）
-- source_of_truth: docs/requirements/REQ-030.md:30（REQ-030-011）
-- recommended_route: no-action（任意。REQ-030-011 への追従参照併記または現状維持）
-- ng_classification: pre-existing
-- notes: 歴史注記様式として許容範囲の可能性が高い。FD-05 対応時に同時検討
 
 ### FD-07: AG-00x 一時識別子の名前空間衝突（REQ本文中の参照が正規コーパス上で解決不能・誤解可能）
 - id: FD-07
@@ -191,17 +155,6 @@
 - ng_classification: pre-existing（低優先度の今回修正対象候補）
 - notes: フロー説明に必要な要約範囲の解釈（guide として許容される要約粒度の規則）は文書化されていない
 
-### FD-16: 配布参照境界 — phase-transition skill scripts 内の内部 ID 言及
-- id: FD-16
-- category: 配布物整合性（配布参照境界・ID 汚染）
-- target: `src/common/skills/agentdev-workflow-phase-transition/scripts/lib/identity.ts:4`
-- evidence: check_distribution_boundary.ts の機械 failure 1件（baseline 未管理）: コメント行「* read-side check target (REQ-111-023): this module never writes it.」が `REQ-111` 具体IDを含む。同 skill は skill-projection-manifest の projection 対象（consumer から視認可能）。REQ-111-023 は実在行（docs/requirements/REQ-111.md:38・遷移後の現在工程の特定・再開の照合義務）でコメント文意自体は健全。配布物は AgentDevFlow 利用者が読む成果物であり内部 ID は記述しない原則（req-structure-review 配布物 ID 汚染検出）に触れる
-- severity: medium
-- confidence: high（機械的一意判定）
-- source_of_truth: check_distribution_boundary.ts（機械検査 owner）・distribution-targets.yaml、REQ-111-023
-- recommended_route: intake（コメントを機能的記述〔「遷移記録復元前の identity 照合の検査対象」等〕へ置換、または IR-059 系 baseline への登録判断。実装 Case での修正が軽微）
-- ng_classification: 今回修正対象候補（commit dac7852b3、2026-11-04、delta window 内の新規導入）
-
 ## 推奨アクション
 
 - req-define入力案: 6件（FD-03〔昇格判断〕・FD-04〔昇格判断〕・FD-07〔AG 使用規約 REQ 化〕・FD-08〔RA-005 参照解決〕・FD-09+FD-10〔実行義務 REQ 型定義〕・FD-13〔guide 所有層の裁定〕）
@@ -257,3 +210,10 @@
 - docs-check の bun test 全件実行と件数突合（docs-check コマンド自体の STEP-1 gate。本診断は機械候補収集のみに限定）
 - .agentdev/ 配下の運用記録・状態（intake/learning/RU の処理は inspect-docs の禁止事項。STEP-3-3 で存在確認のみ）
 - 前回までの inbox 16件の処理・再分類（親 orchestrator が所有）
+
+## 処理記録（2026-11-07 inspect-promote、backlog-auto stage 2 inspect 系統、--auto なし）
+
+- promote 3件（FD-01・FD-02・FD-16。全件自律確定、HITL 対象なし・破壊的変更なし）→ `.agentdev/inspect/promoted/finding-20261107-docs-mechanical-fixes.md` へ原状保存・本ファイルから削除。根拠: FD-01 は IR-072 triage_action（updated を最終内容変更 commit 日〔author date〕へ機械的進行）の決定的適用で修正方向一意〔対象5ファイルの frontmatter updated 乖離を現物確認済み・commit 6ed481996 が同種是正の前例〕、FD-02 は designs/README.md「新規 Design 追加時の index 登録手順」への現行違反で登録内容様式も同規定が確定〔verification-resource-lifecycle 表記 0件を現物確認済み・行登録は昇格判断に依存しない〕、FD-16 は check_distribution_boundary 機械 failure 1件（baseline 未管理）の現行違反で修正方向の2択〔機能的記述への置換 or IR-059 系 baseline 登録〕を IDX-04 前例〔2026-10-27 promote〕に倣い promoted 成果物側に未決の実装判断として記載
+- reject 1件（FD-06。対応不要のため即時削除・却下理由は当該 commit message 参照）: capture-boundaries.md:63,98 の REQ-006-021 参照は「case-close への委譲を廃止」が REQ-006-021 の元内容と正確に一致する変更経緯注記であり文脈が自然、現行の正（REQ-030-011）への追跡可能、検出側推奨も no-action（任意）のため対応不要確定。FD-05 対応時に本参照箇所（現状維持済み）を併せて確認する相互参照情報は FD-05 の defer 継続記録側へ引き継ぎ
+- defer 12件（本ファイルに残置）: FD-03・FD-04〔draft Design 昇格判断は case-close Design 確定フローの正規経路で行う〕、FD-05〔修正方向〔参照差し替え or 歴史痕明記〕が未確定。FD-06 reject 済みの capture-boundaries.md:63,98〔現状維持が標準〕を対応時に併せて確認すること〕、FD-07・FD-09・FD-10・FD-13〔Case スコープ一時識別子使用規約・実行義務 REQ 型定義・guide 所有層裁定の恒久規範の新規確定を要し req-define 経路へ送付。FD-10 は FD-09 と同時〕、FD-08〔既知 defer IDX-10（20261026T190542Z）側の再評価条件発火・再評価の結果未解決のため IDX-10 と同時再評価条件を維持〕、FD-11〔v51 表記の現行化か凍結注記かの表現判断未確定・意図的凍結の可能性が注記不在のため解消されず〕、FD-12〔既知 defer GR12（20261017T102200Z）と同一対象表・同一論点〔REQ-099-018 組合せ記録確認の前提未了・同ガイドは delta window 内更新なしを現物確認済み〕で GR12 側 defer 前例を踏襲・同時再評価条件を維持〕、FD-14〔既知 defer DC01 族（20261017T102200Z・IDX-06 併合済み）への増分併合・同時再評価条件統合〕、FD-15〔乖離未発生の予防的改善で FD-12 と同時再評価条件〕
+- 分類は Jev 先行評価（観測 20261107T072209Z-3811。FD-01 promote 1.0・FD-02 promote 0.95・FD-16 promote 1.0・FD-06 reject 0.96・他12件 defer 0.75〜1.0）＋ LLM 最終判断（全16項目で Jev 分類と一致。FD-06 のみ暫定分類 defer から Jev・検出側推奨〔no-action〕・参照の歴史的正確性確認により reject へ変更）により全件自律確定。STEP-5 adversarial-review は条件付き化発動条件（手動分類対象が存在し本質的争点が残る）を満たさないため生成せず（観測なし=契約どおり。promote 3件は v4-responsibility-boundaries「人間判断への引き上げ条件」1〜5すべてに非該当の正規契約からの決定的導出、defer 12件は採否未確定の保留判断として分類基準から導出、reject 1件は対応不要の確定）

@@ -1,0 +1,254 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261107T072209Z-3811",
+  "workflow": "inspect-promote",
+  "evaluationKind": "finding-disposition",
+  "subject": "inspect-docs finding 20261107T070520Z の16検出事項（FD-01〜FD-16）の promote/defer/reject 分類",
+  "sourceRevision": "7528a03eafb4008e332fa7369e0ac887f378f513",
+  "durationMs": 830,
+  "inputTokens": 5510,
+  "inputs": {
+    "requestDigest": "267c9363795775cf18499b5a13e762fcf8ebaaac39697f40066390d7af33e758",
+    "references": [
+      {
+        "digest": "b1be15066f6fb5c8e008ce965f25eee0d6c791fd93a8de6dee61aab1362e11bf",
+        "label": "検出事項ファイル（検出元）",
+        "path": ".agentdev/inspect/inbox/inspect-docs-finding-20261107T070520Z.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "fd01-disposition",
+      "questionForm": "choice",
+      "value": "promote",
+      "probabilityDistribution": {
+        "promote": 1,
+        "defer": 0,
+        "reject": 0
+      }
+    },
+    {
+      "questionId": "fd02-disposition",
+      "questionForm": "choice",
+      "value": "promote",
+      "probabilityDistribution": {
+        "promote": 0.95,
+        "defer": 0.05,
+        "reject": 0
+      }
+    },
+    {
+      "questionId": "fd03-disposition",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0.01,
+        "defer": 0.99,
+        "reject": 0
+      }
+    },
+    {
+      "questionId": "fd04-disposition",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0.02,
+        "defer": 0.96,
+        "reject": 0.02
+      }
+    },
+    {
+      "questionId": "fd05-disposition",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0.03,
+        "defer": 0.97,
+        "reject": 0
+      }
+    },
+    {
+      "questionId": "fd06-disposition",
+      "questionForm": "choice",
+      "value": "reject",
+      "probabilityDistribution": {
+        "promote": 0,
+        "defer": 0.04,
+        "reject": 0.96
+      }
+    },
+    {
+      "questionId": "fd07-disposition",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0.25,
+        "defer": 0.75,
+        "reject": 0
+      }
+    },
+    {
+      "questionId": "fd08-disposition",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0.05,
+        "defer": 0.95,
+        "reject": 0
+      }
+    },
+    {
+      "questionId": "fd09-disposition",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0.02,
+        "defer": 0.98,
+        "reject": 0
+      }
+    },
+    {
+      "questionId": "fd10-disposition",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0.01,
+        "defer": 0.99,
+        "reject": 0
+      }
+    },
+    {
+      "questionId": "fd11-disposition",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0,
+        "defer": 1,
+        "reject": 0
+      }
+    },
+    {
+      "questionId": "fd12-disposition",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0.02,
+        "defer": 0.98,
+        "reject": 0
+      }
+    },
+    {
+      "questionId": "fd13-disposition",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0.01,
+        "defer": 0.99,
+        "reject": 0
+      }
+    },
+    {
+      "questionId": "fd14-disposition",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0,
+        "defer": 1,
+        "reject": 0
+      }
+    },
+    {
+      "questionId": "fd15-disposition",
+      "questionForm": "choice",
+      "value": "defer",
+      "probabilityDistribution": {
+        "promote": 0.01,
+        "defer": 0.98,
+        "reject": 0.01
+      }
+    },
+    {
+      "questionId": "fd16-disposition",
+      "questionForm": "choice",
+      "value": "promote",
+      "probabilityDistribution": {
+        "promote": 1,
+        "defer": 0,
+        "reject": 0
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "fd01-disposition",
+        "value": "promote"
+      },
+      {
+        "questionId": "fd02-disposition",
+        "value": "promote"
+      },
+      {
+        "questionId": "fd03-disposition",
+        "value": "defer"
+      },
+      {
+        "questionId": "fd04-disposition",
+        "value": "defer"
+      },
+      {
+        "questionId": "fd05-disposition",
+        "value": "defer"
+      },
+      {
+        "questionId": "fd06-disposition",
+        "value": "reject"
+      },
+      {
+        "questionId": "fd07-disposition",
+        "value": "defer"
+      },
+      {
+        "questionId": "fd08-disposition",
+        "value": "defer"
+      },
+      {
+        "questionId": "fd09-disposition",
+        "value": "defer"
+      },
+      {
+        "questionId": "fd10-disposition",
+        "value": "defer"
+      },
+      {
+        "questionId": "fd11-disposition",
+        "value": "defer"
+      },
+      {
+        "questionId": "fd12-disposition",
+        "value": "defer"
+      },
+      {
+        "questionId": "fd13-disposition",
+        "value": "defer"
+      },
+      {
+        "questionId": "fd14-disposition",
+        "value": "defer"
+      },
+      {
+        "questionId": "fd15-disposition",
+        "value": "defer"
+      },
+      {
+        "questionId": "fd16-disposition",
+        "value": "promote"
+      }
+    ]
+  }
+}

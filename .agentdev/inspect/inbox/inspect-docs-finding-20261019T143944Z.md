@@ -45,3 +45,5 @@
 - 再評価条件: Design 索引の親子状態表示契約（親 status 列の包含範囲）が判断される時（DS-13〔20260927〕の再評価条件「Design 索引規則の経過措置判断の機会」と同時）、または references 配下 Design の status が accepted へ遷移して可視性の実害が顕在化する時
 
 - 2026-10-27 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: IDX-02 は defer 継続（自律確定）: 再評価条件（親子状態表示契約の判断〔DS-13 同時〕、references 配下 Design の status 遷移による実害顕在化）はいずれも未発火。stage 1 診断（20261026T190542Z）の既知項目照合で対象変化の報告なし
+
+- 2026-11-07 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: IDX-02 は defer 継続（自律確定）: 再評価条件（親子状態表示契約の判断〔DS-13 同時〕、references 配下 Design の status 遷移による実害顕在化）はいずれも未発火。stage 1 診断（20261107T070520Z）の既知項目照合で対象変化の報告なし

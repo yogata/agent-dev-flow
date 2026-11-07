@@ -124,3 +124,5 @@
 - 2026-10-19 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: RQ-35/RQ-36/DS-22/DS-25/GD-05/RM-02 は再評価条件未充足のため defer 継続（自律確定）: RM-02 の docs/README.md Report 節は Markdown リンクなしのまま不変を現物確認。DC-13 は解消確認により reject・セクション削除（自律確定）: docs/decisions/README.md「現行 Decision」節に「DEC-018 は欠番であり、対応する Decision ファイルは存在しない。」の明記を現物確認（2026-10-16 時点の再評価記録では不在、2026-10-16 以降に追加）。numbering-policy.md:56 の「各 README、索引類で明記」義務は充足。Jev 先行評価（観測 20261019T150102Z-f15b、dc13-disposition=reject 0.81）と LLM 最終判断一致。残る numbering-policy 既知欠番節（:58-66）への DEC-018 追記は、同節の自己規定（:62「numbering-policy は欠番の存在宣言のみを担い、交叉参照データの体系的蓄積は req-impact-map/retired/ が担う」・REQ 採番スクリプトの欠番レジストリ）から DEC 側の記載義務に当たらない補完候補であり対応不要と判断。却下理由の詳細は commit message に記録
 
 - 2026-10-27 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: RQ-35/RQ-36/DS-22/DS-25/GD-05/RM-02 は再評価条件未充足のため defer 継続（自律確定）: stage 1 診断（20261026T190542Z）の既知項目照合で対象変化の報告なし（RQ-36 の SPLIT 正式計測機会も未発生）
+
+- 2026-11-07 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: RQ-35/RQ-36/DS-22/DS-25/GD-05/RM-02 は再評価条件未充足のため defer 継続（自律確定）: stage 1 診断（20261107T070520Z）の既知項目照合で対象変化の報告なし（RQ-36 の SPLIT 正式計測機会も未発生）
