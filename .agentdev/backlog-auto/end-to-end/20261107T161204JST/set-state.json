@@ -1,0 +1,146 @@
+{
+  "一式識別子": "20261107T161204JST",
+  "作成日時": "2026-11-07T18:35:00+09:00",
+  "backlog_auto_started_at": "2026-11-07T16:12:04+09:00",
+  "義務スナップショット": {
+    "说明": "元 RU 一式（RU-0263〜RU-0269）の必須の要求と受け入れ義務のスナップショット。RU 本文から抽出。完了突合の正の一つである（RU・要件doc 削除後も本スナップショットから突合可能）。",
+    "RUs": {
+      "RU-0263": {
+        "タイトル": "phase_adoption_record_contract.test.ts の期待文言不一致の是正",
+        "必須要求": "テスト期待文言を SKILL.md 側実文（templates/phase-readme.md 全体を1つのbacktickで囲む現行正規表記）へ整合させること。REQ-117-002 に含まれない別欠陥として REQ-117 系との突合の下で実施。",
+        "受け入れ義務": [
+          "修正後テストが合格すること",
+          "full integrity suite split 1 が継続 fail でなくなること",
+          "期待文言と SKILL.md 実文の突合（grep 実測）を検証差分に記録すること"
+        ]
+      },
+      "RU-0264": {
+        "タイトル": "prepare_definition_pr.ts extractFreshnessTargets の REQ freshness 報告形式対応",
+        "必須要求": "REQ-117-011 の受入条件に対する非適合修正として、REQ ファイルの freshness 報告形式（ファイル名のみ報告）への対応追加および/または補正漏れ検出の script 組込み（実現方法は req-define で確定）。",
+        "受け入れ義務": [
+          "REQ ファイルを含む freshness 報告において measurement-convergence step の frontmatterUpdatedTargets が REQ ファイルを捕捉することを機械確認すること",
+          "手動 contingency を不要にすること"
+        ]
+      },
+      "RU-0265": {
+        "タイトル": "worktree 実行時の .agentdev/tmp 前提テストの整備（req-id-roundtrip ENOENT）",
+        "必須要求": "整備方針（worktree 側事前作成 or テスト側自動作成・req-define で判断）を確定し、REQ-018-008 の存在保証責務の所在（REQ 追加 or 実装側整備）を明確化すること。",
+        "受け入れ義務": [
+          "worktree（.agentdev 未整備）での full suite 実行時に req-id-roundtrip.test.ts が環境依存 fail（ENOENT）として顕在化しなくなること"
+        ]
+      },
+      "RU-0266": {
+        "タイトル": "Local モード純環境での agentdev_gh 失敗分類の契約変更検討",
+        "必須要求": "Local 投影検出を repo 解決に前置する契約変更（検出順序変更）を採用するか否かの判断を、現行契約（REQ-009-051・REQ-052-013/014 との関係・トレードオフ）を踏まえて req-define で実施すること。不採用の場合も判断根拠を含めて閉じること。",
+        "受け入れ義務": [
+          "採用/不採用いずれかの判断が判断根拠とともに要件doc に確定記録されていること"
+        ]
+      },
+      "RU-0267": {
+        "タイトル": "docs 機械的整合是正（Design frontmatter 鮮度 5 ファイル・designs/README.md 索引行追加）",
+        "必須要求": "FD-01: case-auto.md・case-run.md・req-define.md・v51-phase-transition-and-coexistence-model.md・verification-resource-lifecycle.md の 5 ファイルの frontmatter updated を各ファイルの最終内容変更 commit の author date（IR-072 detection_method どおり・frontmatter のみの変更 commit は除外）へ進行。FD-02: docs/designs/README.md 横断 Design 一覧へ verification-resource-lifecycle の行（status: draft）を追加。",
+        "受け入れ義務": [
+          "check_integrity（IR-072）の該当 NG が解消すること",
+          "designs/README.md に該当行が登録され docs-check の README 索引診断が通過すること"
+        ]
+      },
+      "RU-0268": {
+        "タイトル": "phase-transition identity.ts コメントの配布物 ID 汚染修正",
+        "必須要求": "src/common/skills/agentdev-workflow-phase-transition/scripts/lib/identity.ts:4 のコメント REQ-111-023 具体ID言及を解消（機能的記述への置換（文意保持確認）または IR-059 系 baseline 登録・req-define で判断）。",
+        "受け入れ義務": [
+          "check_distribution_boundary の機械 failure 1 件が解消（修正適用または baseline 管理化）し同検査が通過すること",
+          "修正方向の判断根拠を検証差分に記録すること"
+        ]
+      },
+      "RU-0269": {
+        "タイトル": "case-run-execution-adapter SKILL.md 作成先文言の Design 正本追随是正",
+        "必須要求": "src/common/skills/agentdev-case-run-execution-adapter/SKILL.md L94 の作成先文言を Design 正本（verification-resource-lifecycle.md）の修正後境界（環境指定TEMPまたはプロジェクト内正規一時領域 repo root の .agentdev/tmp/・REQ-018-008(b)・案件番号非根拠）へ追随。Design 正本が正で SKILL 側を正本に合わせる方向。verification-resource-lifecycle.md 本体・実装は変更対象外。",
+        "受け入れ義務": [
+          "SKILL.md の作成先文言が verification-resource-lifecycle.md の修正後境界と整合していること",
+          "修正後の SKILL.md において旧文言（案件専用領域・案件識別子をパス要素に含む repo 外ディレクトリ）が grep で 0 件になること",
+          "SKILL 契約行と作成ヘルパー（verification-resources-ledger.ts evaluateCreationDestination）の機械検査基準の文言整合を検証差分に記録すること"
+        ]
+      }
+    }
+  },
+  "対応表": {
+    "説明": "RU・要件doc・operation_unit・実行単位の対応（統合・分割を含む）。stage 4 以降で追記。",
+    "初期状態": {
+      "RU-0263": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261107T161204JST.md",
+        "operation_unit": "OU-001",
+        "実行単位": "未確定"
+      },
+      "RU-0264": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261107T161204JST.md",
+        "operation_unit": "OU-002",
+        "実行単位": "未確定"
+      },
+      "RU-0265": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261107T161204JST.md",
+        "operation_unit": "OU-003",
+        "実行単位": "未確定"
+      },
+      "RU-0266": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261107T161204JST.md",
+        "operation_unit": "対象外（不採用判断記録・AG-004・REQ 本文目的節へ恒久記録・HITL Q-RU0266-3=B）",
+        "実行単位": "対象外"
+      },
+      "RU-0267": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261107T161204JST.md",
+        "operation_unit": "OU-004",
+        "実行単位": "未確定"
+      },
+      "RU-0268": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261107T161204JST.md",
+        "operation_unit": "OU-005",
+        "実行単位": "未確定"
+      },
+      "RU-0269": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261107T161204JST.md",
+        "operation_unit": "OU-006",
+        "実行単位": "未確定"
+      }
+    }
+  },
+  "基準点情報": {
+    "確定日時": "2026-11-07T18:35:00+09:00",
+    "最後の正式リリース": {
+      "版番号": "5.1.7",
+      "タグ名": "v5.1.7",
+      "タグ対象コミット": "7ea066b2ece667c5d2aac4b0b80b37054584cd2e"
+    },
+    "開始コミットID": "9e8c53e63eb7f71a9a571a3f054ca65e2cc33ddd",
+    "確定手続の証拠": "正式 SemVer タグ列挙（git tag --list v[0-9]* --sort=-v:refname で v5.1.7 が最大）・祖先到達判定（git merge-base --is-ancestor v5.1.7 HEAD / 9e8c53e63 ともに到達可能を 2026-11-07 実測）・rc タグ・非 SemVer ベースラインタグは基準から除外。利用者起動指示（2026-11-07）による固定指定（最後の正式リリースタグ v5.1.7・開始コミット 9e8c53e63 = backlog-auto 実行開始時 main HEAD）と一致。"
+  },
+  "進捗": {
+    "整理サイクル": "完了（stage1 inspect-docs 検出16件 commit 7528a03ea / stage2 3系統並列 learning 1369b9338・intake 121521f9d・inspect deaf41a0c・jev整理 fbe672e9 / stage3 backlog-review RU-0263〜0269 生成 commit ccf669829・HITL承認 Q-BR-20261107-01=A）",
+    "stage4_要件定義": "完了（2026-11-07 単一 req-define 実行・入力 RU-0263〜0269 明示列挙・壁打ち HITL 1回（4問）回答反映・要件doc 439行 auto_ready:true 確定・commit fd3834516）",
+    "stage5_実行": "blocked停止（2026-11-07T17:47起動・Root Case issue_create 直前で停止）。原因: 現行 opencode プロセスの環境変数 AGENTDEV_GH_REPO=local/issues（旧値・Local版向け）を repo 解決（repo-resolution.ts・プロセス環境変数を直接読取・上書経路なし）が採用し GitHub 操作が全て 404 失敗。Windows ユーザー環境変数は yogata/agent-dev-flow に修正済みのため opencode 再起動のみで解消見込。HITL Q-CASEAUTO-ENV-1 回答=A（opencode再起動→backlog-auto再実行）。再開: backlog-auto 再実行で set-state から stage 5 を再構成（Root Case 未作成のため case-auto は stage 1 から・REQ-119 採番・冪等検出・preflight は冪等再実行）。要件doc は確定済み（stage 4 完了・fd3834516）のため req-define 再実行不要",
+    "stage6_全体完了判定": "未着手",
+    "stage7_リリース": "未着手"
+  },
+  "リリース状態": {
+    "状態": "未着手",
+    "備考": "公開の明示許可はまだない（2026-11-07 利用者指示）。公開承認は利用者回答を得るまで保留。"
+  },
+  "要件doc情報": {
+    "パス": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261107T161204JST.md",
+    "行数": 439,
+    "work_type": "bugfix",
+    "scale": "standard",
+    "auto_ready": true,
+    "受け入れゴール": "AG-001〜008（8件）",
+    "operation_units": "OU-001〜006（6件・single・recommended_order 1〜6）",
+    "test_strategy": "TS-001〜008（8件）",
+    "artifact_actions": "ACT-REQ-001: 新規 REQ create（REQ-119 仮記・採番は case-open 決定的採番スクリプト）。ACT-REQ-002: REQ-117-011 行 update（文言明確化）",
+    "壁打ちHITL回答": {
+      "Q-RU0265-1": "B. テスト側自動作成（mkdirSync recursive・REQ-018 APPEND なし）",
+      "Q-RU0264-2": "C. 両方の採用（REQファイル名のみ報告形式対応 + fail-closed 補正漏れ検出 + REQ-117-011 文言明確化）",
+      "Q-RU0266-3": "B. 不採用（現行契約維持・判断根拠を要件docへ確定記録して閉じる）",
+      "Q-RU0268-4": "A. 機能的記述へ置換（REQ-111-023 具体ID除去・producer側で文意保持・baseline登録なし）"
+    },
+    "adversarial-review": "7争点抽出・全て収束（収束監査合格）・未解決ユーザー判断 0件",
+    "commit": "fd3834516"
+  }
+}
