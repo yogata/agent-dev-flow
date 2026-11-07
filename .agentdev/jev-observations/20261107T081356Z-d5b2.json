@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261107T081356Z-d5b2",
+  "workflow": "backlog-review",
+  "evaluationKind": "integration-split-judgment",
+  "subject": "採用済み成果物6件の統合・分割判定",
+  "sourceRevision": "fbe672e9a",
+  "durationMs": 301,
+  "inputTokens": 1382,
+  "inputs": {
+    "requestDigest": "12ad50644130d4cd3efe1730a26402e4abb1123eafa8e0bdfb43b35b4036d2a1",
+    "references": [
+      {
+        "digest": "1890d698b489991eab0bbf571d3d6f39750d70073994a413bc3a79ae0b5a3319",
+        "label": "learning-wording-alignment",
+        "path": ".agentdev/learning/promoted/existing-measure-update-case-run-adapter-skill-wording-alignment.md"
+      },
+      {
+        "digest": "888a2133db3d3d807b1a84a49911676ff757bfcd07f41d52f201636737ddcf06",
+        "label": "intake-phase-adoption-wording",
+        "path": ".agentdev/intake/promoted/2026-11-04-phase-adoption-template-wording-mismatch.md"
+      },
+      {
+        "digest": "70019fc50512155c909240c93582209107159e90efbbf3bebe0161646d88ef2e",
+        "label": "intake-freshness-extraction",
+        "path": ".agentdev/intake/promoted/2026-11-04-prepare-definition-pr-freshness-path-extraction.md"
+      },
+      {
+        "digest": "e518022f83edcb668a9cc133080ed13f3fe6f45c16c35edf1e5473d975dc84a8",
+        "label": "intake-worktree-tmp",
+        "path": ".agentdev/intake/promoted/2026-11-04-worktree-agentdev-tmp-test-premise.md"
+      },
+      {
+        "digest": "d11c4110d95ea966eb6addb3ad8789480e5e8572f7f008cf07ab9210e568ecc3",
+        "label": "intake-pr3925-local-mode",
+        "path": ".agentdev/intake/promoted/2026-11-05-pr3925-phase-route-findings.md"
+      },
+      {
+        "digest": "e8a65f60f61b1125381ac7fc5c4fede3bb625bf306a100b209d57132b36db578",
+        "label": "inspect-docs-mechanical-fixes",
+        "path": ".agentdev/inspect/promoted/finding-20261107-docs-mechanical-fixes.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "is-learning-wording-alignment",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0,
+        "分割": 0,
+        "1:1": 1
+      }
+    },
+    {
+      "questionId": "is-intake-phase-adoption-wording",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0,
+        "分割": 0,
+        "1:1": 1
+      }
+    },
+    {
+      "questionId": "is-intake-freshness-extraction",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0.06,
+        "分割": 0,
+        "1:1": 0.94
+      }
+    },
+    {
+      "questionId": "is-intake-worktree-tmp",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0.06,
+        "分割": 0.01,
+        "1:1": 0.93
+      }
+    },
+    {
+      "questionId": "is-intake-pr3925-local-mode",
+      "questionForm": "choice",
+      "value": "1:1",
+      "probabilityDistribution": {
+        "統合": 0.05,
+        "分割": 0.09,
+        "1:1": 0.86
+      }
+    },
+    {
+      "questionId": "is-inspect-docs-mechanical-fixes",
+      "questionForm": "choice",
+      "value": "分割",
+      "probabilityDistribution": {
+        "統合": 0.03,
+        "分割": 0.88,
+        "1:1": 0.09
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "is-learning-wording-alignment",
+        "value": "1:1"
+      },
+      {
+        "questionId": "is-intake-phase-adoption-wording",
+        "value": "1:1"
+      },
+      {
+        "questionId": "is-intake-freshness-extraction",
+        "value": "1:1"
+      },
+      {
+        "questionId": "is-intake-worktree-tmp",
+        "value": "1:1"
+      },
+      {
+        "questionId": "is-intake-pr3925-local-mode",
+        "value": "1:1"
+      },
+      {
+        "questionId": "is-inspect-docs-mechanical-fixes",
+        "value": "分割"
+      }
+    ]
+  }
+}

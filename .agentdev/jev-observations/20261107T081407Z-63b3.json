@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261107T081407Z-63b3",
+  "workflow": "backlog-review",
+  "evaluationKind": "depends-on-reorderability",
+  "subject": "RU候補7件（採用済み成果物6件由来）の depends_on 依存解決の並べ替え可能性",
+  "sourceRevision": "fbe672e9a",
+  "durationMs": 239,
+  "inputTokens": 797,
+  "inputs": {
+    "requestDigest": "de74f857e3114d59945754582ab5781f7bbd7944206e115a7bb6166cffe4ce5d",
+    "references": [
+      {
+        "digest": "1890d698b489991eab0bbf571d3d6f39750d70073994a413bc3a79ae0b5a3319",
+        "label": "learning-wording-alignment",
+        "path": ".agentdev/learning/promoted/existing-measure-update-case-run-adapter-skill-wording-alignment.md"
+      },
+      {
+        "digest": "888a2133db3d3d807b1a84a49911676ff757bfcd07f41d52f201636737ddcf06",
+        "label": "intake-phase-adoption-wording",
+        "path": ".agentdev/intake/promoted/2026-11-04-phase-adoption-template-wording-mismatch.md"
+      },
+      {
+        "digest": "70019fc50512155c909240c93582209107159e90efbbf3bebe0161646d88ef2e",
+        "label": "intake-freshness-extraction",
+        "path": ".agentdev/intake/promoted/2026-11-04-prepare-definition-pr-freshness-path-extraction.md"
+      },
+      {
+        "digest": "e518022f83edcb668a9cc133080ed13f3fe6f45c16c35edf1e5473d975dc84a8",
+        "label": "intake-worktree-tmp",
+        "path": ".agentdev/intake/promoted/2026-11-04-worktree-agentdev-tmp-test-premise.md"
+      },
+      {
+        "digest": "d11c4110d95ea966eb6addb3ad8789480e5e8572f7f008cf07ab9210e568ecc3",
+        "label": "intake-pr3925-local-mode",
+        "path": ".agentdev/intake/promoted/2026-11-05-pr3925-phase-route-findings.md"
+      },
+      {
+        "digest": "e8a65f60f61b1125381ac7fc5c4fede3bb625bf306a100b209d57132b36db578",
+        "label": "inspect-docs-mechanical-fixes",
+        "path": ".agentdev/inspect/promoted/finding-20261107-docs-mechanical-fixes.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "dep-reorderability-batch",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.97,
+        "false": 0.030000000000000027
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "dep-reorderability-batch",
+        "value": true
+      }
+    ]
+  }
+}
