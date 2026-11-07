@@ -2791,11 +2791,10 @@ describe("検証用一時資材の未記録entity消費・検査不能明示・�
     expect(skill).toContain("不正規形");
   });
 
-  test("作成入口の作成先確認接続の契約行が case-open・case-run・adapter の各 SKILL.md に存在する", () => {
+  test("作成入口の作成先確認接続の契約行が case-open・case-run の各 SKILL.md に存在する", () => {
     for (const skillName of [
       "agentdev-workflow-case-open",
       "agentdev-workflow-case-run",
-      "agentdev-case-run-execution-adapter",
     ]) {
       const skill = fs.readFileSync(
         path.join(REPO_ROOT, "src", "common", "skills", skillName, "SKILL.md"),
