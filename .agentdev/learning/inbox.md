@@ -613,3 +613,10 @@
 - 出典: m0729/m0731（1回目事故・復元）・m0787/m0792（2回目事故・復元）・2回目の正直報告記録
 - 関連: Case #3928・REQ-018-008(b)・先行 entry「中断セッションのワークフロー一時ファイルは .agentdev/ 直下に残り通常の tmp 検査から漏れる」（同根の大容量本文更新規律）
 - タグ: #learning-capture #issue_update #本文破壊 #正本 #VERIFY限界 #再発防止
+## [2026-11-07T13:55+09:00][learning_candidate][detached起動コマンドの実行基盤二重/三重起動が機械工程のtwin検出を guaranteed 再現する][Case #3928]
+- 検知: Epic #3928 最終closeの detached nohup 起動（`bash -c "... date +%s > epoch && nohup bash -c 'echo $$ > pid; bun 機械工程...' & sleep 3; cat pid"`）が同一コマンドを0.3秒窓で複数実行した。m1297: outer 2 + inner 2（6701997630 補足記録の4 shell）。m1320: outer 1 + inner 3（13:39:38.338/.395/.412/.628 起動・report-premerge-m1320.json findings 2件の具体対象 7560/42392 + grounds 消費実測 35316/7512）。各 inner chain が compose と機械工程を並行実行し、各実行は「他 chain の生存 launcher shell」を in-scope（commandLine に案件識別子を含む）未登録として検出して拒否される。同一 commandLine の複数実体は属性一致でも曖昧消費しない fail-closed 契約のため、twin の grounds 化（現 run origin）だけでは並行 chain を被覆できず、起動時に未存在の twin は事前 grounds 化も不可能。
+- 対処: m1320 では無変更再実行を行わず、具体対象（pid・startedAt・commandLine）付きで正直記録（6702480374）。compose 時 ancestor grounds（自 chain の pid-exact）と記録済み shell の startedAt 属性 grounds は意図どおり機能した（findings 2,468→2）。
+- 学び: detached 起動は実行基盤の重複実行を構造的に含む。機械工程の起動は (i) 起動直後の重複実行検出（同一入力の bun プロセス数確認）と (ii) 二重起動が解消されない場合の起動経路変更（同期実行・単一 submission 保証付き経路）を前提に設計する。launcher shell の生存自体は in-scope 検出対象であるため、起動機構の衛生がそのまま機械受理の前提になる。
+- 出典: report-premerge-m1320.json findings 2件（pid 7560/42392・startedAt 実測）・compose-input-population-w12-generation-log.json（grounds [7512, 35316]）・6701997630 補足記録（m1297 2+2 twin）・6702480374（本記録）
+- 関連: Case #3928・close_mechanical_steps.ts evaluateObservationEntityConsumption（attr grounds の一意消費契約）・verify-resource-lifecycle Design
+- タグ: #learning-capture #detached起動 #二重実行 #launcher-shell #fail-closed #機械工程
