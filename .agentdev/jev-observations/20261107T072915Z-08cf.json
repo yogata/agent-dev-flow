@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261107T072915Z-08cf",
+  "workflow": "learning-promote",
+  "evaluationKind": "sublimation-assessment",
+  "subject": "promote 暫定2クラスの昇華可能性（adapter SKILL 文言整合・大容量 Issue 本文照合規律）",
+  "sourceRevision": "7528a03ea",
+  "durationMs": 642,
+  "inputTokens": 984,
+  "inputs": {
+    "requestDigest": "371e0bc85fe5700556be8b57af74902342dbc6b7332909eb05d833288495986f"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "u1",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.19,
+        "false": 0.81
+      }
+    },
+    {
+      "questionId": "u2",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.7,
+        "false": 0.30000000000000004
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "u1",
+        "value": false
+      },
+      {
+        "questionId": "u2",
+        "value": true
+      }
+    ]
+  }
+}

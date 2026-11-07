@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261107T073721Z-ec2e",
+  "workflow": "learning-promote",
+  "evaluationKind": "review-trigger-condition",
+  "subject": "2026-11-07 run・STEP-2/3 反映済み evaluation-report（41 クラス・promote 2）の review 発動条件判定",
+  "sourceRevision": "7528a03ea",
+  "durationMs": 784,
+  "inputTokens": 959,
+  "inputs": {
+    "requestDigest": "eb380b24b12291588228f74141836be58e678075a390336f3c010e4bfb10882b"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "rt1",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.95,
+        "false": 0.050000000000000044
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "rt1",
+        "value": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261107T072629Z-8c55",
+  "workflow": "learning-promote",
+  "evaluationKind": "eight-axis-scoring",
+  "subject": "promote 暫定2クラス（adapter SKILL 文言整合・大容量 Issue 本文照合規律）の 8軸評価（7軸）",
+  "sourceRevision": "7528a03ea",
+  "durationMs": 616,
+  "inputTokens": 2852,
+  "inputs": {
+    "requestDigest": "2aa25ab7f0b3ed9a433133b63e7852151fbd7fceca4f3137d3d91e3a7a7ed116"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "sa-impact",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "1: 軽微": 0.02,
+        "2: 小": 0.65,
+        "3: 中": 0.31,
+        "4: 大": 0.02,
+        "5: 致命的": 0
+      }
+    },
+    {
+      "questionId": "sa-transfer",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1: 固有": 0.01,
+        "2: 限定": 0.1,
+        "3: 中程度": 0.19,
+        "4: 高い": 0.67,
+        "5: 汎用": 0.03
+      }
+    },
+    {
+      "questionId": "sa-reflect",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1: 不明": 0,
+        "2: 曖昧": 0,
+        "3: 概要あり": 0.01,
+        "4: 明確": 0.76,
+        "5: 自足的に整備済み": 0.23
+      }
+    },
+    {
+      "questionId": "sa-automation",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1: 困難": 0,
+        "2: 低い": 0.02,
+        "3: 可能": 0.27,
+        "4: 容易": 0.68,
+        "5: 即自動化可": 0.03
+      }
+    },
+    {
+      "questionId": "sa-reuse",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1: 低い": 0.06,
+        "2: やや低い": 0.14,
+        "3: 中程度": 0.15,
+        "4: 高い": 0.54,
+        "5: 高い": 0.11
+      }
+    },
+    {
+      "questionId": "sa-recurrence",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1: 極低": 0,
+        "2: 低い": 0.01,
+        "3: 中程度": 0.04,
+        "4: 高い": 0.83,
+        "5: ほぼ確実": 0.12
+      }
+    },
+    {
+      "questionId": "sa-cost",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1: 割高": 0,
+        "2: やや割高": 0,
+        "3: 妥当": 0.01,
+        "4: 良い": 0.32,
+        "5: 良い": 0.67
+      }
+    },
+    {
+      "questionId": "sb-impact",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1: 軽微": 0,
+        "2: 小": 0,
+        "3: 中": 0.04,
+        "4: 大": 0.88,
+        "5: 致命的": 0.08
+      }
+    },
+    {
+      "questionId": "sb-transfer",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1: 固有": 0.01,
+        "2: 限定": 0.01,
+        "3: 中程度": 0.01,
+        "4: 高い": 0.47,
+        "5: 汎用": 0.5
+      }
+    },
+    {
+      "questionId": "sb-reflect",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1: 不明": 0.01,
+        "2: 曖昧": 0.03,
+        "3: 概要あり": 0.16,
+        "4: 明確": 0.59,
+        "5: 自足的に整備済み": 0.21
+      }
+    },
+    {
+      "questionId": "sb-automation",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1: 困難": 0,
+        "2: 低い": 0.01,
+        "3: 可能": 0.01,
+        "4: 容易": 0.66,
+        "5: 即自動化可": 0.32
+      }
+    },
+    {
+      "questionId": "sb-reuse",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1: 低い": 0.05,
+        "2: やや低い": 0.11,
+        "3: 中程度": 0.1,
+        "4: 高い": 0.55,
+        "5: 高い": 0.19
+      }
+    },
+    {
+      "questionId": "sb-recurrence",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1: 極低": 0,
+        "2: 低い": 0,
+        "3: 中程度": 0,
+        "4: 高い": 0.53,
+        "5: ほぼ確実": 0.47
+      }
+    },
+    {
+      "questionId": "sb-cost",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1: 割高": 0,
+        "2: やや割高": 0,
+        "3: 妥当": 0,
+        "4: 良い": 0.19,
+        "5: 良い": 0.81
+      }
+    }
+  ],
+  "confidence": 0.69
+}
