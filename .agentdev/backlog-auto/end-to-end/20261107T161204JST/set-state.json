@@ -136,11 +136,18 @@
     "stage4_要件定義": "完了（2026-11-07 単一 req-define 実行・入力 RU-0263〜0269 明示列挙・壁打ち HITL 1回（4問）回答反映・要件doc 439行 auto_ready:true 確定・commit fd3834516）",
     "stage5_実行": "完了（2026-11-07 再開実行: 環境変数 blocker 解消後 Q-CASEAUTO-ENV-1 回答A どおり set-state から冪等再開。単一 case-auto・要件doc明示指定・v4標準モード。stage1 case-open pass〔Root Case #3961・REQ-119 採番・設計PR #3962 merged 6361a10e8〕・stage2 case-ready pass〔execution contract・Standard flow 確定・ready遷移・Q-GIT-3961 回答b rebase で分岐解消・draft/RU 削除 commit 90842e944〕・stage3 case-run pass〔DEL-3961-1 result=completed-pr・PR #3963〕・stage4 case-close pass〔merge 6c6a4bd14・QG-4 pass・Design確定見送り判断・capture commit d36ace95c・検証資材回収 Q-CLOSE-3961-DEL=全削除・Issue #3961 closed〕・クリーンアップ検証ゲート合格。全工程 2026-11-07T23:15:16+09:00 完了）",
     "stage6_全体完了判定": "完了・完遂（2026-11-07 判定。義務スナップショット RU-0263〜0269 と対応表を正として突合: RU-0263→REQ-119-001〔TS-001 12 tests pass・split1 対象 fail 解消・grep 突合記録〕・RU-0264→REQ-119-002〔TS-002 52 tests pass・fail-closed 差分検出含む〕・RU-0265→REQ-119-003〔TS-003 未整備 worktree 13 tests pass・ENOENT 解消〕・RU-0266→判断記録〔実測 REQ-119.md:14 不採用判断+3根拠恒久記録・Issue #3961 目的節同一記録〕・RU-0267→REQ-119-004/005〔TS-005 check_integrity OK960/NG0・TS-006 designs/README.md:162 行登録実測〕・RU-0268→REQ-119-006〔TS-007 checker failures0・identity.ts REQ-111-023 残存0実測〕・RU-0269→REQ-119-007〔TS-008 旧文言0件実測・L94 新文言確認・語彙一対一突合〕。TS-004 は目的節確認型〔要件テーブル行なし〕で充足。過不足なし。Issue #3961 closed・PR #3963 merged 実測確認。残存〔完遂妨げなし〕: .agentdev/close-acceptance/ 未追跡〔次回 reclamation 対象〕・remote branch fix/issue-3961 残存〔case-close 契約上削除せず〕・pre-existing fail 12件〔baseline 再現〕・対象範囲外 SKILL 2ファイル旧文言〔Findings 4 記録済み〕）",
-    "stage7_リリース": "未着手"
+    "stage7_リリース": "完了（2026-11-07T23:27:47+09:00。基準点再確認: 開始時以降に新しい正式タグなし・v5.1.7 が最大のまま。版番号 v5.1.8〔パッチ+1〕。タグ v5.1.8 を対象コミット 88d8718b8 に作成・push 済み。無関係コミット混入検知: 開始コミット 9e8c53e63..88d8718b8 = 23 commit 全て一式関連と突合済み。Release 草稿作成・読戻し確認済みのうえ Q-REL-20261107 回答「草稿作成+公開まで」の明示承認により release_publish 実行）"
   },
   "リリース状態": {
-    "状態": "未着手",
-    "備考": "公開の明示許可はまだない（2026-11-07 利用者指示）。公開承認は利用者回答を得るまで保留。"
+    "状態": "完了",
+    "版番号": "v5.1.8",
+    "タグ名": "v5.1.8",
+    "タグ対象コミット": "88d8718b8a94c800f26e89313d52d99033c788d9",
+    "Release URL": "https://github.com/yogata/agent-dev-flow/releases/tag/v5.1.8",
+    "公開実行形態": "workflow 実行",
+    "承認根拠": "HITL 質問 ID: Q-REL-20261107、回答の記録参照: 「草稿作成+公開まで」（2026-11-07・Hermes 監督経由の利用者回答）",
+    "公開日時": "2026-11-07T23:27:47+09:00",
+    "備考": "公開の明示許可は Q-REL-20261107 の回答により確定（草稿作成と公開を同一承認で実施）。"
   },
   "要件doc情報": {
     "パス": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261107T161204JST.md",
