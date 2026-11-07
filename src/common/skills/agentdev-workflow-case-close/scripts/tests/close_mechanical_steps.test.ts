@@ -5212,4 +5212,160 @@ describe("台帳記載所在のパス境界（兄弟・類似名別所在の誤�
     expect(reconciliation.attributionUnknown.entries).toHaveLength(0);
     expect(isCloseOperationPermitted(report).permitted).toBe(false);
   });
+
+  test("実経路: FS 台帳記載所在の # 区切り形の別名（dedicated-run#other）を commandLine で参照する番号なし process は範囲外の attribution-unknown 報告のみ（# は Windows の正当なファイル名文字で FS 所在では区切りとしない）", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = boundaryRunner({
+      processLiveness: {
+        "707": {
+          alive: true,
+          commandLine: "node <repo>/tmp-area/dedicated-run#other/server.js",
+          cwd: "C:/other",
+        },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: boundaryCheck(baseCheck),
+      }),
+      runner,
+    );
+    const reconciliation = readReconciliation(report);
+    expect(reconciliation.permitted).toBe(true);
+    expect(reconciliation.findings).toHaveLength(0);
+    const processEntry = reconciliation.attributionUnknown.entries.find(
+      (entry) => entry.source === "process-liveness",
+    );
+    expect(processEntry?.count).toBe(1);
+    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+  });
+
+  test("実経路: FS 台帳記載所在の ? 区切り形の別名（dedicated-run?other）を commandLine で参照する番号なし process は範囲外の attribution-unknown 報告のみ（? も FS 所在では区切りとしない）", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = boundaryRunner({
+      processLiveness: {
+        "708": {
+          alive: true,
+          commandLine: "node <repo>/tmp-area/dedicated-run?other/server.js",
+          cwd: "C:/other",
+        },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: boundaryCheck(baseCheck),
+      }),
+      runner,
+    );
+    const reconciliation = readReconciliation(report);
+    expect(reconciliation.permitted).toBe(true);
+    expect(reconciliation.findings).toHaveLength(0);
+    const processEntry = reconciliation.attributionUnknown.entries.find(
+      (entry) => entry.source === "process-liveness",
+    );
+    expect(processEntry?.count).toBe(1);
+    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+  });
+
+  test("実経路: FS 台帳記載所在を引用符で括った正確な参照を commandLine で行う番号なし process は範囲内として未登録拒否を維持する（引用符は FS 所在でも参照の区切り）", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = boundaryRunner({
+      processLiveness: {
+        "709": {
+          alive: true,
+          commandLine: 'node "<repo>/tmp-area/dedicated-run" --serve',
+          cwd: "C:/other",
+        },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: boundaryCheck(baseCheck),
+      }),
+      runner,
+    );
+    const reconciliation = readReconciliation(report);
+    expect(reconciliation.permitted).toBe(false);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 709"),
+      ),
+    ).toBe(true);
+    expect(reconciliation.attributionUnknown.entries).toHaveLength(0);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: URL 台帳記載所在への query・fragment 形の参照（?tab=・#anchor）は範囲内として未登録拒否を維持する（URL 所在では ?・# を参照の区切りとして従来どおり）", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: JSON.stringify([
+        ledgerEntryJson({
+          id: "vr-3928-url",
+          kind: "remote",
+          location: "https://example.test/verify-target",
+          identifiers: { url: "https://example.test/verify-target" },
+          collectedAt: "2026-11-05T10:00:00.000Z",
+          registrationBasis: "evidenced-occurrence-record",
+        }),
+      ]),
+      listenPorts: {},
+      remoteAbsenceInputs: {
+        "https://example.test/verify-target": {
+          httpStatus404Observed: true,
+          authenticationConfirmed: true,
+          visibilityConfirmed: true,
+          targetIdConfirmed: true,
+          confirmedAbsenceEvidence: "admin console listing records the target removed",
+        },
+        "https://example.test/verify-target?tab=readme": {
+          httpStatus404Observed: false,
+          authenticationConfirmed: true,
+          visibilityConfirmed: true,
+          targetIdConfirmed: true,
+        },
+        "https://example.test/verify-target#readme": {
+          httpStatus404Observed: false,
+          authenticationConfirmed: true,
+          visibilityConfirmed: true,
+          targetIdConfirmed: true,
+        },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: {
+          ...baseCheck,
+          deletionConfirmations: [
+            {
+              entryId: "vr-3928-url",
+              identifiers: { url: "https://example.test/verify-target" },
+              confirmedBy: "user",
+              confirmedAt: "2026-11-05T10:01:00.000Z",
+            },
+          ],
+          caseCreationScope: boundaryScope,
+        },
+      }),
+      runner,
+    );
+    const reconciliation = readReconciliation(report);
+    expect(reconciliation.permitted).toBe(false);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("verify-target?tab=readme"),
+      ),
+    ).toBe(true);
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("verify-target#readme"),
+      ),
+    ).toBe(true);
+    expect(reconciliation.attributionUnknown.entries).toHaveLength(0);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
 });
