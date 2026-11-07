@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261107T184326Z-9471",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-or-epic-attribution",
+  "subject": "Case #3964 実行構成判断（RA-001〜006・TS-001〜013 の実行単位構成と3軸判断）",
+  "sourceRevision": "38492b493",
+  "durationMs": 1047,
+  "inputTokens": 1804,
+  "inputs": {
+    "requestDigest": "c462e44cc129bcd4e908aa4e08a393f4b8b7ea7f95ad05777b7be06483b6e61c"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-attribution",
+      "questionForm": "choice",
+      "value": "Epic（Child Issue と Wave / 依存構造を作成する）",
+      "probabilityDistribution": {
+        "Standard（Root Case 自身を単一 execution unit とし Child Issue を作成しない）": 0.01,
+        "Epic（Child Issue と Wave / 依存構造を作成する）": 0.99
+      }
+    },
+    {
+      "questionId": "q2-dependency-strength",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "関連（同じ領域だが実行依存なし）": 0,
+        "弱（実行順序の推奨はあるが並列可）": 0.05,
+        "必須（一方が他方なしでは成立しない）": 0.95
+      }
+    },
+    {
+      "questionId": "q3-functional-coherence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "分散（共通主題なし）": 0.01,
+        "部分的（関連するが単一主題ではない）": 0.41,
+        "一貫（単一の機能的主題）": 0.58
+      }
+    }
+  ],
+  "confidence": 0.98,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-attribution",
+        "value": "Epic（Child Issue と Wave / 依存構造を作成する）"
+      },
+      {
+        "questionId": "q2-dependency-strength",
+        "value": 2
+      },
+      {
+        "questionId": "q3-functional-coherence",
+        "value": 2
+      }
+    ]
+  }
+}

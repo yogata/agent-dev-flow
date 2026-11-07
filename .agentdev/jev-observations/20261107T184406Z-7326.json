@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261107T184406Z-7326",
+  "workflow": "case-ready",
+  "evaluationKind": "wave-composition-parallelism",
+  "subject": "Case #3964 Wave-1 候補集合（RA-001・RA-003・RA-004・RA-005）の並列可否判断",
+  "sourceRevision": "38492b493",
+  "durationMs": 290,
+  "inputTokens": 1515,
+  "inputs": {
+    "requestDigest": "d75186c82d962715256e8c8e06411e355649261550d3f1382ca951fd73dfb020"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-parallel-ok",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.91,
+        "false": 0.08999999999999997
+      }
+    },
+    {
+      "questionId": "q2-mandatory-dep-absence",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.9,
+        "false": 0.09999999999999998
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-parallel-ok",
+        "value": true
+      },
+      {
+        "questionId": "q2-mandatory-dep-absence",
+        "value": true
+      }
+    ]
+  }
+}
