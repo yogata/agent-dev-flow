@@ -4532,6 +4532,205 @@ describe("案件作成範囲の母集団宣言（caseCreationScope）と範囲�
     expect(isCloseOperationPermitted(report).permitted).toBe(false);
   });
 
+  test("実経路: 宣言時、専用領域観測に現れた番号なし任意名ファイルは範囲内の未登録として拒否する（場所だけの一括範囲外分類の反例）", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      dedicatedAreaEntries: ["C:/Windows/Temp/dedicated-run/arbitrary.tmp"],
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: { ...baseCheck, caseCreationScope: caseScope },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      attributionUnknown: { declared: boolean; entries: readonly { source: string }[] };
+    };
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("dedicated-run/arbitrary.tmp"),
+      ),
+    ).toBe(true);
+    expect(reconciliation.permitted).toBe(false);
+    expect(reconciliation.attributionUnknown.entries).toHaveLength(0);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: 宣言時、専用領域根の下に束縛される番号なしprocessは範囲内の未登録として拒否し、根の外の番号なしprocessは報告のみのままとする（識別子不在だけの一括範囲外分類と場所だけの一括拒否の双方の反例）", () => {
+    const baseCheck = verificationResourceCheck();
+    const rootedScope = {
+      caseIdentifiers: ["3928", "ru0255"],
+      scopeAndLimits: "検出できる範囲と限界の宣言文（attribution-unknown 報告へそのまま記録される）",
+      dedicatedAreaRoots: ["C:/Windows/Temp/dedicated-run"],
+    };
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      processLiveness: {
+        "1200": {
+          alive: true,
+          commandLine: "node server.js",
+          cwd: "C:\\Windows\\Temp\\dedicated-run\\server",
+        },
+        "1201": {
+          alive: true,
+          commandLine: "C:\\Windows\\System32\\svchost.exe -k netsvcs",
+          cwd: "C:\\Windows\\System32",
+        },
+      },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: { ...baseCheck, caseCreationScope: rootedScope },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      attributionUnknown: {
+        declared: boolean;
+        entries: readonly { source: string; count: number; examples: readonly string[] }[];
+      };
+    };
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("pid 1200"),
+      ),
+    ).toBe(true);
+    expect(
+      reconciliation.findings.some((f) => f.detail.includes("pid 1201")),
+    ).toBe(false);
+    expect(reconciliation.permitted).toBe(false);
+    const processUnknown = reconciliation.attributionUnknown.entries.find(
+      (entry) => entry.source === "process-liveness",
+    );
+    expect(processUnknown).toEqual({
+      source: "process-liveness",
+      count: 1,
+      examples: ["process:pid=1201"],
+    });
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: 本件と無関係な識別子の宣言では専用領域内の残存物を範囲外へ逃がさない（宣言では母集団を観測導出に代替できない反例）", () => {
+    const baseCheck = verificationResourceCheck();
+    const unrelatedScope = {
+      caseIdentifiers: ["zzz"],
+      scopeAndLimits: "検出できる範囲と限界の宣言文（attribution-unknown 報告へそのまま記録される）",
+    };
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      dedicatedAreaEntries: ["<repo>/case-3928-work/leftover.js"],
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: { ...baseCheck, caseCreationScope: unrelatedScope },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      attributionUnknown: { declared: boolean; entries: readonly { source: string }[] };
+    };
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("case-3928-work/leftover.js"),
+      ),
+    ).toBe(true);
+    expect(reconciliation.permitted).toBe(false);
+    expect(reconciliation.attributionUnknown.entries).toHaveLength(0);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: 宣言時、専用領域根の外の共有OS一時領域の未知は報告のみで、根の下のOS一時領域の実在物は範囲内として拒否する（場所だけの一括拒否と一括除外の双方の反例）", () => {
+    const baseCheck = verificationResourceCheck();
+    const rootedScope = {
+      caseIdentifiers: ["3928", "ru0255"],
+      scopeAndLimits: "検出できる範囲と限界の宣言文（attribution-unknown 報告へそのまま記録される）",
+      dedicatedAreaRoots: ["C:/Windows/Temp/dedicated-run"],
+    };
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      osTempAreaMatches: [
+        "C:/Windows/Temp/other-run-cache.tmp",
+        "C:/Windows/Temp/dedicated-run/inside-root-residue.tmp",
+      ],
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: { ...baseCheck, caseCreationScope: rootedScope },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      attributionUnknown: {
+        declared: boolean;
+        entries: readonly { source: string; count: number; examples: readonly string[] }[];
+      };
+    };
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "unregistered-resource" && f.detail.includes("inside-root-residue.tmp"),
+      ),
+    ).toBe(true);
+    expect(
+      reconciliation.findings.some((f) => f.detail.includes("other-run-cache.tmp")),
+    ).toBe(false);
+    expect(reconciliation.permitted).toBe(false);
+    expect(reconciliation.attributionUnknown.declared).toBe(true);
+    expect(reconciliation.attributionUnknown.entries).toEqual([
+      {
+        source: "os-temp-area",
+        count: 1,
+        examples: ["C:/Windows/Temp/other-run-cache.tmp"],
+      },
+    ]);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: 宣言時でも範囲内の検査不能（検査コマンド失敗）は attribution-unknown へ変換せず拒否 findings のまま維持する", () => {
+    const baseCheck = verificationResourceCheck();
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      ledgerText: "[]",
+      inspectionExitCodes: { "dedicated-area-listing": 3 },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass("AC-1")],
+        verificationResourceCheck: { ...baseCheck, caseCreationScope: caseScope },
+      }),
+      runner,
+    );
+    const reconciliation = report.diff.verificationResourceReconciliation as {
+      permitted: boolean;
+      findings: readonly { code: string; detail: string }[];
+      attributionUnknown: { declared: boolean; entries: readonly { source: string }[] };
+    };
+    expect(
+      reconciliation.findings.some(
+        (f) => f.code === "inspection-unavailable" && f.detail.includes("dedicated-area-listing"),
+      ),
+    ).toBe(true);
+    expect(reconciliation.permitted).toBe(false);
+    expect(reconciliation.attributionUnknown.entries).toHaveLength(0);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
   test("実経路: 宣言時でも台帳不在は記録欠落として拒否され、既知残存リスト記載の実在物は存在する限り拒否理由となる（維持）", () => {
     const baseCheck = verificationResourceCheck();
     const runner = fakeRunner({
@@ -4628,6 +4827,48 @@ describe("案件作成範囲の母集団宣言（caseCreationScope）と範囲�
           verificationResourceCheck: {
             ...baseCheck,
             caseCreationScope: { caseIdentifiers: ["3928"], scopeAndLimits: "宣言" },
+          },
+        }),
+      ),
+    ).not.toThrow();
+    expect(() =>
+      validateInput(
+        preMergeInput({
+          verificationResourceCheck: {
+            ...baseCheck,
+            caseCreationScope: {
+              caseIdentifiers: ["3928"],
+              scopeAndLimits: "宣言",
+              dedicatedAreaRoots: [],
+            },
+          },
+        }),
+      ),
+    ).toThrow(/dedicatedAreaRoots/);
+    expect(() =>
+      validateInput(
+        preMergeInput({
+          verificationResourceCheck: {
+            ...baseCheck,
+            caseCreationScope: {
+              caseIdentifiers: ["3928"],
+              scopeAndLimits: "宣言",
+              dedicatedAreaRoots: ["   "],
+            },
+          },
+        }),
+      ),
+    ).toThrow(/dedicatedAreaRoots/);
+    expect(() =>
+      validateInput(
+        preMergeInput({
+          verificationResourceCheck: {
+            ...baseCheck,
+            caseCreationScope: {
+              caseIdentifiers: ["3928"],
+              scopeAndLimits: "宣言",
+              dedicatedAreaRoots: ["C:/Windows/Temp/dedicated-run"],
+            },
           },
         }),
       ),

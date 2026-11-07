@@ -809,6 +809,17 @@ function validateVerificationResourceCheckInput(value: unknown): void {
         "input.verificationResourceCheck.caseCreationScope.scopeAndLimits is required (the declared detection range and limits are recorded verbatim in the attribution-unknown report)",
       );
     }
+    if (scope.dedicatedAreaRoots !== undefined) {
+      if (
+        !Array.isArray(scope.dedicatedAreaRoots) ||
+        scope.dedicatedAreaRoots.length === 0 ||
+        !scope.dedicatedAreaRoots.every((root) => isNonEmptyString(root))
+      ) {
+        fail(
+          "input.verificationResourceCheck.caseCreationScope.dedicatedAreaRoots must be a non-empty array of non-empty strings when present (dedicated-area roots derived from the case creation / dedicated-area records; a meaningless empty declaration is not accepted)",
+        );
+      }
+    }
   }
 }
 
@@ -961,12 +972,18 @@ export interface VerificationResourceCheck {
   observationExclusionGrounds?: readonly ObservationExclusionGround[];
   /**
    * 案件作成範囲の母集団宣言（「検出できる範囲と限界を明示し、本件に範囲を絞る是正」の
-   * 入力表現）。宣言時、案件識別子を含まない観測実在物（共有領域・OS の無記録資材、
-   * OS process・listen・remote）は unregistered-resource findings から分離され、
-   * attribution-unknown として報告のみ（非ブロック）で記録される。識別子を含む実在物・
-   * 台帳/既知残存の照合結果・検査不能は従来どおり拒否 findings のまま
-   * （範囲内の未登録/残存/未確認/検査不能の拒否維持。範囲外の無記録資材の検出保証はない）。
-   * 未宣言時は現行どおり全件が findings となる（現行動作の維持）。
+   * 入力表現）。母集団（範囲内）は案件番号文字列の不在では判定せず、作成先・専用領域・
+   * 生成・実行記録から導出する: 専用領域観測（dedicated-area-listing）の実在物、
+   * dedicatedAreaRoots の下の実在物と process cwd、および案件識別子がパス・commandLine・
+   * cwd・URL に現れる実在物。導出された母集団内の任意名の未登録・残存・検査不能は
+   * unregistered-resource findings で拒否し、母集団外の共有領域・OS の無記録資材
+   * （OS process・listen・remote を含む）は attribution-unknown として報告のみ（非ブロック）
+   * で記録する。台帳/既知残存の照合結果・除外根拠・検査不能は従来どおり拒否 findings のまま。
+   * 帰属は自動化しない（repo の .agentdev/tmp 全体、OS 一時領域全体、共有接頭辞一括、
+   * 共有親 process の子孫一括を本件に自動帰属させない。許可された作成場所は本件の
+   * 所有範囲と同義ではない）。listen は帰属確認属性を持たないため、母集団照合は台帳・
+   * 既知残存リストの PID 等の既存識別情報で機械確認できる範囲に限る。未宣言時は
+   * 現行どおり全件が findings となる（現行動作の維持）。
    */
   caseCreationScope?: CaseCreationScope;
 }
@@ -983,6 +1000,15 @@ export interface CaseCreationScope {
   caseIdentifiers: readonly string[];
   /** 検出できる範囲と限界の宣言（attribution-unknown 報告へそのまま記録。非空必須）。 */
   scopeAndLimits: string;
+  /**
+   * 案件専用領域の根（作成先・専用領域の記録から呼出側が導出した領域起点パス。省略可）。
+   * 宣言時、この根の下の実在物・process cwd は案件識別子の有無に関係なく範囲内
+   * （任意名を含む範囲内＝拒否対象）として扱う。比較は観測パスと同一の正規化空間
+   * （区切り統一・大文字小文字無視）での根起点の一致のみで行う。共有領域全体
+   * （repo の .agentdev/tmp 全体、OS 一時領域全体）や接頭辞一括を根に含めて
+   * 自動帰属させる宣言は呼出側が組み立ててはならない（許可された作成場所≠本件の所有範囲）。
+   */
+  dedicatedAreaRoots?: readonly string[];
 }
 
 /** attribution-unknown 報告区分（範囲外の観測実在物の報告のみ・非ブロックの記録）。 */
@@ -1003,12 +1029,17 @@ export interface AttributionUnknownReport {
  * （全件範囲内扱い＝拒否維持の fail-closed。空宣言で範囲外へ分類しない）。
  * 照合は候補文字列（正規化パス・commandLine・cwd・URL 等）の大文字小文字を
  * 無視した部分一致で行い、1つでも識別子が現れれば範囲内とする。
+ * 案件番号文字列の不在だけでは範囲外にしない: 専用領域の実範囲
+ * （dedicated-area 観測の実在物、dedicatedAreaRoots の下の実在物・process cwd）は
+ * 識別子の有無に関係なく範囲内（任意名を含む範囲内＝拒否対象）とする。
  */
 export function isOutsideCaseCreationPopulation(
   scope: CaseCreationScope | undefined,
   candidates: readonly (string | null | undefined)[],
+  dedicatedAreaBasis: { listed?: boolean; underRoot?: boolean } = {},
 ): boolean {
   if (scope === undefined) return false;
+  if (dedicatedAreaBasis.listed === true || dedicatedAreaBasis.underRoot === true) return false;
   const identifiers = scope.caseIdentifiers
     .map((identifier) => identifier.toLowerCase())
     .filter((identifier) => identifier.length > 0);
@@ -1018,6 +1049,25 @@ export function isOutsideCaseCreationPopulation(
     .map((value) => value.toLowerCase())
     .join("\n");
   return !identifiers.some((identifier) => haystack.includes(identifier));
+}
+
+/**
+ * 候補（正規化後 FS パス・process cwd）が案件専用領域の根（dedicatedAreaRoots。
+ * 作成先・専用領域の記録から呼出側が導出）の下にあるか。観測パスと同一の正規化空間
+ * （区切り統一・先頭 ./ と末尾 / の除去）で根起点の一致のみを比較し、大文字小文字は
+ * 無視する（範囲内寄りの保守的分類。範囲内＝拒否対象）。prefix 文字列の部分一致は
+ * パス区切りを越えない（isUnderNormalizedPath の根起点一致のみ）。
+ */
+function isUnderCaseDedicatedAreaRoot(
+  scope: CaseCreationScope | undefined,
+  normalizedCandidate: string | null | undefined,
+): boolean {
+  if (scope?.dedicatedAreaRoots === undefined) return false;
+  if (normalizedCandidate === undefined || normalizedCandidate === null) return false;
+  const candidate = normalizedCandidate.toLowerCase();
+  return scope.dedicatedAreaRoots.some((root) =>
+    isUnderNormalizedPath(candidate, normalizeObservationPath(root).toLowerCase()),
+  );
 }
 
 /** attribution-unknown の全件リストを source 別の実数件数と先頭5件の例へ集約する。 */
@@ -1614,7 +1664,11 @@ export function attachObservationExclusionGrounds(
  * 観測実在物の未登録判定。除外根拠（台帳・終了判定記録自身、検査実行の作成記録付き
  * 特定実体、正式成果物の役割根拠、無関係共有資材の帰属根拠）と台帳・既知残存リストの
  * 突合を行い、根拠のない実在物を未登録として検出する。帰属が機械確認できない実体は
- * 検査対象のまま拒否する。
+ * 検査対象のまま拒否する。母集団宣言時は母集団（範囲内）を作成先・専用領域・生成・実行
+ * 記録から導出する（専用領域観測の実在物、dedicatedAreaRoots の下の実在物、識別子照合）。
+ * 導出された母集団内は任意名を含み、母集団内の根拠なし実在物は unregistered-resource
+ * findings で拒否する。母集団外の共有領域・OS の無記録資材のみ attribution-unknown
+ * として報告のみ（非ブロック）へ分離する。場所だけでの一括除外・一括拒否はしない。
  */
 export function evaluateUnregisteredObservations(
   observedEntries: readonly ObservedTemporaryResource[],
@@ -1678,7 +1732,12 @@ export function evaluateUnregisteredObservations(
       excludedObservations.push({ path: observed.path, basis: "unrelated-shared-resource-attribution" });
       continue;
     }
-    if (isOutsideCaseCreationPopulation(caseCreationScope, [normalized])) {
+    if (
+      isOutsideCaseCreationPopulation(caseCreationScope, [normalized], {
+        listed: observed.source === "dedicated-area",
+        underRoot: isUnderCaseDedicatedAreaRoot(caseCreationScope, normalized),
+      })
+    ) {
       attributionUnknownEntries.push({ path: observed.path, source: observed.source });
       continue;
     }
@@ -1945,10 +2004,18 @@ export function evaluateObservationEntityConsumption(
       detailParts.push(`startedAt: ${processObservation.startedAt}`);
     }
     if (
-      isOutsideCaseCreationPopulation(options.caseCreationScope, [
-        processObservation.commandLine ?? undefined,
-        processObservation.cwd,
-      ])
+      isOutsideCaseCreationPopulation(
+        options.caseCreationScope,
+        [processObservation.commandLine ?? undefined, processObservation.cwd],
+        {
+          underRoot:
+            processObservation.cwd !== undefined &&
+            isUnderCaseDedicatedAreaRoot(
+              options.caseCreationScope,
+              normalizeObservationPath(processObservation.cwd),
+            ),
+        },
+      )
     ) {
       attributionUnknownEntries.push({ path: `process:pid=${pid}`, source: "process-liveness" });
       continue;
@@ -1968,8 +2035,9 @@ export function evaluateObservationEntityConsumption(
     }
     // listen は観測に帰属確認属性（commandLine・cwd 等）を持たないため、台帳・既知残存の
     // 識別情報照合が範囲内の唯一の経路である。母集団宣言時、照合されない listen は本件との
-    // 確認された接続がなく attribution-unknown として報告のみへ分類する（範囲内の process は
-    // commandLine/cwd の識別子照合で従来どおり拒否される。宣言なしは現行どおり findings）。
+    // 確認された接続がなく attribution-unknown として報告のみへ分類する（listen の帰属確認
+    // 属性不在の限界。範囲内の process は commandLine/cwd の識別子照合と専用領域根の
+    // 束縛で従来どおり拒否される。宣言なしは現行どおり findings）。
     if (isOutsideCaseCreationPopulation(options.caseCreationScope, [])) {
       attributionUnknownEntries.push({ path: `listen:port=${port}`, source: "listen-port-check" });
       continue;
