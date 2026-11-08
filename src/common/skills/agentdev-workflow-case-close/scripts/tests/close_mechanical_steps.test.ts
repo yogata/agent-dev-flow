@@ -1156,10 +1156,10 @@ describe("pre-merge-local-state-check の機械自己出力の特定実体除外
     expect(report.warnings.join("\n")).toContain("worktree has uncommitted changes");
   });
 
-  test("除外は特定実体に限定され、台帳パス等の他実体は継続 fail する", () => {
+  test("除外は特定実体に限定され、他実体は継続 fail する", () => {
     const runner = fakeRunner({
       worktreeStatus:
-        "?? .agentdev/close-acceptance/issue-3942.json\n?? .agentdev/tmp/verification-resources/3928.json\n",
+        "?? .agentdev/close-acceptance/issue-3942.json\n?? scratch-output.json\n",
       issueBody: "- [x] A\n",
       acceptanceRecordIssueNumber: 3942,
     });
