@@ -579,3 +579,40 @@
 
 ---
 
+---
+
+## 2026-11-08: verify-only closure（prNumber 0）の機械工程正規構成は事前観測→stage1（記録なし fail 観測）→stage2（記録完備・accepted）の 3 実行で、fail 件数は bun test stderr から抽出する
+
+- **問題事象**: verify-only closure（PR も carrier commit も存在しない完了・Issue #3972 再開実行）で機械工程の fail 12 件に対する機械受理記録（integrityMachineAcceptance）を構築する際、機械工程報告の full-integrity-suite detail は stdout 先頭行のみ（bun test v1.3.6 バナー）を記録し、fail 件数（1/0/11）が取得できない。bun 1.3.6 のサマリー行「Ran N tests across M files」には fail 件数が含まれない
+- **発生局面**: case-close STEP-5 再開・機械工程 2 段階実行（対象版 5d8446414・main 5d8446414 = 機構是正 ee1af14e4 反映済み・2026-11-08 実測）
+- **検知方法**: stage1 機械工程実行（integrityMachineAcceptance なし）の full-integrity-suite fail（machine-acceptance-record-missing・failedGateNames split1/split3）と事前観測（bun test 3 分割を機械工程と同一コマンド・同一 cwd で直接実行・stdout/stderr 分離退避・UTF-8 明示書出し）の突合
+- **根本原因**: bun test は fail 件数を stderr の「N pass / N fail」行に出すため、機械工程報告（stdout のみ detail 記録）からは fail 件数が抽出できない構造。機械受理記録の observedFailCounts・suiteRunRecords.testCountSummary の構築には事前観測の実測値が必須
+- **自律対応内容**: (1) 事前観測で 3 分割直接実行・stderr 退避・fail 件数を「(fail) 行数と N pass / N fail カウント行の双方突合」で決定的抽出（2998/1・979/0・337/11 実測・split2 は #3979 テスト追加 5 件で 974→979 件に増えているため前回記録の盲信は不可） (2) stage1 を機械受理記録なしで実行し fail 構成観測（MUST DO の機械工程 2 段階実行） (3) stage2 を記録完備で再実行 → exitCategory success・全 11 step pass・warnings 0・accepted=true 書出し成立。 Epic 表更新（epicBodyPath・epicChildStatusUpdates）は機械工程に渡さない（blocked 行は closing 適用対象外で epic-table-analysis が warn を出し exitCategory success を壊すため。省略は入力契約上正当）
+- **ユーザー確認の有なし**: なし
+- **REQ/Decision/Design影響**: なし（実行形態契約 REQ-060・機械受理基準 REQ-032-046 は変更せず維持）
+- **横展開観点**: docs_chore 特例等の他の PR なし完了構成でも同一構成が使える。prNumber 0 は PR 不在の合意表現として入力検証で受理される（mergeable-polling は prNotApplicable で N/A pass・gh pr view 非発行）
+- **再発条件**: verify-only closure・PR なし完了構成で fail ありの bun test を機械受理する場合
+- **予防策候補**: 機械工程入力構築スクリプト（.cjs）に事前観測モードと stage2 モード（stage1 報告 + 退避 stderr からの fail 件数抽出・exit code 突合）を標準実装する
+- **想定反映先**: learning-promote（verify-only closure 実行手順の知識化判定）
+- **関連**: Issue #3972 再開完了記録 comment 6720052233・機構是正 Case #3979 / PR #3982・.agentdev/integrity/reports/case-3972-reopen-observe-buntest.json
+- **タグ**: #verify-only-closure #close_mechanical_steps #bun-test #fail-件数抽出 #機械受理
+
+---
+
+## 2026-11-08: Epic 実行構成表の blocked 行への completed 適用は closing では拒否され（already-blocked skip）reset→closing の 2 段階が正規経路
+
+- **問題事象**: case-close 機械工程の epicChildStatusUpdates で #3972（blocked）に completed を適用したところ epic-table-analysis が warn（already-blocked skip）になり、warning 残存で exitCategory が success にならず isCloseAcceptanceReady が成立しない
+- **発生局面**: case-close STEP-5 再開・Epic #3964 実行構成表更新（#3972 blocked→completed・7/7 化・2026-11-08 実測）
+- **検知方法**: stage1 機械工程報告の warnings「epic child status update skipped: #3972(already-blocked)」と tracking-table.ts 契約（TERMINAL_STATUSES = completed・blocked・failed・applyClosingStatus は既に終端子状態の行を上書きしない）の照合
+- **根本原因**: blocked は終端子状態であり人間判断・再開条件を含む保留状態のため、機械的な closing 書換（pending→completed の冪等置換）は既に終端の行に適用されない安全設計。blocked からの正規遷移は resetChildToPending（blocked→pending の冪等戻し）を前置する 2 段階のみ
+- **自律対応内容**: (1) 機械工程からは Epic 表更新を除外（epicBodyPath・epicChildStatusUpdates を省略） (2) issue_close 後に agentdev-epic-tracker 正規手順（reflect.ts reset → closing・最新取得済み本文に対して決定的適用・行差分突合 [#3972 のみ変化]・terminal 7/7 確認）を実施し issue_update で書込み（case-close 単一書き手・per-Epic 排他制御） (3) Epic 自動クローズ判定は reflect.ts overall で実行 → overallCompleted false（完了条件 1〜5 未評価）を報告（Epic クローズ自体は次段 case-close(#epic) 委譲が所有）
+- **ユーザー確認の有なし**: なし
+- **REQ/Decision/Design影響**: なし（agentdev-epic-tracker scripts 契約の運用確認）
+- **横展開観点**: failed 行からの completed 適用も同一 2 段階。Wave 反復中の一時 blocked と終端 blocked の区別は表では表現されないため、戻し経路（reset）の前置が必須
+- **再発条件**: 停止（blocked）経由で完了した子 Issue の Epic 反映を機械工程の closing 適用で行おうとした場合
+- **予防策候補**: blocked→completed 更新が必要な Case では、機械工程の epicChildStatusUpdates に blocked 行を含めず、issue_close 後の reset→closing 2 段階を標準手順とする
+- **想定反映先**: learning-promote（agentdev-epic-tracker 運用手順の知識化判定）
+- **関連**: Issue #3972 再開完了記録 comment 6720052233・Epic #3964 実行構成表（#3972 行 completed 更新済み）・src/common/skills/agentdev-epic-tracker/scripts/lib/tracking-table.ts
+- **タグ**: #epic-tracker #実行構成表 #blocked-行 #reset-closing #機械工程
+
+---
