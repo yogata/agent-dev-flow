@@ -310,3 +310,76 @@
 - **タグ**: #MSYSパス #traceability-check #委譲 #fail-closed #再観測
 
 ---
+
+## 2026-11-08: 期待値結合テストの事前確認は pin 期待値文字列で直接 grep する（Case #3968・PR 本文 capture）
+
+- **問題事象**: S3-7 事前確認を Issue 列挙の旧記述語句（作成ヘルパー・台帳・作成先拒否等）で grep したため、「作成先確認」「環境指定TEMP」を期待値とする pin（close_mechanical_steps.test.ts「作成先確認接続」）を事前検出できず、bun test 実行後に検出・追随更新した
+- **発生局面**: case-run 実装委譲内（adapter SKILL 文言変更の S3-7 事前確認）
+- **検知方法**: bun test 実行後の pin fail 検出（DEL-3968-1 PR 本文検証差分 3）
+- **根本原因**: 語句を除去する変更の pin 事前確認を、除去語句そのものではなく周辺語句（pin 期待値候補）で行うべきところを Issue 列挙語句で実施した
+- **自律対応内容**: bun test 実行後に pin を検出し同一 PR で期待値を追随更新（adapter 対象を除外）。Level 2 解消（DEL-3968-2）で最終的に main 版採用となり当該 pin は消滅したが、事前確認手法自体の改善知見として記録
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし
+- **横展開観点**: 語句除去系変更では除去語句そのものではなく、周辺語句（作成先確認・環境指定TEMP 等）を pin 期待値候補として grep するのが確実
+- **再発条件**:文言除去変更で pin 期待値を事前 grep せず bun test 後検出に頼る場合
+- **予防策候補**: 実行委譲契約の test strategy 事前確認手順に pin 期待値候補語句での grep を明記
+- **想定反映先**: agentdev-case-run-execution-adapter references/harness-delegation.md（test strategy 実行手順）
+- **関連**: Case #3968・PR #3974 本文 Findings/learning 候補・DEL-3968-1 検証差分 3
+- **タグ**: #pin追随 #期待値結合テスト #事前確認 #grep
+
+---
+
+## 2026-11-08: bun test 統合テスト系は worktree 環境で timeout fail が恒常発生・merge 後 branch では正規領域一時 worktree（detached・origin/main）で bun test 直接実行が pre-existing 判定の実測経路（Case #3968・PR 本文 capture）
+
+- **問題事象**: scripts 統合テスト系（install/projection 系 11件）が worktree 環境で 2.2秒〜31秒 timeout fail を恒常的に発生させる（baseline でも同一結果）。冷キャッシュ初回実行の probe fail は再実行で判別可能
+- **発生局面**: case-run / case-close の bun test フル suite（3 cwd 分割）実行
+- **検知方法**: split3 の fail 明細と baseline 再現実行の同一結果照合（DEL-3968-1/3968-2 検証差分・case-close 検証差分）
+- **根本原因**: worktree の junction 未伝播環境と統合テストの timeout 前提の相互作用（実行環境差）。コード欠陥ではない
+- **自律対応内容**: pre-existing fail の由来分類を stash 復帰ではなく正規領域（.agentdev/tmp/）への一時 detached worktree（origin/main・bun install 不要で bun test 直接実行）で実測再現する経路を確立し、merge で main を取り込み済みの branch でも baseline 実測再現を機械的に立証できた
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（受理由件7 の baseline 再現確認記録〔detached-worktree・sameFailureReproduced〕の実測経路として活用）
+- **横展開観点**: merge 取り込み済み branch での pre-existing 判定は、当該 baseline commit（origin/main）の一時 detached worktree での直接実行が最短経路。baseline commit 進行時は最新 origin/main での再現確認が安全
+- **再発条件**: worktree での full suite 実行による環境固有 timeout fail の由来分類が必要になる場合
+- **予防策候補**: qg-4 受理由件7 の baseline 再現確認手順に detached worktree 実測経路の具体例を追記する判断は promote 判断で評価
+- **想定反映先**: agentdev-quality-gates references/qg-4-final-acceptance.md（受理由件7 運用補助）・agentdev-workflow-case-close 機械工程運用
+- **関連**: Case #3968・PR #3974 本文 Findings/learning 候補・Case #3967 の stash 復帰経路（比較対象）
+- **タグ**: #bun-test #timeout-fail #pre-existing #baseline再現 #detached-worktree
+
+---
+
+## 2026-11-08: pre-merge 機械工程の契約状態記録パスに終了判定記録（.agentdev/close-acceptance/）を含めない・機械工程自身が書出した記録の untracked 検出は humanConfirmedPaths で帰属確認する（Case #3968 close 実行）
+
+- **問題事象**: 機械工程 pre-merge の入力 contractStateCheck.contractStatePaths に .agentdev/close-acceptance/ を含めた結果、機械工程自身が書出した終了判定記録（issue-3968.json）が未コミット・未追跡検出となり contract-state-residue-check が fail（exitCategory failure・accepted 記録書出し拒否）した
+- **発生局面**: case-close STEP-2 機械工程 pre-merge 実行（契約状態残存検査）
+- **検知方法**: 機械工程報告 JSON の contract-state-residue-check step fail（uncommittedStateRecords: .agentdev/close-acceptance）と issue_close の fail-closed 拒否（targetRevision 不一致とは別個の事象として先に発生）
+- **根本原因**: 終了判定記録は恒久 commit 対象の契約状態記録ではなく一時保護記録（post-merge reclamation で回収・.agentdev/close-acceptance/ は git 履歴なし）であり、commit 済み検証の対象（正規契約で git 管理対象と宣言される記録）に含めるべきでなかった
+- **自律対応内容**: contractStatePaths から close-acceptance を除外し、機械工程が書出した記録の untracked 検出（ファイル単位 .agentdev/close-acceptance/issue-3968.json）を humanConfirmedPaths（path + 帰属根拠 basis 実体：機械工程報告 JSON の close-acceptance-record step 記録）で確認して再実行 → residue committed=true・accepted 記録書出し成立
+- **ユーザー確認の有無**: なし（帰属根拠が機械工程報告 JSON で機械的に立証可能な帰属確認）
+- **REQ/Decision/Design影響**: なし（検証に伴う一時資材の取扱いと後片付け責任 Design の記録様式どおりの運用）
+- **横展開観点**: 後続 close 群（#3970/#3971/#3972）で同様の入力組み立てをする際の標準形。終了判定記録は statePaths から除外し、検出時はファイル単位 humanConfirmedPaths で帰属確認する
+- **再発条件**: contractStatePaths への終了判定記録ディレクトリ誤指定
+- **予防策候補**: case-close 機械工程の入力組み立て手順に contractStatePaths の対象範囲（learning/intake/jev-observations 等の恒久契約記録のみ）を明記する判断は promote 判断で評価
+- **想定反映先**: agentdev-workflow-case-close SKILL.md「完了判定の契約状態記録・未追跡残存検証」節の運用補助・references/issue-resolution-and-qg4.md
+- **関連**: Case #3968 close 実行・機械工程報告 mechanical-report-premerge/premerge2
+- **タグ**: #contract-state-residue #終了判定記録 #humanConfirmedPaths #fail-closed #case-close
+
+---
+
+## 2026-11-08: Windows + bun 環境で gate を spawnSync 経由の bun run で起動すると SIGTERM で落ちる・module import 経由 + process.exit(exitCode) ラッパが安定実行経路（Case #3968 close 実行）
+
+- **問題事象**: agentdev-textlint-guard gate.ts を spawnSync（bun run gate.ts --json）経由で起動すると 300〜600 秒待機後 SIGTERM で終了し stdout 空となる事象が再現した（同 gate を bash 直接実行と module import 経由では 12〜300 秒程度で正常完了）
+- **発生局面**: case-close 機械工程 textlintGate の実行経路選択（機械工程 script は GateCommandSpec を spawnSync 相当で実行する）
+- **検知方法**: spawnSync ラッパ script の meta（timedOut: true・exitCode null）と bash 直接実行の成功（ok=true）との乖離
+- **根本原因**: bun run の子プロセス生存・終了タイミング問題（checker 実行契約 Design「安定実行経路」節の既知事象の別形態）。モジュール import 経由では発生しない
+- **自律対応内容**: gate を module import（await import(gate.ts)）で呼び出し runFinalGate を直接実行・証跡退避後に process.exit(result.exitCode) で明示終了するラッパ script を作成し、textlintGate の実行体として機械工程へ渡した（exit 0・12 秒・完了確認）
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（checker 実行契約 Design「安定実行経路」の例外経路〔process.exit 前の stdout flush 保証〕の適用）
+- **横展開観点**: 機械工程の GateCommandSpec で TS checker を bun 起動する場合、安定実行経路は module import 経由のラッパ（process.exit 付き）を command に指定する構成
+- **再発条件**: Windows + bun で CLI 起動形式（bun run <script>）を spawnSync 経由で使用する場合
+- **予防策候補**: checker 実行契約の安定実行経路節に spawnSync 経由の bun run 事象とラッパ構成例を追記する判断は promote 判断で評価
+- **想定反映先**: checker 実行契約 Design「安定実行経路」節・agentdev-workflow-case-close scripts README
+- **関連**: Case #3968 close 実行・textlint-gate 証跡（.agentdev/tmp/3968-close-verify/）
+- **タグ**: #bun #spawnSync #SIGTERM #安定実行経路 #module-import #process-exit
+
+---
+
