@@ -26,6 +26,7 @@ import { createCliRunner } from "../runner-cli.ts";
 import { createLocalRunner } from "../local/runner-local.ts";
 import {
   createGitHubStub,
+  localIssueUpdatedAt,
   makeCloseAcceptanceFixture,
   writeCloseAcceptanceRecord,
   writeRawCloseAcceptanceRecord,
@@ -301,6 +302,42 @@ describe("issue_close の終了前提検証（CliRunner + engine・TS-007）", (
     expect(outcome.kind).toBe("enforcement-crashed");
     expect(stub.issues[0]?.state).toBe("open");
     fs.rmSync(fixture.mainRoot, { recursive: true, force: true });
+  });
+
+  test("〔7〕PR を伴わない完了構成（verify-only closure）の終了判定記録は様式検証のみで受理される", async () => {
+    // issue_close の終了前提検証は様式4項目・対象一致・対象版一致・accepted の消費のみで
+    // PR 存在を判定入力に含まない（REQ-032-046: 全ての終了経路が機械受理の判定を消費する）。
+    // PR なし完了（機械工程の mergeable-polling N/A 経路が書き出した記録）は
+    // PR あり完了と同一の様式検証で受理される。GitHub 版 engine と Local 版 runner の
+    // 両終了経路で同一の受理を pin する。
+    const fixture = makeCloseAcceptanceFixture("ts007-a12-");
+    const stub = await setupCaseIssue(fixture, 1);
+    writeCloseAcceptanceRecord(fixture, 1, {
+      issueNumber: 1,
+      targetRevision: stub.issues[0]?.updated_at ?? "",
+      generatedAt: "2026-11-05T00:00:00Z",
+      accepted: true,
+    });
+    const closed = await closeViaEngine(stub, fixture, 1);
+    expect(closed.ok).toBe(true);
+    expect(stub.issues[0]?.state).toBe("closed");
+
+    const localFixture = makeCloseAcceptanceFixture("ts007-a12-local-");
+    const issuesDir = path.join(localFixture.mainRoot, ".agentdev", "issues");
+    const local = createLocalRunner({ issuesDir, closeAcceptanceIo: localFixture.io });
+    const created = await local.run({ operation: "issue_create", args: { title: "case", body: "body", role: "case", labels: [] } });
+    expect(created.ok).toBe(true);
+    const localUpdatedAt = localIssueUpdatedAt(issuesDir, 1);
+    writeCloseAcceptanceRecord(localFixture, 1, {
+      issueNumber: 1,
+      targetRevision: localUpdatedAt,
+      generatedAt: "2026-11-05T00:00:00Z",
+      accepted: true,
+    });
+    const localClosed = await local.run({ operation: "issue_close", args: { number: 1, reason: "completed" } });
+    expect(localClosed.ok).toBe(true);
+    fs.rmSync(fixture.mainRoot, { recursive: true, force: true });
+    fs.rmSync(localFixture.mainRoot, { recursive: true, force: true });
   });
 
   test("対象 Issue の読み取り失敗は前提検証の失敗として対象副作用を実行しない", async () => {

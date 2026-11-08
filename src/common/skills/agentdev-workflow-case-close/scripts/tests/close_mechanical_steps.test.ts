@@ -193,6 +193,12 @@ describe("入力検証（品質ゲートの省略禁止）", () => {
     expect(() => validateInput(badIssueNumber)).toThrow(/target-issue-number/);
     const fractionalIssueNumber = { ...base, issueNumber: 1.5 };
     expect(() => validateInput(fractionalIssueNumber)).toThrow(/target-issue-number/);
+    const negativePrNumber = { ...base, prNumber: -1 };
+    expect(() => validateInput(negativePrNumber)).toThrow(/prNumber/);
+    const fractionalPrNumber = { ...base, prNumber: 2.5 };
+    expect(() => validateInput(fractionalPrNumber)).toThrow(/prNumber/);
+    const zeroPrNumber = { ...base, prNumber: 0 };
+    expect(validateInput(zeroPrNumber).prNumber).toBe(0);
   });
 
   test("契約状態記録検査の入力形式違反を拒否する", () => {
@@ -1036,6 +1042,40 @@ describe("pre-merge 機械工程の実行（品質ゲート省略なし・報告
     expect(isCloseOperationPermitted(report).permitted).toBe(false);
   });
 
+  test("実経路: PR なし構成（prNumber 0・verify-only closure）では merge 前提確認を N/A pass とし gh pr view を発行しない", () => {
+    const runner = fakeRunner({ issueBody: "- [x] 条件1\n" });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ prNumber: 0, acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const polling = report.result.steps.find((s) => s.name === "mergeable-polling");
+    expect(polling?.status).toBe("pass");
+    expect(polling?.detail).toMatchObject({ prNotApplicable: true, prNumber: 0 });
+    // PR が構造的に存在しないため gh pr view は発行しない。
+    expect(runner.calls.filter((c) => c.command === "gh")).toHaveLength(0);
+    expect(report.result.exitCategory).toBe("success");
+    expect(decideExitCode(report)).toBe(0);
+    expect(report.warnings.join("\n")).not.toContain("mergeable state");
+    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+  });
+
+  test("実経路: PR なし構成でも mergeablePolling maxAttempts 0 の指定は N/A 経路へ吸収され warn にならない", () => {
+    const runner = fakeRunner({ issueBody: "- [x] 条件1\n" });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        prNumber: 0,
+        acceptanceVerdicts: [soundPass("AC-1")],
+        mergeablePolling: { intervalSeconds: 0, maxAttempts: 0 },
+      }),
+      runner,
+    );
+    const polling = report.result.steps.find((s) => s.name === "mergeable-polling");
+    expect(polling?.status).toBe("pass");
+    expect(polling?.detail).toMatchObject({ prNotApplicable: true, prNumber: 0 });
+    expect(report.result.exitCategory).toBe("success");
+    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+  });
+
   test("既知ゲート契約（--req の許容書式）と同一前提の入力検証で不正値を検査開始前に拒否する", () => {
     const runner = fakeRunner({ issueBody: "- [x] A\n" });
     // 空セグメント（REQ-1024-）は桁数上限なしの許容書式でも不正値。
@@ -1584,6 +1624,72 @@ describe("終了判定記録の書出し（変更後の正規完了判定への�
       targetRevision: "2026-11-05T08:00:00Z",
       accepted: true,
       written: true,
+    });
+  });
+
+  test("実経路: PR なし構成（prNumber 0）では受入評価・機械受理・契約状態記録検査の成立で accepted=true の終了判定記録を書き出す", () => {
+    const runner = fakeRunner({ issueBody: "- [x] 条件1\n" });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ prNumber: 0, acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    expect(report.result.exitCategory).toBe("success");
+    const expectedPath = path.join("<repo>", ".agentdev", "close-acceptance", "issue-3931.json");
+    const recordWrites = runner.writes.filter((w) => w.absolutePath === expectedPath);
+    const recordText = recordWrites[recordWrites.length - 1]?.content ?? "{}";
+    const record = JSON.parse(recordText) as Record<string, unknown>;
+    expect(record.issueNumber).toBe(3931);
+    expect(record.targetRevision).toBe("2026-11-05T08:00:00Z");
+    expect(Number.isNaN(Date.parse(String(record.generatedAt)))).toBe(false);
+    expect(record.accepted).toBe(true);
+    expect(record.judgment).toMatchObject({ determined: true, closeAllowed: true, blockingUnmet: [] });
+    expect(report.diff.closeAcceptanceRecord).toMatchObject({
+      targetRevision: "2026-11-05T08:00:00Z",
+      accepted: true,
+      written: true,
+    });
+    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+  });
+
+  test("実経路: PR なし構成でも機械受理が不成立の場合は accepted=false を書き出し終了操作を許可しない", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      integrityExitCodes: { check_integrity: 1 },
+    });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ prNumber: 0, acceptanceVerdicts: [soundPass("AC-1")] }),
+      runner,
+    );
+    const polling = report.result.steps.find((s) => s.name === "mergeable-polling");
+    expect(polling?.status).toBe("pass");
+    const integrityStep = report.result.steps.find((s) => s.name === "full-integrity-suite");
+    expect(integrityStep?.status).toBe("fail");
+    expect(report.result.exitCategory).toBe("failure");
+    expect(decideExitCode(report)).toBe(1);
+    expect(report.diff.closeAcceptanceRecord).toMatchObject({ accepted: false, written: true });
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("実経路: PR なし構成でも受入評価が不成立の場合は accepted=false を書き出し終了操作を許可しない", () => {
+    const runner = fakeRunner({ issueBody: "- [x] 条件1\n" });
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        prNumber: 0,
+        acceptanceVerdicts: [
+          { conditionId: "AC-1", required: true, category: "fail", grounds: {} },
+        ],
+      }),
+      runner,
+    );
+    const evaluationStep = report.result.steps.find(
+      (s) => s.name === "final-acceptance-evaluation",
+    );
+    expect(evaluationStep?.status).toBe("fail");
+    expect(report.result.exitCategory).toBe("failure");
+    expect(report.diff.closeAcceptanceRecord).toMatchObject({ accepted: false, written: true });
+    expect(isCloseOperationPermitted(report)).toEqual({
+      permitted: false,
+      reason: "acceptance-denied",
     });
   });
 

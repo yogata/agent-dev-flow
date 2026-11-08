@@ -4,7 +4,7 @@ case-close の機械工程 script（`scripts/src/close_mechanical_steps.ts`）�
 
 ## I/O 契約
 
-- 入力: `--input`（機械工程入力 JSON ファイル。phase〔pre-merge / post-merge〕、worktreeRoot、repoRoot、branch、prNumber、pre-mergeで必須のissueNumber（終了判定記録の対象 Issue 番号）とissueUpdatedAt（GitHub Issue `updated_at` / Local Issue frontmatter `updated_at` を対象Issueから独立取得した値）、品質ゲート実行仕様、契約状態記録検査入力、受入評価入力（acceptanceSubjectKind・acceptanceVerdicts・acceptanceCrossObligations・acceptanceEmptyBasis）、post-mergeでの終了判定記録回収指定〔reclamation.closeAcceptanceRecord〕等）、`--validate-input`（検証専用経路。後述）
+- 入力: `--input`（機械工程入力 JSON ファイル。phase〔pre-merge / post-merge〕、worktreeRoot、repoRoot、branch、prNumber（PR を伴わない完了構成〔verify-only closure・docs_chore 特例等〕では PR 不在を 0 で表現する。0 の場合は mergeable-polling を N/A pass〔prNotApplicable〕とし `gh pr view` を発行しない。負値・非整数は入力検証で拒否する）、pre-mergeで必須のissueNumber（終了判定記録の対象 Issue 番号）とissueUpdatedAt（GitHub Issue `updated_at` / Local Issue frontmatter `updated_at` を対象Issueから独立取得した値）、品質ゲート実行仕様、契約状態記録検査入力、受入評価入力（acceptanceSubjectKind・acceptanceVerdicts・acceptanceCrossObligations・acceptanceEmptyBasis）、post-mergeでの終了判定記録回収指定〔reclamation.closeAcceptanceRecord〕等）、`--validate-input`（検証専用経路。後述）
 - 出力: stdout に報告 JSON
 - 終了コード: 通常実行は成功 0、要判断 2、失敗 1。`--validate-input` は合格 0 / 不合格 1
 
