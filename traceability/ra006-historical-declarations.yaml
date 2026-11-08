@@ -1,0 +1,11 @@
+# REQ-119-004（docs 機械的整合是正 FD-01・履歴作業単位）の実装対応を本 sidecar で保持する。
+# 宣言原本は docs/designs/workflows/verification-resource-lifecycle.md ヘッダの
+# inline ADF-COVERS(implementation) 宣言（REQ-118 Design 再構成に伴う frontmatter updated 進行の
+# 5 対象ファイルのうち 1 件分。REQ-119-004 は履歴作業単位として行変更しない・AG-012）であり、
+# RA-006（Issue #3971）で現行責務（REQ-118 design 対応）と履歴対応を分離するために
+# inline から sidecar へ移設した。他の 4 対象ファイル（case-auto.md・case-run.md・req-define.md・
+# v51-phase-transition-and-coexistence-model.md）の履歴対応宣言は inline 維持。
+component: ra006-historical-declarations
+implementation:
+  docs/designs/workflows/verification-resource-lifecycle.md:
+    - REQ-119-004

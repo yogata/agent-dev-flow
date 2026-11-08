@@ -6,7 +6,6 @@ updated: 2026-11-08
 ---
 
 <!-- ADF-COVERS(design): REQ-118-001, REQ-118-002, REQ-118-003, REQ-118-004, REQ-118-005, REQ-118-006, REQ-118-007, REQ-118-008, REQ-118-009 -->
-<!-- ADF-COVERS(implementation): REQ-119-004 -->
 
 # 検証に伴う一時資材の取扱いと後片付け責任
 
