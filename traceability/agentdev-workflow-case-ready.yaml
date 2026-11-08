@@ -94,6 +94,7 @@ implementation:
     - REQ-017-022
     - REQ-017-023
     - REQ-017-024
+    - REQ-017-025
     - REQ-061-042
   src/common/skills/agentdev-workflow-case-ready/references/execution-structure.md:
     - REQ-035-012
@@ -157,3 +158,5 @@ verification:
     - REQ-061-034
     - REQ-061-035
     - REQ-061-040
+  src/common/skills/agentdev-workflow-case-ready/references/execution-contract.md:
+    - REQ-017-025
