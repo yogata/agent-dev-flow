@@ -1329,6 +1329,82 @@ describe("post-merge 機械工程（squash merge 後ローカル状態検査と�
     expect(decideExitCode(report)).toBe(2);
     expect(report.warnings.join("\n")).toContain("cleanup");
   });
+
+  test("main worktree 構成（worktreeRoot == repoRoot・Epic 最終close等）は worktree remove と branch --list を実行せず適用対象外として pass する", () => {
+    const runner = fakeRunner();
+    runner.calls.length = 0;
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        phase: "post-merge",
+        worktreeRoot: ".",
+        branch: "main",
+        cleanup: { removeWorktree: true, removeBranch: null },
+      }),
+      runner,
+    );
+    const step = report.result.steps.find((s) => s.name === "cleanup-worktree-branch");
+    expect(step?.status).toBe("pass");
+    const detail = step?.detail as {
+      applicability?: string;
+      worktreeRemoveExitCode?: number | null;
+      worktreeRemoveSkipped?: boolean;
+      branchListOutput?: string | null;
+    };
+    expect(detail.applicability).toBe("main-worktree-not-cleanup-target");
+    expect(detail.worktreeRemoveSkipped).toBe(true);
+    expect(detail.worktreeRemoveExitCode).toBeNull();
+    expect(detail.branchListOutput).toBeNull();
+    // 削除対象でない main working tree への削除試行・main ブランチの残存検知を行わない。
+    expect(runner.calls.some((c) => c.command === "git" && c.args[0] === "worktree")).toBe(false);
+    expect(runner.calls.some((c) => c.command === "git" && c.args[0] === "branch" && c.args[1] === "--list")).toBe(false);
+    expect(decideExitCode(report)).toBe(0);
+    expect(report.warnings.join("\n")).not.toContain("cleanup");
+  });
+
+  test("main worktree 構成でも明示指定された removeBranch の削除失敗は回収失敗として警告を維持する", () => {
+    const runner = fakeRunner();
+    runner.calls.length = 0;
+    const originalRun = runner.run.bind(runner);
+    runner.run = (spec) => {
+      if (spec.command === "git" && spec.args[0] === "branch" && spec.args[1] === "-d") {
+        return { exitCode: 1, stdout: "", stderr: "error: branch not found" };
+      }
+      return originalRun(spec);
+    };
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        phase: "post-merge",
+        worktreeRoot: ".",
+        branch: "main",
+        cleanup: { removeWorktree: true, removeBranch: "stale-feature" },
+      }),
+      runner,
+    );
+    const step = report.result.steps.find((s) => s.name === "cleanup-worktree-branch");
+    expect(step?.status).toBe("warn");
+    const detail = step?.detail as { branchDeleteExitCode?: number | null };
+    expect(detail.branchDeleteExitCode).toBe(1);
+    expect(decideExitCode(report)).toBe(2);
+    expect(report.warnings.join("\n")).toContain("cleanup");
+  });
+
+  test("cleanup.removeWorktree: false 指定時は git worktree remove を発行しない", () => {
+    const runner = fakeRunner();
+    runner.calls.length = 0;
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        phase: "post-merge",
+        cleanup: { removeWorktree: false, removeBranch: "case-100" },
+      }),
+      runner,
+    );
+    const step = report.result.steps.find((s) => s.name === "cleanup-worktree-branch");
+    expect(step?.status).toBe("pass");
+    expect(runner.calls.some((c) => c.command === "git" && c.args[0] === "worktree")).toBe(false);
+    // branch 側は通常構成どおり実行する。
+    expect(runner.calls.some((c) => c.command === "git" && c.args[0] === "branch" && c.args[1] === "-d")).toBe(true);
+    expect(decideExitCode(report)).toBe(0);
+  });
 });
 
 describe("報告 JSON の4要素組み立て", () => {

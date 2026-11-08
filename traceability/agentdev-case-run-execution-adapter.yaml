@@ -16,6 +16,7 @@ implementation:
     - REQ-108-023
     - REQ-110-033
     - REQ-118-001
+    - REQ-118-002
     - REQ-118-004
     - REQ-118-005
     - REQ-118-008
@@ -42,3 +43,8 @@ verification:
     - REQ-003-030
   src/common/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md:
     - REQ-003-030
+  docs/reports/req-118-migration-residue-verification.md:
+    - REQ-118-001
+    - REQ-118-002
+    - REQ-118-004
+    - REQ-119-007

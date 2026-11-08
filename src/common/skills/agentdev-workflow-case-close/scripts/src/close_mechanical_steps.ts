@@ -1801,11 +1801,18 @@ export function runCloseMechanicalSteps(
       for (const warning of outcome.warnings) warnings.push(warning);
       diff.reclamation = outcome.detail;
     }
-    const removed = runner.run({
-      command: "git",
-      args: ["worktree", "remove", worktreeCwd],
-      cwd: input.repoRoot,
-    });
+    // main working tree 構成（worktreeRoot == repoRoot・Epic 最終close等）は worktree
+    // とその checkout ブランチが削除対象外（REQ-118-005）。removeWorktree: false も
+    // worktree 削除を機械工程の外で管理する明示指定。両者は削除試行しない。
+    const mainWorktreeClose = worktreeCwd === path.resolve(input.repoRoot);
+    const worktreeRemovalSkipped = mainWorktreeClose || input.cleanup?.removeWorktree === false;
+    const removed: CommandResult | null = worktreeRemovalSkipped
+      ? null
+      : runner.run({
+          command: "git",
+          args: ["worktree", "remove", worktreeCwd],
+          cwd: input.repoRoot,
+        });
     let branchDeleted: CommandResult | null = null;
     if (input.cleanup?.removeBranch) {
       branchDeleted = runner.run({
@@ -1814,15 +1821,20 @@ export function runCloseMechanicalSteps(
         cwd: input.repoRoot,
       });
     }
-    const branchGone = runner.run({
-      command: "git",
-      args: ["branch", "--list", input.branch],
-      cwd: input.repoRoot,
-    });
-    const cleanupOk =
-      (input.cleanup?.removeWorktree === false || removed.exitCode === 0) &&
-      (branchDeleted === null || branchDeleted.exitCode === 0) &&
-      branchGone.stdout.trim().length === 0;
+    // branch --list 残存検知は通常構成のみ（main 側ブランチは常に存在するため）。
+    // 明示指定された removeBranch の削除失敗は回収失敗として維持する。
+    const branchGone: CommandResult | null = mainWorktreeClose
+      ? null
+      : runner.run({
+          command: "git",
+          args: ["branch", "--list", input.branch],
+          cwd: input.repoRoot,
+        });
+    const cleanupOk = mainWorktreeClose
+      ? branchDeleted === null || branchDeleted.exitCode === 0
+      : (input.cleanup?.removeWorktree === false || (removed?.exitCode ?? 1) === 0) &&
+        (branchDeleted === null || branchDeleted.exitCode === 0) &&
+        (branchGone?.stdout.trim().length ?? 1) === 0;
     steps.push({
       name: "post-merge-local-state-check",
       status: "pass",
@@ -1832,9 +1844,13 @@ export function runCloseMechanicalSteps(
       name: "cleanup-worktree-branch",
       status: cleanupOk ? "pass" : "warn",
       detail: {
-        worktreeRemoveExitCode: removed.exitCode,
+        applicability: mainWorktreeClose
+          ? "main-worktree-not-cleanup-target"
+          : "worktree-cleanup",
+        worktreeRemoveExitCode: removed?.exitCode ?? null,
+        worktreeRemoveSkipped: worktreeRemovalSkipped,
         branchDeleteExitCode: branchDeleted?.exitCode ?? null,
-        branchListOutput: branchGone.stdout.trim(),
+        branchListOutput: branchGone?.stdout.trim() ?? null,
       },
     });
     if (!cleanupOk) warnings.push("worktree/branch cleanup did not fully complete (要判断)");
