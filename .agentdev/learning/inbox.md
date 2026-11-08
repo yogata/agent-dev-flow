@@ -455,3 +455,39 @@
 
 ---
 
+## 2026-11-08: リポジトリ内作業領域の tsc 依存未整備環境では bun install 後に node_modules/.bin/tsc 直接起動が確実（Case #3971 case-run DEL-3971-1 実行・PR #3978 本文 Findings より回収）
+
+- **問題事象**: リポジトリ内作業領域（.agentdev/tmp/）の tsc 依存未整備環境では `bun run tsc --noEmit` が PATH 解決失敗でヘルプ出力を表示し、検証が通過扱いに見えるが実行されていない
+- **発生局面**: case-run DEL-3971-1 の typecheck（integrity scripts package）
+- **検知方法**: bun run tsc の出力がヘルプ表示であることの確認
+- **根本原因**: tsc への PATH 解決が未整備の作業領域で bun run が想定の依存を解決できない
+- **自律対応内容**: package.json の typecheck script の正規形（tsc --noEmit -p tsconfig.distribution-boundary.json）を bun install 後に node_modules/.bin/tsc 直接起動で実行して解消
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（REQ-117-007 の skip メッセージの正規整備手段と整合）
+- **横展開観点**: 依存未整備環境での typecheck 実行は node_modules/.bin/tsc 直接起動に統一する
+- **再発条件**: tsc 依存が未整備の作業領域で bun run tsc を実行する場合
+- **予防策候補**: typecheck 実行手順の統一は promote 判断で評価
+- **想定反映先**: integrity scripts の typecheck 実行手順・REQ-117-007 関連 reference
+- **関連**: PR #3978 本文 Findings / learning・Case #3971 case-run
+- **タグ**: #tsc #bun-run #typecheck #PATH解決 #REQ-117-007
+
+---
+
+## 2026-11-08: bash から node -e で機械工程入力 JSON を構築する際、Windows 絶対パスの文字列リテラルは shell 解釈で \\ エスケープが崩れて ENOENT になる・配列 join(String.fromCharCode(92)) か .cjs スクリプトファイル経由で構築する（Case #3971 close 実行）
+
+- **問題事象**: bash 内蔵 shell の node -e 一行スクリプトで Windows 絶対パスを `'C:\\\\Users\\\\...\\\\tmp\\\\3971...'` の文字列リテラルとして渡したところ、shell→node のエスケープ解釈が崩れて `\tmp` がタブ・`\03971` が `\u0003` に化け、機械工程が issueBodyPath の ENOENT で fail した
+- **発生局面**: case-close STEP-5 の機械工程冪等再実行（fresh updated_at で入力 JSON の issueBodyPath を node -e 一行で書き換えた場合）
+- **検知方法**: 機械工程の stderr に出た ENOENT の path 表示（タブ・制御文字混入が目視確認できた）
+- **根本原因**: bash の二重エスケープ解釈と node -e 文字列リテラルのエスケープ解釈が重なり、複数回のエスケープ層で正確な `\\` の記述が困難
+- **自律対応内容**: パスを配列 `['C:','Users',...].join(String.fromCharCode(92))` で構築して再実行し解消。初回の入力 JSON 構築は .cjs スクリプトファイル経由で成功しており、その経路が正規
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（機械工程入力構築の手順上の学び・契約変更なし）
+- **横展開観点**: bash から node -e でパスを含む JSON を構築する場合は Windows パスを文字列リテラルで直書きせず、配列 join またはスクリプトファイル経由に統一する
+- **再発条件**: bash 一行コマンドで Windows パスを含む JSON を node -e で生成・書き換える場合
+- **予防策候補**: 機械工程入力構築のヘルパースクリプト整備は promote 判断で評価
+- **想定反映先**: agentdev-workflow-case-close scripts README（機械工程入力 JSON の置き場所・構築手順）
+- **関連**: Case #3971 close 実行・機械工程報告（.agentdev/tmp/3971-close-verify/）
+- **タグ**: #node-e #bash エスケープ #windowsパス #機械工程入力 #ENOENT
+
+---
+
