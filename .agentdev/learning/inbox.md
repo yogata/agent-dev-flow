@@ -545,3 +545,37 @@
 
 ---
 
+## 2026-11-08: 配布物本文への concrete ID 直書きは配布依存境界 checker が baseline 差分として即座に検出する
+
+- **問題事象**: 配布 skill scripts 配下のソース（実装コメント）へ要件行 ID（concrete ID）を直書きしたところ、配布依存境界 checker（source profile）の baseline 比較で concrete-id 違反 1件が baseline（failures 0・scanned 496）からの差分として即座に検出された（Case #3979・PR #3982 実装中・計測 2026-11-08・ID 除去で解消）
+- **発生局面**: case-run 実装（close_mechanical_steps.ts のコメント追記・DEL-3979-1）
+- **検知方法**: `bun ./.opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary.ts --profile source --json .`（worktree root 実行）の failures 差分（concrete-id・baseline `.agentdev/tmp/db-3979-baseline.json`〔source profile・ok・failures 0〕との比較）
+- **根本原因**: 配布物本文への concrete ID 混入は配布依存境界違反。コメント内での要件行 ID 直書き禁止規律（「対応関係は traceability/ 配下 sidecar を参照」記述規律）は checker の baseline 比較で機械化・実効的に担保されている
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（既存検査機構の実効性確認・契約変更なし）
+- **横展開観点**: 配布対象の実装コメントにも concrete ID を書かない。要件対応は sidecar 参照の記述規律を守る
+- **再発条件**: 配布 skill ソース面のコメント・本文へ要件行 ID を記載する場合
+- **予防策候補**: 配布物変更 Case の実装時に checker baseline 比較を標準前置にする（concrete ID 混入の実効的な予防ゲートとして機能する実績）
+- **想定反映先**: learning-promote（運用手順の知識化判定）
+- **関連**: Case #3979 / PR #3982 本文検証差分（実装中初回検出・修正済み記録）
+- **タグ**: #配布依存境界 #concrete-id #checker #baseline
+
+---
+
+## 2026-11-08: bun test 分割③の junction 未伝播環境差は件数安定でも実行対象数を検証差分へ明記する
+
+- **問題事象**: bun test 分割③（.opencode/plugins/ ./scripts/）の fail 数は junction 未伝播環境の worktree 実行でも baseline と同一件数（11件）に安定したが、実行対象ファイル数の環境差（worktree の .opencode/plugins/ は空・21 files 348 tests 実行）が件数突合だけでは判別できない（Case #3979 close 実測・計測 2026-11-08）
+- **発生局面**: case-close STEP-2/3 の bun test 3分割正規形実測（merge 直前 HEAD d9f7d2ead・worktree root cwd・timeout 600s 明示）
+- **検知方法**: stderr 件数サマリー（Ran N tests across M files）の M 値の環境差（main root では plugins 分割対象が含まれる・worktree では 21 files。未伝播のため plugins 分割が未実施である旨は検証差分の環境ラベルで明記）
+- **根本原因**: worktree junction 未伝播により分割③の plugins 対象が欠落する構造的環境差は fail 件数には反映されない（欠落対象のテストが実行されないだけ・未実行対象を実行済みとして扱わない規律が必要）
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（既存知識の記録要件確認・契約変更なし）
+- **横展開観点**: verify-only closure に限らず通常 Case の worktree 実行でも同様。検証差分へ実行対象数の環境差（M 値と plugins 分割実施の別）を明記する記録要件を維持する
+- **再発条件**: worktree で bun test 分割③正規形を実行する場合
+- **予防策候補**: 検証差分記録テンプレートに「分割③ 実行対象数と plugins 分割実施の別」の明記欄を追加する検討（promote 判断）
+- **想定反映先**: learning-promote（既存知識 worktree-environment-fail-classification.md への補強判定）
+- **関連**: docs/knowledge/worktree-environment-fail-classification.md・Case #3979 / PR #3982 本文検証差分（環境ラベル記録）
+- **タグ**: #bun-test #worktree #junction #件数突合 #環境差
+
+---
+
