@@ -491,3 +491,57 @@
 
 ---
 
+## 2026-11-08: verify-only closure（PR なし）では機械工程が accepted=true の終了判定記録を書出せず issue_close が終了前提検証で拒否される
+
+- **問題事象**: 検証のみで完了する Issue（PR も carrier commit も存在しない verify-only closure・Wave-4 #3972）の case-close STEP-5 で、agentdev_gh issue_close の終了前提検証（close-acceptance・REQ-032-046 維持機構）が「判定が不成立（accepted=false）」として 2 回構造化拒否した。機械工程（close_mechanical_steps.ts）の受入評価・機械受理基準・契約状態記録検査はすべて成立済み（closeAllowed true・integrityMachineAcceptance accepted・committed）で、完了条件 13/13 達成済み
+- **発生局面**: case-close STEP-5 issue_close（Case #3964 / Issue #3972・verify-only closure・対象版 HEAD 49d94576b = origin/main・変更 0 件）
+- **検知方法**: issue_close の structured failure「the close acceptance record exists but the judgment is not accepted (accepted=false)」（targetRevision 不一致の第1拒否は機械工程冪等再実行で解消済み）
+- **根本原因**: 機械工程の accepted 書出し条件 `isCloseAcceptanceReady` が `report.result.exitCategory === "success"` を要求し、exitCategory success は mergeable-polling step pass（mergeable === "MERGEABLE" または prState === "MERGED" の実在 PR 観測）を前提とする。verify-only closure では PR が構造的に存在せず、mergeablePolling maxAttempts 0（ポーリング不実行）構成でも step は warn → exitCategory は needs-judgment で fixed。PR 前提の構造で Wave-1〜3 子 Issue は全て PR あり close のため露呈せず、verify-only closure は Wave-4 が初適用
+- **自律対応内容**: STEP-1〜4（QG-4 達成判定・docs 検証・機械工程 pre-merge・verify-only closure 判定）を完遂し、停止報告（記録種別 hold・comment 6717844662・再開条件記録）を投稿。Epic #3964 実行構成表 #3972 行を pending → blocked に更新（case-close 単一書き手）。機械工程報告は .agentdev/integrity/reports/case-3972-close-premerge.json に退避。機械工程 script・Tool は配布対象の実装変更であり本 Case（検証のみ・対象外に実装層の追加修正）では変更しない
+- **ユーザー確認の有無**: なし（fail-closed 機械契約の尊重・停止報告経路の正規適用）
+- **REQ/Decision/Design影響**: REQ-032-046（終了前提の機械受理）の判定内容適合と verify-only closure 対応・検証に伴う一時資材の取扱いと後片付け責任 Design「終了操作の安全境界と終了判定記録」節・close_mechanical_steps.ts（mergeable-polling の N/A 経路・accepted 書出し条件）・agentdev_gh close-acceptance（受理判定経路）
+- **横展開観点**: docs_chore 特例フロー（PR なし main 直接 commit）と Epic 最終 close 構成（worktreeRoot==main root・対象 PR merge 済みで polling が MERGED を観測する既存考慮）との整合照合。単一 Issue クローズ ルートの verify-only closure は PR 前提構造の全経路（機械工程・issue_close 前提検証・Local 版 runner）で同型ギャップが存在する可能性
+- **再発条件**: 検証のみで完了する Issue（実装変更を所有しない検証実行 Issue・docs_chore を除く PR なし完了）を case-close STEP-5 で issue_close する場合。実行環境メモ「issue_close 前に本文更新したら fresh updated_at で機械工程冪等再実行」は第1拒否の既知学びであり、第2拒否（accepted 検査）は新規
+- **予防策候補**: 機械工程 script に PR なし構成で exitCategory success となり accepted=true を書出す経路（mergeable-polling の N/A 化: prNumber 0 または PR 不在時の merge 前提確認省略と、受入評価・機械受理・residue 成立時の accepted 書出し）を追加する。または issue_close 前提検証に verify-only closure 用の受理判定経路を追加する。いずれも Definition 変更（REQ-032-046 の判定内容適合範囲）として req-define 経路で合意したうえで実装する
+- **想定反映先**: req-define（機構是正の要件化候補。REQ-032 系または case-close 機械工程の実装要件）
+- **関連**: Case #3964 / Issue #3972 停止報告 comment 6717844662・完了記録 comment 6717724355・機械工程報告 .agentdev/integrity/reports/case-3972-close-premerge.json・#3971 close（PR あり close の直近実績・case-3971-close-premerge-v2.json）
+- **タグ**: #verify-only-closure #issue_close #終了判定記録 #機械受理 #mergeable-polling #fail-closed
+
+---
+
+## 2026-11-08: verify-only closure での full integrity suite 実行時の分割③ plugins 対象欠落（junction 未伝播）と bun install 前置・リダイレクト先の運用学び（Wave-4 再観測）
+
+- **問題事象**: verify-only closure（実装変更なし・main 同一内容に対する検証）でも 3 検査 + full integrity suite を通常 Case と同水準で実行した際、分割③（bun test ./.opencode/plugins/ ./scripts/）の .opencode/plugins 対象欠落（worktree junction 未伝播環境）が同様に発生する。未実行対象を実行済みとして扱わず環境差として記録する運用が verify-only closure の証跡にも必要。既存知識 worktree-environment-fail-classification.md と整合する再観測
+- **発生局面**: case-run Wave-4 検証実行（Case #3964 / Issue #3972・DEL-3972-1）・verify-only closure 証跡
+- **検知方法**: bun test 分割③の実行結果（348 tests / 21 files・11 fail・install projection check 系・.opencode/plugins junction 未伝播による対象欠落）
+- **根本原因**: worktree に .opencode/plugins の junction が伝播しない環境特性（既知・同一構成）
+- **自律対応内容**: fail 12 件（split1 T6 1件 + split3 11件）全件を pre-existing・環境依存として由来分類し、機械受理基準の記録要素（終了コード・件数突合・実行環境・検査範囲・退避先）を SSoT コメントに記録。Wave-1〜3 close と同一 fail 構成を baseline detached worktree 実測（PR #3978 close 記録・baseline 0baf5df4c）と突合
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（既存知識の再観測・契約変更なし）
+- **横展開観点**: verify-only closure の証跡にも環境差（junction 未伝播による対象欠落）の記録を必ず含める
+- **再発条件**: junction 未伝播環境の worktree で full integrity suite を実行する全 Case
+- **予防策候補**: 既存知識 worktree-environment-fail-classification.md に verify-only closure の記録要件を追記する（promote 判断）
+- **想定反映先**: learning-promote（既存知識への追記判定）
+- **関連**: Case #3964 / Issue #3972 SSoT コメント issuecomment-6717238931・worktree-environment-fail-classification.md
+- **タグ**: #junction未伝播 #integrity-suite #verify-only-closure #環境差記録
+
+---
+
+## 2026-11-08: package 単位の bun install 前置後の worktree root cwd 正規形実行と退避ファイルの絶対パス指定
+
+- **問題事象**: worktree 内で各 package（case-close scripts・agentdev-gh・agentdev-gh-tool opencode/senpi・traceability scripts・integrity scripts・textlint-guard plugin）のテスト・checker を実行する際、package 単位の bun install 前置後に各 package のテストを worktree root cwd の正規形（`./` prefix 付きパス指定）で実行すれば依存解決が成立する。traceability check のように scripts cwd から実行する検査では、stdout/stderr の退避ファイルのリダイレクト先を cwd 相対でなく絶対パスで指定しないと失敗する実測
+- **発生局面**: case-run Wave-4 検証実行（Case #3964 / Issue #3972・DEL-3972-1）
+- **検知方法**: traceability check の相対リダイレクト失敗の実測
+- **根本原因**: cwd 相対リダイレクトは実行時 cwd に依存し、検査の実行 cwd（traceability scripts 配下）と退避先の意図（一時領域）がずれる
+- **自律対応内容**: 退避ファイルのリダイレクト先を絶対パスで指定して実行・SSoT コメントに運用手順を記録
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（検証実行手順の学び・契約変更なし）
+- **横展開観点**: scripts cwd から実行する検査（traceability check 等）の退避指定は全て絶対パスに統一する
+- **再発条件**: worktree 内の package 単位検証で cwd が実行対象ごとに変わる検査をリダイレクト付きで実行する場合
+- **予防策候補**: 検証手順テンプレートに「リダイレクト先は絶対パス」を明記する（promote 判断）
+- **想定反映先**: learning-promote（運用手順の知識化判定）
+- **関連**: Case #3964 / Issue #3972 SSoT コメント issuecomment-6717238931（verify-only closure 証跡・bun install 前置の記載）
+- **タグ**: #bun-install #worktree #リダイレクト #検証手順
+
+---
+
