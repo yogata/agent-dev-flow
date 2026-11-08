@@ -335,9 +335,22 @@ describe("終了判定記録の様式検証（parseCloseAcceptanceRecord）", ()
   test("機械工程の報告詳細などの追加項目は様式束縛の対象外として受理する", () => {
     const parsed = parseCloseAcceptanceRecord(JSON.stringify({
       ...baseRecord,
-      verificationResources: { state: "confirmed-empty", entries: [] },
+      closeReviewReport: { worktree: "feature/issue-3932", verificationRows: 3 },
     }));
     expect(parsed.ok).toBe(true);
+  });
+
+  test("旧様式相当（旧台帳照合の結果のみを含み判定内容 accepted を含まない記録）は受理しない", () => {
+    const parsed = parseCloseAcceptanceRecord(JSON.stringify({
+      issueNumber: 3932,
+      targetRevision: "2026-11-05T00:00:00Z",
+      generatedAt: "2026-11-05T12:00:00Z",
+      verificationResources: { state: "confirmed-empty", entries: [] },
+    }));
+    expect(parsed.ok).toBe(false);
+    if (!parsed.ok) {
+      expect(parsed.detail).toContain("requires a boolean accepted");
+    }
   });
 
   test.each([

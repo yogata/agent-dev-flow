@@ -62,7 +62,10 @@ for (const backend of ["GitHub", "Local"] as const) {
               issueNumber: condition === "issue-mismatch" ? 2 : 1,
               targetRevision: condition === "stale" ? "2020-01-01T00:00:00Z" : revision,
               generatedAt: "2026-11-05T01:00:00Z",
-              ...(condition === "missing-judgment" ? {} : { accepted: condition !== "denied" }),
+              ...(condition === "missing-judgment"
+                ? // 旧様式相当: 旧台帳照合の結果のみを含み、判定内容（accepted）を含まない記録。
+                  { verificationResources: { state: "confirmed-empty", entries: [] } }
+                : { accepted: condition !== "denied" }),
             });
           }
           if (condition === "malformed") writeRawCloseAcceptanceRecord(fixture, 1, "{invalid");

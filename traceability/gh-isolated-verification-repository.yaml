@@ -1,0 +1,7 @@
+component: gh-isolated-verification-repository
+implementation:
+  docs/knowledge/gh-isolated-verification-repository.md:
+    - REQ-118-006
+verification:
+  docs/knowledge/gh-isolated-verification-repository.md:
+    - REQ-118-006

@@ -277,6 +277,7 @@ case-run は委譲プロンプト構築時に本テンプレート構造を維�
 - PR 本文の必須セクション: Refs（Issue 番号）、実行識別情報（adf_delegation へ委譲単位識別子を転記）、検証差分（実行工程 case-run の行ごとに観測証跡を記録）、Findings / Capture候補、Design確定候補。正: adapter skill「実行担当サブエージェントの責務」節、agentdev-workflow-templates の実行識別情報・検証差分セクション規約
 - SSoT チャネル: 成功（completed-pr）は PR 本文、blocked / failed は Issue コメント。一時 session 通信・ローカル変数・中間ファイルは SSoT ではない。正: adapter skill「Result 契約（最小契約）」節の SSoT 表
 - 禁止事項の要点: 完了条件チェックボックス更新（case-close 専任）、Issue 進行状況更新（取りまとめ専任）、raw gh CLI による GitHub 書込み（Custom Tool 経由）、配布物本文への concrete ID 直書き（対応関係は traceability/ sidecar へ）、`.agentdev/intake/` `.agentdev/learning/` の直接変更、生 gh WRITE 迂回、スイープ stage（`git add -A` 等）。正: 委譲 prompt の MUST NOT DO セクション、capture-boundaries reference
+- 検証用一時資材と後片付け: 検証用remote、clone、bare repository、退避ログ、補助スクリプト、専用server・process等の検証用一時資材（worktree クリーンアップとは別の検証作業の資材）は、許可された範囲で作成・利用し、安全条件が成立する範囲で回収する。後片付けの実施結果、確認根拠、未処理事項（未回収・確認不能・引継ぎ）を報告へ含め、継続利用する資材は引継ぎ事項として報告する。許可範囲を超える必要副作用は既存の停止・判断経路を利用する。正: v4-delegation-contracts Design「検証用一時資材の作成・報告義務」節、検証に伴う一時資材の取扱いと後片付け責任 Design「一時資材の配置・利用・回収」節
 </delegation-contract-summary>
 ```
 
