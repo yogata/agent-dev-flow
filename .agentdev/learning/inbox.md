@@ -383,3 +383,75 @@
 
 ---
 
+## 2026-11-08: textlint gate ラッパの実行ランタイムは bun が正・node --experimental-strip-types の ESM loader は vendored bundle の blob: URL import を fail-closed ブロックする（Case #3970 close 実行）
+
+- **問題事象**: Case #3968 close で確立した module import + process.exit ラッパ経路を node --experimental-strip-types で実行したところ、textlint-guard の vendored engine bundle（textlint-engine.bundle.json）の動的 import が `Received protocol 'blob:'` で fail-closed ブロックされ gate が検査不能（exit 1・0 inspected）となった
+- **発生局面**: case-close STEP-3 機械工程 textlintGate 実行（merge 直前 HEAD の最終検査）
+- **検知方法**: 機械工程 1回目実行の textlint-final-check step fail（exitCode 1・stderrTail 空）→ ラッパ単独再実行でエラー本文を取得
+- **根本原因**: node v26 の既定 ESM loader は import 許可 scheme を file/data/node に制限しており、vendored bundle が使用する blob: URL 動的 import をブロックする（bun の ESM loader は blob: を解決する）。ラッパの module import 構成は正だが実行ランタイムの選択が環境依存だった
+- **自律対応内容**: ラッパの起動を `node --experimental-strip-types` から `bun <wrapper.mts>` に変更（runFinalGate の module import + process.exit 構成は変更なし）→ exit 0・ok=true・拒否対象違反ゼロを確認し、機械工程 2回目で textlint-final-check step pass
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（checker 実行契約「安定実行経路」の運用補完・実装変更なし）
+- **横展開観点**: 機械工程の GateCommandSpec で module import ラッパを使う TS checker は、vendored bundle（blob: 動的 import）を含む場合ラッパの実行 command は bun を指定する。node は vendor 非依存 checker 向けの選択肢
+- **再発条件**: node --experimental-strip-types で vendored bundle を import する checker ラッパを実行する場合
+- **予防策候補**: checker 実行契約「安定実行経路」節への実行ランタイム選択規律（vendored bundle 含有 → bun）の追記は promote 判断で評価
+- **想定反映先**: checker 実行契約 Design「安定実行経路」節・agentdev-workflow-case-close scripts README
+- **関連**: Case #3970 close 実行・Case #3968 close のラッパ確立学び・textlint 証跡（.agentdev/tmp/3970-close-verify/textlint-bun-stdout.json）
+- **タグ**: #node-esm-loader #blob-url #vendored-bundle #textlint #安定実行経路 #bun
+
+---
+
+## 2026-11-08: git worktree remove が .git メタデータ削除後に物理ディレクトリ削除へ失敗し「メタデータ消滅 + 物理残骸」を残す・rm -rf と prune での掃除と照合を織り込む（Case #3970 close 実行）
+
+- **問題事象**: post-merge 機械工程の cleanup-worktree-branch で `git worktree remove .worktrees/3970-feature` が exit 255 で失敗。直後に `git worktree list` から対象が消え（メタデータ削除済み）`is not a working tree` となる一方、.worktrees/3970-feature が物理残存した
+- **発生局面**: case-close STEP-6 worktree/branch 削除（bun install 済み worktree・node_modules 30MB の gitignore 領域あり）
+- **検知方法**: 機械工程報告 JSON の cleanup-worktree-branch step warn（worktreeRemoveExitCode 255）と worktree list / 物理ディレクトリ実在確認の乖離
+- **根本原因**: git worktree remove の物理削除段階が Windows のファイルロック等で失敗したと推定。メタデータ削除は先行して完了するため、失敗後に「git 管理上は存在しない・ディスクには残存する」半分状態を生む
+- **自律対応内容**: 物理ディレクトリの中身確認（空ディレクトリに縮退していた）→ rm -rf で物理削除 → git worktree prune → worktree list と .worktrees/ 実在確認で不存在を照合。branch は機械工程内で -d 削除・remote は deleteBranchOnMerge で自動削除済みを ls-remote で確認
+- **ユーザー確認の有無**: なし（untracked・gitignore 外の残存は 0件と実測済み）
+- **REQ/Decision/Design影響**: なし（既存の残骸掃除手順の具体化）
+- **横展開観点**: bun install 済み worktree の remove 後は、worktree list と物理ディレクトリ実在の双方を確認し、半分状態の場合は rm -rf + prune で掃除してから不存在確認へ進む
+- **再発条件**: Windows で gitignore 領域が重い worktree の remove を実行する場合
+- **予防策候補**: agentdev-git-worktree のクリーンアップ手順への半分状態掃除の追記は promote 判断で評価
+- **想定反映先**: agentdev-git-worktree references・agentdev-workflow-case-close references/cleanup-and-capture.md
+- **関連**: Case #3970 close 実行・postmerge 報告 JSON（.agentdev/tmp/3970-close-verify/postmerge.stdout）
+- **タグ**: #git-worktree-remove #windowsロック #残骸掃除 #半分状態 #prune
+
+---
+
+## 2026-11-08: bun test の実行形態逸脱が fail を実行形態由来として生む実測 — scripts cwd 直実行で 24 fail のうち 23件が正規形再実行で解消（Case #3970 case-run DEL-3970-1 実行）
+
+- **問題事象**: worktree の full integrity suite を scripts cwd 直実行（非正規形）で起動したところ 24 fail を観測。正規形（worktree root cwd・`./` prefix・timeout 600s 明示）での再実行で 23件が解消し、残 1件（relied-diff T6）のみ baseline でも再現する pre-existing と分類
+- **発生局面**: case-run DEL-3970-1 の full integrity suite 実行（REQ-060 の 3 cwd 分割正規形契約）
+- **検知方法**: 非正規形実行と正規形再実行の fail 件数差（24 → 1）の突合
+- **根本原因**: bun test の cwd 依存テストが混在するスイートで、cwd 逸脱により実行形態由来の fail が量産される（REQ-060 の実行形態契約の逸脱検知条件が実務で機能した事例。worktree 環境 fail 分類の knowledge と整合）
+- **自律対応内容**: 正規形（worktree root cwd・./ prefix）再実行で解消を確認し、fail 明細の由来分類を baseline 5fa75b7d9 detached worktree での再現確認で確定（T6 のみ pre-existing）
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（REQ-060 実行形態契約の逸脱検知の有効性実証）
+- **横展開観点**: worktree 環境の fail 分類では正規形再実行を前置し、実行形態由来 fail を由来分類へ混入させない
+- **再発条件**: bun test を scripts cwd 直実行など非正規形で起動する場合
+- **予防策候補**: worktree 環境 fail 分類 knowledge への実測事例追記は promote 判断で評価
+- **想定反映先**: docs/knowledge/ の worktree 環境 fail 分類 knowledge・REQ-060 関連 reference
+- **関連**: PR #3977 本文検証差分「bun test フル suite 実行環境ラベル」節・Case #3970 case-run
+- **タグ**: #bun-test #実行形態逸脱 #正規形再実行 #fail分類 #worktree
+
+---
+
+## 2026-11-08: worktree で bun install 前置後に tsc --noEmit が依存解決可能になる — package 境界ごとの前置要否は REQ-060-006 どおり（Case #3970 case-run DEL-3970-1 実行）
+
+- **問題事象**: worktree 環境では node_modules が伝播せず、bun install 前置なしの typecheck が依存解決に失敗する環境がある
+- **発生局面**: case-run DEL-3970-1 の typecheck（case-close scripts package）
+- **検知方法**: bun install --cwd 前置実施後の tsc --noEmit が終了コード 0（error 0件）で通過
+- **根本原因**: worktree は git 管理対象のみ伝播し node_modules（gitignore 対象）は main root に留まるため、package 境界ごとの bun install 前置が要否分岐となる（REQ-060-006 のとおり）
+- **自律対応内容**: bun install --cwd src/common/skills/agentdev-project-extensions/scripts と bun install --cwd .opencode/skills/repo-agentdev-integrity/scripts を前置し、typecheck と full suite を正規実行
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（REQ-060-006 の運用確認）
+- **横展開観点**: worktree での typecheck・test 実行は対象 package 境界の bun install 前置を手順に織り込む（node_modules は gitignore 対象・merge 差分への影響なし）
+- **再発条件**: worktree 環境で bun install 前置なしに package 依存を前提とする検証を実行する場合
+- **予防策候補**: REQ-060-006 の worktree 手順表への前置対象一覧の整備は promote 判断で評価
+- **想定反映先**: REQ-060 関連 reference・docs/knowledge/ の worktree 検証手順
+- **関連**: PR #3977 本文検証差分「依存パッケージ状態」節・Case #3970 case-run
+- **タグ**: #bun-install #worktree #node_modules #typecheck #REQ-060-006
+
+---
+
