@@ -616,3 +616,39 @@
 - **タグ**: #epic-tracker #実行構成表 #blocked-行 #reset-closing #機械工程
 
 ---
+
+## 2026-11-08: contract-state-residue-check の humanConfirmedPaths は untrackedListing の観測形（省略形 vs ファイル形）に一致させる必要がある
+
+- **問題事象**: Epic close 機械工程（Issue #3964）の contractStateCheck.humanConfirmedPaths にディレクトリ接頭辞 `.agentdev/close-acceptance/` を指定したところ、untrackedListing がファイル形 `.agentdev/close-acceptance/issue-3964.json` を観測したため正確一致せず、帰属不能検出（humanConfirmationItems）に計上されて contract-state-residue-check が fail（fail-closed）し exitCategory が failure になった
+- **発生局面**: case-close Epic Wave クローズ・機械工程 pre-merge 1段階目（Epic #3964 close・2026-11-08 実測・報告退避 .agentdev/tmp/epic3964-close-premerge-report.json → integrity/reports/epic-3964-close-premerge.json は 2段階目）
+- **検知方法**: 報告 JSON の diff.contractStateResidue.humanConfirmationItems と warnings（"untracked residue with undeterminable attribution requires human confirmation"）・evaluateContractStateResidue の一致判定は normalizeRelPath 後の正確一致のみ（isUnderPath は statePaths と approvalEntries にのみ適用）
+- **根本原因**: 省略形観測（`?? dir/`）を前提にしたディレクトリ接頭辞指定は matchesSelfAcceptanceRecordEntry（local-state-check 専用の省略形一致）とは異なり residue 検査では受理されない。観測形の事前確認なしに path 形式を仮定した
+- **自律対応内容**: humanConfirmedPaths をファイル単位 `.agentdev/close-acceptance/issue-3964.json`（実在の自己終了判定記録・機械工程報告 diff.closeAcceptanceRecord で実在確認済み・post-merge で退避後に回収）へ修正し、fresh updated_at で冪等再実行 → contract-state-residue-check pass（humanConfirmed 1 件・humanConfirmationItems 空）
+- **ユーザー確認の有無**: なし（機械工程 2段階実行〔運用学び (d)〕による冪等修正）
+- **REQ/Decision/Design影響**: なし（close_mechanical_steps.ts 契約の運用確認）
+- **横展開観点**: humanConfirmedPaths を渡す前に `git ls-files --others --exclude-standard` で観測形を確認する（省略形ならディレクトリ接頭辞・ファイル形ならファイルパス）。機械工程自己記録の観測は実行順序（close-acceptance-record step が residue 検査の前に書込む）により毎回出現する
+- **再発条件**: humanConfirmedPaths を観測形確認なしで省略形想定のディレクトリ接頭辞で指定した場合
+- **予防策候補**: 機械工程入力構築手順に「humanConfirmedPaths 指定前の untrackedListing 観測形確認」を含める。1段階目 fail は観測形を特定する実測として活用できる（運用学び (d) の 2段階実行と親和）
+- **想定反映先**: learning-promote（close_mechanical_steps 入力構築手順の知識化判定）
+- **関連**: Issue #3964 Epic close 完了記録 comment 6720643954・src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts（evaluateContractStateResidue）
+- **タグ**: #contract-state-residue #humanConfirmedPaths #機械工程 #fail-closed #2段階実行
+
+---
+
+## 2026-11-08: Epic close 構成（worktreeRoot == main root）の post-merge cleanup は main worktree remove 拒否と branch=main 残存が構造的に warn になる
+
+- **問題事象**: Epic close の post-merge 機械工程で cleanup-worktree-branch が warn（worktreeRemoveExitCode 128・branchListOutput "* main"）になり exitCategory が needs-judgment になった。worktreeRoot == repoRoot == main root の構成では削除対象が存在しないため、この warn は構造的に避けられない
+- **発生局面**: case-close Epic Wave クローズ・STEP-E6 post-merge 機械工程（Epic #3964 close・2026-11-08 実測）
+- **検知方法**: 報告 JSON の cleanup-worktree-branch detail（worktreeRemoveExitCode 128 = main working tree への git 拒否・branchListOutput "* main"）と git worktree list / git branch list の独立実測の突合
+- **根本原因**: post-merge cleanup step は単一 Issue close（worktree + feature branch 削除）を前提とし、Epic close 構成（main root 直接・branch main）の N/A 経路を持たない。mergeable-polling の prNumber 0 N/A pass（#3979 で実装済み）と異なり、cleanup は cleanup.removeWorktree: false でも branchListOutput 判定が warn を出す
+- **自律対応内容**: 意味レビューで構造的 N/A と確定: (1) 本 Epic 由来の worktree/branch は全削除済み（git worktree list 実測・feature/issue-3972 は前段 STEP-6 で削除済み） (2) worktreeRemoveExitCode 128 は main worktree（remove 不可の正）への拒否で実害なし (3) branch=main の存在は Epic close 構成の正常状態であり cleanup 残存ではない。cleanup.removeWorktree: false・removeBranch: null の入力構成で機械実行記録を残し、needs-judgment を報告として受理
+- **ユーザー確認の有無**: なし（機械工程報告の意味レビューはモデル担当〔機械工程の script 呼び出し契約〕）
+- **REQ/Decision/Design影響**: なし（case-close Design「機械工程の script 呼び出し契約」の運用確認・Epic close 構成の cleanup N/A 経路は後続の機構整理候補）
+- **横展開観点**: Epic close（worktreeRoot == main root）をまたぐ Case の post-merge は常に同一 warn 構成になる。warn の意味レビューで参照する実測（git worktree list・branch list・本 Epic 由来 worktree/branch の不在）を報告に含める
+- **再発条件**: Epic Issue または PR なし完了構成で post-merge 機械工程を実行した場合（毎回構造的に発生）
+- **予防策候補**: close_mechanical_steps.ts の post-merge cleanup に Epic close 構成判定（worktreeRoot == repoRoot）を入力検証レベルで追加し、cleanup を N/A pass として記録する経路の整備
+- **想定反映先**: learning-promote（Epic close 構成の post-merge 機械工程運用の知識化判定）
+- **関連**: Issue #3964 Epic close 完了記録 comment 6720643954・機構是正 Case #3979 / PR #3982（mergeable-polling prNumber 0 N/A pass の先例）・.agentdev/integrity/reports/epic-3964-close-postmerge.json
+- **タグ**: #epic-close #post-merge #cleanup #機械工程 #needs-judgment
+
+---
