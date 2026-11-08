@@ -473,6 +473,9 @@ export function validateInput(value: unknown): CloseMechanicalInput {
     }
   }
   if (typeof v.prNumber !== "number") fail("input.prNumber is required");
+  if (!Number.isInteger(v.prNumber) || v.prNumber < 0) {
+    fail("input.prNumber must be a non-negative integer (0 means the completion path has no pull request)");
+  }
   const input = v as unknown as CloseMechanicalInput;
   if (v.reclamation != null) {
     if (input.phase === "pre-merge") {
@@ -867,10 +870,14 @@ function writeCloseAcceptanceRecord(
 /**
  * 終了判定記録の accepted 書出し条件（変更後の正規完了判定）。
  * 受入評価（必須完了条件の評価結果）の確定・許可に加え、契約状態記録の
- * コミット済み検査・未追跡残存検査（diff.contractStateResidue）の成立を
+ * コミット済み検査・未追跡残存検査（diff.contractStateResidue）と機械受理
+ * （full integrity suite の受理判定 diff.integrityMachineAcceptance）の成立を
  * 明示消費する。exitCategory success は全 step の pass を含むため residue
- * step の fail も含めて拒否するが、residue 判定の消費はここで明示的に行う
- * （契約状態記録・未追跡残存検査が終了判定記録の受理条件として失われない。対応関係は repository top-level traceability/ 配下 sidecar を参照）。
+ * step の fail も含めて拒否するが、residue 判定と機械受理の消費はここで
+ * 明示的に行う（契約状態記録・未追跡残存検査・機械受理基準が終了判定記録の
+ * 受理条件として失われない。対応関係は repository top-level traceability/ 配下 sidecar を参照）。
+ * PR を伴わない完了構成（mergeable-polling が N/A pass の構成）では merge 前提
+ * 確認は適用されないため、この条件は merge 前提の成立を要求しない。
  */
 function isCloseAcceptanceReady(report: CloseMechanicalReport): boolean {
   if (report.result.phase !== "pre-merge" || report.result.exitCategory !== "success") return false;
@@ -880,6 +887,10 @@ function isCloseAcceptanceReady(report: CloseMechanicalReport): boolean {
     | { committed?: boolean; humanConfirmationItems?: readonly string[] }
     | undefined;
   if (residue?.committed !== true || (residue.humanConfirmationItems?.length ?? 0) > 0) return false;
+  const machineAcceptance = report.diff.integrityMachineAcceptance as
+    | { accepted?: boolean }
+    | undefined;
+  if (machineAcceptance?.accepted !== true) return false;
   return true;
 }
 
@@ -1496,40 +1507,55 @@ export function runCloseMechanicalSteps(
       );
       return assembleReport(input.phase, steps, diff, warnings, proposal);
     }
-    const polling = input.mergeablePolling ?? { intervalSeconds: 10, maxAttempts: 30 };
-    let mergeable = "UNKNOWN";
-    let prState: string | null = null;
-    let attempts = 0;
-    for (; attempts < polling.maxAttempts; attempts++) {
-      const view = runner.run({
-        command: "gh",
-        args: ["pr", "view", String(input.prNumber), "--json", "mergeable,mergeStateStatus,state"],
-        cwd: input.repoRoot,
+    if (input.prNumber < 1) {
+      // PR を伴わない完了構成（verify-only closure・docs_chore 特例等の PR なし
+      // 完了。prNumber 0 は PR 不在の合意表現）。merge 前提確認は PR を伴う完了
+      // にのみ適用されるため N/A として pass 記録し、gh pr view
+      // を発行しない。step 記録に適用対象外であることを明示する。終了判定の
+      // 成立条件（受入評価・機械受理・契約状態記録検査）は後段 step で従来
+      // どおり実行され、accepted 書出し条件（isCloseAcceptanceReady）もそちら
+      // を消費する（merge 前提の適用対象外を受理条件の省略へ変換しない）。
+      steps.push({
+        name: "mergeable-polling",
+        status: "pass",
+        detail: { prNotApplicable: true, prNumber: input.prNumber },
       });
-      if (view.exitCode !== 0) {
-        steps.push({ name: "mergeable-polling", status: "fail", detail: { error: view.stderr.trim() } });
-        return assembleReport(input.phase, steps, diff, warnings, proposal);
+    } else {
+      const polling = input.mergeablePolling ?? { intervalSeconds: 10, maxAttempts: 30 };
+      let mergeable = "UNKNOWN";
+      let prState: string | null = null;
+      let attempts = 0;
+      for (; attempts < polling.maxAttempts; attempts++) {
+        const view = runner.run({
+          command: "gh",
+          args: ["pr", "view", String(input.prNumber), "--json", "mergeable,mergeStateStatus,state"],
+          cwd: input.repoRoot,
+        });
+        if (view.exitCode !== 0) {
+          steps.push({ name: "mergeable-polling", status: "fail", detail: { error: view.stderr.trim() } });
+          return assembleReport(input.phase, steps, diff, warnings, proposal);
+        }
+        const parsed = JSON.parse(view.stdout) as { mergeable?: string; state?: string };
+        mergeable = parsed.mergeable ?? "UNKNOWN";
+        prState = typeof parsed.state === "string" ? parsed.state : null;
+        // 既merge PR は mergeable 算出の対象外（GitHub API は merged PR に UNKNOWN を返すため
+        // ポーリングで変化しない）。state=MERGED は merge 前提が成立済みであることの実観測であり、
+        // Epic 最終close構成（worktreeRoot==main root・対象PRは既にmerge済み）の false-positive
+        // 要判断を除去する。開いている PR の MERGEABLE/CONFLICTING/UNKNOWN 判定は従来どおり。
+        const mergePrerequisiteSatisfied = mergeable === "MERGEABLE" || prState === "MERGED";
+        if (mergePrerequisiteSatisfied) break;
+        if (mergeable === "CONFLICTING") break;
+        runner.sleep(polling.intervalSeconds * 1000);
       }
-      const parsed = JSON.parse(view.stdout) as { mergeable?: string; state?: string };
-      mergeable = parsed.mergeable ?? "UNKNOWN";
-      prState = typeof parsed.state === "string" ? parsed.state : null;
-      // 既merge PR は mergeable 算出の対象外（GitHub API は merged PR に UNKNOWN を返すため
-      // ポーリングで変化しない）。state=MERGED は merge 前提が成立済みであることの実観測であり、
-      // Epic 最終close構成（worktreeRoot==main root・対象PRは既にmerge済み）の false-positive
-      // 要判断を除去する。開いている PR の MERGEABLE/CONFLICTING/UNKNOWN 判定は従来どおり。
       const mergePrerequisiteSatisfied = mergeable === "MERGEABLE" || prState === "MERGED";
-      if (mergePrerequisiteSatisfied) break;
-      if (mergeable === "CONFLICTING") break;
-      runner.sleep(polling.intervalSeconds * 1000);
-    }
-    const mergePrerequisiteSatisfied = mergeable === "MERGEABLE" || prState === "MERGED";
-    steps.push({
-      name: "mergeable-polling",
-      status: mergePrerequisiteSatisfied ? "pass" : "warn",
-      detail: { mergeable, state: prState, attempts: attempts + 1 },
-    });
-    if (!mergePrerequisiteSatisfied) {
-      warnings.push(`mergeable state is ${mergeable} after polling (要判断)`);
+      steps.push({
+        name: "mergeable-polling",
+        status: mergePrerequisiteSatisfied ? "pass" : "warn",
+        detail: { mergeable, state: prState, attempts: attempts + 1 },
+      });
+      if (!mergePrerequisiteSatisfied) {
+        warnings.push(`mergeable state is ${mergeable} after polling (要判断)`);
+      }
     }
 
     const status = runner.run({ command: "git", args: ["status", "--porcelain"], cwd: worktreeCwd });
