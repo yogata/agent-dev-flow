@@ -17,10 +17,11 @@ const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const TEMP_ROOT = join(TEMP_BASE, `phase-domain-state-${crypto.randomUUID().slice(0, 8)}`);
 
 // 必須存在エントリと許可エントリ集合を分離する。adoptions/（直接採用の採否記録。
-// 1採用1ファイル）と transitions/（工程遷移の遷移記録）は初回保存時に実体化する
-// domain state であり、不在を失敗にせず、実在する場合の許可集合に含める。
+// 1採用1ファイル）と transitions/（工程遷移の遷移記録）と revisions/（正規改訂の
+// 改訂記録。1改訂1ファイル）は初回保存時に実体化する domain state であり、
+// 不在を失敗にせず、実在する場合の許可集合に含める。
 const REQUIRED_PHASE_ENTRIES = new Set(["README.md", "identity.yaml", "themes.md", "pending.md", "received"]);
-const ALLOWED_PHASE_ENTRIES = new Set([...REQUIRED_PHASE_ENTRIES, "adoptions", "transitions"]);
+const ALLOWED_PHASE_ENTRIES = new Set([...REQUIRED_PHASE_ENTRIES, "adoptions", "transitions", "revisions"]);
 const IDENTITY_FIELDS = ["undertaking", "target_version", "current_phase"] as const;
 
 interface ThemeEntry {
@@ -95,6 +96,26 @@ describe("phase domain state 領域の保存契約", () => {
     for (const entry of entries) {
       expect(ALLOWED_PHASE_ENTRIES.has(entry)).toBe(true);
     }
+  });
+
+  it("revisions/（改訂記録）が実体化しても許可集合検査に合格する", () => {
+    // 領域契約（phase/README.md「revisions/ の様式」・revision-record.ts の保存先）に沿った
+    // 保存が最初の改訂記録作成時に試験不合格にならないことを、テンポラリ複製で検証する。
+    const replica = join(TEMP_ROOT, "phase-replica-with-revisions");
+    rmSync(replica, { recursive: true, force: true });
+    mkdirSync(join(replica, "received"), { recursive: true });
+    for (const required of REQUIRED_PHASE_ENTRIES) {
+      if (required === "received") continue;
+      writeFileSync(join(replica, required), "");
+    }
+    mkdirSync(join(replica, "revisions"));
+    writeFileSync(join(replica, "revisions", "2026-11-10-rev-1.md"), "# 改訂記録（様式は README 契約）");
+    const entries = readdirSync(replica).filter((entry) => entry !== "received");
+    for (const entry of entries) {
+      expect(ALLOWED_PHASE_ENTRIES.has(entry)).toBe(true);
+    }
+    expect(entries).toContain("revisions");
+    rmSync(replica, { recursive: true, force: true });
   });
 
   it("identity.yaml が取組・対象版・現在工程の3フィールドを持つ", () => {
