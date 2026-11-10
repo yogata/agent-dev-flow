@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261110T100851Z-0046",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "E-1 参照整理一括（仮番号参照・権威参照旧指定・呼称世代混在の解決）の既存REQ照合",
+  "sourceRevision": "3896e71564a83990ed61c2ac3853e315e2c0d43c",
+  "durationMs": 796,
+  "inputTokens": 1971,
+  "inputs": {
+    "requestDigest": "a92b217ac6775fdf34d2306614a7a3a6cad5729f87700b9afb45a806d242b990",
+    "snapshot": "req-input adf-simplification-c-gamma-reference-cleanup (生成 2026-11-10T19:05+09:00、源泉: ADF全体簡素化調査・実装計画第53報告 v8・2026-11-10 利用者承認、planned_cases: C-γ(E-1))。対象 E-1: 仮番号参照53ファイル＋権威参照の旧指定＋呼称の世代混在を実在識別子・現行呼称へ解決。採番規則の形式例示は残す。機械抽出(REQ-{N 等の検出)→個別判断→修正を一括実施。受け入れ条件: 修正後の機械抽出で根拠示しの仮番号が0件、置換先が元の記述が要求する正規の条項・定義であることを置換対象ごとに確認(実在識別子へ置き換えただけでは合格としない)、形式例示の残存は意図と記録、リンク・参照検査合格。完了条件: 試験基線(合計5,598試験・既知不合格12件)に新規不合格0件、配布物(src/ 配下)へ新規 REQ/DEC 識別子参照を追加しない(IR-055 差分0件)、整合性検査(QG 相当)合格。対象外: B1〜B3(別 req-input)、形式例示そのものの削除・採番規則の変更、仮番号が指す元報告の再評価。"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-existing-req-matching",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.26,
+        "REQ操作なし": 0.69,
+        "保留": 0.05
+      }
+    },
+    {
+      "questionId": "q2-matching-confidence",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.48,
+        "false": 0.52
+      }
+    }
+  ],
+  "confidence": 0.61,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-existing-req-matching",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q2-matching-confidence",
+        "value": false
+      }
+    ]
+  }
+}
