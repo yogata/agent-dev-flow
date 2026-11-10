@@ -61,7 +61,7 @@ updated: 2026-10-03
 | REQ-008 | 構造化 req_draft 契約 | IR-016 | ドメイン状態 |
 | REQ-003 | 外部エージェント統合契約 | IR-006, IR-024 | commands, skills |
 | v2:REQ-0140 | 文書品質ゲート | IR-013 | docs, Design, document-type-responsibilities.md |
-| REQ-009 | ローカル版 OpenCode 導入方式とローカルIssue運用 | IR-016, IR-046, IR-047, IR-048 | src/common/tools/agentdev-gh/local/, .opencode/commands/agentdev/, .opencode/skills/agentdev-*/, .agentdev/issues/, Design, guides |
+| REQ-009 | ローカル版 OpenCode 導入方式とローカルIssue運用 | IR-016, IR-046, IR-048 | src/common/tools/agentdev-gh/local/, .opencode/commands/agentdev/, .opencode/skills/agentdev-*/, .agentdev/issues/, Design, guides |
 | REQ-002 | 配布物ID除去後の文意保持、構文健全性、責務整合 | IR-016 | docs, Design, docs-spec-rebuild-integrity.md |
 | v2:REQ-0143 | Command 定義ファイルフォーマット標準化 | IR-049 | commands, command-file-format.md |
 | REQ-010 | docs-check/integrity 運用是正 | IR-016, IR-052 | integrity scripts, docs-check, Design |
@@ -102,7 +102,7 @@ REQ-002-028、029、035 は RETIRE 扱いとし、それぞれの検査（構文
 - **REQ-005**: Command protocol (2 ルール)
 - **REQ-006**: Case 実行オーケストレーション (3 ルール)
 - **v2:REQ-0107**: Reporting (2 ルール)
-- **REQ-009**: ローカル版 OpenCode 導入方式とローカルIssue運用 (4 ルール: IR-016, IR-046, IR-047, IR-048)
+- **REQ-009**: ローカル版 OpenCode 導入方式とローカルIssue運用 (3 ルール: IR-016, IR-046, IR-048)
 - **REQ-010**: docs-check/integrity 検出設計改善 (4 ルール: IR-044, IR-050, IR-051, IR-052)
 - **REQ-003**: 実行契約、委譲、プロセス設計 (3 ルール: IR-006, IR-032, IR-033)
 - **REQ-003**: 文書化規律、HITL境界 (3 ルール: IR-013, IR-019, IR-035)
@@ -162,3 +162,13 @@ IR-011（Mapping table 全件記録、file-backed tombstone）の物理削除に
 
 > 旧タイトルの復元は tag `v2.4.0` で確認可能。
 > Phase 4 では交叉参照の保存と再配置を責務とし、旧タイトル詳細の復元は別途歴史参照作業とする。
+
+### IR-047 削除に伴う交叉参照再配置
+
+IR-047（src/opencode-local link origin dir structure）は、実行検出が配布境界 checker の lib 実装（`lib/distribution-boundary-rules.ts`、IR-046・IR-048 として統合）へ移行したため、tombstone とカタログ/所有表の AUTOGEN 導出エントリを削除した（PR #3347、OU-009、commit df187fd86）。
+影響マトリクスの REQ-009 行と影響カテゴリの REQ-009 行から IR-047 を除去し、現行有効ルール（IR-016, IR-046, IR-048）のみを列挙する。
+本節は REQ-001-013（廃止識別子への参照は移行表・履歴節・置換連鎖による履歴参照に限定）に基づく交叉参照の再配置である。
+
+| 旧交叉参照 | 旧タイトル | 再配置元 | 再配置日 | 後継 |
+|---|---|---|---|---|
+| `IR-047` | src/opencode-local link origin dir structure | 影響マトリクス REQ-009 行・影響カテゴリ REQ-009 行（PR #3347 で tombstone 削除時に未更新の残存参照） | 2026-11-11 | なし（実行検出は IR-046・IR-048 の配布境界 checker lib 実装へ統合済み） |
