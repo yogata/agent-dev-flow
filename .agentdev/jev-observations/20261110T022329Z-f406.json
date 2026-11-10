@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261110T022329Z-f406",
+  "workflow": "case-ready",
+  "evaluationKind": "scope-overlap-detection",
+  "subject": "Root Case #3988（C-β 文書系契約整合）の既存オープンIssueとの対象範囲交差判定",
+  "sourceRevision": "7a6de96ed7ed0ea4f682f89421b4f77bf5a93b2d",
+  "durationMs": 1479,
+  "inputTokens": 1129,
+  "inputs": {
+    "requestDigest": "a6298cfd80086047cc393259791c76083e57b84a9b1a5d4971259344b0327be5"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "scope-overlap",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.07,
+        "false": 0.9299999999999999
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "scope-overlap",
+        "value": false
+      }
+    ]
+  }
+}
