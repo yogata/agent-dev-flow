@@ -2,7 +2,7 @@
 title: ローカルIssue共通スキーマ
 status: accepted
 created: 2026-06-20
-updated: "2026-10-18"
+updated: "2026-11-10"
 ---
 <!-- ADF-COVERS(implementation): REQ-009-014, REQ-009-026, REQ-009-027, REQ-009-028, REQ-009-029, REQ-009-030, REQ-009-031, REQ-009-032, REQ-009-033, REQ-009-034, REQ-009-037, REQ-009-039 -->
 <!-- ADF-COVERS(implementation): REQ-011-007 -->
@@ -63,7 +63,7 @@ role: case のローカルIssueは工程別の再開入口フィールドを持�
 追跡Issueの物理表現。保持する情報の意味論（role、kind、状態と状態遷移、再評価・解決・反映追跡の意味）は agentdev-issue-tracking Design を正とする。
 
 - `status` 値域: 追跡Issue 6状態の論理トークンと同一値（`created`、`in-discussion`、`on-hold`、`ready`、`resolved`、`closed`）。agentdev-issue-tracking Design の状態の三段写像に従う
-- `labels` 値域: kind 4値（`problem`、`idea`、`task`、`risk`）からちょうど 1 つ。追加ラベルは許容しない（機械検証）。物理写像表の正は agentdev-issue-tracking Design
+- `labels` 値域: 原則空配列。通常ラベルの任意付与可（labels は Tool 契約上の必須フィールドであり、付与するラベル値の選択は任意、起票時の既定付与は設けない）。値域の列挙拘束とラベル値域の機械検証は適用しない（`role: case` の値域所属検証は現行どおり維持する）。kind は本文標準構造の kind 項目で表現し、ラベルでは表現しない。物理写像表の正は agentdev-issue-tracking Design
 - 本文: 追跡Issue本文の標準構造（件名、背景、影響、関連成果物、選択肢、判断材料、不足情報、保留理由と再評価条件、解決結論、反映先と反映状態、関連 Case Issue 参照）に従う。Case 固有セクション（PR 相当セクション、マージ結果）を必須項目としない
 - コメント相当履歴: GitHub Issue コメント相当の検討経過を、本文内の追記型コメント相当セクション（日時エントリの時系列）として保持する。物理表現は `## 検討経過` セクションに `### {ISO 8601 日時}` 見出しと本文からなる日時エントリの時系列とする
 - クローズ: issue_close の reason（completed / not_planned）のいずれも `closed` へ遷移する。reason の詳細は `## 検討経過` の履歴で保持し、ローカル版 issue_read は closeReason を null として返す。再オープンは `closed` → `in-discussion` とする（agentdev-issue-tracking Design の再オープン遷移に従う）
