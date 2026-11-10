@@ -105,7 +105,7 @@ execution_unit 分割可能性があるにも関わらず case-open が停止し
 
 ### Purpose
 
-下位 command から受領した adversarial-review 由来の user-decision-required + decision_context を伝播し、当該 execution_unit の自走を停止してユーザー判断を待機する。
+下位 command から受領した adversarial-review 由来の user-decision-required + decision_context をまず bounded parent decision resolution（STEP-6）へ入力し、上位合意矛盾・新規ユーザー判断事項の2分類に帰着した場合に限り、当該 execution_unit の自走を停止してユーザー判断を待機する。
 
 ### Input Resolution
 
@@ -120,11 +120,12 @@ execution_unit 分割可能性があるにも関わらず case-open が停止し
 
 ### Procedure
 
-case-auto は当該 execution_unit の自走を停止し、ユーザー判断を待機する。
-停止伝播契約の詳細は case-auto command Design（project extension 経由参照）「adversarial-review 由来の停止伝播（case-auto の停止伝播受領）」節を正とする。
+case-auto は受領した decision_context をまず STEP-6（bounded parent decision resolution）へ入力し、STEP-6 で上位合意矛盾・新規ユーザー判断事項の2分類に帰着した場合に限り、当該 execution_unit の自走を停止してユーザー判断を待機する。
+停止伝播契約の詳細は case-auto command Design（project extension 経由参照）「停止伝播契約」節を正とする。
 
 - **受領**: case-run 起源は result `blocked` + user-decision-required 分類、工程委譲起源は既存 status + `parent_decision_required`（v4-lifecycle-state-machine Design「adversarial-review 由来の停止信号」節、v4-delegation-contracts Design「review 経路での parent_decision_required / decision_context 適用」節）。user-decision-required は case-run result enum 第5状態ではなく停止理由分類である
-- **自走停止**: 当該 execution_unit のみ停止。他 ready 対象は継続（部分停止、STEP-3 Wave 反復制御）
+- **bounded parent decision resolution 先行**: 受領した decision_context を STEP-6 へ先に入力する。正規契約から導出可能なもの・委譲された裁量の範囲内のものは回答して当該下位の再開点（resume point）から再開し、自走停止に進まない
+- **自走停止**: STEP-6 で上位合意矛盾・新規ユーザー判断事項に分類された場合のみ、当該 execution_unit のみ停止。他 ready 対象は継続（部分停止、STEP-3 Wave 反復制御）
 - **ユーザー提示**: decision_context をユーザーへ提示し判断を待機
 - **resume point**: case-run 起源は当該 Issue の case-run 再開ポイント（準備フェーズ、実装フェーズ、提出フェーズのいずれか）、工程委譲起源は当該工程の委譲起点
 - **再開**: ユーザー判断解決後、resume point から再開。adversarial-review 再発動要否は adversarial-review Design「再 review 条件」「再 review 停止条件」に従い case-auto は独自判断しない
@@ -136,7 +137,8 @@ user-decision-required は STEP-4 の HITL 境界停止条件分類とは独立�
 
 ### Result
 
-- 当該 execution_unit の自走停止
+- decision_context の STEP-6 入力と回答・resume（上位合意矛盾・新規ユーザー判断事項に帰着しない場合）
+- 上位合意矛盾・新規ユーザー判断事項に帰着した場合の当該 execution_unit 自走停止
 - decision_context のユーザー提示
 - resume point 記録
 
@@ -146,7 +148,7 @@ user-decision-required は STEP-4 の HITL 境界停止条件分類とは独立�
 
 ### Completion Verification
 
-- 当該 execution_unit のみ停止し、他 ready 対象が継続（部分停止）していること。ユーザー提示と resume point が記録されていること
+- 受領した decision_context を STEP-6 へ先に入力し、上位合意矛盾・新規ユーザー判断事項に帰着しない判断を自走停止せず回答・resume していること。帰着した場合のみ当該 execution_unit のみ停止し、他 ready 対象が継続（部分停止）していること。ユーザー提示と resume point が記録されていること
 
 ### Resume-Idempotency
 

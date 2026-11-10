@@ -129,15 +129,15 @@ CI typecheck job での `git diff --exit-code` 検証は検討候補として記
 
 ## 委譲結果受領の最終ゲート（3点ゲート）
 
-case-run（受領側）は、委譲結果の受領時に最終ゲートとして次の3点を必須検査する:
+case-run（受領側）は、委譲結果の受領時に最終ゲートとして4状態 result（`completed-pr` / `blocked` / `failed` / `delegation-unavailable`）の必須検査と状態別の必須欄検査を行う:
 
-| 検査点 | 内容 |
+| result 状態 | 必須欄 |
 |---|---|
-| 4状態 result | `completed-pr` / `blocked` / `failed` / `delegation-unavailable` のいずれか1状態が明示されていること |
-| commit hash | 委譲内作業の commit hash が含まれること |
-| PR URL | 作成された PR の URL が含まれること |
+| `completed-pr` | 委譲内作業の commit hash、作成された PR の URL |
+| `blocked` / `failed` / `delegation-unavailable` | 停止理由と再開情報（SSoT 記録先を含む） |
 
-- 3点のいずれかが欠ける委譲応答を「要約で完結した `completed-pr`」として扱わない。実装・検証の要約は3点検査の通過を代替しない
+- 開始前・途中の停止結果に PR URL・commit hash を要求しない
+- 必須欄のいずれかが欠ける委譲応答を「要約で完結した `completed-pr`」として扱わない。実装・検証の要約は3点検査の通過を代替しない
 - 不足する委譲応答は `completed-pr` として扱わず再開（再委譲または継続指示）する。継続指示の場合、委譲先へ欠落している情報（commit hash、PR URL 等）の提出を指示する
 - **verify-only closure との整合**: PR も carrier commit も存在しない Issue 完了（verify-only closure）は、SSoT コメント（Issue コメント）契約の別経路として既存どおり扱う。3点ゲートの不足判定が正当な verify-only closure を再開扱いにしない。verify-only closure の完了証跡は SSoT コメントに記録された検証結果であり、PR URL・carrier commit の不在は不足判定の対象としない
 

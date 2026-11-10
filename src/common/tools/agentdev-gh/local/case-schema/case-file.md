@@ -55,7 +55,7 @@ labels: [feature]
 ## role: tracking の条件付きスキーマ（追跡Issue）
 
 - `status` 値域: 追跡Issue 6 状態（起票 `created`、検討中 `in-discussion`、保留 `on-hold`、実行準備完了 `ready`、解決済み `resolved`、クローズ済み `closed`）。三段写像は agentdev-issue-tracking Design が所有
-- `labels` 値域: kind（`problem`、`idea`、`task`、`risk`）からちょうど 1 つ
+- `labels` 値域: 原則空配列。通常ラベルの任意付与可（labels は Tool 契約上の必須フィールドであり、付与するラベル値の選択は任意、起票時の既定付与は設けない）。値域の列挙拘束とラベル値域の機械検証は適用しない（`role: case` の値域所属検証は現行どおり維持する）。kind は本文標準構造の kind 項目で表現し、ラベルでは表現しない
 - 本文: 追跡Issue本文の標準構造（件名、背景、影響、関連成果物、選択肢、判断材料、不足情報、保留理由と再評価条件、解決結論、反映先と反映状態、関連 Case Issue 参照）に従う。Case 固有セクションを必須項目としない
 - コメント相当履歴: `## 検討経過` セクションへ `### c{NN} {ISO 8601 日時}` 見出し + 本文のエントリとして時系列で保持する。旧形式の `### {ISO 8601 日時}` は最初のコメント書込時に移行する
 

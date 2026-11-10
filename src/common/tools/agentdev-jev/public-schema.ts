@@ -137,7 +137,9 @@ export const AGENTDEV_JEV_REQUEST_PROPERTY_SCHEMA = {
     "Structured Jev prior-evaluation operation request. See the agentdev_jev operation contract (evaluate, " +
     "observation_write). The public contract is provider- and SDK-independent. When the credentials " +
     "(CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN) are unset, evaluate returns a distinct not_configured failure " +
-    "without calling the API; callers fall back to the legacy LLM path. No auto-retry on API failure. Evaluation " +
+    "without calling the API (no observation generated); on evaluator failures (including not_configured/unset " +
+    "credentials) a mandatory closed semantic evaluation must not fall back to LLM reasoning — the judgment stays " +
+    "undetermined and dependent successors are suppressed (caller workflow contract). No auto-retry on API failure. Evaluation " +
     "language is Japanese. " +
     "One semantic evaluation = one observation: evaluate persists the observation (one JSON) under " +
     ".agentdev/jev-observations/ right after the evaluator succeeds (and a failure observation when the call " +

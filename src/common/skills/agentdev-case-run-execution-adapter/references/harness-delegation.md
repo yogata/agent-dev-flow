@@ -272,7 +272,7 @@ case-run は委譲プロンプト構築時に本テンプレート構造を維�
 ```markdown
 <delegation-contract-summary>
 - result 契約（4状態）: 実行完了時は completed-pr（PR番号/ PR URL を伴う）、回答可能な blocker は blocked、repository context で回答不能な blocker は failed、委譲起動不能は delegation-unavailable（実行未試行のため pending に戻す）。正: adapter skill「Result 契約（最小契約）」節
-- 3点ゲート: result に (1) 4状態のいずれか1状態、(2) 委譲内作業の commit hash、(3) PR URL の3点を必ず含める。要約で完結した completed-pr は 3点の代替にならない。正: adapter skill「委譲結果受領の最終ゲート（3点ゲート）」節
+- 3点ゲート: result に 4状態のいずれか1状態と状態別の必須欄を含める（completed-pr は委譲内作業の commit hash・PR URL、blocked・failed・delegation-unavailable は停止理由と再開情報〔SSoT 記録先を含む〕。開始前・途中の停止結果に PR URL・commit hash を要求しない）。要約で完結した completed-pr は 3点の代替にならない。正: adapter skill「委譲結果受領の最終ゲート（3点ゲート）」節
 - worktree 隔離: 引き渡された worktree root 配下でのみ作業する。メインリポジトリ・他 worktree でのファイル編集は禁止（検知時は直ちに停止し failed、詳細は Issue コメントに構造化記録）。実装開始前に worktree 内判定で自己検証する。正: adapter skill「worktree 隔離の遵守（禁止事項）」節
 - PR 本文の必須セクション: Refs（Issue 番号）、実行識別情報（adf_delegation へ委譲単位識別子を転記）、検証差分（実行工程 case-run の行ごとに観測証跡を記録）、Findings / Capture候補、Design確定候補。正: adapter skill「実行担当サブエージェントの責務」節、agentdev-workflow-templates の実行識別情報・検証差分セクション規約
 - SSoT チャネル: 成功（completed-pr）は PR 本文、blocked / failed は Issue コメント。一時 session 通信・ローカル変数・中間ファイルは SSoT ではない。正: adapter skill「Result 契約（最小契約）」節の SSoT 表
@@ -343,7 +343,7 @@ adapter skill は本要件を宣言的に定義し、case-run からの委譲 pr
 配布 SKILL（`agentdev-case-run-execution-adapter` SKILL.md）の委譲契約自体は変更しない（起動手段は harness 責務）。
 
 1. **起動不能の事前判定（能力検出）**: 委譲起動前に、実行担当サブエージェント型の利用可否、起動 API の状態、実行 command の起動可否等の能力を検出する。検出された制限は直ちに `delegation-unavailable` の根拠とせず、次の接合形態決定の入力とする
-2. **接合形態の決定**: 能力検出の結果、委譲起動が不可能な場合は、委譲実行者によるプロセス内直接実装を接合形態として決定する。プロセス内直接実装では、result 契約（4状態）、3点ゲート（4状態 result・commit hash・PR URL）、PR 本文 SSoT の委譲契約を self-apply する（Case #3086 で実証済みの履行形態）。これは配布 SKILL の委譲契約の変更ではなく、同一契約の自己適用である。プロセス内直接実装も不可能な場合に限り `delegation-unavailable` とする（実行未試行のため Issue を `pending` に戻す）
+2. **接合形態の決定**: 能力検出の結果、委譲起動が不可能な場合は、委譲実行者によるプロセス内直接実装を接合形態として決定する。プロセス内直接実装では、result 契約（4状態）、3点ゲート（4状態 result 必須＋状態別必須欄。completed-pr は commit hash・PR URL、blocked・failed・delegation-unavailable は停止理由と再開情報〔SSoT 記録先を含む〕）、PR 本文 SSoT の委譲契約を self-apply する（Case #3086 で実証済みの履行形態）。これは配布 SKILL の委譲契約の変更ではなく、同一契約の自己適用である。プロセス内直接実装も不可能な場合に限り `delegation-unavailable` とする（実行未試行のため Issue を `pending` に戻す）
 3. **記録**: 接合形態の決定事実と実行結果を SSoT に記録する。`completed-pr` の場合は PR 本文（`## Findings / Capture候補` に接合形態がプロセス内直接実装〔self-apply〕である旨を明記）、`blocked`/ `failed` の場合は Issue コメントに構造化記録する。記録方式は後述「委譲起動失敗、異常終了時事後処理」と同一の SSoT 契約に従う
 
 接合形態がプロセス内直接実装に決定された場合の実行（実装、検証、PR 作成）は、委譲契約の通常経路と同一の品質ゲート、test strategy 項目の test-fix ループ、traceability check を適用する。

@@ -3,7 +3,8 @@
 # 正本: docs/designs/local/local-case-file.md「role: tracking の条件付きスキーマ」「labels 値域（role: case）」
 # 要件: REQ-009-029
 #
-# role ごとの labels 値域を定義する。role: tracking の kind 値の意味論の正は
+# role ごとの labels 値域を定義する。role: tracking の labels 値域は値域定義を持たない
+# （原則空配列・通常ラベルの任意付与可）。role: tracking の kind 値の意味論の正は
 # agentdev-issue-tracking Design が所有する。
 # 本ファイルは docs/designs/local/local-case-file.md と矛盾してはならない。
 
@@ -14,22 +15,10 @@ canonical_spec: "docs/designs/local/local-case-file.md"
 # role 条件付き labels 値域
 role_conditional_labels:
   tracking:
-    enum_ref: "#tracking_label_enum"
-    constraint: "kind 4 値からちょうど 1 つを含める"
+    constraint: "原則空配列。通常ラベルの任意付与可（付与するラベル値の選択は任意、起票時の既定付与は設けない）。値域の列挙拘束とラベル値域の機械検証は適用しない。kind は本文標準構造の kind 項目で表現し、ラベルでは表現しない"
   case:
     enum_ref: "#case_label_enum"
     constraint: "0 個以上を選定"
-
-# role: tracking の labels 値域（kind と同値）
-tracking_label_enum:
-  problem:
-    description: "問題。解決が必要と認識された未解決事項"
-  idea:
-    description: "アイデア。将来の改善・拡張の候補"
-  task:
-    description: "作業。実施が見込まれる作業項目"
-  risk:
-    description: "リスク。将来の不確実な懸念"
 
 # role: case の labels 値域
 case_label_enum:
@@ -50,7 +39,7 @@ case_label_enum:
 
 # ガードレール
 constraints:
-  - "role に対応する enum に存在しないラベルを追加してはならない"
+  - "role: case に対応する enum に存在しないラベルを追加してはならない（role: tracking は値域の列挙拘束と機械検証の適用外）"
   - "labels は配列として扱い、単一文字列としては扱わない"
   - "labels を状態遷移やワークフロー状態の代替として扱わない"
-  - "role: tracking は kind 4 値からちょうど 1 つを含める（機械検証）"
+  - "role: tracking の labels 値域は原則空配列・通常ラベルの任意付与可（値域の列挙拘束と機械検証の適用外）。kind は本文標準構造の kind 項目で表現する"
