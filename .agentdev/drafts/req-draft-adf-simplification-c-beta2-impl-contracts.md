@@ -8,7 +8,7 @@ source_rus: []
 
 # 要件doc draft: 実装系契約是正7件（A-7〜A-13・C-β2）の要件定義
 
-ADF全体簡素化調査（全2,079ファイル評価・第50報告）に基づく実装計画（第53報告 v8・2026-11-10 利用者承認）の C-β2「実装系契約是正 A-7〜A-13」を正規工程（要件改訂・Design 改訂・Case・PR・検査）で実施するための要件定義。前段の C-α1（PR #3986）・C-β（PR #3992・Issue #3988）は完了済みで、計画の定める受入条件（A-1〜A-6 の受入完了後に別 req-input で投入）が満たされたため本入力を投入した。
+ADF全体簡素化調査（全2,079ファイル評価・第50報告）に基づく実装計画（第53報告 v8・2026-11-10 利用者承認）の C-β2「実装系契約是正 A-7〜A-13」を正規工程（要件改訂・Design 改訂・Case・PR・検査）で実施するための要件定義。前段の C-α1（PR #3986）・C-βのA-1〜A-6（PR #3992・Issue #3988）は統合・クローズ済みであり、A-7〜A-13 の本 req-input への分割は監督上の処理である（計画本文にその分割が明示されているわけではなく、入力ファイル本文の記載による）。
 
 ## 入力と区別
 
@@ -22,10 +22,12 @@ ADF全体簡素化調査（全2,079ファイル評価・第50報告）に基づ�
 - STEP-4/5: agentdev-architecture-advisory に A-13 正本所在・A-7 契約形状・A-9 境界設計・Decision 要否を照会し、4ラベル構造の助言を受理・分類採用（確定事項: A-13 正本は case-auto Design〔REQ-034-007 適用〕、A-7 は暗黙推測禁止を REQ 行に固定し機構は Design、A-9 は design-first、A-7/A-8/A-9/A-13 に新規 Decision 不要。A-10〜A-12 は親エージェントが同一根拠〔入出力形式・workflow 定義・既存 Design 適用範囲内・新機構なし〕で Decision 不要を補完確認）。助言の未確認事項（統合後の最終対応表の各セル値、GitHub 版対象識別の受理のみ扱い）は要件本文と分離し、Design 適用時の全件照合・例外宣言パターン（pr_merge commitHash と同一形式）で処理する
 - STEP-6: 決定的組立・検査を assemble-draft-section.ts（version 0.2.0）で実施（5操作すべて dry-run 合格・証拠は assembly_evidence）。REQ-011 追加行は要件テーブル（2列構造 `| ID | 要件 |`、現行末尾 REQ-011-033）への追記として突合済み
 - STEP-8 adversarial-review: 3論理役割・2系統の独立 stream で審議し、本質的争点 2件を受理反映。(1) REQ 行（A-7）の「作成対象の Case（Issue）」は GitHub 版の対象解決（head branch）と過剰に衝突するため「作成対象」へ一般化、(2) case-auto Design 停止伝播節の「user-decision-required は停止理由分類節の分類軸とは独立する」記述が正本テーブル統合と矛盾するため、同節の位置づけ更新を ACT-DESIGN-005 として追加。非本質的指摘（intro と既存 L310 の参照重複等）は簡約維持の判断で棄却
+- 訂正（2026-11-10・監督者による承認計画照合の指摘5件を反映）: (1) TS-003・AG-003・RA-003 の合格条件を検出件数の非減少からケース単位の対応づけ回帰（変更前に拒否した書込みケースが変更後も拒否・変更前に許可した読取りケースが変更後も通過）へ変更。(2) ACT-DESIGN-003 を現行10分類のみの対応表（対応停止条件列追加・値域変更なし）+ infra-transient（停止種別）と user-decision-required（付随報告分類）の位置づけ分離へ再構成し、ACT-DESIGN-005 を廃止（case-auto Design L536 の「分類軸とは独立する」既存規定と新構成が整合するため）。(3) 上位合意矛盾・新規ユーザー判断事項の定義に bounded parent decision resolution で解決できない場合の限定（stop-and-decision-resolution.md L68 と case-auto Design L305-306 の現行規定と同一条件）を反映。(4) 別 req-input 分割の由来を監督上の処理として訂正（入力ファイル本文の記載どおり。計画本文の明示事項ではない）。(5) gh api オプション分類の根拠を gh CLI 実動作（gh api --help: パラメータ追加時の既定 POST 切替、--method GET 指定時のクエリ文字列化、フラグ実名 -f/--raw-field・-F/--field・--input）で確認し本文に明記。IR-053 例外登録文は現行 Design の既存文（当初組立検査の old_text 完全一致により保存時点から存在を実証）であり今回の変更は保持のみ。訂正後の組立検査（ACT-DESIGN-002・003 の再実行）2/2 合格、ACT-DESIGN-005 の組立証拠は廃止に伴い削除
 
 ## 重要変更の事前通知の実施記録
 
 - 第1次（2026-11-10T19:31+09:00）: ドラフト保存（write 実行）に先立つセッション出力として、REQ-011 への要件行2行追加、custom-tool-contracts Design 2節更新、case-auto Design 3箇所更新の事前通知（変更理由・変更内容・影響・確定事項と未確認事項の区別）を実施した
+- 第2次（2026-11-10T23:22+09:00）: 訂正保存に先立つ追加通知として、A-13 の Design 構成変更（現行10分類表+停止種別/付随報告の位置づけ分離・ACT-DESIGN-005 廃止・上位合意矛盾の先行条件限定）、A-9 合格条件のケース単位対応づけ回帰への変更、別 req-input 分割の由来訂正（監督上の処理）、gh api 境界の根拠明記を差分通知した
 
 # draft-data
 
@@ -39,7 +41,7 @@ summary: >-
   （A-7〜A-13）を正規工程で実施する。REQ-011 へ pr_create の対象識別明示契約と読戻し照合
   3項目（base・head・body 一致必須）の2要件行を追加し、custom-tool-contracts Design に
   pr_create 契約・gh api 暗黙 POST を含む副作用分類境界を定める。case-auto Design の停止理由分類を
-  分類・実行結果状態・利用者判断要否・再開入口の対応表を持つ単一正本に整理し、実行参照文書は
+  現行10分類（値域変更なし）の対応表と停止種別・付随報告の位置づけからなる単一正本に整理し、実行参照文書は
   簡約する。textlint guard の配布方針追随、README-INSTALL の導入先誤指定是正、case-close
   完了条件受け入れ判定の個別対応化は、既存 REQ・Design の規定どおりとする実装是正として
   realization_actions へ構造化する。配布物（src/ 配下）の本文に新規の REQ/DEC 識別子参照を
@@ -60,7 +62,7 @@ agreed_items:
       pr_create の読戻し照合 3項目（A-8）。PR 作成成功の読戻し照合（VERIFY）に base・head・body を含め、3項目とも作成時送信値と読戻し値の一致を必須とする（実装計画で固定した値であり変更しない）。各項目の不一致は成功確認を拒否し、検証不一致を伴う成功を返さない（REQ-011-023 の WRITE VERIFY 一般則の pr_create 適用）。誤対象・誤分支の PR が成功確認を通過しないことを試験で証明する。読戻しに必要な取得情報（runner-cli の取得項目、head の短縮形式と完全形式等の物理表現の正規化を含む）は Design が定める。
   - id: AG-003
     content: |-
-      gh write 検出器の暗黙 POST 検出境界（A-9）。gh api の暗黙 POST（-f・-F・--raw-field・--input 等のフィールド系・入力系オプションによる、明示メソッド指定を欠く POST）を検出する境界を、副作用有無の分類範囲として先に Design（custom-tool-contracts「迂回防止」節）に定め、検出器（gh-command-detector.ts）はそれに従って修正する。明示的な GET 指定と併用するフィールド系オプション（クエリパラメータ化される読み取り）は許容対象とし、解析不能または曖昧な組合せは書込み側に分類して拒否する（検出器の over-block 許容・under-block 不許可の方針）。あわせて読み取り目的のコマンド（gh api 読み取り・gh pr view 等）への過剰拒否を見直す。対処による見逃しの増加は禁止条件とし、対象の書込み（暗黙 POST を含む）が拒否されることと許可対象の読取りが通過することの両方を試験で証明する。複合シェル構文の既存検出を退行させない。
+      gh write 検出器の暗黙 POST 検出境界（A-9）。gh api の暗黙 POST（-f/--raw-field・-F/--field・--input 等のフィールド系・入力系オプションによる、明示メソッド指定を欠く POST）を検出する境界を、副作用有無の分類範囲として先に Design（custom-tool-contracts「迂回防止」節）に定め、検出器（gh-command-detector.ts）はそれに従って修正する。明示的な GET 指定と併用するフィールド系オプション（クエリパラメータ化される読み取り）は許容対象とし、解析不能または曖昧な組合せは書込み側に分類して拒否する（検出器の over-block 許容・under-block 不許可の方針）。あわせて読み取り目的のコマンド（gh api 読み取り・gh pr view 等）への過剰拒否を見直す。対処による見逃しの増加は禁止条件とし、件数比較ではなく、変更前に拒否した書込みの各試験ケースが変更後も同じく拒否されること（ケース単位の対応づけ）と、変更前に許可していた読取りの各ケースが変更後も通過することの両方を試験で証明する。複合シェル構文の既存検出を退行させない。
   - id: AG-004
     content: |-
       textlint guard の配布方針追随（A-10）。配布方針変更（導入時生成・PR #3238・DEC-047）が未反映の試験と生成コード説明を現行方針へ追随し、試験・説明・README・Design の四方で配布方針（版固定情報の配布と導入時生成）が一致する。REQ-029-012 と textlint-quality-runtime Design は現行方針どおりであり変更しない。
@@ -72,7 +74,7 @@ agreed_items:
       完了条件受け入れ判定の個別対応化（A-12）。close_mechanical_steps.ts（deriveAcceptancePopulation 等）・final-acceptance.ts の完了条件受け入れ判定が条件数のみで個別対応を持たない構造を是正し、正規の各完了条件と判定入力を、既存の条件本文・位置情報等を利用して個別に対応付ける。新たな恒久台帳は設けない。検証範囲には既存コミット再利用・途中再開・検証のみの経路（verify-only closure）を含め、いずれの経路でも最新の完了条件に対する判定の省略がないことを確認する。無関係な条件への判定・判定欠落・重複・古い条件への判定が誤って合格せず、正しい条件への判定が受理され、最終的な終了操作（issue_close の終了前提としての機械受理）まで拒否が有効であることを試験で証明する。REQ-032-001/031〜038/046 と case-close Design「完了条件単位の最終評価と非循環証拠」節の現行規定からの実装逸脱是正であり、REQ・Design は変更しない。
   - id: AG-007
     content: |-
-      停止理由分類集合の整合化（A-13）。case-auto の停止理由分類の不一致（実行参照文書の10分類と Design の9分類、同一文書内の「10分類」「9軸」の共存、分類詳細の参照先 dangling、infra-transient・user-decision-required の別文脈での再使用）を是正する。停止条件・停止理由・原因分類・利用者判断の要否・実行結果状態を区別した上で、正規の分類を case-auto Design「停止理由分類」節の一箇所に定め、Workflow Skill の実行参照文書・停止報告・再開指示は分類値の列挙と名前レベル参照（配布物本文に REQ/Decision 識別子の新規参照を追加しない）へ簡約する。既存の停止分類全件（現行10分類の各々、infra-transient、user-decision-required の位置づけ）について、停止理由・実行結果状態・利用者判断の要否・再開入口の対応を一覧として照合し、同じ停止事象が実行文書・Design・停止報告・再開指示で矛盾なく解釈できることを証明する。停止分類の新設・安全上必要な停止理由の削除は行わない（整合化のみ）。所有関係は「値域・定義・対応は Design、検出・分類適用・報告手順は Workflow Skill」と分割する（REQ-034-007・DEC-010 適用）。
+      停止理由分類集合の整合化（A-13）。case-auto の停止理由分類の不一致（実行参照文書の10分類と Design の9分類、同一文書内の「10分類」「9軸」の共存、分類詳細の参照先 dangling、infra-transient・user-decision-required の別文脈での再使用）を是正する。停止条件・停止理由・原因分類・停止種別・付随報告・利用者判断の要否・実行結果状態を区別した上で、正規の分類を case-auto Design「停止理由分類」節の一箇所に定め、Workflow Skill の実行参照文書・停止報告・再開指示は分類値の列挙と名前レベル参照（配布物本文に REQ/Decision 識別子の新規参照を追加しない）へ簡約する。既存の停止分類全件（現行10分類の各々）について、停止理由・対応停止条件・実行結果状態・利用者判断の要否・再開入口の対応を一覧として照合し、infra-transient（停止種別）と user-decision-required（停止伝播に付随する報告分類）は分類一覧の値と区別して位置づける。上位合意矛盾・新規ユーザー判断事項は bounded parent decision resolution で解決できない場合に限定して報告する（実行参照文書の停止伝播先行条件〔A-2〕と同一停止事象で一意に読めること）。同じ停止事象が実行文書・Design・停止報告・再開指示で矛盾なく解釈できることを証明する。停止分類の新設・安全上必要な停止理由の削除は行わない（整合化のみ）。所有関係は「値域・定義・対応は Design、検出・分類適用・報告手順は Workflow Skill」と分割する（REQ-034-007・DEC-010 適用）。
 artifact_actions:
   - id: ACT-REQ-011-001
     artifact: req
@@ -112,7 +114,7 @@ artifact_actions:
     content: |-
       読み取り系の許容: agentdev_gh の読み取り操作が operation-failed（安全ページ上限到達等）で継続不能になった場合の contingency として、読み取り専用 gh CLI の手動実行（gh issue list --search 等、読取形式に限定）を許容する。書込み系（作成・更新・クローズ・merge・comment）の直接実行は許容しない（gh api の読取り・書込みの区分は後述の「gh api の副作用分類境界」に従う）。この許容に基づき、配布 reference（agentdev-issue-management/references/issue-operation-safety.md、agentdev-workflow-case-open/references/definition-pr-and-idempotency.md）における読取系 gh 直記述は IR-053 の例外パス（IR053_EXEMPT_PATHS）として登録する（REQ-095-003 の contingency 原則に基づく）。
 
-      gh api の副作用分類境界: 検出器（gh-write guard）の gh api に対する禁止範囲は次の分類に従う。(1) 明示的な書込みメソッド指定（--method / -X の POST・PATCH・PUT・DELETE）を含む gh api は書込みとして拒否する。(2) フィールド系・入力系オプション（-f / --field、-F、--raw-field、--input 等）を含み、かつ明示的な GET 指定を含まない gh api は暗黙 POST（gh CLI の既定動作）として書込みとして拒否する。(3) 明示的な GET 指定と併用するフィールド系オプション（クエリパラメータ化される読み取り）は読み取りとして許容する。(4) 判定要素の解析が不能または曖昧な組合せは書込み側に分類して拒否する（検出器の over-block 許容・under-block 不許容の方針）。境界の変更による見逃しの増加を許容せず、対象の書込み（暗黙 POST を含む）が拒否されることと許可対象の読取りが通過することの両方を検出器試験で証明する。検出器は本境界に従って実装し、検出器実装が境界を先行して決定しない。
+      gh api の副作用分類境界: 検出器（gh-write guard）の gh api に対する禁止範囲は次の分類に従う。(1) 明示的な書込みメソッド指定（--method / -X の POST・PATCH・PUT・DELETE）を含む gh api は書込みとして拒否する。(2) フィールド系・入力系オプション（-f/--raw-field、-F/--field、--input 等）を含み、かつ明示的な GET 指定を含まない gh api は暗黙 POST として書込みとして拒否する（gh CLI の既定動作: パラメータ追加時の既定メソッドは POST に切替わる）。(3) 明示的な GET 指定と併用するフィールド系オプションは読み取りとして許容する（gh CLI は --method GET 指定時パラメータをクエリ文字列として送る）。(4) 判定要素の解析が不能または曖昧な組合せは書込み側に分類して拒否する（検出器の over-block 許容・under-block 不許容の方針）。境界の変更による見逃しの増加を許容せず、変更前に拒否した書込みの各ケースが変更後も拒否されること（ケース単位の対応づけ。件数の比較では代替しない）と、許可対象の読取りが通過することの両方を検出器試験で証明する。検出器は本境界に従って実装し、検出器実装が境界を先行して決定しない。
   - id: ACT-DESIGN-003
     artifact: design
     operation: update
@@ -123,22 +125,25 @@ artifact_actions:
     target_area: 停止理由分類（REQ-034-015/108 拡張）
     source_items: [AG-007]
     content: |-
-      case-auto は停止時に停止理由を以下の分類で報告する。本節が停止理由分類の値域・定義・対応（実行結果状態、利用者判断の要否、再開入口）の単一正本であり、Workflow Skill（`agentdev-workflow-case-auto`）の実行参照文書・停止報告・再開指示は本節の分類値を列挙し本節を名前で参照する（配布物本文に REQ/Decision 識別子の新規参照を追加しない）。分類は再開コマンド選択とユーザー通知の精度向上が目的であり、HITL 境界の変更ではない。停止条件（11項目）の全量は REQ-034-015、原因別処理（8原因分類）は REQ-096-012、検出・分類適用・報告の手順は Workflow Skill が所有し、本節はこれらを複製しない。
+      case-auto は停止時に停止理由を以下の分類で報告する。本節が停止理由分類（10分類）の値域・定義・対応（実行結果状態、利用者判断の要否、再開入口）の単一正本であり、Workflow Skill（`agentdev-workflow-case-auto`）の実行参照文書・停止報告・再開指示は本節の分類値を列挙し本節を名前で参照する（配布物本文に REQ/Decision 識別子の新規参照を追加しない）。分類は再開コマンド選択とユーザー通知の精度向上が目的であり、HITL 境界の変更ではない。本節は分類の新設・廃止を行わず、現行10分類の値域を維持する。
 
-      | 分類 | 定義 | 実行結果状態 | 利用者判断の要否 | 再開入口 |
-      |---|---|---|---|---|
-      | req-define 合意要件からの逸脱 | case-open または後続工程が合意済み要件、対象外、受け入れ条件を変更した場合、合意されていない機能要件または制約を追加した場合、合意済み OU を欠落・統合・分割して要件の意味を変更した場合 | blocked（要件再合意が必要） | 要 | req-define での再合意後に case-auto を再開（Root Case 指定） |
-      | command 契約・実装不整合 | execution_unit へ分割可能であるにもかかわらず case-open が単一 Epic 子 Issue 上限により停止した場合、case-open または後続工程の実装が契約へ整合していない場合、構成生成事前検証（REQ-032-015）が実装されていない場合 | fail（実装・契約側の欠陥） | 原則不要（実装の修正） | 実装修正後に case-auto を再開 |
-      | 要件未合意のスコープ拡大 | 合意されていないスコープが実行中に追加された場合 | blocked（要件再合意が必要） | 要 | req-define での再合意後に case-auto を再開 |
-      | repo 外実体変更 | DB マイグレーション実行、デプロイ/apply、クラウドリソース操作、外部SaaS設定変更、課金、権限、認証情報変更が必要な場合 | blocked（repo 外操作の実行待ち） | 要（repo 外操作の実行判断） | 利用者による repo 外操作の実行・承認後に case-auto を再開 |
-      | CI/test/lint 失敗 | コンフリクト解消モデル（v2:ADR-0132）の Level 2 まで試行しても自己修復不能な場合 | fail | 原則不要（実装・検証の修正） | 修正後に case-auto を再開 |
-      | branch 削除検出 | 作成元不明 branch / user-owned branch / 他作業 branch の削除を検出した場合（停止条件(9)） | blocked（削除判断待ち） | 要（削除の判断） | 利用者の削除判断後に case-auto を再開 |
-      | 未コミット変更の帰属不明 | 変更の由来が不明で安全に続行できない場合 | blocked（帰属確認待ち） | 要（帰属の確認） | 帰属確認後に case-auto を再開 |
-      | 上位合意矛盾 | case-auto が受領した decision_context が現行正規成果物（REQ/Decision/Design/Issue）間の矛盾に起因する場合。当該矛盾そのものが finding の対象であり、case-auto が一方を勝手に採用できない（REQ-034-034、DEC-008 決定3） | blocked（矛盾解消待ち） | 要（矛盾の解消判断） | 矛盾解消（finding 経路を含む）後に case-auto を再開 |
-      | 新規ユーザー判断事項 | case-auto が受領した decision_context が新しいユーザー価値判断、対象範囲変更、外部契約変更を必要とし、正規契約から導出できず case-auto に委譲された裁量（REQ-096-015）の範囲外である場合、すなわち人間に留保された判断（REQ-096-005）の新規確定を要する場合（REQ-034-034、DEC-008 決定4） | blocked（新規判断の確定待ち） | 要（人間に留保された判断の新規確定） | req-define での再合意後に case-auto を再開 |
-      | 並列起動不能（実行環境由来） | 当該 stage の起動可能対象集合に対して背景起動が1件も成立しない場合。原因の断定を含まない。delegation-unavailable との弁別基準は「委譲起動不能時の扱い」節を参照（REQ-034-028、REQ-034-044、DEC-042）。停止報告には起動試行履歴（試行回数、起動成立数、最終成功起動時刻）を含める（REQ-034-045） | 停止（並列性の回復待ち） | 要（実行環境の回復運用） | 実行環境の回復後に durable state からの冪等再開（REQ-034-044） |
-      | infra-transient（ツール基盤故障） | ツール基盤（harness・Custom Tool 実行環境）の故障に起因する停止種別。判定条件（単一ツール恒常失敗・プロセス生存・再試行無効・他経路正常の4条件同時成立）と回復経路は「infra-transient（ツール基盤故障）停止分類」節が所有する | 停止種別（Case 失敗 blocked / failed と区別して報告） | 要（harness 再起動等の回復運用） | harness 再起動後に durable state からの冪等再開 |
-      | user-decision-required（adversarial-review 由来） | case-run result enum（completed-pr / blocked / failed / delegation-unavailable）の第5状態ではなく、既存結果に付随する停止理由分類である。adversarial-review 由来の decision_context は bounded parent decision resolution（REQ-034-032〜034、DEC-008）で自律解決できない場合に上位合意矛盾・新規ユーザー判断事項のいずれかに帰着して自走停止し、解決できる場合は当該下位の resume point から再開する | blocked（付随。decision_context への回答待ち） | 要（decision_context への回答） | 利用者回答後に当該 resume point から再開 |
+      本節は次の概念を区別する。停止条件（いつ停止するか。全量は REQ-034-015）、停止理由分類（なぜ停止したかの報告分類。本節の10分類）、原因別処理（失敗・停止理由の原因分類。8原因分類は REQ-096-012）、停止種別（Case 失敗 blocked / failed と区別される報告種別。infra-transient）、停止伝播に付随する報告分類（user-decision-required。分類一覧の値ではない）。検出・分類適用・報告の手順は Workflow Skill が所有し、本節はこれらを複製しない。
+
+      | 分類 | 定義 | 対応停止条件 | 実行結果状態 | 利用者判断の要否 | 再開入口 |
+      |---|---|---|---|---|---|
+      | req-define 合意要件からの逸脱 | case-open または後続工程が合意済み要件、対象外、受け入れ条件を変更した場合、合意されていない機能要件または制約を追加した場合、合意済み OU を欠落・統合・分割して要件の意味を変更した場合 | (1) | blocked（要件再合意が必要） | 要 | req-define での再合意後に case-auto を再開（Root Case 指定） |
+      | command 契約・実装不整合 | execution_unit へ分割可能であるにもかかわらず case-open が単一 Epic 子 Issue 上限により停止した場合、case-open または後続工程の実装が契約へ整合していない場合、構成生成事前検証（REQ-032-015）が実装されていない場合 | (11) | fail（実装・契約側の欠陥） | 原則不要（実装の修正） | 実装修正後に case-auto を再開 |
+      | 要件未合意のスコープ拡大 | 合意されていないスコープが実行中に追加された場合 | (2) | blocked（要件再合意が必要） | 要 | req-define での再合意後に case-auto を再開 |
+      | repo 外実体変更 | DB マイグレーション実行、デプロイ/apply、クラウドリソース操作、外部SaaS設定変更、課金、権限、認証情報変更が必要な場合 | (3)(4)(5)(6) | blocked（repo 外操作の実行待ち） | 要（repo 外操作の実行判断） | 利用者による repo 外操作の実行・承認後に case-auto を再開 |
+      | CI/test/lint 失敗 | コンフリクト解消モデル（v2:ADR-0132）の Level 2 まで試行しても自己修復不能な場合 | (7)(8) | fail | 原則不要（実装・検証の修正） | 修正後に case-auto を再開 |
+      | branch 削除検出 | 作成元不明 branch / user-owned branch / 他作業 branch の削除を検出した場合 | (9) | blocked（削除判断待ち） | 要（削除の判断） | 利用者の削除判断後に case-auto を再開 |
+      | 未コミット変更の帰属不明 | 変更の由来が不明で安全に続行できない場合 | (10) | blocked（帰属確認待ち） | 要（帰属の確認） | 帰属確認後に case-auto を再開 |
+      | 上位合意矛盾 | bounded parent decision resolution で decision_context が現行正規情報源間の矛盾に起因し、既存正規契約から導出できない場合に限る。解決可能な不一致は権威優先で解消して自走停止にせず、未解決規範矛盾に該当する場合のみ本分類で報告する（REQ-034-034、DEC-008 決定3） | —（STEP-6 経由） | blocked（矛盾解消待ち） | 要（矛盾の解消判断） | 矛盾解消（finding 経路を含む）後に case-auto を再開 |
+      | 新規ユーザー判断事項 | 同 decision_context が、新しいユーザー価値判断、対象範囲変更、外部契約変更を必要とし、正規契約から導出できず case-auto に委譲された裁量（REQ-096-015）の範囲外である場合、すなわち人間に留保された判断（REQ-096-005）の新規確定を要する場合（REQ-034-034、DEC-008 決定4） | —（STEP-6 経由） | blocked（新規判断の確定待ち） | 要（人間に留保された判断の新規確定） | req-define での再合意後に case-auto を再開 |
+      | 並列起動不能（実行環境由来） | 停止条件11項目に対応しない独立停止事由。当該 stage の起動可能対象集合に対して背景起動が1件も成立しない場合。原因の断定を含まない。delegation-unavailable との弁別基準は「委譲起動不能時の扱い」節を参照（REQ-034-028、REQ-034-044、DEC-042）。停止報告には起動試行履歴（試行回数、起動成立数、最終成功起動時刻）を含める（REQ-034-045） | —（独立停止事由） | 停止（並列性の回復待ち） | 要（実行環境の回復運用） | 実行環境の回復後に durable state からの冪等再開（REQ-034-044） |
+      infra-transient（ツール基盤故障）は停止種別であり、本表の分類軸ではない。Case 失敗（blocked / failed）と区別して報告し、判定条件（単一ツール恒常失敗・プロセス生存・再試行無効・他経路正常の4条件同時成立）と回復経路は「infra-transient（ツール基盤故障）停止分類」節が所有する。
+
+      user-decision-required（adversarial-review 由来）は停止伝播に付随する報告分類であり、本表の分類軸ではない（case-run result enum の第5状態でもない）。受領した decision_context はまず bounded parent decision resolution へ入力し、上位合意矛盾・新規ユーザー判断事項のいずれかに帰着した場合に限り自走停止してユーザー判断を待機し、正規契約から導出可能なもの・委譲された裁量の範囲内のものは回答して当該下位の resume point から再開する（位置づけは「user-decision-required の位置づけ（REQ-014-012）」節）。
   - id: ACT-DESIGN-004
     artifact: design
     operation: update
@@ -150,17 +155,6 @@ artifact_actions:
     source_items: [AG-007]
     content: |-
       - workflow 実装本体（orchestration stage モデル、Wave 反復制御、停止理由の検出・分類適用・報告手順、reference 構成）は Workflow Skill（`agentdev-workflow-case-auto`）が所有し、本 Design はこれらを複製しない。停止理由分類の値域・定義・対応（実行結果状態、利用者判断の要否、再開入口）は本 Design「停止理由分類」節が単一正本として所有する。各工程の output_contract（工程別契約表）も Workflow Skill が所有する。
-  - id: ACT-DESIGN-005
-    artifact: design
-    operation: update
-    target_design:
-      operation: update
-      domain: commands
-      slug: case-auto
-    target_area: user-decision-required の位置づけ（REQ-014-012）
-    source_items: [AG-007]
-    content: |-
-      user-decision-required は「停止理由分類（REQ-034-015/108 拡張）」節の分類一覧（adversarial-review 由来の行）に位置づけられ、本節はその停止伝播経路上の位置づけ（受領・親判断解決との順序、自走停止の条件）を定める。
 conflict_resolutions:
   - id: CR-001
     conflict: A-13 の停止理由分類の正本所在。case-auto Design L111 は「停止理由分類は Workflow Skill が所有し本 Design は複製しない」と宣言する一方、REQ-034-007 は public contract（stop state を含む）の正規文書を Command Design とし、同一 Design 内に9分類の表が実在し、Workflow Skill 側は「10分類」「9軸」が混在し分類詳細の参照先が dangling である
@@ -169,6 +163,7 @@ conflict_resolutions:
       単一正本とし、検出・分類適用・報告手順は Workflow Skill が所有する分割を採用した
       （agentdev-architecture-advisory の確定事項を採用。REQ-034-007 と文書優先規則「文書間矛盾時は現行 REQ 優先」、
       DEC-010 の3層責務の適用。src/ 側は名前レベル参照のみで REQ/DEC 識別子の新規参照追加をしない IR-055 制約にも整合）。
+      正本は現行10分類の値域を維持し（新設・廃止なし）、infra-transient（停止種別）と user-decision-required（停止伝播に付随する報告分類）は分類軸と区別して位置づける。上位合意矛盾・新規ユーザー判断事項は bounded parent decision resolution で解決できない場合に限定する（実行参照文書の先行条件と同一条件）。
   - id: CR-002
     conflict: A-7/A-8 の公開入力契約変更と A-13 の規範一元化を Decision（ADR）として記録すべきか
     resolution: >-
@@ -234,9 +229,9 @@ test_strategy:
   - id: TS-003
     target_item: AG-003
     verification: |-
-      検出器の両方向部品試験。(a) 暗黙 POST（-f/-F/--raw-field/--input を含み明示 GET なし）が拒否される (b) 明示的な書込みメソッド指定（-X POST/PATCH/PUT/DELETE）が拒否される (c) 許可対象の読取り（フラグなし gh api、gh api -X GET -f …、gh pr view 等）が通過する (d) 複合シェル構文（&&、;、パイプ混在）の既存検出が退行しない (e) 曖昧な組合せが書込み側に分類される。既存検出の回帰テストを先に固定してから新パターンを追加したことを確認する。
+      検出器の両方向部品試験。(a) 暗黙 POST（-f/--raw-field・-F/--field・--input を含み明示 GET なし）が拒否される (b) 明示的な書込みメソッド指定（-X POST/PATCH/PUT/DELETE）が拒否される (c) 許可対象の読取り（フラグなし gh api、gh api -X GET -f …、gh pr view 等）が通過する (d) 変更前の検出器の全拒否ケースと全許可ケースをコマンド入力単位で固定した回帰スイートを作成し、変更後に同一入力がすべて同一判定（拒否ケースは拒否・許可ケースは許可）であることを対応づけで確認する。複合シェル構文（&&、;、パイプ混在）を含む (e) 曖昧な組合せが書込み側に分類される。回帰スイートを先に固定してから新パターンを追加したことを確認する。
     pass_criteria: |-
-      対象の書込み（暗黙 POST を含む）がすべて拒否され、許可対象の読取りがすべて通過する。複合シェル構文の既存検出件数が検出器変更前後で減少しない（見逃し増加0件）。Design「迂回防止」節の分類境界（4分類）と検出器の判定が全試験ケースで一致する。
+      対象の書込み（暗黙 POST を含む）がすべて拒否され、許可対象の読取りがすべて通過する。変更前に拒否した書込みの各ケースが変更後も拒否され、変更前に許可した読取りの各ケースが変更後も通過する（ケース単位の対応づけによる見逃し増加0件の証明。検出件数の非減少のみでは合格としない）。Design「迂回防止」節の分類境界（4分類）と検出器の判定が全試験ケースで一致する。
     on_failure: |-
       fix-and-reverify。見逃しの増加は禁止条件のため、境界定義と検出器のどちらが誤りかを特定して修正し再検証する。
   - id: TS-004
@@ -266,9 +261,9 @@ test_strategy:
   - id: TS-007
     target_item: AG-007
     verification: |-
-      停止分類全件照合。既存の停止分類全件（現行10分類の各々、infra-transient、user-decision-required の位置づけ）について、停止理由・実行結果状態・利用者判断の要否・再開入口の対応を一覧として照合し、実行参照文書（Workflow Skill references・SKILL.md）・Design・停止報告様式・再開指示で同じ停止事象が矛盾なく解釈できることを確認する。簡約後の実行参照文書の分類値が Design 正本の分類一覧と一致すること、分類詳細の dangling 参照が解消されていることを確認する。配布物（src/ 配下）への REQ/DEC 識別子の新規参照追加の検査は TS-008 が担う。
+      停止分類全件照合。既存の停止分類全件（現行10分類の各々）について、停止理由・対応停止条件・実行結果状態・利用者判断の要否・再開入口の対応を一覧として照合し、実行参照文書（Workflow Skill references・SKILL.md）・Design・停止報告様式・再開指示で同じ停止事象が矛盾なく解釈できることを確認する。infra-transient が停止種別として、user-decision-required が停止伝播に付随する報告分類として、分類一覧の値と区別されて位置づけられていることを確認する。上位合意矛盾・新規ユーザー判断事項が bounded parent decision resolution で解決できない場合に限定して報告される条件が、実行参照文書の停止伝播先行条件（A-2。stop-and-decision-resolution.md）と Design で同一停止事象について一意に対応することを確認する。簡約後の実行参照文書の分類値が Design 正本の分類一覧と一致すること、分類詳細の dangling 参照が解消されていることを確認する。配布物（src/ 配下）への REQ/DEC 識別子の新規参照追加の検査は TS-008 が担う。
     pass_criteria: |-
-      10分類の各々と infra-transient・user-decision-required の対応が一覧で過不足なく照合され（安全上必要な停止理由の欠落0件）、四箇所（実行文書・Design・停止報告・再開指示）の記述が同一の停止事象に同一の解釈を与える。「10分類」「9軸」等の表記混在が解消する。
+      10分類の各々の対応が一覧で過不足なく照合され（安全上必要な停止理由の欠落0件・分類の新設0件）、infra-transient・user-decision-required が停止種別・付随報告として分類一覧と区別されている。上位合意矛盾・新規ユーザー判断事項の報告条件が A-2 の先行条件と一意に対応する。四箇所（実行文書・Design・停止報告・再開指示）の記述が同一の停止事象に同一の解釈を与える。「10分類」「9軸」等の表記混在が解消する。
     on_failure: |-
       fix-and-reverify。分類の欠落・矛盾は Design 正本または簡約側のどちらかを修正して再照合する。
   - id: TS-008
@@ -310,11 +305,12 @@ realization_actions:
     responsibility: gh-write guard 検出器の実装責務
     ownership_hints:
       - src/common/guards/gh-write/gh-command-detector.ts
-      - 検出器試験（既存検出の回帰テスト固定→暗黙 POST・読取り許容・曖昧block のパターン追加）
+      - 検出器試験（全拒否・全許可ケースのコマンド入力単位での回帰スイート固定→暗黙 POST・読取り許容・曖昧block のパターン追加→対応づけ回帰の実行）
     intent: >-
       Design「迂回防止」節の副作用分類境界（ACT-DESIGN-002）に従って検出器を修正する。正規表現の追加だけでなく
-      分類境界（明示メソッド・フィールド系/入力系オプション・明示 GET・曖昧時の block 側倒し）を実装し、
-      既存の複合シェル構文検出を退行させない。Design が先に境界を定め、検出器が従う順序を維持する。
+      分類境界（明示メソッド・フィールド系/入力系オプション・明示 GET・曖昧時の block 側倒し）を実装する。
+      変更前の全拒否ケース・全許可ケースをコマンド入力単位で固定した回帰スイートを先に作成し、変更後も
+      対応づけが保持されることを証明する（件数比較ではなく対応づけ）。Design が先に境界を定め、検出器が従う順序を維持する。
     verification_refs: [TS-003]
     source_items: [AG-003]
   - id: RA-004
@@ -363,7 +359,8 @@ realization_actions:
     intent: >-
       Design「停止理由分類」節（ACT-DESIGN-003 で正本化）を名前で参照し、分類値の列挙と簡約した記述へ置き換える。
       配布物本文に REQ/Decision 識別子の新規参照を追加しない（IR-055・差分0件）。安全上必要な停止理由の
-      記述を欠落させない。
+      記述を欠落させない。infra-transient（停止種別）と user-decision-required（停止伝播に付随する報告分類）を
+      分類一覧の値として扱わず、Design 正本の位置づけ区分に従って簡約する。
     verification_refs: [TS-007]
     source_items: [AG-007]
 review_dispositions: []
@@ -407,7 +404,7 @@ assembly_evidence:
       end_line: 126
     execution_conditions:
       operation: replace
-      edit_sha256: 56db5bb0324d2a9d4d8a061aebd4a683274700c0565243d1e4cbade3fcea5383
+      edit_sha256: e8ed5b375b7a067a727856d1a9f0a1a67c1c79cedfca11615c792b0d08a09272
       expected_old_count: 1
     checker:
       name: assemble-draft-section
@@ -429,7 +426,7 @@ assembly_evidence:
       changed_lines_count: 3
       added: 3
       removed: 1
-    executed_at: "2026-11-10T10:23:43.752Z"
+    executed_at: "2026-11-10T14:21:59.724Z"
   - target_file: docs/designs/commands/case-auto.md
     target_content_sha256: a5c1a5b3cfd027443c41083613798fa969a81fd0ab5aff534875576427b62bd6
     check_scope:
@@ -438,7 +435,7 @@ assembly_evidence:
       end_line: 311
     execution_conditions:
       operation: replace
-      edit_sha256: 4ac1250019d23c8aad425b588ff08f61d44fe748c04d9af4acf81ac916ad2b0a
+      edit_sha256: 711905fdb8be4eb0e19866dbd4e6dd572deacd228012ed0f7fef92d3e0e9716c
       expected_old_count: 1
     checker:
       name: assemble-draft-section
@@ -457,10 +454,10 @@ assembly_evidence:
         count: 3
         all_ok: true
     diff_compact:
-      changed_lines_count: 16
-      added: 16
+      changed_lines_count: 20
+      added: 20
       removed: 14
-    executed_at: "2026-11-10T10:24:26.550Z"
+    executed_at: "2026-11-10T14:22:22.568Z"
   - target_file: docs/designs/commands/case-auto.md
     target_content_sha256: a5c1a5b3cfd027443c41083613798fa969a81fd0ab5aff534875576427b62bd6
     check_scope:
@@ -492,37 +489,6 @@ assembly_evidence:
       added: 1
       removed: 1
     executed_at: "2026-11-10T10:24:30.144Z"
-  - target_file: docs/designs/commands/case-auto.md
-    target_content_sha256: a5c1a5b3cfd027443c41083613798fa969a81fd0ab5aff534875576427b62bd6
-    check_scope:
-      heading: "### user-decision-required の位置づけ（REQ-014-012）"
-      start_line: 526
-      end_line: 539
-    execution_conditions:
-      operation: replace
-      edit_sha256: 38118f891e87a4cef74e5ee491b15978978d616e3e099ecef51d031d94f8fa2a
-      expected_old_count: 1
-    checker:
-      name: assemble-draft-section
-      version: 0.2.0
-      settings:
-        heading_match: exact-after-normalization
-        old_text_count_check: true
-    result_affecting_references:
-      heading_match_rule: "search-target-area.ts compatible: normalizeTargetArea + exact match only + code-fence-aware scan"
-      scan_scope: target section only
-    checks_summary:
-      pre:
-        count: 3
-        all_ok: true
-      post:
-        count: 3
-        all_ok: true
-    diff_compact:
-      changed_lines_count: 1
-      added: 1
-      removed: 1
-    executed_at: "2026-11-10T10:27:03.531Z"
 case_open_hints:
   epic_needed: true
   decomposition: >-
@@ -538,6 +504,6 @@ case_open_hints:
 ## summary
 
 - 出所: ADF全体簡素化実装計画（第53報告 v8・2026-11-10 利用者承認）§2 A群表の A-7〜A-13（確定値）。前段 C-α1・C-β 完了済み
-- 操作分類: A-7/A-8 は REQ-011 への APPEND（2要件行）+ custom-tool-contracts Design 更新。A-9 は Design「迂回防止」節更新 + 検出器実装。A-10〜A-12 は既存 REQ/Design の規定どおりとする実装是正（realization のみ）。A-13 は case-auto Design 正本化 + 実行参照文書簡約
+- 操作分類: A-7/A-8 は REQ-011 への APPEND（2要件行）+ custom-tool-contracts Design 更新。A-9 は Design「迂回防止」節更新 + 検出器実装。A-10〜A-12 は既存 REQ/Design の規定どおりとする実装是正（realization のみ）。A-13 は case-auto Design 正本化（現行10分類の対応表+停止種別/付随報告の位置づけ分離）+ 実行参照文書簡約
 - 固定制約: 配布物本文への新規 REQ/DEC 識別子参照追加なし（IR-055・差分0件）、A-8 の3項目一致必須、A-9 の見逃し増加禁止、A-12 の恒久台帳不設置、A-13 は整合化のみ
 - 試験基線: 2026-11-10 C-β完了時（統合直前 HEAD 585a60708・3分割正規形・5,598試験・既知不合格12件）。新しい不合格 0件を完了条件に含む
