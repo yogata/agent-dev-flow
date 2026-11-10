@@ -19,7 +19,7 @@ summary: >-
   ADF 全体簡素化・実装計画（第53報告 v8・2026-11-10 利用者承認）の C-α2 小修正 F-2〜F-9 を要件定義した。
   F-2/F-5/F-8 は一括是正REQ（仮 REQ-120・REQ-119 型3行）、F-3 は REQ-036-034 追記、F-4 は REQ-090-030 追記と
   custom-tool-contracts Design 注記、F-9 は 9 Design ファイル（document-model + 8 v4 Design）の移行期優先規則の
-  歴史的説明化として保存する。F-6/F-7 は既存要件行（REQ-032-014/037/038・REQ-029-015・REQ-021-032・REQ-012-030）
+  処遇実態確認を条件とする歴史的説明化として保存する（実態未確認・未処遇残存・現行規範として必要な場合は適用せず停止）。F-6/F-7 は既存要件行（REQ-032-014/037/038・REQ-029-015・REQ-021-032・REQ-012-030）
   で規定済みのため反映作業のみとし要件行を追加しない。組立検査12件すべて dry-run 合格済み。
 
 # auto_gate: case-auto 自走可否の判定材料
@@ -46,7 +46,11 @@ agreed_items:
       F-3（第46報告 I-010）: inspect-docs の完了報告に、待ち行列（.agentdev/inspect/inbox の未処理検出事項）の滞留期間として
       最古エントリの経過日数を、完了報告の付帯情報として含める（REQ-036-010 の出力契約の列挙に対する診断出力の追加ではなく、
       報告付帯情報の追加と位置づける）。契約追加は最小限とし、新規の機構を作らない。変更面は inspect-docs の報告契約
-      （SKILL.md 完了報告 STEP、references、完了報告 template standard.md）。
+      （SKILL.md 完了報告 STEP、references、完了報告 template standard.md）。経過日数算出の日時ソース・基準時計・丸めの
+      具体化は計画に明示されておらず、現行の出力契約で規定された日時情報は検出事項ファイル名の timestamp
+      （タイムゾーン付き ISO 8601。検出事項への frontmatter は規定されず実例もない）のみであるため、これらの具体化は
+      Case 設計で現行契約と突合して確定し Definition へ根拠とともに記録する（frontmatter 優先・mtime 代替・UTC 基準・
+      整数日差は未確認の候補として扱い、承認済みの仕様として扱わない）。
   - id: AG-003
     content: >-
       F-4（第45報告 J-002）: agentdev_jev の観測書込みは sourceRevision を次の規則の順で正規化して保存する。
@@ -56,6 +60,11 @@ agreed_items:
       として構造化失敗とし、observation を生成しない（REQ-090-002 と同じ経路）。正規化後の値は REQ-090-006 の一次事実として
       保存する sourceRevision の正規形であり、REQ-090-026 の版区切り判別を破らない。既存観測の遡及修正・移行・書換えを
       行わない。実装面は src/common/tools/agentdev-jev/observation.ts と試験。規則の確定値は入力（実装計画）から変更しない。
+      母集団の基準: 規則は計画書（第53報告 §2 F群表）が第45報告時点の実測478件の分布に照合して固定した確定値である
+      （計画集計: 40桁hex 221件・8桁149件・9桁46件〔ほかに注釈つき23件〕・unknown/unspecified 22件・作業状態記述子27件）。
+      本要件定義時点の実測は 485観測・197種（注釈付き34出現/11種・2026-11-10 実測）であり、478→485・注釈つき23→34出現の
+      差は計画集計後の並行作業による観測追加に由来する集計時点の差であって、規則の確定値を変更しない。試験はこの差の説明を
+      検証結果に記録する。
   - id: AG-004
     content: >-
       F-5（第46報告 B-001）: backlog-auto の evidence 保存手順（references の Evidence 節）に、保存時の拡張子規則
@@ -72,8 +81,11 @@ agreed_items:
   - id: AG-006
     content: >-
       F-7（第6報告 D-001）: agentdev-traceability の参照文書（references/{sidecar-and-policy,check-interpretation}.md）を、
-      policy.yaml の3軸（verification/design/implementation の必須・任意）モデルに追随させた説明へ修正する。
-      実装（scripts/lib/verification_scope.ts の3軸解決）は正しいため文書のみの修正。この内容は既存要件行
+      policy.yaml の3軸（verification/design/implementation の必須・任意・旧行の扱い）モデルに追随させた説明へ修正する。
+      説明は、各軸とも required が既定であり、policy.yaml の当該軸の optional へ明示登録された現行要件行のみその軸の
+      missing 計上から除外されること、および旧行（v4 cutover 前後の区分）は区分と根拠を policy.yaml への明示登録と
+      Definition 変更として扱うことを含む。実装（scripts/lib/verification_scope.ts の3軸解決）は正しいため文書のみの修正。
+      この内容は既存要件行
       （REQ-021-032 policy.yaml 3軸機構、REQ-012-030 検証対応要否は policy.yaml 所有・未指定は必須）により規定済みであり、
       新規の要件行を付けず反映作業として扱う。修正文は配布物本文に REQ/Decision 識別子を書かない（IR-055）。
   - id: AG-007
@@ -85,13 +97,17 @@ agreed_items:
       各ディレクトリが表記載または約束対象規則による除外のいずれかに分類でき、分類不能なディレクトリが0件であること。
   - id: AG-008
     content: >-
-      F-9（第14報告 L-001）: v3→v4 移行優先規則を記述する現行 Design の当該規定を歴史的説明へ移す。対象は 9 箇所:
+      F-9（第14報告 L-001）: v3→v4 移行優先規則を記述する現行 Design の当該規定を、処遇実態の確認を条件として
+      歴史的説明へ移す。対象は 9 箇所:
       docs/designs/foundations/document-model.md「信頼できる情報源の優先順位」節の移行期間規定、および 8 つの v4 Design
       （workflows/v4-standard-lifecycle、workflows/v4-lifecycle-state-machine、quality/v4-quality-gate-model、
       foundations/v4-traceability-model、foundations/v4-runtime-execution-model、foundations/v4-responsibility-boundaries、
       foundations/v4-operating-model、foundations/v4-durable-state-and-recovery）の位置づけ節の同一文。
-      移行処遇記録（docs/designs/foundations/references/crosswalk-inventory.md）の全行が executed であることと照合し、
-      記録上の移行完了と実際の処遇状態を区別して確認する。互換処理（v3 判定コード）自体の削除は要求しない。
+      適用条件: (i) 移行処遇記録（docs/designs/foundations/references/crosswalk-inventory.md）の全行が executed であることを
+      機械検査で確認すること、(ii) 記録上の移行完了と実際の処遇状態を区別した実態確認（未置換 v3 accepted Design の残存・
+      権威移行の実態）を行い、当該規範が現行規範として不要と確認できること。確認できない場合（実態が未確認・未処遇の
+      v3 Design が残る・現行規範として必要）は置換を適用せず現行文を維持したまま Case を停止して要件確認へ差し戻す。
+      互換処理（v3 判定コード）自体の削除は要求しない。
       歴史的記録は REQ-103-020（過去時点の事実として保持・歴史的本文を書き換えない）の制約を維持する。
   - id: AG-009
     content: >-
@@ -101,7 +117,10 @@ agreed_items:
       で説明できる限り合格阻害としない）。(b) IR-055: merge HEAD で check_integrity を実行し IR-055 baseline 差分0件であること
       （比較に用いた baseline ファイルの git リビジョンを検証証拠に記録。変更ファイルに対する grep は前置自己点検に過ぎない）。
       (c) 変更した skill/command パスの src/common 側と .opencode 側の hash が一致すること（check_integrity 投影ミラー検査合格）。
-      (d) 整合性検査（QG相当）に合格すること。
+      (d) 整合性検査（QG相当）に合格すること。(e) 継承する編集規律: 既存の ADF-COVERS コメント行は維持する。編集は
+      UTF-8（BOM なし）・行単位の文字列置換で行い、PowerShell 経由の全 file 一括書込みをしない。本 Case に無関係な変更を
+      巻き込まない。正規成果物への書込み前に git pull --ff-only で共有本線の実際の変更を確認し、安全に同期できない場合は
+      取り消さず停止する。
 
 # artifact_actions: REQ/Decision/Design への保存対象
 artifact_actions:
@@ -150,7 +169,7 @@ artifact_actions:
       ## 備考
 
       - 要件番号は決定的採番スクリプト（alloc-req-number.ts）の採番結果を正とする（本文は現行最大 REQ-119 時点の次番号 REQ-120 を仮記）。
-      - F-6・F-7・F-9 に要件行を付けない判断の記録: F-6 は REQ-032-014（検証不能は完了扱いしない）・REQ-032-037（代替検証は同等以上の観測能力・未証明範囲不増を確認できないなら達成証拠としない）・REQ-032-038・REQ-029-015（代替経路履行なしに検査省略して成功扱いしない）により規定済み。F-7 は REQ-021-032（policy.yaml 3軸機構）・REQ-012-030（検証対応要否は policy.yaml 所有・未指定は必須）により規定済み。F-9 は Design 操作（document-model.md ほか9ファイルの歴史的説明化）が正であり、新規の恒久命題を創出しない。
+      - F-6・F-7・F-9 に要件行を付けない判断の記録: F-6 は REQ-032-014（検証不能は完了扱いしない）・REQ-032-037（代替検証は同等以上の観測能力・未証明範囲不増を確認できないなら達成証拠としない）・REQ-032-038・REQ-029-015（代替経路履行なしに検査省略して成功扱いしない）により規定済み。F-7 は REQ-021-032（policy.yaml 3軸機構）・REQ-012-030（検証対応要否は policy.yaml 所有・未指定は必須）により規定済み。F-9 は Design 操作（document-model.md ほか9ファイルの、処遇実態の確認を条件とした歴史的説明化）が正であり、新規の恒久命題を創出しない。
   - id: ACT-REQ-002
     artifact: req
     operation: append
@@ -176,11 +195,16 @@ artifact_actions:
       slug: document-model
     target_area: 信頼できる情報源の優先順位
     source_items: [AG-008]
+    application_precondition: >-
+      適用は停止条件付きとする: (i) 処遇記録 crosswalk-inventory.md の全行 executed を機械検査で確認すること、
+      (ii) 記録上の移行完了と実際の処遇状態を区別した実態確認（未置換 v3 accepted Design の残存・権威移行の実態）を行い、
+      当該規範が現行規範として不要と確認できること。実態が未確認の場合、未処遇の v3 Design が残る場合、または現行規範として
+      必要な場合は本置換を適用せず現行文を維持したまま Case を停止して要件確認へ差し戻す。
     content: |
       置換前（削除対象・原文）:
       v4 移行期間中、accepted の v4 モデル定義 Design と未置換の v3 accepted Design の衝突は、当該 v3 Design の処遇実行段階まで v3 を正とする（v3-v4-crosswalk.md 処遇実行原則）。
       置換後（挿入文）:
-      v3 → v4 移行期間中は、accepted の v4 モデル定義 Design と未置換の v3 accepted Design の衝突について、当該 v3 Design の処遇実行段階まで v3 を正とする扱いとした（v3-v4-crosswalk.md 処遇実行原則。処遇記録 crosswalk-inventory.md の全行 executed を移行完了の記録と区別して照合済み）。この規則は移行完了に伴い現行規範ではなく、歴史的説明として保持する（REQ-103-020）。
+      v3 → v4 移行期間中は、accepted の v4 モデル定義 Design と未置換の v3 accepted Design の衝突について、当該 v3 Design の処遇実行段階まで v3 を正とする扱いとした（v3-v4-crosswalk.md 処遇実行原則）。処遇記録 crosswalk-inventory.md の全行 executed と実際の処遇状態の確認をもって移行は完了しており、この規則は現行規範ではなく歴史的説明として保持する（REQ-103-020）。
   - id: ACT-DESIGN-002
     artifact: design
     operation: append
@@ -202,11 +226,16 @@ artifact_actions:
       slug: v4-standard-lifecycle
     target_area: ADF v4 標準ライフサイクル（語彙直交性・公開 UX・req-define 入口・継続コラボレーションループ）
     source_items: [AG-008]
+    application_precondition: >-
+      適用は停止条件付きとする: (i) 処遇記録 crosswalk-inventory.md の全行 executed を機械検査で確認すること、
+      (ii) 記録上の移行完了と実際の処遇状態を区別した実態確認（未置換 v3 accepted Design の残存・権威移行の実態）を行い、
+      当該規範が現行規範として不要と確認できること。実態が未確認の場合、未処遇の v3 Design が残る場合、または現行規範として
+      必要な場合は本置換を適用せず現行文を維持したまま Case を停止して要件確認へ差し戻す。
     content: |
       置換前（削除対象・原文）:
       本 Design の規定が v3 accepted Design と衝突する場合、当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）までは v3 を正とする。当該段階での置換実行をもって権威は本 Design へ移行する。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施する。
       置換後（挿入文）:
-      本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）は全行 executed 済みであり、この移行規則は現行規範ではなく歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
+      本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）の全行 executed と実際の処遇状態の確認をもってこの移行規則は現行規範ではなく、歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
   - id: ACT-DESIGN-004
     artifact: design
     operation: update
@@ -216,11 +245,16 @@ artifact_actions:
       slug: v4-lifecycle-state-machine
     target_area: ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応）
     source_items: [AG-008]
+    application_precondition: >-
+      適用は停止条件付きとする: (i) 処遇記録 crosswalk-inventory.md の全行 executed を機械検査で確認すること、
+      (ii) 記録上の移行完了と実際の処遇状態を区別した実態確認（未置換 v3 accepted Design の残存・権威移行の実態）を行い、
+      当該規範が現行規範として不要と確認できること。実態が未確認の場合、未処遇の v3 Design が残る場合、または現行規範として
+      必要な場合は本置換を適用せず現行文を維持したまま Case を停止して要件確認へ差し戻す。
     content: |
       置換前（削除対象・原文）:
       本 Design の規定が v3 accepted Design と衝突する場合、当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）までは v3 を正とする。当該段階での置換実行をもって権威は本 Design へ移行する。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施する。
       置換後（挿入文）:
-      本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）は全行 executed 済みであり、この移行規則は現行規範ではなく歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
+      本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）の全行 executed と実際の処遇状態の確認をもってこの移行規則は現行規範ではなく、歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
   - id: ACT-DESIGN-005
     artifact: design
     operation: update
@@ -230,11 +264,16 @@ artifact_actions:
       slug: v4-quality-gate-model
     target_area: ADF v4 Quality / Verification / Evidence / Gate モデル
     source_items: [AG-008]
+    application_precondition: >-
+      適用は停止条件付きとする: (i) 処遇記録 crosswalk-inventory.md の全行 executed を機械検査で確認すること、
+      (ii) 記録上の移行完了と実際の処遇状態を区別した実態確認（未置換 v3 accepted Design の残存・権威移行の実態）を行い、
+      当該規範が現行規範として不要と確認できること。実態が未確認の場合、未処遇の v3 Design が残る場合、または現行規範として
+      必要な場合は本置換を適用せず現行文を維持したまま Case を停止して要件確認へ差し戻す。
     content: |
       置換前（削除対象・原文）:
       本 Design の規定が v3 accepted Design と衝突する場合、当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）までは v3 を正とする。当該段階での置換実行をもって権威は本 Design へ移行する。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施する。
       置換後（挿入文）:
-      本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）は全行 executed 済みであり、この移行規則は現行規範ではなく歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
+      本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）の全行 executed と実際の処遇状態の確認をもってこの移行規則は現行規範ではなく、歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
   - id: ACT-DESIGN-006
     artifact: design
     operation: update
@@ -244,11 +283,16 @@ artifact_actions:
       slug: v4-traceability-model
     target_area: ADF v4 Traceability モデル（Change / Evidence 中心）
     source_items: [AG-008]
+    application_precondition: >-
+      適用は停止条件付きとする: (i) 処遇記録 crosswalk-inventory.md の全行 executed を機械検査で確認すること、
+      (ii) 記録上の移行完了と実際の処遇状態を区別した実態確認（未置換 v3 accepted Design の残存・権威移行の実態）を行い、
+      当該規範が現行規範として不要と確認できること。実態が未確認の場合、未処遇の v3 Design が残る場合、または現行規範として
+      必要な場合は本置換を適用せず現行文を維持したまま Case を停止して要件確認へ差し戻す。
     content: |
       置換前（削除対象・原文）:
       本 Design の規定が v3 accepted Design と衝突する場合、当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）までは v3 を正とする。当該段階での置換実行をもって権威は本 Design へ移行する。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施する。
       置換後（挿入文）:
-      本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）は全行 executed 済みであり、この移行規則は現行規範ではなく歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
+      本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）の全行 executed と実際の処遇状態の確認をもってこの移行規則は現行規範ではなく、歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
     application_notes: 核心文の後の個別追記事項（REQ-107/v5 語義）を保持し、核心文のみを置換する。
   - id: ACT-DESIGN-007
     artifact: design
@@ -259,11 +303,16 @@ artifact_actions:
       slug: v4-runtime-execution-model
     target_area: ADF v4 Runtime 実行モデル（authority 格子・直列化単位・冪等経路・runtime 制御ループ）
     source_items: [AG-008]
+    application_precondition: >-
+      適用は停止条件付きとする: (i) 処遇記録 crosswalk-inventory.md の全行 executed を機械検査で確認すること、
+      (ii) 記録上の移行完了と実際の処遇状態を区別した実態確認（未置換 v3 accepted Design の残存・権威移行の実態）を行い、
+      当該規範が現行規範として不要と確認できること。実態が未確認の場合、未処遇の v3 Design が残る場合、または現行規範として
+      必要な場合は本置換を適用せず現行文を維持したまま Case を停止して要件確認へ差し戻す。
     content: |
       置換前（削除対象・原文）:
       本 Design の規定が v3 accepted Design と衝突する場合、当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）までは v3 を正とする。当該段階での置換実行をもって権威は本 Design へ移行する。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施する。
       置換後（挿入文）:
-      本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）は全行 executed 済みであり、この移行規則は現行規範ではなく歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
+      本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）の全行 executed と実際の処遇状態の確認をもってこの移行規則は現行規範ではなく、歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
   - id: ACT-DESIGN-008
     artifact: design
     operation: update
@@ -273,11 +322,16 @@ artifact_actions:
       slug: v4-responsibility-boundaries
     target_area: ADF v4 実装責務境界（意味判断 Skill / 決定的処理 code / Harness adapter / Project Extensions）
     source_items: [AG-008]
+    application_precondition: >-
+      適用は停止条件付きとする: (i) 処遇記録 crosswalk-inventory.md の全行 executed を機械検査で確認すること、
+      (ii) 記録上の移行完了と実際の処遇状態を区別した実態確認（未置換 v3 accepted Design の残存・権威移行の実態）を行い、
+      当該規範が現行規範として不要と確認できること。実態が未確認の場合、未処遇の v3 Design が残る場合、または現行規範として
+      必要な場合は本置換を適用せず現行文を維持したまま Case を停止して要件確認へ差し戻す。
     content: |
       置換前（削除対象・原文）:
       本 Design の規定が v3 accepted Design と衝突する場合、当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）までは v3 を正とする。当該段階での置換実行をもって権威は本 Design へ移行する。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施する。
       置換後（挿入文）:
-      本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）は全行 executed 済みであり、この移行規則は現行規範ではなく歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
+      本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）の全行 executed と実際の処遇状態の確認をもってこの移行規則は現行規範ではなく、歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
   - id: ACT-DESIGN-009
     artifact: design
     operation: update
@@ -287,11 +341,16 @@ artifact_actions:
       slug: v4-operating-model
     target_area: ADF v4 Operating Model（目的・三層責務・Project Contract・寿命・文書モデル）
     source_items: [AG-008]
+    application_precondition: >-
+      適用は停止条件付きとする: (i) 処遇記録 crosswalk-inventory.md の全行 executed を機械検査で確認すること、
+      (ii) 記録上の移行完了と実際の処遇状態を区別した実態確認（未置換 v3 accepted Design の残存・権威移行の実態）を行い、
+      当該規範が現行規範として不要と確認できること。実態が未確認の場合、未処遇の v3 Design が残る場合、または現行規範として
+      必要な場合は本置換を適用せず現行文を維持したまま Case を停止して要件確認へ差し戻す。
     content: |
       置換前（削除対象・原文）:
       本 Design の規定が v3 accepted Design と衝突する場合、当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）までは v3 を正とする。当該段階での置換実行をもって権威は本 Design へ移行する。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施する。
       置換後（挿入文）:
-      本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）は全行 executed 済みであり、この移行規則は現行規範ではなく歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
+      本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）の全行 executed と実際の処遇状態の確認をもってこの移行規則は現行規範ではなく、歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
     application_notes: 核心文の後の個別追記事項（REQ-103-020/021 導線）を保持し、核心文のみを置換する。
   - id: ACT-DESIGN-010
     artifact: design
@@ -302,11 +361,16 @@ artifact_actions:
       slug: v4-durable-state-and-recovery
     target_area: ADF v4 durable state と再構成・恢復（配置表・権威移行・部分失敗調整）
     source_items: [AG-008]
+    application_precondition: >-
+      適用は停止条件付きとする: (i) 処遇記録 crosswalk-inventory.md の全行 executed を機械検査で確認すること、
+      (ii) 記録上の移行完了と実際の処遇状態を区別した実態確認（未置換 v3 accepted Design の残存・権威移行の実態）を行い、
+      当該規範が現行規範として不要と確認できること。実態が未確認の場合、未処遇の v3 Design が残る場合、または現行規範として
+      必要な場合は本置換を適用せず現行文を維持したまま Case を停止して要件確認へ差し戻す。
     content: |
       置換前（削除対象・原文）:
       本 Design の規定が v3 accepted Design と衝突する場合、当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）までは v3 を正とする。当該段階での置換実行をもって権威は本 Design へ移行する。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施する。
       置換後（挿入文）:
-      本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）は全行 executed 済みであり、この移行規則は現行規範ではなく歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
+      本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）の全行 executed と実際の処遇状態の確認をもってこの移行規則は現行規範ではなく、歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
 
 # conflict_resolutions: 壁打ち・審議で解消された衝突の記録（後続コマンドは同じ内容をユーザーへ再確認しない）
 conflict_resolutions:
@@ -320,9 +384,11 @@ conflict_resolutions:
     conflict: F-9 の編集範囲（document-model.md 1ファイルのみか、同一文が再述される 8 v4 Design を含む 9 箇所か）。
     resolution: >-
       adversarial-review（Stream A 所見 A-1）で 1 ファイルのみでは入力の受け入れ条件「現行判断に不要な過渡条件を読ませる構造が解消」が
-      成立しないことが確定したため、9 箇所すべてを歴史的説明化する（選択肢①）。既存文は REQ-103-020 の歴史保持制約の範囲で
+      成立しないことが確定したため、対象は 9 箇所すべてとする（選択肢①）。適用は処遇実態の確認を条件とし（各 action の
+      application_precondition および TS-008 を参照）、実態が未確認の場合・未処遇の v3 Design が残る場合・現行規範として必要な
+      場合は適用せず停止する（監督者による承認計画照合で確定）。既存文は REQ-103-020 の歴史保持制約の範囲で
       意味を保持したまま時制と位置づけのみを変更する。v4-traceability-model と v4-operating-model は核心文のみを置換する。
-      組立検査12件（dry-run）すべて合格済み。
+      組立検査12件（dry-run・2026-11-10T14:21Z 再実施）すべて合格済み。
   - id: CR-003
     conflict: F-3 の報告項目追加と REQ-036-010（出力は最小限の診断結果、問題候補、推奨アクション、必要な場合の要件定義入力案に限定すること）の出力契約の関係。
     resolution: >-
@@ -437,7 +503,7 @@ test_strategy:
   - id: TS-002
     target_item: AG-002
     verification: |
-      既知日時の待ち行列（.agentdev/inspect/inbox の fixture。日時ソースは検出事項 frontmatter の日時、不在時はファイル mtime とし、基準時計は実行環境の UTC、日数丸めは日付差の整数日）を入力として完了報告を生成し、最古エントリの経過日数が正しく表示されることを確認する。模板検査（check_templates.ts）が完了報告 template の変更で失敗しないことを確認する。変更後の src/common 側と .opencode 側の該当ファイル（SKILL.md・references・templates/inspect-docs/standard.md）の hash が一致することを確認する。
+      既知の日時を持つ待ち行列（.agentdev/inspect/inbox の fixture。各行列エントリの日時は検証入力として与える）を入力として完了報告を生成し、最古エントリの経過日数が正しく表示されることを確認する。実装が採用する日時ソース・基準時計・丸めは、現行の出力契約で規定された日時情報（検出事項ファイル名の timestamp・タイムゾーン付き ISO 8601。検出事項への frontmatter は規定されず実例もない）と突合して Case 設計で確定し、採用結果と根拠を Definition に記録する（frontmatter 優先・mtime 代替・UTC 基準・整数日差は未確認の候補であり、承認済みの仕様として扱わない）。模板検査（check_templates.ts）が完了報告 template の変更で失敗しないことを確認する。変更後の src/common 側と .opencode 側の該当ファイル（SKILL.md・references・templates/inspect-docs/standard.md）の hash が一致することを確認する。
     pass_criteria: |
       経過日数が期待値と一致すること。模板検査合格・投影 hash 一致であること。報告が完了報告の付帯情報として当該項を含め、診断出力の列挙を変更しないこと。
     on_failure: |
@@ -445,7 +511,7 @@ test_strategy:
   - id: TS-003
     target_item: AG-003
     verification: |
-      src/common/tools/agentdev-jev の試験（bun test・cwd repo root・./付きパス指定）と型検査（tsc --noEmit）を実施する。試験行列は入出力例全件（866c86aaf（main HEAD）→866c86aaf、大文字16進40桁（注釈付き）→小文字化40桁、c7905af5→c7905af5、unknown→unknown、working-tree@2026 10 17→そのまま、（メモのみ）→構造化失敗）に加え、境界値（hex4桁・41桁・既に小文字のhex・0x 付き・全角/半角混在括弧対・先頭注釈・注釈連鎖・中間括弧対・空白のみ・unspecified）を含める。既存観測ファイル全部に対して新規則を適用するシミュレーションを行い、構造化失敗となる既存観測が0件・注釈剥離が生じる観測が34件（2026-11-10 実測値。注釈付き作業状態記述子）であることを確認する。変更差分が observation.ts と試験ファイルに限られることを確認する。
+      src/common/tools/agentdev-jev の試験（bun test・cwd repo root・./付きパス指定）と型検査（tsc --noEmit）を実施する。試験行列は計画書（第53報告 §2 F群表）の入出力例全件を含める: 866c86aaf（main HEAD）→866c86aaf、5C78CBF1…（40桁）→小文字化40桁、c7905af5→c7905af5（8桁）、09c832627→09c832627（9桁・既に小文字）、unknown→unknown、working-tree@2026-10-17→そのまま、（メモのみ）→構造化失敗。加えて境界値として、4桁hex→小文字化、41桁hex→(2) 非該当のため注釈・空白除去後そのまま保存（桁数・大小文字を維持）、0x 付きhex→16進数判定外のためそのまま保存、既に小文字のhex→変化なし、全角/半角混在括弧対・先頭注釈・注釈連鎖・中間括弧対・空白のみ・unspecified を含める。既存観測全部（2026-11-10 要件定義時点の実測: 485観測・197種・注釈付き34出現/11種）に対して新規則を適用するシミュレーションを行い、構造化失敗となる既存観測が0件であることを確認する。計画書の集計（第45報告時点478件: 40桁hex 221件・8桁149件・9桁46件・ほかに注釈つき23件・unknown/unspecified 22件・作業状態記述子27件）と本時点実測（485観測・注釈付き34出現）の差は集計時点の差（計画集計後の並行作業による観測追加）として検証結果に記録する。規則の確定値は計画書から変更しない。変更差分が observation.ts と試験ファイルに限られることを確認する。
     pass_criteria: |
       試験・型検査がすべて合格すること。入出力例・境界値がすべて規則どおりであること。既存観測のシミュレーションで構造化失敗0件であること。
     on_failure: |
@@ -469,7 +535,7 @@ test_strategy:
   - id: TS-006
     target_item: AG-006
     verification: |
-      修正後の参照文書の説明と実装の一致を、traceability_policy.test.ts（.opencode/skills/repo-agentdev-integrity/scripts/tests/）の実行、または fixture policy.yaml に対する verification_scope.ts の実行出力との軸ごとの比較で確認する。修正文が配布物本文に REQ/Decision 識別子を含まないことを grep で確認する（IR-055）。変更後の src/common 側と .opencode 側の該当ファイルの hash 一致を確認する。
+      修正後の参照文書の説明と実装の一致を、traceability_policy.test.ts と traceability_check.test.ts（.opencode/skills/repo-agentdev-integrity/scripts/tests/。実装は src/common/skills/agentdev-traceability/scripts/lib を直接 import）の実行、または fixture policy.yaml に対する verification_scope.ts の実行出力との軸ごとの比較で確認する。照合は旧行の扱いを含むこと: 各軸とも required が既定で、当該軸の optional への明示登録行のみ missing 計上から除外されること（REQ-905 型の軸別 optional fixture）、policy.yaml に未登録の行は全軸 required であること、未知 ID は unknown-req-ref として報告されること、policy 読取不能時は合格扱いにしないこと。修正文が配布物本文に REQ/Decision 識別子を含まないことを grep で確認する（IR-055）。変更後の src/common 側と .opencode 側の該当ファイルの hash 一致を確認する。
     pass_criteria: |
       3軸（verification/design/implementation の必須・任意）の説明が実装の解決結果と一致すること。配布物本文の REQ/Decision 識別子差分0件であること。
     on_failure: |
@@ -485,11 +551,11 @@ test_strategy:
   - id: TS-008
     target_item: AG-008
     verification: |
-      移行処遇記録（docs/designs/foundations/references/crosswalk-inventory.md）の全行の確定状態が executed であることを機械検査（行カウントと executed 計数の一致、2026-11-10 時点で131行）で確認し、記録上の移行完了と実際の処遇状態を区別した対応表を提示する。9 箇所（document-model.md + 8 v4 Design）の編集後文面が対応表と対応し、いずれも「現行規範ではなく歴史的説明として保持する（REQ-103-020）」を含むことを確認する。
+      (1) 移行処遇記録（docs/designs/foundations/references/crosswalk-inventory.md）の全行の確定状態が executed であることを機械検査（行カウントと executed 計数の一致。2026-11-10 時点で131行）で確認する。(2) 記録上の移行完了と実際の処遇状態を区別した実態確認を行う: 未置換の v3 accepted Design の残存、処遇実行段階列どおりの権威移行の実態を、正規成果物（docs/designs/ の該当 v3/v4 Design の現行状態）と突合して確認し、処遇記録と Design 記述の対応表を提示する。(3) (1)(2) で当該規範が現行規範として不要と確認できた場合のみ、9 箇所（document-model.md + 8 v4 Design）への置換を適用する。
     pass_criteria: |
-      処遇記録の全行 executed が機械検査で確認できること。9 箇所すべてが歴史的説明化され、現行規範としての過渡条件を読ませる構造が解消していること。
+      (1) 処遇記録の全行 executed が機械検査で確認できること。(2) 実態確認の結果、未処遇の v3 Design が残存せず、処遇記録と Design の記述が対応していること。(3) 適用後、9 箇所すべてが歴史的説明化され、現行判断に不要な過渡条件を読ませる構造が解消していること。
     on_failure: |
-      非 executed 行が発見された場合はfix-and-reverify でなく Case を停止する（移行未完了なら歴史的説明化の前提が崩れるため要件定義に差し戻す）。文面の不備は fix-and-reverify で修正する。
+      停止条件（fix-and-reverify で完結させない）: 実態が未確認の場合、未処遇の v3 Design が残る場合、現行規範として必要な場合は置換を適用せず現行文を維持したまま Case を停止し、要件確認へ差し戻す。適用後の文面の不備は fix-and-reverify で修正する。
   - id: TS-009
     target_item: AG-009
     verification: |
@@ -619,7 +685,7 @@ review_dispositions:
     disposition: not_applicable
     reason_code: saved_as_design_operation
     reason: |
-      F-9 は Design 操作（document-model.md と8つの v4 Design、計9ファイルの歴史的説明化）が正であり、新規の恒久命題を創出しないため REQ 行を付けない。選別原理（REQ-120 目的節）と判断記録（REQ-120 備考）に恒久保持する。保存対象は ACT-DESIGN-001 と ACT-DESIGN-003〜010（ACT-DESIGN-002 は F-4 の観測契約注記）。
+      F-9 は Design 操作（document-model.md と8つの v4 Design、計9ファイルの処遇実態確認を条件とした歴史的説明化）が正であり、新規の恒久命題を創出しないため REQ 行を付けない。選別原理（REQ-120 目的節）と判断記録（REQ-120 備考）に恒久保持する。保存対象は ACT-DESIGN-001 と ACT-DESIGN-003〜010（ACT-DESIGN-002 は F-4 の観測契約注記）。
     evidence:
       path: docs/designs/foundations/document-model.md
       section: 信頼できる情報源の優先順位
@@ -637,7 +703,7 @@ assembly_evidence:
     result_affecting_references: &assembly_references { heading_match_rule: "search-target-area.ts compatible: normalizeTargetArea + exact match only + code-fence-aware scan", scan_scope: target section only }
     checks_summary: { pre: { count: 2, all_ok: true }, post: { count: 2, all_ok: true } }
     diff_compact: { changed_lines_count: 2, added: 2, removed: 0 }
-    executed_at: "2026-11-10T10:41:37.003Z"
+    executed_at: "2026-11-10T14:21:15.498Z"
   - target_file: docs/requirements/REQ-090.md
     target_content_sha256: a857e2385c117303bd7913e3f8b7dd9a820343ce3f3a56d99d9873386f7a38c9
     check_scope: { heading: "## 要件", start_line: 14, end_line: 45 }
@@ -646,16 +712,16 @@ assembly_evidence:
     result_affecting_references: *assembly_references
     checks_summary: { pre: { count: 2, all_ok: true }, post: { count: 2, all_ok: true } }
     diff_compact: { changed_lines_count: 2, added: 2, removed: 0 }
-    executed_at: "2026-11-10T10:41:37.115Z"
+    executed_at: "2026-11-10T14:21:15.636Z"
   - target_file: docs/designs/foundations/document-model.md
     target_content_sha256: 779cce9d8d93d5ef68d6629680b53f0b461e2acc918001626bee07c4608ae827
     check_scope: { heading: "## 信頼できる情報源の優先順位", start_line: 339, end_line: 349 }
-    execution_conditions: { operation: replace, edit_sha256: e868edfa7cba1d588a8228143d615c7cda6cbf61158ff3470fe203216f1487c6, expected_old_count: 1 }
+    execution_conditions: { operation: replace, edit_sha256: 26edbefcffacfbb3523cf55e26b89df89e3bf2001a1a1428a3c1317ca3786d06, expected_old_count: 1 }
     checker: *assembly_checker
     result_affecting_references: *assembly_references
     checks_summary: { pre: { count: 3, all_ok: true }, post: { count: 3, all_ok: true } }
     diff_compact: { changed_lines_count: 1, added: 1, removed: 1 }
-    executed_at: "2026-11-10T10:17:47.685Z"
+    executed_at: "2026-11-10T14:21:15.769Z"
   - target_file: docs/designs/responsibilities/custom-tool-contracts.md
     target_content_sha256: 75a58d73bf500a492940bb5b6e79c9efe9e4e113f965a433227bc8631d054c86
     check_scope: { heading: "## 対象操作の境界（初期セット）", start_line: 39, end_line: 107 }
@@ -664,79 +730,79 @@ assembly_evidence:
     result_affecting_references: *assembly_references
     checks_summary: { pre: { count: 2, all_ok: true }, post: { count: 2, all_ok: true } }
     diff_compact: { changed_lines_count: 1, added: 1, removed: 0 }
-    executed_at: "2026-11-10T10:41:37.217Z"
+    executed_at: "2026-11-10T14:21:15.898Z"
   - target_file: docs/designs/workflows/v4-standard-lifecycle.md
     target_content_sha256: 0e22100f67bf1d7fe20685130fc93183073b7d5edd723f09e2ce102ded66d86d
     check_scope: { heading: "# ADF v4 標準ライフサイクル（語彙直交性・公開 UX・req-define 入口・継続コラボレーションループ）", start_line: 12, end_line: 85 }
-    execution_conditions: { operation: replace, edit_sha256: acbcdbbe14185993697c9fa89c7bcafe8c03af2821b889dd2707eaecbbbc0ae0, expected_old_count: 1 }
+    execution_conditions: { operation: replace, edit_sha256: 0f68049952ad0c5d9506805e3c37d2180b8726715bb3a40bc77447faeae8fab1, expected_old_count: 1 }
     checker: *assembly_checker
     result_affecting_references: *assembly_references
     checks_summary: { pre: { count: 3, all_ok: true }, post: { count: 3, all_ok: true } }
     diff_compact: { changed_lines_count: 1, added: 1, removed: 1 }
-    executed_at: "2026-11-10T10:41:37.323Z"
+    executed_at: "2026-11-10T14:21:16.026Z"
   - target_file: docs/designs/workflows/v4-lifecycle-state-machine.md
     target_content_sha256: 0d4b5f542cb3268c6656a0ea38f0e95b55dd7c2804c91569abbb06006fcb773b
     check_scope: { heading: "# ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応）", start_line: 11, end_line: 88 }
-    execution_conditions: { operation: replace, edit_sha256: acbcdbbe14185993697c9fa89c7bcafe8c03af2821b889dd2707eaecbbbc0ae0, expected_old_count: 1 }
+    execution_conditions: { operation: replace, edit_sha256: 0f68049952ad0c5d9506805e3c37d2180b8726715bb3a40bc77447faeae8fab1, expected_old_count: 1 }
     checker: *assembly_checker
     result_affecting_references: *assembly_references
     checks_summary: { pre: { count: 3, all_ok: true }, post: { count: 3, all_ok: true } }
     diff_compact: { changed_lines_count: 1, added: 1, removed: 1 }
-    executed_at: "2026-11-10T10:41:37.431Z"
+    executed_at: "2026-11-10T14:21:16.141Z"
   - target_file: docs/designs/quality/v4-quality-gate-model.md
     target_content_sha256: b7b81a3496a88a4b45f4a360a3037e9c98263d7f7b695009f1adad61705e6575
     check_scope: { heading: "# ADF v4 Quality / Verification / Evidence / Gate モデル", start_line: 13, end_line: 149 }
-    execution_conditions: { operation: replace, edit_sha256: acbcdbbe14185993697c9fa89c7bcafe8c03af2821b889dd2707eaecbbbc0ae0, expected_old_count: 1 }
+    execution_conditions: { operation: replace, edit_sha256: 0f68049952ad0c5d9506805e3c37d2180b8726715bb3a40bc77447faeae8fab1, expected_old_count: 1 }
     checker: *assembly_checker
     result_affecting_references: *assembly_references
     checks_summary: { pre: { count: 3, all_ok: true }, post: { count: 3, all_ok: true } }
     diff_compact: { changed_lines_count: 1, added: 1, removed: 1 }
-    executed_at: "2026-11-10T10:41:37.537Z"
+    executed_at: "2026-11-10T14:21:16.262Z"
   - target_file: docs/designs/foundations/v4-traceability-model.md
     target_content_sha256: fc94b0274e6bc7123238061351111f7219b2894b32b8a30c06c6b930327cf064
     check_scope: { heading: "# ADF v4 Traceability モデル（Change / Evidence 中心）", start_line: 14, end_line: 150 }
-    execution_conditions: { operation: replace, edit_sha256: acbcdbbe14185993697c9fa89c7bcafe8c03af2821b889dd2707eaecbbbc0ae0, expected_old_count: 1 }
+    execution_conditions: { operation: replace, edit_sha256: 0f68049952ad0c5d9506805e3c37d2180b8726715bb3a40bc77447faeae8fab1, expected_old_count: 1 }
     checker: *assembly_checker
     result_affecting_references: *assembly_references
     checks_summary: { pre: { count: 3, all_ok: true }, post: { count: 3, all_ok: true } }
     diff_compact: { changed_lines_count: 1, added: 1, removed: 1 }
-    executed_at: "2026-11-10T10:41:37.644Z"
+    executed_at: "2026-11-10T14:21:16.385Z"
   - target_file: docs/designs/foundations/v4-runtime-execution-model.md
     target_content_sha256: af506bf6929aca4532c11d3f1c86a880475033afebf9222eb509f50d75da6e0c
     check_scope: { heading: "# ADF v4 Runtime 実行モデル（authority 格子・直列化単位・冪等経路・runtime 制御ループ）", start_line: 10, end_line: 92 }
-    execution_conditions: { operation: replace, edit_sha256: acbcdbbe14185993697c9fa89c7bcafe8c03af2821b889dd2707eaecbbbc0ae0, expected_old_count: 1 }
+    execution_conditions: { operation: replace, edit_sha256: 0f68049952ad0c5d9506805e3c37d2180b8726715bb3a40bc77447faeae8fab1, expected_old_count: 1 }
     checker: *assembly_checker
     result_affecting_references: *assembly_references
     checks_summary: { pre: { count: 3, all_ok: true }, post: { count: 3, all_ok: true } }
     diff_compact: { changed_lines_count: 1, added: 1, removed: 1 }
-    executed_at: "2026-11-10T10:41:37.760Z"
+    executed_at: "2026-11-10T14:21:16.512Z"
   - target_file: docs/designs/foundations/v4-responsibility-boundaries.md
     target_content_sha256: 5d057c6b33828c471cd544d3df0b470ae91d826ab410dacc7a671016340101f8
     check_scope: { heading: "# ADF v4 実装責務境界（意味判断 Skill / 決定的処理 code / Harness adapter / Project Extensions）", start_line: 13, end_line: 173 }
-    execution_conditions: { operation: replace, edit_sha256: acbcdbbe14185993697c9fa89c7bcafe8c03af2821b889dd2707eaecbbbc0ae0, expected_old_count: 1 }
+    execution_conditions: { operation: replace, edit_sha256: 0f68049952ad0c5d9506805e3c37d2180b8726715bb3a40bc77447faeae8fab1, expected_old_count: 1 }
     checker: *assembly_checker
     result_affecting_references: *assembly_references
     checks_summary: { pre: { count: 3, all_ok: true }, post: { count: 3, all_ok: true } }
     diff_compact: { changed_lines_count: 1, added: 1, removed: 1 }
-    executed_at: "2026-11-10T10:41:37.865Z"
+    executed_at: "2026-11-10T14:21:16.639Z"
   - target_file: docs/designs/foundations/v4-operating-model.md
     target_content_sha256: f6a8c4e1f775cfd13281e8c3dc6ba3a69bfeb5997887d207fe9d197c65d5535e
     check_scope: { heading: "# ADF v4 Operating Model（目的・三層責務・Project Contract・寿命・文書モデル）", start_line: 15, end_line: 111 }
-    execution_conditions: { operation: replace, edit_sha256: acbcdbbe14185993697c9fa89c7bcafe8c03af2821b889dd2707eaecbbbc0ae0, expected_old_count: 1 }
+    execution_conditions: { operation: replace, edit_sha256: 0f68049952ad0c5d9506805e3c37d2180b8726715bb3a40bc77447faeae8fab1, expected_old_count: 1 }
     checker: *assembly_checker
     result_affecting_references: *assembly_references
     checks_summary: { pre: { count: 3, all_ok: true }, post: { count: 3, all_ok: true } }
     diff_compact: { changed_lines_count: 1, added: 1, removed: 1 }
-    executed_at: "2026-11-10T10:41:37.971Z"
+    executed_at: "2026-11-10T14:21:16.769Z"
   - target_file: docs/designs/foundations/v4-durable-state-and-recovery.md
     target_content_sha256: 718314bc7f8cc6c488de3b11e20251dd5297bb9eda4cb3eb54d0e75a04fa272f
     check_scope: { heading: "# ADF v4 durable state と再構成・恢復（配置表・権威移行・部分失敗調整）", start_line: 12, end_line: 98 }
-    execution_conditions: { operation: replace, edit_sha256: acbcdbbe14185993697c9fa89c7bcafe8c03af2821b889dd2707eaecbbbc0ae0, expected_old_count: 1 }
+    execution_conditions: { operation: replace, edit_sha256: 0f68049952ad0c5d9506805e3c37d2180b8726715bb3a40bc77447faeae8fab1, expected_old_count: 1 }
     checker: *assembly_checker
     result_affecting_references: *assembly_references
     checks_summary: { pre: { count: 3, all_ok: true }, post: { count: 3, all_ok: true } }
     diff_compact: { changed_lines_count: 1, added: 1, removed: 1 }
-    executed_at: "2026-11-10T10:41:38.073Z"
+    executed_at: "2026-11-10T14:21:16.913Z"
 
 # case_open_hints: case-open 構成生成への参考情報
 case_open_hints:
@@ -751,10 +817,14 @@ important_change_notification:
     - >-
       F-9 移行期優先規則の歴史的説明化（document-model.md + 8 v4 Design の計9箇所・各1文の時制変更と
       「現行規範ではなく歴史的説明として保持する（REQ-103-020）」の明記）。理由・影響・確定事項・未確認事項を通知済み。
+    - >-
+      監督者による承認計画照合に基づく訂正（2026-11-10・訂正版保存前に受領）: F-9 の適用を処遇実態確認の条件付きとし、
+      F-7 に policy.yaml の旧行の扱いを追加し、F-4 の母集団の基準（計画集計478件と要件定義時点実測485観測・注釈付き34出現）
+      を明記し、F-3 の日時ソース具体化を Case 設計での確定事項として未確認候補と区別した。
   non_notified_minor_changes:
     - "REQ-036・REQ-090 への追記（新規行追加・既存行変更なし）は軽微な変更として通知対象外"
 ```
 
 # summary
 
-C-α2 小修正 F-2〜F-9 の要件定義。8修正のうち新規の恒久命題・新規成果物の作成義務に該当する F-2/F-5/F-8 は一括是正REQ（仮 REQ-120・REQ-119 型3行）として新規作成し、F-3 は REQ-036-034、F-4 は REQ-090-030（と custom-tool-contracts Design 注記）として追記する。F-6/F-7 は既存要件行で規定済みのため反映作業のみ（行なし）、F-9 は 9 Design ファイルの歴史的説明化（adversarial-review で 1 ファイルから 9 箇所へ範囲確定）。すべての局所修正・追記は組立スクリプトによる dry-run 構造検査12件合格済み（証拠は assembly_evidence）。実現面は RA-001〜RA-007（skill 報告面・observation.ts 実装・references 追記・README 新規・状態表整理）、検証は TS-001〜TS-009（既知不合格12件の固定リスト差分方式・check_integrity による IR-055 実ゲート・投影 hash 一致を含む）。work_type は maintenance、scale は standard（変更ファイル数シグナルを超えるが各修正は微小で単一 Case 計画が確定済みのため非昇格）。REQ 番号 REQ-120 は仮記で、採番は alloc-req-number.ts の確定値を正とする。
+C-α2 小修正 F-2〜F-9 の要件定義。8修正のうち新規の恒久命題・新規成果物の作成義務に該当する F-2/F-5/F-8 は一括是正REQ（仮 REQ-120・REQ-119 型3行）として新規作成し、F-3 は REQ-036-034、F-4 は REQ-090-030（と custom-tool-contracts Design 注記）として追記する。F-6/F-7 は既存要件行で規定済みのため反映作業のみ（行なし。F-7 は policy.yaml の旧行の扱いを含む3軸説明への修正）、F-9 は 9 Design ファイルの処遇実態確認を条件とする歴史的説明化（adversarial-review で 1 ファイルから 9 箇所へ範囲確定、監督者照合で実態確認前の確定適用を禁止する停止条件を追加。実態未確認・未処遇残存・現行規範として必要な場合は適用せず停止）。すべての局所修正・追記は組立スクリプトによる dry-run 構造検査12件合格済み（証拠は assembly_evidence）。実現面は RA-001〜RA-007（skill 報告面・observation.ts 実装・references 追記・README 新規・状態表整理）、検証は TS-001〜TS-009（既知不合格12件の固定リスト差分方式・check_integrity による IR-055 実ゲート・投影 hash 一致を含む）。work_type は maintenance、scale は standard（変更ファイル数シグナルを超えるが各修正は微小で単一 Case 計画が確定済みのため非昇格）。REQ 番号 REQ-120 は仮記で、採番は alloc-req-number.ts の確定値を正とする。
