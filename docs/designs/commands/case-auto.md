@@ -5,6 +5,7 @@ created: 2026-06-21
 updated: "2026-11-07"
 ---
 <!-- ADF-COVERS(implementation): REQ-015-012 -->
+<!-- ADF-COVERS(design): REQ-015-012 -->
 <!-- ADF-COVERS(implementation): REQ-100-004 -->
 <!-- ADF-COVERS(implementation): REQ-119-004 -->
 <!-- ADF-COVERS(implementation): REQ-034-001, REQ-034-002, REQ-034-003, REQ-034-004, REQ-034-005, REQ-034-006, REQ-034-007, REQ-034-010, REQ-034-011, REQ-034-012, REQ-034-013, REQ-034-014, REQ-034-015, REQ-034-016, REQ-034-017, REQ-034-018, REQ-034-019, REQ-034-020, REQ-034-021, REQ-034-022, REQ-034-023, REQ-034-024, REQ-034-025, REQ-034-026, REQ-034-027, REQ-034-028, REQ-034-029, REQ-034-030, REQ-034-031, REQ-034-032, REQ-034-033, REQ-034-034, REQ-034-035, REQ-034-036, REQ-034-037, REQ-034-038, REQ-034-039, REQ-034-040, REQ-034-041, REQ-034-042, REQ-034-043, REQ-034-044, REQ-034-045, REQ-035-016, REQ-035-017 -->
@@ -77,9 +78,9 @@ orchestration 中の警告・確認・選択肢提示に由来する HITL questi
   - case-auto が Epic Issue 番号を記録。Epic Issue 本文の実行構成から Wave 構成、各子Issue 状態を読み取る（読み取りのみ。Epic Issue 本文の書き込みは case-close 相当の統合処理の責務）
   - case-auto が現在 Wave の未着手（pending）子Issue を認識し、Epic・Wave・Standard Issue を横断する共有 active Issue task 枠（REQ-034-027。上限・空き枠補充・起動間隔 10 秒は後述「runtime 制御契約」節と v4-runtime-execution-model「runtime 制御ループ」節参照）で各子Issue へインライン case-run を実行。各子Issue の実行担当サブエージェントへ case-auto から直接委譲
   - case-run は単一 Issue 実行に専念し（REQ-031-015）、Wave 内子Issue の並列起動・fan-out/fan-in の制御は case-auto の orchestration が単一所有する（DEC-041）。case-run に独立実行枠は存在しない
-  - 現 Wave の全子Issue の完了（completed-pr / blocked / failed / delegation-unavailable）を待機し、現 Wave の収束（REQ-035-016）を確認する
   - completed-pr の子Issue がある場合、case-close(#epic) 相当の統合処理を Wave 反復を進行させる stage 3 内部処理として実施（統合処理は active Issue task の実行枠を消費しないが共有書き込みの直列化点として扱う。REQ-034-042）
-  - 次 Wave の開始は現 Wave の収束（REQ-035-016）と後続 Wave の意味的依存条件の充足（必要な統合・マージの完了を含む。REQ-035-017）の両方を確認してから行う（REQ-034-012）
+  - 子 Issue の開始条件は必要な意味的依存条件の充足のみとする（依存充足ゲート・スロット型キュー。DEC-051）。Wave 収束（全子 Issue の実行結果確定）を後続の子 Issue 開始の前提としない。Wave 構成は意味的依存 DAG から導出される実行構成の記録単位として維持する（REQ-035-016）
+  - 実装本体・手順の詳細は Workflow Skill（`agentdev-workflow-case-auto`）が単一所有し本 Design は複製しない。Wave 実行制御の単一所有は case-auto orchestration stage 3（「runtime 制御契約」節・DEC-041）が担う
 - 工程間の状態引き継ぎ（Issue番号、PR番号、RU ファイルパス、capture 対象情報を最終工程まで保持）
 - 複数REQ対応（case-ready の確定結果から複数 REQ doc または scale:large 検出時、確定済みの Issue 構造に従う）
 - 停止条件の検出（停止時タイミング情報の追記。11項目の停止条件いずれかを検出時、実行停止。人間に留保された判断（REQ-096-005）の新規確定では Root Case へ req-define 再合意を要旨とする報告をコメントへ記録する）
@@ -538,12 +539,13 @@ case-auto は user-decision-required を新規 result 状態として扱わず�
 
 ### 停止伝播契約（REQ-015-012）
 
-case-auto は下位 command から user-decision-required + decision_context を受領した場合、以下の挙動をとる。
+case-auto は下位 command から user-decision-required + decision_context を受領した場合、まず bounded parent decision resolution（次節。REQ-034-032〜034、DEC-008）へ入力し、以下の優先関係で処理する。
 
-1. **自走停止**: 対象 execution_unit（Issue）の処理を停止し、ユーザー判断を待機する。他の ready 対象の execution_unit がある場合は継続する（部分停止、REQ-034-035/016 準拠）
-2. **ユーザー提示**: decision_context（対象案、合意候補、未解決争点、推奨案と根拠、ユーザーに確定してほしい判断）をユーザーへ提示する（decision_context 構成は v4-delegation-contracts Design が正）
-3. **resume point の記録**: 停止時の resume point を記録する。resume point は v4-lifecycle-state-machine Design に従い、case-run 起源の場合は当該 Issue の case-run 再開ポイント（準備フェーズ、実装フェーズ、提出フェーズのいずれか）、工程委譲起源の場合は当該工程の委譲起点とする
-4. **resume point から再開**: ユーザー判断の解決後、resume point から処理を再開する。
+1. **限定的親判断解決の先行**: 正規契約から導出可能なもの・委譲された裁量の範囲内のものは、回答して当該下位の再開点（resume point）から再開する（REQ-034-032/033）
+2. **自走停止（上位合意矛盾・新規ユーザー判断等のみ）**: 上位合意矛盾、または新規ユーザー価値判断・対象範囲変更・外部契約変更等（REQ-034-034。人間に留保された判断〔REQ-096-005〕の新規確定を要する場合）に限り、対象 execution_unit（Issue）の処理を停止し、ユーザー判断を待機する。他の ready 対象の execution_unit がある場合は継続する（部分停止、REQ-034-035/016 準拠）
+3. **ユーザー提示**: decision_context（対象案、合意候補、未解決争点、推奨案と根拠、ユーザーに確定してほしい判断）をユーザーへ提示する（decision_context 構成は v4-delegation-contracts Design が正）
+4. **resume point の記録**: 停止時の resume point を記録する。resume point は v4-lifecycle-state-machine Design に従い、case-run 起源の場合は当該 Issue の case-run 再開ポイント（準備フェーズ、実装フェーズ、提出フェーズのいずれか）、工程委譲起源の場合は当該工程の委譲起点とする
+5. **resume point から再開**: ユーザー判断の解決後、resume point から処理を再開する。
 adversarial-review の再発動要否は adversarial-review Design「再 review 条件」「再 review 停止条件」の各節に従い（REQ-014-007）、case-auto は独自に判断しない。
 adversarial-review 自体を恒久的な統制ゲートとしない（REQ-014-009）
 
