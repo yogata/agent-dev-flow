@@ -706,3 +706,75 @@
 - **タグ**: #case-ready #並行実行 #domain-state #冪等前置
 
 ---
+
+## 2026-11-10: worktree の junction 投影伝播状態が bun test 基線突合の試験数に直結し、投影適用後は基線形態の再現前置が必要（Case #3988・PR #3992 本文 Findings より回収）
+
+- **問題事象**: worktree 環境の bun test 基線突合では、junction 投影の伝播状態（worktree-partial）が試験数に直接影響する（未投影時 3,000 試験 → 投影適用後 4,751 試験）。bun test ./.opencode/ を基線突合に使う worktree 実行では、`scripts/self-sync.ps1 -Mode apply` と third-party Skill 取得の前置が基線形態の再現に必要
+- **発生局面**: case-run DEL-3988-2 の QG-4 検証（3 分割 bun test・件数突合）
+- **検知方法**: 投影適用前後の bun test 試験数差（3,000 → 4,751）の実測
+- **根本原因**: worktree への junction 伝播は部分的に開始し、self-sync apply と third-party Skill 取得を経て基線形態へ回復する。伝播状態がそのまま bun test の実行対象数に現れる
+- **自律対応内容**: 検証差分に手順を記録済み（PR #3992 本文実行環境ラベル節）
+- **ユーザー確認の有無**: なし（capture 回収）
+- **REQ/Decision/Design影響**: なし（既存知識 worktree-environment-fail-classification.md の補強候補）
+- **横展開観点**: worktree での基線突合は投影伝播状態の環境ラベルと前置手順の記録を必須化する
+- **再発条件**: worktree の bun test 基線突合を投影状態を管理せずに実行する場合
+- **予防策候補**: worktree 環境 fail 分類 knowledge への投影前置手順の追記（promote 判断）
+- **想定反映先**: learning-promote（worktree-environment-fail-classification.md への補強判定）
+- **関連**: PR #3992 本文 Findings/learning・Case #3988
+- **タグ**: #worktree #junction #bun-test #基線突合 #投影前置
+
+---
+
+## 2026-11-10: checker の安定実行経路（node --experimental-strip-types）は bun 固有 API・CommonJS require を含む checker で利用不可・checker ごとの実行経路の使い分けが必要（Case #3988・PR #3992 本文 Findings より回収）
+
+- **問題事象**: checker の安定実行経路（node --experimental-strip-types）は bun 固有 API（import.meta.path・import.meta.main）と CommonJS require を含む checker では利用できない。distribution boundary は runCli export + bun import wrapper、check_integrity は bun run 直実行で stdout 退避が成立した。stdout 退避の wrapper 手順（process.exit 差し替え + writeFileSync）は checker 実行契約の例外経路として有効
+- **発生局面**: case-run DEL-3988-2 の checker 実行経路選択（配布依存境界・check_integrity）
+- **検知方法**: node 経由実行の失敗と bun 経路での成立の実測
+- **根本原因**: checker 側の Bun ランタイム API・require 依存が node の strip-types 経路で解決しない（checker 実行契約 Design「安定実行経路」の既知制約の具体実測）
+- **自律対応内容**: checker ごとに bun import wrapper / bun run 直実行を使い分け、stdout 退避は spawnSync + writeFileSync（UTF-8 明示）で成立させた
+- **ユーザー確認の有無**: なし（capture 回収）
+- **REQ/Decision/Design影響**: なし（checker 実行契約「安定実行経路」の例外経路運用）
+- **横展開観点**: 既存学び（#3968 module import ラッパ・#3970 bun ランタイム指定）と同一領域。checker 個別の依存 API に応じた経路選択表の整備が promote 判断の候補
+- **再発条件**: bun 固有 API・require を含む checker を node 経路で実行する場合
+- **予防策候補**: checker 実行契約の安定実行経路節に checker 依存 API と経路の対応表を追記する判断（promote 判断）
+- **想定反映先**: learning-promote（checker 実行契約 Design への補強判定）
+- **関連**: PR #3992 本文 Findings/learning・Case #3988・#3968/#3970 の textlint ラッパ学び（比較対象）
+- **タグ**: #checker実行経路 #bun #node-strip-types #安定実行経路 #stdout退避
+
+---
+
+## 2026-11-10: Windows・bun 1.3.6 の当該環境で bun install --cwd の相対パス指定が ENOENT・絶対パス指定は成功（Case #3988・PR #3992 本文 Findings より回収）
+
+- **問題事象**: Windows・bun 1.3.6 の当該環境で `bun install --cwd src/common/skills/agentdev-project-extensions/scripts` が ENOENT となり、同じ package の絶対パス指定は成功した。依存整備では絶対パスを使用（変更側と detached baseline 側の双方）。これは本環境での実測であり、全 Windows/Bun 版へ一般化しない
+- **発生局面**: case-run DEL-3988-2 の依存パッケージ前置（worktree・baseline detached worktree の両方）
+- **検知方法**: bun install --cwd 相対パス実行の ENOENT と絶対パス実行の成功（runs 10/11・exit=0）の実測
+- **根本原因**: bun install --cwd の相対パス解決が本環境（bun 1.3.6・Windows）で機能しない実測。REQ-060 の bun install 前置手順は相対パス例を示すが、環境差で絶対パスが必要になり得る
+- **自律対応内容**: 依存整備を絶対パス指定で実施（環境ラベルへ整備手段を記録）
+- **ユーザー確認の有無**: なし（capture 回収）
+- **REQ/Decision/Design影響**: なし（bun install 前置手順の環境差注記候補）
+- **横展開観点**: bun install --cwd を手順化する際は相対パス失敗時の絶対パスフォールバックを併記するのが安全
+- **再発条件**: 同環境で bun install --cwd に相対パスを渡す場合
+- **予防策候補**: REQ-060 関連 reference への環境差注記追加（promote 判断）
+- **想定反映先**: learning-promote（bun install 手順の環境差注記判定）
+- **関連**: PR #3992 本文 Findings/learning・Case #3988・既存 learning「worktree で bun install 前置後に tsc --noEmit が依存解決可能になる」
+- **タグ**: #bun-install #windows #絶対パス #ENOENT #依存前置
+
+---
+
+## 2026-11-10: 分割③の .opencode/plugins junction は src/opencode/plugins の test files を重複走査する・tracked union と実行延べ件数を区別して件数突合する（Case #3988・PR #3992 本文 Findings より回収）
+
+- **問題事象**: 分割③の `.opencode/plugins` 配下 6 junction は src/opencode/plugins の 23 test files を重複走査する（44 files = scripts tracked 21 + 投影 23）。tracked union 253 と実行延べ件数 276 を区別する。旧 .opencode anchor 221 files も integrity 122 + skills 投影 58 + tools 投影 18 + plugins 投影 23 で説明でき、投影数を欠落や新規テストと誤認せず件数突合できる
+- **発生局面**: case-run DEL-3988-2 の bun test 3 分割・件数突合（投影伝播済み worktree 環境）
+- **検知方法**: 分割③の実行対象ファイル数（44）と tracked 列挙（21 scripts）の差分を投影 23 files として分離・union 突合
+- **根本原因**: 投影伝播済み環境では分割③に投影重複が含まれ、実行延べ件数が tracked union を超える。既存学び「bun test 分割③の junction 未伝播環境差は件数安定でも実行対象数を検証差分へ明記する」（未伝播の欠落側）の対の環境差（伝播済みの重複側）
+- **自律対応内容**: 件数突合に tracked union 全被覆と実行延べ件数の区別を記録（PR #3992 本文件数突合行）
+- **ユーザー確認の有無**: なし（capture 回収）
+- **REQ/Decision/Design影響**: なし（既存知識の対側環境差の補完）
+- **横展開観点**: 件数突合の説明モデルは「未伝播 = 欠落側」「伝播済み = 重複側」の双方を検証差分へ記録できると突合が完全になる
+- **再発条件**: 投影伝播済み worktree で bun test 分割③を実行し件数突合する場合
+- **予防策候補**: 既存知識 worktree-environment-fail-classification.md への重複側環境差の追記（promote 判断）
+- **想定反映先**: learning-promote（既存知識への補強判定）
+- **関連**: PR #3992 本文 Findings/learning・Case #3988・既存 learning「bun test 分割③の junction 未伝播環境差」（2026-11-08・対側環境差）
+- **タグ**: #bun-test #分割③ #junction投影 #重複走査 #件数突合
+
+---
