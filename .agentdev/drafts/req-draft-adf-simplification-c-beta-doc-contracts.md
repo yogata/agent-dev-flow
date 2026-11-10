@@ -216,6 +216,24 @@ artifact_actions:
       3. **ユーザー提示**: decision_context（対象案、合意候補、未解決争点、推奨案と根拠、ユーザーに確定してほしい判断）をユーザーへ提示する（decision_context 構成は v4-delegation-contracts Design が正）
       4. **resume point の記録**: 停止時の resume point を記録する。resume point は v4-lifecycle-state-machine Design に従い、case-run 起源の場合は当該 Issue の case-run 再開ポイント（準備フェーズ、実装フェーズ、提出フェーズのいずれか）、工程委譲起源の場合は当該工程の委譲起点とする
       5. **resume point から再開**: ユーザー判断の解決後、resume point から処理を再開する。
+  - id: ACT-DESIGN-005
+    artifact: design
+    operation: update
+    target_design:
+      operation: update
+      domain: commands
+      slug: case-auto
+    target_area: "frontmatter 直下の ADF-COVERS 宣言ブロック（`<!-- ADF-COVERS(implementation): REQ-015-012 -->` 行の直後）"
+    source_items: [AG-002]
+    content: |
+      （case-open STEP-3 の design 対応事前確認で REQ-015-012 の design 対応欠落を coverage --req で検出したため、
+      case-open Design「意味変更行の design 対応事前確認」節に従い REQ-015-012 の design 対応を本 action に組込む。
+      REQ-015-012 の設計根拠は case-auto Design「停止伝播契約（REQ-015-012）」節〔ACT-DESIGN-004 で更新対象〕である）
+      DefinitionEdit（旧文完全一致置換・行追加のみ）:
+      - path: docs/designs/commands/case-auto.md
+      - oldText: <!-- ADF-COVERS(implementation): REQ-015-012 -->
+      - newText: <!-- ADF-COVERS(implementation): REQ-015-012 -->
+        <!-- ADF-COVERS(design): REQ-015-012 -->
 
 conflict_resolutions:
   - id: CR-001
