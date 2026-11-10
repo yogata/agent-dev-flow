@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261110T002447Z-f60f",
+  "workflow": "req-define",
+  "evaluationKind": "requirement-classification",
+  "subject": "req-input C-β の4保存対象候補（REQ-031-029 行・REQ-015 目的文+REQ-015-012 行・local-case-file tracking labels 行・case-auto Wave 反復制御節）の最終分類・Design 分離判断",
+  "sourceRevision": "c3ee427379616c600cf0af7041f6c16044030d11",
+  "durationMs": 226,
+  "inputTokens": 1599,
+  "inputs": {
+    "requestDigest": "9da2e1a4a07fd41f113c5bed37a53ee7c6634fab8e2f64c1b28fd516b3eef4e4",
+    "snapshot": "入力一次記録: C:/Users/ogatay/work/hermes-vault/project-list/req-input-adf-simplification-c-beta-doc-contracts.md（req-input・C-β 文書系 A-1〜A-6）"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-req031-029",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.96,
+        "Design行": 0.04
+      }
+    },
+    {
+      "questionId": "q2-req015-012",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.83,
+        "Design行": 0.17
+      }
+    },
+    {
+      "questionId": "q3-localcasefile-labels",
+      "questionForm": "choice",
+      "value": "Design行",
+      "probabilityDistribution": {
+        "REQ行": 0,
+        "Design行": 1
+      }
+    },
+    {
+      "questionId": "q4-caseauto-wave",
+      "questionForm": "choice",
+      "value": "Design行",
+      "probabilityDistribution": {
+        "REQ行": 0.03,
+        "Design行": 0.97
+      }
+    },
+    {
+      "questionId": "q5-separation-needed",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.44,
+        "false": 0.56
+      }
+    }
+  ],
+  "confidence": 0.92,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-req031-029",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q2-req015-012",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q3-localcasefile-labels",
+        "value": "Design行"
+      },
+      {
+        "questionId": "q4-caseauto-wave",
+        "value": "Design行"
+      },
+      {
+        "questionId": "q5-separation-needed",
+        "value": false
+      }
+    ]
+  }
+}

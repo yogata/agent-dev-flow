@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261110T002423Z-4e2c",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "req-input C-β（文書系 A-1〜A-6）6項目の既存REQ照合判断（CREATE/APPEND/UPDATE/REQ操作なしの帰属）",
+  "sourceRevision": "c3ee427379616c600cf0af7041f6c16044030d11",
+  "durationMs": 1646,
+  "inputTokens": 2079,
+  "inputs": {
+    "requestDigest": "943b12e13744ba20707024b4de105687b6f8a56e33c92f17ecab585f1ddc9fb5",
+    "snapshot": "入力一次記録: C:/Users/ogatay/work/hermes-vault/project-list/req-input-adf-simplification-c-beta-doc-contracts.md（req-input・slug adf-simplification-c-beta-doc-contracts・2026-11-10 利用者承認の実装計画第53報告 v8 由来・C-β 文書系 A-1〜A-6）"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-a1",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 1,
+        "REQ操作なし": 0,
+        "保留": 0
+      }
+    },
+    {
+      "questionId": "q2-a2",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 1,
+        "REQ操作なし": 0,
+        "保留": 0
+      }
+    },
+    {
+      "questionId": "q3-a3",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1,
+        "保留": 0
+      }
+    },
+    {
+      "questionId": "q4-a46",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.01,
+        "REQ操作なし": 0.98,
+        "保留": 0.01
+      }
+    },
+    {
+      "questionId": "q5-a5",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.03,
+        "REQ操作なし": 0.97,
+        "保留": 0
+      }
+    },
+    {
+      "questionId": "q6-confirm",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.39,
+        "false": 0.61
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-a1",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "q2-a2",
+        "value": "UPDATE"
+      },
+      {
+        "questionId": "q3-a3",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q4-a46",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q5-a5",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q6-confirm",
+        "value": false
+      }
+    ]
+  }
+}
