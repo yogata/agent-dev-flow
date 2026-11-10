@@ -105,13 +105,12 @@ export function localStatusValues(role: IssueRole): readonly string[] {
 }
 
 /**
- * role ごとの labels 値域（同上）。tracking の labels 値域検証（kind 4値から
- * ちょうど1つ）は廃止済みであり、既存 kind トークン付き資産の読取を壊さないため
- * 機械検証対象外（空集合）とする。起票・更新の受理面は issueCreate / issueUpdate が
- * 通常ラベル非許容の値域差異として処理する。
+ * role ごとの labels 値域（同上）。tracking は値域の列挙拘束とラベル値域の
+ * 機械検証の適用外（原則空配列・通常ラベルの任意付与可）であり値域定義を持たない。
+ * role: case の値域所属検証は現行どおり維持する。
  */
 export function localLabelValues(role: IssueRole): readonly string[] {
-  return role === "tracking" ? [] : CASE_LABEL_VALUES;
+  return role === "case" ? CASE_LABEL_VALUES : [];
 }
 
 /** role ごとの終端 status。 */
@@ -140,8 +139,8 @@ export function validateLocalIssue(
   if (!localStatusValues(fm.role).includes(fm.status)) {
     errors.push(`status '${fm.status}' is not in the ${fm.role} status values`);
   }
-  // tracking の labels 値域検証（kind 4値からちょうど1つ）は廃止済み。
-  // 既存 kind トークン付き資産の読取互換を維持するため検証しない。
+  // tracking の labels 値域は列挙拘束と機械検証の適用外（原則空配列・通常ラベルの
+  // 任意付与可）。role: case の値域所属検証は現行どおり維持する。
   if (fm.role === "case") {
     const labelValues = localLabelValues(fm.role);
     for (const label of fm.labels) {
@@ -652,15 +651,14 @@ export class LocalRunner implements GhRunner {
     const labels = Array.isArray(args.labels)
       ? args.labels.filter((l): l is string => typeof l === "string")
       : [];
-    // ローカル版の値域差異: tracking の通常ラベル非許容（kind も Tool 操作契約から
-    // 削減済み）。起票時の labels は空配列のみを受理する。
-    if (role === "tracking" && labels.length > 0) {
-      return this.fail("tracking issue_create accepts an empty labels array only");
-    }
-    const labelValues = localLabelValues(role);
-    for (const label of labels) {
-      if (!labelValues.includes(label)) {
-        return this.fail(`label '${label}' is not in the ${role} label values`);
+    // tracking の labels 値域は列挙拘束の適用外（原則空配列・通常ラベルの任意付与可）。
+    // role: case の値域所属検証は現行どおり維持する。
+    if (role !== "tracking") {
+      const labelValues = localLabelValues(role);
+      for (const label of labels) {
+        if (!labelValues.includes(label)) {
+          return this.fail(`label '${label}' is not in the ${role} label values`);
+        }
       }
     }
     const finalLabels = labels;
@@ -741,7 +739,7 @@ export class LocalRunner implements GhRunner {
     }
     if (Array.isArray(args.labels)) {
       const labels = args.labels.filter((l): l is string => typeof l === "string");
-      // ローカル版の値域差異: tracking の通常ラベル非許容。labels は空配列のみ受理する。
+      // tracking の labels 値域は列挙拘束の適用外（原則空配列・通常ラベルの任意付与可）。
       if (fm.role === "case") {
         const labelValues = localLabelValues(fm.role);
         for (const label of labels) {
@@ -749,8 +747,6 @@ export class LocalRunner implements GhRunner {
             return this.fail(`label '${label}' is not in the ${fm.role} label values`);
           }
         }
-      } else if (labels.length > 0) {
-        return this.fail("tracking issue_update accepts an empty labels array only");
       }
       nextFm.labels = labels;
       changed = true;

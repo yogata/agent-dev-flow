@@ -64,7 +64,9 @@ export function createAgentdevJevToolDefinition(deps: {
       "Operations: " +
       AGENTDEV_JEV_PUBLIC_CONTRACTS.map((c) => `${c.operation} (side-effect, fail-closed)`).join(", ") +
       ". When the credentials are unset the tool returns a distinct not_configured failure without calling " +
-      "the API and workflows continue on the legacy LLM path; API failures are never auto-retried and are returned " +
+      "the API (no observation generated); on evaluator failures (including not_configured/unset credentials) a " +
+      "mandatory closed semantic evaluation must not fall back to LLM reasoning — the judgment stays undetermined " +
+      "and dependent successors are suppressed (caller workflow contract); API failures are never auto-retried and are returned " +
       "as structured failures. One semantic evaluation = one observation: evaluate persists the observation (one " +
       "JSON per evaluation) under .agentdev/jev-observations/ right after the evaluator succeeds — before the " +
       "caller proceeds to the reasoning model — and persists a failure observation when a call fails after " +

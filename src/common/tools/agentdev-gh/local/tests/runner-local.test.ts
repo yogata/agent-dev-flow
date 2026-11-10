@@ -132,13 +132,31 @@ describe("LocalRunner: ローカルIssueの作成と採番", () => {
     fs.rmSync(issuesDir, { recursive: true, force: true });
   });
 
-  test("tracking の issue_create は通常ラベル指定を拒否する（ローカル版の値域差異）", async () => {
+  test("tracking の issue_create は通常ラベル指定を受理する（値域の列挙拘束の適用外）", async () => {
     const issuesDir = makeIssuesDir();
     const reply = await run(issuesDir, {
       operation: "issue_create",
       args: { title: "無印", body: "本文", labels: ["feature"], role: "tracking" },
     });
-    expect(reply.ok).toBe(false);
+    expect(reply.ok).toBe(true);
+    expect(readIssueFile(issuesDir, 1)).toContain("labels: [feature]");
+    fs.rmSync(issuesDir, { recursive: true, force: true });
+  });
+
+  test("tracking の labels は空配列と通常ラベル付与の双方を受理する（issue_create / issue_update）", async () => {
+    const issuesDir = makeIssuesDir();
+    const created = await run(issuesDir, {
+      operation: "issue_create",
+      args: { title: "課題", body: "本文", labels: ["docs", "chore"], role: "tracking" },
+    });
+    expect(created.ok).toBe(true);
+    expect(readIssueFile(issuesDir, 1)).toContain("labels: [docs, chore]");
+    const cleared = await run(issuesDir, {
+      operation: "issue_update",
+      args: { number: 1, labels: [] },
+    });
+    expect(cleared.ok).toBe(true);
+    expect(readIssueFile(issuesDir, 1)).toContain("labels: []");
     fs.rmSync(issuesDir, { recursive: true, force: true });
   });
 
@@ -242,7 +260,7 @@ describe("LocalRunner: issue_read / issue_update / issue_list", () => {
     fs.rmSync(issuesDir, { recursive: true, force: true });
   });
 
-  test("issue_update は status を変更せず、role: tracking への通常ラベル指定を拒否する", async () => {
+  test("issue_update は status を変更せず、role: tracking への通常ラベル指定を受理する", async () => {
     const issuesDir = makeIssuesDir();
     await run(issuesDir, { operation: "issue_create", args: { title: "C", body: "b", labels: [], role: "case" } });
     await run(issuesDir, {
@@ -253,8 +271,10 @@ describe("LocalRunner: issue_read / issue_update / issue_list", () => {
       operation: "issue_update",
       args: { number: 2, labels: ["feature"] },
     });
-    expect(tracked.ok).toBe(false);
-    expect(readIssueFile(issuesDir, 2)).toContain("status: created");
+    expect(tracked.ok).toBe(true);
+    const updated = readIssueFile(issuesDir, 2);
+    expect(updated).toContain("status: created");
+    expect(updated).toContain("labels: [feature]");
     fs.rmSync(issuesDir, { recursive: true, force: true });
   });
 

@@ -69,7 +69,7 @@ describe("TS-009 case-auto 工程契約（stage 内並列・stage 間 fan-in・�
 });
 
 describe("TS-009 adapter 委譲契約（3点ゲート・成果物検証）", () => {
-  test("委譲結果受領の最終ゲート（4状態 result・commit hash・PR URL）を保持する", () => {
+  test("委譲結果受領の最終ゲート（4状態 result 必須・状態別必須欄）を保持する", () => {
     for (const element of ["4状態 result", "commit hash", "PR URL"]) {
       expect(adapterSkill).toContain(element);
     }
