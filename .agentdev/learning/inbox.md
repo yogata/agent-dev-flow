@@ -670,3 +670,39 @@
 - **タグ**: #case-open #idempotency #issue_list #重複生成 #円等検出
 
 ---
+
+## 2026-11-10: case-ready 受入検査の check_integrity 既存警告が機械工程の後続抑止を引き、対照救済＋手動相当手順への切替が毎回必要になる構造
+
+- **問題事象**: case-ready STEP-1 の受入検査（accept_definition_checks.ts・acceptance-checks phase）で check_integrity が既存警告1件（gh-direct-invocation・case-close scripts README 由来・warning cap 超過）により終了コード1となり、script は definition-acceptance-checks fail で後続ゲート（overlap-cross-check・generate_indexes・traceability-check）を実行せず停止した。既存警告は本 Case 変更と無関係な baseline 警告であるため受入判断としては過剰停止であり、残り3ゲートは手動相当手順での個別実行に切替した
+- **発生局面**: case-ready STEP-1 設計PR受入の機械工程（Case #3988 / PR #3991）
+- **検知方法**: script 報告 JSON の definition-acceptance-checks step fail（check_integrity exitCode 1・summary {ng:0, warning:1}）と definition-acceptance.md「受入検査の機械工程と検査証拠の保存」の後続抑止契約
+- **根本原因**: accept_definition_checks.ts は非ゼロ終了の integrity gate を無条件で fail 扱いして後続ゲートを抑止する。対照救済（contrastive-no-worse-proof: main 対照実行で NG/Warning finding 集合の完全一致・悪化0件を機械証明）と手動相当手順（manual-equivalent-procedure: 残りゲートの個別実行・証跡保存）は GATE_ALTERNATIVE_ROUTES に定義されているが、script 側には baseline 悪化0件を機械判定した上で継続する経路が実装されておらず、実行毎にモデルの手動切替が必要になる
+- **自律対応内容**: (1) check_integrity の報告を証跡保存（acceptance-report-3988.json の step detail） (2) main HEAD 対照実行で NG 0・Warning 1・finding 集合完全一致（IDENTICAL_SET=true）を機械証明 (3) overlap-cross-check・generate_indexes（AUTOGEN 再生成差分0件）・traceability-check（11検査 pass・fail 0）を個別実行・証跡保存 (4) 対照救済 warn として受入判断へ進み（検査を pass に書き換えない）、merge 実行
+- **ユーザー確認の有無**: なし（GATE_ALTERNATIVE_ROUTES の代替経路適用・case-open 実績と同一経路・同一根拠）
+- **REQ/Decision/Design影響**: なし（既存の対照救済経路の運用確認。script の自動対照判定追加は機構整理候補として記録まで）
+- **横展開観点**: case-revise 由来の設計修正PR 受入（case-ready 再実行）でも同一構造で発生し得る。対照救済の証明材料（worktree/main の finding 集合突合結果）を検証記録へ機械突合可能な形で保存すると受入判断の根拠が強化される
+- **再発条件**: 既存 warning が warning cap を超過した状態で受入検査を実行した場合（現行の gh-direct-invocation 警告残存下では継続的に発生し得る）
+- **予防策候補**: 既知警告の解消（case-close scripts README の gh CLI 表現是正）または checker 側 warning cap 更新を別 Case で実施する。あるいは accept_definition_checks.ts に対照実行の自動突合 step を追加し、悪化0件機械証明時に needs-judgment で継続する経路を整備する
+- **想定反映先**: learning-promote（機構整理候補の要件化判定）
+- **関連**: Case #3988・PR #3991・.agentdev/integrity/reports/acceptance-report-3988.json・case-ready references/definition-acceptance.md「受入検査の機械工程と検査証拠の保存」節・2026-11-07 の measurement-convergence 学び（機械工程 fail の手動救済の先例）
+- **タグ**: #case-ready #受入検査 #対照救済 #機械工程 #既存警告
+
+---
+
+## 2026-11-10: case-ready 実行中に並行レーンが main worktree の domain state を commit・push 済みで、前置永続化が冪等に不要化する実観測（Case #3988）
+
+- **問題事象**: case-ready STEP-2 前置として、draft 未コミット修正（ACT-DESIGN-005 追加・case-open coverage 検出由来）と未追跡 jev 観測2件の明示パス指定 commit を実行しようとした時点で、working tree が clean になっており、並行レーンによる commit（c900bd9c6 draft 修正・f8e2a5570 learning）と push が完了していた。操作自体は失敗しないが、計画した前置永続化は不要になっていた
+- **発生局面**: 運用（case-ready STEP-2 前置。case-auto orchestration の並行レーンと本レーンの同一 domain state 操作競合）
+- **検知方法**: git branch --show-current・git status --short・git log の前置確認で、git status --short が空・c900bd9c6 が存在している事実を検出（git add が何もステージせず commit が nothing to commit で失敗する形で表面化）
+- **根本原因**: 複数レーンが同一 main worktree で domain state 永続化を行い得る構造であり、前置確認は永続化対象の存在確認だけでは並行レーンの進行を予測できない
+- **自律対応内容**: 重複実行なし。git status・git show で並行レーンの commit 内容を確認（draft 修正 18行追加・正規手順と同一の明示パス指定 commit 形式・push 済み）し、前置永続化を再実行せず STEP-2 以降を継続。結果的に競合・lost update なし
+- **ユーザー確認の有無**: なし（冪等前置確認からの機械的再利用判定）
+- **REQ/Decision/Design影響**: なし（並列実行安全ステージング手順の運用確認）
+- **横展開観点**: stage 間並行実行（case-auto orchestration）では同一 domain state 対象を複数レーンが扱い得る。domain state 永続化の前置は「存在すれば再利用・不在なら実行」の冪等形で実装し、実行直前の git status 再確認が競合防止の最小手順
+- **再発条件**: 同一対象の domain state を複数レーンが並行で永続化しようとした場合
+- **予防策候補**: domain state 永続化の所有レーン明確化、または並行レーン検知時の待機・再確認手順の明文化（ REQ/Design 判断は learning-promote に委譲）
+- **想定反映先**: learning-promote（並列実行レーン間の domain state 操作規律の知識化判定）
+- **関連**: Case #3988・commit c900bd9c6・f8e2a5570・f7392b9be・agentdev-git-worktree git-common-procedures.md 手順3（concurrent-safe staging）
+- **タグ**: #case-ready #並行実行 #domain-state #冪等前置
+
+---
