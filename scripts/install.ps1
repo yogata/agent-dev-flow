@@ -924,6 +924,8 @@ function New-MechanicalStepProbeInput {
                 integrityGates = @(@{ name = 'full-integrity-suite'; command = 'bun'; args = @($traceChecker); cwd = $RepoRoot })
                 textlintGate = @{ name = 'textlint-final-check'; command = 'bun'; args = @($traceChecker); cwd = $RepoRoot }
                 contractStateCheck = @{ contractStatePaths = @('.agentdev/learning/inbox.md'); approvalEntries = @() }
+                issueUpdatedAt = '2025-01-01T00:00:00Z'
+                issueNumber = 1
             }
         }
         'cross-dependency' {
