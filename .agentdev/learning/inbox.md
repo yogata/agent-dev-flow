@@ -652,3 +652,21 @@
 - **タグ**: #epic-close #post-merge #cleanup #機械工程 #needs-judgment
 
 ---
+
+## 2026-11-10: case-open 円等検出の issue_list search トークン（topic_slug 単独）が既存 Root Case を取りこぼし重複 Root Case・重複設計PR を作成した
+
+- **問題事象**: case-open STEP-2 の円等検出で issue_list search トークン「adf-simplification-c-beta-doc-contracts」（draft topic_slug）を1件だけ使用してヒット 0件と判定し、Root Case #3989 と設計PR #3990 を新規作成した。実行後、同一 draft から作成済みの Root Case #3988（タイトル「Case: ADF全体簡素化調査の文書系契約間不一致を正本契約へ整合させる」・タイトルと本文に topic_slug を含まない）と設計PR #3991 が既存であることが判明した。#3989 は対照実行側により「[duplicate] …（#3988 へ集約）」へタイトル更新済み。definition/issue-3988 と definition/issue-3989 の tree 差分は 0件（git diff --stat 空出力・計測 baseline: ローカル main HEAD f7392b9be・origin/main c3ee42737・2026-11-10・`git diff origin/definition/issue-3988 origin/definition/issue-3989 --stat`）
+- **発生局面**: 運用（case-open STEP-2 円等検出。工程委譲 DEL-OU001-S1）
+- **検知方法**: STEP-5 円等再実行確認の未クローズ Case 群取得（issue_list search「Case:」）で #3988 の存在を検知し、git fetch 後の branch 間 diff --stat で tree 完全一致を機械確認
+- **根本原因**: 円等キー語を draft topic_slug に限定した単一トークン検索を採用した。GitHub search/issues は in:title tokenized match であり、既存 Root Case のタイトル（Case 接頭辞＋主題）に topic_slug が含まれず、本文にも topic_slug が埋め込まれていなかったため検索が空振りした。search トークン選択性指針（issue-operation-safety.md「issue_list の絞り込み規律」節）は選択性を要求するが、ヒット 0件時の主題語・REQ 行 ID 併用の再検証までは契約化されていなかった
+- **自律対応内容**: 既存 #3988 を正規 Root Case として再利用判定し、設計PR #3991 を正規受入対象と認定した。#3990 と #3991 の tree 差分 0件を機械証明して重複 PR の内容不備がないことを確認。#3990 は merge せず重複記録を完了報告へ記載した（PR close 操作は agentdev_gh 操作カタログに存在しないため後続工程の判断へ委譲）
+- **ユーザー確認有無**: なし（workflow 円等契約からの機械的再利用判定）
+- **REQ/Decision/Design影響**: REQ-030-010（円等再実行確認）の運用面に影響の余地。agentdev-issue-management の issue-operation-safety.md「issue_list の絞り込み規律」節への追加規律候補（影響の記録まで。反映判断は learning-promote の責務）
+- **横展開観点**: 既存成果物の円等検出を行う全 workflow（case-ready・case-revise・case-close）へ同種の複数トークン検証を適用できる
+- **再発条件**: draft の topic_slug が既存 Root Case のタイトル・本文に含まれない書式で起票されている場合に、topic_slug 単独の search トークンで円等検出を実施した場合
+- **予防策候補**: 円等検出の search は topic_slug に加え、合意済み対象・目的から導出した主題語と対象 REQ 番号を併用する複数トークン検索とする。ヒット 0件の場合でも主題語・REQ 行 ID による再検索を実施する二段検証を STEP-2 円等検出の標準手順へ追加する
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/root-case-and-definition-package.md（STEP-2 円等検出手順）、agentdev-issue-management issue-operation-safety.md（issue_list の絞り込み規律）
+- **関連**: #3988、#3989、#3990、#3991、.agentdev/drafts/req-draft-adf-simplification-c-beta-doc-contracts.md
+- **タグ**: #case-open #idempotency #issue_list #重複生成 #円等検出
+
+---
