@@ -288,3 +288,19 @@ describe("corpus 適用（是正パターンでの二入口同一性と bypass �
     expect(gate.output).toContain("FAIL");
   });
 });
+
+
+// mkdtemp の作業フォルダーは使い捨てのため、この試験ファイルの終わりに自分の接頭辞の物を掃く。
+import { afterAll } from "bun:test";
+import * as cleanupFs from "node:fs";
+import * as cleanupOs from "node:os";
+import * as cleanupPath from "node:path";
+
+afterAll(() => {
+  const prefixes = ["adftl-gate-"];
+  const tmp = cleanupOs.tmpdir();
+  for (const entry of cleanupFs.readdirSync(tmp)) {
+    if (!prefixes.some((p) => entry.startsWith(p))) continue;
+    cleanupFs.rmSync(cleanupPath.join(tmp, entry), { recursive: true, force: true });
+  }
+});
