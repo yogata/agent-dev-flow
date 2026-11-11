@@ -108,7 +108,7 @@ context 管理:
 ## 所有関係と委譲
 
 - public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（`src/common/commands/agentdev/case-auto.md`）はその実行時投影である（DEC-010）。
-- workflow 実装本体（orchestration stage モデル、Wave 反復制御、停止理由分類、reference 構成）は Workflow Skill（`agentdev-workflow-case-auto`）が所有し、本 Design はこれらを複製しない。各工程の output_contract（工程別契約表）も Workflow Skill が所有する。
+- workflow 実装本体（orchestration stage モデル、Wave 反復制御、停止理由の検出・分類適用・報告手順、reference 構成）は Workflow Skill（`agentdev-workflow-case-auto`）が所有し、本 Design はこれらを複製しない。停止理由分類の値域・定義・対応（実行結果状態、利用者判断の要否、再開入口）は本 Design「停止理由分類」節が単一正本として所有する。各工程の output_contract（工程別契約表）も Workflow Skill が所有する。
 - case-run（インライン実行）の workflow 実装本体は case-run の Workflow Skill（`agentdev-workflow-case-run`）が所有する（case-run は常に単一 Issue 実行。Wave 実行制御は case-auto stage 3 が所有するため epic-wave 実行契約は本 Design 側へ集約される）。
 - Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
@@ -284,20 +284,25 @@ stage 3 の段階的派遣（case-ready 起動、子 Issue 起票を含む）は
 
 ### 停止理由分類（REQ-034-015/108 拡張）
 
-case-auto は停止時に停止理由を以下の分類で報告する。
-分類は再開コマンド選択とユーザー通知の精度向上が目的であり、HITL 境界の変更ではない。
+case-auto は停止時に停止理由を以下の分類で報告する。本節が停止理由分類（10分類）の値域・定義・対応（実行結果状態、利用者判断の要否、再開入口）の単一正本であり、Workflow Skill（`agentdev-workflow-case-auto`）の実行参照文書・停止報告・再開指示は本節の分類値を列挙し本節を名前で参照する（配布物本文に REQ/Decision 識別子の新規参照を追加しない）。分類は再開コマンド選択とユーザー通知の精度向上が目的であり、HITL 境界の変更ではない。本節は分類の新設・廃止を行わず、現行10分類の値域を維持する。
 
-| 分類 | 定義 |
-|---|---|
-| req-define 合意要件からの逸脱 | case-open または後続工程が合意済み要件、対象外、受け入れ条件を変更した場合、合意されていない機能要件または制約を追加した場合、合意済み OU を欠落・統合・分割して要件の意味を変更した場合 |
-| command 契約・実装不整合 | execution_unit へ分割可能であるにもかかわらず case-open が単一 Epic 子 Issue 上限により停止した場合、case-open または後続工程の実装が契約へ整合していない場合、構成生成事前検証（REQ-032-015）が実装されていない場合 |
-| 要件未合意のスコープ拡大 | 合意されていないスコープが実行中に追加された場合 |
-| repo 外実体変更 | DB マイグレーション実行、デプロイ/apply、クラウドリソース操作、外部SaaS設定変更、課金、権限、認証情報変更が必要な場合 |
-| CI/test/lint 失敗 | コンフリクト解消モデル（v2:ADR-0132）の Level 2 まで試行しても自己修復不能な場合 |
-| 未コミット変更の帰属不明 | 変更の由来が不明で安全に続行できない場合 |
-| 上位合意矛盾 | case-auto が受領した decision_context が現行正規成果物（REQ/Decision/Design/Issue）間の矛盾に起因する場合。当該矛盾そのものが finding の対象であり、case-auto が一方を勝手に採用できない（REQ-034-034、DEC-008 決定3） |
-| 新規ユーザー判断事項 | case-auto が受領した decision_context が新しいユーザー価値判断、対象範囲変更、外部契約変更を必要とし、正規契約から導出できず case-auto に委譲された裁量（REQ-096-015）の範囲外である場合、すなわち人間に留保された判断（REQ-096-005）の新規確定を要する場合（REQ-034-034、DEC-008 決定4） |
-| 並列起動不能（実行環境由来） | 当該 stage の起動可能対象集合に対して背景起動が1件も成立しない場合。原因の断定を含まない。delegation-unavailable との弁別基準は「委譲起動不能時の扱い」節を参照（REQ-034-028、REQ-034-044、DEC-042）。停止報告には起動試行履歴（試行回数、起動成立数、最終成功起動時刻）を含める（REQ-034-045） |
+本節は次の概念を区別する。停止条件（いつ停止するか。全量は REQ-034-015）、停止理由分類（なぜ停止したかの報告分類。本節の10分類）、原因別処理（失敗・停止理由の原因分類。8原因分類は REQ-096-012）、停止種別（Case 失敗 blocked / failed と区別される報告種別。infra-transient）、停止伝播に付随する報告分類（user-decision-required。分類一覧の値ではない）。検出・分類適用・報告の手順は Workflow Skill が所有し、本節はこれらを複製しない。
+
+| 分類 | 定義 | 対応停止条件 | 実行結果状態 | 利用者判断の要否 | 再開入口 |
+|---|---|---|---|---|---|
+| req-define 合意要件からの逸脱 | case-open または後続工程が合意済み要件、対象外、受け入れ条件を変更した場合、合意されていない機能要件または制約を追加した場合、合意済み OU を欠落・統合・分割して要件の意味を変更した場合 | (1) | blocked（要件再合意が必要） | 要 | req-define での再合意後に case-auto を再開（Root Case 指定） |
+| command 契約・実装不整合 | execution_unit へ分割可能であるにもかかわらず case-open が単一 Epic 子 Issue 上限により停止した場合、case-open または後続工程の実装が契約へ整合していない場合、構成生成事前検証（REQ-032-015）が実装されていない場合 | (11) | fail（実装・契約側の欠陥） | 原則不要（実装の修正） | 実装修正後に case-auto を再開 |
+| 要件未合意のスコープ拡大 | 合意されていないスコープが実行中に追加された場合 | (2) | blocked（要件再合意が必要） | 要 | req-define での再合意後に case-auto を再開 |
+| repo 外実体変更 | DB マイグレーション実行、デプロイ/apply、クラウドリソース操作、外部SaaS設定変更、課金、権限、認証情報変更が必要な場合 | (3)(4)(5)(6) | blocked（repo 外操作の実行待ち） | 要（repo 外操作の実行判断） | 利用者による repo 外操作の実行・承認後に case-auto を再開 |
+| CI/test/lint 失敗 | コンフリクト解消モデル（v2:ADR-0132）の Level 2 まで試行しても自己修復不能な場合 | (7)(8) | fail | 原則不要（実装・検証の修正） | 修正後に case-auto を再開 |
+| branch 削除検出 | 作成元不明 branch / user-owned branch / 他作業 branch の削除を検出した場合 | (9) | blocked（削除判断待ち） | 要（削除の判断） | 利用者の削除判断後に case-auto を再開 |
+| 未コミット変更の帰属不明 | 変更の由来が不明で安全に続行できない場合 | (10) | blocked（帰属確認待ち） | 要（帰属の確認） | 帰属確認後に case-auto を再開 |
+| 上位合意矛盾 | bounded parent decision resolution で decision_context が現行正規情報源間の矛盾に起因し、既存正規契約から導出できない場合に限る。解決可能な不一致は権威優先で解消して自走停止にせず、未解決規範矛盾に該当する場合のみ本分類で報告する（REQ-034-034、DEC-008 決定3） | —（STEP-6 経由） | blocked（矛盾解消待ち） | 要（矛盾の解消判断） | 矛盾解消（finding 経路を含む）後に case-auto を再開 |
+| 新規ユーザー判断事項 | 同 decision_context が、新しいユーザー価値判断、対象範囲変更、外部契約変更を必要とし、正規契約から導出できず case-auto に委譲された裁量（REQ-096-015）の範囲外である場合、すなわち人間に留保された判断（REQ-096-005）の新規確定を要する場合（REQ-034-034、DEC-008 決定4） | —（STEP-6 経由） | blocked（新規判断の確定待ち） | 要（人間に留保された判断の新規確定） | req-define での再合意後に case-auto を再開 |
+| 並列起動不能（実行環境由来） | 停止条件11項目に対応しない独立停止事由。当該 stage の起動可能対象集合に対して背景起動が1件も成立しない場合。原因の断定を含まない。delegation-unavailable との弁別基準は「委譲起動不能時の扱い」節を参照（REQ-034-028、REQ-034-044、DEC-042）。停止報告には起動試行履歴（試行回数、起動成立数、最終成功起動時刻）を含める（REQ-034-045） | —（独立停止事由） | 停止（並列性の回復待ち） | 要（実行環境の回復運用） | 実行環境の回復後に durable state からの冪等再開（REQ-034-044） |
+infra-transient（ツール基盤故障）は停止種別であり、本表の分類軸ではない。Case 失敗（blocked / failed）と区別して報告し、判定条件（単一ツール恒常失敗・プロセス生存・再試行無効・他経路正常の4条件同時成立）と回復経路は「infra-transient（ツール基盤故障）停止分類」節が所有する。
+
+user-decision-required（adversarial-review 由来）は停止伝播に付随する報告分類であり、本表の分類軸ではない（case-run result enum の第5状態でもない）。受領した decision_context はまず bounded parent decision resolution へ入力し、上位合意矛盾・新規ユーザー判断事項のいずれかに帰着した場合に限り自走停止してユーザー判断を待機し、正規契約から導出可能なもの・委譲された裁量の範囲内のものは回答して当該下位の resume point から再開する（位置づけは「user-decision-required の位置づけ（REQ-014-012）」節）。
 
 execution_unit 分割可能性があるにもかかわらず case-open が停止した場合、「req-define 合意要件からの逸脱」ではなく「command 契約・実装不整合」として報告する。
 これは case-open の契約・実装不整合であり、要件doc側の問題ではない。
