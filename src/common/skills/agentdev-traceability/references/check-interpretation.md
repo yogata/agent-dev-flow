@@ -26,10 +26,10 @@ check は `src/check.ts` を `--root <repo-root>` 付きで実行する。出力
 | `unknown-roles` | decision / design / implementation / verification 以外の role | role キーを4種のいずれかへ修正する |
 | `unknown-req-refs` | 存在しない要件行 ID への参照（sidecar、inline declaration、policy.yaml の optional 列挙を含む） | 要件行 ID の誤記を修正する。参照先が廃止済み要件行の場合は後継要件行へ対応付け替える、または対応関係を削除する |
 | `invalid-artifact-paths` | 存在しない、または取得不能な artifact path（sidecar 参照先のファイル不在・読取不能を含む） | sidecar のパスを成果物の現行リポジトリ相対パスへ更新する。成果物を削除した場合は対応関係ごと整理する |
-| `missing-design` | Design 対応の欠落（現行要件行で0件） | 該当要件行を実現する現在の設計へ Design 対応を追加する。Design 確定工程（Definition 保存）で成立させる（Design 対応0件のまま実装着手しない） |
-| `missing-implementation` | 実装対応の欠落（現行要件行で0件） | 該当要件行を実際に実現する永続成果物へ実装対応を sidecar（または producer-only artifact の inline declaration）へ追加する |
-| `missing-verification` | 検証対応の欠落（検証スコープポリシーが required と判定する現行要件行のみ計上） | 恒続的な検証手段を用意し検証対応を追加する。恒続的に検証可能な対象を持たない行のみ、検証スコープポリシー（`traceability/policy.yaml`）の `optional` へ明示登録する |
-| `policy-invalid` | 検証スコープポリシーの不正（schema 違反、default 値不正、optional 列挙の要件行 ID 形式違反、存在しない要件行の列挙、policy 読取不能） | `traceability/policy.yaml` を正規 schema へ修正する。policy の不正は検証対応の要否判定全体を不能にするため、他の missing 系判定の前に解消する |
+| `missing-design` | Design 対応の欠落（policy が design 軸で任意と明示登録した現行要件行を除き計上） | 該当要件行を実現する現在の設計へ Design 対応を追加する。Design 確定工程（Definition 保存）で成立させる（Design 対応0件のまま実装着手しない）。旧要件行で恒続的に対応可能な対象を持たない行のみ、検証スコープポリシー（`traceability/policy.yaml`）の design 軸 `optional` へ明示登録する |
+| `missing-implementation` | 実装対応の欠落（policy が implementation 軸で任意と明示登録した現行要件行を除き計上） | 該当要件行を実際に実現する永続成果物へ実装対応を sidecar（または producer-only artifact の inline declaration）へ追加する。旧要件行で恒続的に対応可能な対象を持たない行のみ、policy の implementation 軸 `optional` へ明示登録する |
+| `missing-verification` | 検証対応の欠落（policy が verification 軸で任意と明示登録した現行要件行を除き計上。policy が required と判定する行のみ計上する現行性格と同一） | 恒続的な検証手段を用意し検証対応を追加する。恒続的に検証可能な対象を持たない行のみ、検証スコープポリシー（`traceability/policy.yaml`）の verification 軸 `optional` へ明示登録する |
+| `policy-invalid` | 検証スコープポリシーの不正（未知のトップレベルキー、軸配下の未知のキー、default 値不正、optional 列挙の要件行 ID 形式違反、存在しない要件行の列挙、policy 読取不能を含む） | `traceability/policy.yaml` を正規 schema へ修正する。policy の不正は各軸の要否判定全体を不能にするため、他の missing 系判定の前に解消する |
 | `duplicate-inconsistencies` | 同一 artifact パス × role × 要件行 ID の組み合わせが sidecar と inline declaration の間、または同一情報源内で矛盾する状態 | 保持したい保存方式へ統一する（sidecar と inline の重複の整理、または同一情報源内の矛盾の解消）。移行中の矛盾は移行完了時に解消する |
 | `malformed-links` | 隣接工程間対応の宣言形式・構文違反（inline 宣言の形式不備・不明方向、sidecar links セクションの schema 不正） | 宣言行・sidecar links セクションを正規形式へ修正する。書式は本スキル SKILL.md「links 宣言」節と references/sidecar-and-policy.md。方向は upstream（下流→上流）のみ許容する |
 | `dangling-links` | links の source / target 参照先の不存在 | 参照先パスを成果物の現行リポジトリ相対パスへ更新する。成果物を削除した場合は links 対応ごと整理する。参照先が採用されていない参照例の成果物である場合は links 対応を削除してよい |
@@ -37,7 +37,8 @@ check は `src/check.ts` を `--root <repo-root>` 付きで実行する。出力
 補足:
 
 - Decision 対応の欠落はどの検出項目にも計上されない（対応完全性規則の任意役割）。Decision の有無を理由に対応関係を追加・修正する必要はない
-- 検証スコープポリシーが存在しない場合、全現行要件行が `missing-verification` の計上対象になる（安全側既定）。これは検査の誤動作ではなく規定の挙動である。任意行として扱いたい要件行は policy へ明示登録する
+- missing 系3項目（`missing-design` / `missing-implementation` / `missing-verification`）は、検証スコープポリシーの3軸（design・implementation・verification）のうち当該軸で任意と明示登録された現行要件行の欠落を計上しない。各軸とも required が既定であり、policy への明示登録のみが任意区分の手段である（区分機構の用途、登録・解除の規律は references/sidecar-and-policy.md「検証スコープポリシー（policy.yaml）の利用手順」節を参照）
+- 検証スコープポリシーが存在しない場合、全現行要件行が3軸とも対応必須として計上対象になる（安全側既定）。これは検査の誤動作ではなく規定の挙動である。任意行として扱いたい要件行は policy へ明示登録する
 - findings の解消は対応関係データの修正のみで行い、要件そのものや検査基準を改変しない
 
 ## --req 限定実行時の検出結果計上性格判定（3段判定）
