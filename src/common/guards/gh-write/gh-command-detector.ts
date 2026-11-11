@@ -74,8 +74,15 @@ const GH_WRITE_PATTERNS: readonly WritePattern[] = [
 //     （gh CLI は --method GET 指定時パラメータをクエリ文字列として送る）。
 // (4) 判定要素の解析が不能または曖昧な組合せは書込み側に分類して拒否する
 //     （over-block 許容・under-block 不許容）。
+// トークン解釈はシェル引用符の意味論に従う: 引用符はトークン分割のみに影響し
+// フラグ解釈には影響しないため、引用符付きフラグ（'-f'、"-X" 等）も引用符なしと
+// 同一に判定する。一方、引用符内に含まれる値は単一トークンとしてまとまり、
+// 値の内部の文字列（'body=x --method GET' 等）はフラグ・メソッド指定として
+// 解釈しない。閉じられていない引用符は解析不能として分類 (4) の曖昧 block に倒す。
+// 単発 &（バックグラウンド実行演算子）も &&・||・;・| と同様にコマンド区切りとして
+// 扱い、各セグメントを独立分類する。
 const GH_API_COMMAND_RE = /\bgh\s+api\b/;
-const GH_API_SEGMENT_SPLIT_RE = /\s*(?:&&|\|\||;|\|)\s*/;
+const GH_API_SEGMENT_SPLIT_RE = /\s*(?:&&|\|\||;|\||&)\s*/;
 const GH_API_WRITE_METHOD_RE = /^(?:POST|PATCH|PUT|DELETE)$/i;
 const GH_API_GET_METHOD_RE = /^GET$/i;
 
@@ -145,15 +152,57 @@ function extractGhApiArgs(segment: string): string | null {
 }
 
 /**
- * 1行を複合シェル構文（&&、||、;、|）で分割し、gh api を含むセグメントを
+ * シェル引用符の意味論に従い引数部分をトークン化する。
+ * 引用符はトークン分割のみに影響しフラグ解釈には影響しないため引用符文字は除去し、
+ * 引用符内の値は空白を含めて単一トークンにまとめる（値の内部はフラグとして解釈されない）。
+ * 閉じられていない引用符は解析不能として unterminated で報告する。
+ */
+function tokenizeSegmentArgs(args: string): { tokens: readonly string[]; unterminated: boolean } {
+  const tokens: string[] = [];
+  let current = "";
+  let hasCurrent = false;
+  let quote: '"' | "'" | null = null;
+  for (const character of args) {
+    if (quote !== null) {
+      if (character === quote) {
+        quote = null;
+      } else {
+        current += character;
+      }
+      continue;
+    }
+    if (character === '"' || character === "'") {
+      quote = character;
+      hasCurrent = true;
+      continue;
+    }
+    if (/\s/.test(character)) {
+      if (hasCurrent) tokens.push(current);
+      current = "";
+      hasCurrent = false;
+      continue;
+    }
+    current += character;
+    hasCurrent = true;
+  }
+  if (quote !== null) return { tokens: [], unterminated: true };
+  if (hasCurrent) tokens.push(current);
+  return { tokens, unterminated: false };
+}
+
+/**
+ * 1行を複合シェル構文（&&、||、;、|、単発 &）で分割し、gh api を含むセグメントを
  * Design 分類境界に従い判定する。block すべきセグメントがあればその判定を返す。
  */
 function detectGhApiBoundary(line: string): GhWriteVerdict | null {
   for (const segment of line.split(GH_API_SEGMENT_SPLIT_RE)) {
     const args = extractGhApiArgs(segment);
     if (args === null) continue;
-    const tokens = args.trim().split(/\s+/).filter((token) => token !== "");
-    const classification = classifyGhApiArgs(tokens);
+    const tokenized = tokenizeSegmentArgs(args.trim());
+    if (tokenized.unterminated) {
+      return { kind: "block", command: segment.trim(), rule: "gh api ambiguous" };
+    }
+    const classification = classifyGhApiArgs(tokenized.tokens);
     if (classification.kind === "block") {
       return { kind: "block", command: segment.trim(), rule: classification.rule };
     }
