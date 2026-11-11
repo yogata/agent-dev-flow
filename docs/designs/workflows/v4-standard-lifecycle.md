@@ -11,7 +11,7 @@ updated: "2026-10-19"
 
 # ADF v4 標準ライフサイクル（語彙直交性・公開 UX・req-define 入口・継続コラボレーションループ）
 
-位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）までは v3 を正とする。当該段階での置換実行をもって権威は本 Design へ移行する。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施する。
+位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）の全行 executed と実際の処遇状態の確認をもってこの移行規則は現行規範ではなく、歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
 
 ## work_type / scale / Epic / Wave の v4 意味モデル
 

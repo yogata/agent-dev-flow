@@ -13,7 +13,7 @@ updated: "2026-10-20"
 
 # ADF v4 Traceability モデル（Change / Evidence 中心）
 
-位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）までは v3 を正とする。当該段階での置換実行をもって権威は本 Design へ移行する。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施する。あわせて本 Design は REQ-107（ADF v5 工程間追跡と品質検証の責務分離）と DEC-054（ADF v5 追跡・品質検証モデル）に基づく v5 追跡語義（標準関係、設計根拠対応の条件付き化、構造検査と意味品質検証の分離）を、v4 語義の搬送範囲とともに所有する。
+位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）の全行 executed と実際の処遇状態の確認をもってこの移行規則は現行規範ではなく、歴史的説明として保持する（REQ-103-020）。あわせて本 Design は REQ-107（ADF v5 工程間追跡と品質検証の責務分離）と DEC-054（ADF v5 追跡・品質検証モデル）に基づく v5 追跡語義（標準関係、設計根拠対応の条件付き化、構造検査と意味品質検証の分離）を、v4 語義の搬送範囲とともに所有する。
 
 本 Design は DEC-037（Traceability の Change / Evidence 中心への再中心化）の Design 実体である。DEC-037 の標準関係構造（covers 単独の標準コア関係）は DEC-054 が covers と採用された隣接工程間対応へ拡張した。モデル要素、完全性規則、保存方式、直接走査、用語政策の所有対応は吸収節に定める。
 

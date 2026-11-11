@@ -345,7 +345,7 @@ consumer 境界は producer、direct consumer、orchestration pre-reader、inval
 3. Design
 4. guides
 
-v4 移行期間中、accepted の v4 モデル定義 Design と未置換の v3 accepted Design の衝突は、当該 v3 Design の処遇実行段階まで v3 を正とする（v3-v4-crosswalk.md 処遇実行原則）。
+v3 → v4 移行期間中は、accepted の v4 モデル定義 Design と未置換の v3 accepted Design の衝突について、当該 v3 Design の処遇実行段階まで v3 を正とする扱いとした（v3-v4-crosswalk.md 処遇実行原則）。処遇記録 crosswalk-inventory.md の全行 executed と実際の処遇状態の確認をもって移行は完了しており、この規則は現行規範ではなく歴史的説明として保持する（REQ-103-020）。
 
 ## 設定規則
 

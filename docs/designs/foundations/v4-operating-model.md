@@ -14,7 +14,7 @@ updated: "2026-11-04"
 
 # ADF v4 Operating Model（目的・三層責務・Project Contract・寿命・文書モデル）
 
-位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）までは v3 を正とする。当該段階での置換実行をもって権威は本 Design へ移行する。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施する。処遇実行段階を経過していない v3 成果物は過去時点の事実として保持し、現行規範として参照されない限り歴史的本文を書き換えない（REQ-103-020）。本節の対応導線により、歴史的成果物は現行契約として誤認されず、正規所有者へ到達できる（REQ-103-021）。
+位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）の全行 executed と実際の処遇状態の確認をもってこの移行規則は現行規範ではなく、歴史的説明として保持する（REQ-103-020）。処遇実行段階を経過していない v3 成果物は過去時点の事実として保持し、現行規範として参照されない限り歴史的本文を書き換えない（REQ-103-020）。本節の対応導線により、歴史的成果物は現行契約として誤認されず、正規所有者へ到達できる（REQ-103-021）。
 
 ## 目的と適用範囲
 
