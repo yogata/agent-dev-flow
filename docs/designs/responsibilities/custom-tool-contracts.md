@@ -4,7 +4,7 @@ status: accepted
 created: 2026-08-24
 updated: "2026-11-08"
 ---
-<!-- ADF-COVERS(design): REQ-090-001, REQ-090-002, REQ-090-003, REQ-090-004, REQ-090-009, REQ-090-010, REQ-090-011, REQ-090-012, REQ-090-013, REQ-090-014, REQ-090-015, REQ-090-016, REQ-090-017, REQ-090-018, REQ-090-019, REQ-090-020, REQ-090-021, REQ-090-022, REQ-090-023, REQ-090-024, REQ-090-025, REQ-090-026, REQ-090-027, REQ-090-028, REQ-090-029, REQ-011-022, REQ-011-025, REQ-011-026, REQ-011-033 -->
+<!-- ADF-COVERS(design): REQ-090-001, REQ-090-002, REQ-090-003, REQ-090-004, REQ-090-009, REQ-090-010, REQ-090-011, REQ-090-012, REQ-090-013, REQ-090-014, REQ-090-015, REQ-090-016, REQ-090-017, REQ-090-018, REQ-090-019, REQ-090-020, REQ-090-021, REQ-090-022, REQ-090-023, REQ-090-024, REQ-090-025, REQ-090-026, REQ-090-027, REQ-090-028, REQ-090-029, REQ-090-030, REQ-011-022, REQ-011-025, REQ-011-026, REQ-011-033 -->
 <!-- ADF-COVERS(design): REQ-009-051, REQ-052-012, REQ-052-013, REQ-052-014, REQ-052-015 -->
 <!-- ADF-COVERS(design): REQ-052-016, REQ-052-017（障害局面の書込み経路限定と診断手順分類の操作契約設計） -->
 <!-- ADF-COVERS(design): REQ-052-018（issue_close の終了前提の Tool 実行境界設計） -->
@@ -99,6 +99,7 @@ GitHub版 / Local版等価性:
 - 旧派生状態の除去: recordState、outcome、llmTreatment、unchanged/corrected、finalizedBy、direct-finalization marker、fallback reason、not_configured/invalid_input observation を正規観測契約から除去する（REQ-090-017）。既存の v1 観測（1 Workflow 実行 = 1 JSON、部分レコード/完成レコード形式）は履歴として保持し、migration・変換・読み取り互換を要求しない。v1 観測を新契約の現行 observation として解釈しない。
 - 操作構成の自由度: operation カタログ（evaluate、観測の永続化と final result 反映の操作分割の有無）、観測 JSON の field 名、filename、完了状態の物理表現は実装設計時の自由度とし、本節の意味契約（一次事実、evaluation 単位 confidence、中断耐性、fail-open）を変更しない範囲で定める。provider 返却の score 値から定義済み scale level への正規化の写像方法も、連続値を canonical result として残さない限りにおいて実装設計時の自由度とする（REQ-090-014）。
 - 配布境界: ADF 汎用の Tool として配布対象とする（REQ-052-006）。正式名称 `agentdev_jev`、物理配置 Tool 本体 `src/opencode/tools/agentdev-jev/`、Cloudflare adapter パッケージ（`src/opencode/tools/agentdev-jev/` 配下。Cloudflare AI Gateway 接続。物理ディレクトリ名は repository 規約に従う。評価 SDK・HTTP 依存はこの adapter パッケージに閉じる）、Plugin 登録配線 `src/opencode/plugins/agentdev-jev-tool/`。
+- sourceRevision の正規化: 観測書込みは sourceRevision から前後の空白と注釈を除去し、16進数の commit hash 相当は小文字化して保存する。unknown・unspecified・作業状態記述子はそのまま保存し、正規化後に空になる値は入力事前検証失敗として observation を生成しない。規則の確定値は REQ-090-030 を正とする。既存観測の遡及修正は行わない。
 
 ### issue_close の終了前提（Case Issue）
 
