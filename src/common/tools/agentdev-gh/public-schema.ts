@@ -34,7 +34,11 @@ export const AGENTDEV_GH_REQUEST_PROPERTY_SCHEMA = {
       type: "integer",
       minimum: 1,
       description:
-        "Issue/PR (or local issue) number. comment_create/comment_list use the parent issue or PR number.",
+        "Issue/PR (or local issue) number. comment_create/comment_list use the parent issue or PR number. " +
+        "pr_create accepts it as the explicit target identification (target Case/Issue number); the Local " +
+        "implementation requires it and rejects a request without it before any side effect, while the " +
+        "GitHub implementation accepts it but does not use it for target resolution (the target is " +
+        "identified by the head branch, a declared exception).",
     },
     commentId: {
       type: "string",

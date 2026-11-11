@@ -61,6 +61,7 @@ case-run は実行担当サブエージェントを委譲起動する。
 ### PR 作成
 
 実行担当サブエージェントは実装完了後、`agentdev_gh` の pr_create 操作で PR を作成する。
+要求には対象識別（対象 Case Issue の番号を number で指定）を含める。対象識別を欠く要求は Tool が受理しない（GitHub 実装は対象を head branch で特定するため number は作成対象解決には使用しないが、要求への含めは公開契約の同一性のために必須）。
 PR 本文には Issue 番号（`Refs: #N`）と実行識別情報セクション（対象 Case、実行単位、委譲単位識別子。`agentdev-workflow-templates` の実行識別情報セクション規約参照）を含める。
 併せて検証差分セクション（実行工程、検証種別、検証結果、finding 差分の5分類: 新規、修正済み、既出、撤回、無効。`agentdev-workflow-templates` の検証差分セクション規約参照）を含める。
 実行担当サブエージェントは実施した各検証（test strategy 項目検証、bun test フル suite、配布依存境界 gate、targeted docs guard、トレーサビリティ check、品質ゲート等）ごとに検証差分セクションへ実行工程 case-run の行として記録する。

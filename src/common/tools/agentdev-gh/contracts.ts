@@ -18,6 +18,19 @@ export type IssueNumber = number & { readonly __brand: "IssueNumber" };
 /** PR 番号（GitHub Pull Request の識別数値）。IssueNumber と型上の混入を防ぐ。 */
 export type PrNumber = number & { readonly __brand: "PrNumber" };
 
+/**
+ * head branch 参照の物理表現の正規化。短縮形式（branch 名）と完全形式
+ * （owner:branch）を短縮形式の論理値へ統一する。pr_create の読み戻し照合は
+ * 本関数で正規化した後の論理値で比較する（Design「対象操作の境界」節の
+ * pr_create 読戻し照合条項）。GitHub の ref 名に `:` は含まれないため
+ * 最初の `:` 以降を branch 名とする。Local 実装は branch 名をそのまま
+ * 保持するため冪等（変化なし）。
+ */
+export function normalizeHeadRef(v: string): string {
+  const i = v.indexOf(":");
+  return i >= 0 ? v.slice(i + 1) : v;
+}
+
 /** Issue 番号の構築（境界でのみ使用）。 */
 export function issueNumber(n: number): IssueNumber {
   if (!Number.isInteger(n) || n <= 0) {
@@ -192,6 +205,14 @@ export type GhToolRequest =
       readonly body: string;
       readonly base: string;
       readonly head: string;
+      /**
+       * 作成対象の対象識別（対象番号の指定）。Local 実装では必須として検証し
+       * （対象識別を欠く要求は副作用発生前に入力契約違反として拒否する）、
+       * 指定番号で対象 Case（Issue）を解決する。GitHub 実装は受理して PR 作成の
+       * 対象解決には使用しない（対象は head branch で特定する。受理条件差は
+       * Design が宣言する例外であり pr_merge の commitHash と同一の形式）。
+       */
+      readonly number?: number;
     }
   | { readonly operation: "pr_read"; readonly number: PrNumber }
   | {

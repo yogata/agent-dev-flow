@@ -114,6 +114,7 @@ describe("公開スキーマと実行時 validator の一致性（実行時受�
     { operation: "issue_list", role: "tracking", state: "open", labels: ["x"], search: "語" },
     { operation: "issue_reopen", number: 7 },
     { operation: "pr_create", title: "P", body: "B", base: "main", head: "feature/x" },
+    { operation: "pr_create", title: "P", body: "B", base: "main", head: "feature/x", number: 7 },
     { operation: "pr_read", number: 9 },
     { operation: "pr_merge", number: 9, method: "squash" },
     { operation: "pr_changed_files", number: 9 },
