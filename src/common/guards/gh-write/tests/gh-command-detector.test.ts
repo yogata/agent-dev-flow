@@ -27,6 +27,13 @@ describe("生 gh WRITE の検出（拒否）", () => {
     ["gh api repos/o/r/issues -X POST -f title=x", "gh api WRITE method"],
     ["gh api repos/o/r/issues/5 --method PATCH -f body=y", "gh api WRITE method"],
     ["gh api repos/o/r/issues/5 --method=DELETE", "gh api WRITE method"],
+    ["gh api repos/o/r/issues -f title=x", "gh api implicit POST"],
+    ["gh api repos/o/r/issues --raw-field body=y", "gh api implicit POST"],
+    ["gh api repos/o/r/issues/5 -F labels=bug", "gh api implicit POST"],
+    ["gh api repos/o/r/issues/5 --field milestone=1", "gh api implicit POST"],
+    ["gh api repos/o/r/issues/5 --input payload.json", "gh api implicit POST"],
+    ["gh api repos/o/r/issues/5 --method", "gh api ambiguous"],
+    ["gh api repos/o/r/issues/5 -X HEAD", "gh api ambiguous"],
     ["gh label create foo", "gh label WRITE"],
     ["gh release create v1", "gh release WRITE"],
     ["gh repo edit --description x", "gh repo WRITE"],
@@ -43,12 +50,20 @@ describe("生 gh WRITE の検出（拒否）", () => {
   test.each([
     "echo 'gh issue create --title x' | gh issue view 5",
     "cd /d && gh pr merge 7 --squash",
+    "git status && gh api repos/o/r/issues -f title=x",
+    "gh api repos/o/r/issues/5 | gh api repos/o/r/issues -f title=x",
+    "git status; gh api repos/o/r/issues -X POST -f title=x",
   ])("複合コマンド中の gh WRITE も block する（%s）", (command) => {
     expect(detectGhWriteCommand(command).kind).toBe("block");
   });
 
   test("複数行コマンドの2行目の gh WRITE を block する", () => {
     const command = "echo hello\ngit status\ngh issue comment 5 --body y";
+    expect(detectGhWriteCommand(command).kind).toBe("block");
+  });
+
+  test("複数行コマンドの2行目の暗黙 POST gh api を block する", () => {
+    const command = "echo hello\ngit status\ngh api repos/o/r/issues -f title=x";
     expect(detectGhWriteCommand(command).kind).toBe("block");
   });
 
@@ -81,6 +96,8 @@ describe("読み取り系の許容（Design 所有の禁止範囲）", () => {
     "gh api repos/o/r/issues/5",
     "gh api repos/o/r/issues/5 --method GET",
     "gh api repos/o/r/issues/5 -X GET",
+    "gh api repos/o/r/issues/5 --method GET -f title=x",
+    "gh api repos/o/r/issues/5 -X GET -f page=2",
     "gh label list",
     "gh release view v1",
     "gh release list",
