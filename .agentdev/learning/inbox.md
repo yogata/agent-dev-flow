@@ -814,3 +814,57 @@
 - **タグ**: #prepare_definition_pr #measurement-convergence #対照救済 #機械工程 #check_integrity
 
 ---
+
+## 2026-11-11: generate_indexes 派生物は script 実行後に作業 tree へ未 commit で残るため、明示パス指定 commit の実行前に派生物の commit 状態を確認して含めるか分離するかを明示判断する（Case #4004 より回収）
+
+- **問題事象**: case-open STEP-4 の機械工程後、stagePaths 外の generate_indexes 派生物（req-health-metrics.md・requirements/README.md）が作業 tree へ未 commit で残存していた。その状態で docs/README.md 手動管理区間の件数照合補正を明示パス指定 commit（`git commit -- docs/README.md`）したところ、対象パス内に generate_indexes が書き換えた AUTOGEN 件数行と REQ-120 行が含まれており、補正 commit に派生物変更が意図せず混在した（計測: HEAD f8a2d9bb5・worktree .worktrees/4004-definition・branch definition/issue-4004・Case #4004・2026-11-11・`git show f8a2d9bb5 --stat` で 3 insertions/2 deletions を観測）
+- **発生局面**: 実装（case-open STEP-4・docs/README.md 手動管理区間の件数照合補正）
+- **検知方法**: 補正 commit の git show --stat で差分行数が手動区間1行置換より多いことの突合
+- **根本原因**: generate_indexes は commit 前配置契約で実行されるため派生物が script 実行後に作業 tree へ残る構造であり、明示パス指定 commit が対象パス内の派生物変更を含み得る点の実行時確認規律が手順に明文化されていない
+- **自律対応内容**: 混在した commit を取り消さず、同一 commit に含まれた派生物変更を標準 contingency（派生物の同一 PR 取り込み）どおりの正当な構成として記録し、残りの stagePaths 外派生物を別の明示パス指定補正 commit（e4453c82）で回収した
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（generate_indexes 派生物の事後突合 contingency の適用内。手順補強の候補のみ）
+- **横展開観点**: 明示パス指定 commit を行う機械工程手順では、commit 対象パス内の作業 tree 残存変更（特に generate_indexes 等の自動書換え派生物）の有無を `git status --short` で事前確認し、同一 commit へ含める contingency 適用か分離補正 commit かを明示的に判断してから commit する
+- **再発条件**: REQ 行追加を伴う Definition 変更で generate_indexes 派生物が stagePaths 外に残る状態で、派生物パスを含む別パスの明示パス指定補正 commit を実行する場合
+- **予防策候補**: 手動管理区間照合補正手順への派生物 commit 状態の事前確認前置の追加判断、および混在検出時の報告様式の明記（promote 判断）
+- **想定反映先**: learning-promote（機械工程手順・Definition PR 構成への補強判定）
+- **関連**: Case #4004・PR #4007・docs/designs/commands/case-open.md「機械工程の script 呼び出し契約（RU-0162）」節・definition-pr-and-idempotency.md「generate_indexes 派生物の事後突合」節
+- **タグ**: #generate_indexes #派生物 #明示パス指定commit #stagePaths #手動管理区間
+
+---
+
+## 2026-11-11: 並行 case-auto 稼働環境では設計PR push 前に git fetch で origin/main の進行と重複パスを確認し、競合を push 前に解消して clean mergeable な PR を作成する手順が有効（Case #4004 より回収）
+
+- **問題事象**: 並行 case-auto（C-β2・Case #4002）の設計PR #4003 が本 Case の Definition 作業中に origin/main へ merge され（bc7c75aa0）、本 Case の definition branch（起点 474180ed7）との間で重複パス 2件（custom-tool-contracts.md・req-health-metrics.md）の競合が push 前に判明した（計測: merge-base 474180ed7・重複検出は `git diff --name-only` の双方 branch 間突合・Case #4004・2026-11-11）
+- **発生局面**: 実装（case-open STEP-4・設計PR push 直前）
+- **検知方法**: push 前の並行隔離検査で origin/main 進行の実測（git fetch 後の merge-base 再計算）と重複パス突合
+- **根本原因**: 並行 case-auto 複数稼働では Definition 作業中に base が進行し得るため、push 直前の base 進行確認が実質必須になる一方、作成元 origin/main HEAD 固定の隔離規律だけでは進行の追随時点を定めていない
+- **自律対応内容**: origin/main を definition branch へ merge し（merge commit 99c40b49）、競合を実際に重なる箇所だけ調整（custom-tool-contracts.md は両 Case の design 宣言を統合保持・req-health-metrics.md は AUTOGEN を generate_indexes 再実行で正規形復元）した後、check_integrity・traceability check を merge 後 HEAD で再実行してから push した。PR #4007 は clean mergeable で作成された
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（並行 case-open の作業隔離規律・MUST DO「競合は実際に重なる箇所だけ調整」の適用内。手順補強の候補のみ）
+- **横展開観点**: 並行 case-auto 稼働環境の Definition 工程では、push 直前に `git fetch` → merge-base 再計算 → 重複パス突合 → 重複ありなら branch へ merge・競合解消・ゲート再実行、の順を前置する。push 後の conflict は case-close/case-ready の同期リスク対応へ回帰するより実コストが低い
+- **再発条件**: 並行 case-auto が他 Case の Definition PR を merge し得る環境で、重複パスを持つ Definition branch を push する場合
+- **予防策候補**: case-open STEP-4 手順への「push 前の origin/main 進行確認と重複パス競合の解消前置」の明文化判断（promote 判断）
+- **想定反映先**: learning-promote（並行実行手順・Definition PR 作成への補強判定）
+- **関連**: Case #4004・Case #4002・PR #4007・PR #4003・definition-pr-and-idempotency.md「並行 case-open の作業隔離」節
+- **タグ**: #並行case-auto #設計PR #merge追随 #競合解消 #push前確認
+
+---
+
+## 2026-11-11: 長文本文の bash heredoc 経由 node への渡しは終端解析に失敗し得るため、検査専用本文ファイルは extension rule 標準回復手段〔b〕（project root 内 git 管理対象外領域への作成）が安定（Case #4004 より回収）
+
+- **問題事象**: PR 本文（約6,000字）を bash の heredoc で node stdin へ渡して検査専用本文ファイルを作成しようとしたところ、heredoc の終端解析が失敗し（warning: here-document delimited by end-of-file と node の Unterminated template）、本文ファイルの作成に失敗した（計測: workspace 外一時ディレクトリ・Case #4004・2026-11-11・bash stderr と node SyntaxError で観測）
+- **発生局面**: 実装（case-open STEP-4・yomiyasu lint の検査専用本文ファイル作成）
+- **検知方法**: node の SyntaxError（Unterminated template）と bash の here-document warning
+- **根本原因**: 長文本文を heredoc 内のテンプレートリテラルへ組み込む構成は、本文中の記号や終端行の解析に脆弱であり、大文字サイズの本文には不向き
+- **自律対応内容**: extension rule の標準回復手段〔b〕（作成先を project root 内の git 管理対象外領域 .agentdev/integrity/reports/ へ変更）へ切替し、write ツールによる検査専用本文ファイルの作成・lint 実行・検査後削除で完結させた
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（yomiyasu application rule の標準回復手段の適用内）
+- **横展開観点**: 検査専用本文ファイルの作成は、workspace 外一時ディレクトリ経由の heredoc 渡しよりも project root 内 git 管理対象外領域（.agentdev/integrity/reports/）への直接作成が長文で安定する。切替は guard 違反の迂回ではなく rule 側が定義する正規の代替経路である
+- **再発条件**: 5,000字超級の本文を yomiyasu lint または同型の検査専用ファイル経路へ渡す場合
+- **予防策候補**: 長文本文の検査専用ファイル作成では project root 内領域を第一候補とする運用明記（promote 判断）
+- **想定反映先**: learning-promote（yomiyasu rule 運用・書込み guard 対応手順への補強判定）
+- **関連**: Case #4004・PR #4007・.agentdev/extensions/skills/agentdev-workflow-case-open.yaml「yomiyasu-application-before-write」rule
+- **タグ**: #heredoc #検査専用ファイル #yomiyasu-lint #書込みguard #標準回復手段
+
+---
