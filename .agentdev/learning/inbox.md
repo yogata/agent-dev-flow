@@ -778,3 +778,21 @@
 - **タグ**: #bun-test #分割③ #junction投影 #重複走査 #件数突合
 
 ---
+
+## 2026-11-11: check_changed_docs.ts は docs workflow 対象外ファイルを --files に渡すと TARGET-EMPTY strict failure を報告する誤用検出挙動を持つ・docs 変更 0 件の実装 PR では実行経路側の事前確認が必要（Case #3994・PR #3998 本文 Findings より回収）
+
+- **問題事象**: check_changed_docs.ts は `--files` に docs workflow 対象外のファイル（.ps1 等）を渡すと TARGET-EMPTY strict failure を報告する誤用検出挙動を持つ。docs 変更 0 件の実装 PR では targeted docs guard は適用対象なしであり、実行経路側で docs 変更の有無を事前確認してから呼ぶ前提の設計である（計測 baseline: PR #3998 HEAD ea8b89cf3・case-run DEL-3994-1・2026-11-11・targeted docs guard 実行経路での観測）
+- **発生局面**: case-run DEL-3994-1 の targeted docs guard 実行経路判断（docs 変更 0 件の実装 PR）
+- **検知方法**: case-run の実行時実測と PR #3998 本文 Findings/learning への記録（case-close STEP-6-4 で回収）
+- **根本原因**: targeted docs guard の検査対象は docs workflow 対象ファイルに限定されており、対象外ファイルのみの指定は検査対象 0 件（TARGET-EMPTY）として strict failure になる設計。誤用検出としての挙動は正しいが、実行経路側の docs 変更有無の事前確認規律が明文化されていない
+- **自律対応内容**: docs 変更 0 件の本 PR では targeted docs guard を適用対象なしとして実行せず、PR #3998 本文検証差分へ「docs 変更 0 件のため適用対象なし」と記録した（guard 側の修正はしていない）
+- **ユーザー確認の有無**: なし（capture 回収）
+- **REQ/Decision/Design影響**: なし（実行経路側の事前確認運用の明確化候補のみ）
+- **横展開観点**: 対象限定型 checker 全般で、実行経路側は適用対象の有無を事前確認してから呼ぶ。zero-targets を検査省略ではなく無効実行として扱う既知契約と同型の運用注意
+- **再発条件**: docs 変更 0 件の実装 PR で targeted docs guard を `--files` 指定付きで実行する場合
+- **予防策候補**: 機械工程・workflow 側の実行経路に docs 変更有無の事前確認前置を追加する判断、および TARGET-EMPTY 時の案内に誤用検出である旨の明記（promote 判断）
+- **想定反映先**: learning-promote（checker 実行契約・機械工程手順への補強判定）
+- **関連**: PR #3998 本文 Findings/learning・Case #3994・check_changed_docs.ts
+- **タグ**: #targeted-docs-guard #check_changed_docs #対象限定 #誤用検出 #実行経路
+
+---
