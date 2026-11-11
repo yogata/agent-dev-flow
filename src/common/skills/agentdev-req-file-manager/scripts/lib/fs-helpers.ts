@@ -1,55 +1,24 @@
 /**
- * ファイル名・番号・ゼロ埋めヘルパー（純粋関数中心）。
+ * ファイル名・番号・ゼロ埋めヘルパー（REQ 採番用）。
  *
- * fs I/O 関数は本ファイル内に隔離し、コア計算は純粋関数として扱う。
+ * 正規所有は agentdev-artifact-validation scripts/lib であり、本ファイルは
+ * supported lib interface 経由の再公開のみを行う。
+ * adrNumberFromFilename のみ、ADR 採番契約が正規文書から導出不能なため
+ * 本スキルの局所定義を維持する（該当統合の停止。導出根拠の記録は case 実行 PR 本文参照）。
  */
 
-import { readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
-
-export { reqNumberFromFilename } from "../../../agentdev-artifact-validation/scripts/lib/fs-helpers.ts";
+export {
+  reqNumberFromFilename,
+  listMarkdownFiles,
+  readFileContent,
+  joinPath,
+  pad4,
+  pad3,
+  safeMax,
+} from "../../../agentdev-artifact-validation/scripts/lib/fs-helpers.ts";
 
 /** ファイル名 `ADR-NNNN.md` から番号を取り出す。 */
 export function adrNumberFromFilename(filename: string): number | null {
   const m = /^ADR-(\d{3,4})\.md$/.exec(filename);
   return m && m[1] ? parseInt(m[1], 10) : null;
-}
-
-/** 指定ディレクトリ直下の `.md` ファイル名一覧（非再帰）。存在しない場合は空配列。 */
-export function listMarkdownFiles(dir: string): string[] {
-  try {
-    const entries = readdirSync(dir, { withFileTypes: true });
-    return entries
-      .filter((e) => e.isFile() && e.name.endsWith(".md"))
-      .map((e) => e.name);
-  } catch {
-    return [];
-  }
-}
-
-/** ファイル内容を読む I/O ヘルパー（純粋関数ではない）。 */
-export function readFileContent(path: string): string {
-  return readFileSync(path, "utf-8");
-}
-
-/** パス結合ヘルパー（テスト容易性のためラップ）。 */
-export function joinPath(...segments: string[]): string {
-  return join(...segments);
-}
-
-/** 最小幅4桁のゼロ埋め表示。切詰めなし。 */
-export function pad4(n: number): string {
-  return n.toString().padStart(4, "0");
-}
-
-/** 最小幅3桁のゼロ埋め表示。切詰めなし。 */
-export function pad3(n: number): string {
-  return n.toString().padStart(3, "0");
-}
-
-/** 正の整数のみを max 計算対象とする（NaN/負数を弾く）。 */
-export function safeMax(numbers: number[]): number {
-  const valid = numbers.filter((n) => Number.isFinite(n) && n > 0);
-  if (valid.length === 0) return 0;
-  return valid.reduce((a, b) => (a > b ? a : b));
 }

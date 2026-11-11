@@ -1,43 +1,18 @@
 /**
- * 共通結果型と stdout/stderr 出力ヘルパー（公開検証契約の JSON 結果・エラー契約）。
+ * 共通結果型と stdout/stderr 出力ヘルパー（採番スクリプト用）。
  *
- * 全スクリプトの出力 JSON は成功時は ok: true を含み、
- * エラー時は非ゼロ終了コード + stderr メッセージとする。
+ * 正規所有は agentdev-artifact-validation scripts/lib であり、本ファイルは
+ * supported lib interface 経由の再公開のみを行う。
+ * 成功時は ok: true を含み、エラー時は非ゼロ終了コード + stderr メッセージとする。
  */
 
-export type AllocOk = {
-  ok: true;
-  allocated: string;
-  max: number;
-};
+export { emitJson, emitError } from "../../../agentdev-artifact-validation/scripts/lib/result.ts";
 
-export type AllocErr = {
-  ok: false;
-  error: string;
-};
-
-export type AllocResult = AllocOk | AllocErr;
-
-export type CheckOk = {
-  ok: true;
-  errors: string[];
-  warnings: string[];
-};
-
-export type CheckErr = {
-  ok: false;
-  error: string;
-};
-
-export type CheckResult = CheckOk | CheckErr;
-
-/** stdout に JSON を出力する（argv/stdin → stdout JSON 契約）。 */
-export function emitJson(value: unknown): void {
-  process.stdout.write(JSON.stringify(value, null, 2) + "\n");
-}
-
-/** stderr にエラーを出力し非ゼロ終了コードで終了する。 */
-export function emitError(message: string, code = 1): never {
-  process.stderr.write(message + "\n");
-  process.exit(code);
-}
+export type {
+  AllocOk,
+  AllocErr,
+  AllocResult,
+  CheckOk,
+  CheckErr,
+  CheckResult,
+} from "../../../agentdev-artifact-validation/scripts/lib/result.ts";

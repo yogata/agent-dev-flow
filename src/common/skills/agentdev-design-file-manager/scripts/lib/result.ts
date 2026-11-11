@@ -1,33 +1,13 @@
 /**
- * 共通結果型と stdout/stderr 出力ヘルパー（公開検証契約の JSON 結果・エラー契約）。
+ * 結果型と stdout/stderr 出力ヘルパー（Design 固有スクリプト用）。
  *
- * 本スキル (agentdev-design-file-manager) の Design 固有スクリプト群が利用する。
+ * 正規所有は agentdev-artifact-validation scripts/lib であり、本ファイルは
+ * supported lib interface 経由の再公開のみを行う。
+ * 本スキル (agentdev-design-file-manager) は Design 固有処理（target_area 検索）のみを
+ * 担い、共通検証 script と共有 lib の所有は agentdev-artifact-validation に一つに集約。
  * 成功時は ok: true を含み、エラー時は非ゼロ終了コード + stderr メッセージとする。
- *
- * 共通検証スクリプト (check-frontmatter-consistency / check-entry-existence /
- * check-change-impact) は agentdev-artifact-validation の公開検証契約へ委譲する
- * ため、本ファイルには Design 固有の search 結果型のみを含む（共通検証 script と共有 lib の所有は agentdev-artifact-validation に一つに集約）。
  */
 
-export type SearchOk = {
-  ok: true;
-  matches: Array<{ file: string; line: number; text: string }>;
-};
+export { emitJson, emitError } from "../../../agentdev-artifact-validation/scripts/lib/result.ts";
 
-export type SearchErr = {
-  ok: false;
-  error: string;
-};
-
-export type SearchResult = SearchOk | SearchErr;
-
-/** stdout に JSON を出力する（argv/stdin → stdout JSON 契約）。 */
-export function emitJson(value: unknown): void {
-  process.stdout.write(JSON.stringify(value, null, 2) + "\n");
-}
-
-/** stderr にエラーを出力し非ゼロ終了コードで終了する。 */
-export function emitError(message: string, code = 1): never {
-  process.stderr.write(message + "\n");
-  process.exit(code);
-}
+export type { SearchOk } from "../../../agentdev-artifact-validation/scripts/lib/result.ts";
