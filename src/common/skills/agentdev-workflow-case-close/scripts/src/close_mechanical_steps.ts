@@ -1802,8 +1802,10 @@ export function runCloseMechanicalSteps(
       diff.reclamation = outcome.detail;
     }
     // main working tree 構成（worktreeRoot == repoRoot・Epic 最終close等）は worktree
-    // とその checkout ブランチが削除対象外（REQ-118-005）。removeWorktree: false も
+    // とその checkout ブランチが削除対象外。removeWorktree: false も
     // worktree 削除を機械工程の外で管理する明示指定。両者は削除試行しない。
+    // （main working tree 構成の削除対象外根拠は case-close Design「機械工程の
+    // script 呼び出し契約」節・repository top-level traceability/ 配下 sidecar 参照）
     const mainWorktreeClose = worktreeCwd === path.resolve(input.repoRoot);
     const worktreeRemovalSkipped = mainWorktreeClose || input.cleanup?.removeWorktree === false;
     const removed: CommandResult | null = worktreeRemovalSkipped
