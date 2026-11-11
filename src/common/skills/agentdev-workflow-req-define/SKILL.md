@@ -11,7 +11,7 @@ req-define command の workflow 実装本体である。
 主フロー req-define → case-auto（内部 lifecycle: case-open → case-ready → case-run → case-close）の起点であり、Case 確立後の Definition 変更は本 workflow での再合意を例外経路（case-revise → case-ready）の起点とする。
 対話（HITL）と永続状態（要件doc draft、RU）の分離を維持し、中断・再開できるようにする。
 
-req-define command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
+req-define command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（責務3層分化と1:N分割原則、要件doc draft 契約要件〔生成・配置・消費・削除〕）。
 
 ## 入力
 
@@ -35,7 +35,7 @@ req-define command は公開 interface（入出力契約・ガードレール）
 ## 制御平面（STEP 一覧）
 
 req-define workflow は次の11 STEP で構成する。
-各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<foundations/v4-durable-state-and-recovery>.md`）。
+各 STEP は再開ポイント（resume point）を持つ（STEP resume point と会話記憶非依存、`docs/designs/<foundations/v4-durable-state-and-recovery>.md`）。
 対話の進行は永続状態（入力ファイル、壁打ちで確定した合議内容を含む draft-data 下書き）から再構成でき、会話コンテキストのみに依存しない。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -62,7 +62,7 @@ req-define workflow は次の11 STEP で構成する。
 ### resume protocol
 
 - 再開点は永続状態から再構成する: 入力ファイル（RU、検出事項）、`.agentdev/drafts/` 配下の draft 下書き（STEP-6 生成後）、`draft-data` の `status` と `auto_gate`
-- 対話ターン間の合意内容は draft-data 下書き（runtime artifact、REQ-{NNNN}）へ逐次反映し、会話コンテキスト喪失後も下書きから再開できる
+- 対話ターン間の合意内容は draft-data 下書き（runtime artifact、workflow STEP 契約の durable state 優先順位）へ逐次反映し、会話コンテキスト喪失後も下書きから再開できる
 - 未解決質問・未解決衝突・停止理由は draft の該当フィールドが正であり、会話履歴を権威情報源としない
 - 採用判断・未決事項の区別も draft の該当フィールドが正である。中断や再実行によって区別を失わず、再開時に未決事項を無断で解決済みにせず、既存の採用判断を未採用へ変化させない（変更駆動入口での受理・中断再開時の状態維持の要件。採用済み所見の受理記録を含む）
 
@@ -74,7 +74,7 @@ req-define workflow は次の11 STEP で構成する。
 
 ## 主要 Capability Skill 連携
 
-本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
+本スキルは次の Capability Skill を名レベルで参照する。他 Skill の内部構造（protocol 名、Step 名、Section 名、見出し名、references 内部パス）へ直接依存しない。
 
 - `agentdev-req-analysis`: セッションコンテキスト検知、壁打ちメソドロジー、分析観点、detailed gates、チェックボックス品質基準
 - `agentdev-req-file-manager`: 既存REQ照合方法論
@@ -118,6 +118,6 @@ req-define workflow は次の11 STEP で構成する。
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
 - **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
-- **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
-- **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
+- **責務3層分化と1:N分割原則**: Command は公開入口、Workflow Skill は工程の実装、Capability Skill は共通能力を所有する。Workflow Skill の分割は制御構造の実質差異に基づき評価し、操作の違いだけでは分割しない
+- **STEP resume point と会話記憶非依存**: 安定した STEP 識別子と永続情報から再開点を再構成する。再開点を決める契約と、実行基盤による現在 STEP の選択処理を区別する。
 - **req-define command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

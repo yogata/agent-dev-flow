@@ -22,7 +22,7 @@ description: クローズ済み Case Issue/PR から未回収の変更候補を 
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-intake-from-github` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
+本コマンドは workflow 実装本体を `agentdev-workflow-intake-from-github` スキルへ委譲する（責務3層分化と1:N分割原則、intake pipeline 実行契約要件）。
 工程、分岐、再開、停止などの高水準の実行構造は同スキルの制御平面（control plane）が所有する。
 
 ## 不変条件

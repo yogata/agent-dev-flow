@@ -11,7 +11,7 @@ req-define で再合意済みの Definition 変更の既存 Case への反映、
 case-revise は新しい要求、Decision、対象範囲を自身では決定せず、意味判断は req-define が所有する。
 上流の問題は上流の無断書換えではなく正規改訂と影響再評価へ接続する。
 
-case-revise command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}）。
+case-revise command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（Command / Workflow Skill / Capability Skill 責務3層分化の Decision、case-revise 実行契約〔再合意済み Definition 変更の反映、実変更時のみ設計修正PR作成、影響ある Issue のみ再評価、冪等再実行〕）。
 
 ## 入力
 
@@ -36,7 +36,7 @@ case-revise command は公開 interface（入出力契約・ガードレール�
 ## 制御平面（STEP 一覧）
 
 case-revise workflow は次の5 STEP で構成する。
-各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`<foundations/v4-durable-state-and-recovery>` Design）。
+各 STEP は再開ポイント（resume point）を持つ（STEP resume point と会話記憶非依存の Decision、`<foundations/v4-durable-state-and-recovery>` Design）。
 会話コンテキストに依存せず、永続状態（Root Case Issue、設計修正PR、REQ / Decision / Design、Epic Issue、子 Issue）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -104,7 +104,7 @@ case-revise workflow は次の5 STEP で構成する。
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
 - **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **case-open / case-ready Design**: Definition Package、設計修正PRの lifecycle、canonical Definition 判定、冪等キー
-- **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
+- **Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則の Decision**: 責務3層分化の採用記録（docs/decisions/ 配下）
 - **case-revise command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）
 - **req-define workflow スキル**: 上流工程（Definition の意味判断と再合意。case-revise は未合意変更を本工程へ差し戻す）
 - **case-ready workflow スキル**: 後続工程（設計修正PR受入と execution contract / execution structure 再確定）

@@ -10,7 +10,7 @@ backlog 整理サイクル（inspect-docs → 昇格3系統 → backlog-review�
 子ワークフロー内部の分類、評価、昇格、RU 生成ロジック、並列実行アルゴリズムは各子 Workflow Skill が正規の処理主体として所有し、本スキルはこれらを複製しない。
 backlog 整理サイクルは継続コラボレーションループ（`<workflows/v4-collaboration-loop>` Design）における要求入口としてのループ駆動点であり、Observe → Intake/Learning → Backlog の実行順序で一巡する。
 
-backlog-auto command は公開 interface（入出力契約、ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。
+backlog-auto command は公開 interface（入出力契約、ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（Command / Workflow Skill / Capability Skill 責務3層分化の Decision、backlog-auto 公開コマンド追加と workflow 実装本体 Workflow Skill 追加の要件行）。
 一気通貫実行（単一起動での整理サイクルからパッチリリース作成までの接続、set-state による一式の運搬体、実行前後の版管理）の実行契約は一気通貫実行の REQ が所有し、版番号規則・リリース条件・公開操作はパッチリリース規則の Decision（accepted）に従う。
 
 ## 入力
@@ -34,7 +34,7 @@ backlog-auto command は公開 interface（入出力契約、ガードレール�
 ## 制御平面（STEP 一覧）
 
 backlog-auto workflow は次の11 STEP で構成する。
-各 STEP は再開ポイント（resume point）を持ち（DEC-{N}、`<foundations/v4-durable-state-and-recovery>` Design）、会話コンテキストに依存せず、永続状態（`backlog_auto_started_at`、set-state、各子コマンドの永続状態）から再開点を再構成する。
+各 STEP は再開ポイント（resume point）を持ち（STEP resume point と会話記憶非依存の Decision、`<foundations/v4-durable-state-and-recovery>` Design）、会話コンテキストに依存せず、永続状態（`backlog_auto_started_at`、set-state、各子コマンドの永続状態）から再開点を再構成する。
 STEP 番号は既存 STEP（STEP-1〜6）の契約を維持したままの追加順を反映し、実行順序は「STEP 間の依存と分岐」の定義を正とする。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -140,7 +140,7 @@ backlog-auto は、一気通貫実行（stage 4〜7、backlog 整理サイクル
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
 - **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
-- **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
-- **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
+- **Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則の Decision**: 責務3層分化の採用記録（docs/decisions/ 配下）
+- **STEP resume point と会話記憶非依存の Decision**: STEP resume point 採用の記録（docs/decisions/ 配下）
 - **一気通貫実行の実行契約 REQ とパッチリリース規則の Decision（accepted）**: 一気通貫実行の要求（単一起動、set-state、完遂判定、版管理、リリース条件）と版番号規則・リリース条件・公開操作の正
 - **backlog-auto command**: 本スキルの呼出元（公開 interface、ガードレール、dispatch を所有）

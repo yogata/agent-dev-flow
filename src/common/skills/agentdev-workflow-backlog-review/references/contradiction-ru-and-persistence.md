@@ -78,7 +78,7 @@ RU を生成し、承認済みの docs/knowledge/ 知識文書保存を実行し
    - **履歴検査実施記録**: 履歴検査の実施（実行手段、収集した使用済み番号の範囲、衝突の有無、確定した提案番号）を進捗記録（Evidence）に残す。衝突により採番を進めた場合は代替番号の決定根拠も記録する
 2. session由来RU（`source_type: chat`、`generated_by: session`）の場合は、正規原本（一時成果物ライフサイクル要件、artifact-contracts Design「RU アーティファクト契約（session由来RU）」）へ委譲した要件（二段階承認、frontmatter 必須フィールド、`agreement_confirmed_at`、session 論理URI、RU 本文必須8セクション、永続ID 採番）に従う
 3. depends_on 検証を実行する（RU-ID のみ許容、unresolved、循環の検証）
-  4. docs/knowledge/ 知識文書保存処置を実行する。STEP-5 で承認済みの操作種別（新規、更新、置換、削除）に従い、整形済み知識文書（1知識1ファイル、kebab-case slug、必須内容5項目）を docs/knowledge/ へ書き込む。承認なしの docs/knowledge/ 書き込みは行わない（REQ-{NNNN}-{NNN}）。docs/knowledge/ への書き込みは git 永続化対象の副作用である。知識文書の保存が確認できた採用済み成果物を promoted から削除する（REQ-{NNNN}-{NNN}）
+  4. docs/knowledge/ 知識文書保存処置を実行する。STEP-5 で承認済みの操作種別（新規、更新、置換、削除）に従い、整形済み知識文書（1知識1ファイル、kebab-case slug、必須内容5項目）を docs/knowledge/ へ書き込む。承認なしの docs/knowledge/ 書き込みは行わない（docs/knowledge/ 知識文書契約の利用者承認要件）。docs/knowledge/ への書き込みは git 永続化対象の副作用である。知識文書の保存が確認できた採用済み成果物を promoted から削除する（バックログ統合要件の成功成果物削除規定）
 5. RU 生成が成功した採用済み成果物のみを削除する。
 削除条件は当該成果物が RU に取り込まれ、RU ファイルの生成が確認できた場合のみ。
 RU 化に失敗した成果物、矛盾により除外された成果物は残置する

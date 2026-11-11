@@ -23,7 +23,7 @@ case-run は orchestration stage（case-auto が管理する command 間進行�
 | 実装フェーズ | 5-6 | work planが未完了 または チェックボックス未完了 |
 | 提出フェーズ | 7-11 | PRが未作成 |
 
-## STEP model（REQ-{NNNN}-{NNN}、DEC-{N}）
+## STEP model（workflow STEP 契約・STEP resume point と会話記憶非依存）
 
 本スキルは Workflow Skill として case-run workflow の STEP transition を所有する（制御平面）。
 STEP 識別子は workflow 内安定識別子であり、STEP reference 8 要素（Purpose / Input Resolution / Preconditions / Procedure / Result / Evidence / Completion Verification / Resume-Idempotency）は `<foundations/v4-durable-state-and-recovery>` Design に従う。
@@ -48,7 +48,7 @@ compaction や中断再開後に current STEP と必要入力を復元するた�
 1. **SSoT 再構成**: Issue 本文、要件doc、REQ/Decision/Design から再取得・再検証
 2. **identifier 保持**: Issue 番号、PR 番号、worktree ブランチ名、STEP 識別子
 3. **最小 scalar**: なし（case-run は scalar 状態を保持しない）
-4. **runtime artifact**: 要件doc draft、検出事項（REQ-{NNNN} lifecycle に従う）
+4. **runtime artifact**: 要件doc draft、検出事項（一時成果物のライフサイクル契約に従う）
 
 ### Input Resolution（case-run workflow）
 

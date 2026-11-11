@@ -29,7 +29,7 @@ Case 確立後の Definition 変更も本コマンドで再合意し、再合意
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-req-define` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
+本コマンドは workflow 実装本体を `agentdev-workflow-req-define` スキルへ委譲する（責務3層分化と1:N分割原則、要件doc draft 実行契約要件）。
 工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの制御平面（control plane）が所有する。
 
 ## 不変条件

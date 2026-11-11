@@ -115,7 +115,7 @@ Issue/ REQ/ Decision/ Design/ work plan のいずれかの記載内容を満た�
 
 - **pass**: `no-deviation`。実装は Issue/ REQ/ Decision/ Design/ work plan に整合。
 - **warn**: 軽微乖離のみ（`scope-creep` 等）。そのまま進行可能（乖離内容を実装記録に併記）。
-- **fail**: 重大乖離あり（`impl-bug`/ `spec-bug`）。失敗原因を分類して報告する（REQ-{NNNN}-{NNN}）。修正の実行は Gate が所有せず、impl-bug は case-run 修正ループ、spec-bug は case-revise 経路という正規所有工程へ任せる（REQ-{NNNN}-{NNN}）。人間判断へ移行するのは引き上げ条件に該当する場合のみ。
+- **fail**: 重大乖離あり（`impl-bug`/ `spec-bug`）。失敗原因を分類して報告する（品質ゲート所有境界条項）。修正の実行は Gate が所有せず、impl-bug は case-run 修正ループ、spec-bug は case-revise 経路という正規所有工程へ任せる（失敗原因分類と原因別処理条項）。人間判断へ移行するのは引き上げ条件に該当する場合のみ。
 
 ## 報告フォーマット
 
@@ -149,7 +149,7 @@ Issue/ REQ/ Decision/ Design/ work plan のいずれかの記載内容を満た�
 ### 重要事項
 
 自動ループバックはしない。
-エージェントが乖離分類と推奨アクションを提示し、修正の実行は正規所有工程（上記 mapping の対応経路。case-run 修正ループまたは case-revise）へ任せる（REQ-{NNNN}-{NNN}）。人間判断へ移行するのは引き上げ条件に該当する場合のみ。
+エージェントが乖離分類と推奨アクションを提示し、修正の実行は正規所有工程（上記 mapping の対応経路。case-run 修正ループまたは case-revise）へ任せる（品質ゲート所有境界条項）。人間判断へ移行するのは引き上げ条件に該当する場合のみ。
 
 ## case-revise 連携
 

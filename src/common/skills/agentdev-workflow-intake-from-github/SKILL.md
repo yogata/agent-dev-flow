@@ -9,7 +9,7 @@ intake-from-github command の workflow 実装本体である。
 クローズ済みの GitHub Issue/PR の本文、コメントから未回収の変更候補を抽出し、intake item として `.agentdev/intake/inbox/` に保存する保存専用 workflow を所有する。
 GitHub Issue の作成、採用可否の判断、review、整形、分類は行わない。
 
-intake-from-github command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
+intake-from-github command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（責務3層分化と1:N分割原則、intake pipeline 要件〔蓄積・capture 整理・分類確定・配置先限定〕）。
 
 ## 入力
 
@@ -31,7 +31,7 @@ intake-from-github command は公開 interface（入出力契約・ガードレ�
 
 ## workflow model（capture-only型、STEP model 対象外）
 
-本スキルは capture-only型の workflow であり、STEP model の対象外である（REQ-{NNNN}-{NNN}）。
+本スキルは capture-only型の workflow であり、STEP model の対象外である（workflow モデル検証要件の capture-only 型除外条項）。
 resume point / export / import を持たない。
 工程は逐次実行し、中断時は workflow を最初から再実行する。
 抽出の再実行は読み取りのみのため安全であり、保存済みファイルとの重複はファイル名への連番付与で吸収する。
@@ -56,7 +56,7 @@ frontmatter、状態フィールド、重複排除キーは持たない。
 
 ## 主要 Capability Skill 連携
 
-本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
+本スキルは次の Capability Skill を名レベルで参照する。他 Skill の内部構造（protocol 名、Step 名、Section 名、見出し名、references 内部パス）へ直接依存しない。
 
 - `agentdev-intake-pipeline`: GitHub 残課題抽出の判定基準（期間解釈、データ取得、構造的検出、LLM 全文解析、item 生成ルール、ファイル名規則）
 - Custom Tool `agentdev_gh`: GitHub Issue/PR の読み取り操作
@@ -77,5 +77,5 @@ frontmatter、状態フィールド、重複排除キーは持たない。
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
+- **責務3層分化と1:N分割原則**: Command は公開入口、Workflow Skill は工程の実装、Capability Skill は共通能力を所有する。Workflow Skill の分割は制御構造の実質差異に基づき評価し、操作の違いだけでは分割しない
 - **intake-from-github command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

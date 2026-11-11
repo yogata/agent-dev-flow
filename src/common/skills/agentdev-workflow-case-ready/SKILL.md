@@ -12,7 +12,7 @@ case-ready は Definition 確定境界として単一責務を保ち、REQ / Dec
 Wave は意味的な依存関係のまとまりとして扱い、Wave 構成の導出は実行上限の数値に依存しない。
 本スキルが確定する設計（設計PR受入・Decision 受理・canonical Definition 確定）は、v5 責務分割における設計確定の責務である。v5 有限実行モード（case-auto 実行契約）では、この設計確定は後続の実装構築・Issue 協調を強制されずに独立終了できる。段階案件では本工程の確定完了をもって工程単独の確定・終了が成立し、設計確定と最終的な要求充足の判定は別に扱う。現行 v4 標準モードでは ready 遷移後に case-run へ進行する現行実行経路を維持する。
 
-case-ready command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}）。
+case-ready command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（Command / Workflow Skill / Capability Skill 責務3層分化の Decision、case-ready 実行契約〔Definition 受入、Decision 受理、実行契約と実行構造の確定、トレーサビリティ完全性ゲート、ready 遷移、draft / RU 削除〕）。
 
 ## 入力
 
@@ -38,7 +38,7 @@ case-ready command は公開 interface（入出力契約・ガードレール）
 ## 制御平面（STEP 一覧）
 
 case-ready workflow は次の7 STEP で構成する。
-各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`<foundations/v4-durable-state-and-recovery>` Design）。
+各 STEP は再開ポイント（resume point）を持つ（STEP resume point と会話記憶非依存の Decision、`<foundations/v4-durable-state-and-recovery>` Design）。
 会話コンテキストに依存せず、永続状態（Root Case Issue、設計PR、REQ / Decision / Design、Epic Issue、capture 成果物）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -56,9 +56,9 @@ case-ready workflow は次の7 STEP で構成する。
 - **基本順序**: STEP-1 → STEP-2 → STEP-3 → STEP-4 → STEP-5 → STEP-6 → STEP-7
 - **missing-design / policy 不正差し戻し分岐（STEP-2）**: canonical 再取得時の traceability check 機械実行で missing-design または verification policy の不正を検出した場合は case-open へ差し戻し、ready へ遷移せず停止する。トレーサビリティ完全性ゲート（STEP-6）は case-ready が所有し続け、STEP-2 との二重定義は行わない。required 行の verification 対応欠落（missing-verification）は ready 拒否条件に含めない。verification 対応の作成・更新は case-run が担い、対応完全性の最終完全性検査は case-close が所有する
 - **実変更なし分岐（STEP-1）**: 設計PRが存在しない場合（実変更のない bugfix 等の Case）は設計PRを作らず canonical Definition は現行 main の状態を採用し、execution contract 確定と ready 遷移へ進む。空の設計PRを作成する経路は存在しない
-- **HITL 分岐（STEP-1）**: 当該判断が人間に留保された判断（REQ-{NNNN}-{NNN}）を新規に確定する必要がある場合、または既存の安全境界が要求する操作承認を要する場合は停止し、既存 PR を保持したままユーザー判断を求める。人間判断への移送の判定は語の使用（新しい Decision、意味変更、対象範囲の確定、意味的な不整合の解消）だけで行わず、`REQ-{NNNN}-{NNN}` の留保事項該当性で行う。判断の難易度、確信度、評価器間の不一致、結果状態、唯一解でないことだけを理由として移送しない
+- **HITL 分岐（STEP-1）**: 当該判断が人間に留保された判断（ADF 判断アーキテクチャの人間判断境界が定める）を新規に確定する必要がある場合、または既存の安全境界が要求する操作承認を要する場合は停止し、既存 PR を保持したままユーザー判断を求める。人間判断への移送の判定は語の使用（新しい Decision、意味変更、対象範囲の確定、意味的な不整合の解消）だけで行わず、人間に留保された判断の留保事項該当性で行う。判断の難易度、確信度、評価器間の不一致、結果状態、唯一解でないことだけを理由として移送しない
 - **CI 失敗分岐（STEP-1）**: 設計PRの CI / 品質検査失敗時は ready へ遷移せず、既存 PR を保持したまま停止する。修復後に再実行できる
-- **Draft 状態分岐（STEP-1）**: merge 実行前に pr_read の isDraft で Draft 状態を確認する（REQ-{NNNN}-{NNN}）。isDraft: true の場合は pr_merge を実行せず、GitHub Draft PR が正規 lifecycle 外であることを識別可能な理由とともに blocked で停止する。draft 解除の自動実行、pr_ready 相当操作、raw gh WRITE による復旧は行わない
+- **Draft 状態分岐（STEP-1）**: merge 実行前に pr_read の isDraft で Draft 状態を確認する（case-ready 実行契約の merge 前 Draft 状態確認条項）。isDraft: true の場合は pr_merge を実行せず、GitHub Draft PR が正規 lifecycle 外であることを識別可能な理由とともに blocked で停止する。draft 解除の自動実行、pr_ready 相当操作、raw gh WRITE による復旧は行わない
 - **Epic 分岐（STEP-5）**: Epic 確定時は Child Issue と Wave / 依存構造を作成する。Standard 確定時は Child Issue を作成しない
 - **冪等分岐（全体）**: 再実行時、merge 済み Definition、既存 Child Issue、既存 Wave / 依存構造、Decision 受理記録を再利用し、不足分だけを処理する
 
@@ -71,7 +71,7 @@ case-ready workflow は次の7 STEP で構成する。
 ### 終了条件（termination）
 
 - 正常終了: draft / RU 削除・同期確認 STEP の完了報告出力まで
-- 停止終了: 設計PRの忠実性・整合性・品質検査で人間に留保された判断（REQ-{NNNN}-{NNN}）の新規確定または既存の安全境界が要求する操作承認が必要な場合（停止理由は REQ-{NNNN}-{NNN} の原因分類へ対応させる）、CI / 品質検査失敗、canonical 再取得時の traceability check による missing-design または verification policy の不正検出（case-open へ差し戻し）、構成検証の上限超過または構成不備、受理不能または判断情報不足の proposed Decision、トレーサビリティ完全性ゲートの missing-design / policy 不正残存、main 同期不一致
+- 停止終了: 設計PRの忠実性・整合性・品質検査で人間に留保された判断（ADF 判断アーキテクチャの人間判断境界が定める）の新規確定または既存の安全境界が要求する操作承認が必要な場合（停止理由は失敗・停止理由の8原因区別〔ADF 判断アーキテクチャの原因別処理規定〕へ対応させる）、CI / 品質検査失敗、canonical 再取得時の traceability check による missing-design または verification policy の不正検出（case-open へ差し戻し）、構成検証の上限超過または構成不備、受理不能または判断情報不足の proposed Decision、トレーサビリティ完全性ゲートの missing-design / policy 不正残存、main 同期不一致
 
 ## 主要 Capability Skill 連携
 
@@ -112,7 +112,7 @@ Decision 受理、execution contract と実行構造の確定、lifecycle gate �
 
 - **内蔵ツール使用規律**: ファイル検索・内容検索・ディレクトリ列挙は実行基盤の内蔵ツール（ファイル検索、内容検索、読み取り）を使用し、bash 内蔵コマンド（grep、ls 等）を標準手順としない。bash 実行が本来必要な処理（script 呼び出し、git 操作等）は本規律の対象外とする（workflow-skill-model Design「workflow skill 本文における内蔵ツール使用規律」節）
 - **機械工程の script 呼び出し**: 忠実性・整合性・品質検査、overlap 突合、AUTOGEN 再生成差分検出、traceability check（STEP-1 受入検査）、merge 後 canonical 再取得と draft/RU 削除の git rm・明示パス指定 commit（STEP-2 / STEP-7）は、工程別 script `scripts/src/accept_definition_checks.ts` の呼び出しで実行する（phase: acceptance-checks / canonical-and-cleanup）。報告 JSON（実行結果・差分・警告・提案本文）の意味レビューと agentdev_gh による I/O はモデルが担う（case-ready Design「機械工程の script 呼び出し契約」節）
-- **Definition 受入**: 忠実性確認（req-define 合意内容との投影検査）、整合性検査、品質検査を設計PR確定前に行う。merge 実行前に pr_read の isDraft 確認を行い、isDraft: true 時は pr_merge を実行せず blocked で停止する。人間に留保された判断（REQ-{NNNN}-{NNN}）の新規確定が不要で、既存の正規契約から導出できる解消と委譲された裁量の範囲内の判断である場合は追加承認なしで merge する。merge 後は canonical Definition を再取得し、merge を巻き戻さない
+- **Definition 受入**: 忠実性確認（req-define 合意内容との投影検査）、整合性検査、品質検査を設計PR確定前に行う。merge 実行前に pr_read の isDraft 確認を行い、isDraft: true 時は pr_merge を実行せず blocked で停止する。人間に留保された判断（ADF 判断アーキテクチャの人間判断境界が定める）の新規確定が不要で、既存の正規契約から導出できる解消と委譲された裁量の範囲内の判断である場合は追加承認なしで merge する。merge 後は canonical Definition を再取得し、merge を巻き戻さない
 - **execution contract 投影**: 機能要件、非機能要件、制約、対象外、受け入れ条件は新規作成せず合意済み Definition を投影する。runtime-only 判断（worktree 状態、staleness、実 diff、実装結果、test 実行結果）は事前確定せず case-run の安全検査として維持する
 - **Standard / Epic 確定**: 連結成分（必須依存のみをエッジ）と依存強度、Epic サイズ、機能的一貫性の3軸で自律生成する。単独根は Epic 化せず Standard flow とする。無関係な operation_unit 群を単一 Epic へ機械的に集約しない
 - **Decision 受理の冪等**: 再実行時、既に accepted へ遷移済みの Decision に対して重複する状態遷移や承認記録を生成しない
@@ -128,7 +128,7 @@ Decision 受理、execution contract と実行構造の確定、lifecycle gate �
 - **`<workflows/v4-standard-lifecycle>` Design**: work_type / scale / Epic / Wave の v4 意味モデル（OU / Epic / Wave / Issue 階層の語彙）
 - **`<workflows/issue-title-policy>` Design**: Epic 確定時の Root Case 接頭辞更新（`Epic: 主題`）と子 Issue タイトル（`[Epic #<親番号>] Wave-N: 主題`。`Task:` 接頭辞は廃止）の書式の単一参照点
 - **case-open / case-ready Design**: execution_unit 構成（連結成分・3軸判断の機械的判定手順を含む）と Wave 構成・Wave 重複前置検出
-- **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
+- **Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則の Decision**: 責務3層分化の採用記録（docs/decisions/ 配下）
 - **case-ready command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）
 - **case-open workflow スキル**: 前工程（Root Case 確立と Definition Package 生成、設計PR作成）
 - **case-run workflow スキル**: 後続工程（execution contract の消費と実装実行）

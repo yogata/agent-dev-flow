@@ -15,7 +15,7 @@ description: 検出事項を分類、採用し、採用済み成果物として 
 ## 出力
 
 - `.agentdev/inspect/promoted/*.md`（手動 promote 採用済み、RU 化対象）
-- reject 検出事項は即時削除（`archive/rejected/` 廃止）。reject 時の commit message に却下理由を含める（AG-{NNN}、監査証跡の補強）
+- reject 検出事項は即時削除（`archive/rejected/` 廃止）。reject 時の commit message に却下理由を含める（監査証跡の補強。現行の正本は inspect-promote command Design の監査証跡条項）
 - `.agentdev/intake/promoted/inspect-auto-*.md`（`--auto` 時の自動 promote 成果物。backlog-review へ流入）
 - `.agentdev/inspect/promoted/auto-promote-log.md`（`--auto` 実行ログ。append-only）
 - セッション内完了報告
@@ -36,7 +36,7 @@ description: 検出事項を分類、採用し、採用済み成果物として 
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-inspect-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
+本コマンドは workflow 実装本体を `agentdev-workflow-inspect-promote` スキルへ委譲する（責務3層分化と1:N分割原則、検出コマンド実行契約要件）。
 工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの制御平面（control plane）が所有する。
 エラー処理（inbox 空時は「対象なし」終了、読込失敗時はスキップ警告、全件 defer 時は残置報告、push 失敗時は停止）も同スキルが所有する。
 

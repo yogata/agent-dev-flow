@@ -2,7 +2,7 @@
 //
 // provider 実装（Cloudflare adapter）は本契約の構造適合を実装する。
 // adapter 内部でのみ外部 API 固有処理を消費し、本契約面と Workflow 層へ API 固有の
-// 名称・型・格納位置を漏らさない（REQ-{NNNN}-{NNN}）。
+// 名称・型・格納位置を漏らさない（Jev 先行評価操作契約の provider 非依存条項）。
 // 失敗は生エラーをそのまま throw し、構造化（失敗分類）は engine が担う。
 
 import type { JevQuestionForm } from "./contracts.ts";

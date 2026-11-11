@@ -1,6 +1,6 @@
 # `agentdev-design-file-manager` scripts
 
-Design 固有の決定的処理スクリプト群（AG-{NNN}/006、design-principles.md 第5節）。
+Design 固有の決定的処理スクリプト群（「Script 所有権と委譲契約」、design-principles.md 第5節）。
 
 ## 構成
 

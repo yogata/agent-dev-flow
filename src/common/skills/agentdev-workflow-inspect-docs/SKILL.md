@@ -8,11 +8,11 @@ description: "inspect-docs workflow 本体。docs 全体の意味整合性と配
 inspect-docs command の workflow 実装本体である。
 docs 全体（REQ/Decision/Design/guides/README）と配布物の意味整合性診断から、検出事項の `.agentdev/inspect/inbox/` 出力、`.agentdev/inspect/` 配下の git 永続化、完了報告までの制御構造を所有する。
 
-inspect-docs command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
+inspect-docs command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（責務3層分化と1:N分割原則、検出と診断コマンド群の要件〔命名統一・公開 command 集合・diagnostics 命名限定・inbox 出力と reject 即時削除〕）。
 
 ## 型判定: read-only-diagnostic型（STEP model 対象外）
 
-本スキルは read-only-diagnostic型（検査対象を直接修正しない診断専用の型）であり、STEP model の対象外である（REQ-{NNNN}-{NNN}）。
+本スキルは read-only-diagnostic型（検査対象を直接修正しない診断専用の型）であり、STEP model の対象外である（Capability Skill・代表ケース検証要件の read-only-diagnostic 型除外条項）。
 **STEP resume point / export / import を持たない**。
 
 - 工程は先頭から通しで実行する。中断が発生した場合は workflow を最初から再実行する（診断は対象の読み取りと検出事項ファイルの生成のみの冪等な処理であり、再実行で同等の結果を得る）
@@ -44,7 +44,7 @@ inspect-docs command は公開 interface（入出力契約・ガードレール�
 ## 制御平面（工程一覧）
 
 本スキルの工程一覧を次に示す。
-STEP ラベルは工程順序の整理ラベルであり、**resume point ではない**（read-only-diagnostic型、REQ-{NNNN}-{NNN}）。
+STEP ラベルは工程順序の整理ラベルであり、**resume point ではない**（read-only-diagnostic型の STEP model 対象外条項）。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -60,7 +60,7 @@ STEP ラベルは工程順序の整理ラベルであり、**resume point では
 
 ## STEP-2 意味診断の並列委譲構造
 
-STEP-2 の意味診断（REQ 体系/6観点、Design、Decision/guides/README）は、範囲が重複しない診断担当への並列委譲で実行する（REQ-{NNNN}-{NNN}）。
+STEP-2 の意味診断（REQ 体系/6観点、Design、Decision/guides/README）は、範囲が重複しない診断担当への並列委譲で実行する（inspect-docs の意味診断並列化要件）。
 
 - **診断担当分割**: 対象の文書種別で範囲が重複しない診断担当（REQ 体系/6観点担当、Design 担当、Decision/guides/README 担当）へ分割する。大きすぎる範囲は完了できる単位へ切り分ける。6観点の網羅確認は fan-in 後に親が行うため、担当の切り分けは網羅性を損なわない
 - **候補整理の前置**: 委譲に先立ち、docs-check（利用可能な環境での実行結果の取り込み）、README 索引、`rg`、正規成果物の直接読取の既存手段で候補を収集し、診断担当ごとの対象範囲と根拠箇所（file:line 形式）へ整理して委譲時に明示する
@@ -75,7 +75,7 @@ STEP-2 の意味診断（REQ 体系/6観点、Design、Decision/guides/README）
 
 ## 主要 Capability Skill 連携
 
-本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
+本スキルは次の Capability Skill を名レベルで参照する（配布成果物の skill 名レベル参照契約）。
 
 - `agentdev-req-structure-diagnostics`: REQ 参照ID整合性、第一参照導線、現行/廃止/世代境界、6観点 structure review、文書分類一貫性、配布物整合性の判定ロジック
 - `agentdev-doc-diagnostics`: 診断カテゴリ、共通証拠構造、finding 出力契約、文書種別別診断へのルーティング

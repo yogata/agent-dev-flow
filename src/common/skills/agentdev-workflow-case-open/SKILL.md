@@ -11,7 +11,7 @@ case-open command の workflow 実装本体である。
 execution contract の確定、Standard / Epic の最終確定、Child Issue / Wave の作成、RU 削除、proposed Decision の受理評価は行わない（case-ready 実行契約 REQ へ移管）。
 Root Case 確立は価値がある有限作業における Issue の必要時利用であり、case-open 自身は要求・設計の正規情報を再所有しない（合意済み入力の反映に限定する）。
 
-case-open command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}）。
+case-open command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（Command / Workflow Skill / Capability Skill 責務3層分化の Decision、case-open 実行契約〔Root Case 確立、Definition Package 生成、実変更時のみ設計PR作成、冪等再実行〕）。
 
 ## 入力
 
@@ -35,7 +35,7 @@ case-open command は公開 interface（入出力契約・ガードレール）�
 ## 制御平面（STEP 一覧）
 
 case-open workflow は次の6 STEP で構成する。
-各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`<foundations/v4-durable-state-and-recovery>` Design）。
+各 STEP は再開ポイント（resume point）を持つ（STEP resume point と会話記憶非依存の Decision、`<foundations/v4-durable-state-and-recovery>` Design）。
 会話コンテキストに依存せず、永続状態（draft-data、Root Case Issue、設計PR）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -111,7 +111,7 @@ case-open は、上流工程（req-define）で確定した対象要件を実行
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
 - **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **case-open / case-ready Design**: Definition Package 構成、設計PR lifecycle、冪等キー
-- **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
-- **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
+- **Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則の Decision**: 責務3層分化の採用記録（docs/decisions/ 配下）
+- **STEP resume point と会話記憶非依存の Decision**: STEP resume point 採用の記録（docs/decisions/ 配下）
 - **case-open command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）
 - **case-ready command**: 後続コマンド（Definition 受入と実行準備完了。execution contract 確定と構成確定を所有）

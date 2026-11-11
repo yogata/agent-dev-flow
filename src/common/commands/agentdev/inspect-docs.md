@@ -46,7 +46,7 @@ docs全体（REQ/Decision/Design/guides）の意味整合性を診断し、検�
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-inspect-docs` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
+本コマンドは workflow 実装本体を `agentdev-workflow-inspect-docs` スキルへ委譲する（責務3層分化と1:N分割原則、検出コマンド実行契約要件）。
 工程、分岐、再開、停止などの高水準の実行構造は同スキルの制御平面（control plane）が所有する。
 エラー処理（スキャン対象ディレクトリ不存在時は該当カテゴリを空扱い警告、ファイル読込失敗時はスキップ警告）も同スキルが所有する。
 

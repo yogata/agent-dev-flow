@@ -8,16 +8,16 @@ description: "対論型レビューの実行入口。Orchestrator、Reviewer、R
 本スキルは、Orchestrator、Reviewer、Reviewee の3論理的役割で構成される審議を通じて、本質的争点を抽出し合意を形成する助言プロトコルの実行入口である。
 審議結果は判断材料であり、ユーザー承認、実装実行、強制的統制判定のいずれにもならない。
 
-- **参照元**: 呼出元コマンド（default-on + skip policy、REQ-{NNNN}-{NNN}/{NNN}）、ユーザー明示的選択
+- **参照元**: 呼出元コマンド（default-on + skip policy、caller 統合共通契約の default-on 条項・skip policy 条項）、ユーザー明示的選択
 - **特性**: 審議プロトコルの振る舞い契約を実行入口として提供する。実装実行、ファイル編集、外部状態変更は本スキルの対象外
 
 ## 発動契約
 
-原則適用・skip 可能な助言手段（対論型レビュー）である（REQ-{NNNN}-{NNN}）。
-REQ-{NNNN} で定義される caller 対象 command では adversarial-review を原則実行し、ユーザー明示指定を通常発動の必須条件としない（default-on、REQ-{NNNN}-{NNN}）。
-skip 条件は当該経路の正規所有者が明示的かつ判定可能に定義し、skip 判断のためだけに新規 HITL / 承認点を追加せず、skip 対象でもユーザー明示要求時は実行する（REQ-{NNNN}-{NNN}）。
-ただし新規必須工程、QG、承認ゲート、統制ゲートとして導入せず、QG-1〜QG-4、既存 HITL を代替せず、新しい恒久統制ゲートとしない（REQ-{NNNN}-{NNN}/{NNN}、REQ-{NNNN}-{NNN}）。
-副作用権限（commit、push、merge、ファイル保存、Issue と PR の作成・更新・コメント、レビュー結果の自動適用、ユーザー承認）を代行しない（REQ-{NNNN}-{NNN}）。
+原則適用・skip 可能な助言手段（対論型レビュー）である（caller 統合共通契約の原則適用・非ゲート条項）。
+caller 統合要件が対象と定める command では adversarial-review を原則実行し、ユーザー明示指定を通常発動の必須条件としない（default-on、caller 統合共通契約の default-on 条項）。
+skip 条件は当該経路の正規所有者が明示的かつ判定可能に定義し、skip 判断のためだけに新規 HITL / 承認点を追加せず、skip 対象でもユーザー明示要求時は実行する（caller 統合共通契約の skip policy 条項）。
+ただし新規必須工程、QG、承認ゲート、統制ゲートとして導入せず、QG-1〜QG-4、既存 HITL を代替せず、新しい恒久統制ゲートとしない（caller 統合共通契約の導入禁止・QG/HITL 非代替条項と恒久統制ゲート化禁止条項）。
+副作用権限（commit、push、merge、ファイル保存、Issue と PR の作成・更新・コメント、レビュー結果の自動適用、ユーザー承認）を代行しない（対論型レビュー審議契約の副作用権限非代行条項）。
 発動契約の詳細は Design「発動契約」を正とする。
 
 ## 審議上の3論理的役割
@@ -85,24 +85,24 @@ QG-1〜QG-4 を代替せず、通常のコードレビュー、テスト、機�
 
 ## caller integration 共通契約
 
-本スキルは REQ-{NNNN} が定める7コマンド（req-define、inspect-promote、intake-promote、learning-promote、backlog-review、case-open、case-run）および case-auto（停止伝播のみ、REQ-{NNNN}-{NNN}）からの caller integration に対し、Design「adversarial-review caller integration 共通契約」節（REQ-{NNNN}）が定める共通契約に従う。
-共通契約の正規所有者は Design であり、本 SKILL.md は重複定義しない（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。
+本スキルは caller 統合要件が定める7コマンド（req-define、inspect-promote、intake-promote、learning-promote、backlog-review、case-open、case-run）および case-auto（停止伝播のみ、caller 統合要件の case-auto 停止伝播条項）からの caller integration に対し、Design「adversarial-review caller integration 共通契約」節（caller 統合共通契約の Design 正規所有）が定める共通契約に従う。
+共通契約の正規所有者は Design であり、本 SKILL.md は重複定義しない（caller 統合共通契約の Design 正規所有・一つの意味の一つの正本への集約条項）。
 
 呼出元と本スキルの主な契約（詳細は Design を正とする）:
 
 | 契約 | 要件 | 概要 |
 |---|---|---|
-| 原則適用・skip 可能 | REQ-{NNNN}-{NNN}/{NNN} | 必須工程、QG、承認ゲート、統制ゲートとして導入せず、QG-1〜QG-4、既存 HITL を代替しない |
-| default-on | REQ-{NNNN}-{NNN} | REQ-{NNNN} caller 対象 command では原則実行し、ユーザー明示指定を通常発動の必須条件としない。QG/HITL 代替、新規恒久統制ゲート化禁止は維持 |
-| skip policy | REQ-{NNNN}-{NNN} | skip 条件は当該経路の正規所有者が明示的かつ判定可能に定義。skip 判断のみの新規 HITL/承認点追加禁止。skip 対象でもユーザー明示要求時は実行 |
-| 副作用禁止 | REQ-{NNNN}-{NNN}/{NNN} | ファイル、Issue、PR、git 操作を行わず、レビュー結果用の新規正規 artifact を生成しない |
-| accepted finding 反映 | REQ-{NNNN}-{NNN} | accepted finding の対象候補への反映は呼出元の責務 |
-| 再 review 条件 | REQ-{NNNN}-{NNN} | 対象の意味内容変更時のみ再発動可能、同一 finding の再起票禁止 |
-| 再 review 停止条件 | REQ-{NNNN}-{NNN} | 新 finding なし、全 finding 処理済み、HITL/blocker 移行、意味内容変化なしの4点 |
-| unresolved 時の扱い | REQ-{NNNN}-{NNN} | unresolved 残時は不可逆処理へ進まず、adversarial-review 自体を恒久統制ゲート化しない |
-| 呼出失敗時の扱い | REQ-{NNNN}-{NNN} | silent skip 禁止、利用不能報告後に従来フローと既存 QG/HITL を維持 |
+| 原則適用・skip 可能 | caller 統合共通契約・原則適用条項（必須工程・QG・承認ゲート・統制ゲート非導入、QG/HITL 非代替） | 必須工程、QG、承認ゲート、統制ゲートとして導入せず、QG-1〜QG-4、既存 HITL を代替しない |
+| default-on | caller 統合共通契約・default-on 条項 | caller 統合要件の対象 command では原則実行し、ユーザー明示指定を通常発動の必須条件としない。QG/HITL 代替、新規恒久統制ゲート化禁止は維持 |
+| skip policy | caller 統合共通契約・skip policy 条項 | skip 条件は当該経路の正規所有者が明示的かつ判定可能に定義。skip 判断のみの新規 HITL/承認点追加禁止。skip 対象でもユーザー明示要求時は実行 |
+| 副作用禁止 | caller 統合共通契約・副作用禁止条項（git/Issue/PR 操作禁止・結果 artifact 非生成） | ファイル、Issue、PR、git 操作を行わず、レビュー結果用の新規正規 artifact を生成しない |
+| accepted finding 反映 | caller 統合共通契約・accepted finding 呼出元反映条項 | accepted finding の対象候補への反映は呼出元の責務 |
+| 再 review 条件 | caller 統合共通契約・再 review 条件条項 | 対象の意味内容変更時のみ再発動可能、同一 finding の再起票禁止 |
+| 再 review 停止条件 | caller 統合共通契約・再 review 停止条件条項 | 新 finding なし、全 finding 処理済み、HITL/blocker 移行、意味内容変化なしの4点 |
+| unresolved 時の扱い | caller 統合共通契約・unresolved 時不可逆処理禁止条項 | unresolved 残時は不可逆処理へ進まず、adversarial-review 自体を恒久統制ゲート化しない |
+| 呼出失敗時の扱い | caller 統合共通契約・呼出失敗時報告条項 | silent skip 禁止、利用不能報告後に従来フローと既存 QG/HITL を維持 |
 
-user-decision-required の位置づけ（case-run result enum の第5状態ではなく case-auto の停止理由分類）は v4-lifecycle-state-machine Design「adversarial-review 由来の停止信号」節、review 経路での parent_decision_required / decision_context 適用は v4-delegation-contracts Design「adversarial-review との委譲契約接続」節をそれぞれ正とする（REQ-{NNNN}-{NNN}）。
+user-decision-required の位置づけ（case-run result enum の第5状態ではなく case-auto の停止理由分類）は v4-lifecycle-state-machine Design「adversarial-review 由来の停止信号」節、review 経路での parent_decision_required / decision_context 適用は v4-delegation-contracts Design「adversarial-review との委譲契約接続」節をそれぞれ正とする（caller 統合共通契約・user-decision-required 位置づけ条項）。
 
 ## 非対象
 

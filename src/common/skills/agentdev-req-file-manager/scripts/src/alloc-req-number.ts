@@ -1,5 +1,5 @@
 /**
- * REQ番号採番スクリプト（AG-{NNN}、AG-{NNN}、REQ-{NNNN}-{NNN}/160）。
+ * REQ番号採番スクリプト（「Script 所有権と委譲契約」に基づく本 skill 正規所有）。
  *
  * 既存の REQ ファイル群から最大番号を特定し、その +1 を採番する。
  * あわせて既知欠番レジストリ（docs/designs/foundations/numbering-policy.md

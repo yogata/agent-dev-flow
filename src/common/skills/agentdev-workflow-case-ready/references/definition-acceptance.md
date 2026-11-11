@@ -17,7 +17,7 @@
 
 ### 忠実性・整合性・品質検査（設計PRあり）
 
-1. **忠実性確認**: req-define での最新合意内容（req_draft の合意済み内容〔agreed_items、operation_units、realization_actions、受入条件〕。req_draft は取得時点の最新の合意記録であり、case-revise 由来の再合意があれば反映後の内容を照合基準とする）と設計PRの変更内容を突合し、req-define で合意済みの意味内容に対する忠実な投影であることを確認する。判断方法: 閉じた意味評価（合意済み内容と変更内容の突合。事実・判断基準・結果空間〔忠実/非忠実〕は評価前に限定）。確定権限: 正規契約（合意済み内容）からの導出。人間に留保された判断（REQ-{NNNN}-{NNN}）を新規に確定しない
+1. **忠実性確認**: req-define での最新合意内容（req_draft の合意済み内容〔agreed_items、operation_units、realization_actions、受入条件〕。req_draft は取得時点の最新の合意記録であり、case-revise 由来の再合意があれば反映後の内容を照合基準とする）と設計PRの変更内容を突合し、req-define で合意済みの意味内容に対する忠実な投影であることを確認する。判断方法: 閉じた意味評価（合意済み内容と変更内容の突合。事実・判断基準・結果空間〔忠実/非忠実〕は評価前に限定）。確定権限: 正規契約（合意済み内容）からの導出。人間に留保された判断（ADF 判断アーキテクチャの人間判断境界が定める）を新規に確定しない
 2. **整合性検査**: REQ / Decision / Design の相互整合と frontmatter 整合を確認する。決定的検証は `agentdev-artifact-validation` の公開検証契約へ委譲する。判断方法: 決定的処理（機械検証へ委譲）。確定権限: 正規契約からの導出
 3. **品質検査**: 設計PRの CI 結果とリポジトリの品質検査結果を確認する。merge 直前には、branch HEAD（origin/main 取り込み済み）の状態で変更を伴う docs ファイル群の frontmatter `updated` を再実測し、設計PR 差分と一致することを確認してから merge する。再実測を省略した merge を行わず、未 commit 変更が残る working tree での代替実測も行わない。再実測対象範囲（変更を伴う docs ファイル群）の特定手順は case-open 側 reference（definition-pr-and-idempotency）「frontmatter updated 再実測の対象範囲の特定」節を参照する。判断方法: 決定的処理（機械的証拠の突合）。確定権限: 正規契約からの導出
 
@@ -55,7 +55,7 @@ workflow extension（`.agentdev/extensions/skills/*.yaml`）に acceptance_gates
 
 ### merge 前の isDraft 確認（STEP-1 の正規経路）
 
-merge 実行前に、Custom Tool `agentdev_gh` の pr_read で対象 PR の isDraft を確認する（REQ-{NNNN}-{NNN}）。
+merge 実行前に、Custom Tool `agentdev_gh` の pr_read で対象 PR の isDraft を確認する（case-ready 実行契約の merge 前 Draft 状態確認条項）。
 
 - **isDraft: false（通常 Pull Request）**: 3検査 pass を前提に pr_merge へ進む。確認位置は merge 実行より前でなければならない
 - **isDraft: true（GitHub Draft PR）**: pr_merge を実行せず、blocked で停止する。停止理由には「GitHub Draft PR が正規 lifecycle 外であり merge 不可」であることを識別可能な情報（対象 PR 番号を含む）を記録する。GitHub Draft PR は外部変更・既存成果物・旧版由来を含む正規 lifecycle 外の異常状態として扱う
@@ -63,14 +63,14 @@ merge 実行前に、Custom Tool `agentdev_gh` の pr_read で対象 PR の isDr
 
 ### 確定判定と merge
 
-- merge 前の isDraft 確認（上記）で isDraft: false を確認した後、人間に留保された判断（REQ-{NNNN}-{NNN}）の新規確定が不要で、既存の正規契約から導出できる解消と委譲された裁量の範囲内の判断である（上記3検査が pass し、必須受け入れ義務の欠落・縮小・反転を含む合意済み意味内容からの逸脱がない）場合、追加の人間承認を要求せず設計PRを merge する
+- merge 前の isDraft 確認（上記）で isDraft: false を確認した後、人間に留保された判断（ADF 判断アーキテクチャの人間判断境界が定める）の新規確定が不要で、既存の正規契約から導出できる解消と委譲された裁量の範囲内の判断である（上記3検査が pass し、必須受け入れ義務の欠落・縮小・反転を含む合意済み意味内容からの逸脱がない）場合、追加の人間承認を要求せず設計PRを merge する
 - merge は Case 単位の設計PR（Definition / Amendment のいずれか）に対して実行する
 
 ### HITL 停止条件
 
-当該判断が人間に留保された判断（REQ-{NNNN}-{NNN}）を新規に確定する必要がある場合、または既存の安全境界が要求する操作承認を要する場合は停止し、既存 PR を保持したままユーザー判断を求める。
+当該判断が人間に留保された判断（ADF 判断アーキテクチャの人間判断境界が定める）を新規に確定する必要がある場合、または既存の安全境界が要求する操作承認を要する場合は停止し、既存 PR を保持したままユーザー判断を求める。
 
-人間判断への移送の判定は、語の使用（新しい Decision の作成、合意済み意味内容の変更、対象範囲の拡大、意味的な不整合の解消）だけで行わず、`REQ-{NNNN}-{NNN}` の留保事項（新しい目的、価値、優先順位、対象範囲、外部契約、受け入れ条件、恒久規範、または既存正規契約だけでは解決不能な規範間の優先関係の確定）への該当性で行う。判断の難易度、確信度、評価器間の不一致、結果状態、唯一解でないことだけを理由として人間判断へ移送しない。停止理由は `REQ-{NNNN}-{NNN}` の原因分類へ対応させる
+人間判断への移送の判定は、語の使用（新しい Decision の作成、合意済み意味内容の変更、対象範囲の拡大、意味的な不整合の解消）だけで行わず、人間に留保された判断の留保事項（新しい目的、価値、優先順位、対象範囲、外部契約、受け入れ条件、恒久規範、または既存正規契約だけでは解決不能な規範間の優先関係の確定）への該当性で行う。判断の難易度、確信度、評価器間の不一致、結果状態、唯一解でないことだけを理由として人間判断へ移送しない。停止理由は失敗・停止理由の8原因区別（ADF 判断アーキテクチャの原因別処理規定）へ対応させる
 
 ### CI 失敗時
 
