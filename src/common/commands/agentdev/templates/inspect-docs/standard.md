@@ -7,6 +7,7 @@
  - 検出事項: {finding_count}件
  - 推奨経路: {route_summary}
  - req-define入力案: {draft_count}件（{0件の場合は「該当なし」}）
+ - 待ち行列滞留: {queue_retention_days}日（最古エントリの検出事項ファイル名 timestamp 起算。{0件の場合は「滞留なし」}）
 検証結果: ✅ OK
 git 永続化: commit: {hash}, push: {成功/失敗}
 次のコマンド:
