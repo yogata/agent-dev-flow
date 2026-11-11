@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261111T132358Z-b078",
+  "workflow": "case-ready",
+  "evaluationKind": "scope-overlap-detection",
+  "subject": "Case #4005 対象範囲と既存オープン Case（#4002・#4004）の交差判断",
+  "sourceRevision": "7e851e67b9cf8e736dc6bb8cf9955d6bf63e43a9",
+  "durationMs": 917,
+  "inputTokens": 1146,
+  "inputs": {
+    "requestDigest": "f6bd64c4b069fec3903ce7dd1e160252d971dd407a1a9ca5aff5198b535f1c44"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-scope-overlap",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.95,
+        "false": 0.050000000000000044
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-scope-overlap",
+        "value": true
+      }
+    ]
+  }
+}

@@ -868,3 +868,39 @@
 - **タグ**: #heredoc #検査専用ファイル #yomiyasu-lint #書込みguard #標準回復手段
 
 ---
+
+## 2026-11-11: 並行 case-auto 稼働環境で untracked ファイルを掃除する場合、内容確認と削除実行を同一 bash コマンドへ連結せず所有者確認を別コマンドに分離する（Case #4005 より回収）
+
+- **問題事象**: case-ready STEP-1 の対照実行で main 作業ディレクトリの untracked ファイル 3 件（.agentdev/jev-observations/20261111T1308〜1309Z）を自 run の環境ノイズと誤判定して削除した。削除と同一コマンドで実行したメタデータ確認の出力で、3 件が並行 run（Case #4002・workflow=case-ready）の Jev 観測（Standard/Epic 帰属・Wave 構成・スコープ重複の3判定）であることが判明したが、rm は連結実行済みで中止できなかった（計測: HEAD 7e851e67b 作業時点・Case #4005・2026-11-11・node による workflow/subject 確認で観測）
+- **発生局面**: 実装（case-ready STEP-1・check_integrity 対照実行の untracked-residue NG 解消）
+- **検知方法**: 削除後の観測メタデータ確認（workflow=case-ready・subject=Case #4002 の表示）
+- **根本原因**: untracked ファイルの所有者確認を rm と同一 bash コマンドに連結したため、確認結果を踏まえた中止判断が実行序列に入らなかった。並行 case-auto run が共有 main 作業ディレクトリへ書き込む Jev 観測は自 run の一時物と外観が同一（jev-observations/ 配下の当日タイムスタンプ名）であり、タイムスタンプの新旧だけを所有判定根拠にしてはならない
+- **自律対応内容**: 削除した 3 件の復元は不能（untracked のため）。並行 run への影響は observation_write が fail-open（観測書込み失敗は独立警告）であり判断成立を阻害しない契約であることを確認し、並行 run による当該3評価の再実行（evaluationKind と questionId は維持、新規 observationId で観測再作成）を回復経路として完了報告へ記録した
+- **ユーザー確認の有無**: なし（並行 run 資源の非干渉実行条件(4)の違反。完了報告で報告済み）
+- **REQ/Decision/Design影響**: なし（jev-observations は永続 git 管理対象の観測 domain state であり、削除条件は設定されない〔REQ-090-006〕。手順補強の候補のみ）
+- **横展開観点**: untracked ファイルの削除判定は「内容確認 → 中止判断 → 削除実行」を別 bash コマンドに分離して実行する。同一コマンドへの連結は確認結果を反映しない実行序列になる。並行 case-auto 環境では .agentdev/jev-observations/ の当日タイムスタンプ物を自 run の一時物と断定せず、観測メタデータの workflow・subject で所有 run を照合する
+- **再発条件**: 並行 case-auto run が稼働する環境で、main 作業ディレクトリの untracked ファイルを integrity NG 対応として掃除する場合
+- **予防策候補**: untracked 掃除手順への所有者確認（観測メタデータ照合）の前置と、確認コマンドと削除コマンドの分離規律の明文化判断（promote 判断）
+- **想定反映先**: learning-promote（並行実行環境の untracked 掃除手順・機械工程への補強判定）
+- **関連**: Case #4005・Case #4002・.agentdev/README.md の jev-observations 行（永続・git 管理対象・削除条件なし）・check_integrity untracked-residue
+- **タグ**: #並行case-auto #untracked #Jev観測 #誤削除 #所有者確認
+
+---
+
+## 2026-11-11: 並行 case-auto 稼働環境の squash merge 後ブランチ削除判定は diff 全体空ではなく、PR 変更ファイル単位の diff 空 + branch コミット変更ファイルの漏出 0 件で判定する（Case #4005 より回収）
+
+- **問題事象**: squash merge 後の definition branch 削除判定（複数コミット構成・git diff origin/main {branch} が空であること）で、並行 run の push（#4003 merge・draft 削除 commit・learning capture）により diff が非空（7 ファイル）となり、判定条件を文字どおり適用すると -D 前の過剰停止になる状態が生じた（計測: HEAD 4881550ee・branch definition/issue-4005・Case #4005・2026-11-11・git diff --name-only で観測）
+- **発生局面**: 実装（case-ready STEP-7・設計側 worktree とローカルブランチの削除）
+- **検知方法**: diff 非空差分 7 ファイルの帰属分析（diff-tree による branch コミット変更ファイルとの突合）
+- **根本原因**: worktree-operations.md「squash merge 後の条件付き -D 許可」の diff 空条件は単一 run 前提であり、並行 run が main を進行させる環境では branch 分岐後の main 側変更が恒常的に diff を非空にする
+- **自律対応内容**: 判定を分解して機械確認した。限定確認（origin/main..branch が自 Case 2 commit のみ）合格、PR 対象 4 ファイルの diff が空（branch 側変更は main へ squash merge で取り込み済み）、非空差分 7 ファイルすべてが main 側進行分（#4003 関連 4 ファイル・draft 削除 2 件・inbox.md 追加）で branch 独自変更の漏出 0 件を確認した上で squash merge 済みと判定し -D を実行した。判定根拠は検証記録へ記録済み
+- **ユーザー確認の有無**: なし（既存手順の趣旨〔branch 側未取り込み変更の不在確認〕を維持する分解検査の適用）
+- **REQ/Decision/Design影響**: なし（worktree-operations.md の判定手順の並行実行環境での適用補強の候補のみ）
+- **横展開観点**: 並行 case-auto 環境の squash merge 後ブランチ削除では、diff 全体空ではなく「PR 変更ファイル単位の diff 空 + branch コミット変更ファイル（diff-tree 出力）の diff 漏出 0 件」で判定する。非空差分は main 側進行分の帰属を機械突合で確認する
+- **再発条件**: 並行 case-auto run が main を進行させ得る環境で squash merge 済みブランチを削除する場合
+- **予防策候補**: worktree-operations.md「squash merge 後の条件付き -D 許可」への並行実行環境向け分解判定手順の追記判断（promote 判断）
+- **想定反映先**: learning-promote（agentdev-git-worktree 手順への補強判定）
+- **関連**: Case #4005・worktree-operations.md「squash merge 後の条件付き -D 許可」節・agentdev-git-worktree references git-common-procedures.md
+- **タグ**: #squashmerge #ブランチ削除 #並行case-auto #判定分解 #worktree-operations
+
+---
