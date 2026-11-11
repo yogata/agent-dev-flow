@@ -920,3 +920,39 @@
 - **タグ**: #squashmerge #ブランチ削除 #並行case-auto #判定分解 #worktree-operations
 
 ---
+
+## 2026-11-12: agentdev-textlint-guard distribution test の archive install ケースが bun キャッシュ競合起因の疑いで不定期 fail する（基線 12 件外の新規出現・受入では不再現）(Case 4004・PR 4019 より回収)
+
+- **問題事象**: bun test ③ 分割（.opencode/plugins）で agentdev-textlint-guard distribution / consumer install の archive install 系テストが ENOENT: failed copying files from cache to destination for package has-symbols で fail（2026-11-11〜12・基線 2026-11-11 採取時は合格・既知不合格 12 件リスト外の新規出現）
+- **発生局面**: 検証（case-run 前置自己点検の 3 分割実行・Case 4004）
+- **検知方法**: bun test fail 明細の読み取り（has-symbols パッケージのキャッシュコピー失敗）
+- **根本原因**: bun install のキャッシュコピー段の競合レースの疑い（実行環境の同時実行・キャッシュ状態依存）。case-run は bun install 単独実行が plugin 配下で成功することを確認し環境由来と暫定分類したが、機械的なレース特定は未実施
+- **自律対応内容**: 受入検査（基線構成を再現した投影 worktree・同一環境ラベル）で当該テストが 2 回の独立観測（③ 全分割実行・plugin 単独 187 pass / 0 fail）で不再現であることを確認し、新規不合格 0 の判定を維持した。実装側の環境由来説を申告のまま受入証拠へ昇格させず、「新規失敗なし」の自側実測のみを受入根拠とした
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（本 Case 変更対象の plugin・install.ps1 は未変更。既知不合格リストへの追加登録は未実施・再発時に改めて判断）
+- **横展開観点**: bun キャッシュ競合の疑いがある失敗は、時間差再実行での不再現をフレーク分類の根拠にする前に同一環境での独立再観測回数を記録する。単独実行の成功だけでは環境由来の確定にならない
+- **再発条件**: 並行実行やキャッシュ共有環境で textlint-guard distribution テストを含む bun test を実行する場合
+- **予防策候補**: 失敗時の bun キャッシュ状態記録（cache dir の内容証跡）と、テスト内 bun install のキャッシュ分離（一時 cache dir 指定）の検討判断（promote 判断）
+- **想定反映先**: learning-promote（textlint-guard distribution テストの安定化判定）
+- **関連**: Case #4004・PR #4019 本文の Findings 節（検証詳細）・.agentdev/tmp/c-alpha2-baseline/known-failures-fixed.md（既知 12 件リスト・本件は含まない）
+- **タグ**: #bun-cache #distribution-test #フレーク疑い #textlint-guard #並行実行
+
+---
+
+## 2026-11-12: textlint 最終 gate の script 経由 spawn 起動で一時的に exit 9 が観測され得る（単独再実行 exit 0・由来分類未確定）(Case 4004 より回収)
+
+- **問題事象**: close_mechanical_steps pre-merge の textlint-final-check gate が exitCode 9・stderr 空 で 1 回だけ失敗（2026-11-12・同一構成の手動実行と単独再実行は exit 0・632 対象全件実行で合格）
+- **発生局面**: 検証（case-close pre-merge 機械工程・Case 4004）
+- **検知方法**: 機械工程報告 JSON の gate step FAIL（exitCode 9・stderrTail 空）
+- **根本原因**: 未確定。直前に打ち切られた別起動（バックグラウンド起動を harness が kill）の残留プロセス、または spawn 実行形態（timeout・stdio pipe の差）に由来する可能性。gate 本体の終了コード表に 9 は定義されていない
+- **自律対応内容**: 単独再実行（timing 隔離）で exit 0 を確認し、受入では exit 0 の独立実行 3 件（632 全件実行を含む）をもって textlint gate の合格証拠とし、exit 9 の失敗実行を隠蔽せず実値のまま記録した。merge 判断は再発なしの確認後に進めた
+- **ユーザー確認の有無**: なし（merge 前に再発なし確認を完了・停止条件の適用判断として記録）
+- **REQ/Decision/Design影響**: なし（gate 実装・契約の変更なし）
+- **横展開観点**: 機械 gate の一時的異常終了（未定義の終了コード・stderr 空）は、単独再実行で解消しても「由来分類未確定」として記録を残す。合格証拠は実行形態規律に適合した再実行の実値とし、失敗実行の握り潰しをしない
+- **再発条件**: 機械工程 script が外部 gate を spawn で起動し、同一環境に直近の打ち切り起動が残留する場合
+- **予防策候補**: 機械工程の gate 起動前の残留プロセス確認、未定義終了コード検出時の自動単独再実行手順の検討判断（promote 判断）
+- **想定反映先**: learning-promote（close_mechanical_steps の gate 起動堅牢化判定）
+- **関連**: Case #4004・対応記録コメント（残課題として記録済み）・docs/knowledge/checker-cli-stdout-loss-on-windows-bun.md（類型の既知事象）
+- **タグ**: #textlint-gate #exit9 #spawn #由来未確定 #fail-closed記録
+
+---
