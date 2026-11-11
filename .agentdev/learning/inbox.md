@@ -796,3 +796,21 @@
 - **タグ**: #targeted-docs-guard #check_changed_docs #対象限定 #誤用検出 #実行経路
 
 ---
+
+## 2026-11-11: prepare_definition_pr.ts は measurement-convergence step で収束補正を完結させた後も元の check_integrity 終了コードで後続 gate を抑止して終了する・収束成立時の継続は呼出側の再実行と対照救済手順に依存する（Case #4002 より回収）
+
+- **問題事象**: case-open STEP-4 機械工程 script（prepare_definition_pr.ts）で、check_integrity の NG 5件（req-updated-freshness 4件・IndexGenerationConsistency 1件）に対し measurement-convergence step が frontmatter updated 4ファイル追随・補正 commit・generate_indexes 再実行（exit 0）で全件解消した後も、script は元の check_integrity 非ゼロ終了コードを理由に後続 gate（traceability check）を抑止して終了コード 1 で返した。収束後の commit 済み HEAD での check_integrity 再実行は NG 0・Warning 1（既出債務）であり、実質的な gate 不合格は残っていない（計測 baseline: worktree HEAD 644ec5b4b・branch definition/issue-4002・Case #4002・2026-11-11・`bun .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts --profile source --root .worktrees/4002-definition` での観測）
+- **発生局面**: 実装（case-open STEP-4 機械工程・Definition 設計PR作成）
+- **検知方法**: script 報告 JSON の step 一覧（measurement-convergence 4 step が pass、check_integrity step が fail・warning「check_integrity failed」）と終了コード 1 の突合
+- **根本原因**: script の終了コード駆動が収束補正前の check_integrity 終了コードに固定されており、収束 step の成功を根拠に後続 gate を続行する分岐を持たない。あわせて check_integrity の終了コード規律は warning > 0 でも EXIT_NG を返すため、既存 warning 債務（#3998 由来の CanonicalConflict gh-direct-invocation・case-close scripts README:7）が 1 件以上ある環境では Definition PR 段階の script gate が構造的に非ゼロになる
+- **自律対応内容**: 冪等再実行手順に従い、報告 JSON と git 状態から適用済み工程（worktree 再利用・編集適用済み・収束 commit 完了）を確認した上で、残 gate（check_integrity 再確認・traceability check）を同一 spec・同一証跡契約（stdout/stderr 全文・終了コード・対象版・実行条件）で commit 済み HEAD に対して再実行した。check_integrity の既出 warning は main HEAD との対照実行で findings 差分 0 件（本変更起因の検出悪化 0 件）を機械証明して PR 作成可と判断し、traceability check は共有 lib の consumeDefinitionTraceability で gate 判定仕様どおりに消費した（missing-design 0 件・missing-implementation/verification は deferred 義務）
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（対照救済・手動 contingency・冪等再実行の既存契約の適用内。script 挙動の改善候補の記録のみ）
+- **横展開観点**: 収束・補正型 step を持つ機械工程 script 全般で、補正後の再検証と後続 gate 続行を script 内で完結させるか、呼出側の継続手順として明文化する。check 系 gate が warning も fail 扱いにする終了コード規律の環境では、対照実行による悪化 0 件証明の併用が実務上必須
+- **再発条件**: measurement-convergence の trigger 条件（計測日不整合・req-updated-freshness NG）が成立し、かつ既存 warning 債務が 1 件以上ある環境で prepare_definition_pr.ts を実行する場合
+- **予防策候補**: prepare_definition_pr.ts の収束 step 完了時に後続 gate 続行（または収束後再実行の自動化）へ進む分岐の追加判断、check_integrity の warning-only exit に対する対照救済の script 組込み判断（promote 判断）
+- **想定反映先**: learning-promote（機械工程 script 契約・checker 実行契約への補強判定）
+- **関連**: Case #4002・PR #4003・src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts・docs/designs/commands/case-open.md「機械工程の script 呼び出し契約（RU-0162）」節
+- **タグ**: #prepare_definition_pr #measurement-convergence #対照救済 #機械工程 #check_integrity
+
+---
