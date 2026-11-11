@@ -615,6 +615,96 @@ describe("母集団の空状態と grounds 欠落の拒否", () => {
 });
 
 // ---------------------------------------------------------------------------
+// 判定個別対応: 母集団の個別識別子と判定入力の照合（A-12）
+// ---------------------------------------------------------------------------
+
+describe("判定個別対応（母集団の個別識別子と判定入力の照合）", () => {
+  /**
+   * 個別識別を含む母集団の標本（正規本文の条件本文・位置から導出した識別子を
+   * 母集団導出が保持する状態を表す）。
+   */
+  function populatedWithConditions(
+    conditions: readonly { id: string; text: string; line: number; required: boolean }[],
+  ): ConditionPopulation {
+    return {
+      extractionSucceeded: true,
+      contractConditionCount: conditions.length,
+      contractRequiredCount: conditions.filter((c) => c.required).length,
+      contractRequiredConditionIds: conditions.filter((c) => c.required).map((c) => c.id),
+      contractConditions: conditions,
+    };
+  }
+
+  const conditions = [
+    { id: "C-A", text: "条件A", line: 1, required: true },
+    { id: "C-B", text: "条件B", line: 2, required: true },
+  ];
+
+  test("無関係な条件への判定（母集団に存在しない識別子）を拒否する", () => {
+    const result = evaluateFinalAcceptance({
+      subjectKind: "child-issue",
+      population: populatedWithConditions(conditions),
+      verdicts: [soundPass("C-A"), soundPass("C-OTHER")],
+    });
+    expect(result.closeAllowed).toBe(false);
+    const unknown = result.violations.filter((v) => v.code === "verdict-for-unknown-condition");
+    expect(unknown.map((v) => v.conditionId)).toEqual(["C-OTHER"]);
+  });
+
+  test("変更前の完了条件（stale 判定）への判定を拒否し、現行条件の判定欠落を検出する", () => {
+    const result = evaluateFinalAcceptance({
+      subjectKind: "child-issue",
+      population: populatedWithConditions(conditions),
+      verdicts: [soundPass("C-OLD-A"), soundPass("C-OLD-B")],
+    });
+    expect(result.closeAllowed).toBe(false);
+    const unknown = result.violations.filter((v) => v.code === "verdict-for-unknown-condition");
+    expect(unknown.map((v) => v.conditionId).sort()).toEqual(["C-OLD-A", "C-OLD-B"]);
+    const missing = result.violations.filter(
+      (v) => v.code === "verdict-missing-for-contract-condition",
+    );
+    expect(missing.map((v) => v.conditionId).sort()).toEqual(["C-A", "C-B"]);
+  });
+
+  test("stale 判定と現行判定の混在でも残る現行条件の欠落を検出する", () => {
+    const result = evaluateFinalAcceptance({
+      subjectKind: "child-issue",
+      population: populatedWithConditions(conditions),
+      verdicts: [soundPass("C-OLD-A"), soundPass("C-B")],
+    });
+    expect(result.closeAllowed).toBe(false);
+    expect(result.violations.map((v) => v.code)).toContain("verdict-for-unknown-condition");
+    const missing = result.violations.filter(
+      (v) => v.code === "verdict-missing-for-contract-condition",
+    );
+    expect(missing.map((v) => v.conditionId)).toEqual(["C-A"]);
+  });
+
+  test("正しい個別対応の判定は受理する（無関係・stale 判定なし）", () => {
+    const result = evaluateFinalAcceptance({
+      subjectKind: "child-issue",
+      population: populatedWithConditions(conditions),
+      verdicts: [soundPass("C-A"), soundPass("C-B")],
+    });
+    expect(result.closeAllowed).toBe(true);
+    expect(result.violations).toEqual([]);
+  });
+
+  test("母集団の個別識別子を伴う重複判定は重複違反と欠落として検出する", () => {
+    const result = evaluateFinalAcceptance({
+      subjectKind: "child-issue",
+      population: populatedWithConditions(conditions),
+      verdicts: [soundPass("C-A"), soundPass("C-A")],
+    });
+    expect(result.closeAllowed).toBe(false);
+    expect(result.violations.map((v) => v.code)).toContain("duplicate-condition-verdicts");
+    expect(result.violations.map((v) => v.code)).toContain(
+      "verdict-missing-for-contract-condition",
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
 // 正常系: 誤完了防止と同じ判定処理・同じ経路で全必須条件成立対象が完了できる
 // ---------------------------------------------------------------------------
 

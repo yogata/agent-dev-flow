@@ -7,6 +7,7 @@ import {
   assembleReport,
   decideExitCode,
   deriveAcceptancePopulation,
+  deriveCompletionConditionId,
   deriveCurrentWave,
   evaluateContractStateResidue,
   evaluateIntegrityMachineAcceptance,
@@ -286,7 +287,7 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
   test("実経路: リポジトリ全体の未追跡対象と状態記録を検査し、外部制限の未達は受入gapチャネルで別に報告する", () => {
     const runner = fakeRunner({ issueBody: "- [x] 条件1\n" });
     const report = runCloseMechanicalSteps(
-      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      preMergeInput({ acceptanceVerdicts: [soundPass(CID1)] }),
       runner,
     );
     const step = report.result.steps.find((s) => s.name === "contract-state-residue-check");
@@ -317,7 +318,7 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
       contractStateStatus: "?? .agentdev/jev-observations/obs-1.json\n",
     });
     const report = runCloseMechanicalSteps(
-      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      preMergeInput({ acceptanceVerdicts: [soundPass(CID1)] }),
       runner,
     );
     const step = report.result.steps.find((s) => s.name === "contract-state-residue-check");
@@ -338,7 +339,7 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
       untrackedOutput: "stray.txt\n",
     });
     const report = runCloseMechanicalSteps(
-      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      preMergeInput({ acceptanceVerdicts: [soundPass(CID1)] }),
       runner,
     );
     const step = report.result.steps.find((s) => s.name === "contract-state-residue-check");
@@ -358,7 +359,7 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
     });
     const report = runCloseMechanicalSteps(
       preMergeInput({
-        acceptanceVerdicts: [soundPass("AC-1")],
+        acceptanceVerdicts: [soundPass(CID1)],
         contractStateCheck: {
           contractStatePaths: [".agentdev/jev-observations", ".agentdev/learning/inbox.md"],
           approvalEntries: [],
@@ -389,7 +390,7 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
     });
     const report = runCloseMechanicalSteps(
       preMergeInput({
-        acceptanceVerdicts: [soundPass("AC-1")],
+        acceptanceVerdicts: [soundPass(CID1)],
         contractStateCheck: {
           contractStatePaths: [".agentdev/jev-observations", ".agentdev/learning/inbox.md"],
           approvalEntries: ["sandbox"],
@@ -413,7 +414,7 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
       untrackedExit: 128,
     });
     const report = runCloseMechanicalSteps(
-      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      preMergeInput({ acceptanceVerdicts: [soundPass(CID1)] }),
       runner,
     );
     const step = report.result.steps.find((s) => s.name === "contract-state-residue-check");
@@ -505,7 +506,7 @@ describe("full integrity suite の機械受理基準（記録実体の検証と�
           failureOrigins: [classifiedPreExistingFailure("check_integrity")],
           observedFailCounts: [{ gate: "check_integrity", failCount: 1 }],
         }),
-        acceptanceVerdicts: [soundPass("AC-1"), soundPass("AC-2")],
+        acceptanceVerdicts: [soundPass(CID1), soundPass(CID2)],
       }),
       runner,
     );
@@ -614,7 +615,7 @@ describe("full integrity suite の機械受理基準（記録実体の検証と�
           ],
           observedFailCounts: [{ gate: "check_integrity", failCount: 1 }],
         }),
-        acceptanceVerdicts: [soundPass("AC-1")],
+        acceptanceVerdicts: [soundPass(CID1)],
       }),
       runner,
     );
@@ -634,7 +635,7 @@ describe("full integrity suite の機械受理基準（記録実体の検証と�
 
   test("(c) fail 残存時に機械受理基準の記録実体が欠落する入力は拒否する（記録不在・実体欠落・件数不一致）", () => {
     const missingRecord = runCloseMechanicalSteps(
-      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      preMergeInput({ acceptanceVerdicts: [soundPass(CID1)] }),
       fakeRunner({
         issueBody: "- [ ] 条件1\n",
         integrityExitCodes: { check_integrity: 1 },
@@ -715,7 +716,7 @@ describe("full integrity suite の機械受理基準（記録実体の検証と�
           ],
           observedFailCounts: [{ gate: "check_integrity", failCount: 1 }],
         }),
-        acceptanceVerdicts: [soundPass("AC-1")],
+        acceptanceVerdicts: [soundPass(CID1)],
       }),
       runner,
     );
@@ -765,7 +766,7 @@ describe("full integrity suite の機械受理基準（記録実体の検証と�
           failureOrigins: [classifiedPreExistingFailure("check_integrity")],
           observedFailCounts: [{ gate: "check_integrity", failCount: 1 }],
         }),
-        acceptanceVerdicts: [soundPass("AC-1")],
+        acceptanceVerdicts: [soundPass(CID1)],
       }),
       runner,
     );
@@ -850,8 +851,8 @@ describe("完了条件チェックボックスの機械的抽出（評価はモ�
     const extraction = extractCompletionCheckboxes(body);
     expect(extraction.total).toBe(4);
     expect(extraction.checked).toBe(2);
-    expect(extraction.items[0]).toEqual({ text: "未達条件 A", checked: false });
-    expect(extraction.items[1]).toEqual({ text: "達成条件 B", checked: true });
+    expect(extraction.items[0]).toEqual({ text: "未達条件 A", checked: false, line: 3 });
+    expect(extraction.items[1]).toEqual({ text: "達成条件 B", checked: true, line: 4 });
   });
 });
 
@@ -891,11 +892,12 @@ describe("完了条件チェックボックスの CRLF 入力抽出（読取後�
     const items = JSON.parse(report.proposal.completion_checkboxes!) as {
       text: string;
       checked: boolean;
+      line: number;
     }[];
     expect(items).toEqual([
-      { text: "未達条件 A", checked: false },
-      { text: "達成条件 B", checked: true },
-      { text: "空行を挟んだ未達条件 C", checked: false },
+      { text: "未達条件 A", checked: false, line: 3 },
+      { text: "達成条件 B", checked: true, line: 4 },
+      { text: "空行を挟んだ未達条件 C", checked: false, line: 6 },
     ]);
     expect(items.every((item) => item.text.length > 0)).toBe(true);
   });
@@ -1011,7 +1013,7 @@ describe("pre-merge 機械工程の実行（品質ゲート省略なし・報告
       issueBody: "- [x] 条件1\n",
     });
     const report = runCloseMechanicalSteps(
-      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      preMergeInput({ acceptanceVerdicts: [soundPass(CID1)] }),
       runner,
     );
     const polling = report.result.steps.find((s) => s.name === "mergeable-polling");
@@ -1030,7 +1032,7 @@ describe("pre-merge 機械工程の実行（品質ゲート省略なし・報告
     });
     const report = runCloseMechanicalSteps(
       preMergeInput({
-        acceptanceVerdicts: [soundPass("AC-1")],
+        acceptanceVerdicts: [soundPass(CID1)],
         mergeablePolling: { intervalSeconds: 0, maxAttempts: 2 },
       }),
       runner,
@@ -1045,7 +1047,7 @@ describe("pre-merge 機械工程の実行（品質ゲート省略なし・報告
   test("実経路: PR なし構成（prNumber 0・verify-only closure）では merge 前提確認を N/A pass とし gh pr view を発行しない", () => {
     const runner = fakeRunner({ issueBody: "- [x] 条件1\n" });
     const report = runCloseMechanicalSteps(
-      preMergeInput({ prNumber: 0, acceptanceVerdicts: [soundPass("AC-1")] }),
+      preMergeInput({ prNumber: 0, acceptanceVerdicts: [soundPass(CID1)] }),
       runner,
     );
     const polling = report.result.steps.find((s) => s.name === "mergeable-polling");
@@ -1064,7 +1066,7 @@ describe("pre-merge 機械工程の実行（品質ゲート省略なし・報告
     const report = runCloseMechanicalSteps(
       preMergeInput({
         prNumber: 0,
-        acceptanceVerdicts: [soundPass("AC-1")],
+        acceptanceVerdicts: [soundPass(CID1)],
         mergeablePolling: { intervalSeconds: 0, maxAttempts: 0 },
       }),
       runner,
@@ -1441,13 +1443,26 @@ function soundPass(conditionId: string): ConditionVerdict {
   };
 }
 
+/**
+ * fixture 本文（"- [ ] 条件1\n- [ ] 条件2\n"）の完了条件識別子。
+ * 母集団導出と同一の決定的導出を使い、判定入力を正規条件と個別対応させる。
+ */
+const CID1 = deriveCompletionConditionId("条件1", 1);
+const CID2 = deriveCompletionConditionId("条件2", 2);
+
 describe("抽出フェーズの母集団導出（deriveAcceptancePopulation）", () => {
-  test("抽出成功は正規完了条件の取得状態を母集団へ反映する", () => {
-    const population = deriveAcceptancePopulation({ total: 3 });
+  test("抽出成功は正規完了条件の個別識別を含む取得状態を母集団へ反映する", () => {
+    const extraction = extractCompletionCheckboxes("- [ ] 条件1\n- [x] 条件2\n");
+    const population = deriveAcceptancePopulation(extraction);
     expect(population).toEqual({
       extractionSucceeded: true,
-      contractConditionCount: 3,
-      contractRequiredCount: 3,
+      contractConditionCount: 2,
+      contractRequiredCount: 2,
+      contractRequiredConditionIds: [CID1, CID2],
+      contractConditions: [
+        { id: CID1, text: "条件1", line: 1, required: true },
+        { id: CID2, text: "条件2", line: 2, required: true },
+      ],
       emptyBasis: undefined,
     });
   });
@@ -1462,12 +1477,46 @@ describe("抽出フェーズの母集団導出（deriveAcceptancePopulation）",
   });
 
   test("0 件抽出は emptyBasis を根拠に主張され、根拠なしでは条件なしとして受理されない", () => {
-    const withoutBasis = deriveAcceptancePopulation({ total: 0 });
+    const withoutBasis = deriveAcceptancePopulation({ total: 0, items: [] });
     expect(withoutBasis.extractionSucceeded).toBe(true);
     expect(withoutBasis.contractConditionCount).toBe(0);
     expect(withoutBasis.emptyBasis).toBeUndefined();
-    const withBasis = deriveAcceptancePopulation({ total: 0 }, "正規契約上の完了条件なし");
+    const withBasis = deriveAcceptancePopulation(
+      { total: 0, items: [] },
+      "正規契約上の完了条件なし",
+    );
     expect(withBasis.emptyBasis).toBe("正規契約上の完了条件なし");
+  });
+});
+
+describe("完了条件の個別識別子導出（deriveCompletionConditionId）", () => {
+  test("同一の条件本文・位置からは同一の識別子を導出する（決定的）", () => {
+    expect(deriveCompletionConditionId("条件1", 1)).toBe(CID1);
+    expect(deriveCompletionConditionId("条件2", 2)).toBe(CID2);
+  });
+
+  test("条件本文が変われば識別子が変わる（stale 判定が現行識別子集合に現れない根拠）", () => {
+    expect(deriveCompletionConditionId("条件2改訂", 2)).not.toBe(CID2);
+  });
+
+  test("本文内位置が変われば識別子が変わる", () => {
+    expect(deriveCompletionConditionId("条件1", 2)).not.toBe(CID1);
+  });
+
+  test("異なる条件間で識別子が衝突しない", () => {
+    expect(CID1).not.toBe(CID2);
+  });
+
+  test("抽出結果（行番号保持）と母集団導出の識別子が一致する（抽出フェーズが母集団導出を兼ねる）", () => {
+    const extraction = extractCompletionCheckboxes("- [ ] 条件1\n- [x] 条件2\n");
+    const population = deriveAcceptancePopulation(extraction);
+    expect(population.contractRequiredConditionIds).toEqual(
+      extraction.items.map((item) => deriveCompletionConditionId(item.text, item.line)),
+    );
+    expect(population.contractConditions?.map((condition) => condition.id)).toEqual([
+      CID1,
+      CID2,
+    ]);
   });
 });
 
@@ -1492,8 +1541,8 @@ describe("受入評価の実経路接続（final-acceptance-evaluation step と�
     const report = runCloseMechanicalSteps(
       preMergeInput({
         acceptanceVerdicts: [
-          soundPass("AC-1"),
-          { conditionId: "AC-2", required: true, category: "fail", grounds: {} },
+          soundPass(CID1),
+          { conditionId: CID2, required: true, category: "fail", grounds: {} },
         ],
       }),
       runner,
@@ -1514,9 +1563,14 @@ describe("受入評価の実経路接続（final-acceptance-evaluation step と�
       extractionSucceeded: true,
       contractConditionCount: 2,
       contractRequiredCount: 2,
+      contractRequiredConditionIds: [CID1, CID2],
+      contractConditions: [
+        { id: CID1, text: "条件1", line: 1, required: true },
+        { id: CID2, text: "条件2", line: 2, required: true },
+      ],
       emptyBasis: undefined,
     });
-    expect(evaluation.blockingUnmet).toEqual(["AC-2"]);
+    expect(evaluation.blockingUnmet).toEqual([CID2]);
     expect(report.result.exitCategory).toBe("failure");
     expect(decideExitCode(report)).toBe(1);
     expect(isCloseOperationPermitted(report)).toEqual({
@@ -1529,7 +1583,7 @@ describe("受入評価の実経路接続（final-acceptance-evaluation step と�
     const runner = fakeRunner({ issueBody: "- [ ] 条件1\n- [ ] 条件2\n" });
     const report = runCloseMechanicalSteps(
       preMergeInput({
-        acceptanceVerdicts: [soundPass("AC-1"), soundPass("AC-2")],
+        acceptanceVerdicts: [soundPass(CID1), soundPass(CID2)],
       }),
       runner,
     );
@@ -1545,8 +1599,8 @@ describe("受入評価の実経路接続（final-acceptance-evaluation step と�
     const denied = runCloseMechanicalSteps(
       preMergeInput({
         acceptanceVerdicts: [
-          soundPass("AC-1"),
-          { conditionId: "AC-2", required: true, category: "blocked", grounds: {} },
+          soundPass(CID1),
+          { conditionId: CID2, required: true, category: "blocked", grounds: {} },
         ],
       }),
       fakeRunner({ issueBody: "- [ ] 条件1\n- [ ] 条件2\n" }),
@@ -1554,7 +1608,7 @@ describe("受入評価の実経路接続（final-acceptance-evaluation step と�
     expect(isCloseOperationPermitted(denied).permitted).toBe(false);
     const reverified = runCloseMechanicalSteps(
       preMergeInput({
-        acceptanceVerdicts: [soundPass("AC-1"), soundPass("AC-2")],
+        acceptanceVerdicts: [soundPass(CID1), soundPass(CID2)],
       }),
       fakeRunner({ issueBody: "- [ ] 条件1\n- [ ] 条件2\n" }),
     );
@@ -1566,7 +1620,7 @@ describe("受入評価の実経路接続（final-acceptance-evaluation step と�
     const denied = runCloseMechanicalSteps(
       preMergeInput({
         acceptanceVerdicts: [
-          { conditionId: "AC-1", required: true, category: "fail", grounds: {} },
+          { conditionId: CID1, required: true, category: "fail", grounds: {} },
         ],
       }),
       runner,
@@ -1592,7 +1646,7 @@ describe("受入評価の実経路接続（final-acceptance-evaluation step と�
       issueBody: "- [ ] 条件1\n",
     });
     const report = runCloseMechanicalSteps(
-      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      preMergeInput({ acceptanceVerdicts: [soundPass(CID1)] }),
       runner,
     );
     expect(report.result.exitCategory).toBe("failure");
@@ -1662,6 +1716,92 @@ describe("受入評価の実経路接続（final-acceptance-evaluation step と�
   });
 });
 
+describe("判定個別対応の経路試験（既存コミット再利用・途中再開・verify-only closure）", () => {
+  // 完了条件の文言変更を含む本文変更: 変更で識別子も変わる（決定的導出）。
+  const bodyAfterChange = "- [ ] 条件1\n- [ ] 条件2改訂\n";
+  const staleId2 = deriveCompletionConditionId("条件2", 2);
+  const currentId2 = deriveCompletionConditionId("条件2改訂", 2);
+
+  test("既存コミット再利用: 変更前の完了条件へ紐付いた判定の再利用は stale として拒否され、現行条件の判定欠落も検出する", () => {
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass(CID1), soundPass(staleId2)],
+      }),
+      fakeRunner({ issueBody: bodyAfterChange }),
+    );
+    const evaluation = report.diff.acceptanceEvaluation as {
+      closeAllowed: boolean;
+      violations: { code: string; conditionId: string }[];
+    };
+    expect(evaluation.closeAllowed).toBe(false);
+    expect(
+      evaluation.violations
+        .filter((v) => v.conditionId === staleId2)
+        .map((v) => v.code),
+    ).toContain("verdict-for-unknown-condition");
+    expect(
+      evaluation.violations
+        .filter((v) => v.code === "verdict-missing-for-contract-condition")
+        .map((v) => v.conditionId),
+    ).toContain(currentId2);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("途中再開（fix-and-reverify）: 変更後本文に対応した判定の再検証では終了操作を許可する", () => {
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass(CID1), soundPass(currentId2)],
+      }),
+      fakeRunner({ issueBody: bodyAfterChange }),
+    );
+    const evaluation = report.diff.acceptanceEvaluation as { closeAllowed: boolean };
+    expect(evaluation.closeAllowed).toBe(true);
+    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+  });
+
+  test("verify-only closure（PR なし構成）でも同一の母集団導出・個別照合が実行され、stale 判定を拒否する", () => {
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        prNumber: 0,
+        acceptanceVerdicts: [soundPass(CID1), soundPass(staleId2)],
+      }),
+      fakeRunner({ issueBody: bodyAfterChange }),
+    );
+    const evaluation = report.diff.acceptanceEvaluation as { closeAllowed: boolean };
+    expect(evaluation.closeAllowed).toBe(false);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+    const reverified = runCloseMechanicalSteps(
+      preMergeInput({
+        prNumber: 0,
+        acceptanceVerdicts: [soundPass(CID1), soundPass(currentId2)],
+      }),
+      fakeRunner({ issueBody: bodyAfterChange }),
+    );
+    expect(isCloseOperationPermitted(reverified)).toEqual({ permitted: true });
+  });
+
+  test("無関係な条件への判定を含む報告は issue_close 前提の機械受理判定で拒否される", () => {
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        acceptanceVerdicts: [soundPass(CID1), soundPass(deriveCompletionConditionId("別のIssue由来の条件", 1))],
+      }),
+      fakeRunner({ issueBody: "- [ ] 条件1\n" }),
+    );
+    const evaluation = report.diff.acceptanceEvaluation as {
+      closeAllowed: boolean;
+      violations: { code: string; conditionId: string }[];
+    };
+    expect(evaluation.closeAllowed).toBe(false);
+    const unknown = evaluation.violations.filter((v) => v.code === "verdict-for-unknown-condition");
+    expect(unknown).toHaveLength(1);
+    expect(unknown[0]?.conditionId).toBe(deriveCompletionConditionId("別のIssue由来の条件", 1));
+    expect(isCloseOperationPermitted(report)).toEqual({
+      permitted: false,
+      reason: "acceptance-denied",
+    });
+  });
+});
+
 
 
 
@@ -1682,7 +1822,7 @@ describe("終了判定記録の書出し（変更後の正規完了判定への�
   test("実経路: 必須項目（対象Issue番号・判定対象版・判定生成時刻・判定内容）と受理状態をmain repo rootへ書き出す", () => {
     const runner = fakeRunner({ issueBody: "- [x] 条件1\n" });
     const report = runCloseMechanicalSteps(
-      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      preMergeInput({ acceptanceVerdicts: [soundPass(CID1)] }),
       runner,
     );
     expect(report.result.exitCategory).toBe("success");
@@ -1706,7 +1846,7 @@ describe("終了判定記録の書出し（変更後の正規完了判定への�
   test("実経路: PR なし構成（prNumber 0）では受入評価・機械受理・契約状態記録検査の成立で accepted=true の終了判定記録を書き出す", () => {
     const runner = fakeRunner({ issueBody: "- [x] 条件1\n" });
     const report = runCloseMechanicalSteps(
-      preMergeInput({ prNumber: 0, acceptanceVerdicts: [soundPass("AC-1")] }),
+      preMergeInput({ prNumber: 0, acceptanceVerdicts: [soundPass(CID1)] }),
       runner,
     );
     expect(report.result.exitCategory).toBe("success");
@@ -1733,7 +1873,7 @@ describe("終了判定記録の書出し（変更後の正規完了判定への�
       integrityExitCodes: { check_integrity: 1 },
     });
     const report = runCloseMechanicalSteps(
-      preMergeInput({ prNumber: 0, acceptanceVerdicts: [soundPass("AC-1")] }),
+      preMergeInput({ prNumber: 0, acceptanceVerdicts: [soundPass(CID1)] }),
       runner,
     );
     const polling = report.result.steps.find((s) => s.name === "mergeable-polling");
@@ -1752,7 +1892,7 @@ describe("終了判定記録の書出し（変更後の正規完了判定への�
       preMergeInput({
         prNumber: 0,
         acceptanceVerdicts: [
-          { conditionId: "AC-1", required: true, category: "fail", grounds: {} },
+          { conditionId: CID1, required: true, category: "fail", grounds: {} },
         ],
       }),
       runner,
@@ -1792,8 +1932,8 @@ describe("終了判定記録の書出し（変更後の正規完了判定への�
     runCloseMechanicalSteps(
       preMergeInput({
         acceptanceVerdicts: [
-          soundPass("AC-1"),
-          { conditionId: "AC-2", required: true, category: "fail", grounds: {} },
+          soundPass(CID1),
+          { conditionId: CID2, required: true, category: "fail", grounds: {} },
         ],
       }),
       runner,
@@ -1807,13 +1947,13 @@ describe("終了判定記録の書出し（変更後の正規完了判定への�
     expect(record.accepted).toBe(false);
     expect(record.judgment.determined).toBe(true);
     expect(record.judgment.closeAllowed).toBe(false);
-    expect(record.judgment.blockingUnmet).toEqual(["AC-2"]);
+    expect(record.judgment.blockingUnmet).toEqual([CID2]);
   });
 
   test("後段gate失敗時は受理なしの記録を書き出し、旧accepted記録を無効化する（issue_reopen 無効化の維持）", () => {
     const issueUpdatedAt = "2026-11-05T08:00:00Z";
     const input = {
-      ...preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      ...preMergeInput({ acceptanceVerdicts: [soundPass(CID1)] }),
       issueUpdatedAt,
     } as unknown as CloseMechanicalInput;
     const runner = fakeRunner({
@@ -1855,7 +1995,7 @@ describe("終了判定記録の書出し（変更後の正規完了判定への�
       }),
     });
     const report = runCloseMechanicalSteps(
-      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      preMergeInput({ acceptanceVerdicts: [soundPass(CID1)] }),
       runner,
     );
     const recordPath = path.join("<repo>", ".agentdev", "close-acceptance", "issue-3931.json");
@@ -1891,7 +2031,7 @@ describe("終了判定記録の書出し（変更後の正規完了判定への�
     });
     delete runner.writeTextFile;
     const report = runCloseMechanicalSteps(
-      preMergeInput({ acceptanceVerdicts: [soundPass("AC-1")] }),
+      preMergeInput({ acceptanceVerdicts: [soundPass(CID1)] }),
       runner,
     );
     const acceptanceRecord = report.diff.closeAcceptanceRecord as { written: boolean; accepted: boolean };
@@ -1917,7 +2057,7 @@ describe("終了判定記録の書出し（変更後の正規完了判定への�
       preMergeInput({
         repoRoot: tempRoot,
         worktreeRoot: "nested-worktree",
-        acceptanceVerdicts: [soundPass("AC-1")],
+        acceptanceVerdicts: [soundPass(CID1)],
       }),
       runner,
     );
