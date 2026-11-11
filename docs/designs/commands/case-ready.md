@@ -90,7 +90,7 @@ Definition 保存内部責務（case-ready / case-revise）は、draft の artif
 
 case-ready の機械工程（設計PRの忠実性・整合性・品質検査の実行、overlap 突合、AUTOGEN 対象 block の再生成差分検出、traceability check、merge 後の canonical 再取得、draft/RU 削除の git rm と明示パス指定 commit）は、工程別 script 1 回の呼び出しに束ねる。GitHub I/O（pr_read、pr_merge、Issue 本文更新）は Custom Tool agentdev_gh の境界を維持する。REQ/Decision/Design の保存実体（Capability Skill 委譲による保存手続き）は本 script の対象外とし、保存責務の委譲構造を変更しない。
 
-- 入力 JSON / 報告 JSON / 終了コードの契約、品質ゲートの script 内実行（省略禁止）、inspect_cross_dependencies.ts と同じ作り（共通基盤不作成）、意味判断のモデル担当は、case-open Design「機械工程の script 呼び出し契約（RU-0162）」節と同一の規律に従う
+- 入力 JSON / 報告 JSON / 終了コードの契約、品質ゲートの script 内実行（省略禁止）、inspect_cross_dependencies.ts と同じ作り（反復可能な機械処理に限り agentdev-artifact-validation 所有の共有 lib を supported lib interface 経由で利用できる。工程固有のゲート選択・順序・実行条件・結果解釈は各工程の Design が所有し続け、横断的な共通基盤を新設しない）、意味判断のモデル担当は、case-open Design「機械工程の script 呼び出し契約（RU-0162）」節と同一の規律に従う
 - canonical 再取得の fetch・ff-only merge が失敗した場合は、ローカル main と origin/main の分岐の有無（ahead/behind の件数とコミット一覧）を検出し、報告 JSON の該当 step detail へ反映する。script は分岐を自動解消せず、解消は agentdev-git-worktree の「Squash merge 後分岐ハンドリング手順」（git-common-procedures.md）に従う（REQ-061-052）。同手順の処理分岐（完全重複・部分重複・独立変更）と case-close STEP-4-3 からの既存参照を変更しない
 - 報告 JSON には検査結果、再生成差分、警告、提案する Issue/PR 本文を含め、モデルは報告 JSON の意味レビューと agentdev_gh による I/O 実行のみを担う
 - workflow skill 参照文面は script 呼び出しと報告 JSON 解釈へ置き換えて短縮する
