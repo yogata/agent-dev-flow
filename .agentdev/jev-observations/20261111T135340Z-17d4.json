@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261111T135340Z-17d4",
+  "workflow": "case-ready",
+  "evaluationKind": "scope-overlap-detection",
+  "subject": "Root Case #4004（ADF簡素化 C-α2 小修正 F-2〜F-9・Standard Case）の既存オープン Issue とのスコープ重複判定",
+  "sourceRevision": "0b7f37254f21dba759bbe9898893cd36b2b23d37",
+  "durationMs": 839,
+  "inputTokens": 1531,
+  "inputs": {
+    "requestDigest": "d63cf57fd55b669a1ccba11c022c8ef9f8a43c02b917b52328b1e4f27f92ca05"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "scope-overlap",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.33,
+        "false": 0.6699999999999999
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "scope-overlap",
+        "value": false
+      }
+    ]
+  }
+}
