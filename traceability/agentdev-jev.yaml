@@ -30,6 +30,7 @@ implementation:
     - REQ-090-016
     - REQ-090-017
     - REQ-090-023
+    - REQ-090-030
   src/common/tools/agentdev-jev/provider.ts:
     - REQ-090-022
   src/common/tools/agentdev-jev/adapter-cloudflare/index.ts:
@@ -62,6 +63,7 @@ verification:
     - REQ-090-017
     - REQ-090-018
     - REQ-090-023
+    - REQ-090-030
   src/common/tools/agentdev-jev/tests/index.test.ts:
     - REQ-090-002
     - REQ-090-003
