@@ -458,3 +458,19 @@ describe("fail-open と中断耐性（TS-007）", () => {
     expect(content.confidence).toBeCloseTo(0.91);
   });
 });
+
+
+// mkdtemp の作業フォルダーは使い捨てのため、この試験ファイルの終わりに自分の接頭辞の物を掃く。
+import { afterAll } from "bun:test";
+import * as cleanupFs from "node:fs";
+import * as cleanupOs from "node:os";
+import * as cleanupPath from "node:path";
+
+afterAll(() => {
+  const prefixes = ["jev-index-"];
+  const tmp = cleanupOs.tmpdir();
+  for (const entry of cleanupFs.readdirSync(tmp)) {
+    if (!prefixes.some((p) => entry.startsWith(p))) continue;
+    cleanupFs.rmSync(cleanupPath.join(tmp, entry), { recursive: true, force: true });
+  }
+});

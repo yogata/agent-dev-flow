@@ -177,3 +177,19 @@ describe("launcher / runLauncher protected-path rejection", () => {
     }
   }, 60000);
 });
+
+
+// mkdtemp の作業フォルダーは使い捨てのため、この試験ファイルの終わりに自分の接頭辞の物を掃く。
+import { afterAll } from "bun:test";
+import * as cleanupFs from "node:fs";
+import * as cleanupOs from "node:os";
+import * as cleanupPath from "node:path";
+
+afterAll(() => {
+  const prefixes = ["trust-test-"];
+  const tmp = cleanupOs.tmpdir();
+  for (const entry of cleanupFs.readdirSync(tmp)) {
+    if (!prefixes.some((p) => entry.startsWith(p))) continue;
+    cleanupFs.rmSync(cleanupPath.join(tmp, entry), { recursive: true, force: true });
+  }
+});
