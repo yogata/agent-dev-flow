@@ -3,7 +3,7 @@
 // 環境依存の実装詳細（gh オプション運用、--input によるファイル渡し、
 // UTF-8 BOM なし一時ファイル、シェルを経由しない引数配列での gh 呼び出し、
 // REST API による title/body 投入、応答の正規化）はすべて本ファイルの内側に
-// 隠蔽する（REQ-{NNNN}-{NNN}）。呼び出し側（engine / plugin）には現れない。
+// 隠蔽する（GitHub I/O の Tool 内部完結契約条項）。呼び出し側（engine / plugin）には現れない。
 //
 // 実行方式:
 //   - gh は node:child_process の spawnSync（シェル不使用、引数配列）で呼ぶ。
@@ -637,7 +637,7 @@ export class CliRunner implements GhRunner {
     });
   }
 
-  /** `gh pr view --json` を使う読み取り（pr_read / pr_mergeable）。mergeable は時間変動値のため単一読取の正規化結果を返す。isDraft は GitHub Draft 状態の観測値（REQ-{NNNN}-{NNN}）。 */
+  /** `gh pr view --json` を使う読み取り（pr_read / pr_mergeable）。mergeable は時間変動値のため単一読取の正規化結果を返す。isDraft は GitHub Draft 状態の観測値（設計PRの状態契約条項）。 */
   private prView(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
     if (number === null) return this.fail("pr view requires number", 0, "invalid-input");

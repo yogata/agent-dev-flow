@@ -12,7 +12,7 @@ squash merge 先は main とし、同期時のリスク事前検出を行う。
 Case 状態モデルでは active から closed への遷移を担い、停止時は Root Case 指定の再開入口（case-close）を停止報告へ記録する（Root Case の status は実行継続のまま active を維持する。失敗・未完了はマージ結果等の記録で表現する）。再開時は Root Case 指定による経路解決（正規状態、実行構成、既存成果物、実行の生存状況の照合）に従い未完了 STEP を続行する。
 完了判定は最終的な要求充足の根拠を確認し、PR のマージや Issue の終了だけを根拠に完了と宣言しない。外部副作用は成果物の作成と区別し、確認済みの権限・安全条件を満たす範囲に限定する。
 
-case-close command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
+case-close command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（Command / Workflow Skill / Capability Skill 責務3層分化の Decision、case-close 実行契約〔完了条件照合・整合確認・結果分離報告・capture 分離回収〕）。
 
 ## 入力
 
@@ -36,14 +36,14 @@ case-close command は公開 interface（入出力契約・ガードレール）
 
 case-close workflow は次の STEP で構成する。
 Epic Wave クローズは STEP-1 のルーティングで分岐し、E1〜E6 として並列記述する。
-各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<foundations/v4-durable-state-and-recovery>.md`）。
+各 STEP は再開ポイント（resume point）を持つ（STEP resume point と会話記憶非依存の Decision、`docs/designs/<foundations/v4-durable-state-and-recovery>.md`）。
 会話コンテキストに依存せず、永続状態（GitHub Issue/PR、`.agentdev/`、commit hash、Design status）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
 | STEP-1 | Issue 番号解決・ルーティング | Issue 番号受領 | 単一 Issue クローズ または Epic Wave クローズのルート確定 | [references/issue-resolution-and-qg4.md](references/issue-resolution-and-qg4.md) |
 | STEP-2 | QG-4 達成判定 | ルート確定（単一 Issue） | 完了条件チェックボックス評価・更新、観点8 評価スコープ確定 | [references/issue-resolution-and-qg4.md](references/issue-resolution-and-qg4.md) |
-| STEP-3 | docs 検証・Design 確定（配布依存境界 最終 gate 含む） | QG-4 合格 | targeted docs guard、IR-{NNN} check_extensions.ts、配布依存境界 最終 gate、full integrity suite 実行（bun test 実行形態契約）、Design 状態評価（棚卸し制：PR 本文申告候補の統合を含む全件評価）・Design status 昇格 | [references/docs-and-design-promotion.md](references/docs-and-design-promotion.md) |
+| STEP-3 | docs 検証・Design 確定（配布依存境界 最終 gate 含む） | QG-4 合格 | targeted docs guard、project-extensions 整合性検査（check_extensions.ts）、配布依存境界 最終 gate、full integrity suite 実行（bun test 実行形態契約）、Design 状態評価（棚卸し制：PR 本文申告候補の統合を含む全件評価）・Design status 昇格 | [references/docs-and-design-promotion.md](references/docs-and-design-promotion.md) |
 | STEP-4 | PR マージ・コンフリクト解消 | docs 検証合格（配布依存境界 最終 gate 含む） | マージ済みPR（squash merge 先は main）、HEAD commit hash 記録、コンフリクト Level 1 解消 または case-auto エスカレーション | [references/pr-merge-and-conflict.md](references/pr-merge-and-conflict.md) |
 | STEP-5 | Post-merge・Issue クローズ | PR マージ完了 | CI 通過確認、Issue 本文更新、Issue close | [references/cleanup-and-capture.md](references/cleanup-and-capture.md) |
 | STEP-6 | クリーンアップ・Capture 回収・永続化 | Issue クローズ完了 | worktree/ローカルブランチ削除、親Epic 自動クローズ、実行前同期、Capture 回収、学び検知、`.agentdev/` 永続化、tmp/ 残存確認、完了報告 | [references/cleanup-and-capture.md](references/cleanup-and-capture.md) |
@@ -57,10 +57,10 @@ Epic Wave クローズは STEP-1 のルーティングで分岐し、E1〜E6 と
 - **PR なし特例フロー（docs_chore、main 直接 push 済み）**: STEP-1（特例ルート）→ STEP-2 → STEP-3 → STEP-5 → STEP-6。PR 関連処理（STEP-4、STEP-5 の CI 通過確認等 PR 依存部分）は N/A とし、既存 commit を最終成果物として QG-4（STEP-2）は直接 commit 内容で検証する。適用条件と実装系 feature/fix への適用除外は case-close command の特例フローセクションを正とする
 - **verify-only closure（PR も carrier commit も存在しない Issue 完了）**: 単一 Issue クローズのルート分岐に従い、STEP-2 QG-4 達成判定の判定根拠を case-run が記録した SSoT コメント（Issue コメント）から参照する。docs_chore 特例フロー（main 直接 commit が存在する PR なし完了）は直接 commit 内容で QG-4 を検証するため、verify-only closure とは判定根拠が異なる。SSoT コメント参照手順と不在時の完了抑止は [references/issue-resolution-and-qg4.md](references/issue-resolution-and-qg4.md) の STEP-2 を参照する
 
-### 共通事前マージ gate（両ルート共通、DEC-{N}、配布依存境界 Design）
+### 共通事前マージ gate（両ルート共通、配布依存境界の多層 enforcement の Decision、配布依存境界 Design）
 
 配布依存境界の最終 gate は single-Issue ルート（STEP-3-1）と Epic Wave ルート（STEP-E4-1）の両方で、PR マージ前に必ず経由する共用事前マージ seam である。
-両ルートとも同一 detector（`check_distribution_boundary.ts` 経由の `lib/distribution-boundary.ts`、IR-{NNN}）を呼び出し、どちらかのルートだけ gate を省略しない（DEC-{N}「事前書き込み gate と最終 gate の契約」、case-run command STEP-S5 と case-close で同一 detector を再利用）。
+両ルートとも同一 detector（`check_distribution_boundary.ts` 経由の `lib/distribution-boundary.ts`、distribution-reference-boundary）を呼び出し、どちらかのルートだけ gate を省略しない（配布依存境界の多層 enforcement の Decision「事前書き込み gate と最終 gate の契約」、case-run command STEP-S5 と case-close で同一 detector を再利用）。
 gate 違反時は両ルートとも PR マージを停止する。
 
 ### 再開プロトコル（resume protocol）
@@ -102,7 +102,7 @@ gate 違反時は両ルートとも PR マージを停止する。
 - **検証の成功と後片付けの区別**: 検証の成功と後片付けの未達を区別して報告する。中止・失敗・異常終了は既存の停止・再開経路で扱い、作業の中止と後片付けを含む全責任の完遂を混同しない
 ## 主要 Capability Skill 連携
 
-本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
+本スキルは次の Capability Skill を名レベルで参照する。他 Skill の内部構造（protocol 名、Step 名、Section 名、見出し名、references 内部パス）へ直接依存しない。
 
 - `agentdev-quality-gates`: QG-4 Final Acceptance Gate、観点8 PR対象範囲 vs 全体 判定マトリクス
 - Custom Tool `agentdev_gh`: PR merge / pr_mergeable（UNKNOWN ポーリングは workflow 側）/ Issue close。ローカル版の pr_merge は取り込み結果の記録（commitHash 実在 VERIFY 含む）であり、取り込み実行の主体は case-close である（references/pr-merge-and-conflict.md「ローカル版 PR マージ（取り込み）の手順」節）
@@ -118,7 +118,7 @@ gate 違反時は両ルートとも PR マージを停止する。
 - `agentdev-conventional-commits`: GitHub auto-close 回避ガイドライン
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 - `agentdev-traceability`: トレーサビリティ能力（check。QG-4 の対応完全性の独立再検査。fail-open）
-- integrity checker skill（リポジトリ固有・配布対象外）: check_changed_docs.ts（targeted docs guard）、check_extensions.ts（IR-{NNN}）
+- integrity checker skill（リポジトリ固有・配布対象外）: check_changed_docs.ts（targeted docs guard）、check_extensions.ts（project-extensions 整合性検査）
 
 ## トレーサビリティ能力の利用（QG-4 独立再検査）
 
@@ -154,6 +154,6 @@ case-close は、完了判定（STEP-2 QG-4）と完了記録（記録コメン�
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
 - **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
-- **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
-- **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
+- **Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則の Decision**: 責務3層分化の採用記録（docs/decisions/ 配下）
+- **STEP resume point と会話記憶非依存の Decision**: STEP resume point 採用の記録（docs/decisions/ 配下）
 - **case-close command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

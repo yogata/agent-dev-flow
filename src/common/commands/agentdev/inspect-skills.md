@@ -48,7 +48,7 @@ Command→Skill 参照妥当性と Skill 構造を、検査対象を直接修正
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-inspect-skills` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
+本コマンドは workflow 実装本体を `agentdev-workflow-inspect-skills` スキルへ委譲する（責務3層分化と1:N分割原則、検出コマンド実行契約要件）。
 工程、分岐、再開、停止などの高水準の実行構造は同スキルの制御平面（control plane）が所有する。
 エラー処理（対象ファイル不存在時は空扱い警告、読込失敗時はスキップ警告、参照先 Skill 不存在時は検出事項として報告）も同スキルが所有する。
 

@@ -161,7 +161,15 @@ describe("Definition acceptance scenarios (TS-003)", () => {
   const doc = read(REF_DEF_REL);
 
   test("(a) agreed projection: merges without extra approval", () => {
-    expect(doc).toMatch(/人間に留保された判断（REQ-\{NNNN\}-\{NNN\}）の新規確定が不要で、既存の正規契約から導出できる解消と委譲された裁量の範囲内の判断である（上記3検査が pass し、必須受け入れ義務の欠落・縮小・反転を含む合意済み意味内容からの逸脱がない）場合、追加の人間承認を要求せず/);
+    // REQ-061-001: 合意済みの意味内容への忠実性と必要な受入検査の合格が merge 判定の前提であること。
+    expect(doc).toMatch(/忠実な投影であることを確認する/);
+    expect(doc).toMatch(/上記3検査が pass し、必須受け入れ義務の欠落・縮小・反転を含む合意済み意味内容からの逸脱がない/);
+    // REQ-061-002: 人間に留保された判断の新規確定が不要な場合、追加承認なしで設計PRを統合すること。
+    // 前提（新規確定が不要）と結論（追加の人間承認を要求せず merge）が同一の merge 判定文中に
+    // 結合していることを検証する（「追加承認なし」の文字列単独の緩和検出は行わない）。
+    expect(doc).toMatch(/人間に留保された判断（ADF 判断アーキテクチャの人間判断境界が定める）の新規確定が不要で[^。]*追加の人間承認を要求せず設計PRを merge する/);
+    // REQ-061-003 / REQ-096-005: 人間に留保された判断が必要な場合は停止し、既存 PR を保持すること。
+    expect(doc).toMatch(/新規に確定する必要がある場合、または既存の安全境界が要求する操作承認を要する場合は停止し、既存 PR を保持したままユーザー判断を求める/);
   });
 
   test("(b) no Definition PR (no-change case): proceeds without creating an empty PR", () => {

@@ -1,12 +1,12 @@
 /**
- * 共通結果型と stdout/stderr 出力ヘルパー（REQ-{NNNN}-{NNN} I/O 契約）。
+ * 共通結果型と stdout/stderr 出力ヘルパー（公開検証契約の JSON 結果・エラー契約）。
  *
  * 本スキル (agentdev-design-file-manager) の Design 固有スクリプト群が利用する。
  * 成功時は ok: true を含み、エラー時は非ゼロ終了コード + stderr メッセージとする。
  *
  * 共通検証スクリプト (check-frontmatter-consistency / check-entry-existence /
  * check-change-impact) は agentdev-artifact-validation の公開検証契約へ委譲する
- * ため、本ファイルには Design 固有の search 結果型のみを含む（REQ-{NNNN}-{NNN}/032）。
+ * ため、本ファイルには Design 固有の search 結果型のみを含む（共通検証 script と共有 lib の所有は agentdev-artifact-validation に一つに集約）。
  */
 
 export type SearchOk = {

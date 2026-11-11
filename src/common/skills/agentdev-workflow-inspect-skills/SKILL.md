@@ -8,11 +8,11 @@ description: "inspect-skills workflow 本体。Command→Skill 参照、Skill �
 inspect-skills command の workflow 実装本体である。
 Command/Skill 参照妥当性と Skill 構造の診断から、検出事項の分類、推奨経路の提示、`.agentdev/inspect/inbox/` 出力、`.agentdev/inspect/` 配下の git 永続化、完了報告までの制御構造を所有する。
 
-inspect-skills command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
+inspect-skills command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（責務3層分化と1:N分割原則、検出と診断コマンド群の要件〔命名統一・公開 command 集合・diagnostics 命名限定・inbox 出力と reject 即時削除〕）。
 
 ## 型判定: read-only-diagnostic型（STEP model 対象外）
 
-本スキルは read-only-diagnostic型（検査対象を直接修正しない診断専用の型）であり、STEP model の対象外である（REQ-{NNNN}-{NNN}）。
+本スキルは read-only-diagnostic型（検査対象を直接修正しない診断専用の型）であり、STEP model の対象外である（Capability Skill・代表ケース検証要件の read-only-diagnostic 型除外条項）。
 **STEP resume point / export / import を持たない**。
 
 - 工程は先頭から通しで実行する。中断が発生した場合は workflow を最初から再実行する（診断は対象の読み取りと検出事項ファイルの生成のみの冪等な処理であり、再実行で同等の結果を得る）
@@ -47,7 +47,7 @@ inspect-skills command は公開 interface（入出力契約・ガードレー�
 ## 制御平面（工程一覧）
 
 本スキルの工程一覧を次に示す。
-STEP ラベルは工程順序の整理ラベルであり、**resume point ではない**（read-only-diagnostic型、REQ-{NNNN}-{NNN}）。
+STEP ラベルは工程順序の整理ラベルであり、**resume point ではない**（read-only-diagnostic型の STEP model 対象外条項）。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -62,7 +62,7 @@ STEP ラベルは工程順序の整理ラベルであり、**resume point では
 
 ## 主要 Capability Skill 連携
 
-本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
+本スキルは次の Capability Skill を名レベルで参照する。他 Skill の内部構造（protocol 名、Step 名、Section 名、見出し名、references 内部パス）へ直接依存しない。
 
 - `agentdev-inspect-skills`: 診断観点と判定基準（参照妥当性、粒度、段階的開示、責務境界、canonical name、内部構造依存、配布物構文健全性）
 - `agentdev-git-worktree`: ドメイン状態永続化プロシージャ（並列実行安全ステージング含む）

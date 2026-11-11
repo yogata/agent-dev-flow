@@ -146,7 +146,7 @@ function beforeMeta(payload: unknown): {
   return { role: meta.role, labels };
 }
 
-// 出力 URL: GitHub 実装は https URL、Local 実装（Case ファイル）は絶対パスを識別子として返す（REQ-{NNNN}-{NNN}）。
+// 出力 URL: GitHub 実装は https URL、Local 実装（Case ファイル）は絶対パスを識別子として返す（GitHub 実装と差し替え可能な Local 実装契約条項）。
 function isAcceptedUrl(v: string): boolean {
   return /^https:\/\//.test(v) || v.startsWith("/") || /^[A-Za-z]:[\\/]/.test(v);
 }

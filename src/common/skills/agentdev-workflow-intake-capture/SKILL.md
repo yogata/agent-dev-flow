@@ -9,7 +9,7 @@ intake-capture command の workflow 実装本体である。
 ユーザーの手動入力から未分類の作業候補、不整合、規約違反、未回収課題を intake item として `.agentdev/intake/inbox/` に保存する保存専用 workflow を所有する。
 GitHub Issue の作成、採用可否の判断、review、整形、分類は行わない。
 
-intake-capture command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
+intake-capture command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（責務3層分化と1:N分割原則、intake pipeline 要件〔蓄積・capture 整理・分類確定・配置先限定〕）。
 
 ## 入力
 
@@ -29,7 +29,7 @@ intake-capture command は公開 interface（入出力契約・ガードレー�
 
 ## workflow model（capture-only型、STEP model 対象外）
 
-本スキルは capture-only型の workflow であり、STEP model の対象外である（REQ-{NNNN}-{NNN}）。
+本スキルは capture-only型の workflow であり、STEP model の対象外である（workflow モデル検証要件の capture-only 型除外条項）。
 resume point / export / import を持たない。
 工程は逐次実行し、中断時は workflow を最初から再実行する。
 保存済みファイルとの重複はファイル名への連番付与で吸収するため、再実行は安全である。
@@ -75,7 +75,7 @@ workflow 管理用の frontmatter、状態フィールド、重複排除キー�
 
 ## 主要 Capability Skill 連携
 
-本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
+本スキルは次の Capability Skill を名レベルで参照する。他 Skill の内部構造（protocol 名、Step 名、Section 名、見出し名、references 内部パス）へ直接依存しない。
 
 - `agentdev-git-worktree`: ドメイン状態永続化プロシージャ（並列実行安全ステージング、構造化エラー形式）
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
@@ -94,5 +94,5 @@ workflow 管理用の frontmatter、状態フィールド、重複排除キー�
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
+- **責務3層分化と1:N分割原則**: Command は公開入口、Workflow Skill は工程の実装、Capability Skill は共通能力を所有する。Workflow Skill の分割は制御構造の実質差異に基づき評価し、操作の違いだけでは分割しない
 - **intake-capture command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

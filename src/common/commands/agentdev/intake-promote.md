@@ -28,7 +28,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 |------|------|------|
 | `採用` | 対応すべきと判断。採用済み成果物に整形。inbox 元ファイルは削除 | `/agentdev/backlog-review` |
 | `保留` | 判断を保留。inbox に残す | 再度 `/agentdev/intake-promote` |
-| `却下` | 対応不要と判断。inbox 元ファイルは即時削除（reject commit message に却下理由を含める、AG-{NNN}） | - |
+| `却下` | 対応不要と判断。inbox 元ファイルは即時削除（reject commit message に却下理由を含める、監査証跡条項。現行の正本は intake-promote command Design） | - |
 
 ## 整形の方向性
 
@@ -40,7 +40,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-intake-promote` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
+本コマンドは workflow 実装本体を `agentdev-workflow-intake-promote` スキルへ委譲する（責務3層分化と1:N分割原則、intake pipeline 実行契約要件）。
 工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの制御平面（control plane）が所有する。
 
 ## 自律確定と HITL 境界
@@ -67,7 +67,7 @@ intake-promote の内部 review フェーズにおける分類値は以下の 3 
 - 採用・保留・却下の判断が正規契約からの導出または委譲された裁量の範囲で確定できる item はユーザー承認なしで確定する（自律確定）。人間に留保された判断が必要な item のみを HITL 対象とし、破壊的変更の明示承認は維持する（詳細判定表は v4-responsibility-boundaries Design「ADF判断アーキテクチャ詳細基準」節参照）
 - 整形結果は軽量な成果物として扱う（workflow 管理成果物として扱わない）。frontmatter（route/status 等）、重複排除キー、後続成果物参照は含めない
 - intake 成果物の参照先は inbox/ と promoted/ に限る（accepted/ は廃止済み）
-- 採用 item の inbox 元ファイルは成果物保存後に削除する（.agentdev/intake/archive/promoted/ への移動は廃止）。reject item の inbox 元ファイルは即時削除し、reject 時の commit message に却下理由を含める（AG-{NNN}、監査証跡の補強）
+- 採用 item の inbox 元ファイルは成果物保存後に削除する（.agentdev/intake/archive/promoted/ への移動は廃止）。reject item の inbox 元ファイルは即時削除し、reject 時の commit message に却下理由を含める（監査証跡の補強。現行の正本は intake-promote command Design の監査証跡条項）
 
 ## ガードレール
 

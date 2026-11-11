@@ -55,7 +55,7 @@ REQファイル修正が必要なバグ修正は feature に昇格する（work_
 
 ## Scripts（決定的処理）
 
-`scripts/` 配下の決定的スクリプトが、本スキルが規定する REQ/Decision 採番、要件行 ID 採番を機械的に実行する（design-principles.md 第5節「Script は決定的でテスト可能な処理を担う」、REQ、AG-{NNN}/{NNN}）。
+`scripts/` 配下の決定的スクリプトが、本スキルが規定する REQ/Decision 採番、要件行 ID 採番を機械的に実行する（design-principles.md 第5節「Script は決定的でテスト可能な処理を担う」、REQ、「Script 所有権と委譲契約」）。
 LLM 推論で実行していた決定的処理をスクリプトへ委譲することで、番号の重複、欠番埋めを確実に防止する。
 
 配置先: `.opencode/skills/agentdev-req-file-manager/scripts/`（REQ/Decision 固有採番）。
@@ -64,7 +64,7 @@ LLM 推論で実行していた決定的処理をスクリプトへ委譲する�
 > **移管済み script**:
 > - `search-target-area.ts`（Design ファイル内 target_area 見出し検索）は `agentdev-design-file-manager` へ移管済み。
 > Design 固有処理は同 skill の公開操作契約経由で呼び出す。
-> - 文書種別横断の検証 script（`check-frontmatter-consistency`、`check-entry-existence`、`check-change-impact`）と共有 lib は `agentdev-artifact-validation` へ移管済み（AG-{NNN}、AG-{NNN}、AG-{NNN}、RU-{NNNN}-01 合意）。
+> - 文書種別横断の検証 script（`check-frontmatter-consistency`、`check-entry-existence`、`check-change-impact`）と共有 lib は `agentdev-artifact-validation` へ移管済み（「Script 所有権と委譲契約」による共通検証の所有集約）。
 > 本スキルは公開検証契約へ委譲し、内部 script パスを直接参照しない。
 
 ### I/O 契約（REQ）
@@ -87,7 +87,7 @@ LLM 推論で実行していた決定的処理をスクリプトへ委譲する�
 > `alloc-decision-number.ts`（Decision 固有）は `agentdev-decision-file-manager` へ移管済み（OU-{NNN}）。
 > Decision 番号採番は同 skill の公開操作契約経由で呼び出す。
 
-> frontmatter id↔ファイル名整合性（`check-frontmatter-consistency`）、エントリ存在確認（`check-entry-existence`）、変更範囲検証（`check-change-impact`）は `agentdev-artifact-validation` へ移管済みであり、同 skill の公開検証契約へ委譲する（AG-{NNN}）。
+> frontmatter id↔ファイル名整合性（`check-frontmatter-consistency`）、エントリ存在確認（`check-entry-existence`）、変更範囲検証（`check-change-impact`）は `agentdev-artifact-validation` へ移管済みであり、同 skill の公開検証契約へ委譲する（「Script 所有権と委譲契約」の委譲規則）。
 > 詳細は同 SKILL.md 参照。
 
 ### 実行方法
@@ -104,7 +104,7 @@ cd src/common/skills/agentdev-req-file-manager/scripts && npm test
 
 Definition 保存内部責務と Design 保存内部責務は、REQ番号、Decision番号、要件行IDの採番を `agentdev-req-file-manager` の決定的スクリプトとして bash 経由で呼び出し、JSON 結果を parse して意味判断（NG 時の対応等）を行う（REQ）。
 target_area 見出し検索は、Design 固有処理として `agentdev-design-file-manager` 配下のスクリプトで実行する。
-frontmatter 整合性確認、エントリ存在確認、変更範囲検証は、`agentdev-artifact-validation` の公開検証契約経由で呼び出す（AG-{NNN}）。
+frontmatter 整合性確認、エントリ存在確認、変更範囲検証は、`agentdev-artifact-validation` の公開検証契約経由で呼び出す（「Script 所有権と委譲契約」の委譲規則）。
 詳細は保存内部責務の実行手順を参照。
 
 ---
@@ -173,7 +173,7 @@ REQ間の関連（置き換え、関連、分割元/分割先）もREQ本文内�
 
 ---
 
-## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
+## STEP model 連携（workflow STEP 契約・STEP resume point と会話記憶非依存）
 
 本スキルは Capability Skill として、case-open / case-close / case-ready / case-revise 等の Workflow Skill が所有する STEP から呼び出される（`<workflows/workflow-skill-model>` Design）。
 本スキル自身は STEP を所有しない。

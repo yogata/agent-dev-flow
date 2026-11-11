@@ -1,6 +1,6 @@
 # agentdev-jev（Custom Tool 本体）
 
-Jev 先行評価 Custom Tool `agentdev_jev` の本体（REQ-{NNNN}、DEC-{NNN}）。Plugin（`src/opencode/plugins/agentdev-jev-tool/`）は登録の配線のみを担い、操作契約・正規化・失敗の構造化・観測の形式検証は本 Tool が所有する。
+Jev 先行評価 Custom Tool `agentdev_jev` の本体（Jev 先行評価の実運用組込み要件、Jev 先行評価採用の Decision）。Plugin（`src/opencode/plugins/agentdev-jev-tool/`）は登録の配線のみを担い、操作契約・正規化・失敗の構造化・観測の形式検証は本 Tool が所有する。
 
 判断対象の意味、評価基準、Jev を呼ぶべき箇所、reasoning model による最終判断は Workflow / Capability Skill が所有し、本 Tool は所有しない（機械処理のみ）。
 
@@ -35,5 +35,5 @@ provider 実装は `adapter-cloudflare/` パッケージを動的に解決する
 ## テスト実行
 
 ```bash
-bun test ./tests/   # cwd: repo root（REQ-{NNN}）
+bun test ./tests/   # cwd: repo root（bun test 実行形態契約）
 ```

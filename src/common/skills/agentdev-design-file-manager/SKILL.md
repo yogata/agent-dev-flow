@@ -110,7 +110,7 @@ Design 保存（Design 本体へ要件を反映する case-ready / case-revise �
 
 ## Scripts（決定的処理）
 
-`scripts/` 配下の決定的スクリプトが、本スキルが規定する Design 固有処理を機械的に実行する（design-principles.md 第5節、AG-{NNN}/{NNN}）。
+`scripts/` 配下の決定的スクリプトが、本スキルが規定する Design 固有処理を機械的に実行する（design-principles.md 第5節、「Script 所有権と委譲契約」）。
 LLM 推論で実行していた決定的処理をスクリプトへ委譲することで、target_area マッチングのばらつきを確実に防止する。
 
 配置先: 本スキル配下の `scripts/`（Design 固有）。
@@ -172,7 +172,7 @@ Design の初回作成・増分更新の保存では、書込み直前の適用�
 
 ---
 
-## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
+## STEP model 連携（workflow STEP 契約・STEP resume point と会話記憶非依存）
 
 本スキルは Capability Skill として、case-ready Workflow Skill が所有する STEP の Design 保存内部責務から呼び出される（`<workflows/workflow-skill-model>` Design）。
 本スキル自身は STEP を所有しない。

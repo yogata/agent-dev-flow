@@ -294,7 +294,7 @@ work_type 判定基準と固有ルールは `agentdev-workflow-lifecycle` を参
 関数削除を要求する完了条件の書き方標準である。
 共用関数の包括的削除による破壊的変更を防止する（PR #1140 / #1139 Epic #1138 由来）。
 
-- 関数削除を要求する完了条件は対象スコープ（例: 「from checkX」「IR-{NNN} 由来の context exemption」）を明記すること
+- 関数削除を要求する完了条件は対象スコープ（例: 「from checkX」「整合性ルール由来の context exemption」）を明記すること
 - 関数名列挙による完全削除の代用を禁止する。共用関数、cross-cutting helper は複数 checker から参照される可能性があり、定義削除前に全使用箇所を確認すること
 - 完了条件の checkbox は「対象スコープの明示」と「全使用箇所の確認証拠」を含むこと
 

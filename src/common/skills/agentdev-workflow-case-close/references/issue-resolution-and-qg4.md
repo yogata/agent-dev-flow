@@ -58,7 +58,7 @@ Issue 番号を解決し、単一 Issue クローズと Epic Wave クローズ�
 ### Purpose
 
 Issue 本文の完了条件チェックボックスを最終評価・更新し、達成判定（QG-4）を行う。
-完了条件の評価と状態遷移は、既存の完了条件・証拠からの導出として自律確定する（REQ-{NNNN}-{NNN}。確定権限: 正規契約からの導出）。最終工程であること自体を理由に人間承認を要求しない。修正が必要な場合は正規所有工程（case-run 差し戻し等）へ戻し、人間判断は引き上げ条件（REQ-{NNNN}、`<foundations/v4-responsibility-boundaries>` Design「人間判断への引き上げ条件」節）に該当する場合のみとする。
+完了条件の評価と状態遷移は、既存の完了条件・証拠からの導出として自律確定する（ADF 判断アーキテクチャの case-close 自律確定規定。確定権限: 正規契約からの導出）。最終工程であること自体を理由に人間承認を要求しない。修正が必要な場合は正規所有工程（case-run 差し戻し等）へ戻し、人間判断は引き上げ条件（`<foundations/v4-responsibility-boundaries>` Design「人間判断への引き上げ条件」節が所有）に該当する場合のみとする。
 
 ### Input Resolution
 
@@ -97,7 +97,7 @@ Issue 本文の完了条件チェックボックスを最終評価・更新し�
 - 手順、再 grep/再検査/再計測、事後確認（再読込 VERIFY）、未達項目残存時の停止（完了条件評価専任責務）、test strategy 処理完了確認（未処理項目が残る場合は構造化エラーで停止）の詳細は `agentdev-quality-gates` の QG-4 を参照
 - PR 存在確認
 - **verify-only closure の QG-4 達成判定（SSoT コメント参照）**: verify-only closure（PR も carrier commit も存在しない Issue 完了）では、case-run が記録した SSoT コメント（Issue コメント）の実行コマンド列と検証結果を判定根拠として参照する。PR が存在しないため PR 本文の検証差分セクションは存在せず、SSoT コメントが検証証跡の恒久記録の正となる。SSoT コメントから次の3点を確認する:
-  - 3検査（配布依存境界・IR-{NNN}・トレーサビリティ）の実行記録と新規違反 0 件確認
+  - 3検査（配布依存境界・runtime-unresolved-reference・トレーサビリティ）の実行記録と新規違反 0 件確認
   - integrity suite の N/M 件数突合と直前実績比較
   - 実行コマンド列の再実行可能性（実行 cwd・実行形態の記載）
   SSoT コメントが存在しない verify-only closure、または SSoT コメントに検証結果の記載が欠落している場合は QG-4 不合格として完了扱いにしない。docs_chore 特例フロー（main 直接 commit が存在する PR なし完了）は本手順の対象外であり、直接 commit 内容で QG-4 を検証する

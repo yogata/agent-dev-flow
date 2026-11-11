@@ -1,5 +1,5 @@
 /**
- * 変更範囲検証スクリプト（AG-{NNN}、AG-{NNN}、REQ-{NNNN}-{NNN}/160）。
+ * 変更範囲検証スクリプト（「Script 所有権と委譲契約」による共通検証 script としての正規所有）。
  *
  * 変更対象ファイルパスのリストと、許可パスリスト（glob 風プレフィックス）を比較し、
  * 許可範囲外の変更を検出する。Definition 保存内部責務（case-ready / case-revise の Capability Skill 委譲）の

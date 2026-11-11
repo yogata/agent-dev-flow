@@ -10,7 +10,7 @@ inspect-promote command の workflow 実装本体である。
 `--auto` 明示 opt-in 時は自動 promote 対象カテゴリに合致する検出事項を `.agentdev/intake/promoted/` へ自動投入する。
 finding disposition を STEP resume point として所有する。
 
-inspect-promote command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
+inspect-promote command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（責務3層分化と1:N分割原則、検出と診断コマンド群の要件〔命名統一・公開 command 集合・diagnostics 命名限定・inbox 出力と reject 即時削除〕）。
 
 ## 入力
 
@@ -42,7 +42,7 @@ inspect-promote command は公開 interface（入出力契約・ガードレー�
 ## 制御平面（STEP 一覧）
 
 inspect-promote workflow は次の8 STEP で構成する。
-各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<foundations/v4-durable-state-and-recovery>.md`）。
+各 STEP は再開ポイント（resume point）を持つ（STEP resume point と会話記憶非依存、`docs/designs/<foundations/v4-durable-state-and-recovery>.md`）。
 会話コンテキストに依存せず、永続状態（`.agentdev/inspect/inbox/`、`.agentdev/inspect/promoted/`、`.agentdev/intake/promoted/`、auto-promote-log）から再開点を再構成する。
 **finding disposition（STEP-3〜STEP-7 の分類・採用・保留・却下）は独立した resume point 群を構成する。**
 
@@ -65,7 +65,7 @@ inspect-promote workflow は次の8 STEP で構成する。
 - **inbox 空**: STEP-2 で「対象なし」と報告して終了
 - **unresolved な本質的争点**: STEP-5 でユーザー判断事項として停止（STEP-6 へ進まない）
 
-## resume protocol（DEC-{N}、会話記憶非依存）
+## resume protocol（STEP resume point と会話記憶非依存）
 
 - 各 STEP の再開点は永続状態から再構成する（`<foundations/v4-durable-state-and-recovery>` Design の優先順位に従う）
 - **検出事項ごとの分類確定状態の再構成**: inbox に残存する検出事項は未確定（STEP-3 分類から再開）、`.agentdev/inspect/promoted/` に保存済みの検出事項は promote 確定（再保存しない）、auto-promote-log 記載済みかつ `.agentdev/intake/promoted/inspect-auto-*.md` 投入済みは自動 promote 確定（再投入しない）、inbox から削除済みは reject 確定（復元しない）、inbox 残置かつ処理実行済み報告があるものは defer 確定
@@ -74,7 +74,7 @@ inspect-promote workflow は次の8 STEP で構成する。
 
 ## 主要 Capability Skill 連携
 
-本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
+本スキルは次の Capability Skill を名レベルで参照する（配布成果物の skill 名レベル参照契約）。
 
 - `agentdev-adversarial-review`: inspect-promote の review 呼出（共通契約は同 skill が正規所有）
 - `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ（明示パス stage、`git commit -- <paths>`）
@@ -92,11 +92,11 @@ inspect-promote workflow は次の8 STEP で構成する。
 
 ## 自律確定の判定位置とHITLフォールバック
 
-判断確定の境界は共通原則（REQ-{NNNN}-{NNN}）に従う。自律確定可否の判定基準（人間判断への引き上げ条件の完全な一覧と promote 系への適用。REQ-{NNNN}-{NNN} により自律確定可否は一意性ではなく正規契約からの導出または委譲された裁量の範囲で判定する）は横断契約Design（v4-responsibility-boundaries Design「HITL 判断確定原則」節、extension 経由で解決）が集約所有し、本スキルは判定表を重複保持しない（DEC-{N}）。
+判断確定の境界は共通原則（ADF判断アーキテクチャの確定権限3分類）に従う。自律確定可否の判定基準（人間判断への引き上げ条件の完全な一覧と promote 系への適用。ADF判断アーキテクチャの promote 系自律確定条項により、自律確定可否は一意性ではなく正規契約からの導出または委譲された裁量の範囲で判定する）は横断契約Design（v4-responsibility-boundaries Design「HITL 判断確定原則」節、extension 経由で解決）が集約所有し、本スキルは判定表を重複保持しない（判断方法・確定権限・人間判断境界の統一モデルの Decision）。
 
-- **判定位置**: 分類・検証（STEP-3）と必要な adversarial-review（STEP-5）を経た後、取得可能な根拠から promote / defer / reject を正規契約からの導出または委譲された裁量の範囲で確定できる検出事項は、ユーザー承認なしで確定する（REQ-{NNNN}-{NNN}）
-- **部分自律確定**: 同一実行内に自律確定可能項目とユーザー判断必要項目が混在する場合、未決項目に依存しない項目を先行確定し、ユーザー判断必要項目のみ HITL 対象とする（REQ-{NNNN}-{NNN}）
-- **`--auto` fast path との区別**: `--auto` fast path（自動 promote 対象カテゴリの事前定義による早期処理、明示 opt-in）と通常経路の自律確定（レビュー・検証を経た最終確認省略）は別概念とする。通常の実行によって `--auto` を暗黙的に有効化しない（REQ-{NNNN}-{NNN}）
+- **判定位置**: 分類・検証（STEP-3）と必要な adversarial-review（STEP-5）を経た後、取得可能な根拠から promote / defer / reject を正規契約からの導出または委譲された裁量の範囲で確定できる検出事項は、ユーザー承認なしで確定する（inspect-promote の自律確定と HITL 限定条項）
+- **部分自律確定**: 同一実行内に自律確定可能項目とユーザー判断必要項目が混在する場合、未決項目に依存しない項目を先行確定し、ユーザー判断必要項目のみ HITL 対象とする（inspect-promote の自律確定と HITL 限定条項）
+- **`--auto` fast path との区別**: `--auto` fast path（自動 promote 対象カテゴリの事前定義による早期処理、明示 opt-in）と通常経路の自律確定（レビュー・検証を経た最終確認省略）は別概念とする。通常の実行によって `--auto` を暗黙的に有効化しない（自動昇格の明示オプトイン要件）
 - **報告形式**: 判定結果、主要根拠、HITL不要と判断した理由は既存の分類結果と実行報告（STEP-8 完了報告）を優先利用して報告し、新規永続成果物を必須としない
 
 ## 終了条件（termination）

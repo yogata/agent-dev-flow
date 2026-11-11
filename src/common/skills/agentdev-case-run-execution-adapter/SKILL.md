@@ -199,7 +199,7 @@ plan artifact 等の中間成果物の内部構造には依存しない。
 実行担当サブエージェントは中間成果物の内部構造に依存した処理、検証を行わず、result 契約（4状態）のみで接合する。
 AgentDevFlow の永続状態は既存の draft/ Issue/ PR/ REQ/ Decision/ Design に限定し、中間成果物を永続状態として扱わない。
 
-## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
+## STEP model 連携（workflow STEP 契約・STEP resume point と会話記憶非依存）
 
 本スキルは Capability Skill として、case-run Workflow Skill の `execute` STEP（`agentdev-workflow-orchestration` 参照）から委譲起動される（`<workflows/workflow-skill-model>` Design）。
 本スキル自身は case-run workflow の STEP を所有せず、委譲契約（4状態 result）で case-run 側 STEP へ接合する。
@@ -246,25 +246,25 @@ STEP reference 8 要素は `<foundations/v4-durable-state-and-recovery>` Design 
 
 ## adversarial-review 統合（case-run: adapter 委譲内）
 
-本スキルは case-run の adapter 委譲内（REQ-{NNNN}）における adversarial-review 統合（実装方針形成、review 呼出、結果反映、blocked 遷移）の実行時参照を提供する。
-正規原本は `agentdev-case-run-execution-adapter` Design「adversarial-review 統合（実装方針→review→結果反映）」節である（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}）。
+本スキルは case-run の adapter 委譲内（case-run 実行契約の実装担当サブエージェント委譲規律）における adversarial-review 統合（実装方針形成、review 呼出、結果反映、blocked 遷移）の実行時参照を提供する。
+正規原本は `agentdev-case-run-execution-adapter` Design「adversarial-review 統合（実装方針→review→結果反映）」節である（caller 統合要件の case-run 実装方針条項、重複定義禁止〔一つの意味を一つの正本へ〕）。
 本 SKILL.md は重複定義せず、詳細は `references/adversarial-review-integration.md`「adversarial-review 統合（adapter 委譲内）」節を参照。
 
 呼出元（case-run command）と本スキルの主な契約（詳細は Design と reference を正とする）:
 
 | 契約 | 要件 | 概要 |
 |---|---|---|
-| 実装方針の形成と限定 | REQ-{NNNN}-{NNN} | 委譲内で既確定 Issue/REQ/Decision/Design を実現する内部選択として実装方針を形成する。case-run 本体は形成しない |
-| 実施位置 | REQ-{NNNN}-{NNN} | 最初の実装変更前に実施する（実装、検証、PR 作成より前） |
-| 委譲内 review 呼出 | REQ-{NNNN}-{NNN}/{NNN} | adapter 委譲内で実行担当サブエージェントが発動条件判定（ユーザー明示指定）と review 呼出を分離して実施する |
-| blocked 遷移（実装方針限定違反） | REQ-{NNNN}-{NNN} | 実装方針が既確定文書の変更、追加、撤回を必要とする場合は blocked へ遷移する |
-| blocked 遷移（要件/仕様問題） | REQ-{NNNN}-{NNN} | 要件、仕様問題を検出した場合は勝手に仕様変更せず blocked へ遷移する |
-| blocked 遷移（unresolved 残存） | REQ-{NNNN}-{NNN} | unresolved な本質的争点またはユーザー判断事項が残る場合は実装の最初の変更へ進まず blocked へ遷移する |
-| 従来フロー維持 | REQ-{NNNN}-{NNN} | 発動条件非該当時、呼出失敗時は委譲内の従来フロー（実装方針形成、実装、検証、PR 作成）を維持する |
-| accepted finding 反映 | REQ-{NNNN}-{NNN} | accepted finding の実装方針への反映は adapter 委譲内の実行担当サブエージェント責務 |
-| 再 review 条件 | REQ-{NNNN}-{NNN} | 意味内容変更時のみ再発動可能、同一 finding 再起票禁止（正は adversarial-review Design） |
-| 呼出失敗時の扱い | REQ-{NNNN}-{NNN} | silent skip 禁止、従来フロー維持（正は adversarial-review Design） |
-| 副作用境界 | REQ-{NNNN}-{NNN}/{NNN} | `semantic_review`（書き込み禁止型）、新規 artifact 非生成（正は adversarial-review Design、v4-delegation-contracts Design） |
+| 実装方針の形成と限定 | caller 統合要件・case-run 実装方針限定条項 | 委譲内で既確定 Issue/REQ/Decision/Design を実現する内部選択として実装方針を形成する。case-run 本体は形成しない |
+| 実施位置 | caller 統合要件・実装変更前実施条項 | 最初の実装変更前に実施する（実装、検証、PR 作成より前） |
+| 委譲内 review 呼出 | caller 統合要件・Step 分離条項 | adapter 委譲内で実行担当サブエージェントが発動条件判定（ユーザー明示指定）と review 呼出を分離して実施する |
+| blocked 遷移（実装方針限定違反） | caller 統合要件・実装方針限定 blocked 条項 | 実装方針が既確定文書の変更、追加、撤回を必要とする場合は blocked へ遷移する |
+| blocked 遷移（要件/仕様問題） | caller 統合要件・case-run blocked 経路条項 | 要件、仕様問題を検出した場合は勝手に仕様変更せず blocked へ遷移する |
+| blocked 遷移（unresolved 残存） | caller 統合共通契約・unresolved 時不可逆処理禁止条項 | unresolved な本質的争点またはユーザー判断事項が残る場合は実装の最初の変更へ進まず blocked へ遷移する |
+| 従来フロー維持 | caller 統合共通契約・silent skip 禁止と従来フロー維持条項 | 発動条件非該当時、呼出失敗時は委譲内の従来フロー（実装方針形成、実装、検証、PR 作成）を維持する |
+| accepted finding 反映 | caller 統合共通契約・accepted finding 反映条項 | accepted finding の実装方針への反映は adapter 委譲内の実行担当サブエージェント責務 |
+| 再 review 条件 | caller 統合共通契約・再 review 条件条項 | 意味内容変更時のみ再発動可能、同一 finding 再起票禁止（正は adversarial-review Design） |
+| 呼出失敗時の扱い | caller 統合共通契約・呼出失敗時条項 | silent skip 禁止、従来フロー維持（正は adversarial-review Design） |
+| 副作用境界 | caller 統合共通契約・副作用禁止条項 | `semantic_review`（書き込み禁止型）、新規 artifact 非生成（正は adversarial-review Design、v4-delegation-contracts Design） |
 
 ## See Also
 

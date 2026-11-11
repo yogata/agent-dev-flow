@@ -9,8 +9,8 @@ intake-promote command の workflow 実装本体である。
 `.agentdev/intake/inbox/` 内の intake item を直接読み込み、内部 review フェーズで分類したのち、採用 item を `backlog-review` に渡せる採用済み成果物に整形する制御構造を所有する。
 classification → review → HITL → persistence → destructive handling の各段階を独立 resume point として構成する。
 
-intake-promote command は公開 interface（入出力契約・ガードレール・分類値契約）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
-各 item の分類確定は、横断契約Designの HITL 判断確定原則に基づき、取得可能な根拠から正規契約からの導出または委譲された裁量の範囲で確定できる item を自律確定し、人間判断への引き上げ条件（REQ-{NNNN}、`<foundations/v4-responsibility-boundaries>` Design「人間判断への引き上げ条件」節）に該当する item のみを HITL 対象とする（後述「自律確定とHITL境界」）。
+intake-promote command は公開 interface（入出力契約・ガードレール・分類値契約）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（責務3層分化と1:N分割原則、intake pipeline 要件〔蓄積・capture 整理・分類確定・配置先限定〕）。
+各 item の分類確定は、横断契約Designの HITL 判断確定原則に基づき、取得可能な根拠から正規契約からの導出または委譲された裁量の範囲で確定できる item を自律確定し、人間判断への引き上げ条件（intake 分類確定契約。`<foundations/v4-responsibility-boundaries>` Design「人間判断への引き上げ条件」節）に該当する item のみを HITL 対象とする（後述「自律確定とHITL境界」）。
 
 ## 入力
 
@@ -33,7 +33,7 @@ intake-promote command は公開 interface（入出力契約・ガードレー�
 ## 制御平面（STEP 一覧）
 
 intake-promote workflow は次の6 STEP で構成する。
-各 STEP は再開ポイント（resume point）を持ち（DEC-{N}、`docs/designs/<foundations/v4-durable-state-and-recovery>.md`）、classification / review / HITL / persistence / destructive handling の5段階がそれぞれ独立した再開ポイントである。
+各 STEP は再開ポイント（resume point）を持ち（STEP resume point と会話記憶非依存、`docs/designs/<foundations/v4-durable-state-and-recovery>.md`）、classification / review / HITL / persistence / destructive handling の5段階がそれぞれ独立した再開ポイントである。
 会話コンテキストに依存せず、永続状態（inbox / promoted の実ファイル状態、分類確定状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -55,12 +55,12 @@ intake-promote workflow は次の6 STEP で構成する。
 
 ## 自律確定とHITL境界
 
-各 item の分類確定は、横断契約Design（extension 経由で解決）「HITL 判断確定原則」節（人間判断への引き上げ条件の完全な一覧と promote 系への適用）に基づいて行う。自律確定可否は一意性ではなく、正規契約からの導出または委譲された裁量の範囲かで判定する（REQ-{NNNN}-{NNN}）。本スキルは判定表を重複保持しない（DEC-{N}）。
+各 item の分類確定は、横断契約Design（extension 経由で解決）「HITL 判断確定原則」節（人間判断への引き上げ条件の完全な一覧と promote 系への適用）に基づいて行う。自律確定可否は一意性ではなく、正規契約からの導出または委譲された裁量の範囲かで判定する（intake 分類確定契約の自律確定と HITL 限定条項）。本スキルは判定表を重複保持しない（判断方法・確定権限・人間判断境界の統一モデル）。
 
 - **判定位置**（intake-promote command Design「自律確定の判定位置とHITLフォールバック」節）:
   - classification（STEP-1）: 取得可能な根拠から採用・保留・却下を正規契約からの導出または委譲された裁量の範囲で確定できる item は自律確定候補とする
   - review（STEP-2）: 自律確定候補のうち対論型レビューが必要な item は review を経た後に確定する
-  - HITL（STEP-3）: ユーザー判断が必要な item のみを HITL 対象とする（REQ-{NNNN}-{NNN}）
+  - HITL（STEP-3）: ユーザー判断が必要な item のみを HITL 対象とする（intake 分類確定契約の HITL 限定条項）
   - persistence（STEP-4、STEP-5）: 確定済み分類に従い自動実行する
 - **部分自律確定**: 同一実行内に自律確定可能 item とユーザー判断必要 item が混在する場合、未決項目に依存しない item を先行確定し、ユーザー判断必要 item のみ HITL 対象とする
 - **HITL 提示形式**: STEP-3 ではユーザー判断が必要な item のみを提示し、自律確定済み item は確定内容の報告にとどめる
@@ -70,13 +70,13 @@ intake-promote workflow は次の6 STEP で構成する。
 
 ## 再開プロトコル（永続状態による再開）
 
-会話コンテキストを権威情報源とせず、永続状態から current STEP を再構成する（DEC-{N}）。
+会話コンテキストを権威情報源とせず、永続状態から current STEP を再構成する（STEP resume point と会話記憶非依存）。
 優先順位は `<foundations/v4-durable-state-and-recovery>` Design に従う。
 
 1. SSoT 再構成: `.agentdev/intake/inbox/` と `.agentdev/intake/promoted/` の実ファイル状態
 2. identifier 保持: item ファイルパス、採用済み成果物パス
 3. 最小 scalar: 採用・保留・却下の件数
-4. runtime artifact: 暫定分類表、adversarial-review findings（REQ-{NNNN} lifecycle）
+4. runtime artifact: 暫定分類表、adversarial-review findings（caller 統合共通契約の finding lifecycle）
 
 ### current STEP 再構成規則
 
@@ -95,10 +95,10 @@ HITL（STEP-3）の承認状態は単独では永続状態に記録されない�
 
 ## 主要 Capability Skill 連携
 
-本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
+本スキルは次の Capability Skill を名レベルで参照する。他 Skill の内部構造（protocol 名、Step 名、Section 名、見出し名、references 内部パス）へ直接依存しない。
 
 - `agentdev-intake-pipeline`: inbox 確認、Review 観点、分類提示形式、採用 item 整形、保存と振り分け、Git 永続化の判定基準。intake-promote の review 候補判断と内部手続き
-- `agentdev-adversarial-review`: intake-promote の review 呼出（共通契約の正規所有者は adversarial-review Design、REQ-{NNNN}）
+- `agentdev-adversarial-review`: intake-promote の review 呼出（共通契約の正規所有者は adversarial-review Design。caller 統合共通契約の Design 正規所有条項）
 - `agentdev-git-worktree`: ドメイン状態永続化プロシージャ（並列実行安全ステージング、構造化エラー形式）
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 
@@ -109,7 +109,7 @@ HITL（STEP-3）の承認状態は単独では永続状態に記録されない�
 - **保存先**: `.agentdev/intake/promoted/` 直下のみ（フラット構造）。整形結果に frontmatter（route/status 等）、重複排除キー、後続成果物参照を含めない（command 不変条件）
 - **元 item 不変**: intake item の元の内容は改変しない（整理、構造化のみ、command 不変条件）。元 item の本文に整形結果を書き込まない
 - **accepted/ 廃止**: `.agentdev/intake/accepted/` を参照、使用しない（command 不変条件）
-- **git 永続化**: `.agentdev/intake/` 配下の変更のみを対象とする。commit message は `chore(agentdev): review and promote intake items`（Conventional Commits 形式）。reject item を含む場合は commit message に却下理由を含める（AG-{NNN}、監査証跡の補強）。変更なし時は commit/push せず「変更なし」と報告。push 失敗時は構造化エラー形式で停止（完了扱いにしない）
+- **git 永続化**: `.agentdev/intake/` 配下の変更のみを対象とする。commit message は `chore(agentdev): review and promote intake items`（Conventional Commits 形式）。reject item を含む場合は commit message に却下理由を含める（監査証跡の補強。現行の正本は intake-promote command Design の監査証跡条項）。変更なし時は commit/push せず「変更なし」と報告。push 失敗時は構造化エラー形式で停止（完了扱いにしない）
 - **実行前同期**: `git pull --ff-only` 失敗時は構造化エラーメッセージを表示して停止する（自動解消しない）
 - **完了報告**: template は `.opencode/commands/agentdev/templates/intake-promote/standard.md` に従う。分類結果（採用、保留、却下の件数、一覧。自律確定 item は主要根拠とHITL不要理由を含む）と git 永続化結果を含める
 
@@ -119,6 +119,6 @@ HITL（STEP-3）の承認状態は単独では永続状態に記録されない�
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
 - **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **`<foundations/v4-durable-state-and-recovery>` Design**: 永続状態の優先順位、current STEP 再構成
-- **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
-- **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
+- **責務3層分化と1:N分割原則**: Command は公開入口、Workflow Skill は工程の実装、Capability Skill は共通能力を所有する。Workflow Skill の分割は制御構造の実質差異に基づき評価し、操作の違いだけでは分割しない
+- **STEP resume point と会話記憶非依存**: 安定した STEP 識別子と永続情報から再開点を再構成する。再開点を決める契約と、実行基盤による現在 STEP の選択処理を区別する。
 - **intake-promote command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

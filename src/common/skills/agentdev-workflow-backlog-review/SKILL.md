@@ -7,10 +7,10 @@ description: "backlog-review workflow 本体。採用済み成果物の分析・
 
 backlog-review command の workflow 実装本体である。
 `.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/inspect/promoted/*.md` の採用済み成果物を読み込み、分析、統合してユーザーに判定を提示し、承認後に直接 RU（Requirement Unit）を生成する制御構造を所有する。
-backlog-review が docs/knowledge/ への知識文書保存へ処置すると判定した採用済み成果物（source type は問わない）は、利用者承認後に docs/knowledge/ へ直接保存され、RU 化を経ない。docs/knowledge/ への書き込みは git 永続化対象の副作用である。REQ / Decision / Design 反映、ガードレール移管、Project Extension 接続、通常の Issue による修正等の具体的実現先へのルーティングは learning 由来を含めて行わず、システム変更を必要とするものは RU として req-define へ渡す（REQ-{NNNN}-{NNN}）。
+backlog-review が docs/knowledge/ への知識文書保存へ処置すると判定した採用済み成果物（source type は問わない）は、利用者承認後に docs/knowledge/ へ直接保存され、RU 化を経ない。docs/knowledge/ への書き込みは git 永続化対象の副作用である。REQ / Decision / Design 反映、ガードレール移管、Project Extension 接続、通常の Issue による修正等の具体的実現先へのルーティングは learning 由来を含めて行わず、システム変更を必要とするものは RU として req-define へ渡す（バックログ統合要件の正規昇華経路規定）。
 ユーザー承認は RU 作成承認を兼ねる。
 
-backlog-review command は公開 interface（入出力契約・ガードレール・RU フォーマット委譲契約）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}、REQ-{NNNN}-{NNN}〜{NNN}）。
+backlog-review command は公開 interface（入出力契約・ガードレール・RU フォーマット委譲契約）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（Command / Workflow Skill / Capability Skill 責務3層分化の Decision、バックログ統合要件の成果処理行）。
 
 ## 入力
 
@@ -35,7 +35,7 @@ backlog-review command は公開 interface（入出力契約・ガードレー�
 ## 制御平面（STEP 一覧）
 
 backlog-review workflow は次の8 STEP で構成する。
-各 STEP は再開ポイント（resume point）を持ち（DEC-{N}、`docs/designs/<foundations/v4-durable-state-and-recovery>.md`）、会話コンテキストに依存せず、永続状態（promoted/ 残存成果物、RU-*.md 実ファイルと frontmatter、req-units/ 配下状態）から再開点を再構成する。
+各 STEP は再開ポイント（resume point）を持ち（STEP resume point と会話記憶非依存の Decision、`docs/designs/<foundations/v4-durable-state-and-recovery>.md`）、会話コンテキストに依存せず、永続状態（promoted/ 残存成果物、RU-*.md 実ファイルと frontmatter、req-units/ 配下状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -58,13 +58,13 @@ backlog-review workflow は次の8 STEP で構成する。
 
 ## 再開プロトコル（永続状態による再開）
 
-会話コンテキストを権威情報源とせず、永続状態から current STEP を再構成する（DEC-{N}）。
+会話コンテキストを権威情報源とせず、永続状態から current STEP を再構成する（STEP resume point と会話記憶非依存の Decision）。
 優先順位は `<foundations/v4-durable-state-and-recovery>` Design に従う。
 
 1. SSoT 再構成: `.agentdev/{intake,learning,inspect}/promoted/` と `.agentdev/backlog/req-units/` の実ファイル状態
 2. identifier 保持: 成果物パス、RU-ID（RU frontmatter の `source_type`、`generated_by`、`status`、`depends_on`、`tentative_classification`、`sources`）
 3. 最小 scalar: RU 生成数、統合・分割数、矛盾数
-4. runtime artifact: RU 構成案、adversarial-review findings（REQ-{NNNN} lifecycle）
+4. runtime artifact: RU 構成案、adversarial-review findings（一時成果物ライフサイクル要件）
 
 ### current STEP 再構成規則
 
@@ -83,10 +83,10 @@ RU 実ファイルと docs/knowledge/ の知識文書実ファイル（STEP-7 �
 
 ## 主要 Capability Skill 連携
 
-本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
+本スキルは次の Capability Skill を名レベルで参照する（配布成果物の skill 名レベル参照契約）。
 
 - `agentdev-backlog-integration`: 採用済み成果物の読込、分析、統合・分割判定、depends_on 依存解決、矛盾検出、RU 生成ルール（frontmatter、セクション構成、採番、前工程からの引き継ぎ（upstream handoff）転記）、docs/knowledge/ 知識文書保存・知識の削除・保留の処置判定。backlog-review の review 候補判断と内部手続き
-- `agentdev-adversarial-review`: backlog-review の review 呼出（共通契約の正規所有者は adversarial-review Design、REQ-{NNNN}）
+- `agentdev-adversarial-review`: backlog-review の review 呼出（共通契約の正規所有者は adversarial-review Design、adversarial-review caller integration 共通契約）
 - `agentdev-git-worktree`: ドメイン状態永続化プロシージャ（並列実行安全ステージング、構造化エラー形式）
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open。document-model Design の文書7分類モデルは extension 経由で参照）
 
@@ -107,12 +107,12 @@ agentdev-traceability の coverage、impact、check を一般文書探索、構�
 - **docs/knowledge/ 知識文書保存と backlog 自体の処置**: backlog-review が docs/knowledge/ への知識文書保存へ処置すると判定した採用済み成果物（source type は問わない）は、利用者承認後に docs/knowledge/ へ直接保存され、RU 化を経ない。docs/knowledge/ への書き込みは git 永続化対象の副作用である。docs/knowledge/ 直接保存の手順は次のとおりである（正規原本は backlog-review Design「learning 由来プロジェクト知識の docs/knowledge/ 直接保存」節。実行詳細は [references/contradiction-ru-and-persistence.md](references/contradiction-ru-and-persistence.md) の STEP-7、操作種別判定は `agentdev-backlog-integration` の docs/knowledge/ 知識文書保存と backlog 自体の処置の契約参照）:
   1. 知識候補の内容を知識文書契約（1知識1ファイル、kebab-case slug、必須内容5項目）へ整形する
   2. 既存 docs/knowledge/ 配下ファイルとの重複・陳腐化を確認し、新規、更新、置換、削除の操作種別を判定する
-  3. 操作種別ごとの変更内容を利用者へ提示し、承認を得る。承認なしの書き込みは行わない（REQ-{NNNN}-{NNN}）
+  3. 操作種別ごとの変更内容を利用者へ提示し、承認を得る。承認なしの書き込みは行わない（docs/knowledge/ 知識文書契約の利用者承認要件）
   4. 承認後、docs/knowledge/ へファイルを書き込み、保存に成功した採用済み成果物を promoted から削除する
   REQ / Decision / Design 反映、ガードレール移管、Project Extension 接続、通常の Issue による修正等の具体的実現先へのルーティングは learning 由来を含めて行わず、システム変更を必要とするものは RU として req-define へ渡す。RU 以外への昇華を含む全処置はユーザー承認を経る。ADF リポジトリ外の project-local 資産（Project Extension の接続定義）は直接書き換えず、書き込み先の実行前提（git 管理境界）を明示した指示を完了報告に含める
 - **削除条件**: RU 生成が成功した採用済み成果物、docs/knowledge/ への知識文書保存に成功した採用済み成果物を削除する（当該成果物が RU に取り込まれ、RU ファイルの生成が確認できた場合、または知識文書の保存が確認できた場合）。RU 化・保存に失敗した成果物、矛盾により除外された成果物は残置する。docs/knowledge/ 知識の削除処置と判定された成果物のみ、ユーザーの明示承認を経た上で例外として削除する
 - **非更新対象**: `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md`、`.agentdev/learning/deferred.md` を更新しない
-- **矛盾検出時**: 正規情報源間の未解決規範矛盾に該当するため人間判断へ移行する（REQ-{NNNN}-{NNN}）。ユーザーの指示を待ち、自動的に解決しない。矛盾する artifact を RU 化せずユーザーに確認する。矛盾しない artifact は通常通り RU 化する（partial success）
+- **矛盾検出時**: 正規情報源間の未解決規範矛盾に該当するため人間判断へ移行する（バックログ統合要件の矛盾解決をユーザーへ委ねる規定）。ユーザーの指示を待ち、自動的に解決しない。矛盾する artifact を RU 化せずユーザーに確認する。矛盾しない artifact は通常通り RU 化する（partial success）
 - **破壊的変更の明示承認**: 矛盾解消、要件仕様スコープ変更、大量成果物削除等は明示承認を維持する
 - **git 永続化**: 並列実行安全ステージングプロシージャに従い明示パスでステージする。生成した RU は `.agentdev/backlog/req-units/` 配下、保存・更新・置換・削除した知識文書は `docs/knowledge/` 配下、削除した採用済み成果物は `.agentdev/{intake,learning,inspect}/promoted/` 配下の各パスを `git add <path>`/ `git rm <path>` で明示的にステージする。`.agentdev/` 全体の一括 `git add` は禁止。commit message は `chore(agentdev): generate requirement units via backlog-review`。`git commit -- <paths>`（--only pathspec 形式）を実行し `git push` を行う。失敗時は構造化エラーメッセージを表示して停止する
 - **完了報告**: 全て成功時は `.opencode/commands/agentdev/templates/backlog-review/standard.md`、partial success（矛盾あり）時は `partial.md`、採用済み成果物なし時は `zero-promoted.md` に従う。RU 生成結果、知識文書保存結果、backlog 自体の処置結果（知識の削除、保留）、git 永続化結果を含め、次のコマンド（`/agentdev/req-define`）を提示する
@@ -122,6 +122,6 @@ agentdev-traceability の coverage、impact、check を一般文書探索、構�
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
 - **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **`<foundations/v4-durable-state-and-recovery>` Design**: 永続状態の優先順位、current STEP 再構成
-- **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
-- **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
+- **Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則の Decision**: 責務3層分化の採用記録（docs/decisions/ 配下）
+- **STEP resume point と会話記憶非依存の Decision**: STEP resume point 採用の記録（docs/decisions/ 配下）
 - **backlog-review command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

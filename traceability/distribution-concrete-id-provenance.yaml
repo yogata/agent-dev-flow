@@ -17,12 +17,444 @@
 # 6. src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md :56（参考値）
 #    旧 matched ID: IR-072 / 行内容: "(b) IR-072 req-updated-freshness による frontmatter updated 追随" / 書換後: "(b) req-updated-freshness による frontmatter updated 追随"（規則の記述名で自己完結。規則の詳細は docs/designs/integrity/rules/IR-072-req-updated-freshness.md）
 #
+# Case #3996: case-run SKILL.md の根拠参照7行8出現（基準6bedd394a）を個別照合。
+# L17 DEC-{N}: DEC-010「決定」責務3層分化。本文に3層の所有責務を明記。
+# L52 DEC-{N}: DEC-011「決定」安定STEP識別子・永続情報による再開。
+#   隣接していた仮Designパスも実ファイル v4-durable-state-and-recovery.md と照合し、
+#   配布本文は同じ再開契約を説明する。See Also のDesign概念名参照は維持。
+# L88 REQ-{NNNN}-{NNN}: REQ-002-017。他Skillの内部構造へ直接依存しない契約を本文に明記。
+# L101 IR-{NNN}: IR-056-project-extensions-integrity「検査項目」。
+#   check_extensions.tsとの対応はrule-ownership.mdでも確認。本文に検査内容を明記。
+# L120 第1・第2 REQ-{NNNN}-{NNN}: REQ-101-008 / REQ-101-014。
+#   導入commit cf8586a83で当該段落と同時にagentdev-workflow-case-run.yamlの
+#   implementationへ追加された2行と現行REQ本文を照合。取りまとめ責務・反映待ち読取を本文に明記。
+# L157 DEC-{N}.md: DEC-010「決定」。正式主題に加え責務3層と1:N分割基準を説明。
+# L158 DEC-{N}.md: DEC-011「決定」。正式主題に加え再開契約とharness実処理の区別を説明。
+# 各出現は現行義務の根拠示しであり形式例ではない。番号をconsumerへ直書きせず、
+# 本文だけで責務・再開・検査・記録の内容を判別できる説明へ置換。履歴の同定先は下記linksに保持。
+#
+# Case #3996: artifact-validation SKILL.md、基準6bedd394aの出現別対応。
+# 原参照は8fb17eb83:src/opencode/skills/agentdev-artifact-validation/SKILL.mdで復元。
+# 原合意本文は7c7444f72^:.agentdev/drafts/req-draft-acceptance-centered-responsibility-revision.md
+# のAG-003/009/019とCR-002、および同revisionのRU-20260722-01.mdで確認。
+# L8 第1 AG-{NNN}=AG-003: 共通script/lib単一所有と複製禁止。
+# L8 第2 AG-{NNN}=AG-009: 所有skill内部の直接参照禁止と公開検証契約委譲。
+# L8 第3 AG-{NNN}=AG-019: 公開操作契約を通じた委譲。
+# L8 第4 CR-{NNN}=CR-002: 共通検証script/lib/test所有skill新設、内部直接参照禁止・公開検証契約委譲。
+# L8 第5 RU-{NNNN}-01=RU-20260722-01: 本skillを共通検証・共有lib・公開契約の所有者とする合意。
+#   上記5出現の現行採用先はagentdev-artifact-validation Design「目的」「提供する判断、操作」「境界」。
+# L35 AG-{NNN}/{NNN}/{NNN}=AG-003/009/019: 単一所有・非複製・公開契約委譲。
+# L58 第1 AG-{NNN}=AG-009、第2 AG-{NNN}=AG-019: 内部libパス参照禁止・公開検証契約委譲。
+# L59 AG-{NNN}=AG-003: 同一script/libを複数skillへ複製しない。
+# L95 AG-{NNN}=AG-009: 兄弟skillからの内部lib直接import禁止。
+#   L35/58/59/95の現行採用先はartifact-contracts Design「Script 所有権と委譲契約」L109-127。
+# 本文には責務境界と契約の主題・具体的義務を記述し、consumerが番号やproducer側文書なしで理解可能。
+# L68 REQ-{NNNN}はstdin JSON入力の形式例として保持（根拠示しではない）。
+#
 # links.upstream は、書換対象配布物（下流）から出典正規文書（上流）への対応を機械検査可能な形で保持する
 # （ REQ-021.md / REQ-060.md / REQ-061.md / REQ-108.md は各出典要件行の正規文書、
 #   IR-072-req-updated-freshness.md は出典整合性ルールの詳細、themes.md はテーマ識別子の正本）。
+#
+# Case #3996: adversarial-review SKILL.md の根拠参照24出現（基準6bedd394a）を個別照合。
+# 全出現は現行有効な caller 統合契約・統合要件・審議契約への根拠示し（形式例示・履歴保持なし）。
+# L11 REQ-{NNNN}-{NNN}/{NNN}: REQ-014-013/014「決定」default-on・skip policy 条項。
+# L16 REQ-{NNNN}-{NNN}: REQ-014-001「決定」原則適用・新規ゲート非導入。
+# L17 REQ-{NNNN}: REQ-015（帯）7 caller 対象定義。L17 REQ-{NNNN}-{NNN}: REQ-014-013 default-on。
+# L18 REQ-{NNNN}-{NNN}: REQ-014-014 skip policy 品質要件。
+# L19 REQ-{NNNN}-{NNN}/{NNN}+第2出現: REQ-014-001/002 非導入・非代替、REQ-014-009 恒久ゲート化禁止。
+# L20 REQ-{NNNN}-{NNN}: REQ-082-006「決定」副作用権限非代行。
+# L88 第1REQ-{NNNN}: REQ-015（帯）。L88 REQ-{NNNN}-{NNN}: REQ-015-012 case-auto 停止伝播。
+# L88 第2REQ-{NNNN}: REQ-014-003 共通契約の Design 正規所有。
+# L89 2出現: REQ-014-003 Design 正規所有、REQ-014-011 一つの意味の一つの正本への集約。
+# L95-103 表根拠列: REQ-014-001/002・013・014・004/005・006・007・008・009・010。
+# L105 REQ-{NNNN}-{NNN}: REQ-014-012 user-decision-required 位置づけ。
+# 本文は条項主題の一般化表現で自己完結させ、番号と決定の対応は本 sidecar が保持。
+#
+# Case #3996 E-1/C-γ: 配布物・正典横断の brace 参照（仮番号参照）一括個別分類と解決。
+# 抽出基準: 6bedd394a。抽出対象 954ファイル・{N}/{NNN}/{NNN} 形式込み 602出現（先行修正42出現を除く
+# 対象 560出現をバッチ分割して全件個別分類: 根拠示し=一般化表現（src/common）または実在ID解決（docs 側）へ
+# 編集、形式例示=ID 構文の教示例として保持、履歴保持=過去記録の逐語引用として保持、blocked=正典との
+# 意味不一致として編集せず質問保留。分類別内訳: 根拠示し=379・形式例示=178・履歴保持=3。
+# 個別対応の正本（意味対応の詳細・git 来歴・pin型テスト前置確認）は case 実行内台帳
+# .agentdev/tmp/e3-capture/ledger/batch-{2..10}.md（実行終了時に削除）。本ブロックはその出現別蒸留であり、
+# tmp 削除後も出現→解決先の対応を機械検査可能に保持する。
+#
+# docs/designs/commands/case-open.md (1出現):
+#   106 REQ-{NNNN}-{MMM}〔形式例示〕
+# docs/designs/foundations/decision-lifecycle.md (3出現):
+#   66 DEC-{NNN}〔形式例示〕; 73 DEC-{NNN}〔形式例示〕; 80 DEC-{NNN}〔形式例示〕
+# docs/designs/foundations/document-model.md (5出現):
+#   427第1 REQ-{NNN}〔形式例示〕; 427第2 REQ-{NNN}〔形式例示〕; 428 DEC-{NNN}〔形式例示〕; 430第1 REQ-{NNN}〔形式例示〕
+#   430第2 DEC-{NNN}〔形式例示〕
+# docs/designs/foundations/numbering-policy.md (6出現):
+#   22 REQ-{NNN}-{MMM}〔形式例示〕; 28 REQ-{NNN}〔形式例示〕; 29 DEC-{NNN}〔形式例示〕; 30 IR-{NNN}〔形式例示〕
+#   36 REQ-{NNN}-{MMM}〔形式例示〕; 93 REQ-{NNN}-{MMM}〔形式例示〕
+# docs/designs/foundations/patterns.md (5出現):
+#   28 REQ-{NNN}〔形式例示〕; 36第1 REQ-{NNN}〔形式例示〕; 36第2 REQ-{NNN}-{MMM}〔形式例示〕; 50 REQ-{NNN}-001〔形式例示〕
+#   179 REQ-{NNNN}〔形式例示〕
+# docs/designs/integrity/distribution-boundary.md (1出現):
+#   85 IR-{NNNN}〔形式例示〕
+# docs/designs/integrity/index-auto-generation.md (1出現):
+#   56 DEC-{NNN}〔形式例示〕
+# docs/designs/integrity/integrity-rule-catalog.md (1出現):
+#   258 REQ-{NNNN}〔形式例示〕
+# docs/designs/integrity/rules/IR-025-retired-adr-path-rule.md (2出現):
+#   16 DEC-{NNN}〔形式例示〕; 29 DEC-{NNN}〔形式例示〕
+# docs/designs/integrity/rules/IR-064-unresolved-placeholder.md (6出現):
+#   13第1 REQ-{NNNN}〔形式例示〕; 13第2 DEC-{N}〔形式例示〕; 40 REQ-{NNNN}〔形式例示〕; 41第1 DEC-{N}〔形式例示〕
+#   41第2 REQ-{NNNN}-{NNN}〔形式例示〕; 43 IR-{NNNN}〔形式例示〕
+# docs/designs/integrity/rules/IR-067-referenced-req-row-existence.md (2出現):
+#   13 REQ-{NNNN}-{NNN}〔形式例示〕; 41 REQ-{NNNN}-{NNN}〔形式例示〕
+# docs/designs/integrity/rules/IR-069-req-number-gap-recorded.md (2出現):
+#   16第1 REQ-{NNN}〔形式例示〕; 16第2 REQ-{NNN}〔形式例示〕
+# docs/designs/quality/textlint-quality-runtime.md (1出現):
+#   59 REQ-{NNN}-{MMM}〔形式例示〕
+# docs/designs/responsibilities/document-type-responsibilities.md (1出現):
+#   369 REQ-{NNN}-{NNN}〔形式例示〕
+# docs/designs/skills/agentdev-decision-file-manager.md (3出現):
+#   28 DEC-{NNN}〔形式例示〕; 36 DEC-{NNN}〔形式例示〕; 92 REQ-{NNNN}〔形式例示〕
+# docs/designs/skills/agentdev-req-file-manager.md (1出現):
+#   44 REQ-{NNN}〔形式例示〕
+# docs/designs/skills/agentdev-skill-authoring.md (1出現):
+#   67 REQ-{NNNN}-{NNN}〔形式例示〕
+# docs/designs/skills/agentdev-traceability.md (2出現):
+#   31 REQ-{NNNN}-{MMM}〔形式例示〕; 35 REQ-{NNNN}-{MMM}〔形式例示〕
+# docs/guides/artifacts-and-state.md (4出現):
+#   10 REQ-{NNN}〔形式例示〕; 11 DEC-{NNN}〔形式例示〕; 49 REQ-{NNN}〔形式例示〕; 51 DEC-{NNN}〔形式例示〕
+# docs/guides/diagnostics-and-maintenance.md (1出現):
+#   48 DEC-{NNN}〔形式例示〕
+# docs/guides/glossary.md (2出現):
+#   39 REQ-{NNN}〔形式例示〕; 40 DEC-{NNN}〔形式例示〕
+# docs/guides/project-docs-and-specs.md (2出現):
+#   29 REQ-{NNN}〔形式例示〕; 41 DEC-{NNN}〔形式例示〕
+# docs/reports/integrity/audits/req-045-consistency-audit-20260822.md (2出現):
+#   77第1 DEC-{N}〔履歴保持〕; 77第2 REQ-{NNNN}-{NNN}〔履歴保持〕
+# docs/requirements/README.md (1出現):
+#   122 REQ-{NNN}〔形式例示〕
+# docs/requirements/REQ-010.md (1出現):
+#   38 DEC-{N}〔形式例示〕
+# docs/requirements/REQ-012.md (1出現):
+#   23 REQ-{NNNN}-{MMM}〔形式例示〕
+# docs/requirements/retired/REQ-046.md (1出現):
+#   28 DEC-{N}〔履歴保持〕
+# src/common/commands/agentdev/backlog-auto.md (2出現):
+#   42 DEC-{N}→DEC-010; 42 REQ-{NNNN}-{NNN}→REQ-041
+# src/common/commands/agentdev/backlog-review.md (5出現):
+#   37 DEC-{N}→DEC-010; 37 REQ-{NNNN}-{NNN}→REQ-039; 22第1 REQ-{NNNN}→REQ-039-006; 22第2 REQ-{NNNN}-{NNN}→REQ-056-006
+#   55 REQ-{NNNN}-{NNN}→REQ-056-006
+# src/common/commands/agentdev/inspect-docs.md (2出現):
+#   49 DEC-{N}→DEC-010; 49 REQ-{NNNN}-{NNN}→REQ-036
+# src/common/commands/agentdev/inspect-promote.md (3出現):
+#   39 DEC-{N}→DEC-010; 39 REQ-{NNNN}-{NNN}→REQ-036; 18 AG-{NNN}→（AG→現行正本）
+# src/common/commands/agentdev/inspect-skills.md (2出現):
+#   51 DEC-{N}→DEC-010; 51 REQ-{NNNN}-{NNN}→REQ-036
+# src/common/commands/agentdev/intake-capture.md (2出現):
+#   23 DEC-{N}→DEC-010; 23 REQ-{NNNN}-{NNN}→REQ-037
+# src/common/commands/agentdev/intake-from-github.md (2出現):
+#   25 DEC-{N}→DEC-010; 25 REQ-{NNNN}-{NNN}→REQ-037
+# src/common/commands/agentdev/intake-promote.md (4出現):
+#   43 DEC-{N}→DEC-010; 43 REQ-{NNNN}-{NNN}→REQ-037; 31 AG-{NNN}→（AG→現行正本）; 70 AG-{NNN}→（AG→現行正本）
+# src/common/commands/agentdev/learning-promote.md (4出現):
+#   28 DEC-{N}→DEC-010; 28 REQ-{NNNN}-{NNN}→REQ-038; 41第1 REQ-{NNNN}-{NNN}→REQ-015-002; 41第2 REQ-{NNNN}→REQ-014-003
+# src/common/commands/agentdev/req-define.md (2出現):
+#   32 DEC-{N}→DEC-010; 32 REQ-{NNNN}-{NNN}→REQ-008
+# src/common/commands/agentdev/templates/req-define/req-draft.md (12出現):
+#   44 AG-{NNN}〔形式例示〕; 46 AG-{NNN}〔形式例示〕; 53 REQ-{NNN}〔形式例示〕; 58第1 AG-{NNN}〔形式例示〕
+#   58第2 AG-{NNN}〔形式例示〕; 65 AG-{NNN}〔形式例示〕; 76 AG-{NNN}〔形式例示〕; 106 AG-{NNN}〔形式例示〕
+#   128 AG-{NNN}〔形式例示〕; 61 DEC-{NNN}〔形式例示〕; 83 CR-{NNN}〔形式例示〕; 91 REQ-{NNNN}〔形式例示〕
+# src/common/skills/agentdev-artifact-semantics/scripts/README.md (3出現):
+#   52 REQ-{NNNN}-{MMM}〔形式例示〕; 53 REQ-{NNNN}-{MMM}〔形式例示〕; 58 REQ-{NNNN}-{MMM}〔形式例示〕
+# src/common/skills/agentdev-artifact-semantics/scripts/src/design-basis.ts (1出現):
+#   25 REQ-{NNNN}-{MMM}〔形式例示〕
+# src/common/skills/agentdev-artifact-validation/SKILL.md (1出現):
+#   68 REQ-{NNNN}〔形式例示〕
+# src/common/skills/agentdev-artifact-validation/scripts/README.md (5出現):
+#   3 AG-{NNN}→AG-003/009/019; 58第1 AG-{NNN}→AG-003; 58第2 AG-{NNN}→AG-019; 59 AG-{NNN}→AG-009
+#   60 AG-{NNN}→AG-003
+# src/common/skills/agentdev-artifact-validation/scripts/lib/result.ts (1出現):
+#   2 REQ-{NNNN}-{NNN}→REQ-0103-160
+# src/common/skills/agentdev-artifact-validation/scripts/package.json (2出現):
+#   5第1 REQ-{NNNN}-{NNN}→REQ-0103-159/160; 5第2 AG-{NNN}→AG-003/009/019
+# src/common/skills/agentdev-artifact-validation/scripts/src/check-change-impact.ts (3出現):
+#   2第1 AG-{NNN}→AG-002; 2第2 AG-{NNN}→AG-006; 2第3 REQ-{NNNN}-{NNN}→REQ-0103-159/160
+# src/common/skills/agentdev-artifact-validation/scripts/src/check-entry-existence.ts (6出現):
+#   3第1 AG-{NNN}→AG-002; 3第2 AG-{NNN}→AG-006; 3第3 REQ-{NNNN}-{NNN}→REQ-0103-159/160; 5第1 REQ-{NNNN}〔形式例示〕
+#   5第2 ADR-{NNNN}〔形式例示〕; 9 REQ-{NNNN}〔形式例示〕
+# src/common/skills/agentdev-artifact-validation/scripts/src/check-frontmatter-consistency.ts (3出現):
+#   2第1 AG-{NNN}→AG-002; 2第2 AG-{NNN}→AG-006; 2第3 REQ-{NNNN}-{NNN}→REQ-0103-159/160
+# src/common/skills/agentdev-artifact-validation/scripts/src/check-req-row-existence.ts (3出現):
+#   14 REQ-{NNNN}-{NNN}〔形式例示〕; 67第1 REQ-{NNNN}〔形式例示〕; 67第2 REQ-{NNNN}〔形式例示〕
+# src/common/skills/agentdev-artifact-validation/scripts/tests/check-req-row-existence.test.ts (1出現):
+#   141 REQ-{NNNN}-{NNN}〔形式例示〕
+# src/common/skills/agentdev-backlog-integration/SKILL.md (14出現):
+#   29 REQ-{NNNN}→REQ-015（帯）; 30第1 REQ-{NNNN}-{NNN}→REQ-014-003; 30第2 REQ-{NNNN}-{NNN}→REQ-014-011; 37 REQ-{NNNN}-{NNN}→REQ-015-008
+#   38 REQ-{NNNN}-{NNN}/{NNN}→REQ-015-001/008; 39 REQ-{NNNN}-{NNN}→REQ-015-008; 40 REQ-{NNNN}-{NNN}→REQ-015-008; 41 REQ-{NNNN}-{NNN}→REQ-014-013、REQ-014-014、REQ-015-002、REQ-015-003
+#   42 REQ-{NNNN}-{NNN}→REQ-015-003; 43 REQ-{NNNN}-{NNN}/{NNN}→REQ-014-004/005; 44 REQ-{NNNN}-{NNN}→REQ-014-006; 45 REQ-{NNNN}-{NNN}→REQ-014-007
+#   46 REQ-{NNNN}-{NNN}→REQ-014-009; 47 REQ-{NNNN}-{NNN}→REQ-014-010
+# src/common/skills/agentdev-backlog-integration/references/integration-judgment.md (1出現):
+#   65 RU-{NNNN}〔形式例示〕
+# src/common/skills/agentdev-case-run-execution-adapter/SKILL.md (16出現):
+#   202第1 REQ-{NNNN}-{NNN}→REQ-005-024; 202第2 DEC-{N}→DEC-011; 249 REQ-{NNNN}→REQ-031（帯・委譲規律）; 250第1 REQ-{NNNN}-{NNN}→REQ-015-010
+#   250第2 REQ-{NNNN}-{NNN}→REQ-014-011; 257 REQ-{NNNN}-{NNN}→REQ-015-010; 258 REQ-{NNNN}-{NNN}→REQ-015-010; 259 REQ-{NNNN}-{NNN}/{NNN}→REQ-015-001
+#   260 REQ-{NNNN}-{NNN}→REQ-015-010; 261 REQ-{NNNN}-{NNN}→REQ-015-011; 262 REQ-{NNNN}-{NNN}→REQ-014-009; 263 REQ-{NNNN}-{NNN}→REQ-014-010
+#   264 REQ-{NNNN}-{NNN}→REQ-014-006; 265 REQ-{NNNN}-{NNN}→REQ-014-007; 266 REQ-{NNNN}-{NNN}→REQ-014-010; 267 REQ-{NNNN}-{NNN}/{NNN}→REQ-014-004/005
+# src/common/skills/agentdev-decision-file-manager/SKILL.md (1出現):
+#   87 REQ-{NNNN}〔形式例示〕
+# src/common/skills/agentdev-decision-file-manager/scripts/src/alloc-decision-number.ts (3出現):
+#   2第1 AG-{NNN}→AG-002; 2第2 AG-{NNN}→AG-006; 2第3 REQ-{NNNN}-{NNN}→REQ-0103-159/160
+# src/common/skills/agentdev-design-file-manager/SKILL.md (3出現):
+#   113 AG-{NNN}/{NNN}→AG-002/006; 175第1 REQ-{NNNN}-{NNN}→REQ-005-024; 175第2 DEC-{N}→DEC-011
+# src/common/skills/agentdev-design-file-manager/scripts/README.md (1出現):
+#   3 AG-{NNN}→AG-002/006
+# src/common/skills/agentdev-design-file-manager/scripts/lib/result.ts (2出現):
+#   2 REQ-{NNNN}-{NNN}→REQ-0103-160; 9 REQ-{NNNN}-{NNN}→REQ-0136-029/032
+# src/common/skills/agentdev-design-file-manager/scripts/package.json (2出現):
+#   5第1 REQ-{NNNN}-{NNN}→REQ-0136-029/032; 5第2 AG-{NNN}→AG-002/006
+# src/common/skills/agentdev-design-file-manager/scripts/src/search-target-area.ts (5出現):
+#   2第1 AG-{NNN}→AG-002; 2第2 AG-{NNN}→AG-006; 2第3 REQ-{NNNN}-{NNN}→REQ-0103-159/160; 2第4 REQ-{NNNN}-{NNN}→REQ-0136-029/032
+#   8 REQ-{NNNN}-{NNN}→REQ-0136-029
+# src/common/skills/agentdev-design-file-manager/scripts/tests/search-target-area.test.ts (4出現):
+#   59 IR-{NNN}〔形式例示〕; 60 IR-{NNN}〔形式例示〕; 77第1 IR-{NNN}〔形式例示〕; 77第2 IR-{NNN}〔形式例示〕
+# src/common/skills/agentdev-doc-diagnostics/SKILL.md (2出現):
+#   9第1 AG-{NNN}→AG-008（導入 a76ce162d で復元）→現行正本 REQ-036-011; 9第2 RU-{NNNN}-01→RU-20260722-01（導入 a76ce162d で復元）→現行正本 REQ-036-011
+# src/common/skills/agentdev-git-worktree/references/worktree-operations.md (1出現):
+#   218 REQ-{NNNN}-{MMM}〔形式例示〕
+# src/common/skills/agentdev-inspect-skills/SKILL.md (8出現):
+#   59 IR-{NNN}→IR-053; 60第1 AG-{NNN}→AG-003; 60第2 CR-{NNN}→CR-001; 61 IR-{NNN}→IR-007
+#   97 AG-{NNN}→AG-003; 98 IR-{NNN}→IR-007; 149第1 IR-{NNN}→IR-050; 149第2 IR-{NNN}→IR-051
+# src/common/skills/agentdev-intake-pipeline/SKILL.md (10出現):
+#   27第1 REQ-{NNNN}-{NNN}→REQ-015-006; 27第2 REQ-{NNNN}-{NNN}→REQ-014-011; 31 REQ-{NNNN}-{NNN}→REQ-015-006; 32 REQ-{NNNN}-{NNN}→REQ-015-001
+#   33 REQ-{NNNN}-{NNN}→REQ-015-002; 34 REQ-{NNNN}-{NNN}→REQ-015-003; 36 REQ-{NNNN}→REQ-014-003; 38第1 REQ-{NNNN}-{NNN}→REQ-027-001
+#   38第2 DEC-{N}→DEC-010; 46 REQ-{NNNN}→REQ-014-007
+# src/common/skills/agentdev-issue-management/SKILL.md (1出現):
+#   41 REQ-{NNNN}-{NNN}〔形式例示〕
+# src/common/skills/agentdev-learning-pipeline/SKILL.md (2出現):
+#   73第1 REQ-{NNNN}-{NNN}/{NNN}→REQ-014-014/REQ-015-003; 73第2 REQ-{NNNN}→REQ-014-003
+# src/common/skills/agentdev-quality-gates/SKILL.md (3出現):
+#   43 REQ-{NNNN}-{NNN}→REQ-096-013; 58第1 REQ-{NNNN}-{NNN}/{NNN}→REQ-096-012/013; 58第2 REQ-{NNNN}→REQ-096-005
+# src/common/skills/agentdev-quality-gates/references/common-gate-contract.md (2出現):
+#   14 REQ-{NNNN}-{NNN}/{NNN}→REQ-096-012/013; 77 REQ-{NNNN}-{NNN}→REQ-096-013
+# src/common/skills/agentdev-quality-gates/references/qg-1-definition-integrity.md (1出現):
+#   155 REQ-{NNNN}-{NNN}/{NNN}→REQ-096-012/013
+# src/common/skills/agentdev-quality-gates/references/qg-3-implementation-deviation.md (3出現):
+#   118第1 REQ-{NNNN}-{NNN}→REQ-096-013; 118第2 REQ-{NNNN}-{NNN}→REQ-096-012; 152 REQ-{NNNN}-{NNN}→REQ-096-013
+# src/common/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md (5出現):
+#   95第1 REQ-{NNNN}-{NNN}→REQ-096-012; 95第2 REQ-{NNNN}→REQ-096-005; 95第3 REQ-{NNNN}-{NNN}→REQ-096-017; 521第1 REQ-{NNNN}-{NNN}→REQ-096-013
+#   521第2 REQ-{NNNN}-{NNN}→REQ-096-012
+# src/common/skills/agentdev-req-analysis/SKILL.md (3出現):
+#   89第1 REQ-{NNNN}-{NNN}→REQ-027-001; 89第2 DEC-{N}→DEC-010; 97 REQ-{NNNN}→REQ-008-003
+# src/common/skills/agentdev-req-analysis/references/pass-criteria-writing-guide.md (7出現):
+#   73 REQ-{NNNN}〔形式例示〕; 74 REQ-{NNNN}〔形式例示〕; 78 REQ-{NNNN}〔形式例示〕; 87 REQ-{NNNN}〔形式例示〕
+#   89 REQ-{NNNN}〔形式例示〕; 90 REQ-{NNNN}〔形式例示〕; 92 REQ-{NNNN}〔形式例示〕
+# src/common/skills/agentdev-req-analysis/references/req-define-detailed-gates.md (1出現):
+#   103 REQ-{NNNN}〔形式例示〕
+# src/common/skills/agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md (2出現):
+#   59 AG-{NNN}〔形式例示〕; 95 AG-{NNN}〔形式例示〕
+# src/common/skills/agentdev-req-file-manager/SKILL.md (16出現):
+#   17 REQ-{NNNN}〔形式例示〕; 19 REQ-{NNNN}-{MMM}〔形式例示〕; 47 REQ-{NNNN}〔形式例示〕; 58 AG-{NNN}/{NNN}→AG-002/006
+#   67第1 AG-{NNN}→AG-003; 67第2 AG-{NNN}→AG-009; 67第3 AG-{NNN}→AG-019; 67第4 RU-{NNNN}-01→RU-20260722-01
+#   90 AG-{NNN}→AG-019; 107 AG-{NNN}→AG-019; 114 REQ-{NNNN}〔形式例示〕; 133 REQ-{NNNN}-{MMM}〔形式例示〕
+#   176第1 REQ-{NNNN}-{NNN}→REQ-005-024; 176第2 DEC-{N}→DEC-011; 183 REQ-{NNNN}〔形式例示〕; 184 REQ-{NNNN}〔形式例示〕
+# src/common/skills/agentdev-req-file-manager/references/create-append-update-flow.md (2出現):
+#   15 REQ-{NNNN}〔形式例示〕; 70 REQ-{NNNN}-{MMM}〔形式例示〕
+# src/common/skills/agentdev-req-file-manager/references/matching-and-merge.md (1出現):
+#   161 REQ-{NNNN}〔形式例示〕
+# src/common/skills/agentdev-req-file-manager/references/numbering-and-validation.md (11出現):
+#   10 REQ-{NNNN}〔形式例示〕; 43 REQ-{NNNN}-{MMM}〔形式例示〕; 48 REQ-{NNNN}-{MMM}〔形式例示〕; 68 REQ-{NNNN}〔形式例示〕
+#   75 REQ-{NNNN}〔形式例示〕; 81 REQ-{NNNN}〔形式例示〕; 93 REQ-{NNNN}〔形式例示〕; 106 REQ-{NNNN}〔形式例示〕
+#   120 REQ-{NNNN}〔形式例示〕; 127第1 REQ-{NNNN}〔形式例示〕; 127第2 REQ-{NNNN}〔形式例示〕
+# src/common/skills/agentdev-req-file-manager/references/save-procedure.md (2出現):
+#   30 REQ-{NNNN}〔形式例示〕; 47 REQ-{NNNN}〔形式例示〕
+# src/common/skills/agentdev-req-file-manager/scripts/README.md (4出現):
+#   3 AG-{NNN}→AG-002/006; 5 RU-{NNNN}→RU-0016（同括弧内 OU-{NNN}=OU-002）; 6第1 AG-{NNN}→AG-019; 6第2 RU-{NNNN}-01→RU-20260722-01
+# src/common/skills/agentdev-req-file-manager/scripts/lib/result.ts (1出現):
+#   2 REQ-{NNNN}-{NNN}→REQ-0103-160
+# src/common/skills/agentdev-req-file-manager/scripts/package.json (2出現):
+#   5第1 REQ-{NNNN}-{NNN}→REQ-0103-159/160; 5第2 AG-{NNN}→AG-002/006
+# src/common/skills/agentdev-req-file-manager/scripts/src/alloc-composite-id.ts (4出現):
+#   2第1 AG-{NNN}→AG-002; 2第2 AG-{NNN}→AG-006; 2第3 REQ-{NNNN}-{NNN}→REQ-0103-159/160; 35 REQ-{NNN}-{NNN}〔形式例示〕
+# src/common/skills/agentdev-req-file-manager/scripts/src/alloc-req-number.ts (3出現):
+#   2第1 AG-{NNN}→AG-002; 2第2 AG-{NNN}→AG-006; 2第3 REQ-{NNNN}-{NNN}→REQ-0103-159/160
+# src/common/skills/agentdev-req-file-manager/templates/doc_requirement.md (2出現):
+#   2 REQ-{NNNN}〔形式例示〕; 18 REQ-{NNNN}-001〔形式例示〕
+# src/common/skills/agentdev-req-structure-diagnostics/references/req-structure-review.md (1出現):
+#   11 REQ-{NNNN}〔形式例示〕
+# src/common/skills/agentdev-skill-authoring/references/design-principles.md (2出現):
+#   292 REQ-{NNNN}-{NNN}〔形式例示〕; 295 REQ-{NNNN}-{NNN}〔形式例示〕
+# src/common/skills/agentdev-traceability/SKILL.md (9出現):
+#   14 REQ-{NNNN}-{MMM}〔形式例示〕; 51 REQ-{NNNN}-{MMM}〔形式例示〕; 117 REQ-{NNNN}-{MMM}〔形式例示〕; 124 REQ-{NNNN}-{MMM}〔形式例示〕
+#   130 REQ-{NNNN}-{MMM}〔形式例示〕; 142第1 REQ-{NNNN}-{MMM}〔形式例示〕; 142第2 REQ-{NNNN}-{MMM}〔形式例示〕; 165第1 REQ-{NNNN}〔形式例示〕
+#   165第2 REQ-{NNNN}-{MMM}〔形式例示〕
+# src/common/skills/agentdev-traceability/references/check-interpretation.md (2出現):
+#   85 REQ-{NNNN}-{MMM}〔形式例示〕; 95 REQ-{NNNN}-{MMM}〔形式例示〕
+# src/common/skills/agentdev-traceability/references/sidecar-and-policy.md (7出現):
+#   11 REQ-{NNNN}-{MMM}〔形式例示〕; 17 REQ-{NNNN}-{MMM}〔形式例示〕; 20 REQ-{NNNN}-{MMM}〔形式例示〕; 23 REQ-{NNNN}-{MMM}〔形式例示〕
+#   26 REQ-{NNNN}-{MMM}〔形式例示〕; 88 REQ-{NNNN}-{MMM}〔形式例示〕; 100 REQ-{NNNN}-{MMM}〔形式例示〕
+# src/common/skills/agentdev-traceability/scripts/README.md (6出現):
+#   16 REQ-{NNNN}〔形式例示〕; 48 REQ-{NNNN}-{MMM}〔形式例示〕; 58 REQ-{NNNN}-{MMM}〔形式例示〕; 62 REQ-{NNNN}-{MMM}〔形式例示〕
+#   67第1 REQ-{NNNN}-{MMM}〔形式例示〕; 67第2 REQ-{NNNN}-{MMM}〔形式例示〕
+# src/common/skills/agentdev-traceability/scripts/lib/declarations.ts (2出現):
+#   7 REQ-{NNNN}-{MMM}〔形式例示〕; 131 REQ-{NNNN}-{MMM}〔形式例示〕
+# src/common/skills/agentdev-traceability/scripts/lib/requirements.ts (2出現):
+#   1 REQ-{NNNN}〔形式例示〕; 4 REQ-{NNNN}-{MMM}〔形式例示〕
+# src/common/skills/agentdev-traceability/scripts/lib/sidecar.ts (2出現):
+#   150 REQ-{NNNN}-{MMM}〔形式例示〕; 162 REQ-{NNNN}-{MMM}〔形式例示〕
+# src/common/skills/agentdev-traceability/scripts/lib/verification_scope.ts (2出現):
+#   97 REQ-{NNNN}-{MMM}〔形式例示〕; 114 REQ-{NNNN}-{MMM}〔形式例示〕
+# src/common/skills/agentdev-traceability/scripts/src/check.ts (2出現):
+#   8第1 REQ-{NNNN}-{MMM}〔形式例示〕; 8第2 REQ-{NNNN}-{MMM}〔形式例示〕
+# src/common/skills/agentdev-traceability/scripts/src/coverage.ts (3出現):
+#   4 REQ-{NNNN}-{MMM}〔形式例示〕; 5第1 REQ-{NNNN}-{MMM}〔形式例示〕; 5第2 REQ-{NNNN}-{MMM}〔形式例示〕
+# src/common/skills/agentdev-traceability/scripts/src/impact.ts (3出現):
+#   5 REQ-{NNNN}-{MMM}〔形式例示〕; 6第1 REQ-{NNNN}-{MMM}〔形式例示〕; 6第2 REQ-{NNNN}-{MMM}〔形式例示〕
+# src/common/skills/agentdev-workflow-backlog-auto/SKILL.md (6出現):
+#   13第1 DEC-{N}→DEC-010; 13第2 REQ-{NNNN}-{NNN}→REQ-041-001; 13第3 REQ-{NNNN}-{NNN}→REQ-041-002; 37 DEC-{N}→DEC-011
+#   143 DEC-{N}→DEC-010; 144 DEC-{N}→DEC-011
+# src/common/skills/agentdev-workflow-backlog-review/SKILL.md (12出現):
+#   10 REQ-{NNNN}-{NNN}→REQ-039-006; 13第1 DEC-{N}→DEC-010; 13第2 REQ-{NNNN}-{NNN}〜{NNN}→REQ-039-001〜004; 38 DEC-{N}→DEC-011
+#   61 DEC-{N}→DEC-011; 67 REQ-{NNNN}→REQ-008（帯）; 86 REQ-{NNNN}-{NNN}→REQ-002-017; 89 REQ-{NNNN}→REQ-014-003
+#   110 REQ-{NNNN}-{NNN}→REQ-056-006; 115 REQ-{NNNN}-{NNN}→REQ-039-003; 125 DEC-{N}→DEC-010; 126 DEC-{N}→DEC-011
+# src/common/skills/agentdev-workflow-backlog-review/references/analysis-composition-and-review.md (12出現):
+#   103 REQ-{NNNN}-{NNN}→REQ-096-020; 213 REQ-{NNNN}-{NNN}→REQ-056-006; 231第1 REQ-{NNNN}→REQ-090（帯）; 231第2 DEC-{NNN}→DEC-040
+#   248 REQ-{NNNN}-{NNN}→REQ-090-025; 249 REQ-{NNNN}-{NNN}→REQ-090-026; 263 REQ-{NNNN}-{NNN}→REQ-090-012; 271 REQ-{NNNN}-{NNN}→REQ-090-019
+#   282 REQ-{NNNN}-{NNN}→REQ-090-018; 284 REQ-{NNNN}→REQ-096; 293 REQ-{NNNN}→REQ-090-027; 295 REQ-{NNNN}→REQ-096
+# src/common/skills/agentdev-workflow-backlog-review/references/contradiction-ru-and-persistence.md (2出現):
+#   81第1 REQ-{NNNN}-{NNN}→REQ-056-006; 81第2 REQ-{NNNN}-{NNN}→REQ-039-004
+# src/common/skills/agentdev-workflow-case-auto/references/stop-and-decision-resolution.md (7出現):
+#   68第1 REQ-{NNNN}-{NNN}→REQ-096-012; 68第2 DEC-{N}→DEC-008（決定(4)）; 69 REQ-{NNNN}-{NNN}→REQ-096-005; 182 REQ-{NNNN}-{NNN}→REQ-096-003
+#   183 REQ-{NNNN}-{NNN}/{NNN}→REQ-096-003/006（+015）; 184 REQ-{NNNN}-{NNN}→REQ-096-012; 185 REQ-{NNNN}-{NNN}→REQ-096-005
+# src/common/skills/agentdev-workflow-case-close/SKILL.md (11出現):
+#   15第1 DEC-{N}→DEC-010; 15第2 REQ-{NNNN}-{NNN}〜{NNN}→REQ-032（帯・001〜004）; 39 DEC-{N}→DEC-011; 46 IR-{NNN}→IR-056
+#   60 DEC-{N}→DEC-014; 63第1 IR-{NNN}→IR-059; 63第2 DEC-{N}→DEC-014; 105 REQ-{NNNN}-{NNN}→REQ-002-017
+#   121 IR-{NNN}→IR-056; 157 DEC-{N}→DEC-010; 158 DEC-{N}→DEC-011
+# src/common/skills/agentdev-workflow-case-close/references/docs-and-design-promotion.md (2出現):
+#   33第1 REQ-{NNNN}-{NNN}→REQ-096-012; 33第2 REQ-{NNNN}→REQ-096（帯・REQ-096-005）
+# src/common/skills/agentdev-workflow-case-close/references/issue-resolution-and-qg4.md (3出現):
+#   61第1 REQ-{NNNN}-{NNN}→REQ-096-017; 61第2 REQ-{NNNN}→REQ-096（帯・REQ-096-005）; 100 IR-{NNN}→IR-055
+# src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts (1出現):
+#   290 REQ-{NNNN}-{MMM}〔形式例示〕
+# src/common/skills/agentdev-workflow-case-open/SKILL.md (5出現):
+#   14第1 DEC-{N}→DEC-010; 14第2 REQ-{NNNN}-{NNN}→REQ-030（帯・001/002/003/010）; 38 DEC-{N}→DEC-011; 114 DEC-{N}→DEC-010
+#   115 DEC-{N}→DEC-011
+# src/common/skills/agentdev-workflow-case-open/references/root-case-and-definition-package.md (1出現):
+#   69 DEC-{N}→DEC-026
+# src/common/skills/agentdev-workflow-case-open/scripts/lib/definition-traceability-gate.ts (1出現):
+#   67 REQ-{NNN}-{NNN}〔形式例示〕
+# src/common/skills/agentdev-workflow-case-open/scripts/lib/shared_area_registration.ts (5出現):
+#   10第1 REQ-{NNN}-{MMM}〔形式例示〕; 10第2 REQ-{NNN}-{MMM}〔形式例示〕; 30第1 REQ-{NNN}-{MMM}〔形式例示〕; 30第2 REQ-{NNN}-{MMM}〔形式例示〕
+#   30第3 REQ-{NNN}-{MMM}〔形式例示〕
+# src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts (1出現):
+#   375 REQ-{NNNN}-{MMM}〔形式例示〕
+# src/common/skills/agentdev-workflow-case-ready/SKILL.md (10出現):
+#   15第1 DEC-{N}→DEC-010; 15第2 REQ-{NNNN}-{NNN}→REQ-061（帯）; 41 DEC-{N}→DEC-011; 59第1 REQ-{NNNN}-{NNN}→REQ-096-005
+#   59第2 REQ-{NNNN}-{NNN}→REQ-096-005; 61 REQ-{NNNN}-{NNN}→REQ-061-032; 74第1 REQ-{NNNN}-{NNN}→REQ-096-005; 74第2 REQ-{NNNN}-{NNN}→REQ-096-012
+#   115 REQ-{NNNN}-{NNN}→REQ-096-005（REQ-061-002 経由）; 131 DEC-{N}→DEC-010
+# src/common/skills/agentdev-workflow-case-ready/references/decision-acceptance.md (3出現):
+#   14 REQ-{NNNN}→REQ-096（帯・REQ-096-002/003）; 18第1 REQ-{NNNN}-{NNN}→REQ-096-005; 18第2 REQ-{NNNN}-{NNN}/{NNN}→REQ-096-004/006
+# src/common/skills/agentdev-workflow-case-ready/references/definition-acceptance.md (6出現):
+#   20 REQ-{NNNN}-{NNN}→REQ-096-005; 58 REQ-{NNNN}-{NNN}→REQ-061-032; 66 REQ-{NNNN}-{NNN}→REQ-096-005（REQ-061-002 経由）; 71 REQ-{NNNN}-{NNN}→REQ-096-005（REQ-061-003 経由）
+#   73第1 REQ-{NNNN}-{NNN}（codespan）→REQ-096-005; 73第2 REQ-{NNNN}-{NNN}（codespan）→REQ-096-012
+# src/common/skills/agentdev-workflow-case-ready/references/execution-structure.md (13出現):
+#   13 REQ-{NNNN}-{NNN}→REQ-061-047; 21 REQ-{NNNN}-{NNN}→REQ-061-019; 47 REQ-{NNNN}-{NNN}→REQ-061-048; 66第1 REQ-{NNNN}→REQ-090（帯）
+#   66第2 DEC-{NNN}→DEC-040; 87 REQ-{NNNN}-{NNN}→REQ-090-025; 88 REQ-{NNNN}-{NNN}→REQ-090-026; 103 REQ-{NNNN}-{NNN}→REQ-090-012
+#   111 REQ-{NNNN}-{NNN}→REQ-090-019; 121 REQ-{NNNN}-{NNN}→REQ-090-018; 123 REQ-{NNNN}→REQ-096（帯・REQ-096-030）; 131 REQ-{NNNN}→REQ-090-027
+#   133 REQ-{NNNN}→REQ-096（帯・REQ-096-030）
+# src/common/skills/agentdev-workflow-case-revise/SKILL.md (4出現):
+#   14第1 DEC-{N}→DEC-010; 14第2 REQ-{NNNN}-{NNN}→REQ-062（帯）; 39 DEC-{N}→DEC-011; 107 DEC-{N}→DEC-010
+# src/common/skills/agentdev-workflow-case-revise/references/definition-revision.md (1出現):
+#   25 REQ-{NNNN}-{NNN}→REQ-062-003
+# src/common/skills/agentdev-workflow-inspect-docs/SKILL.md (6出現):
+#   11第1 DEC-{N}→DEC-010; 11第2 REQ-{NNNN}-{NNN}〜{NNN}→REQ-036-001〜004; 15 REQ-{NNNN}-{NNN}→REQ-027-003; 47 REQ-{NNNN}-{NNN}→REQ-027-003
+#   63 REQ-{NNNN}-{NNN}→REQ-036-029; 78 REQ-{NNNN}-{NNN}→REQ-002-017
+# src/common/skills/agentdev-workflow-inspect-promote/SKILL.md (11出現):
+#   13第1 DEC-{N}→DEC-010; 13第2 REQ-{NNNN}-{NNN}〜{NNN}→REQ-036-001〜004; 45 DEC-{N}→DEC-011; 68 DEC-{N}→DEC-011
+#   77 REQ-{NNNN}-{NNN}→REQ-002-017; 95第1 REQ-{NNNN}-{NNN}→REQ-096-003（帯 REQ-096）; 95第2 REQ-{NNNN}-{NNN}→REQ-096-018; 95第3 DEC-{N}→DEC-048
+#   97 REQ-{NNNN}-{NNN}→REQ-036-018; 98 REQ-{NNNN}-{NNN}→REQ-036-018; 99 REQ-{NNNN}-{NNN}→REQ-036-021
+# src/common/skills/agentdev-workflow-inspect-promote/references/auto-promote-and-review.md (11出現):
+#   53第1 REQ-{NNNN}→REQ-090（帯・本体 REQ-090-004）; 53第2 DEC-{NNN}→DEC-040; 70 REQ-{NNNN}-{NNN}→REQ-090-025; 71 REQ-{NNNN}-{NNN}→REQ-090-026
+#   83 REQ-{NNNN}-{NNN}→REQ-090-012; 91 REQ-{NNNN}-{NNN}→REQ-090-019; 100 REQ-{NNNN}-{NNN}→REQ-090-018; 102 REQ-{NNNN}→REQ-096（帯・行030）
+#   109 REQ-{NNNN}-{NNN}→REQ-090-024; 115 REQ-{NNNN}→REQ-090-027; 117 REQ-{NNNN}→REQ-096（帯・行030）
+# src/common/skills/agentdev-workflow-inspect-promote/references/hitl-and-disposition.md (2出現):
+#   12 REQ-{NNNN}-{NNN}→REQ-036-018; 13 REQ-{NNNN}-{NNN}→REQ-036-018
+# src/common/skills/agentdev-workflow-inspect-skills/SKILL.md (5出現):
+#   11第1 DEC-{N}→DEC-010; 11第2 REQ-{NNNN}-{NNN}〜{NNN}→REQ-036-001〜004（provenance 旧表記「〜004」）; 15 REQ-{NNNN}-{NNN}→REQ-027-003; 50 REQ-{NNNN}-{NNN}→REQ-027-003
+#   65 REQ-{NNNN}-{NNN}→REQ-002-017
+# src/common/skills/agentdev-workflow-intake-capture/SKILL.md (5出現):
+#   12第1 DEC-{N}→DEC-010; 12第2 REQ-{NNNN}-{NNN}〜{NNN}→REQ-037-001〜004; 32 REQ-{NNNN}-{NNN}→REQ-027-003; 78 REQ-{NNNN}-{NNN}→REQ-002-017
+#   97 DEC-{N}→DEC-010
+# src/common/skills/agentdev-workflow-intake-from-github/SKILL.md (5出現):
+#   12第1 DEC-{N}→DEC-010; 12第2 REQ-{NNNN}-{NNN}〜{NNN}→REQ-037-001〜004; 34 REQ-{NNNN}-{NNN}→REQ-027-003; 59 REQ-{NNNN}-{NNN}→REQ-002-017
+#   80 DEC-{N}→DEC-010
+# src/common/skills/agentdev-workflow-intake-promote/SKILL.md (14出現):
+#   12第1 DEC-{N}→DEC-010; 12第2 REQ-{NNNN}-{NNN}〜{NNN}→REQ-037-001〜004; 13 REQ-{NNNN}→REQ-037-003; 36 DEC-{N}→DEC-011
+#   58第1 REQ-{NNNN}-{NNN}→REQ-037-003; 58第2 DEC-{N}→DEC-048; 63 REQ-{NNNN}-{NNN}→REQ-037-003; 73 DEC-{N}→DEC-011
+#   79 REQ-{NNNN}→REQ-014-007; 98 REQ-{NNNN}-{NNN}→REQ-002-017; 101 REQ-{NNNN}→REQ-014-003; 112 AG-{NNN}→（AG 一時合意→現行正本）
+#   122 DEC-{N}→DEC-010; 123 DEC-{N}→DEC-011
+# src/common/skills/agentdev-workflow-intake-promote/references/classification-and-review.md (12出現):
+#   32 REQ-{NNNN}-{NNN}→REQ-037-003; 108第1 REQ-{NNNN}→REQ-090（帯・本体 REQ-090-004）; 108第2 DEC-{NNN}→DEC-040; 125 REQ-{NNNN}-{NNN}→REQ-090-025
+#   126 REQ-{NNNN}-{NNN}→REQ-090-026; 139 REQ-{NNNN}-{NNN}→REQ-090-012; 147 REQ-{NNNN}-{NNN}→REQ-090-019; 157 REQ-{NNNN}-{NNN}→REQ-090-018
+#   159 REQ-{NNNN}→REQ-096（行030）; 167 REQ-{NNNN}-{NNN}→REQ-090-024; 173 REQ-{NNNN}→REQ-090-027; 175 REQ-{NNNN}→REQ-096（行030）
+# src/common/skills/agentdev-workflow-learning-promote/SKILL.md (12出現):
+#   12第1 DEC-{N}→DEC-010; 12第2 REQ-{NNNN}-{NNN}〜{NNN}→REQ-038-001〜004; 36 DEC-{N}→DEC-011; 59 DEC-{N}→DEC-011
+#   65 REQ-{NNNN}→REQ-014-007; 90 REQ-{NNNN}-{NNN}→REQ-002-017; 93 REQ-{NNNN}→REQ-014-003; 100 AG-{NNN}→AG-004/005
+#   101第1 REQ-{NNNN}→REQ-096（帯・REQ-096-004/005）; 101第2 REQ-{NNNN}-{NNN}→REQ-038-002; 115 DEC-{N}→DEC-010; 116 DEC-{N}→DEC-011
+# src/common/skills/agentdev-workflow-learning-promote/references/analysis-and-review.md (10出現):
+#   199第1 REQ-{NNNN}→REQ-090（帯・本体 REQ-090-004）; 199第2 DEC-{NNN}→DEC-040; 216 REQ-{NNNN}-{NNN}→REQ-090-025; 217 REQ-{NNNN}-{NNN}→REQ-090-026
+#   232 REQ-{NNNN}-{NNN}→REQ-090-012; 240 REQ-{NNNN}-{NNN}→REQ-090-019; 252 REQ-{NNNN}-{NNN}→REQ-090-018; 254 REQ-{NNNN}→REQ-096（帯・行030）
+#   264 REQ-{NNNN}→REQ-090-027; 266 REQ-{NNNN}→REQ-096（帯・行030）
+# src/common/skills/agentdev-workflow-learning-promote/references/hitl-and-persistence.md (1出現):
+#   16 REQ-{NNNN}-{NNN}→REQ-038-002
+# src/common/skills/agentdev-workflow-lifecycle/SKILL.md (2出現):
+#   15第1 REQ-{NNNN}-{NNN}→REQ-005-024; 15第2 DEC-{N}→DEC-011
+# src/common/skills/agentdev-workflow-orchestration/SKILL.md (3出現):
+#   26第1 REQ-{NNNN}-{NNN}→REQ-005-024; 26第2 DEC-{N}→DEC-011; 51 REQ-{NNNN}→REQ-008-003
+# src/common/skills/agentdev-workflow-req-define/SKILL.md (7出現):
+#   14第1 DEC-{N}→DEC-010; 14第2 REQ-{NNNN}-{NNN}〜{NNN}→REQ-008（帯・draft 契約）; 38 DEC-{N}→DEC-011; 65 REQ-{NNNN}→REQ-005-024
+#   77 REQ-{NNNN}-{NNN}→REQ-002-017; 121 DEC-{N}→DEC-010; 122 DEC-{N}→DEC-011
+# src/common/skills/agentdev-workflow-req-define/references/requirement-development.md (11出現):
+#   165第1 REQ-{NNNN}→REQ-090（帯・本体 004）; 165第2 DEC-{NNN}→DEC-040; 182 REQ-{NNNN}-{NNN}→REQ-090-025; 183 REQ-{NNNN}-{NNN}→REQ-090-026
+#   195 REQ-{NNNN}-{NNN}→REQ-090-012; 205 REQ-{NNNN}-{NNN}→REQ-090-019; 214 REQ-{NNNN}-{NNN}→REQ-090-018; 216 REQ-{NNNN}→REQ-096（行030）
+#   223 REQ-{NNNN}-{NNN}→REQ-090-024; 229 REQ-{NNNN}→REQ-090-027; 231 REQ-{NNNN}→REQ-096（行030）
+# src/common/skills/agentdev-workflow-routing/SKILL.md (2出現):
+#   17第1 REQ-{NNNN}-{NNN}→REQ-005-024; 17第2 DEC-{N}→DEC-011
+# src/common/skills/agentdev-workflow-templates/SKILL.md (1出現):
+#   297 IR-{NNN}〔形式例示〕
+# src/common/skills/agentdev-workflow-templates/templates/case-open/root-case-report.md (1出現):
+#   12 REQ-{NNNN}〔形式例示〕
+# src/common/skills/agentdev-workflow-templates/templates/case-ready/root-case-report.md (1出現):
+#   13 DEC-{N}〔形式例示〕
+# src/common/tools/agentdev-gh/contracts.ts (1出現):
+#   303 REQ-{NNNN}-{NNN}→REQ-083-001
+# src/common/tools/agentdev-gh/runner-cli.ts (2出現):
+#   6 REQ-{NNNN}-{NNN}→REQ-011-013（導入時実 ID・現行欠番）; 640 REQ-{NNNN}-{NNN}→REQ-083-001
+# src/common/tools/agentdev-gh/specs-issue.ts (1出現):
+#   149 REQ-{NNNN}-{NNN}→REQ-011-006
+# src/common/tools/agentdev-gh/specs-pr.ts (1出現):
+#   27 REQ-{NNNN}-{NNN}→REQ-011-006
+# src/common/tools/agentdev-jev/README.md (3出現):
+#   3第1 REQ-{NNNN}→REQ-090（帯・本体 REQ-090-004）; 3第2 DEC-{NNN}→DEC-040; 38 REQ-{NNN}→REQ-060-001（所有は CEC「bun test 実行形態契約」節）
+# src/common/tools/agentdev-jev/engine.ts (1出現):
+#   3 REQ-{NNNN}-{NNN}→REQ-090-001 + JCD:91-92
+# src/common/tools/agentdev-jev/provider.ts (1出現):
+#   5 REQ-{NNNN}-{NNN}→JCD:93（保証）
+
 component: distribution-concrete-id-provenance
 links:
   upstream:
+    src/common/skills/agentdev-adversarial-review/SKILL.md:
+      - docs/requirements/REQ-014.md
+      - docs/requirements/REQ-015.md
+      - docs/requirements/REQ-082.md
+    src/common/skills/agentdev-artifact-validation/SKILL.md:
+      - docs/designs/skills/agentdev-artifact-validation.md
+      - docs/designs/responsibilities/artifact-contracts.md
+    src/common/skills/agentdev-workflow-case-run/SKILL.md:
+      - docs/decisions/DEC-010.md
+      - docs/decisions/DEC-011.md
+      - docs/requirements/REQ-002.md
+      - docs/requirements/REQ-101.md
+      - docs/designs/foundations/v4-durable-state-and-recovery.md
+      - docs/designs/integrity/rules/IR-056-project-extensions-integrity.md
     src/common/skills/agentdev-phase-theme-collaboration/scripts/README.md:
       - docs/requirements/REQ-060.md
       - .agentdev/phase/themes.md
@@ -32,3 +464,310 @@ links:
       - docs/requirements/REQ-021.md
       - docs/requirements/REQ-061.md
       - docs/designs/integrity/rules/IR-072-req-updated-freshness.md
+    src/common/skills/agentdev-case-run-execution-adapter/SKILL.md:
+      - docs/decisions/DEC-011.md
+      - docs/requirements/REQ-005.md
+      - docs/requirements/REQ-014.md
+      - docs/requirements/REQ-015.md
+      - docs/requirements/REQ-031.md
+    src/common/skills/agentdev-workflow-case-close/references/docs-and-design-promotion.md:
+      - docs/designs/foundations/v4-responsibility-boundaries.md
+      - docs/requirements/REQ-096.md
+    src/common/skills/agentdev-workflow-case-close/references/issue-resolution-and-qg4.md:
+      - docs/designs/foundations/v4-responsibility-boundaries.md
+      - docs/designs/integrity/rules/IR-055-runtime-unresolved-reference.md
+      - docs/requirements/REQ-031.md
+      - docs/requirements/REQ-096.md
+    src/common/skills/agentdev-workflow-case-close/SKILL.md:
+      - docs/decisions/DEC-010.md
+      - docs/decisions/DEC-011.md
+      - docs/decisions/DEC-014.md
+      - docs/designs/integrity/rules/IR-056-project-extensions-integrity.md
+      - docs/designs/integrity/rules/IR-059-distribution-reference-boundary.md
+      - docs/requirements/REQ-002.md
+      - docs/requirements/REQ-032.md
+    src/common/skills/agentdev-workflow-case-open/references/root-case-and-definition-package.md:
+      - docs/decisions/DEC-026.md
+    src/common/skills/agentdev-workflow-case-open/SKILL.md:
+      - docs/decisions/DEC-010.md
+      - docs/decisions/DEC-011.md
+      - docs/requirements/REQ-030.md
+    src/common/skills/agentdev-workflow-case-ready/references/decision-acceptance.md:
+      - docs/designs/foundations/v4-responsibility-boundaries.md
+      - docs/requirements/REQ-061.md
+      - docs/requirements/REQ-096.md
+    src/common/skills/agentdev-workflow-case-ready/references/definition-acceptance.md:
+      - docs/designs/foundations/v4-responsibility-boundaries.md
+      - docs/requirements/REQ-061.md
+      - docs/requirements/REQ-096.md
+    src/common/skills/agentdev-workflow-case-ready/references/execution-structure.md:
+      - docs/decisions/DEC-040.md
+      - docs/designs/foundations/v4-responsibility-boundaries.md
+      - docs/requirements/REQ-061.md
+      - docs/requirements/REQ-090.md
+      - docs/requirements/REQ-096.md
+    src/common/skills/agentdev-workflow-case-ready/SKILL.md:
+      - docs/decisions/DEC-010.md
+      - docs/decisions/DEC-011.md
+      - docs/designs/foundations/v4-responsibility-boundaries.md
+      - docs/requirements/REQ-061.md
+      - docs/requirements/REQ-096.md
+    src/common/skills/agentdev-workflow-case-revise/references/definition-revision.md:
+      - docs/requirements/REQ-062.md
+    src/common/skills/agentdev-workflow-case-revise/SKILL.md:
+      - docs/decisions/DEC-010.md
+      - docs/decisions/DEC-011.md
+      - docs/requirements/REQ-062.md
+    src/common/skills/agentdev-artifact-validation/scripts/lib/result.ts:
+      - docs/designs/skills/agentdev-artifact-validation.md
+    src/common/skills/agentdev-artifact-validation/scripts/package.json:
+      - docs/designs/responsibilities/artifact-contracts.md
+      - docs/designs/skills/agentdev-artifact-validation.md
+    src/common/skills/agentdev-artifact-validation/scripts/README.md:
+      - docs/designs/responsibilities/artifact-contracts.md
+      - docs/designs/skills/agentdev-artifact-validation.md
+    src/common/skills/agentdev-artifact-validation/scripts/src/check-change-impact.ts:
+      - docs/designs/responsibilities/artifact-contracts.md
+      - docs/designs/skills/agentdev-artifact-validation.md
+    src/common/skills/agentdev-artifact-validation/scripts/src/check-entry-existence.ts:
+      - docs/designs/responsibilities/artifact-contracts.md
+      - docs/designs/skills/agentdev-artifact-validation.md
+    src/common/skills/agentdev-artifact-validation/scripts/src/check-frontmatter-consistency.ts:
+      - docs/designs/responsibilities/artifact-contracts.md
+      - docs/designs/skills/agentdev-artifact-validation.md
+    src/common/skills/agentdev-decision-file-manager/scripts/src/alloc-decision-number.ts:
+      - docs/designs/responsibilities/artifact-contracts.md
+      - docs/designs/skills/agentdev-decision-file-manager.md
+    src/common/skills/agentdev-design-file-manager/scripts/lib/result.ts:
+      - docs/designs/responsibilities/artifact-contracts.md
+      - docs/designs/skills/agentdev-artifact-validation.md
+    src/common/skills/agentdev-design-file-manager/scripts/package.json:
+      - docs/designs/responsibilities/artifact-contracts.md
+      - docs/designs/skills/agentdev-design-file-manager.md
+    src/common/skills/agentdev-design-file-manager/scripts/README.md:
+      - docs/designs/responsibilities/artifact-contracts.md
+      - docs/designs/skills/agentdev-design-file-manager.md
+    src/common/skills/agentdev-design-file-manager/scripts/src/search-target-area.ts:
+      - docs/designs/responsibilities/artifact-contracts.md
+      - docs/designs/skills/agentdev-artifact-validation.md
+      - docs/designs/skills/agentdev-design-file-manager.md
+    src/common/skills/agentdev-design-file-manager/SKILL.md:
+      - docs/decisions/DEC-011.md
+      - docs/designs/responsibilities/artifact-contracts.md
+      - docs/designs/skills/agentdev-design-file-manager.md
+      - docs/requirements/REQ-005.md
+    src/common/skills/agentdev-req-file-manager/SKILL.md:
+      - docs/decisions/DEC-011.md
+      - docs/designs/responsibilities/artifact-contracts.md
+      - docs/designs/skills/agentdev-artifact-validation.md
+      - docs/designs/skills/agentdev-req-file-manager.md
+      - docs/requirements/REQ-005.md
+    src/common/skills/agentdev-req-file-manager/scripts/README.md:
+      - docs/designs/responsibilities/artifact-contracts.md
+      - docs/designs/skills/agentdev-decision-file-manager.md
+      - docs/designs/skills/agentdev-req-file-manager.md
+    src/common/skills/agentdev-req-file-manager/scripts/package.json:
+      - docs/designs/responsibilities/artifact-contracts.md
+      - docs/designs/skills/agentdev-req-file-manager.md
+    src/common/skills/agentdev-req-file-manager/scripts/lib/result.ts:
+      - docs/designs/skills/agentdev-artifact-validation.md
+    src/common/skills/agentdev-req-file-manager/scripts/src/alloc-composite-id.ts:
+      - docs/designs/responsibilities/artifact-contracts.md
+      - docs/designs/skills/agentdev-req-file-manager.md
+    src/common/skills/agentdev-req-file-manager/scripts/src/alloc-req-number.ts:
+      - docs/designs/responsibilities/artifact-contracts.md
+      - docs/designs/skills/agentdev-req-file-manager.md
+    src/common/skills/agentdev-backlog-integration/SKILL.md:
+      - docs/requirements/REQ-014.md
+      - docs/requirements/REQ-015.md
+    src/common/skills/agentdev-workflow-backlog-auto/SKILL.md:
+      - docs/decisions/DEC-010.md
+      - docs/decisions/DEC-011.md
+      - docs/requirements/REQ-041.md
+    src/common/skills/agentdev-workflow-backlog-review/references/analysis-composition-and-review.md:
+      - docs/requirements/REQ-056.md
+      - docs/requirements/REQ-090.md
+      - docs/requirements/REQ-096.md
+    src/common/skills/agentdev-workflow-backlog-review/references/contradiction-ru-and-persistence.md:
+      - docs/requirements/REQ-039.md
+      - docs/requirements/REQ-056.md
+    src/common/skills/agentdev-workflow-backlog-review/SKILL.md:
+      - docs/decisions/DEC-010.md
+      - docs/decisions/DEC-011.md
+      - docs/requirements/REQ-002.md
+      - docs/requirements/REQ-008.md
+      - docs/requirements/REQ-014.md
+      - docs/requirements/REQ-039.md
+      - docs/requirements/REQ-056.md
+    src/common/skills/agentdev-intake-pipeline/SKILL.md:
+      - docs/decisions/DEC-010.md
+      - docs/requirements/REQ-014.md
+      - docs/requirements/REQ-015.md
+      - docs/requirements/REQ-027.md
+    src/common/skills/agentdev-workflow-intake-capture/SKILL.md:
+      - docs/decisions/DEC-010.md
+      - docs/requirements/REQ-002.md
+      - docs/requirements/REQ-027.md
+      - docs/requirements/REQ-037.md
+    src/common/skills/agentdev-workflow-intake-from-github/SKILL.md:
+      - docs/decisions/DEC-010.md
+      - docs/requirements/REQ-002.md
+      - docs/requirements/REQ-027.md
+      - docs/requirements/REQ-037.md
+    src/common/skills/agentdev-workflow-intake-promote/SKILL.md:
+      - docs/decisions/DEC-010.md
+      - docs/decisions/DEC-011.md
+      - docs/decisions/DEC-048.md
+      - docs/designs/commands/intake-promote.md
+      - docs/designs/workflows/capture-boundaries.md
+      - docs/requirements/REQ-002.md
+      - docs/requirements/REQ-014.md
+      - docs/requirements/REQ-037.md
+    src/common/skills/agentdev-workflow-intake-promote/references/classification-and-review.md:
+      - docs/decisions/DEC-040.md
+      - docs/requirements/REQ-037.md
+      - docs/requirements/REQ-090.md
+      - docs/requirements/REQ-096.md
+    src/common/skills/agentdev-inspect-skills/SKILL.md:
+      - docs/designs/integrity/rules/IR-007-skill-name-dir-match.md
+      - docs/designs/integrity/rules/IR-050-load-skills-command-mis-specification.md
+      - docs/designs/integrity/rules/IR-051-executor-skill-notation-misrecognition.md
+      - docs/designs/integrity/rules/IR-053-gh-direct-invocation-detection.md
+      - docs/requirements/REQ-036.md
+    src/common/skills/agentdev-learning-pipeline/SKILL.md:
+      - docs/requirements/REQ-014.md
+      - docs/requirements/REQ-015.md
+    src/common/skills/agentdev-workflow-inspect-docs/SKILL.md:
+      - docs/decisions/DEC-010.md
+      - docs/requirements/REQ-002.md
+      - docs/requirements/REQ-027.md
+      - docs/requirements/REQ-036.md
+    src/common/skills/agentdev-workflow-inspect-promote/references/auto-promote-and-review.md:
+      - docs/decisions/DEC-040.md
+      - docs/requirements/REQ-090.md
+      - docs/requirements/REQ-096.md
+    src/common/skills/agentdev-workflow-inspect-promote/references/hitl-and-disposition.md:
+      - docs/requirements/REQ-036.md
+      - docs/requirements/REQ-096.md
+    src/common/skills/agentdev-workflow-inspect-promote/SKILL.md:
+      - docs/decisions/DEC-010.md
+      - docs/decisions/DEC-011.md
+      - docs/decisions/DEC-048.md
+      - docs/requirements/REQ-002.md
+      - docs/requirements/REQ-036.md
+      - docs/requirements/REQ-096.md
+    src/common/skills/agentdev-workflow-learning-promote/references/analysis-and-review.md:
+      - docs/decisions/DEC-040.md
+      - docs/requirements/REQ-090.md
+      - docs/requirements/REQ-096.md
+    src/common/skills/agentdev-workflow-learning-promote/references/hitl-and-persistence.md:
+      - docs/requirements/REQ-038.md
+      - docs/requirements/REQ-096.md
+    src/common/skills/agentdev-workflow-learning-promote/SKILL.md:
+      - docs/decisions/DEC-010.md
+      - docs/decisions/DEC-011.md
+      - docs/requirements/REQ-002.md
+      - docs/requirements/REQ-014.md
+      - docs/requirements/REQ-038.md
+      - docs/requirements/REQ-096.md
+    src/common/skills/agentdev-workflow-req-define/references/requirement-development.md:
+      - docs/decisions/DEC-040.md
+      - docs/requirements/REQ-090.md
+      - docs/requirements/REQ-096.md
+    src/common/skills/agentdev-workflow-req-define/SKILL.md:
+      - docs/decisions/DEC-010.md
+      - docs/decisions/DEC-011.md
+      - docs/requirements/REQ-002.md
+      - docs/requirements/REQ-005.md
+      - docs/requirements/REQ-008.md
+    src/common/skills/agentdev-req-analysis/SKILL.md:
+      - docs/decisions/DEC-010.md
+      - docs/requirements/REQ-008.md
+      - docs/requirements/REQ-027.md
+    src/common/skills/agentdev-quality-gates/SKILL.md:
+      - docs/requirements/REQ-096.md
+    src/common/skills/agentdev-quality-gates/references/common-gate-contract.md:
+      - docs/requirements/REQ-096.md
+    src/common/skills/agentdev-quality-gates/references/qg-1-definition-integrity.md:
+      - docs/requirements/REQ-096.md
+    src/common/skills/agentdev-quality-gates/references/qg-3-implementation-deviation.md:
+      - docs/requirements/REQ-096.md
+    src/common/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md:
+      - docs/requirements/REQ-096.md
+    src/common/tools/agentdev-gh/contracts.ts:
+      - docs/requirements/REQ-083.md
+    src/common/tools/agentdev-gh/runner-cli.ts:
+      - docs/requirements/REQ-011.md
+      - docs/requirements/REQ-083.md
+    src/common/tools/agentdev-gh/specs-issue.ts:
+      - docs/requirements/REQ-011.md
+    src/common/tools/agentdev-gh/specs-pr.ts:
+      - docs/requirements/REQ-011.md
+    src/common/tools/agentdev-jev/engine.ts:
+      - docs/designs/responsibilities/custom-tool-contracts.md
+      - docs/requirements/REQ-090.md
+    src/common/tools/agentdev-jev/provider.ts:
+      - docs/designs/responsibilities/custom-tool-contracts.md
+    src/common/tools/agentdev-jev/README.md:
+      - docs/decisions/DEC-040.md
+      - docs/designs/integrity/checker-execution-contracts.md
+      - docs/requirements/REQ-060.md
+      - docs/requirements/REQ-090.md
+    src/common/commands/agentdev/backlog-auto.md:
+      - docs/decisions/DEC-010.md
+      - docs/requirements/REQ-041.md
+    src/common/commands/agentdev/backlog-review.md:
+      - docs/decisions/DEC-010.md
+      - docs/requirements/REQ-039.md
+      - docs/requirements/REQ-056.md
+    src/common/commands/agentdev/inspect-docs.md:
+      - docs/decisions/DEC-010.md
+      - docs/requirements/REQ-036.md
+    src/common/commands/agentdev/inspect-promote.md:
+      - docs/decisions/DEC-010.md
+      - docs/designs/commands/inspect-promote.md
+      - docs/designs/workflows/capture-boundaries.md
+      - docs/requirements/REQ-036.md
+    src/common/commands/agentdev/inspect-skills.md:
+      - docs/decisions/DEC-010.md
+      - docs/requirements/REQ-036.md
+    src/common/commands/agentdev/intake-capture.md:
+      - docs/decisions/DEC-010.md
+      - docs/requirements/REQ-037.md
+    src/common/commands/agentdev/intake-from-github.md:
+      - docs/decisions/DEC-010.md
+      - docs/requirements/REQ-037.md
+    src/common/commands/agentdev/intake-promote.md:
+      - docs/decisions/DEC-010.md
+      - docs/designs/commands/intake-promote.md
+      - docs/requirements/REQ-037.md
+    src/common/commands/agentdev/learning-promote.md:
+      - docs/decisions/DEC-010.md
+      - docs/requirements/REQ-014.md
+      - docs/requirements/REQ-015.md
+      - docs/requirements/REQ-038.md
+    src/common/commands/agentdev/req-define.md:
+      - docs/decisions/DEC-010.md
+      - docs/requirements/REQ-008.md
+    src/common/skills/agentdev-doc-diagnostics/SKILL.md:
+      - docs/requirements/REQ-036.md
+    src/common/skills/agentdev-workflow-inspect-skills/SKILL.md:
+      - docs/decisions/DEC-010.md
+      - docs/requirements/REQ-002.md
+      - docs/requirements/REQ-027.md
+      - docs/requirements/REQ-036.md
+    src/common/skills/agentdev-workflow-lifecycle/SKILL.md:
+      - docs/decisions/DEC-011.md
+      - docs/requirements/REQ-005.md
+    src/common/skills/agentdev-workflow-orchestration/SKILL.md:
+      - docs/decisions/DEC-011.md
+      - docs/requirements/REQ-005.md
+      - docs/requirements/REQ-008.md
+    src/common/skills/agentdev-workflow-routing/SKILL.md:
+      - docs/decisions/DEC-011.md
+      - docs/requirements/REQ-005.md
+    src/common/skills/agentdev-workflow-case-auto/references/stop-and-decision-resolution.md:
+      - docs/decisions/DEC-008.md
+      - docs/requirements/REQ-096.md
+    src/common/skills/agentdev-workflow-templates/SKILL.md:
+      - docs/designs/integrity/integrity-rule-catalog.md

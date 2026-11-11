@@ -1,5 +1,5 @@
 /**
- * frontmatter id ↔ ファイル名整合性確認スクリプト（AG-{NNN}、AG-{NNN}、REQ-{NNNN}-{NNN}/160）。
+ * frontmatter id ↔ ファイル名整合性確認スクリプト（「Script 所有権と委譲契約」による共通検証 script としての正規所有）。
  *
  * 指定ディレクトリ配下の `REQ-NNNN.md` / `ADR-NNNN.md` / `DEC-NNN.md` について、
  * frontmatter の `id:` とファイル名が一致するか検証する。

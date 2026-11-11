@@ -14,7 +14,7 @@ case-run は常に単一 Issue を処理し、Epic や Wave を処理対象と�
 Wave 実行制御（Wave 構成の読み取り、現在 Wave 判定、fan-out/fan-in、子 Issue 並列起動、共有 active Issue task 枠）は case-auto の orchestration stage 3 が単一所有し、case-run 経由で case-auto の管理外の実行枠（独立実行枠）を生成できない。
 委譲内では実行範囲、入力、権限、検証条件を当該 Issue 本文と正規契約から実行中に確認できる。
 
-case-run command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（DEC-{N}）。
+case-run command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する。これは、Command が公開入口、Workflow Skill が工程の実装、Capability Skill が共通能力を所有する責務3層分化に従う。
 
 ## 入力
 
@@ -49,7 +49,7 @@ v5 有限実行モード（case-auto workflow 実装本体「v5 有限実行モ�
 
 ## 制御平面（STEP 一覧）
 
-各 STEP は再開ポイント（resume point）を持つ（DEC-{N}、`docs/designs/<foundations/v4-durable-state-and-recovery>.md`）。
+各 STEP は再開ポイント（resume point）を持つ。安定した STEP 識別子と永続情報から再開点を決定し、会話記憶を権威情報源としない。
 会話コンテキストに依存せず、永続状態（GitHub Issue/PR、Issue コメント、worktree・ブランチの存在、PR URL）から再開点を再構成する。
 
 ### single workflow（単一 Issue 実行モード）
@@ -85,7 +85,7 @@ v5 有限実行モード（case-auto workflow 実装本体「v5 有限実行モ�
 
 ## 主要 Capability Skill 連携
 
-本スキルは次の Capability Skill を名レベルで参照する（REQ-{NNNN}-{NNN}）。
+本スキルは次の Capability Skill を名レベルで参照する。他 Skill の内部構造（protocol 名、Step 名、Section 名、見出し名、references 内部パス）へ直接依存しない。
 
 - `agentdev-workflow-orchestration`: 再開ポイント判定、状態機械、CI 対応ループ、capture 境界、障害伝播
 - `agentdev-case-run-execution-adapter`: 実行担当サブエージェント委譲の adapter protocol、result 4状態契約、adapter 委譲内 adversarial-review
@@ -98,7 +98,7 @@ v5 有限実行モード（case-auto workflow 実装本体「v5 有限実行モ�
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 - `agentdev-workflow-templates`: 工程記録コメントテンプレート（記録種別別3種）の選定と様式
 - `agentdev-traceability`: トレーサビリティ能力（coverage、check。委譲内の対応関係確認と PR 作成前検査。fail-open）
-- integrity checker skill（リポジトリ固有・配布対象外）: check_changed_docs.ts（targeted docs guard）、check_extensions.ts（IR-{NNN}）、check_distribution_boundary.ts（配布依存境界、source / link 両 profile）、generate_indexes.ts（AUTOGEN 索引再生成）
+- integrity checker skill（リポジトリ固有・配布対象外）: check_changed_docs.ts（targeted docs guard）、check_extensions.ts（Project Extensions の構造・配置・ID・参照パス・委譲先 Skill・旧機構残存・上書き意図の検査）、check_distribution_boundary.ts（配布依存境界、source / link 両 profile）、generate_indexes.ts（AUTOGEN 索引再生成）
 - 検証用一時資材の後片付け責任（検証に伴う一時資材の取扱いと後片付け責任 Design）: STEP-S4 委譲の作成・利用・回収の義務接続と、STEP-S5 委譲結果受領時の後片付けの実施結果・確認根拠・未処理事項の報告受領（「共通制約」の検証用一時資材の節参照）
 
 ## トレーサビリティ能力の利用
@@ -117,7 +117,7 @@ case-run の実行担当（委譲内サブエージェント）は、対象要�
 
 ## 工程記録の取りまとめ反映（記録契機）
 
-case-run は記録契機に応じて、実行担当の報告を受けた取りまとめとして Case Issue の記録コメント投稿と本文進行状況・結果セクション更新を実行する（REQ-{NNNN}-{NNN}、REQ-{NNNN}-{NNN}。記録コメント様式の正は `workflows/issue-lifecycle-records` Design、テンプレート投影と選定は `agentdev-workflow-templates`）。
+case-run は記録契機に応じて、実行担当の報告を受けた取りまとめとして Case Issue の記録コメント投稿と本文進行状況・結果セクション更新を実行する。実行担当の報告だけで反映済みとせず、取りまとめが本文・コメントへの反映を担い、Epic 反映待ちの間も子 Issue の最新記録を読み取れる状態にする。記録コメント様式の正は `workflows/issue-lifecycle-records` Design、テンプレート投影と選定は `agentdev-workflow-templates` とする。
 
 - **記録契機**: 停止、判断変更、検証証拠の3種とする。着手・引き渡し・再開を契機とするコメント生成は廃止しており、着手は進行状況の開始日時（初回実着手）、引き渡しと再開は本文・PR で表現する。内部の全手順、全ツール実行、思考、定期投稿を記録契機に追加しない。短い複数の変化はまとめて記録でき、停止の通知を遅らせない
 - **委譲要求と実着手の区別**: STEP-S4 の委譲起動（委譲要求）は実着手と同一視しない。進行状況の開始日時は、実行担当から実装または検証に実着手した事実を報告された時点で初回設定する（停止・再開で上書きしない）
@@ -154,6 +154,6 @@ case-run は、実行担当サブエージェントへの委譲契約に重要�
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
 - **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
-- **`docs/decisions/DEC-{N}.md`**: Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則
-- **`docs/decisions/DEC-{N}.md`**: STEP resume point と会話記憶非依存
+- **責務3層分化と1:N分割原則**: Command は公開入口、Workflow Skill は工程の実装、Capability Skill は共通能力を所有する。Workflow Skill の分割は制御構造の実質差異に基づき評価し、操作の違いだけでは分割しない。
+- **STEP resume point と会話記憶非依存**: 安定した STEP 識別子と永続情報から再開点を再構成する。再開点を決める契約と、実行基盤による現在 STEP の選択処理を区別する。
 - **case-run command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

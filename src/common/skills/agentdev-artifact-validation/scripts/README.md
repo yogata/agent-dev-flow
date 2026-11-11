@@ -1,6 +1,6 @@
 # `agentdev-artifact-validation` scripts
 
-文書種別横断の決定的検証 script 群と共有 lib（AG-{NNN}/009/019、design-principles.md 第5節）。
+文書種別横断の決定的検証 script 群と共有 lib（「Script 所有権と委譲契約」、design-principles.md 第5節）。
 
 ## 構成
 
@@ -55,6 +55,6 @@ echo '{"root":"<repo-root>","files":[{"path":"<written-artifact-path>","content"
 
 ## 所有権と委譲
 
-本ディレクトリの script と lib は `agentdev-artifact-validation` が正規所有する（AG-{NNN}、AG-{NNN}）。
-利用側 command、skill は内部 lib パスを直接参照せず、公開検証契約（script の argv/stdin → stdout JSON）へ委譲する（AG-{NNN}）。
-同一 script または共有 lib を複数 skill へ複製しない（AG-{NNN}）。
+本ディレクトリの script と lib は `agentdev-artifact-validation` が正規所有する（「Script 所有権と委譲契約」に基づく単一所有）。
+利用側 command、skill は内部 lib パスを直接参照せず、公開検証契約（script の argv/stdin → stdout JSON）へ委譲する（「Script 所有権と委譲契約」の委譲規則）。
+同一 script または共有 lib を複数 skill へ複製しない（「Script 所有権と委譲契約」の複製禁止規則）。

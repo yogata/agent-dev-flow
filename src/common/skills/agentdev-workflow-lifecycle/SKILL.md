@@ -12,7 +12,7 @@ agentdev系コマンドのフェーズ定義、SSoT遷移、work_type 判定基�
 全 agentdev コマンドの一覧、入出力リファレンスは command README（`commands/agentdev/README.md`）を参照。
 本 skill は全 agentdev コマンドからフェーズ定義、work_type 判定基準の参照元として使用される。
 
-## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
+## STEP model 連携（workflow STEP 契約・STEP resume point と会話記憶非依存）
 
 本スキルは Workflow Skill として宣言的定義（ライフサイクル判定、work_type 判定、scale 判定、SSoT 遷移、上位への引き継ぎ判定）を提供する。
 本スキル自身は workflow STEP を所有せず、各 command の Workflow Skill が所有する STEP から参照される（`<workflows/workflow-skill-model>` Design）。

@@ -24,18 +24,18 @@ intake-from-github と intake-promote コマンドの知識ベースである。
 ## adversarial-review 候補判断と内部手続き（intake-promote）
 
 本スキルは intake-promote の review 候補判断と内部手続きの参照実装を `references/intake-promotion.md` に保持する。
-正典は `agentdev-intake-pipeline` Design「adversarial-review 候補判断と内部挿入」節（REQ-{NNNN}-{NNN}）であり、本 SKILL.md は重複定義しない（REQ-{NNNN}-{NNN}）。
+正典は `agentdev-intake-pipeline` Design「adversarial-review 候補判断と内部挿入」節（caller 統合要件の intake 挿入条項）であり、本 SKILL.md は重複定義しない（caller 統合共通契約の一つの意味の一つの正本への集約条項）。
 
 | 項目 | 要件 | 概要 |
 |---|---|---|
-| 挿入位置 | REQ-{NNNN}-{NNN} | Step 4（暫定分類生成）完了後、Step 5（ユーザ提示）開始前 |
-| 発動条件判定 / review 呼出 Step 分離 | REQ-{NNNN}-{NNN} | 発動条件判定 Step と review 呼出 Step を独立手順として分離 |
-| default-on と skip 条件 | REQ-{NNNN}-{NNN} | 原則発動。skip 条件（重複確実等）該当時は省略して従来フローを継続。ユーザー明示指示は通常の指示としてその場で実行する（専用の検出・フラグ・保存・伝播を持たない） |
-| 条件非該当時の従来フロー維持 | REQ-{NNNN}-{NNN} | 条件非該当時は従来フローを維持 |
+| 挿入位置 | caller 統合要件・intake 挿入条項 | Step 4（暫定分類生成）完了後、Step 5（ユーザ提示）開始前 |
+| 発動条件判定 / review 呼出 Step 分離 | caller 統合要件・Step 分離条項 | 発動条件判定 Step と review 呼出 Step を独立手順として分離 |
+| default-on と skip 条件 | caller 統合要件・default-on 条項 | 原則発動。skip 条件（重複確実等）該当時は省略して従来フローを継続。ユーザー明示指示は通常の指示としてその場で実行する（専用の検出・フラグ・保存・伝播を持たない） |
+| 条件非該当時の従来フロー維持 | caller 統合要件・skip 時従来フロー継続条項 | 条件非該当時は従来フローを維持 |
 
-挿入境界、発動条件、戻り先は intake-promote command Design「adversarial-review 挿入境界（intake-promote）」節が正であり、共通契約（任意性、副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱い）は adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-{NNNN}）が正とする。
+挿入境界、発動条件、戻り先は intake-promote command Design「adversarial-review 挿入境界（intake-promote）」節が正であり、共通契約（任意性、副作用禁止、accepted finding 反映責務、再 review 条件、停止条件、呼出失敗時取扱い）は adversarial-review Design「adversarial-review caller integration 共通契約」節（caller 統合共通契約の Design 正規所有）が正とする。
 
-## STEP model 連携（REQ-{NNNN}-{NNN}、DEC-{N}）
+## STEP model 連携（Capability Skill 横断抽出契約、責務3層分化と1:N分割原則）
 
 本スキルは Capability Skill として、intake-from-github / intake-promote command の各 STEP から呼び出される（`<workflows/workflow-skill-model>` Design）。
 本スキル自身は STEP を所有しない。
@@ -43,7 +43,7 @@ intake-from-github と intake-promote コマンドの知識ベースである。
 ### 永続成果物と Input Resolution
 
 本スキルが扱う intake item（`.agentdev/intake/inbox/*.md`）、採用済み成果物（`.agentdev/intake/promoted/*.md`）は永続状態の優先順位に従う。
-(1) SSoT 再構成（inbox/ promoted/ 配下の永続ファイル、REQ/Decision/Design は docs/ 配下）、(2) identifier 保持（item path、promoted item path）、(3) 最小 scalar、(4) runtime artifact（暫定分類、評価結果、adversarial-review findings、REQ-{NNNN} lifecycle）。
+(1) SSoT 再構成（inbox/ promoted/ 配下の永続ファイル、REQ/Decision/Design は docs/ 配下）、(2) identifier 保持（item path、promoted item path）、(3) 最小 scalar、(4) runtime artifact（暫定分類、評価結果、adversarial-review findings、caller 統合共通契約の finding lifecycle）。
 優先順位の詳細は `<foundations/v4-durable-state-and-recovery>` Design 参照。
 
 呼出元 STEP は本スキルの出力（採用済み成果物、分類結果レポート）を STEP の result evidence として扱い、次 STEP の Input Resolution で再取得できる。

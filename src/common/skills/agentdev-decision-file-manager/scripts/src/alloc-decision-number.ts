@@ -1,5 +1,5 @@
 /**
- * Decision番号採番スクリプト（AG-{NNN}、AG-{NNN}、REQ-{NNNN}-{NNN}/160、OU-{NNN} 移行）。
+ * Decision番号採番スクリプト（「Script 所有権と委譲契約」に基づく本 skill 正規所有。req-file-manager 配下から移管済み）。
  *
  * 既存の Decision ファイル群から最大番号を特定し、その +1 を採番する。
  * 欠番埋め禁止（agentdev-decision-file-manager 採番ルール）。

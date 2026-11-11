@@ -19,7 +19,7 @@ description: 採用済み成果物を分析、統合し、ユーザー承認後�
 ## 出力
 
 - `.agentdev/backlog/req-units/RU-*.md`（Requirement Unit）
-- `docs/knowledge/` 配下の知識文書（利用者承認後に直接保存する正規昇華経路。書き込みは git 永続化対象の副作用。REQ-{NNNN}、REQ-{NNNN}-{NNN}）
+- `docs/knowledge/` 配下の知識文書（利用者承認後に直接保存する正規昇華経路。書き込みは git 永続化対象の副作用。backlog 統合の知識文書昇華条項、プロジェクト知識の承認保存条項）
 - 成功した採用済み成果物の削除（RU 生成成功分、docs/knowledge/ 知識文書保存成功分を含む）
 - backlog 自体の処置の報告（docs/knowledge/ 知識文書保存、重複・陳腐化した知識の削除、保留を完了報告に処置別に記録）
 
@@ -34,7 +34,7 @@ RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, 
 
 ## workflow
 
-本コマンドは workflow 実装本体を `agentdev-workflow-backlog-review` スキルへ委譲する（DEC-{N}、REQ-{NNNN}-{NNN}）。
+本コマンドは workflow 実装本体を `agentdev-workflow-backlog-review` スキルへ委譲する（責務3層分化と1:N分割原則、バックログ統合実行契約要件）。
 工程、分岐、状態遷移、再開、停止などの高水準の実行構造は同スキルの制御平面（control plane）が所有する。
 
 ## 不変条件
@@ -52,7 +52,7 @@ RU-*.md の構造（frontmatter: `source_type`, `generated_by`, `generated_at`, 
 
 - REQ ファイルの保存は行わない（Definition の保存・確定は `case-ready` が担当）
 - GitHub Issue の作成は行わない（`case-open` が担当）
-- docs/knowledge/ への知識文書の新規、更新、置換、削除は利用者承認なしに行わない（REQ-{NNNN}-{NNN}）
+- docs/knowledge/ への知識文書の新規、更新、置換、削除は利用者承認なしに行わない（プロジェクト知識の承認保存条項）
 - `.agentdev/intake/inbox/`、`.agentdev/learning/inbox.md`、`.agentdev/learning/deferred.md` は更新しない
 - ADF リポジトリ外の project-local 資産（Project Extension の接続定義）を直接書き換えない（書き込み先の実行前提を明示した指示の出力で代替する）
 - RU 生成に失敗した成果物は削除しない

@@ -6,7 +6,7 @@ description: docs 横断診断カテゴリ、共通証拠構造、共通 finding
 # docs 横断診断知識ベース（doc-diagnostics）
 
 inspect-docs command から呼ばれる docs 横断診断の判断基盤である。
-横断診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティングを一次所有する（AG-{NNN}、RU-{NNNN}-01 合意）。
+横断診断カテゴリ、共通証拠構造、共通 finding 出力契約、文書種別別診断へのルーティングを一次所有する（検出と診断コマンド群の要件における diagnostics 系 skill 委譲条項の受け先）。
 REQ 固有の SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT 診断は再定義せず `agentdev-req-structure-diagnostics` へルーティングする。
 文章表層検査は共通 textlint 基盤が担い、本スキルはこれを保持しない。
 本スキルの診断は docs 横断の意味診断に限定する。

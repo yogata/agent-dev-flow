@@ -300,7 +300,7 @@ export type GhToolSuccess =
       readonly body: string;
       readonly state: "open" | "closed" | "merged";
       readonly mergeable: "MERGEABLE" | "CONFLICTING" | "UNKNOWN";
-      /** GitHub Draft 状態の観測値。正規 lifecycle は Draft 状態を使用しない（REQ-{NNNN}-{NNN}）。 */
+      /** GitHub Draft 状態の観測値。正規 lifecycle は Draft 状態を使用しない（設計PRの状態契約条項）。 */
       readonly isDraft: boolean;
     }
   | {
