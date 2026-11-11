@@ -1,7 +1,7 @@
 # STEP-4/5/6: 停止条件検出・adversarial-review 由来の停止伝播・bounded parent decision resolution（stop-and-decision-resolution）
 
 > 本 reference は `agentdev-workflow-case-auto` SKILL.md の制御平面（STEP 一覧）STEP-4, STEP-5, STEP-6 詳細である。
-> 停止条件検出（11項目）・停止理由分類（7軸＋上位合意矛盾/新規ユーザー判断）、adversarial-review 由来の停止伝播、bounded parent decision resolution（限定的親判断解決）を提供する。
+> 停止条件検出（11項目）・停止理由分類（10分類。値域・定義・対応の正は case-auto command Design「停止理由分類」節）、adversarial-review 由来の停止伝播、bounded parent decision resolution（限定的親判断解決）を提供する。
 
 ## 目次
 
@@ -13,7 +13,7 @@
 
 ### Purpose
 
-11項目の停止条件を検出し、停止理由を分類軸で報告して再開可能な次コマンドを提示する。
+11項目の停止条件を検出し、停止理由を分類（10分類）で報告して再開可能な次コマンドを提示する。
 
 ### Input Resolution
 
@@ -50,13 +50,13 @@
 
 #### 停止時集約報告との接続
 
-本 STEP は停止判定と停止理由分類のみを担い、完了済み / 進行中 / 未実行 / 観測不能の集約と再開に必要な次コマンドの報告構造の生成は STEP-8 の取りまとめ経路が実行する（二重実装しない。様式と生成経路は STEP-8 reference「停止時集約報告（取りまとめ経路）」節）。本 STEP の停止理由分類（7軸＋上位合意矛盾/新規ユーザー判断＋並列起動不能）と resume 契約は本節の追記によって変更されず、分類値は STEP-8 停止報告へそのまま透過する。集約対象は durable state（対象別・stage 別観測証跡、Issue/PR 状態）から再構成した現行観測であり、判定時点で観測不能な対象は進行中と断定せず観測不能として報告する。
+本 STEP は停止判定と停止理由分類のみを担い、完了済み / 進行中 / 未実行 / 観測不能の集約と再開に必要な次コマンドの報告構造の生成は STEP-8 の取りまとめ経路が実行する（二重実装しない。様式と生成経路は STEP-8 reference「停止時集約報告（取りまとめ経路）」節）。本 STEP の停止理由分類（10分類）と resume 契約は本節の追記によって変更されず、分類値は STEP-8 停止報告へそのまま透過する。集約対象は durable state（対象別・stage 別観測証跡、Issue/PR 状態）から再構成した現行観測であり、判定時点で観測不能な対象は進行中と断定せず観測不能として報告する。
 
-#### 停止理由分類（7軸＋上位合意矛盾/新規ユーザー判断＋並列起動不能）
+#### 停止理由分類（10分類）
 
-停止条件を次の分類軸で報告する（HITL 境界の変更ではなく、再開コマンド選択とユーザー通知の精度向上が目的）。
+停止条件を次の分類（10分類）で報告する（HITL 境界の変更ではなく、再開コマンド選択とユーザー通知の精度向上が目的）。
 
-| 分類軸 | 対応停止条件 |
+| 分類 | 対応停止条件 |
 |---|---|
 | req-define 合意要件からの逸脱 | (1) |
 | command 契約・実装不整合 | (11) |
@@ -65,12 +65,15 @@
 | CI/test/lint 失敗 | (7)(8) |
 | branch 削除検出 | (9) |
 | 未コミット変更の帰属不明 | (10) |
-| 上位合意矛盾 | bounded parent decision resolution で decision_context が現行正規情報源間の矛盾に起因し、既存正規契約から導出できない場合。解決可能な不一致は権威優先で解消し、未解決規範矛盾は人間判断へ移行する（失敗・停止理由の8原因区別と原因別処理の ADF 判断アーキテクチャ規定、および限定的親判断解決の既存停止経路規定） |
-| 新規ユーザー判断事項 | 同 decision_context が人間判断への引き上げ条件（ADF 判断アーキテクチャの人間判断への引き上げ条件。新しい目的・価値・優先順位・対象範囲・外部契約・受け入れ条件・恒久規範、または既存正規契約だけでは解決不能な規範間優先関係の新規確定を要する場合）に該当する場合。Root Case 指定の再開入口（req-define）を報告する |
-| 並列起動不能（実行環境由来） | 停止条件11項目に対応しない独立停止事由。当該 stage の起動可能対象集合に対して背景起動が1件も成立しない場合。原因の断定を含まない。delegation-unavailable との弁別基準は case-auto Design「委譲起動不能時の扱い」節を参照。停止報告には起動試行履歴（試行回数、起動成立数、最終成功起動時刻）を含める |
+| 上位合意矛盾 | —（STEP-6 経由。bounded parent decision resolution で自律解決できない場合に限る） |
+| 新規ユーザー判断事項 | —（STEP-6 経由。再開入口は Root Case 指定の req-define） |
+| 並列起動不能（実行環境由来） | —（独立停止事由。当該 stage の背景起動が1件も成立しない場合。停止報告には起動試行履歴を含める。delegation-unavailable との弁別基準は case-auto Design「委譲起動不能時の扱い」節を参照） |
 
 execution_unit 分割可能性があるにも関わらず case-open が停止した場合、「req-define 合意要件からの逸脱」ではなく「command 契約・実装不整合」として報告する（case-open の契約・実装不整合であり要件doc 側の問題ではない）。
-各分類の定義、対応停止条件、再開コマンド候補の詳細は `agentdev-workflow-orchestration` を参照。
+分類の値域・定義・対応（実行結果状態、利用者判断の要否、再開入口）の正は case-auto command Design「停止理由分類」節であり、本節は分類値の列挙と対応停止条件の対応づけ（検出・分類適用手順）を所有する。
+
+infra-transient（ツール基盤故障）は停止種別であり本表の分類一覧の値ではない。Case 失敗（blocked / failed）と区別して報告し、判定条件と回復経路の正は case-auto command Design「infra-transient（ツール基盤故障）停止分類」節である。
+user-decision-required（adversarial-review 由来）は停止伝播に付随する報告分類であり本表の分類一覧の値ではない（STEP-5 で扱う。位置づけの正は case-auto command Design「user-decision-required の位置づけ」節）。
 
 #### 義務投影不完全・検証不能申告の停止伝播
 
@@ -78,7 +81,7 @@ execution_unit 分割可能性があるにも関わらず case-open が停止し
 
 - **受領**: 子 Issue の実行結果（result 4状態に付随する申告区分〔義務投影不完全 / 検証不能〕）または実行構成表・Case Issue 工程記録から申告を検出する
 - **完了伝播の阻止**: 申告子の完了処理（Issue クローズ、実行構成表 completed 反映）を行わない。申告子は `canCompleteChild` が完了を拒否し、依存先である子の `isDependencySatisfied` の blocker として後続子 Issue の投入も阻止する。受入評価の結果が未提供の子（acceptance-missing）と受入評価が拒否している子も同じ経路で完了伝播・投入を阻止する（判定関数は `agentdev-workflow-case-auto` スキル配下の実行コード `scripts/src/wave-gate.ts`。stage 3 runtime 制御契約参照）
-- **停止報告への反映**: 申告区分、対象子 Issue、再開条件（投影不完全の解消または検証方法の確定）を停止報告に含める。停止理由分類は既存軸（該当する場合は「req-define 合意要件からの逸脱」「command 契約・実装不整合」等）へ対応づけ、新規の分類軸を追加しない
+- **停止報告への反映**: 申告区分、対象子 Issue、再開条件（投影不完全の解消または検証方法の確定）を停止報告に含める。停止理由分類は既存分類（該当する場合は「req-define 合意要件からの逸脱」「command 契約・実装不整合」等）へ対応づけ、新規の分類を追加しない
 - **他対象への影響**: 申告子だけを停止伝播の対象とし、影響しない他対象の進行を一律停止しない（部分停止、STEP-3 Wave 反復制御）。影響しない証拠・判定の一律破棄・一律再実行も行わない
 
 ### Result
@@ -123,7 +126,7 @@ execution_unit 分割可能性があるにも関わらず case-open が停止し
 case-auto は受領した decision_context をまず STEP-6（bounded parent decision resolution）へ入力し、STEP-6 で上位合意矛盾・新規ユーザー判断事項の2分類に帰着した場合に限り、当該 execution_unit の自走を停止してユーザー判断を待機する。
 停止伝播契約の詳細は case-auto command Design（project extension 経由参照）「停止伝播契約」節を正とする。
 
-- **受領**: case-run 起源は result `blocked` + user-decision-required 分類、工程委譲起源は既存 status + `parent_decision_required`（v4-lifecycle-state-machine Design「adversarial-review 由来の停止信号」節、v4-delegation-contracts Design「review 経路での parent_decision_required / decision_context 適用」節）。user-decision-required は case-run result enum 第5状態ではなく停止理由分類である
+- **受領**: case-run 起源は result `blocked` + user-decision-required 分類、工程委譲起源は既存 status + `parent_decision_required`（v4-lifecycle-state-machine Design「adversarial-review 由来の停止信号」節、v4-delegation-contracts Design「review 経路での parent_decision_required / decision_context 適用」節）。user-decision-required は case-run result enum の第5状態ではなく、既存結果に付随する報告分類であり、停止理由分類（10分類）一覧の値ではない
 - **bounded parent decision resolution 先行**: 受領した decision_context を STEP-6 へ先に入力する。正規契約から導出可能なもの・委譲された裁量の範囲内のものは回答して当該下位の再開点（resume point）から再開し、自走停止に進まない
 - **自走停止**: STEP-6 で上位合意矛盾・新規ユーザー判断事項に分類された場合のみ、当該 execution_unit のみ停止。他 ready 対象は継続（部分停止、STEP-3 Wave 反復制御）
 - **ユーザー提示**: decision_context をユーザーへ提示し判断を待機
@@ -132,8 +135,8 @@ case-auto は受領した decision_context をまず STEP-6（bounded parent dec
 
 case-auto は停止伝播受領において review 直接起動、finding 解釈、採否、再評価を行わない。
 これらは下位 command の責務であり、case-auto は伝播と再開のみを担う。
-user-decision-required は STEP-4 の HITL 境界停止条件分類とは独立する停止理由分類である。
-停止報告（STEP-8）には user-decision-required を停止理由分類として含める。
+user-decision-required は STEP-4 の HITL 境界停止条件の分類（10分類）とは独立する、下位 command の adversarial-review 由来停止信号の報告分類であり、分類一覧の値ではない（両者を混同しない。位置づけの正は case-auto command Design「user-decision-required の位置づけ」節）。
+停止報告（STEP-8）には user-decision-required を停止伝播に付随する報告として含める。
 
 ### Result
 
@@ -181,8 +184,8 @@ default-on + skip policy と case-auto の自走性を両立し、ユーザー�
 |---|---|---|
 | 自律解決 | decision_context が現行正規成果物（REQ、Decision、Design、Issue その他合意済み情報）から導出できる（確定権限: 正規契約からの導出。ADF判断アーキテクチャの確定権限3分類） | ユーザー停止せず回答して下位 command を resume |
 | 作業仮定で継続 | 外部仕様・互換性・データ保持・セキュリティ・対象範囲・受け入れ条件を変更しない可逆的内部詳細（確定権限: 委譲された裁量。ADF判断アーキテクチャの確定権限3分類と委譲された裁量の範囲規定） | 既存契約で許容された範囲に限り作業仮定と根拠を明示して自走継続 |
-| 上位合意矛盾 | decision_context が現行正規情報源間の矛盾に起因する場合。解決可能な不一致は権威優先で解消し、未解決規範矛盾は人間判断へ移行する（失敗・停止理由の8原因区別と原因別処理の ADF 判断アーキテクチャ規定） | 当該矛盾そのものが finding の対象であり一方を勝手に採用せず停止（STEP-4 停止理由分類「上位合意矛盾」） |
-| 新規ユーザー判断事項 | 人間判断への引き上げ条件（ADF 判断アーキテクチャの人間判断への引き上げ条件。新しい目的・価値・優先順位・対象範囲・外部契約・受け入れ条件・恒久規範、または既存正規契約だけでは解決不能な規範間優先関係の新規確定）に該当 | 既存停止経路でユーザーへ返す（STEP-4 停止理由分類「新規ユーザー判断事項」） |
+| 上位合意矛盾 | decision_context が現行正規成果物間の矛盾に起因し、既存正規契約から導出できない場合に限る。解決可能な不一致は権威優先で解消して自走停止にせず、未解決規範矛盾に該当する場合のみ本分類で報告する | 当該矛盾そのものが finding の対象であり一方を勝手に採用せず停止（STEP-4 停止理由分類「上位合意矛盾」） |
+| 新規ユーザー判断事項 | decision_context が新しいユーザー価値判断、対象範囲変更、外部契約変更を必要とし、正規契約から導出できず委譲された裁量の範囲外である場合、すなわち人間に留保された判断の新規確定を要する場合 | 既存停止経路でユーザーへ返す（STEP-4 停止理由分類「新規ユーザー判断事項」） |
 
 - **resume**: 回答、根拠、作業仮定を下位 command へ返し、既存 resume point から処理を継続する。新規永続結果型は導入しない。adversarial-review 再実行要否は adversarial-review 側の再 review 契約に従い case-auto は独自判断しない
 - **中央集約 review engine とはならない**: case-auto は raw finding を解釈、採否、候補反映しない。下位 command が構造化した decision_context のみを解決対象とし、raw finding を case-auto へそのまま渡さない
@@ -221,7 +224,7 @@ default-on + skip policy と case-auto の自走性を両立し、ユーザー�
 ## resume point
 
 - 停止条件検出結果（11項目のいずれか該当・非該当）
-- 停止理由分類（9軸のいずれか）
+- 停止理由分類（10分類のいずれか）
 - adversarial-review 由来の user-decision-required 受領状態、decision_context、resume point
 - bounded parent decision resolution 判定結果（自律解決/作業仮定/上位合意矛盾/新規ユーザー判断）
 - 判断変更時の受領確認状態（記録コメント・影響対象の処置判断・最新条件の引き渡し・適用方針報告の確認）
@@ -233,7 +236,7 @@ default-on + skip policy と case-auto の自走性を両立し、ユーザー�
 
 ## 関連 Capability Skill
 
-- `agentdev-workflow-orchestration`: 停止理由分類詳細、再開コマンド候補、capture 境界、bg task 破棄検知時の回復
+- `agentdev-workflow-orchestration`: capture 境界、bg task 破棄検知時の回復
 - `agentdev-adversarial-review`: 停止伝播のみ受領（case-auto は直接起動しない）、再 review 条件・停止条件の正
 - `agentdev-project-extensions`: case-auto command Design extension 経由（停止伝播契約、bounded parent decision resolution）
 
