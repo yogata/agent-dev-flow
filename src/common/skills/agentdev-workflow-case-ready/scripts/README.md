@@ -46,4 +46,8 @@ bun .opencode/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_
 
 worktree で投影が利用できない場合は worktree 構造的制約の fallback 手順に従い、ソース側の同等パスから実行する。
 
+## 共有 lib の利用（supported lib interface）
+
+機械工程は、ゲート実行体の解決と可用性検査、引数検査、--validate-input 相当の入力検査実行などの反復可能な機械処理を、正規所有の共有 lib へ集約して利用します。正規所有者は `agentdev-artifact-validation` です。正本は同 skill の `scripts/lib/gate-execution.ts` です。本 skill の機械工程入口は、本 skill 配下の `scripts/lib/gate-execution.ts` 経由でのみ共有 lib を利用する。同 shim は再エクスポートのみを行い、supported lib interface の正の参照経路です。共有 lib の内部パスを入口が直接参照することはありません。工程固有のゲート選択・順序・実行条件・結果解釈は、本 skill の入口 script が所有し続けます。正規の記述は case-ready Design「機械工程の script 呼び出し契約」節です。
+
 ユニットテストは producer 側リポジトリの検証スイートが担う。

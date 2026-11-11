@@ -1,0 +1,142 @@
+{
+  "recordedPurpose": "B1-1 (Issue #4014 / DEL-4014-1) pre-change characterization of the 3 gate entry scripts (TS-001)",
+  "recordedAt": "2026-11-11T15:26:06.456Z",
+  "gateEntryOutcomes": {
+    "prepare_definition_pr": {
+      "p-1-validate-input-valid": {
+        "exitCode": 0,
+        "stdout": "{\n  \"ok\": true,\n  \"mode\": \"validate-input\",\n  \"script\": \"prepare_definition_pr\",\n  \"inputValidation\": \"pass\",\n  \"gatePreValidation\": \"pass\",\n  \"gateAvailability\": {\n    \"records\": [\n      {\n        \"gate\": \"generate_indexes\",\n        \"available\": true,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n        \"alternativeRoutes\": []\n      },\n      {\n        \"gate\": \"check_integrity\",\n        \"available\": true,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n        \"alternativeRoutes\": []\n      },\n      {\n        \"gate\": \"traceability-check\",\n        \"available\": true,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n        \"alternativeRoutes\": []\n      }\n    ],\n    \"missing\": []\n  },\n  \"sideEffects\": \"none\"\n}\n",
+        "stderr": ""
+      },
+      "p-2-validate-input-missing-gate": {
+        "exitCode": 1,
+        "stdout": "{\n  \"ok\": false,\n  \"mode\": \"validate-input\",\n  \"script\": \"prepare_definition_pr\",\n  \"inputValidation\": \"pass\",\n  \"gatePreValidation\": \"pass\",\n  \"gateAvailability\": {\n    \"records\": [\n      {\n        \"gate\": \"generate_indexes\",\n        \"available\": true,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n        \"alternativeRoutes\": []\n      },\n      {\n        \"gate\": \"check_integrity\",\n        \"available\": false,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//missing-gate.ts\",\n        \"alternativeRoutes\": [\n          \"evidence-preservation（証跡化）: ゲート実行体の欠落を検出事項として証跡化する（本報告 JSON の step detail と warnings、呼出側の検証差分記録への記録）\",\n          \"manual-equivalent-procedure（手動相当手順）: 手動相当の手順で同等の検査を実施し、実行証跡（終了コード、標準出力・標準エラー）を記録する\",\n          \"contrastive-no-worse-proof（対照実行による悪化ゼロ件の機械証明）: baseline 対照の対照実行で既知 fail の悪化ゼロ件を機械証明する\"\n        ]\n      },\n      {\n        \"gate\": \"traceability-check\",\n        \"available\": true,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n        \"alternativeRoutes\": []\n      }\n    ],\n    \"missing\": [\n      \"check_integrity\"\n    ]\n  },\n  \"sideEffects\": \"none\"\n}\n",
+        "stderr": ""
+      },
+      "p-3-validate-input-empty-stagepaths": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "error: input.stagePaths must be a non-empty array (explicit path staging)\n"
+      },
+      "p-4-invalid-json": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "error: input is not valid JSON: SyntaxError: JSON Parse error: Unexpected EOF\n"
+      },
+      "p-5-no-args": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "error: --input is required\nusage: bun ./src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts --input <input.json> [--validate-input]\n  --input           機械工程入力 JSON（worktree、branch、Definition 編集内容、品質ゲート実行仕様等）\n  --validate-input  検証専用経路。入力 JSON の契約検証・既知 gate 引数契約検査・ゲート実行体の\n                    存在確認のみを行い（worktree 作成・ゲート実行・git/gh 操作・管理対象ファイル\n                    変更なし）、報告 JSON を stdout へ出力する（合格 0 / 不合格 1）\n"
+      },
+      "p-6-unknown-arg": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "error: unknown argument: --bogus\nusage: bun ./src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts --input <input.json> [--validate-input]\n  --input           機械工程入力 JSON（worktree、branch、Definition 編集内容、品質ゲート実行仕様等）\n  --validate-input  検証専用経路。入力 JSON の契約検証・既知 gate 引数契約検査・ゲート実行体の\n                    存在確認のみを行い（worktree 作成・ゲート実行・git/gh 操作・管理対象ファイル\n                    変更なし）、報告 JSON を stdout へ出力する（合格 0 / 不合格 1）\n"
+      },
+      "p-7-help": {
+        "exitCode": 0,
+        "stdout": "usage: bun ./src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts --input <input.json> [--validate-input]\n  --input           機械工程入力 JSON（worktree、branch、Definition 編集内容、品質ゲート実行仕様等）\n  --validate-input  検証専用経路。入力 JSON の契約検証・既知 gate 引数契約検査・ゲート実行体の\n                    存在確認のみを行い（worktree 作成・ゲート実行・git/gh 操作・管理対象ファイル\n                    変更なし）、報告 JSON を stdout へ出力する（合格 0 / 不合格 1）\n",
+        "stderr": ""
+      },
+      "p-8-run-missing-gate": {
+        "exitCode": 1,
+        "stdout": "{\n  \"result\": {\n    \"exitCategory\": \"failure\",\n    \"dryRun\": false,\n    \"steps\": [\n      {\n        \"name\": \"gate-availability\",\n        \"status\": \"fail\",\n        \"detail\": {\n          \"gates\": [\n            {\n              \"gate\": \"generate_indexes\",\n              \"available\": true,\n              \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n              \"alternativeRoutes\": []\n            },\n            {\n              \"gate\": \"check_integrity\",\n              \"available\": false,\n              \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//missing-gate.ts\",\n              \"alternativeRoutes\": [\n                \"evidence-preservation（証跡化）: ゲート実行体の欠落を検出事項として証跡化する（本報告 JSON の step detail と warnings、呼出側の検証差分記録への記録）\",\n                \"manual-equivalent-procedure（手動相当手順）: 手動相当の手順で同等の検査を実施し、実行証跡（終了コード、標準出力・標準エラー）を記録する\",\n                \"contrastive-no-worse-proof（対照実行による悪化ゼロ件の機械証明）: baseline 対照の対照実行で既知 fail の悪化ゼロ件を機械証明する\"\n              ]\n            },\n            {\n              \"gate\": \"traceability-check\",\n              \"available\": true,\n              \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n              \"alternativeRoutes\": []\n            }\n          ]\n        }\n      }\n    ]\n  },\n  \"diff\": {},\n  \"warnings\": [\n    \"required gate executable is missing in the deployment environment (omission and success are not allowed): check_integrity. alternative routes: evidence-preservation（証跡化）: ゲート実行体の欠落を検出事項として証跡化する（本報告 JSON の step detail と warnings、呼出側の検証差分記録への記録） / manual-equivalent-procedure（手動相当手順）: 手動相当の手順で同等の検査を実施し、実行証跡（終了コード、標準出力・標準エラー）を記録する / contrastive-no-worse-proof（対照実行による悪化ゼロ件の機械証明）: baseline 対照の対照実行で既知 fail の悪化ゼロ件を機械証明する\"\n  ],\n  \"proposal\": {}\n}\n",
+        "stderr": ""
+      },
+      "p-9-run-input-file-missing": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "error: cannot read input file: .agentdev/tmp/del4014-char/no-such-input.json (Error: ENOENT: no such file or directory, open '.agentdev/tmp/del4014-char/no-such-input.json')\n"
+      }
+    },
+    "accept_definition_checks": {
+      "a-1-validate-input-valid": {
+        "exitCode": 0,
+        "stdout": "{\n  \"ok\": true,\n  \"mode\": \"validate-input\",\n  \"script\": \"accept_definition_checks\",\n  \"inputValidation\": \"pass\",\n  \"gatePreValidation\": \"pass\",\n  \"gateAvailability\": {\n    \"records\": [\n      {\n        \"gate\": \"check_integrity\",\n        \"available\": true,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n        \"alternativeRoutes\": []\n      },\n      {\n        \"gate\": \"traceability-check\",\n        \"available\": true,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n        \"alternativeRoutes\": []\n      },\n      {\n        \"gate\": \"overlap-cross-check\",\n        \"available\": true,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n        \"alternativeRoutes\": []\n      },\n      {\n        \"gate\": \"generate_indexes\",\n        \"available\": true,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n        \"alternativeRoutes\": []\n      }\n    ],\n    \"missing\": []\n  },\n  \"sideEffects\": \"none\"\n}\n",
+        "stderr": ""
+      },
+      "a-2-validate-input-missing-gate": {
+        "exitCode": 1,
+        "stdout": "{\n  \"ok\": false,\n  \"mode\": \"validate-input\",\n  \"script\": \"accept_definition_checks\",\n  \"inputValidation\": \"pass\",\n  \"gatePreValidation\": \"pass\",\n  \"gateAvailability\": {\n    \"records\": [\n      {\n        \"gate\": \"check_integrity\",\n        \"available\": false,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//missing-gate.ts\",\n        \"alternativeRoutes\": [\n          \"evidence-preservation（証跡化）: ゲート実行体の欠落を検出事項として証跡化する（本報告 JSON の step detail と warnings、呼出側の検証差分記録への記録）\",\n          \"manual-equivalent-procedure（手動相当手順）: 手動相当の手順で同等の検査を実施し、実行証跡（終了コード、標準出力・標準エラー）を記録する\",\n          \"contrastive-no-worse-proof（対照実行による悪化ゼロ件の機械証明）: baseline 対照の対照実行で既知 fail の悪化ゼロ件を機械証明する\"\n        ]\n      },\n      {\n        \"gate\": \"traceability-check\",\n        \"available\": true,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n        \"alternativeRoutes\": []\n      },\n      {\n        \"gate\": \"overlap-cross-check\",\n        \"available\": true,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n        \"alternativeRoutes\": []\n      },\n      {\n        \"gate\": \"generate_indexes\",\n        \"available\": true,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n        \"alternativeRoutes\": []\n      }\n    ],\n    \"missing\": [\n      \"check_integrity\"\n    ]\n  },\n  \"sideEffects\": \"none\"\n}\n",
+        "stderr": ""
+      },
+      "a-3-validate-input-bad-phase": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "error: phase must be \"acceptance-checks\" or \"canonical-and-cleanup\"\n"
+      },
+      "a-4-invalid-json": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "error: input is not valid JSON: SyntaxError: JSON Parse error: Unexpected EOF\n"
+      },
+      "a-5-no-args": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "error: --input is required\nusage: bun ./src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts --input <input.json> [--validate-input]\n  --input           機械工程入力 JSON（phase、品質ゲート実行仕様、削除対象パス等）\n  --validate-input  検証専用経路。入力 JSON の契約検証・既知 gate 引数契約検査・ゲート実行体の\n                    存在確認のみを行い（worktree 作成・ゲート実行・git/gh 操作・管理対象ファイル\n                    変更なし）、報告 JSON を stdout へ出力する（合格 0 / 不合格 1）\n"
+      },
+      "a-6-unknown-arg": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "error: unknown argument: --bogus\nusage: bun ./src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts --input <input.json> [--validate-input]\n  --input           機械工程入力 JSON（phase、品質ゲート実行仕様、削除対象パス等）\n  --validate-input  検証専用経路。入力 JSON の契約検証・既知 gate 引数契約検査・ゲート実行体の\n                    存在確認のみを行い（worktree 作成・ゲート実行・git/gh 操作・管理対象ファイル\n                    変更なし）、報告 JSON を stdout へ出力する（合格 0 / 不合格 1）\n"
+      },
+      "a-7-help": {
+        "exitCode": 0,
+        "stdout": "usage: bun ./src/common/skills/agentdev-workflow-case-ready/scripts/src/accept_definition_checks.ts --input <input.json> [--validate-input]\n  --input           機械工程入力 JSON（phase、品質ゲート実行仕様、削除対象パス等）\n  --validate-input  検証専用経路。入力 JSON の契約検証・既知 gate 引数契約検査・ゲート実行体の\n                    存在確認のみを行い（worktree 作成・ゲート実行・git/gh 操作・管理対象ファイル\n                    変更なし）、報告 JSON を stdout へ出力する（合格 0 / 不合格 1）\n",
+        "stderr": ""
+      },
+      "a-8-run-missing-gate": {
+        "exitCode": 1,
+        "stdout": "{\n  \"result\": {\n    \"phase\": \"acceptance-checks\",\n    \"exitCategory\": \"failure\",\n    \"steps\": [\n      {\n        \"name\": \"gate-availability\",\n        \"status\": \"fail\",\n        \"detail\": {\n          \"gates\": [\n            {\n              \"gate\": \"check_integrity\",\n              \"available\": false,\n              \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//missing-gate.ts\",\n              \"alternativeRoutes\": [\n                \"evidence-preservation（証跡化）: ゲート実行体の欠落を検出事項として証跡化する（本報告 JSON の step detail と warnings、呼出側の検証差分記録への記録）\",\n                \"manual-equivalent-procedure（手動相当手順）: 手動相当の手順で同等の検査を実施し、実行証跡（終了コード、標準出力・標準エラー）を記録する\",\n                \"contrastive-no-worse-proof（対照実行による悪化ゼロ件の機械証明）: baseline 対照の対照実行で既知 fail の悪化ゼロ件を機械証明する\"\n              ]\n            },\n            {\n              \"gate\": \"overlap-cross-check\",\n              \"available\": true,\n              \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n              \"alternativeRoutes\": []\n            },\n            {\n              \"gate\": \"generate_indexes\",\n              \"available\": true,\n              \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n              \"alternativeRoutes\": []\n            },\n            {\n              \"gate\": \"traceability-check\",\n              \"available\": true,\n              \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n              \"alternativeRoutes\": []\n            }\n          ]\n        }\n      }\n    ]\n  },\n  \"diff\": {},\n  \"warnings\": [\n    \"required gate executable is missing in the deployment environment (omission and success are not allowed): check_integrity. alternative routes: evidence-preservation（証跡化）: ゲート実行体の欠落を検出事項として証跡化する（本報告 JSON の step detail と warnings、呼出側の検証差分記録への記録） / manual-equivalent-procedure（手動相当手順）: 手動相当の手順で同等の検査を実施し、実行証跡（終了コード、標準出力・標準エラー）を記録する / contrastive-no-worse-proof（対照実行による悪化ゼロ件の機械証明）: baseline 対照の対照実行で既知 fail の悪化ゼロ件を機械証明する\"\n  ],\n  \"proposal\": {}\n}\n",
+        "stderr": ""
+      },
+      "a-9-run-input-file-missing": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "error: cannot read input file: .agentdev/tmp/del4014-char/no-such-input.json (Error: ENOENT: no such file or directory, open '.agentdev/tmp/del4014-char/no-such-input.json')\n"
+      }
+    },
+    "close_mechanical_steps": {
+      "c-1-validate-input-valid": {
+        "exitCode": 0,
+        "stdout": "{\n  \"ok\": true,\n  \"mode\": \"validate-input\",\n  \"script\": \"close_mechanical_steps\",\n  \"inputValidation\": \"pass\",\n  \"gatePreValidation\": \"pass\",\n  \"gateAvailability\": {\n    \"records\": [\n      {\n        \"gate\": \"generate_indexes\",\n        \"available\": true,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n        \"alternativeRoutes\": []\n      },\n      {\n        \"gate\": \"traceability-check\",\n        \"available\": true,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n        \"alternativeRoutes\": []\n      },\n      {\n        \"gate\": \"textlint-final-check\",\n        \"available\": true,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n        \"alternativeRoutes\": []\n      },\n      {\n        \"gate\": \"full-integrity-suite\",\n        \"available\": true,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n        \"alternativeRoutes\": []\n      }\n    ],\n    \"missing\": []\n  },\n  \"sideEffects\": \"none\"\n}\n",
+        "stderr": ""
+      },
+      "c-2-validate-input-missing-gate": {
+        "exitCode": 1,
+        "stdout": "{\n  \"ok\": false,\n  \"mode\": \"validate-input\",\n  \"script\": \"close_mechanical_steps\",\n  \"inputValidation\": \"pass\",\n  \"gatePreValidation\": \"pass\",\n  \"gateAvailability\": {\n    \"records\": [\n      {\n        \"gate\": \"generate_indexes\",\n        \"available\": true,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n        \"alternativeRoutes\": []\n      },\n      {\n        \"gate\": \"traceability-check\",\n        \"available\": true,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n        \"alternativeRoutes\": []\n      },\n      {\n        \"gate\": \"textlint-final-check\",\n        \"available\": true,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//fixture-gate.ts\",\n        \"alternativeRoutes\": []\n      },\n      {\n        \"gate\": \"full-integrity-suite\",\n        \"available\": false,\n        \"resolvedExecutable\": \"<REPO_ROOT>//.agentdev//tmp//del4014-char//missing-gate.ts\",\n        \"alternativeRoutes\": [\n          \"evidence-preservation（証跡化）: ゲート実行体の欠落を検出事項として証跡化する（本報告 JSON の step detail と warnings、呼出側の検証差分記録への記録）\",\n          \"manual-equivalent-procedure（手動相当手順）: 手動相当の手順で同等の検査を実施し、実行証跡（終了コード、標準出力・標準エラー）を記録する\",\n          \"contrastive-no-worse-proof（対照実行による悪化ゼロ件の機械証明）: baseline 対照の対照実行で既知 fail の悪化ゼロ件を機械証明する\"\n        ]\n      }\n    ],\n    \"missing\": [\n      \"full-integrity-suite\"\n    ]\n  },\n  \"sideEffects\": \"none\"\n}\n",
+        "stderr": ""
+      },
+      "c-3-validate-input-bad-phase": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "error: phase must be \"pre-merge\" or \"post-merge\"\n"
+      },
+      "c-4-invalid-json": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "error: input is not valid JSON: SyntaxError: JSON Parse error: Unexpected EOF\n"
+      },
+      "c-5-no-args": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "error: --input is required\nusage: bun ./src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts --input <input.json> [--validate-input]\n  --input           機械工程入力 JSON（phase、worktree_root、PR番号、品質ゲート実行仕様等）\n  --validate-input  検証専用経路。入力 JSON の契約検証・既知 gate 引数契約検査・ゲート実行体の\n                    存在確認のみを行い（worktree 作成・ゲート実行・git/gh 操作・管理対象ファイル\n                    変更なし）、報告 JSON を stdout へ出力する（合格 0 / 不合格 1）\n"
+      },
+      "c-6-unknown-arg": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "error: unknown argument: --bogus\nusage: bun ./src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts --input <input.json> [--validate-input]\n  --input           機械工程入力 JSON（phase、worktree_root、PR番号、品質ゲート実行仕様等）\n  --validate-input  検証専用経路。入力 JSON の契約検証・既知 gate 引数契約検査・ゲート実行体の\n                    存在確認のみを行い（worktree 作成・ゲート実行・git/gh 操作・管理対象ファイル\n                    変更なし）、報告 JSON を stdout へ出力する（合格 0 / 不合格 1）\n"
+      },
+      "c-7-help": {
+        "exitCode": 0,
+        "stdout": "usage: bun ./src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts --input <input.json> [--validate-input]\n  --input           機械工程入力 JSON（phase、worktree_root、PR番号、品質ゲート実行仕様等）\n  --validate-input  検証専用経路。入力 JSON の契約検証・既知 gate 引数契約検査・ゲート実行体の\n                    存在確認のみを行い（worktree 作成・ゲート実行・git/gh 操作・管理対象ファイル\n                    変更なし）、報告 JSON を stdout へ出力する（合格 0 / 不合格 1）\n",
+        "stderr": ""
+      },
+      "c-9-run-input-file-missing": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "error: cannot read input file: .agentdev/tmp/del4014-char/no-such-input.json (Error: ENOENT: no such file or directory, open '.agentdev/tmp/del4014-char/no-such-input.json')\n"
+      }
+    }
+  }
+}
