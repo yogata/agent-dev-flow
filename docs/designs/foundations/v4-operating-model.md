@@ -2,7 +2,7 @@
 title: ADF v4 Operating Model（目的・三層責務・Project Contract・寿命・文書モデル）
 status: accepted
 created: 2026-09-18
-updated: "2026-11-04"
+updated: "2026-11-12"
 ---
 <!-- ADF-COVERS(design): REQ-088-001, REQ-088-002, REQ-088-003, REQ-088-004, REQ-088-005, REQ-088-006, REQ-088-007 -->
 <!-- ADF-COVERS(implementation): REQ-088-006（REQ、Decision、Design、Implementation、Evidence の意味境界の正規所有の構成実体は本 Design「中核文書モデル」節そのものである） -->
