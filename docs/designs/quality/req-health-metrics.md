@@ -2,7 +2,7 @@
 title: REQ 健全性メトリクス
 status: accepted
 created: 2026-08-20
-updated: "2026-11-10"
+updated: "2026-11-11"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-044 -->
 
@@ -102,11 +102,11 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 | REQ-002 | 39 | +0 |  |
 | REQ-010 | 37 | +0 |  |
 | REQ-031 | 36 | +0 |  |
+| REQ-011 | 34 | +0 |  |
 | REQ-012 | 34 | +0 |  |
 | REQ-053 | 34 | +0 |  |
 | REQ-096 | 34 | +0 |  |
 | REQ-111 | 33 | +0 |  |
-| REQ-011 | 32 | +0 |  |
 | REQ-036 | 32 | +0 |  |
 | REQ-030 | 31 | +0 |  |
 | REQ-103 | 31 | +0 |  |
@@ -169,7 +169,7 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 | REQ-055 | 2 | +0 |  |
 | REQ-113 | 2 | +0 |  |
 
-計測日: 2026-11-10。
+計測日: 2026-11-11。
 <!-- AUTOGEN:END -->
 
 要件行数は要件テーブル行のみをカウント（目的、適用範囲セクションの散文は除外）。
