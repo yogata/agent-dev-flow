@@ -2,7 +2,7 @@
 title: case-close Design
 status: accepted
 created: 2026-06-21
-updated: "2026-11-08"
+updated: "2026-11-11"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-018, REQ-021-019, REQ-021-022, REQ-021-025 -->
@@ -344,7 +344,7 @@ QG-4 最終完了判定における受け入れ義務保存の実行時投影。
 
 case-close の機械工程（mergeable ポーリング、squash merge 前後のローカル状態検査、Epic 実行構成表の解析と状態更新、完了条件チェックボックス評価の機械的抽出、AUTOGEN 再生成差分検出、full integrity suite の起動と結果集約、契約状態記録・未追跡残存検査、終了判定記録（`.agentdev/close-acceptance/`）の書出し・無効化と終了後回収、worktree/branch クリーンアップ）は、工程別 script 1 回の呼び出しに束ねる。GitHub I/O（pr_merge、issue_close、Issue 本文更新）は Custom Tool agentdev_gh の境界を維持する。
 
-- 入力 JSON / 報告 JSON / 終了コードの契約、品質ゲートの script 内実行（省略禁止）、final-acceptance.ts・inspect_cross_dependencies.ts と同じ作り（共通基盤不作成）、意味判断（警告の重要度評価、Design 確定判断、未達判定の確定）のモデル担当は、case-open Design「機械工程の script 呼び出し契約（RU-0162）」節と同一の規律に従う
+- 入力 JSON / 報告 JSON / 終了コードの契約、品質ゲートの script 内実行（省略禁止）、final-acceptance.ts・inspect_cross_dependencies.ts と同じ作り（反復可能な機械処理に限り agentdev-artifact-validation 所有の共有 lib を supported lib interface 経由で利用できる。工程固有のゲート選択・順序・実行条件・結果解釈は各工程の Design が所有し続け、横断的な共通基盤を新設しない）、意味判断（警告の重要度評価、Design 確定判断、未達判定の確定）のモデル担当は、case-open Design「機械工程の script 呼び出し契約（RU-0162）」節と同一の規律に従う
 - post-merge の worktree/branch クリーンアップは、main working tree 構成（worktreeRoot == repoRoot・Epic 最終close等）では worktree とその checkout ブランチが削除対象外（REQ-118-005）であるため適用対象外として pass を記録し、worktree remove と branch 残存検知を実行しない。cleanup.removeWorktree: false 指定時も worktree 削除を発行しない。通常 worktree 構成は従来どおり削除と残存検知を行い、残存時の要判断警告を維持する。明示指定された removeBranch の削除失敗はいずれの構成でも回収失敗として扱う
 - 報告 JSON にはマージ・検証・クリーンアップの各結果、差分、警告、提案するコメント本文を含める
 - workflow skill 参照文面は script 呼び出しと報告 JSON 解釈へ置き換えて短縮する

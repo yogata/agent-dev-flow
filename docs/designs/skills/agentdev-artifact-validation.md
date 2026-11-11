@@ -2,7 +2,7 @@
 title: agentdev-artifact-validation Design
 status: accepted
 created: 2026-07-22
-updated: "2026-10-25"
+updated: "2026-11-11"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-042 -->
 <!-- ADF-COVERS(design): REQ-107-009 -->
@@ -62,11 +62,14 @@ REQ、Decision、Design 固有の内容判断を行わず、決定的検証の�
 - I/O は argv/stdin で入力を受け取り、stdout で JSON 結果を返す
 - 利用側の保存内部責務および skill（`agentdev-req-file-manager`、`agentdev-decision-file-manager`、`agentdev-design-file-manager` 等）は内部 script パスを直接参照せず、本 skill の公開検証契約へ委譲する
 - 同一 script または共有 lib を複数 skill へ複製しない
+- 共有 lib（fs-helpers、result、および case 系 workflow script が共有するゲート機械処理 lib）の正規所有を本 skill が担う。兄弟 skill の scripts は、本 skill が公開する supported lib interface（本 skill が定義する参照経路）経由で共有 lib を利用する
+- 共有 lib の受理集合（ファイル名形式・番号桁などの解析対象範囲）を変更する場合は、影響する全利用側の変更前後比較と、受理集合が変化する利用側が存在する場合の利用者再合意を前提とする。共有 lib に明示的な書込みなど検証操作の副作用を含めない
 
 ## 境界
 
 REQ 固有 script は `agentdev-req-file-manager`、Decision 固有 script は `agentdev-decision-file-manager`、Design 固有 script は `agentdev-design-file-manager` が所有する。
-利用側は本 skill の内部 script を直接参照せず、公開検証契約へ委譲する。
+利用側は本 skill の内部 script を直接参照せず、公開検証契約への委譲を基本とし、共有 lib に限り本 skill が公開する supported lib interface（本 skill が定義する参照経路）経由の利用を認める。supported lib interface は公開検証契約（操作名、入力、JSON 結果、エラー契約）とは別の内部共用契約であり、検証操作の境界と副作用なしの共通契約を緩めない。
+共有 lib が受理する解析対象の範囲（ファイル名形式、番号桁等の受理集合）の変更は、影響する全利用側の変更前後比較と、受理集合が変化する利用側が存在する場合の利用者再合意を前提とする。
 同一 script または共有 lib を複製しない。
 
 ## 対象外

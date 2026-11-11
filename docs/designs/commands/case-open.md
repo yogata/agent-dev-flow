@@ -2,7 +2,7 @@
 title: case-open Design
 status: accepted
 created: 2026-06-21
-updated: "2026-11-07"
+updated: "2026-11-11"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-004, REQ-030-005, REQ-030-006, REQ-030-007, REQ-030-008, REQ-030-009, REQ-030-010, REQ-030-011, REQ-030-015 -->
@@ -84,7 +84,7 @@ case-open STEP-4（実変更判定と設計PR作成）の機械工程（専用 w
 - 既存の品質ゲート（check_integrity、traceability check、generate_indexes 差分検出）は script 内で実行し、省略しない
 - traceability gate を有効にする入力では、判定対象 REQ 集合（traceabilityReqIds）の存在と有効性を gate 実行前に検証する（REQ-030-028）。欠落・空・不整合入力は fail-closed で報告し、空配列への暗黙正規化で入力不備を隠蔽しない
 - REQ 追加を伴う Definition Package 生成時は、docs/README.md 手動管理区間の件数記述の照合を初回の変更・検証範囲に含め（REQ-030-029）、REQ 行数由来の派生物が stage paths に事前包含できない場合は既存の事後突合 contingency 手順に従う
-- script の実装は inspect_cross_dependencies.ts と同じ作りに従い、共通基盤は作らない
+- script の実装は inspect_cross_dependencies.ts と同じ作りに従う。ゲート実行体の解決と可用性検査、引数検査、--validate-input 相当の入力検査実行など反復可能な機械処理に限り、agentdev-artifact-validation が所有する共有 lib（supported lib interface 経由）を利用できる。工程固有のゲート選択・順序・実行条件・結果解釈は各工程の Design が所有し続け、横断的な共通基盤を新設しない
 - 意味判断（停止判断、deviation 分類、adversarial review、警告の重要度評価）はモデルが担当し続け、script は機械的に確定した手順のみを実行する
 - workflow skill 参照文面（references/*.md）は、LLM が bash コマンドを逐次実行する指示から script 呼び出しと報告 JSON 解釈へ置き換えて短縮する
 - 本契約は Definition 編集（DefinitionEdit による対象パス + 旧文完全一致置換）の script 適用について規定するものであり、新規 REQ/Decision ファイルの worktree 内前置作成（agentdev-git-worktree 標準手順 type=definition による前置作成、node writeFileSync による UTF-8 明示配置）を排除しない。前置作成済みファイルは script の冪等再利用（branch 確認済み worktree 再利用）と整合して扱う。前置作成の具体的手順は配布 reference（definition-pr-and-idempotency.md）の STEP-4 手順が所有する
