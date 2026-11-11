@@ -5,6 +5,22 @@
 
 ---
 
+## 2026-11-11: accept_definition_checks.ts の integrity gate が既出債務 warning で機械 fail となり後続ゲートが後続抑止される構造
+
+- **問題事象**: case-ready 受入検査（accept_definition_checks.ts phase: acceptance-checks）の integrity gate（check_integrity --profile source）が、本 Case 変更と無関係の既出債務 warning（gh-direct-invocation・case-close scripts README の記述行・IR baseline 管理下）により exit 1 となり、script の後続抑止設計（非ゼロ終了の integrity gate は証拠保存後に後続ゲートを実行しない）により overlap 突合・AUTOGEN 再生成差分検出・traceability check が同一呼出しで実行できなかった
+- **発生局面**: case-ready STEP-1 設計PR受入の機械工程（Case #4004 / PR #4007）
+- **検知方法**: script 報告 JSON（caseready-4004-acceptance-report-1.json）の definition-acceptance-checks step fail と warnings（"Definition integrity/quality check failed"）＋ worktree・main 双方の対照実行（いずれも summary NG 0 / Warning 1・「1 new unmanaged NG (delta)」行は main 側にも存在＝本変更起因でない対照証明）
+- **根本原因**: check_integrity の終了コード契約（NG または warning のいずれかで exit 1・warning 専用の抑止フラグなし）と、受入合格条件の意味基準（本変更起因の新規 finding 0 件）との粒度差。既出債務 warning が恒常的に存在する倉庫状態では script が後続ゲートへ到達できない
+- **自律対応内容**: 対照実行（main root での同一検査）により既出債務の新規性なしを機械証明した上で、残り3ゲート（overlap 突合〔exit 0・警告2件〕・generate_indexes + worktree 内 AUTOGEN diff〔exit 0・差分0件〕・traceability check --req 5行〔exit 2・missing-design 0件・deferred 2種は契約どおり〕）を手動相当手順（GATE_ALTERNATIVE_ROUTES の manual-equivalent-procedure）で同等実施し、実行証跡（終了コード・stdout・stderr）を .agentdev/integrity/reports/caseready-4004-* に保存して受理判断した
+- **ユーザー確認の有無**: なし（受入合格条件〔本変更起因の新規 finding 0 件〕からの正規契約導出・意味レビューと受理判断はモデル責務の範囲内）
+- **REQ/Decision/Design影響**: case-ready Design「機械工程の script 呼び出し契約」節（後続抑止時の継続経路の明示化候補）・checker-execution-contracts（check_integrity 終了コードと受入判定の粒度整合）
+- **横展開観点**: 同一構造は case-open の prepare_definition_pr.ts の check_integrity step にも存在し得る（2026-11-07 の measurement-convergence 学び〔Case #3961〕とは別変種）。永久 warning を持つ倉庫での機械工程 script の完遂性を点検する
+- **再発条件**: 既出債務 warning（例: gh-direct-invocation 1 件）が解消されないまま、integrity gate を含む acceptance-checks script を実行する条件
+- **予防策候補**: script 入力に integrity gate の既知 warning 許容リスト（対照証明の添付を必須化）を受け取る入力契約の追加、または非ゼロ終了時に後続ゲートを続行する continuation mode 相当の入力契約拡張
+- **想定反映先**: req-define（case-ready 機械工程の継続契約の要件化候補）
+- **関連**: Case #4004 / PR #4007・accept_definition_checks.ts の GATE_ALTERNATIVE_ROUTES・Case #3961 の measurement-convergence 学び（2026-11-07・別変種）
+- **タグ**: #case-ready-機械工程 #check-integrity #既出債務 #後続抑止 #手動相当手順
+
 ## 2026-11-07: measurement-convergence 補正値 (commitDate) と IR-072 検査値 (author date) の設計差による check_integrity NG 5件残存
 
 - **問題事象**: case-open 機械工程（prepare_definition_pr.ts）の measurement-convergence step が REQ-117-011 契約どおり req-updated-freshness NG 対象 5 ファイルの frontmatter updated を commitDate（本日 2026-11-07）へ補正 commit したが、check_integrity（IR-072）は updated と「最終内容変更 commit の author date」の突合を要求するため、補正値（2026-11-07）と検査要求値（author date・2026-11-04/2026-11-05）の設計差で IR-072 NG 5件が残存し、script は補正前報告の判定のまま failure 終了した
