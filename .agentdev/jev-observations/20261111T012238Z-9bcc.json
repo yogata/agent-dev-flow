@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261111T012238Z-9bcc",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "Case #3994 の未採用ファイル数制限の訂正",
+  "sourceRevision": "a423f12aa",
+  "durationMs": 1555,
+  "inputTokens": 947,
+  "inputs": {
+    "requestDigest": "79ad185b96464652a9fbba1f77aa4a91fedcf08b9218deabfa9f5343a48e202f",
+    "snapshot": "監督者が未採用の3ファイル制限を実行契約とTS-004から除去するよう明示指示。元RU対象外維持、必要最小限の対応宣言のみ付随許容、PR #3998再利用、正本REQ/Design変更なし。"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "case3994-amendment-existing-req-operation",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0.01,
+        "APPEND": 0.03,
+        "UPDATE": 0.71,
+        "REQ操作なし": 0.24,
+        "保留": 0.01
+      }
+    },
+    {
+      "questionId": "case3994-amendment-existing-req-confirmation",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.22,
+        "false": 0.78
+      }
+    }
+  ],
+  "confidence": 0.64,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "case3994-amendment-existing-req-operation",
+        "value": "REQ操作なし",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "case3994-amendment-existing-req-confirmation",
+        "value": false
+      }
+    ]
+  }
+}
