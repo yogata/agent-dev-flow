@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261110T100957Z-b018",
+  "workflow": "req-define",
+  "evaluationKind": "final-classification-design-separation",
+  "subject": "C-α2 小修正の保存対象行候補（新規REQ 3行・REQ-036 追記1行・REQ-090 追記1行・Design 2件）の帰属と Design 分離判断",
+  "sourceRevision": "2b352f7d3",
+  "durationMs": 570,
+  "inputTokens": 3195,
+  "inputs": {
+    "requestDigest": "31b77f0b453bb0163215f2e34ab8549646ea5bcd5e0f9adceaa58b0d988f559a",
+    "references": [
+      {
+        "digest": "c7af6b404b86347674580451384994f02585a392d33cb54ce1f30ff11772dab8",
+        "label": "req-input (C-α2 小修正8件)",
+        "path": "C:/Users/ogatay/work/hermes-vault/project-list/req-input-adf-simplification-c-alpha2-small-fixes.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-f2row",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.82,
+        "Design行": 0.18
+      }
+    },
+    {
+      "questionId": "q2-f2row",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.37,
+        "false": 0.63
+      }
+    },
+    {
+      "questionId": "q1-f3row",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.97,
+        "Design行": 0.03
+      }
+    },
+    {
+      "questionId": "q2-f3row",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.42,
+        "false": 0.5800000000000001
+      }
+    },
+    {
+      "questionId": "q1-f4row",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.92,
+        "Design行": 0.08
+      }
+    },
+    {
+      "questionId": "q2-f4row",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.83,
+        "false": 0.17000000000000004
+      }
+    },
+    {
+      "questionId": "q1-f5row",
+      "questionForm": "choice",
+      "value": "REQ行",
+      "probabilityDistribution": {
+        "REQ行": 0.62,
+        "Design行": 0.38
+      }
+    },
+    {
+      "questionId": "q2-f5row",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.44,
+        "false": 0.56
+      }
+    },
+    {
+      "questionId": "q1-f8row",
+      "questionForm": "choice",
+      "value": "Design行",
+      "probabilityDistribution": {
+        "REQ行": 0.31,
+        "Design行": 0.69
+      }
+    },
+    {
+      "questionId": "q2-f8row",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.57,
+        "false": 0.43000000000000005
+      }
+    },
+    {
+      "questionId": "q1-f9",
+      "questionForm": "choice",
+      "value": "Design行",
+      "probabilityDistribution": {
+        "REQ行": 0,
+        "Design行": 1
+      }
+    }
+  ],
+  "confidence": 0.64,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-f2row",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q2-f2row",
+        "value": false
+      },
+      {
+        "questionId": "q1-f3row",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q2-f3row",
+        "value": false
+      },
+      {
+        "questionId": "q1-f4row",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q2-f4row",
+        "value": true
+      },
+      {
+        "questionId": "q1-f5row",
+        "value": "REQ行"
+      },
+      {
+        "questionId": "q2-f5row",
+        "value": false
+      },
+      {
+        "questionId": "q1-f8row",
+        "value": "REQ行",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q2-f8row",
+        "value": false,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q1-f9",
+        "value": "Design行"
+      }
+    ]
+  }
+}

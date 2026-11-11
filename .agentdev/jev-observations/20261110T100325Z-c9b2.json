@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261110T100325Z-c9b2",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "C-β2 実装系契約是正7件（A-7〜A-13）の既存REQ照合操作分類",
+  "sourceRevision": "2b352f7d3c0fa980d669f2ab4af310c712c5d51e",
+  "durationMs": 263,
+  "inputTokens": 3991,
+  "inputs": {
+    "requestDigest": "2a35c184d3f02039cd82dc9720d0d8e327263ee181bfc9d429684e8f9f54e211",
+    "snapshot": "入力: req-input-adf-simplification-c-beta2-impl-contracts.md（外部パス C:/Users/ogatay/work/hermes-vault/project-list/。出所: ADF全体簡素化実装計画第53報告 v8・2026-11-10 利用者承認）。対象7項目は A-7 pr_create 対象識別明示契約 / A-8 pr_create 読戻し照合3項目 / A-9 gh write 検出器暗黙POST検出 / A-10 textlint 配布方針追随 / A-11 公開導入手順誤指定是正 / A-12 完了条件受け入れ判定個別対応化 / A-13 停止理由分類集合整合化。照合先: REQ-011・REQ-029・REQ-009・REQ-032・REQ-034。"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-a7-pr-create-target",
+      "questionForm": "choice",
+      "value": "UPDATE",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0.06,
+        "UPDATE": 0.93,
+        "REQ操作なし": 0,
+        "保留": 0.01
+      }
+    },
+    {
+      "questionId": "q2-a8-verify-fields",
+      "questionForm": "choice",
+      "value": "APPEND",
+      "probabilityDistribution": {
+        "CREATE": 0.01,
+        "APPEND": 0.56,
+        "UPDATE": 0.17,
+        "REQ操作なし": 0.24,
+        "保留": 0.02
+      }
+    },
+    {
+      "questionId": "q3-a9-gh-write-detector",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0.04000000000000001,
+        "APPEND": 0.25000000000000006,
+        "UPDATE": 0.31000000000000005,
+        "REQ操作なし": 0.32000000000000006,
+        "保留": 0.08000000000000002
+      }
+    },
+    {
+      "questionId": "q4-a10-textlint-follow",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.01,
+        "REQ操作なし": 0.99,
+        "保留": 0
+      }
+    },
+    {
+      "questionId": "q5-a11-install-doc",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0,
+        "REQ操作なし": 1,
+        "保留": 0
+      }
+    },
+    {
+      "questionId": "q6-a12-acceptance-population",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.03,
+        "REQ操作なし": 0.97,
+        "保留": 0
+      }
+    },
+    {
+      "questionId": "q7-a13-stop-classification",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.05,
+        "REQ操作なし": 0.89,
+        "保留": 0.06
+      }
+    },
+    {
+      "questionId": "q8-matching-confidence",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.32,
+        "false": 0.6799999999999999
+      }
+    }
+  ],
+  "confidence": 0.91,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-a7-pr-create-target",
+        "value": "APPEND",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q2-a8-verify-fields",
+        "value": "APPEND"
+      },
+      {
+        "questionId": "q3-a9-gh-write-detector",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q4-a10-textlint-follow",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q5-a11-install-doc",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q6-a12-acceptance-population",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q7-a13-stop-classification",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q8-matching-confidence",
+        "value": false
+      }
+    ]
+  }
+}
