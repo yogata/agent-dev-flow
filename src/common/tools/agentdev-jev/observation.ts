@@ -33,6 +33,8 @@ export function observationsDir(worktree: string): string {
 }
 
 const SHA256_HEX = /^[0-9a-f]{64}$/;
+const HEX_4_TO_40 = /^[0-9a-fA-F]{4,40}$/;
+const ANNOTATION = /[（(][^（）()]*[）)]/g;
 const QUESTION_FORMS = new Set<JevQuestionForm>(["boolean", "choice", "score"]);
 const OBSERVATION_FAILURE_KINDS = new Set<JevObservationFailureKind>([
   "timeout",
@@ -58,6 +60,28 @@ function invalid(detail: string): { ok: false; kind: JevFailureKind; detail: str
 
 function isObservationValue(value: unknown): value is boolean | string | number {
   return typeof value === "boolean" || typeof value === "number" || (typeof value === "string" && value.length > 0);
+}
+
+/**
+ * sourceRevision の書込み前正規化。規則の順で適用する:
+ * (1) 前後の空白と注釈（（…）・(…)）を除去する。
+ * (2) (1) 適用後の値が4〜40桁の16進数のとき小文字化する。
+ * (3) unknown・unspecified、および (1) 適用後も (2) 該当以外の作業状態記述子
+ *     （working-tree@…・RU-…・main@… 等）はそのまま保存する（記述子の形式契約化は対象外）。
+ * (4) (1) の適用後に空になる値は入力事前検証失敗（invalid_input）とし、observation を生成しない
+ *     （評価入力の事前検証失敗と同じ観測生成除外経路）。
+ * 正規化後の値は観測の一次事実として保存する sourceRevision の正規形であり、観測識別子の
+ * 版区切り判別を破らない。既存観測の遡及修正・移行・書換えは行わない。
+ */
+export function normalizeSourceRevision(value: string): { ok: true; normalized: string } | { ok: false; kind: JevFailureKind; detail: string } {
+  // (1) 前後の空白と注釈の除去（注釈除去後の前後空白も併せて除去する）。
+  const normalized = value.trim().replace(ANNOTATION, "").trim();
+  // (4) 空になる値は入力事前検証失敗（invalid_input）。
+  if (normalized.length === 0) {
+    return { ok: false, kind: "invalid_input", detail: "sourceRevision is empty after trimming and annotation removal" };
+  }
+  // (2) 4〜40桁 hex は小文字化。それ以外はそのまま保存する（(3)）。
+  return { ok: true, normalized: HEX_4_TO_40.test(normalized) ? normalized.toLowerCase() : normalized };
 }
 
 /** 評価リクエスト全文の digest（再構成鍵。全文は保存しない）。 */
@@ -406,7 +430,13 @@ export async function writeEvaluationObservation(
   deps: ObservationWriteDeps = {},
 ): Promise<JevObservationWriteResult> {
   const observationId = resolveObservationId(deps);
-  const record: Record<string, unknown> = { ...observation, observationId };
+  // sourceRevision の書込み前正規化。空になる値は invalid_input として構造化失敗とし、
+  // observation を生成しない（評価入力の事前検証失敗と同じ観測生成除外経路）。
+  const normalization = normalizeSourceRevision(observation.sourceRevision);
+  if (!normalization.ok) {
+    return { ok: false, operation: "observation_write", failure: { kind: normalization.kind, retryable: false, detail: normalization.detail } };
+  }
+  const record: Record<string, unknown> = { ...observation, observationId, sourceRevision: normalization.normalized };
   const validation = validateObservation(record);
   if (!validation.ok) {
     return { ok: false, operation: "observation_write", failure: { kind: validation.kind, retryable: false, detail: validation.detail } };

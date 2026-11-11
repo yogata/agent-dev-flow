@@ -1,0 +1,8 @@
+component: agentdev-workflow-inspect-docs
+implementation:
+  src/common/skills/agentdev-workflow-inspect-docs/SKILL.md:
+    - REQ-036-034
+  src/common/skills/agentdev-workflow-inspect-docs/references/distribution-check-and-output.md:
+    - REQ-036-034
+  src/common/commands/agentdev/templates/inspect-docs/standard.md:
+    - REQ-036-034

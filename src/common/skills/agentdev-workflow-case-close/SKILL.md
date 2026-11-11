@@ -88,8 +88,7 @@ gate 違反時は両ルートとも PR マージを停止する。
 - **(a) 契約状態記録の commit 済み検証**: 当該 Case 実行に関連して生成・更新された git 管理契約の状態記録（jev 観測、ローカル issues、capture 成果物等の正規契約で git 管理対象と宣言される記録）がコミット済みであることを検証する。状態記録パスの範囲導出（正規契約から導出した全状態記録パス）は意味判断としてモデルが担当し、入力契約 `contractStateCheck.contractStatePaths` として script へ渡す。検証は repoRoot での `git status --porcelain -- <状態記録パス群>` により行い、未コミット検出時は完了扱いとしない
 - **(b) 未追跡残存検査**: リポジトリの未追跡かつ gitignore 管理対象外のファイル・ディレクトリが承認一覧対象外に残存しないことを検証する。検証は repoRoot での `git ls-files --others --exclude-standard`（リポジトリ全体）により行い、承認一覧エントリ（既存の ng-baseline 系承認一覧機構と同一の物理実体から取得した category/check/file/evidence/count/provenance/reason の恒久承認記録）と突合する。承認済み検出は承認記録として報告にとどめ、承認一覧対象外の残存検出時は完了扱いとしない。検査実行が承認を自動追加することはない
 - **評価範囲**: 正規契約から導出した全状態記録パスとリポジトリ全体の未追跡対象であり、変更ファイルのみの確認で達成としない
-- **帰属不能検出の人間確認（完了阻止）**: 状態記録パス配下でも承認一覧対象でもない検出は帰属が機械判定できないため、人間確認事項として完了判定の前に報告する。報告された確認事項の確認（`contractStateCheck.humanConfirmedPaths` の path と確認根拠 basis の実体）なしに完了判定へ進めない（fail-closed）。検出時は当該 step を失敗とし、`isCloseOperationPermitted` が終了操作（issue_close、Epic 終了・Wave クローズ）を抑止する
-- 検証対象 git コマンドの実行不能は検査不能として fail-closed で扱い、完了判定へ進まない
+- **帰属不能検出の人間確認（完了阻止）**: 状態記録パス配下でも承認一覧対象でもない検出は帰属が機械判定できないため、人間確認事項として完了判定の前に報告する。報告された確認事項の確認（`contractStateCheck.humanConfirmedPaths` の path と確認根拠 basis の実体）なしに完了判定へ進めない（fail-closed）。検出時は当該 step を失敗とし、`isCloseOperationPermitted` が終了操作（issue_close、Epic 終了・Wave クローズ）を抑止する。検証対象 git コマンドの実行不能は検査不能として扱い、検査不能時の処置は「トレーサビリティ能力の利用（QG-4 独立再検査）」節冒頭の統合文（検査不能と代替検証の関係）に従う
 
 ### 一時資材の後片付け評価
 
@@ -125,13 +124,13 @@ gate 違反時は両ルートとも PR マージを停止する。
 本スキルは QG-4 の一部として、対象要件行の Design 対応、implementation 対応、verification 対応（policy が required と判定する要件行）の完全性を `agentdev-traceability` の check で対応関係全体（正規成果物の inline declaration と top-level `traceability/` 配下の sidecar を同一に扱う）から独立して再検査する（STEP-3 docs 検証）。
 case-run 側の事前検査とは独立に実施する。検証手段との対応関係と「今回その検証を実行して合格したか」という実行結果（Issue、PR、QG の記録）を分離して扱う。
 
+- **検査不能と代替検証の関係（本節冒頭に統合）**: 必須検査が検査不能（check 実行不能、検査対象の取得不能、検証対象 git コマンドの実行不能等）の場合は合格として扱わず、検査不能の旨を報告して完了判定とマージへ進まない。検査を別手段へ変更する場合、元の検証義務に対して同等以上の観測能力を持ち未証明範囲が増えないことを確認できないなら達成証拠としない。検査の欠落時は正規の代替経路（証跡化、手動相当手順、対照実行による悪化ゼロ件の機械証明）を契約に従って案内し、代替経路の履行なしに検査を省略して成功扱いとしない。`agentdev-traceability` の不在、実行失敗、空結果、候補過多のみを理由に本 workflow を失敗させず（fail-open）、既存の品質ゲート、targeted docs guard、`rg` 等の独立探索の代替検証経路で継続し、正規成果物そのものの異常とトレーサビリティ機能側の異常を区別する。正規成果物側の実不整合が確認された場合は、既存の品質ゲート、受け入れ条件に従って fail とする
+
 - 対象要件行に Design 対応、implementation 対応、または policy が required と判定する要件行の verification 対応の欠落が残る場合はマージせず停止する。Decision 対応の欠落は QG-4 の不合格条件に含めない。不足する対応関係を自動追加または修正せず、検査失敗を case-run 側の修正対象として差し戻す
-- **検証対応の3完全性ゲート（完了阻止面）**: 対象要件行の Design 対応、implementation 対応、および policy が required と判定する要件行の verification 対応のいずれかに欠落が残る場合、当該 Case を完了として扱わない。導出は `agentdev-traceability` の check（`--req` で対象要件行に限定）で機械的に行い、`missing-design` / `missing-implementation` / `missing-verification` の findings を該当行の完了阻止条件として扱う。check が正常に完全性を判定できなかった場合（check 実行不能、検査対象の取得不能等）は対応完全性の合格として扱わず、検査不能の旨を報告してマージに進まない（fail-closed）
+- **検証対応の3完全性ゲート（完了阻止面）**: 対象要件行の Design 対応、implementation 対応、および policy が required と判定する要件行の verification 対応のいずれかに欠落が残る場合、当該 Case を完了として扱わない。導出は `agentdev-traceability` の check（`--req` で対象要件行に限定）で機械的に行い、`missing-design` / `missing-implementation` / `missing-verification` の findings を該当行の完了阻止条件として扱う。check が正常に完全性を判定できなかった場合（check 実行不能、検査対象の取得不能等）の検査不能時の処置は、本節冒頭の統合文（検査不能と代替検証の関係）に従う
 - **policy optional 行の保護**: verification 対応の完全性判定は、project-level verification policy が required と判定する要件行のみを計上する。policy の正規情報源は `traceability/policy.yaml`（既定 required、optional な要件行のみ明示、未指定の要件行は required）であり、policy が optional と明示した要件行の verification 対応欠落は完全性違反に含めない
 - **worktree root 起点の完全性判定時の取扱い**: traceability check を worktree root 起点で実行して検出対象の完全性が確定できない場合、main 側 root で check を再実行し、トレーサビリティポリシー登録 commit の時系列（ブランチ分岐の前後）を確認してから完了阻止を判断する。durable state 上で解消済みの対象行を本変更起因の失敗と誤判定しない。再実行は読取系 check の実行のみで行う
-- QG-4 の対応完全性検査は有効である。対応完全性は2層で解釈する（正本: v4-traceability-model Design「completeness の 2 層」節）。lifecycle gate 完全性は対象要件行に scope を限定して判定し、対象要件行の Design 対応と implementation 対応、および policy が required と判定する要件行の verification 対応の欠落と、対象要件行に限定した check（`--req`）の未解決不合格を完了阻止条件とする（fail-closed）。全現行要件行を対象とする corpus 完全性の計数（missing 系の件数）は到達目標状態の診断指標として数値追跡し、lifecycle gate の判定と完了条件には使用しない（advisory・fail-open）。verification 対応の完全性判定は policy が required と判定する要件行のみを計上する
-- agentdev-traceability の不在、実行失敗、空結果、候補過多のみを理由に本 workflow を失敗させない（fail-open）。代替検証経路（既存の品質ゲート、targeted docs guard、`rg` 等の独立探索）で継続し、正規成果物そのものの異常とトレーサビリティ機能側の異常を区別する
-- 正規成果物側の実不整合が確認された場合は、既存の品質ゲート、受け入れ条件に従って fail とする
+- QG-4 の対応完全性検査は有効である。対応完全性は2層で解釈する（正本: v4-traceability-model Design「completeness の 2 層」節）。lifecycle gate 完全性は対象要件行に scope を限定して判定し、3完全性ゲートの欠落（Design 対応・implementation 対応・required 行 verification 対応）と対象要件行に限定した check（`--req`）の未解決不合格を完了阻止条件とする（fail-closed）。全現行要件行を対象とする corpus 完全性の計数（missing 系の件数）は到達目標状態の診断指標として数値追跡し、lifecycle gate の判定と完了条件には使用しない（advisory・fail-open）。verification 対応の完全性判定は policy が required と判定する要件行のみを計上する
 
 ## 重要変更の通知と結果説明（完了報告接続）
 

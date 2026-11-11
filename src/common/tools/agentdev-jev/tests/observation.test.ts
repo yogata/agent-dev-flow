@@ -10,7 +10,7 @@ import { describe, expect, test } from "bun:test";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-import { appendFinalResult, defaultObservationId, requestDigest, validateFinalResultObservation, validateObservation, writeEvaluationObservation } from "../observation.ts";
+import { appendFinalResult, defaultObservationId, normalizeSourceRevision, requestDigest, validateFinalResultObservation, validateObservation, writeEvaluationObservation } from "../observation.ts";
 import type { JevObservation } from "../contracts.ts";
 
 const DIGEST = "a".repeat(64);
@@ -434,6 +434,132 @@ describe("defaultObservationId", () => {
   test("timestamp ベースの一意 ID を生成する", () => {
     const id = defaultObservationId(new Date("2026-09-22T00:00:00Z"));
     expect(id).toMatch(/^20260922T000000Z-[0-9a-f]{4}$/);
+  });
+});
+
+// REQ-090-030（sourceRevision 正規化）: 規則の順 (1)注釈・空白除去 → (2)4〜40桁 hex 小文字化 →
+// (3)記述子保持 → (4)空値は invalid_input。入出力例は .agentdev/jev-observations/ 実データ由来の
+// 代表値（TS-003 のシミュレーション対象と同一規則）。
+function normalized(input: string): string {
+  const result = normalizeSourceRevision(input);
+  if (!result.ok) throw new Error(`unexpected invalid_input: ${input}`);
+  return result.normalized;
+}
+
+describe("normalizeSourceRevision（REQ-090-030）", () => {
+  test("(2) 4〜40桁 hex は小文字化する（境界 4桁・39桁・40桁・混在）", () => {
+    expect(normalized("ABCD")).toBe("abcd");
+    expect(normalized("ABCD1234EF567890ABCD1234EF567890ABCD123")).toBe("abcd1234ef567890abcd1234ef567890abcd123");
+    expect(normalized("AbCd1234")).toBe("abcd1234");
+    expect(normalized("000bc77c5e1e521fe184c5553787d43dac621518")).toBe("000bc77c5e1e521fe184c5553787d43dac621518");
+  });
+
+  test("(2) 境界外 hex（3桁・41桁）は小文字化せず記述子として保持する", () => {
+    expect(normalized("ABC")).toBe("ABC");
+    expect(normalized("A".repeat(41))).toBe("A".repeat(41));
+  });
+
+  test("(1) 前後の空白と注釈（全角・半角括弧）を除去する", () => {
+    expect(normalized("  40b30936  ")).toBe("40b30936");
+    expect(normalized("866c86aaf（main HEAD）")).toBe("866c86aaf");
+    expect(normalized("8d6787d8（inbox capture baseline。run 実行時 HEAD は未検証）")).toBe("8d6787d8");
+    expect(normalized("866c86aaf（main HEAD。本 run は git 操作禁止のため run 実行時 HEAD の一致検証は未実施）")).toBe("866c86aaf");
+  });
+
+  test("(3) unknown・unspecified・作業状態記述子は注釈除去後そのまま保存する", () => {
+    expect(normalized("unknown")).toBe("unknown");
+    expect(normalized("unspecified")).toBe("unspecified");
+    expect(normalized("main@2026-10-01 (input digest 55a563e4)")).toBe("main@2026-10-01");
+    expect(normalized("RU-0156 (2026-09-29, agentdev_handoff: true)")).toBe("RU-0156");
+    expect(normalized("working-tree-2026-09-27 (req-define git 禁止のため commit hash 取得せず)")).toBe("working-tree-2026-09-27");
+    expect(normalized("ru:RU-0158@2026-09-27T17:52:30+09:00")).toBe("ru:RU-0158@2026-09-27T17:52:30+09:00");
+    expect(normalized("baseline:agent-dev-flow-main-2026-10-01;worktree-read:2026-10-01;HEAD:8c471d3e")).toBe("baseline:agent-dev-flow-main-2026-10-01;worktree-read:2026-10-01;HEAD:8c471d3e");
+  });
+
+  test("複数注釈を除去し、括弧外の本文（内部空白を含む）を保持する", () => {
+    expect(
+      normalized("v5.0.0 (025b25474fd6143da6627c5e80c4b17f09a4e11c) + RU 2026-10-10（RU作業仮定のGitHub取得時点。req-defineはgitコマンド禁止のため作業開始時再確認は実行側責務）"),
+    ).toBe("v5.0.0  + RU 2026-10-10");
+  });
+
+  test("(4) (1) 適用後に空になる値は invalid_input で構造化失敗する", () => {
+    expect(normalizeSourceRevision("").ok).toBe(false);
+    const blank = normalizeSourceRevision("   ");
+    expect(blank.ok).toBe(false);
+    if (!blank.ok) expect(blank.kind).toBe("invalid_input");
+    const annotationOnly = normalizeSourceRevision("（run 実行時 HEAD は未取得）");
+    expect(annotationOnly.ok).toBe(false);
+    if (!annotationOnly.ok) expect(annotationOnly.kind).toBe("invalid_input");
+  });
+});
+
+describe("writeEvaluationObservation の sourceRevision 正規化（REQ-090-030）", () => {
+  test("注釈付き sourceRevision を正規化して保存する", async () => {
+    const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
+    const seeded = await writeEvaluationObservation(worktree, successObservation({ sourceRevision: "866C86AAF（main HEAD）" }));
+    expect(seeded.ok).toBe(true);
+    if (!seeded.ok) return;
+    const content = JSON.parse(await fs.readFile(path.join(worktree, ".agentdev", "jev-observations", `${seeded.success.observationId}.json`), "utf8")) as { sourceRevision: string };
+    expect(content.sourceRevision).toBe("866c86aaf");
+  });
+
+  test("(1) 適用後に空になる sourceRevision は invalid_input 構造化失敗で観測を生成しない", async () => {
+    const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
+    const result = await writeEvaluationObservation(worktree, successObservation({ sourceRevision: "（注釈のみ）" }));
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.failure.kind).toBe("invalid_input");
+    const entries = await listRelative(path.join(worktree, ".agentdev", "jev-observations")).catch(() => []);
+    expect(entries).toEqual([]);
+  });
+
+  test("失敗観測にも正規化を適用する", async () => {
+    const worktree = await fs.mkdtemp(path.join(os.tmpdir(), "jev-obs-"));
+    const failureObservation: JevObservation = {
+      schemaVersion: 2,
+      observationId: "obs-fixture",
+      workflow: "learning-promote",
+      evaluationKind: "evaluation",
+      subject: "inbox エントリ 1件",
+      sourceRevision: "8D6787D8（inbox capture baseline）",
+      durationMs: 30,
+      inputs: { requestDigest: DIGEST },
+      failure: { kind: "timeout", detail: "evaluator call timed out" },
+    };
+    const seeded = await writeEvaluationObservation(worktree, failureObservation);
+    expect(seeded.ok).toBe(true);
+    if (!seeded.ok) return;
+    const content = JSON.parse(await fs.readFile(path.join(worktree, ".agentdev", "jev-observations", `${seeded.success.observationId}.json`), "utf8")) as { sourceRevision: string };
+    expect(content.sourceRevision).toBe("8d6787d8");
+  });
+});
+
+// 既存観測のシミュレーション（TS-003）: 実在する全観測の sourceRevision に正規化規則を適用し、
+// 構造化失敗 0 件を機械確認する。既存観測ファイル自体の書換えは行わない（読取のみ）。
+// 観測ディレクトリ不在の実行環境（worktree 空洞化・REQ-018）では skip する。
+describe("既存観測 sourceRevision のシミュレーション（REQ-090-030）", () => {
+  test("実在観測全件が正規化規則で構造化失敗にならない", async () => {
+    const observationsDir = path.join(process.cwd(), ".agentdev", "jev-observations");
+    const files = await fs.readdir(observationsDir).catch(() => null);
+    if (files === null) {
+      // worktree 空洞化（junction 未伝播）環境では実データ検証対象が存在しないため skip（REQ-018）。
+      return;
+    }
+    const jsonFiles = files.filter((f) => f.endsWith(".json"));
+    expect(jsonFiles.length).toBeGreaterThan(0);
+    let failures = 0;
+    const failureSamples: string[] = [];
+    for (const file of jsonFiles) {
+      const raw = JSON.parse(await fs.readFile(path.join(observationsDir, file), "utf8")) as { sourceRevision?: unknown };
+      if (typeof raw.sourceRevision !== "string") continue;
+      const normalized = normalizeSourceRevision(raw.sourceRevision);
+      if (!normalized.ok) {
+        failures += 1;
+        if (failureSamples.length < 5) failureSamples.push(`${file}: ${raw.sourceRevision}`);
+      }
+    }
+    expect(failureSamples).toEqual([]);
+    expect(failures).toBe(0);
   });
 });
 

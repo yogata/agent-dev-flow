@@ -2,7 +2,7 @@
 title: ADF v4 実装責務境界（意味判断 Skill / 決定的処理 code / Harness adapter / Project Extensions）
 status: accepted
 created: 2026-09-18
-updated: 2026-10-27
+updated: 2026-11-12
 ---
 <!-- ADF-COVERS(implementation): REQ-003-021, REQ-003-022, REQ-003-023 -->
 <!-- ADF-COVERS(implementation): REQ-096-010, REQ-096-014, REQ-096-021, REQ-096-025, REQ-096-027, REQ-096-028, REQ-096-029, REQ-096-030（ADF判断アーキテクチャの正規実体としての実装対応。REQ-096-028/029/030 は本文規範の実保持を適用時に確認〔閉包条件節等の契約面実在を確認済み 2026-10-27〕） -->
@@ -12,7 +12,7 @@ updated: 2026-10-27
 
 # ADF v4 実装責務境界（意味判断 Skill / 決定的処理 code / Harness adapter / Project Extensions）
 
-位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）までは v3 を正とする。当該段階での置換実行をもって権威は本 Design へ移行する。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施する。
+位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）の全行 executed と実際の処遇状態の確認をもってこの移行規則は現行規範ではなく、歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
 
 ## 意味判断・決定的処理の責務境界
 
