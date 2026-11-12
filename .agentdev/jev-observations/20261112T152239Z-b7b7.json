@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261112T152239Z-b7b7",
+  "workflow": "case-ready",
+  "evaluationKind": "scope-overlap-detection",
+  "subject": "Root Case #4026（C-ε 規則の集約と正本の一元化）の既存オープン Issue とのスコープ重複判定",
+  "sourceRevision": "98564bde027e7c3009bc30f8a337b655c30daba3",
+  "durationMs": 219,
+  "inputTokens": 954,
+  "inputs": {
+    "requestDigest": "b34418520e1c5650d9975d138fdd29ed168e208305c536f4ad65c5350e7d100b"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "scope-overlap",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.37,
+        "false": 0.63
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "scope-overlap",
+        "value": false
+      }
+    ]
+  }
+}

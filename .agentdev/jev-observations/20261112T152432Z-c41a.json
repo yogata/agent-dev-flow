@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261112T152432Z-c41a",
+  "workflow": "case-ready",
+  "evaluationKind": "wave-composition",
+  "subject": "Root Case #4026 の Epic 構成（10 子 Issue・2 Wave）の Wave 構成判断（並列可否・重複前置検出結果は空）",
+  "sourceRevision": "98564bde027e7c3009bc30f8a337b655c30daba3",
+  "durationMs": 647,
+  "inputTokens": 1426,
+  "inputs": {
+    "requestDigest": "1c77b2f95d10e9d1c5c5320963a1d6351c78da153077e04802e88268798aab51"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-wave1-parallel",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.95,
+        "false": 0.050000000000000044
+      }
+    },
+    {
+      "questionId": "q2-wave2-parallel",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.94,
+        "false": 0.06000000000000005
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-wave1-parallel",
+        "value": true
+      },
+      {
+        "questionId": "q2-wave2-parallel",
+        "value": true
+      }
+    ]
+  }
+}

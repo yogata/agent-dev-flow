@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261112T152232Z-29f9",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-epic-attribution",
+  "subject": "Root Case #4026（C-ε 規則の集約と正本の一元化・scale large・まとめ適用後候補 10 子 Issue）の Standard / Epic 確定（3軸判断の総合帰属）",
+  "sourceRevision": "98564bde027e7c3009bc30f8a337b655c30daba3",
+  "durationMs": 1926,
+  "inputTokens": 1441,
+  "inputs": {
+    "requestDigest": "aca993701d5554efd3f4c70747da14db2580d9999e7d50aa5c1ef7ff6c9b28b0"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-attribution",
+      "questionForm": "choice",
+      "value": "Epic",
+      "probabilityDistribution": {
+        "Standard": 0,
+        "Epic": 1
+      }
+    },
+    {
+      "questionId": "q-dependency-strength",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "関連": 0.03,
+        "弱": 0.07,
+        "必須": 0.9
+      }
+    },
+    {
+      "questionId": "q-functional-coherence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "分散": 0.01,
+        "部分的": 0.05,
+        "一貫": 0.94
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-attribution",
+        "value": "Epic"
+      },
+      {
+        "questionId": "q-dependency-strength",
+        "value": 2
+      },
+      {
+        "questionId": "q-functional-coherence",
+        "value": 2
+      }
+    ]
+  }
+}
