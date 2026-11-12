@@ -437,6 +437,14 @@
 #   3 REQ-{NNNN}-{NNN}→REQ-090-001 + JCD:91-92
 # src/common/tools/agentdev-jev/provider.ts (1出現):
 #   5 REQ-{NNNN}-{NNN}→JCD:93（保証）
+#
+# Case #4013（#4012 アーカイブ検査の事前是正・利用者承認済み 2026-11-12）:
+# src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts (1出現・基準409e13a50):
+#   1805 REQ-{NNNN}-{NNN}→REQ-118-005〔根拠示し・既存違反の正常是正〕。
+#   旧行内容: "とその checkout ブランチが削除対象外（REQ-118-005）。removeWorktree: false も"。
+#   書換後: ID を削除し、削除対象外根拠の参照先（case-close Design「機械工程の script 呼び出し契約」節・
+#   本 sidecar）を本文へ明記。checker 規則・比較 baseline・契約の変更なし。
+#   REQ-118-005 との対応は agentdev-workflow-case-close.yaml の implementation・verification 宣言に既存維持。
 
 component: distribution-concrete-id-provenance
 links:

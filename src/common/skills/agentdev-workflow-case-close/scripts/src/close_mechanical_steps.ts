@@ -27,6 +27,7 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import {
   countChildStatuses,
@@ -39,6 +40,7 @@ import {
   evaluateFinalAcceptance,
   type ConditionPopulation,
   type ConditionVerdict,
+  type ContractConditionIdentity,
   type CrossObligation,
   type SubjectKind,
 } from "./final-acceptance.ts";
@@ -563,17 +565,46 @@ export function validateInput(value: unknown): CloseMechanicalInput {
  * 完了条件チェックボックスの機械的抽出（評価はモデルが担当する）。
  * 入力契約は LF 正規化済みの本文であり、CRLF は呼び出し側が
  * issueBodyPath 読取直後に LF へ正規化して渡す。
+ * 各項目には本文内位置（1 始まり行番号）を保持し、母集団導出の個別対応付け
+ * （条件本文と位置からの識別子導出）に使う。
  */
+export interface CompletionCheckboxItem {
+  text: string;
+  checked: boolean;
+  /** 抽出元本文（LF 正規化済み）内の 1 始まり行番号。 */
+  line: number;
+}
+
 export function extractCompletionCheckboxes(
   issueBody: string,
-): { total: number; checked: number; items: readonly { text: string; checked: boolean }[] } {
-  const items: { text: string; checked: boolean }[] = [];
-  for (const line of issueBody.split("\n")) {
+): { total: number; checked: number; items: readonly CompletionCheckboxItem[] } {
+  const items: CompletionCheckboxItem[] = [];
+  const lines = issueBody.split("\n");
+  for (let index = 0; index < lines.length; index++) {
+    const line = lines[index];
+    if (line === undefined) continue;
     const match = line.match(/^\s*-\s+\[([ xX])\]\s+(.*)$/);
     if (!match) continue;
-    items.push({ text: (match[2] ?? "").trim(), checked: match[1] !== " " });
+    items.push({
+      text: (match[2] ?? "").trim(),
+      checked: match[1] !== " ",
+      line: index + 1,
+    });
   }
   return { total: items.length, checked: items.filter((i) => i.checked).length, items };
+}
+
+/**
+ * 正規完了条件の個別識別子（条件本文と本文内位置の両方から決定的に導出）。
+ * 判定入力（ConditionVerdict.conditionId）との対応付けはこの識別子で行い、
+ * 条件数の突合だけでは個別対応しない（A-12）。識別子は本文の文言・位置の
+ * いずれかが変われば変わるため、変更前の完了条件へ紐付いた判定（stale 判定）は
+ * 現行の識別子集合に現れず、受入側で拒否される。恒久台帳は設けない
+ * （A-12 固定制約。識別子は常に正規本文から再導出可能）。
+ */
+export function deriveCompletionConditionId(text: string, line: number): string {
+  const digest = createHash("sha256").update(`${line}\u0000${text}`, "utf8").digest("hex");
+  return `cond-${String(line).padStart(3, "0")}-${digest.slice(0, 16)}`;
 }
 
 /**
@@ -582,10 +613,12 @@ export function extractCompletionCheckboxes(
  * 呼び出し契約」節）。抽出失敗は extractionSucceeded: false とし、空の抽出を
  * 「条件なし」へ変換しない（0 件抽出は emptyBasis を根拠に主張される）。
  * 完了条件チェックボックスはすべて必須完了条件であるため、総数を必須数として
- * 扱う。
+ * 扱う。母集団は正規の各完了条件を識別子（条件本文・位置から導出）で個別に
+ * 保持し、判定入力との対応照合（欠落・重複・無関係・stale 判定の拒否）に使う。
+ * 実行担当の報告（照合入力）からは作らない。
  */
 export function deriveAcceptancePopulation(
-  extraction: { total: number } | null,
+  extraction: { total: number; items: readonly { text: string; line: number }[] } | null,
   emptyBasis?: string,
 ): ConditionPopulation {
   if (extraction === null) {
@@ -595,10 +628,18 @@ export function deriveAcceptancePopulation(
       contractRequiredCount: null,
     };
   }
+  const conditions: ContractConditionIdentity[] = extraction.items.map((item) => ({
+    id: deriveCompletionConditionId(item.text, item.line),
+    text: item.text,
+    line: item.line,
+    required: true,
+  }));
   return {
     extractionSucceeded: true,
     contractConditionCount: extraction.total,
     contractRequiredCount: extraction.total,
+    contractRequiredConditionIds: conditions.map((condition) => condition.id),
+    contractConditions: conditions,
     emptyBasis: extraction.total === 0 ? emptyBasis : undefined,
   };
 }
@@ -1802,8 +1843,10 @@ export function runCloseMechanicalSteps(
       diff.reclamation = outcome.detail;
     }
     // main working tree 構成（worktreeRoot == repoRoot・Epic 最終close等）は worktree
-    // とその checkout ブランチが削除対象外（REQ-118-005）。removeWorktree: false も
+    // とその checkout ブランチが削除対象外。removeWorktree: false も
     // worktree 削除を機械工程の外で管理する明示指定。両者は削除試行しない。
+    // （main working tree 構成の削除対象外根拠は case-close Design「機械工程の
+    // script 呼び出し契約」節・repository top-level traceability/ 配下 sidecar 参照）
     const mainWorktreeClose = worktreeCwd === path.resolve(input.repoRoot);
     const worktreeRemovalSkipped = mainWorktreeClose || input.cleanup?.removeWorktree === false;
     const removed: CommandResult | null = worktreeRemovalSkipped
