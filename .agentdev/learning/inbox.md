@@ -1141,3 +1141,71 @@
 - **タグ**: #機械工程 #回収 #runnerインターフェース #post-merge #fail-closed
 
 ---
+## 2026-11-13: 配布物へテーブル・節を移動・集約する際、docs 配下パス literal は IR-055（runtime-unresolved-reference）の新規違反検出対象になる（移動元から除去しても移動先で再検出される）
+
+- **問題事象**: 既存ファイルから配布物（src/common/skills・src/common/commands）へテーブル等を移動・集約する際、docs/designs/・docs/guides/ のパス literal をそのまま移すと IR-055 の新規違反として検出される。修正前 6 件検出（Case #4026 Wave 1・PR #4038 実績）
+- **発生局面**: 実装（B2-1 規則集約・lifecycle SKILL.md 新節への移動）
+- **検知方法**: check_integrity --json の IR-055 runtime-unresolved-reference 新規違反
+- **根本原因**: 配布物は docs 配下パスを runtime に解決できず、配布依存境界（distribution-reference-boundary）で未解決参照として検出される。移動元の除去だけでは移動先で新たに検出される
+- **自律対応内容**: 移動先の docs 配下パス literal を文書種別表現へ置換してから移動し、修正後 0 件に解消した（名レベル参照はパス非依存のため配布後環境でも機能する）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（IR-055 の検査の規則・比較基準・契約は未変更・ir-055-baseline.json 未変更）
+- **横展開観点**: B2-2 以降の規則集約（Wave 2 の #4030〜#4037）で配布物へ移動する全作業で再発し得る
+- **再発条件**: docs 配下パス literal を含むテーブル・節を配布物へ移動・集約する全状況
+- **予防策候補**: 配布物への移動前チェック（docs 配下パス literal の文書種別表現への置換を手順の一手順化）
+- **想定反映先**: agentdev-workflow-lifecycle（工程駆動の実装手順）・learning-promote
+- **関連**: PR #4038 本文 検証差分表（IR-055 行）・IR-055
+- **タグ**: #IR055 #配布依存境界 #規則集約 #名レベル参照 #Wave2
+
+---
+## 2026-11-13: worktree で 3分割正規形 bun test を実行する場合の依存整備と plugins 分割の main root 読取専用代替（REQ-018-005 運用）
+
+- **問題事象**: worktree の .opencode 投影欠落（plugins 未伝播）のため、worktree 内での 3分割正規形実行は分割③の plugins 対象欠落と plugin 依存（textlint-guard node_modules・vendor junction）の未生成を招く
+- **発生局面**: 検証（case-run・case-close の bun test 実行形態契約の実施）
+- **検知方法**: bun test の Test filter no matches・依存解決失敗
+- **根本原因**: worktree は .opencode/plugins 投影と vendor 依存成果物を含まない（版固定情報のみ git 管理）
+- **自律対応内容**: 依存整備（junction 10箇所: src/common/skills 配下 skill scripts 7 + repo-agentdev-integrity 1 + textlint-guard 2）を前置し、plugins 分割は worktree の junction 未伝播のため main root 実体からの読取専用実行で代替した。bun は worktree 配下からメイン root の node_modules を parent lookup で解決できることを確認済み（2026-11-13 wave1-baseline worktree 実測・996 tests 0 fail）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（REQ-018-004 環境差運用・変更起因検出と混同しない）
+- **横展開観点**: Wave 2 の全子 Issue の検証と case-close の機械工程で継続利用
+- **再発条件**: worktree 内での bun test 3分割実行の全状況
+- **予防策候補**: worktree 作成手順の依存整備（junction 整備手順）の標準化。bun parent lookup の機能を前提にした junction 最小化の検討
+- **想定反映先**: agentdev-git-worktree（worktree 運用指針）・agentdev-workflow-case-run・learning-promote
+- **関連**: PR #4038 本文 検証差分表（実行環境ラベル）・REQ-018・worktree-operations.md「書込み guard 運用指針」
+- **タグ**: #bunTest #worktree #依存整備 #junction #分割③代替 #Wave2
+
+---
+## 2026-11-13: generate_indexes.ts への新規セクション追加では最小構成 producer fixture（req-impact-map 等を持たない）を破壊しないため、ファイル不在・マーカー不在の扱いは既存 README 系と同一の skip 記録に統一すべき
+
+- **問題事象**: AUTOGEN 導出の新規セクションを fail-fast 実装した結果、最小構成 producer fixture（req-impact-map 等の AUTOGEN ブロックを持たないテスト用最小構成）を壊した（Case #4026 Wave 1・PR #4039 の実装過程。修正済み）
+- **発生局面**: 実装（REQ-047-013・generate_indexes.ts の req-impact-map 逆方向対応導出と manifest 導出処理）
+- **検知方法**: bun test 分割①の generate_indexes producer 関連テスト fail（変更起因 1 件・同一 PR で修正）
+- **根本原因**: 新規セクションの不在扱いが既存 README 系セクションの skip 記録契約と不整合の fail-fast だった
+- **自律対応内容**: ファイル不在・マーカー不在の扱いを既存 README 系と同一の skip 記録に統一して修正（該当テスト解消）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: AUTOGEN 導出セクションを追加する全変更（Wave 2 の B3-2〜B3-6 で索引導出を拡張する場合）で適用すべき
+- **再発条件**: generate_indexes.ts への新規セクション追加で最小構成 producer fixture と共存させる全状況
+- **予防策候補**: AUTOGEN セクション追加時の不在扱い規約（skip 記録統一）を generate_indexes.ts の README・規則文書へ明記
+- **想定反映先**: repo-agentdev-integrity（generate_indexes.ts 関連規則・README）・learning-promote
+- **関連**: PR #4039 本文 Findings learning（DEL-4029-1）・generate_indexes.test.ts
+- **タグ**: #AUTOGEN #索引導出 #producerFixture #skip記録 #Wave2
+
+---
+## 2026-11-13: bun test の spawnSync 型テストが main results 配列の呼出形式を文字列照合している場合、results 統合の構造変更は該当テストの同一 PR での追随更新を要する
+
+- **問題事象**: check_integrity.ts の results 統合の構造変更（ir_ids 付与・annotateIrIds ラップ）に伴い、spawnSync 呼出形式を文字列照合する regression_issue616 型テスト 2 件が fail した（Case #4026 Wave 1・PR #4039 の実装過程。同一 PR で修正済み）
+- **発生局面**: 実装（REQ-047-011・checker 出力への IR ID 包含）
+- **検知方法**: bun test 分割①の regression_issue616 fail（変更起因 2 件・同一 PR で修正）
+- **根本原因**: テストが呼出形式（コマンド・引数列）の文字列照合に依存しており、構造変更（ラップ関数の追加）で照合が不整合になった
+- **自律対応内容**: 期待値を新呼出形式へ追随更新（契約テスト期待値の同一 PR 更新・REQ-047-012 の契約テスト追随に整合）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: checker 出力形式の構造変更を行う全 PR（Wave 2 の B3-2〜B3-6 で checker を拡張する場合）で再発し得る
+- **再発条件**: check_integrity.ts の results 統合・呼出形式を変更する全状況
+- **予防策候補**: 呼出形式の文字列照合テストを構造非依存のアサーション（ir_ids の存在・形式固定など PR #4039 で導入の ir_ids 出力形式固定テストと同様）へ移行
+- **想定反映先**: repo-agentdev-integrity（check_integrity.test.ts・regression_issue616）・learning-promote
+- **関連**: PR #4039 本文 Findings learning（DEL-4029-1）・regression_issue616.test.ts・ir_ids 出力形式固定テスト
+- **タグ**: #checker出力 #契約テスト #spawnSync #results統合 #Wave2
+
+---
