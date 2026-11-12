@@ -43,7 +43,7 @@ case-auto workflow は次の8 STEP で構成する。
 | STEP-1 | 入力解決・開始時刻記録 | case-auto 起動 | 入力モード確定、`case_auto_started_at` 記録 | [references/input-resolution-and-orchestration.md](references/input-resolution-and-orchestration.md) |
 | STEP-2 | 工程分岐（継続工程確定） | 入力解決完了 | 工程順序確定（通常経路 / 例外経路 / Issue 再開、auto_gate preflight） | [references/input-resolution-and-orchestration.md](references/input-resolution-and-orchestration.md) |
 | STEP-3 | orchestration 実行 | 工程順序確定 | 各工程の実行結果、stage モデル適用、クリーンアップ検証ゲート、Wave 反復、bg task 状態管理 | [references/input-resolution-and-orchestration.md](references/input-resolution-and-orchestration.md) |
-| STEP-4 | 停止条件検出・停止理由分類 | 各工程の結果受領 | 停止判定（11項目）、停止理由分類（7軸＋上位合意矛盾/新規ユーザー判断）、再開入口の報告（Root Case 指定） | [references/stop-and-decision-resolution.md](references/stop-and-decision-resolution.md) |
+| STEP-4 | 停止条件検出・停止理由分類 | 各工程の結果受領 | 停止判定（11項目）、停止理由分類（10分類。正は case-auto command Design「停止理由分類」節）、再開入口の報告（Root Case 指定） | [references/stop-and-decision-resolution.md](references/stop-and-decision-resolution.md) |
 | STEP-5 | adversarial-review 由来の停止伝播 | user-decision-required + decision_context 受領 | decision_context を STEP-6 へ先に入力、上位合意矛盾・新規ユーザー判断事項に限り自走停止・ユーザー判断待機 | [references/stop-and-decision-resolution.md](references/stop-and-decision-resolution.md) |
 | STEP-6 | bounded parent decision resolution | decision_context 受領 | 自律解決 / 作業仮定 / 上位合意矛盾停止 / 新規ユーザー判断停止 | [references/stop-and-decision-resolution.md](references/stop-and-decision-resolution.md) |
 | STEP-7 | コンフリクト解消 Level 2/3 | case-close から Level 1 失敗エスカレーション受領 | インライン case-run 再実行（最大2回）、オーケストレーション級判断、解消 または 停止 | [references/conflict-resolution-and-reporting.md](references/conflict-resolution-and-reporting.md) |
@@ -155,7 +155,7 @@ v5 の責務語彙（要求確定、設計確定、実装・構築、検証、Is
 
 本スキルは次の Capability Skill を名レベルで参照する。
 
-- `agentdev-workflow-orchestration`: orchestration 詳細プロトコル、bg task 破棄検知・状態別回復、capture 境界、Subagent 委譲プロトコル、停止理由分類詳細、コンフリクト解消 Level 2/3 詳細
+- `agentdev-workflow-orchestration`: orchestration 詳細プロトコル、bg task 破棄検知・状態別回復、capture 境界、Subagent 委譲プロトコル、コンフリクト解消 Level 2/3 詳細（停止理由分類の値域・定義・対応の正は case-auto command Design「停止理由分類」節）
 - `agentdev-case-run-execution-adapter`: case-run 委譲契約（インライン実行時）
 - `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ、コンフリクト解消 rebase パス（Level 1 は case-close、Level 2/3 は本 workflow）
 - `agentdev-epic-tracker`: Epic Issue 本文実行構成表の読取、および Case Issue 工程記録の取りまとめによる記録契機別 Epic 反映の書き込み（書き込みは closing 書き込み〔case-close〕と同一の per-Epic 排他制御・局所直列化の下で実施、手順の正は `agentdev-epic-tracker`）
