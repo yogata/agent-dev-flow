@@ -3,6 +3,9 @@ title: "IR-028: Command 最上位 Step 整数化"
 status: accepted
 created: 2026-08-20
 updated: 2026-10-22
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_command_format.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_command_format.test.ts
 ---
 
 # IR-028: Command 最上位 Step 整数化

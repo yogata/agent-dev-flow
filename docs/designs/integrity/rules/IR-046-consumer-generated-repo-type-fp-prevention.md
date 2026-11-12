@@ -3,6 +3,9 @@ title: "IR-046: consumer-generated リポジトリ種別誤検知防止"
 status: accepted
 created: 2026-08-20
 updated: 2026-10-22
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary.test.ts
 ---
 
 # IR-046: consumer-generated リポジトリ種別誤検知防止

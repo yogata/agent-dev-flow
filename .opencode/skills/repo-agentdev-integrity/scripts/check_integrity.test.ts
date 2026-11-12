@@ -1,5 +1,5 @@
 // ADF-COVERS(verification): REQ-010-002, REQ-010-003, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-066, REQ-010-068, REQ-010-084, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008, REQ-099-001
-// ADF-COVERS(verification): REQ-010-070
+// ADF-COVERS(verification): REQ-010-070, REQ-047-011, REQ-047-012
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
 import { mkdirSync, writeFileSync, copyFileSync, renameSync, rmSync, existsSync, readFileSync, readdirSync, cpSync, symlinkSync } from "fs";
 import { basename, dirname, join } from "path";
@@ -834,6 +834,28 @@ describe("check_integrity.ts --json output schema", () => {
     expect(typeof parsed.summary.warning).toBe("number");
     expect(typeof parsed.summary.info).toBe("number");
     expect(Array.isArray(parsed.results)).toBe(true);
+  });
+
+  it("annotates checker output with rule identifiers (ir_ids, REQ-047-011)", () => {
+    const r = getValidJsonRun();
+    const parsed = JSON.parse(r.stdout);
+    const results = parsed.results as Array<{
+      ir_ids?: string[];
+      check: string;
+    }>;
+    const withIrIds = results.filter(
+      (res) => Array.isArray(res.ir_ids) && res.ir_ids.length > 0,
+    );
+    expect(withIrIds.length).toBeGreaterThan(0);
+    for (const res of withIrIds) {
+      for (const irId of res.ir_ids!) {
+        expect(irId).toMatch(/^IR-\d{3}$/);
+      }
+    }
+    const checks = new Set(withIrIds.map((res) => res.check));
+    expect(checks.has("ir-rule-classification-traceability")).toBe(true);
+    expect(checks.has("skill-projection-manifest")).toBe(true);
+    expect(checks.has("runtime-unresolved-reference")).toBe(true);
   });
 });
 
@@ -6816,5 +6838,124 @@ describe("IR-073 untracked-residue (REQ-010-084)", () => {
       renameSync(join(IR073_ROOT, ".agentdev", "tmp", "notes"), join(IR073_ROOT, ".agentdev", "notes"));
       renameSync(join(IR073_ROOT, ".agentdev", "tmp", "moved.txt"), join(IR073_ROOT, "stray-root.txt"));
     }
+  });
+});
+
+// ─── IR-074: ir-rule-classification-traceability (REQ-047-011〜013, Issue #4029) ──
+// fixture IR 番号は IR-994〜IR-998（3 桁正規化帯。collectIrFiles が IR-NNN 3 桁へ
+// padStart 正規化するため 4 桁番号 fixture は IR-994 のように正規化され、
+// implementation_path ソース内 IR ID 参照と不一致になる）。
+const IR074_ROOT = join(TEMP_ROOT, "ir074");
+
+function writeIr074RuleFile(root: string, filename: string, frontmatterLines: string[]): void {
+  const rulesDir = join(root, "docs", "designs", "integrity", "rules");
+  mkdirp(rulesDir);
+  const lines = ["---", `title: "${filename.replace(/\.md$/, "")} fixture"`, "status: accepted", "created: 2026-11-13", "updated: 2026-11-13", ...frontmatterLines, "---", "", `# ${filename.replace(/\.md$/, "")} fixture`, ""];
+  writeFileSync(join(rulesDir, filename), lines.join("\n"), "utf-8");
+}
+
+function buildIr074Fixture(root: string): void {
+  const scriptsDest = join(root, ".opencode", "skills", "repo-agentdev-integrity", "scripts");
+  copyScripts(root);
+  writeFileSync(join(scriptsDest, "ir074_fixture_impl.ts"), "// IR-994 implementation fixture\n", "utf-8");
+  writeIr074RuleFile(root, "IR-994-ok-classified.md", [
+    "detection_method_class: machine-check",
+    "implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/ir074_fixture_impl.ts",
+    "verification_path: .opencode/skills/repo-agentdev-integrity/scripts/cli_utils.ts",
+  ]);
+  writeIr074RuleFile(root, "IR-995-prose-only.md", ["detection_method_class: prose-only"]);
+  writeIr074RuleFile(root, "IR-996-unclassified.md", []);
+  writeIr074RuleFile(root, "IR-997-bad-path.md", [
+    "detection_method_class: machine-check",
+    "implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/nonexistent_impl.ts",
+    "verification_path: .opencode/skills/repo-agentdev-integrity/scripts/cli_utils.ts",
+  ]);
+  writeIr074RuleFile(root, "IR-998-no-irid-ref.md", [
+    "detection_method_class: machine-check",
+    "implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/cli_utils.ts",
+    "verification_path: .opencode/skills/repo-agentdev-integrity/scripts/cli_utils.ts",
+  ]);
+}
+
+function ir074Results(root: string): {
+  ng: Array<{ evidence?: string; message: string; file?: string; finding_level?: string }>;
+  ok: Array<{ message: string }>;
+} {
+  const r = runScript(root, ["--json"]);
+  const parsed = JSON.parse(r.stdout);
+  const hits = parsed.results.filter(
+    (res: { category: string }) => res.category === "IrRuleClassification",
+  );
+  return { ng: hits.filter((x: { level: string }) => x.level === "ng"), ok: hits.filter((x: { level: string }) => x.level === "ok") };
+}
+
+function ir074KeepOnly(root: string, keep: string[]): void {
+  const rulesDir = join(root, "docs", "designs", "integrity", "rules");
+  for (const f of readdirSync(rulesDir)) {
+    if (f.endsWith(".md") && !keep.includes(f)) {
+      rmSync(join(rulesDir, f), { force: true });
+    }
+  }
+}
+
+describe("IR-074 ir-rule-classification-traceability (REQ-047-011〜013, Issue #4029)", () => {
+  it("passes classified machine-check and prose-only rules (正常例)", () => {
+    const root = join(IR074_ROOT, "ok");
+    mkdirp(root);
+    buildIr074Fixture(root);
+    ir074KeepOnly(root, ["IR-994-ok-classified.md", "IR-995-prose-only.md"]);
+    const { ng, ok } = ir074Results(root);
+    expect(ng.length).toBe(0);
+    expect(ok.length).toBeGreaterThan(0);
+    expect(ok[0].message).toContain("machine-check=1");
+    expect(ok[0].message).toContain("prose-only=1");
+  });
+
+  it("detects undetermined classification (違反例: 分類未確定)", () => {
+    const root = join(IR074_ROOT, "unclassified");
+    mkdirp(root);
+    buildIr074Fixture(root);
+    ir074KeepOnly(root, ["IR-996-unclassified.md"]);
+    const { ng, ok } = ir074Results(root);
+    expect(ng.length).toBe(1);
+    expect(ok.length).toBe(0);
+    expect(ng[0].file ?? "").toContain("IR-996-unclassified.md");
+    expect(ng[0].message).toContain("classification undetermined");
+    expect(ng[0].finding_level).toBe("strict");
+  });
+
+  it("detects machine-check rule missing implementation/verification paths (違反例: パス欠落)", () => {
+    const root = join(IR074_ROOT, "missing-paths");
+    mkdirp(root);
+    buildIr074Fixture(root);
+    ir074KeepOnly(root, ["IR-997-bad-path.md"]);
+    writeIr074RuleFile(root, "IR-997-bad-path.md", ["detection_method_class: machine-check"]);
+    const { ng } = ir074Results(root);
+    expect(ng.length).toBe(1);
+    expect(ng[0].file ?? "").toContain("IR-997-bad-path.md");
+    expect(ng[0].message).toContain("missing implementation_path or verification_path");
+  });
+
+  it("detects non-existent declared paths (違反例: パス不在)", () => {
+    const root = join(IR074_ROOT, "bad-path");
+    mkdirp(root);
+    buildIr074Fixture(root);
+    ir074KeepOnly(root, ["IR-997-bad-path.md"]);
+    const { ng } = ir074Results(root);
+    expect(ng.length).toBe(1);
+    expect(ng[0].file ?? "").toContain("IR-997-bad-path.md");
+    expect(ng[0].message).toContain("non-existent path");
+    expect(ng[0].evidence ?? "").toContain("nonexistent_impl.ts");
+  });
+
+  it("detects implementation source without rule identifier reference (違反例: IR ID 参照不在)", () => {
+    const root = join(IR074_ROOT, "no-irid-ref");
+    mkdirp(root);
+    buildIr074Fixture(root);
+    ir074KeepOnly(root, ["IR-998-no-irid-ref.md"]);
+    const { ng } = ir074Results(root);
+    expect(ng.length).toBe(1);
+    expect(ng[0].file ?? "").toContain("IR-998-no-irid-ref.md");
+    expect(ng[0].message).toContain("do not reference the rule identifier");
   });
 });

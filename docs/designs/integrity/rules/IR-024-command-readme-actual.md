@@ -3,6 +3,9 @@ title: "IR-024: Command README ↔ 実体"
 status: accepted
 created: 2026-08-20
 updated: 2026-08-20
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/commands_structure.test.ts
 ---
 
 # IR-024: Command README ↔ 実体

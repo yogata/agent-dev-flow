@@ -3,6 +3,9 @@ title: "IR-048: generated_by 識別子整合性"
 status: accepted
 created: 2026-08-20
 updated: 2026-08-20
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/../data/distribution-targets.yaml
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary.test.ts
 ---
 
 # IR-048: generated_by 識別子整合性

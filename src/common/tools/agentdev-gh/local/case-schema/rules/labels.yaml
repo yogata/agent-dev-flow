@@ -7,6 +7,10 @@
 # （原則空配列・通常ラベルの任意付与可）。role: tracking の kind 値の意味論の正は
 # agentdev-issue-tracking Design が所有する。
 # 本ファイルは docs/designs/local/local-case-file.md と矛盾してはならない。
+#
+# 実行時消費（REQ-047-012、G-007 解消）: runner-local.ts が本ファイルの
+# case_label_enum を runtime 読込で消費する（local-schema-loader.ts）。
+# labels 値域変更は runner-local.ts へ自動反映される。
 
 schema_version: "2.0"
 target: ".agentdev/issues/issue-{NNNN}.md の labels フィールド"

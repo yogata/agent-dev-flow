@@ -3,6 +3,9 @@ title: "IR-001: 現行 REQ frontmatter id ↔ ファイル名"
 status: accepted
 created: 2026-08-20
 updated: 2026-10-22
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/commands_structure.test.ts
 ---
 
 # IR-001: 現行 REQ frontmatter id ↔ ファイル名

@@ -3,6 +3,9 @@ title: skill/command パス参照実在
 status: accepted
 created: 2026-08-20
 updated: 2026-10-05
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_reference_paths.test.ts
 ---
 
 # IR-062: skill/command パス参照実在

@@ -3,6 +3,9 @@ title: "IR-051: 実行主体の skill 表記誤認検出"
 status: accepted
 created: 2026-08-20
 updated: 2026-10-01
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_executor_notation.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/walk_enumeration_contract.test.ts
 ---
 
 # IR-051: 実行主体の skill 表記誤認検出

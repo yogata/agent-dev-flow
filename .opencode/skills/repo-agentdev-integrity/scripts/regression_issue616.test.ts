@@ -140,7 +140,7 @@ describe("regression_issue616: SKILL.md category gap detection", () => {
     // repo-local skill（repo-agentdev-integrity）は投影側にのみ存在するため、
     // worktree fallback (REQ-018-001) 後も検査対象 SKILL.md を投影パスで参照する。
     expect(content).toContain(
-      "...checkSkillCategoryGap(root, projectionSkillsDir, cmdDir)",
+      "...annotateIrIds(checkSkillCategoryGap(root, projectionSkillsDir, cmdDir), [])",
     );
   });
 });
@@ -156,6 +156,8 @@ describe("regression_issue616: template path integrity", () => {
   test("checkTemplatePathIntegrity is called in main results array", () => {
     const scriptPath = path.join(SCRIPT_DIR, "check_integrity.ts");
     const content = fs.readFileSync(scriptPath, "utf-8") as string;
-    expect(content).toContain("...checkTemplatePathIntegrity(cmdDir, root)");
+    expect(content).toContain(
+      "...annotateIrIds(checkTemplatePathIntegrity(cmdDir, root), [])",
+    );
   });
 });

@@ -8,6 +8,11 @@
 # 解決結論、反映先と反映状態、関連 Case Issue 参照）の正は agentdev-issue-tracking
 # Design が所有する。
 # 本ファイルは docs/designs/local/local-case-file.md と矛盾してはならない。
+#
+# 実行時消費（REQ-047-012、G-007 解消）: runner-local.ts が本ファイルの
+# role_conditional_headings（required / comment_section）と case_headings の
+# number → 見出し対応を runtime 読込で消費する（local-schema-loader.ts）。
+# 見出し変更は runner-local.ts のセクション操作へ自動反映される。
 
 schema_version: "2.0"
 target: ".agentdev/issues/issue-{NNNN}.md の本文見出し"

@@ -9,6 +9,11 @@
 # role: case の 7 状態の正は REQ-006-112 と workflows/v4-lifecycle-state-machine
 # Design、物理表現（状態遷移表・禁止遷移）は docs/designs/local/local-case-file.md が
 # 所有する。本ファイルは docs/designs/local/local-case-file.md と矛盾してはならない。
+#
+# 実行時消費（REQ-047-012、G-007 解消）: runner-local.ts が本ファイルの
+# tracking_status_enum / case_status_enum / terminal_states を runtime 読込で
+# 消費する（local-schema-loader.ts）。値域変更は runner-local.ts へ自動反映され、
+# tracking 値域は tracking-schema.ts との起動時一致検証を持つ。
 
 schema_version: "2.0"
 target: ".agentdev/issues/issue-{NNNN}.md の status フィールド"

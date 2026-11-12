@@ -1,4 +1,4 @@
-// ADF-COVERS(implementation): REQ-044-001, REQ-044-003, REQ-010-082
+// ADF-COVERS(implementation): REQ-044-001, REQ-044-003, REQ-010-082, REQ-047-011
 /**
  * CLI utilities for AgentDevFlow validator scripts.
  * Provides common argument parsing, output formatting, and exit code constants.
@@ -64,6 +64,13 @@ export interface CheckResult {
   /** Type of artifact: "req", "adr", "skill", "command", "spec", "template", "guide", "docmap", "retired" */
   artifact_type?: string;
   finding_category?: FindingCategory;
+  /**
+   * 適用した integrity 規則の識別子（IR ID。例: ["IR-068"]）。
+   * REQ-047-011 / checker-execution-contracts「checker 共通実行契約」の
+   * checker 出力 IR ID 包含義務の JSON/markdown 出力用フィールド。
+   * 出力から rules/IR-NNN-*.md へ機械的に対応できる。
+   */
+  ir_ids?: string[];
 }
 
 export interface ScanSummary {
@@ -391,6 +398,21 @@ export function info(
   return { category, check, level: "info", message, file, line, ...opts };
 }
 
+/**
+ * REQ-047-011: checker 出力への IR ID 包含。
+ * 検査関数の戻り値（CheckResult 群）へ、適用した integrity 規則の識別子（IR ID 群）を
+ * 一括付与する。既に ir_ids を持つ結果は既存値を優先し、付与対象 IR ID は
+ * rules/IR-NNN-*.md の rule_id と一致していなければならない（IR-074 機械検査対象）。
+ * irIds が空配列の場合は結果をそのまま返す（IR 非対応検査の出力形式を変更しない）。
+ */
+export function annotateIrIds(
+  results: CheckResult[],
+  irIds: string[],
+): CheckResult[] {
+  if (irIds.length === 0) return results;
+  return results.map((r) => (r.ir_ids ? r : { ...r, ir_ids: [...irIds] }));
+}
+
 export function computeSummary(results: CheckResult[]): ScanSummary {
   return {
     ok: results.filter((r) => r.level === "ok").length,
@@ -548,7 +570,10 @@ export function formatMarkdownReport(report: IntegrityReport): string {
       lines.push(`### ${cat}`);
       for (const r of results) {
         const loc = r.file ? ` (${r.file}${r.line ? `:${r.line}` : ""})` : "";
-        let detail = `- **[${r.level.toUpperCase()}]** ${r.check}: ${r.message}${loc}`;
+        const irTag = r.ir_ids && r.ir_ids.length > 0
+          ? ` [${r.ir_ids.join(", ")}]`
+          : "";
+        let detail = `- **[${r.level.toUpperCase()}]** ${r.check}: ${r.message}${irTag}${loc}`;
         if (r.route && r.route !== "none") {
           detail += ` → route: ${r.route}`;
         }

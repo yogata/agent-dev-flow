@@ -6,7 +6,7 @@
 // ADF-COVERS(verification): REQ-006-105, REQ-006-106, REQ-006-107, REQ-006-109, REQ-006-111
 // ADF-COVERS(verification): REQ-008-050
 // ADF-COVERS(verification): REQ-009-018, REQ-009-019, REQ-009-020
-// ADF-COVERS(implementation): REQ-010-002, REQ-010-003, REQ-010-005, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-064, REQ-010-066, REQ-010-070, REQ-010-080, REQ-010-081, REQ-010-084, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008, REQ-051-009, REQ-117-006
+// ADF-COVERS(implementation): REQ-010-002, REQ-010-003, REQ-010-005, REQ-010-006, REQ-010-007, REQ-010-063, REQ-010-064, REQ-010-066, REQ-010-070, REQ-010-080, REQ-010-081, REQ-010-084, REQ-051-001, REQ-051-002, REQ-051-003, REQ-051-004, REQ-051-005, REQ-051-006, REQ-051-007, REQ-051-008, REQ-051-009, REQ-117-006, REQ-047-011, REQ-047-012
 // ADF-COVERS(verification): REQ-010-009
 // ADF-COVERS(verification): REQ-010-068, REQ-010-072, REQ-010-073, REQ-010-079
 // ADF-COVERS(implementation): REQ-010-072, REQ-010-073
@@ -41,6 +41,7 @@ import {
   writeReportFile,
   classifyFindingLevel,
   processResults,
+  annotateIrIds,
   type CheckResult,
   type CheckResultOptions,
   type IntegrityEnvironment,
@@ -11102,6 +11103,168 @@ function checkIntegrityRuleRelatedReqExistence(root: string): CheckResult[] {
   return results;
 }
 
+// ─── IR-074: ir-rule-classification-traceability (REQ-047-011〜013, B3-1) ─────
+// integrity 規則文書（rules/IR-NNN-*.md）の機械検査／文章のみ分類（frontmatter
+// detection_method_class）の全件確定検査と、機械検査規則の実装・試験パスの機械対応
+// 検査（integrity-rule-catalog「機械検査／文章のみ分類と実装・試験パスの記載形式」節）。
+// 検査内容:
+//   (1) 全 IR 文書に detection_method_class が定義され、値が machine-check |
+//       prose-only のいずれかであること（分類未確定 0 件）
+//   (2) machine-check 規則は implementation_path（checker ソース）と
+//       verification_path（試験資産）を持ち、各パスが repo root 相対で実在すること
+//   (3) machine-check 規則の implementation_path ソース内に当該 IR ID が存在すること
+//       （checker 出力識別子（REQ-047-011 annotateIrIds 付与）との一致の静的確認）
+//   (4) prose-only 規則はパス記載を要求しない（記載があっても検査しない）
+const IR074_CLASS_VALUES = new Set(["machine-check", "prose-only"]);
+
+function ir074NormalizePathList(
+  value: string | string[] | undefined,
+): string[] {
+  if (value === undefined) return [];
+  return (Array.isArray(value) ? value : [value])
+    .map((p) => p.replace(/^["']|["']$/g, "").trim())
+    .filter((p) => p.length > 0);
+}
+
+export function checkIrRuleClassification(root: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const rulesDir = path.join(root, "docs", "designs", "integrity", "rules");
+  if (!fs.existsSync(rulesDir)) {
+    results.push(
+      info(
+        "IrRuleClassification",
+        "ir-rule-classification-traceability",
+        "No integrity rules directory; IR-074 skipped (REQ-047-012)",
+      ),
+    );
+    return results;
+  }
+  const irInfos = collectIrFiles(rulesDir);
+  let violationCount = 0;
+  let machineCount = 0;
+  let proseCount = 0;
+  for (const ir of irInfos) {
+    const fullPath = path.join(rulesDir, ir.filename);
+    const content = readText(fullPath);
+    if (content === null) continue;
+    const fm = parseFrontmatter(content);
+    const rawClass = fm ? fm["detection_method_class"] : undefined;
+    const classValue = typeof rawClass === "string"
+      ? rawClass.replace(/^["']|["']$/g, "").trim()
+      : "";
+    if (!classValue || !IR074_CLASS_VALUES.has(classValue)) {
+      violationCount++;
+      results.push(
+        ng(
+          "IrRuleClassification",
+          "ir-rule-classification-traceability",
+          `IR classification undetermined for ${ir.id}: frontmatter detection_method_class is missing or invalid ('${classValue}') (REQ-047-012, IR-074)`,
+          ir.relPath,
+          undefined,
+          {
+            evidence: `detection_method_class=${classValue || "(absent)"}`,
+            expected: "detection_method_class must be machine-check or prose-only",
+            route: "intake",
+            finding_category: "document-drift",
+            finding_level: "strict",
+          },
+        ),
+      );
+      continue;
+    }
+    if (classValue === "prose-only") {
+      proseCount++;
+      continue;
+    }
+    machineCount++;
+    const implPaths = ir074NormalizePathList(fm?.["implementation_path"]);
+    const verifyPaths = ir074NormalizePathList(fm?.["verification_path"]);
+    if (implPaths.length === 0 || verifyPaths.length === 0) {
+      violationCount++;
+      results.push(
+        ng(
+          "IrRuleClassification",
+          "ir-rule-classification-traceability",
+          `Machine-check rule ${ir.id} missing implementation_path or verification_path in frontmatter (REQ-047-012, IR-074)`,
+          ir.relPath,
+          undefined,
+          {
+            evidence: `implementation_path=${implPaths.length} entries, verification_path=${verifyPaths.length} entries`,
+            expected: "machine-check rules must declare both implementation_path and verification_path",
+            route: "intake",
+            finding_category: "document-drift",
+            finding_level: "strict",
+          },
+        ),
+      );
+      continue;
+    }
+    const missingPaths = [...implPaths, ...verifyPaths].filter(
+      (p) => !fs.existsSync(path.join(root, ...p.split("/"))),
+    );
+    if (missingPaths.length > 0) {
+      violationCount++;
+      results.push(
+        ng(
+          "IrRuleClassification",
+          "ir-rule-classification-traceability",
+          `Machine-check rule ${ir.id} declares non-existent path(s): ${missingPaths.join(", ")} (REQ-047-012, IR-074)`,
+          ir.relPath,
+          undefined,
+          {
+            evidence: missingPaths.join(", "),
+            expected: "declared implementation/verification paths must exist relative to the repository root",
+            route: "intake",
+            finding_category: "broken-reference",
+            finding_level: "strict",
+          },
+        ),
+      );
+      continue;
+    }
+    const implWithoutIrId: string[] = [];
+    for (const p of implPaths) {
+      const implContent = readText(path.join(root, ...p.split("/")));
+      if (implContent === null) continue;
+      // 宣言的データ語彙（yaml。検出語自体をデータとして保持し実行時の強制箇所が
+      // 消費する。REQ-047-012「機械可読な定義の実行時消費」）は IR ID 参照を
+      // 要求しない。checker ソース（コード）のみ IR ID 存在（出力識別子一致）を
+      // 静的確認する。
+      if (p.endsWith(".yaml") || p.endsWith(".yml")) continue;
+      if (!implContent.includes(ir.id)) implWithoutIrId.push(p);
+    }
+    if (implWithoutIrId.length > 0) {
+      violationCount++;
+      results.push(
+        ng(
+          "IrRuleClassification",
+          "ir-rule-classification-traceability",
+          `Machine-check rule ${ir.id}: implementation source(s) ${implWithoutIrId.join(", ")} do not reference the rule identifier (checker output IR ID mismatch, REQ-047-011, IR-074)`,
+          ir.relPath,
+          undefined,
+          {
+            evidence: implWithoutIrId.join(", "),
+            expected: `implementation source must contain the rule identifier '${ir.id}' (annotateIrIds annotation consumed by checker output)`,
+            route: "intake",
+            finding_category: "document-drift",
+            finding_level: "strict",
+          },
+        ),
+      );
+    }
+  }
+  if (violationCount === 0) {
+    results.push(
+      ok(
+        "IrRuleClassification",
+        "ir-rule-classification-traceability",
+        `IR-074 ir-rule-classification-traceability: ${irInfos.length} rules classified (machine-check=${machineCount}, prose-only=${proseCount}), 0 undetermined, all declared paths exist and reference their rule identifier (REQ-047-011〜013)`,
+      ),
+    );
+  }
+  return results;
+}
+
 // ─── IR-072: req-updated-freshness (REQ-010-068 準拠の新規検査クラス) ──────────
 // 現行 REQ ファイル（docs/requirements/REQ-NNN.md）の frontmatter updated と、
 // 当該ファイルの最終内容変更 commit の日付（author date、%as）を突合する。
@@ -11846,85 +12009,89 @@ async function main(): Promise<void> {
     process.exit(EXIT_OK);
   }
 
+  // REQ-047-011: checker 出力の IR ID 包含。検査関数ごとに適用した IR ID を
+  // annotateIrIds で付与する（IR-074 機械検査が implementation_path ソース内の
+  // IR ID 存在を確認する。IR 非対応検査は annotateIrIds でそのまま保持）。
   const results: CheckResult[] = [
-    ...checkSourceRequiredDirs(root),
-    ...checkReqFrontmatterFilename(reqDir, root),
-    ...checkReqRequiredFields(reqDir, root),
-    ...checkReqReadmeIndexSync(reqDir, root),
-    ...checkRetiredFrontmatter(reqDir, root),
-    ...checkAdrReqCrossReference(reqDir, adrDir, root),
-    ...checkSkillAgentdevPrefix(skillsDir, root),
-    ...checkCommandReadmeSync(cmdDir, root),
-    ...checkExpandedReadmeSync(cmdDir, root),
-    ...checkCommandInventory(cmdDir, root),
-    ...checkLegacyNamespace(skillsDir, cmdDir, root),
-    ...checkBareSlashScoped(skillsDir, cmdDir, root),
-    ...checkNameCollision(skillsDir, root),
-    ...checkDesignsExistence(designsDir, root),
-    ...checkInlineCompletionReportsStrict(cmdDir, root),
-    ...checkInlineCompletionBodyInCommands(cmdDir, root),
-    ...checkPostCompletionOutput(cmdDir, root),
-    ...checkTerminology(cmdDir, root),
-    ...checkLinkIntegrity(root),
-    ...checkDecisionReadmeRetiredReqLink(root),
-    ...checkDesignsRelativeLinkExistence(root),
-    ...checkCanonicalBoundary(root),
-    ...checkLifecycleBoundary(root),
-    ...checkExpandedLegacyNamespace(skillsDir, cmdDir, root),
-    ...checkReqRetiredIndexSync(reqDir, root),
-    ...checkDocMapReqSync(root),
-    ...checkDocMapSpecSync(root),
-    ...checkDocMapGuideSync(root),
-    ...checkAdrReadmeIndexSync(adrDir, root),
-    ...checkSpecReadmeIndexSync(root),
-    ...checkCommandMapConsistency(cmdDir, root, commandMapPath),
-    ...checkObsoleteReferenceDirs(skillsDir, root),
-    ...checkSkillFrontmatter(skillsDir, root),
-    ...checkCommandFrontmatterDetailed(cmdDir, root),
-    ...checkScriptTemplateReferencePaths(cmdDir, skillsDir, root),
-    ...checkAdrStatusNormalization(adrDir, root),
-    ...checkRuidGroundReference(root),
-    ...checkWorkflowStatusProhibition(root),
-    ...checkAcceptedAdrOnlyCitation(root),
-    ...checkPatternResidualDetection(root),
-    ...checkReqBacklogResidualDetection(root),
-    ...checkAbolishedSkillReferences(root),
-    ...checkReqRangeStaleness(root),
-    ...checkSkillCategoryGap(root, projectionSkillsDir, cmdDir),
-    ...checkTemplatePathIntegrity(cmdDir, root),
-    ...checkDistributionUntrackedSkillReference(root), // IR-058 (v2:REQ-0159-003) — source/installed both run; no-op when projection absent
-    ...checkUpdateNotesInDocs(root),
-    ...checkSummaryReqRangeConsistency(root),
-    ...checkOldStatusVocabulary(root),
-    ...checkLegacyNamespaceInDocs(root),
-    ...checkAgentdevExclusion(root),
-    ...checkReferencesRecursiveScan(skillsDir, root),
-    ...checkSkillInternalSectionReference(skillsDir, root), // IR-034 (Phase 6 §4.6)
-    ...checkSkillSeeAlsoReference(skillsDir, root), // IR-035 (Phase 6 §4.6)
-    ...checkReportSelfExclusion(root),
-    ...checkVocabularyRegistrySync(root),
-    ...checkCaptureBoundaryReference(root),
-    ...checkPrTemplateCaptureSection(root),
-    ...checkCommandCaptureDuties(cmdDir, root),
-    ...checkReqVerificationBasis(root),
-    ...checkReqDesignBoundaryViolation(root), // IR-044 (v2:REQ-0108-259)
-    ...checkGhDirectInvocation(root), // IR-053 (v2:REQ-0152-001/002)
-    ...checkDraftSpecStaleness(designsDir, root), // IR-054 (v2:REQ-0154-002)
-    ...checkSisyphusJuniorUlwLoopMisclassification(root), // v2:REQ-0144-013
-    ...checkRuntimeUnresolvedReference(root), // IR-055 (v2:REQ-0108-263/264)
-    ...checkObsoleteSpecPath(root), // IR-057 (v2:REQ-0158-002)
-    ...checkIndexGenerationConsistency(root), // IR-061 (SC-002 Phase C, 索引類自動生成整合性)
-    ...checkCommonPolicyIdentifierInvariant(root), // IR-063 (REQ-051-005, REQ-010-064, Issue #2429)
-    ...checkUnresolvedPlaceholder(root), // IR-064 (REQ-010-065, Issue #2372)
-    ...checkObsoleteVocabulary(root), // IR-065/IR-066 (REQ-010-066/067, Issue #2372)
-    ...checkDocsDesignsLegacyPathDeclarations(root), // IR-066 docs/designs 現在形宣言 (REQ-010-067/080, Case #3457)
-    ...checkReferencedReqRowExistence(root), // IR-067 (REQ-010-069, Issue #2383 (a))
-    ...checkSkillProjectionManifest(root), // IR-068 (Issue #2383 (d), inspect F-01)
-    ...checkReqNumberGapRecorded(root), // IR-069 (REQ-010-070, Case #2917)
-    ...checkIntegrityRuleRelatedReqExistence(root), // IR-071 (REQ-051-009)
-    ...checkReqUpdatedFreshness(root), // IR-072 (REQ-010-068 準拠、patterns.md REQ frontmatter 規約)
-    ...checkUntrackedResidue(root), // IR-073 (REQ-010-084、未追跡かつ gitignore 管理対象外の検出)
-    ...checkRepoLocalPluginProjectionSymmetry(root), // repo-local Plugin 投影対称性検査（runtime-package-boundary.md、Issue #2787）
+    ...annotateIrIds(checkSourceRequiredDirs(root), []),
+    ...annotateIrIds(checkReqFrontmatterFilename(reqDir, root), ["IR-001"]),
+    ...annotateIrIds(checkReqRequiredFields(reqDir, root), ["IR-002"]),
+    ...annotateIrIds(checkReqReadmeIndexSync(reqDir, root), ["IR-004"]),
+    ...annotateIrIds(checkRetiredFrontmatter(reqDir, root), []),
+    ...annotateIrIds(checkAdrReqCrossReference(reqDir, adrDir, root), ["IR-005"]),
+    ...annotateIrIds(checkSkillAgentdevPrefix(skillsDir, root), []),
+    ...annotateIrIds(checkCommandReadmeSync(cmdDir, root), ["IR-024"]),
+    ...annotateIrIds(checkExpandedReadmeSync(cmdDir, root), []),
+    ...annotateIrIds(checkCommandInventory(cmdDir, root), []),
+    ...annotateIrIds(checkLegacyNamespace(skillsDir, cmdDir, root), ["IR-009"]),
+    ...annotateIrIds(checkBareSlashScoped(skillsDir, cmdDir, root), []),
+    ...annotateIrIds(checkNameCollision(skillsDir, root), []),
+    ...annotateIrIds(checkDesignsExistence(designsDir, root), []),
+    ...annotateIrIds(checkInlineCompletionReportsStrict(cmdDir, root), []),
+    ...annotateIrIds(checkInlineCompletionBodyInCommands(cmdDir, root), []),
+    ...annotateIrIds(checkPostCompletionOutput(cmdDir, root), []),
+    ...annotateIrIds(checkTerminology(cmdDir, root), []),
+    ...annotateIrIds(checkLinkIntegrity(root), []),
+    ...annotateIrIds(checkDecisionReadmeRetiredReqLink(root), []),
+    ...annotateIrIds(checkDesignsRelativeLinkExistence(root), []),
+    ...annotateIrIds(checkCanonicalBoundary(root), []),
+    ...annotateIrIds(checkLifecycleBoundary(root), ["IR-003"]),
+    ...annotateIrIds(checkExpandedLegacyNamespace(skillsDir, cmdDir, root), []),
+    ...annotateIrIds(checkReqRetiredIndexSync(reqDir, root), []),
+    ...annotateIrIds(checkDocMapReqSync(root), []),
+    ...annotateIrIds(checkDocMapSpecSync(root), []),
+    ...annotateIrIds(checkDocMapGuideSync(root), ["IR-042"]),
+    ...annotateIrIds(checkAdrReadmeIndexSync(adrDir, root), []),
+    ...annotateIrIds(checkSpecReadmeIndexSync(root), []),
+    ...annotateIrIds(checkCommandMapConsistency(cmdDir, root, commandMapPath), []),
+    ...annotateIrIds(checkObsoleteReferenceDirs(skillsDir, root), ["IR-014"]),
+    ...annotateIrIds(checkSkillFrontmatter(skillsDir, root), ["IR-007"]),
+    ...annotateIrIds(checkCommandFrontmatterDetailed(cmdDir, root), ["IR-006"]),
+    ...annotateIrIds(checkScriptTemplateReferencePaths(cmdDir, skillsDir, root), ["IR-008", "IR-062"]),
+    ...annotateIrIds(checkAdrStatusNormalization(adrDir, root), ["IR-010"]),
+    ...annotateIrIds(checkRuidGroundReference(root), []),
+    ...annotateIrIds(checkWorkflowStatusProhibition(root), []),
+    ...annotateIrIds(checkAcceptedAdrOnlyCitation(root), ["IR-027"]),
+    ...annotateIrIds(checkPatternResidualDetection(root), ["IR-015"]),
+    ...annotateIrIds(checkReqBacklogResidualDetection(root), []),
+    ...annotateIrIds(checkAbolishedSkillReferences(root), ["IR-021"]),
+    ...annotateIrIds(checkReqRangeStaleness(root), ["IR-018"]),
+    ...annotateIrIds(checkSkillCategoryGap(root, projectionSkillsDir, cmdDir), []),
+    ...annotateIrIds(checkTemplatePathIntegrity(cmdDir, root), []),
+    ...annotateIrIds(checkDistributionUntrackedSkillReference(root), ["IR-058"]), // IR-058 (v2:REQ-0159-003) — source/installed both run; no-op when projection absent
+    ...annotateIrIds(checkUpdateNotesInDocs(root), []),
+    ...annotateIrIds(checkSummaryReqRangeConsistency(root), []),
+    ...annotateIrIds(checkOldStatusVocabulary(root), []),
+    ...annotateIrIds(checkLegacyNamespaceInDocs(root), []),
+    ...annotateIrIds(checkAgentdevExclusion(root), []),
+    ...annotateIrIds(checkReferencesRecursiveScan(skillsDir, root), []),
+    ...annotateIrIds(checkSkillInternalSectionReference(skillsDir, root), ["IR-034"]), // IR-034 (Phase 6 §4.6)
+    ...annotateIrIds(checkSkillSeeAlsoReference(skillsDir, root), ["IR-035"]), // IR-035 (Phase 6 §4.6)
+    ...annotateIrIds(checkReportSelfExclusion(root), []),
+    ...annotateIrIds(checkVocabularyRegistrySync(root), []),
+    ...annotateIrIds(checkCaptureBoundaryReference(root), []),
+    ...annotateIrIds(checkPrTemplateCaptureSection(root), []),
+    ...annotateIrIds(checkCommandCaptureDuties(cmdDir, root), []),
+    ...annotateIrIds(checkReqVerificationBasis(root), []),
+    ...annotateIrIds(checkReqDesignBoundaryViolation(root), ["IR-044"]), // IR-044 (v2:REQ-0108-259)
+    ...annotateIrIds(checkGhDirectInvocation(root), ["IR-053"]), // IR-053 (v2:REQ-0152-001/002)
+    ...annotateIrIds(checkDraftSpecStaleness(designsDir, root), ["IR-054"]), // IR-054 (v2:REQ-0154-002)
+    ...annotateIrIds(checkSisyphusJuniorUlwLoopMisclassification(root), []),
+    ...annotateIrIds(checkRuntimeUnresolvedReference(root), ["IR-055", "IR-020"]), // IR-055 (v2:REQ-0108-263/264)。baseline-known 判別は IR-020 実装
+    ...annotateIrIds(checkObsoleteSpecPath(root), ["IR-057"]), // IR-057 (v2:REQ-0158-002)
+    ...annotateIrIds(checkIndexGenerationConsistency(root), ["IR-061"]), // IR-061 (SC-002 Phase C, 索引類自動生成整合性)
+    ...annotateIrIds(checkCommonPolicyIdentifierInvariant(root), ["IR-063"]), // IR-063 (REQ-051-005, REQ-010-064, Issue #2429)
+    ...annotateIrIds(checkUnresolvedPlaceholder(root), ["IR-064"]), // IR-064 (REQ-010-065, Issue #2372)
+    ...annotateIrIds(checkObsoleteVocabulary(root), ["IR-065", "IR-066"]), // IR-065/IR-066 (REQ-010-066/067, Issue #2372)
+    ...annotateIrIds(checkDocsDesignsLegacyPathDeclarations(root), ["IR-066"]), // IR-066 docs/designs 現在形宣言 (REQ-010-067/080, Case #3457)
+    ...annotateIrIds(checkReferencedReqRowExistence(root), ["IR-067"]), // IR-067 (REQ-010-069, Issue #2383 (a))
+    ...annotateIrIds(checkSkillProjectionManifest(root), ["IR-068"]), // IR-068 (Issue #2383 (d), inspect F-01)
+    ...annotateIrIds(checkReqNumberGapRecorded(root), ["IR-069"]), // IR-069 (REQ-010-070, Case #2917)
+    ...annotateIrIds(checkIntegrityRuleRelatedReqExistence(root), ["IR-071"]), // IR-071 (REQ-051-009)
+    ...annotateIrIds(checkReqUpdatedFreshness(root), ["IR-072"]), // IR-072 (REQ-010-068 準拠、patterns.md REQ frontmatter 規約)
+    ...annotateIrIds(checkUntrackedResidue(root), ["IR-073"]), // IR-073 (REQ-010-084、未追跡かつ gitignore 管理対象外の検出)
+    ...annotateIrIds(checkRepoLocalPluginProjectionSymmetry(root), []), // repo-local Plugin 投影対称性検査（runtime-package-boundary.md、Issue #2787）
+    ...annotateIrIds(checkIrRuleClassification(root), ["IR-074"]),
   ];
 
   // REQ-018-001 / checker-execution-contracts.md: fallback 使用時は環境ラベルを
@@ -11954,7 +12121,7 @@ async function main(): Promise<void> {
       ),
     );
   } else {
-    results.push(...checkSourceProjectionConsistency(root));
+    results.push(...annotateIrIds(checkSourceProjectionConsistency(root), ["IR-016"]));
     results.push(...checkBrokenJunctions(projectionSkillsDir, root, cmdDir));
     results.push(...checkJunctionScanCoverage(root));
     results.push(...checkInstalledProjection(root));

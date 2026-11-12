@@ -3,6 +3,9 @@ title: "IR-070: design-frontmatter-required-keys"
 status: accepted
 created: 2026-09-20
 updated: 2026-10-05
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_design_frontmatter.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_design_frontmatter.test.ts
 ---
 
 # IR-070: design-frontmatter-required-keys

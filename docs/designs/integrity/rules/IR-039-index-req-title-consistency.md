@@ -3,6 +3,7 @@ title: "IR-039: index-req-title-consistency"
 status: accepted
 created: 2026-08-20
 updated: 2026-08-20
+detection_method_class: prose-only
 ---
 
 # IR-039: index-req-title-consistency

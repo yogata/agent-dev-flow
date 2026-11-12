@@ -33,6 +33,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import type {
   GhRunner,
   GhRunnerFailureClass,
@@ -47,27 +48,57 @@ import {
   type CloseReason,
   type IssueRole,
 } from "../tracking-schema.ts";
+import { loadLocalCaseSchema } from "./local-schema-loader.ts";
 
 const ISSUE_FILE_PREFIX = "issue-";
 const ISSUE_FILE_SUFFIX = ".md";
 const FRONTMATTER_DELIMITER = "---";
 
-const HEADING_WORKLOG = "## 作業ログ";
-const HEADING_DISCUSSION = "## 検討経過";
-const HEADING_MERGE_CHECK = "## マージ前確認";
-const HEADING_MERGE_RESULT = "## マージ結果";
-const HEADING_DESIGN_CANDIDATES = "## Design確定候補";
-const HEADING_FINDINGS = "## Findings / Capture候補";
-const HEADINGS_BEFORE_WORKLOG = [HEADING_MERGE_CHECK, HEADING_DESIGN_CANDIDATES, HEADING_FINDINGS];
-const PR_BODY_SECTIONS = [HEADING_MERGE_CHECK, HEADING_DESIGN_CANDIDATES, HEADING_FINDINGS];
+// case-schema rules yaml の実行時消費（REQ-047-012、G-007 解消）。
+// status 値域・labels 値域・終端状態・本文見出しの実行時強制箇所は
+// case-schema/rules/{status,labels,headings}.yaml を runtime 読込で消費する。
+// yaml 欠損・スキーマ不適合時は import 時に fail-closed で停止する。
+const RUNNER_DIR = path.dirname(fileURLToPath(import.meta.url));
+const CASE_SCHEMA_RULES_DIR = path.join(RUNNER_DIR, "case-schema", "rules");
+const SCHEMA = loadLocalCaseSchema(CASE_SCHEMA_RULES_DIR);
+
+// tracking 値域は local case-schema（tracking_status_enum）を正として消費する。
+// Tool 本体の写像表（tracking-schema.ts LOCAL_TRACKING_STATUS_VALUES）との不一致は
+// 起動時に fail-closed で検出する（独立所有の同期条件の機械検証）。
+if (SCHEMA.trackingStatusValues.join("|") !== LOCAL_TRACKING_STATUS_VALUES.join("|")) {
+  throw new Error(
+    `local case-schema status.yaml tracking_status_enum (${SCHEMA.trackingStatusValues.join(", ")}) ` +
+      `does not match tracking-schema.ts LOCAL_TRACKING_STATUS_VALUES (${LOCAL_TRACKING_STATUS_VALUES.join(", ")})`,
+  );
+}
+
+const HEADING_WORKLOG = SCHEMA.caseHeadingsByNumber[8] ?? "";
+const HEADING_DISCUSSION = SCHEMA.commentSections.tracking;
+const HEADING_MERGE_CHECK = SCHEMA.caseHeadingsByNumber[9] ?? "";
+const HEADING_MERGE_RESULT = SCHEMA.caseHeadingsByNumber[12] ?? "";
+const HEADING_DESIGN_CANDIDATES = SCHEMA.caseHeadingsByNumber[10] ?? "";
+const HEADING_FINDINGS = SCHEMA.caseHeadingsByNumber[11] ?? "";
+const HEADINGS_BEFORE_WORKLOG = [
+  HEADING_MERGE_CHECK,
+  HEADING_DESIGN_CANDIDATES,
+  HEADING_FINDINGS,
+];
+const PR_BODY_SECTIONS = HEADINGS_BEFORE_WORKLOG;
+for (const [num, heading] of Object.entries(SCHEMA.caseHeadingsByNumber)) {
+  if ([8, 9, 10, 11, 12].includes(Number(num))) {
+    if (!heading) {
+      throw new Error(`local case-schema headings.yaml case_headings number ${num} has no heading`);
+    }
+  }
+}
+
+const CASE_TERMINAL_STATUSES = [...SCHEMA.terminalStates.case];
+const CASE_STATUS_VALUES = SCHEMA.caseStatusValues;
+const CASE_LABEL_VALUES = SCHEMA.caseLabelValues;
+
 const PR_TITLE_PREFIX = "### PR title: ";
 const PR_BASE_PREFIX = "### PR base: ";
 const PR_HEAD_PREFIX = "### PR head: ";
-
-const CASE_NON_TERMINAL_STATUSES = ["open", "ready", "running", "blocked", "review"] as const;
-const CASE_TERMINAL_STATUSES = ["closed", "cancelled"] as const;
-const CASE_STATUS_VALUES = [...CASE_NON_TERMINAL_STATUSES, ...CASE_TERMINAL_STATUSES] as const;
-const CASE_LABEL_VALUES = ["feature", "bugfix", "maintenance", "docs", "refactor", "chore", "epic"] as const;
 
 const COMMENT_ENTRY_HEADING_RE = /^### c(\d{2,}) (\S+)(?: \(updated (\S+)\))?$/;
 const LEGACY_COMMENT_ENTRY_RE = /^### (\S+)$/;

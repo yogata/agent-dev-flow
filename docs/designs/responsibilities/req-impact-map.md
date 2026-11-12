@@ -13,64 +13,34 @@ updated: 2026-11-11
 
 ## 同期更新が必要なケース
 
-本ファイルと `rule-ownership.md` は逆方向の対応表であるため、以下の場合に両ファイルの同期更新が必要:
+本ファイルの REQ → 影響する Rule IDs 対応（`req-impact-map-req-ir-crossref` AUTOGEN ブロック）は、IR 文書（`rules/IR-NNN-*.md`）の frontmatter / Field-Value 表の related_req から `generate_indexes.ts` が自動生成する（rule-ownership.md「対応表の機械検証への移行（B3-1）」と同一の生成経路。REQ-047-013、REQ-010-011）。
 
-- 新規 IR 追加時: 両ファイルの対応行列を同期更新する
-- IR の物理削除時（AG-008、現行の IR 登録モデルは DEC-013）: 両ファイルで対応行を削除し、本ファイルの `## Retired cross-references` 節へ交叉参照を再配置する
-- canonical owner 変更時: 両ファイルで参照先を更新する
-- 新規 REQ 追加、廃止時: 本ファイルの対応行を追加、削除し、影響先ルールドメインと rule-ownership.md の整合を確認する
+- 新規 IR 追加・削除・関連 REQ 変更時: IR 文書の related_req を更新すれば本ブロックは次回の `generate_indexes.ts` 実行で自動追随する。本ブロックの直接編集は行わない
+- 手動の対応行列同期義務（新規 IR 追加時の本ファイル↔rule-ownership.md の双方向同期）は廃止した。rule-ownership.md 側の IR 別関連マッピング（`rule-ownership-ir-crossref`）も同一の IR 文書 frontmatter から生成される
+- IR の物理削除時（AG-008、現行の IR 登録モデルは DEC-013）: IR 文書の物理削除に伴い両 AUTOGEN ブロックから自動除外される。交叉参照の履歴は本ファイルの `## Retired cross-references` 節へ再配置する（この節のみ人手管理を維持する）
 
-両ファイルの同期は手動の双方向管理であり、自動同期機構を持たない。両ファイルの更新は同一 PR で行うことを基準とし、片側のみの更新を残さない。
-
-各現行 REQ が影響する整合性ルールとアーティファクトを記載するマップ（REQ-010-011）。
-10 以上の現行 REQ をカバーする。
+各現行 REQ が影響する整合性ルールを記載するマップ（REQ-010-011）。REQ とルールの対応関係の正は IR 文書の related_req であり、本ブロックはその逆方向導出ビューである。
 
 ## 影響マトリックス（Impact Matrix）
 
-| REQ | タイトル | 影響する Rule IDs | 影響する Artifact |
-|-----|---------|------------------|------------------|
-| REQ-001 | 文書、REQ 管理基準 | IR-001, IR-002, IR-003, IR-004, IR-018 | REQ, REQ index |
-| REQ-002 | Artifact 責任分界 | IR-006, IR-008, IR-014, IR-016, IR-024 | commands, skills, templates, Design |
-| REQ-010 | Integrity/Validation/Tests | IR カタログ全件（現行一覧は integrity-rule-catalog.md が正） | 全アーティファクト |
-| v2:REQ-0107 | Reporting/Writing Quality | IR-013 | templates, guides |
-| REQ-005 | Workflow/Command Protocol | IR-006, IR-024 | commands |
-| REQ-008 | RU lifecycle / Requirement Unit 管理 | IR-016 | ドメイン状態 |
-| REQ-006 | Case 実行オーケストレーション / Epic、Wave | IR-006, IR-013, IR-016 | commands, templates |
-| REQ-036 | REQ 再構成運用 | IR-004, IR-011, IR-015 | REQ, 廃止 REQ |
-| REQ-001 | Decision status 正規化 | IR-005, IR-010 | Decision, Decision index |
-| v2:REQ-0113 | Skill References Design 分離 | IR-008, IR-014 | skills, skill references |
-| REQ-006 | case-auto 最大自走モード | IR-006, IR-016 | commands |
-| REQ-003 | コマンド、スキル、サブエージェント責務分界の再基準化 | IR-006, IR-008, IR-014, IR-024 | commands, skills |
-| REQ-005 | workflow-lifecycle 宣言的純化とコマンド固有手順の目的別スキル移管 | IR-006, IR-008, IR-014 | commands, skills |
-| REQ-036 | AgentDevFlow inspect-* 検出コマンド群と inspect lifecycle | IR-006, IR-024 | commands |
-| REQ-036 | inspect-skills / Command/Skill 参照妥当性検出 | IR-008, IR-014 | commands, skills |
-| REQ-036 | inspect-promote / 検出事項分類、昇格 | IR-016 | ドメイン状態 |
-| REQ-037 | Intake command 群 (capture / from-github / promote) | IR-016 | ドメイン状態 |
-| REQ-038 | Learning-promote | IR-016 | ドメイン状態 |
-| REQ-039 | Backlog-review | IR-016 | ドメイン状態 |
-| REQ-006 | case-run / 実装パイプライン | IR-006, IR-013, IR-016 | commands, templates |
-| REQ-006 | case-close / 完了処理 | IR-006, IR-013, IR-016 | commands, templates |
-| REQ-006 | case-open / Issue 作成 | IR-006 | commands |
-| REQ-006 | Case 実行 orchestration / Issue 更新（case-ready / case-revise） | IR-006 | commands |
-| v2:REQ-0110 | Git worktree cleanup 信頼性 |（(infrastructure)）| - |
-| REQ-004 | 要件定義、保存 | IR-001, IR-002 | REQ |
-| REQ-009 | 配布基盤: source/projection、sync、repo type、consumer install | IR-006, IR-016, IR-046 | commands, skills, ドメイン状態 |
-| REQ-008 | Drafts 配置、Draft Type Registry | IR-016 | ドメイン状態 |
-| REQ-001 | REQ/Design 責務分離の徹底と新ワークフロー（保存内部責務（case-ready / case-revise）への統合、req-define 強化） | IR-008, IR-044 | REQ, Design, commands |
-| v2:REQ-0137 | 並列実行安全 git 操作規律 |（(infrastructure)）| - |
-| REQ-008 | 構造化 req_draft 契約 | IR-016 | ドメイン状態 |
-| REQ-003 | 外部エージェント統合契約 | IR-006, IR-024 | commands, skills |
-| v2:REQ-0140 | 文書品質ゲート | IR-013 | docs, Design, document-type-responsibilities.md |
-| REQ-009 | ローカル版 OpenCode 導入方式とローカルIssue運用 | IR-016, IR-046, IR-048 | src/common/tools/agentdev-gh/local/, .opencode/commands/agentdev/, .opencode/skills/agentdev-*/, .agentdev/issues/, Design, guides |
-| REQ-002 | 配布物ID除去後の文意保持、構文健全性、責務整合 | IR-016 | docs, Design, docs-spec-rebuild-integrity.md |
-| v2:REQ-0143 | Command 定義ファイルフォーマット標準化 | IR-049 | commands, command-file-format.md |
-| REQ-010 | docs-check/integrity 運用是正 | IR-016, IR-052 | integrity scripts, docs-check, Design |
-| REQ-010 | docs-check/integrity 検出設計改善 | IR-044, IR-050, IR-051, IR-052 | integrity-rule-catalog.md, integrity scripts |
-| REQ-010 | docs-check 新規機械検査クラス（共通ポリシー意味識別子検査、未解決プレースホルダー、廃止語彙、旧パス・削除済み名称） | IR-063, IR-064, IR-065, IR-066 | integrity-rule-catalog.md, integrity scripts, .opencode/skills/repo-agentdev-integrity/data/obsolete-vocabulary-map.yaml, NG baseline |
-| REQ-003 | 実行契約、委譲、プロセス設計 | IR-006, IR-032, IR-033 | commands, Design |
-| REQ-003 | 文書化規律、HITL境界 | IR-013, IR-035 | docs, commands, skills, guides |
-| REQ-006 | RU群バッチ処理と複数 execution_unit 並列実行 | IR-006, IR-016 | commands |
-| REQ-049 | 追跡Issue管理機構 | - | commands, skills, templates, Design（論理スキーマの一元管理は `agentdev-issue-tracking` skill Design） |
+<!-- AUTOGEN:BEGIN:id=req-impact-map-req-ir-crossref -->
+| REQ | タイトル | 影響する Rule IDs |
+|-----|---------|------------------|
+| [REQ-001](../../requirements/REQ-001.md) | 文書体系と持続可能な基準構造 | IR-001, IR-024, IR-025, IR-027, IR-037, IR-038, IR-039, IR-040, IR-041, IR-042, IR-043, IR-044, IR-054, IR-057 |
+| [REQ-002](../../requirements/REQ-002.md) | 配布成果物の責務境界 | IR-006, IR-014, IR-056, IR-058 |
+| [REQ-003](../../requirements/REQ-003.md) | 委譲時の判断・承認・副作用境界 | IR-030, IR-031, IR-032, IR-033 |
+| [REQ-009](../../requirements/REQ-009.md) | 配布基盤と導入モデル | IR-046, IR-048, IR-057 |
+| [REQ-010](../../requirements/REQ-010.md) | 自己監査コマンド（docs-check） | IR-001, IR-002, IR-003, IR-004, IR-005, IR-007, IR-010, IR-012, IR-015, IR-018, IR-020, IR-021, IR-023, IR-024, IR-034, IR-035, IR-039, IR-044, IR-049, IR-050, IR-051, IR-052, IR-060, IR-062, IR-063, IR-064, IR-065, IR-066, IR-067, IR-068, IR-069, IR-070, IR-072, IR-073 |
+| [REQ-011](../../requirements/REQ-011.md) | I/O境界と外部連携手段 | IR-053 |
+| [REQ-018](../../requirements/REQ-018.md) | worktree 構造的制約とテスト fallback | IR-068 |
+| [REQ-029](../../requirements/REQ-029.md) | 配布依存境界 | IR-055, IR-059 |
+| [REQ-036](../../requirements/REQ-036.md) | 検出と診断コマンド群（inspect 系） | IR-008, IR-009, IR-013, IR-057, IR-060 |
+| [REQ-037](../../requirements/REQ-037.md) | 取り込みパイプライン（intake） | IR-014 |
+| [REQ-039](../../requirements/REQ-039.md) | バックログ統合（backlog-review） | IR-006 |
+| [REQ-047](../../requirements/REQ-047.md) | 規則所有権の一方向化 | IR-074 |
+| [REQ-051](../../requirements/REQ-051.md) | ガードレール識別体系と機械検査の再編 | IR-063, IR-071 |
+| [REQ-053](../../requirements/REQ-053.md) | 文書と配布物の文章品質契約 | IR-051, IR-060 |
+<!-- AUTOGEN:END -->
 
 ## 要件行影響（Requirement-Line Impact）
 
@@ -88,31 +58,6 @@ REQ-002-028、029、035 は RETIRE 扱いとし、それぞれの検査（構文
 | REQ-001-067〜069 | document-model.md, `agentdev-req-analysis` skill, `agentdev-quality-gates` skill, docs-check command (IR-044 経由), inspect-docs command (REQ-039-003 経由) | IR-044 |
 | REQ-004-031〜033 | `agentdev-req-analysis` skill, `agentdev-quality-gates` skill | IR-044 |
 | REQ-039-003 | req-impact-map.md (本節), `agentdev-req-structure-diagnostics` skill | IR-044 |
-
-## 影響カテゴリ（Impact Categories）
-
-### 高影響（5+ ルール）
-- **REQ-010**: 全整合性ルールに影響 (IR-001~IR-024)
-- **REQ-001**: REQ 管理基準として広範囲に影響 (7 ルール)
-- **REQ-002**: アーティファクト配置規約として広範囲に影響 (5 ルール)
-
-### 中影響（3-4 ルール）
-- **REQ-036**: REQ 再構成運用 (3 ルール)
-- **REQ-003**: コマンド、スキル、サブエージェント責務分界 (4 ルール)
-- **REQ-005**: Command protocol (2 ルール)
-- **REQ-006**: Case 実行オーケストレーション (3 ルール)
-- **v2:REQ-0107**: Reporting (2 ルール)
-- **REQ-009**: ローカル版 OpenCode 導入方式とローカルIssue運用 (3 ルール: IR-016, IR-046, IR-048)
-- **REQ-010**: docs-check/integrity 検出設計改善 (4 ルール: IR-044, IR-050, IR-051, IR-052)
-- **REQ-003**: 実行契約、委譲、プロセス設計 (3 ルール: IR-006, IR-032, IR-033)
-- **REQ-003**: 文書化規律、HITL境界 (3 ルール: IR-013, IR-019, IR-035)
-
-### 低影響（1-2 ルール）
-- **REQ-004**, **REQ-008**, **REQ-001**, **v2:REQ-0113**, **REQ-006**, **REQ-005**, **REQ-036**, **REQ-036**, **REQ-036**, **REQ-037**, **REQ-038**, **REQ-039**, **REQ-006**, **REQ-006**, **REQ-006**, **REQ-006**, **REQ-009**, **REQ-008**, **REQ-001**, **REQ-008**, **REQ-003**, **v2:REQ-0140**, **REQ-002**, **v2:REQ-0143**, **REQ-010**, **REQ-006**
-
-### 直接影響なし
-- **v2:REQ-0110**: Git worktree cleanup 信頼性（インフラストラクチャ層）
-- **v2:REQ-0137**: 並列実行安全 git 操作規律（インフラストラクチャ層）
 
 ## 再発トリアージ（Recurrence Triage）
 

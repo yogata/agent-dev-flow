@@ -3,6 +3,9 @@ title: "IR-031: Findings / Capture候補 見出し統一"
 status: accepted
 created: 2026-08-20
 updated: "2026-09-19"
+detection_method_class: machine-check
+implementation_path: [.opencode/skills/repo-agentdev-integrity/scripts/check_command_format.ts, .opencode/skills/repo-agentdev-integrity/scripts/check_workflow_preventive.ts]
+verification_path: [.opencode/skills/repo-agentdev-integrity/scripts/check_command_format.test.ts, .opencode/skills/repo-agentdev-integrity/scripts/check_workflow_preventive.test.ts]
 ---
 
 # IR-031: Findings / Capture候補 見出し統一

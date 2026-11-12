@@ -1,4 +1,4 @@
-// ADF-COVERS(implementation): REQ-010-011, REQ-059-002, REQ-059-003
+// ADF-COVERS(implementation): REQ-010-011, REQ-059-002, REQ-059-003, REQ-047-013
 // ADF-COVERS(verification): REQ-103-022, REQ-103-024, REQ-103-025
 /**
  * Index auto-generation script (SC-002 Phase C, IR-061).
@@ -79,6 +79,161 @@ const IR045_GAP_ID = 45;
 
 // rule-ownership 内の AUTOGEN ブロック ID（IR 別関連マッピング appendix）。
 export const RULE_OWNERSHIP_BLOCK_ID = "rule-ownership-ir-crossref";
+
+// req-impact-map 内の AUTOGEN ブロック ID（REQ → 影響する Rule IDs の逆方向対応）。
+// IR 文書 frontmatter related_req から導出する（rule-ownership.md
+// 「対応表の機械検証への移行（B3-1）」、REQ-047-013）。
+export const REQ_IMPACT_MAP_BLOCK_ID = "req-impact-map-req-ir-crossref";
+
+// skill-projection-manifest.yaml の skills セクション再生成（B3-3）。
+// 正規情報源は src/common/skills/ のディレクトリ列挙。checker は IR-068 で
+// manifest↔src の差分を厳格検出する。third_party_skills は third-party 取得
+// 機構の管理登録（判断列）であり導出対象外。
+export const SKILL_PROJECTION_MANIFEST_REL =
+  ".opencode/skills/repo-agentdev-integrity/data/skill-projection-manifest.yaml";
+
+export interface SkillProjectionManifestUpdate {
+  skills: string[];
+  generatedAt: string;
+}
+
+/**
+ * src/common/skills/ のディレクトリ列挙から manifest skills リストを導出する。
+ * repo-*（repo-local integrity skill）は third-party / ADF 投影スキルではなく
+ * 検出対象外のため除外する（IR-068 loadSkillProjectionManifest の投影列挙と同一規則）。
+ */
+export function deriveSkillProjectionManifestSkills(skillsDir: string): string[] {
+  let entries: import("fs").Dirent[];
+  try {
+    entries = fs.readdirSync(skillsDir, { withFileTypes: true }) as import("fs").Dirent[];
+  } catch {
+    return [];
+  }
+  const names: string[] = [];
+  for (const entry of entries) {
+    if (entry.name.startsWith("repo-")) continue;
+    if (entry.isDirectory()) {
+      names.push(entry.name);
+      continue;
+    }
+    try {
+      if (fs.statSync(path.join(skillsDir, entry.name)).isDirectory()) {
+        names.push(entry.name);
+      }
+    } catch {
+      // 解決不能エントリ（stale junction 等）は導出対象外。
+    }
+  }
+  return names.sort();
+}
+
+/**
+ * manifest yaml の skills セクションのエントリ行（`skills:` 直後の連続する
+ * リスト行）を機械生成リストで置換した content を返す。エントリ行以外
+ * （空行、後続キー等）は保持する。セクション検出不能時は unchanged を返す。
+ */
+export function replaceSkillProjectionManifestSkills(
+  content: string,
+  skills: string[],
+): string {
+  const lines = content.split(/\r?\n/);
+  const skillsIdx = lines.findIndex((l) => /^skills:\s*$/.test(l));
+  if (skillsIdx === -1) return content;
+  let firstEntry = -1;
+  let lastEntry = -1;
+  for (let i = skillsIdx + 1; i < lines.length; i++) {
+    if (/^\s*-\s+\S/.test(lines[i])) {
+      if (firstEntry === -1) firstEntry = i;
+      lastEntry = i;
+      continue;
+    }
+    if (firstEntry !== -1) break;
+  }
+  if (firstEntry === -1) return content;
+  const generated = skills.map((s) => `  - ${s}`);
+  const out = [
+    ...lines.slice(0, firstEntry),
+    ...generated,
+    ...lines.slice(lastEntry + 1),
+  ];
+  return out.join("\n");
+}
+
+/**
+ * manifest yaml の generated_at 行を更新した content を返す。行不在時は unchanged。
+ */
+export function replaceSkillProjectionManifestGeneratedAt(
+  content: string,
+  generatedAt: string,
+): string {
+  return content.replace(
+    /^generated_at:\s*.*$/m,
+    `generated_at: ${generatedAt}`,
+  );
+}
+
+/**
+ * IR frontmatter / Field-Value 表の related_req から REQ → IR の逆索引を導出する。
+ * v2: 履歴参照と IR カタログの注記セル（非 ID 要素）は除外し、行レベル ID
+ * （REQ-NNN-NNN）はファイルレベル（REQ-NNN）へ集約する。
+ */
+export function buildReqToIrIndex(infos: IrInfo[]): Map<string, string[]> {
+  const reqToIrs = new Map<string, Set<string>>();
+  for (const info of infos) {
+    for (const raw of info.relatedReq) {
+      const id = raw.trim();
+      if (!id || id.startsWith("v2:") || id.startsWith("-")) continue;
+      // 行レベル ID（REQ-NNN-NNN）はファイルレベル（REQ-NNN）へ集約する。
+      // 注記付き要素（REQ-NNN (説明) 等）は ID prefix を正規化して採用する。
+      const fileLevel = /^(REQ-\d+)(?:-\d+)?(?=\s|$)/.exec(id);
+      if (!fileLevel) continue;
+      const reqId = fileLevel[1];
+      let set = reqToIrs.get(reqId);
+      if (!set) {
+        set = new Set<string>();
+        reqToIrs.set(reqId, set);
+      }
+      set.add(info.id);
+    }
+  }
+  const result = new Map<string, string[]>();
+  for (const [reqId, irSet] of reqToIrs) {
+    result.set(
+      reqId,
+      [...irSet].sort((a, b) => {
+        const na = Number(a.slice(3));
+        const nb = Number(b.slice(3));
+        return na - nb;
+      }),
+    );
+  }
+  return result;
+}
+
+/**
+ * req-impact-map 逆方向対応表（REQ → 影響する Rule IDs）の本文を生成する。
+ * REQ タイトルは現行 REQ frontmatter から導出する。reqDir の実在 REQ ファイルと
+ * 突合し、存在しない REQ ID は行に含めない（retired は導出対象外）。
+ */
+export function generateReqImpactMapCrossref(
+  infos: IrInfo[],
+  reqInfos: ReqInfo[],
+): string[] {
+  const reqToIrs = buildReqToIrIndex(infos);
+  const titleById = new Map(reqInfos.map((r) => [r.id, r.title] as const));
+  const reqIds = [...reqToIrs.keys()]
+    .filter((id) => titleById.has(id))
+    .sort((a, b) => Number(a.slice(4)) - Number(b.slice(4)));
+  const lines: string[] = [];
+  lines.push("| REQ | タイトル | 影響する Rule IDs |");
+  lines.push("|-----|---------|------------------|");
+  for (const reqId of reqIds) {
+    const title = sanitizeTableCell(titleById.get(reqId) ?? "");
+    const irCell = reqToIrs.get(reqId)!.join(", ");
+    lines.push(`| [${reqId}](../../requirements/${reqId}.md) | ${title} | ${irCell} |`);
+  }
+  return lines;
+}
 
 // ─── Frontmatter / body parser ──────────────────────────────────────────────
 
@@ -1361,6 +1516,13 @@ RELATED:
     "integrity",
     "rule-ownership.md",
   );
+  const reqImpactMapPath = path.join(
+    root, "docs", "designs", "responsibilities", "req-impact-map.md",
+  );
+  const skillProjectionManifestPath = path.join(
+    root, ...SKILL_PROJECTION_MANIFEST_REL.split("/"),
+  );
+  const sourceSkillsDir = path.join(root, "src", "common", "skills");
   const decisionsDir = path.join(root, "docs", "decisions");
   const decisionRetiredDir = path.join(decisionsDir, "retired");
   const reqDir = path.join(root, "docs", "requirements");
@@ -1535,10 +1697,81 @@ RELATED:
     if (ruleOwnershipUpdated !== ruleOwnershipOriginal) {
       updates.push({ file: ruleOwnershipPath, content: ruleOwnershipUpdated });
     }
+
+    // req-impact-map 逆方向対応（REQ → 影響する Rule IDs）の AUTOGEN 更新（B3-1）。
+    // ファイル不在・マーカー不在時は人手編集領域として扱い、変更せず記録する
+    // （他 README 系と同一の扱い。fail-fast しない）。
+    const reqImpactMapOriginal = readText(reqImpactMapPath);
+    if (reqImpactMapOriginal === null) {
+      console.log(
+        `[generate_indexes] req-impact-map not found, skipping: ${reqImpactMapPath}`,
+      );
+    } else {
+      const reqImpactMapBlocks = findAutogenBlocks(reqImpactMapOriginal).filter(
+        (b) => b.id === REQ_IMPACT_MAP_BLOCK_ID,
+      );
+      if (reqImpactMapBlocks.length === 0) {
+        console.log(
+          `[generate_indexes] req-impact-map AUTOGEN marker not found, skipping: ${REQ_IMPACT_MAP_BLOCK_ID}`,
+        );
+      } else {
+        const reqImpactMapLines = generateReqImpactMapCrossref(infos, reqInfos);
+        const reqImpactMapUpdated = replaceAutogenBlock(
+          reqImpactMapOriginal,
+          REQ_IMPACT_MAP_BLOCK_ID,
+          reqImpactMapLines,
+        );
+        if (reqImpactMapUpdated !== reqImpactMapOriginal) {
+          updates.push({
+            file: reqImpactMapPath,
+            content: reqImpactMapUpdated,
+          });
+        }
+      }
+    }
   } else {
     console.log(
       `[generate_indexes] integrity catalog / rule-ownership not found, skipping (integrity structure absent)`,
     );
+  }
+
+  // skill-projection-manifest.yaml の skills セクション再生成（B3-3）。
+  // 正規情報源（src/common/skills 列挙）から導出し、third_party_skills と
+  // ヘッダーは既存内容を保持する。manifest 不在時はスキップ（導入先に manifest は
+  // 存在しない。IR-068 検査の skip 挙動と同一の適用範囲）。
+  const manifestOriginal = readText(skillProjectionManifestPath);
+  if (manifestOriginal === null) {
+    console.log(
+      `[generate_indexes] skill-projection-manifest not found, skipping: ${skillProjectionManifestPath}`,
+    );
+  } else if (!fs.existsSync(sourceSkillsDir)) {
+    console.log(
+      `[generate_indexes] src/common/skills not found, manifest regeneration skipped`,
+    );
+  } else {
+    const skills = deriveSkillProjectionManifestSkills(sourceSkillsDir);
+    const generatedAt =
+      deriveMeasureDateFromLastCommit(root, [sourceSkillsDir]) ??
+      new Date().toISOString().slice(0, 10);
+    let manifestUpdated = replaceSkillProjectionManifestSkills(
+      manifestOriginal,
+      skills,
+    );
+    manifestUpdated = replaceSkillProjectionManifestGeneratedAt(
+      manifestUpdated,
+      generatedAt,
+    );
+    if (manifestUpdated !== manifestOriginal) {
+      updates.push({
+        file: skillProjectionManifestPath,
+        content: manifestUpdated,
+      });
+    }
+    if (options.dryRun) {
+      console.log(
+        `[generate_indexes] skill-projection-manifest: ${skills.length} skills derived from src/common/skills`,
+      );
+    }
   }
 
   // Decision README 更新 (AG-008 / DEC-009)。対象ファイル不存在時はスキップ。

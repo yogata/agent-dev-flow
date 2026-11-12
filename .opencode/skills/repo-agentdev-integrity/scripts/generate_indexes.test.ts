@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-010-011, REQ-059-001, REQ-059-002, REQ-059-003, REQ-059-004, REQ-059-005
+// ADF-COVERS(verification): REQ-010-011, REQ-059-001, REQ-059-002, REQ-059-003, REQ-059-004, REQ-059-005, REQ-047-013
 /**
  * Regression tests for AUTOGEN marker detection (Issue #1771, RU-0002).
  *
@@ -44,8 +44,17 @@ import {
   README_REQ_SUMMARY_TABLE_GENERATOR,
   README_DECISION_SUMMARY_TABLE_BLOCK_ID,
   generateDocsReadmeDecisionTable,
+  buildReqToIrIndex,
+  generateReqImpactMapCrossref,
+  deriveSkillProjectionManifestSkills,
+  replaceSkillProjectionManifestSkills,
+  replaceSkillProjectionManifestGeneratedAt,
+  collectIrFiles,
+  SKILL_PROJECTION_MANIFEST_REL,
 } from "./generate_indexes.ts";
 import { findRepoRoot } from "./cli_utils.ts";
+
+const REPO_ROOT_FOR_B31 = findRepoRoot(import.meta.dir);
 
 describe("isAutogenBeginLine", () => {
   it("returns true for a canonical marker line", () => {
@@ -860,8 +869,123 @@ describe("readme-decision-summary-table (AG-005, Case #3166)", () => {
   });
 });
 
+const B31_TMP_ROOT = fs.mkdtempSync(
+  path.join(os.tmpdir(), "generate-indexes-b31-"),
+);
+
+function irFixture(id: string, relatedReq: string[]): ReturnType<typeof collectIrFiles>[number] {
+  return {
+    id,
+    num: Number(id.slice(3)),
+    title: `${id} fixture`,
+    filename: `${id.toLowerCase()}-fixture.md`,
+    relPath: `rules/${id.toLowerCase()}-fixture.md`,
+    relatedReq,
+    relatedDesign: [],
+  };
+}
+
+describe("buildReqToIrIndex (REQ-047-013, B3-1 逆方向導出)", () => {
+  it("collects file-level REQ ids per IR with numeric IR ordering", () => {
+    const index = buildReqToIrIndex([
+      irFixture("IR-003", ["REQ-010-003", "REQ-010"]),
+      irFixture("IR-001", ["REQ-010-001", "REQ-001"]),
+    ]);
+    expect([...index.keys()].sort()).toEqual(["REQ-001", "REQ-010"]);
+    expect(index.get("REQ-010")).toEqual(["IR-001", "IR-003"]);
+  });
+
+  it("skips v2 historical refs, annotation cells and non-REQ ids", () => {
+    const index = buildReqToIrIndex([
+      irFixture("IR-002", ["v2:REQ-0143", "REQ-002 (注記)", "-", "039", "REQ-047-011"]),
+    ]);
+    expect([...index.keys()]).toEqual(["REQ-002", "REQ-047"]);
+  });
+});
+
+describe("generateReqImpactMapCrossref (REQ-047-013, B3-1 逆方向導出)", () => {
+  it("renders only current REQ rows with titles and numeric ordering", () => {
+    const reqDir = path.join(B31_TMP_ROOT, "req-crossref");
+    fs.mkdirSync(reqDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(reqDir, "REQ-001.md"),
+      "---\nid: REQ-001\ntitle: 文書体系と持続可能な基準構造\n---\n\nBody.\n",
+      "utf-8",
+    );
+    fs.writeFileSync(
+      path.join(reqDir, "REQ-047.md"),
+      "---\nid: REQ-047\ntitle: 規則所有権の一方向化\n---\n\nBody.\n",
+      "utf-8",
+    );
+    const reqInfos = collectReqFiles(reqDir);
+    const rows = generateReqImpactMapCrossref(
+      [
+        irFixture("IR-001", ["REQ-001"]),
+        irFixture("IR-002", ["REQ-999", "REQ-047"]),
+      ],
+      reqInfos,
+    );
+    expect(rows[0]).toContain("影響する Rule IDs");
+    expect(rows.join("\n")).toContain("| [REQ-001](../../requirements/REQ-001.md) | 文書体系と持続可能な基準構造 | IR-001 |");
+    expect(rows.join("\n")).toContain("| [REQ-047](../../requirements/REQ-047.md) | 規則所有権の一方向化 | IR-002 |");
+    expect(rows.join("\n")).not.toContain("REQ-999");
+  });
+});
+
+describe("skill-projection-manifest regeneration (REQ-047-013, B3-3)", () => {
+  it("derives sorted skills excluding repo-* from src enumeration", () => {
+    const skillsDir = path.join(B31_TMP_ROOT, "skills-enum");
+    fs.mkdirSync(path.join(skillsDir, "agentdev-zzz"), { recursive: true });
+    fs.mkdirSync(path.join(skillsDir, "agentdev-aaa"), { recursive: true });
+    fs.mkdirSync(path.join(skillsDir, "repo-agentdev-integrity"), { recursive: true });
+    const skills = deriveSkillProjectionManifestSkills(skillsDir);
+    expect(skills).toEqual(["agentdev-aaa", "agentdev-zzz"]);
+  });
+
+  it("replaces the skills entry block and keeps surrounding lines", () => {
+    const content = [
+      "# header comment",
+      "schema_version: 1",
+      "generated_at: 2026-01-01",
+      "",
+      "skills:",
+      "  - agentdev-old-a",
+      "  - agentdev-old-b",
+      "",
+      "third_party_skills:",
+      "  - explainer",
+      "",
+    ].join("\n");
+    const updated = replaceSkillProjectionManifestSkills(content, [
+      "agentdev-new-a",
+      "agentdev-new-b",
+      "agentdev-new-c",
+    ]);
+    expect(updated).toContain("  - agentdev-new-a\n  - agentdev-new-b\n  - agentdev-new-c");
+    expect(updated).not.toContain("agentdev-old");
+    expect(updated).toContain("# header comment");
+    expect(updated).toContain("third_party_skills:");
+    expect(updated).toContain("  - explainer");
+    expect(updated).toContain("\n\nthird_party_skills:");
+  });
+
+  it("updates generated_at line only", () => {
+    const content = "schema_version: 1\ngenerated_at: 2026-01-01\n";
+    const updated = replaceSkillProjectionManifestGeneratedAt(content, "2026-11-13");
+    expect(updated).toBe("schema_version: 1\ngenerated_at: 2026-11-13\n");
+  });
+
+  it("exported manifest path matches the canonical data file", () => {
+    expect(SKILL_PROJECTION_MANIFEST_REL).toBe(
+      ".opencode/skills/repo-agentdev-integrity/data/skill-projection-manifest.yaml",
+    );
+    expect(fs.existsSync(path.join(REPO_ROOT_FOR_B31, ...SKILL_PROJECTION_MANIFEST_REL.split("/")))).toBe(true);
+  });
+});
+
 afterAll(() => {
   fs.rmSync(TMP_ROOT, { recursive: true, force: true });
   fs.rmSync(RR_TMP_ROOT, { recursive: true, force: true });
   fs.rmSync(SUP_TMP_ROOT, { recursive: true, force: true });
+  fs.rmSync(B31_TMP_ROOT, { recursive: true, force: true });
 });

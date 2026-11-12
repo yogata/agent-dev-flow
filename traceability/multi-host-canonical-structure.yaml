@@ -66,6 +66,8 @@ verification:
     - REQ-099-016
   .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts:
     - REQ-099-001
+    - REQ-047-011
+    - REQ-047-012
     - REQ-010-002
     - REQ-010-003
     - REQ-010-006
