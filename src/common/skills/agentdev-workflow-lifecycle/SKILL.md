@@ -95,6 +95,57 @@ req-define Step 8 が参照する。
  - 個別変更件数が30件超
  - シグナル対象: 修正候補リスト、検出事項カタログ、影響ファイル一覧等の実装詳細セクション
 
+## 共通報告・Decision・自律確定規約（反復規則の単一正本）
+
+本節は、工程駆動系の操作（テーマ形成・テーマ更新・成果物反映・独立レビュー・工程遷移・テーマ正本管理）と promote 系コマンド（intake-promote・learning-promote・inspect-promote）、inspect 系コマンド（inspect-docs・inspect-skills）に反復していた共通規則の本文の正本である。
+各 command 定義・Workflow Skill・Capability Skill は対象範囲と呼出条件を保持し、本節への名レベル参照により規則本文を消費する。規則本文を各ファイルへ複製しない。本節の配置変更は公開契約の変更として扱う。
+
+### 完了報告の必須要素
+
+工程駆動系の操作の完了報告は、次を必須要素として含める。操作の性質に応じて値が変わり、保存を行わない操作では保存しない旨を、機械検証を実行していない場合はその旨を、完了報告に含める:
+
+- 保存した成果物・記録の保存先の一覧
+- 実行した機械検証とその結果
+- 操作の返却時点で裏で継続している処理の有無
+
+採用内容の範囲が未決事項と重なる場合はその旨を、検討方向の差し替えを受領する場合は旧方向が持っていた前提の行き先（継承または破棄）を、完了報告に含める。
+機械検査の合格は意味品質の保証ではなく、必要条件であって十分条件ではない。
+完了報告への必須要素は、既存の部分反映・失敗時報告・再投入の規律、受領・採用根拠の既存規律、および各操作の本来の責務を変更しない。
+
+### decision 成果物の役割と正本の優先度への参照
+
+decision 成果物は、工程をまたぐ意思決定・未解決課題の管理・方式選択を記録する成果物である。
+受領・テーマ・未決を扱う工程系コマンドおよびワークフロースキルは、decision の操作を行うとき、次の参照経路を辿って decision の役割と正本の優先度を確認する:
+
+- 正本の優先度（source-of-truth priority）は `inspect-docs` コマンド定義「不変条件」節を参照する
+- decision の記録内容の規定は document-model Design「責務マトリックス」節を参照する
+
+参照先の定義本文を、参照を追記する各所へ複製しない。「Decision を直接更新しない」規律と Decision の既存状態規則を変更せず、source-of-truth priority の順序自体を変更しない。
+
+### promote 系操作の自律確定と HITL 境界
+
+promote 系コマンド（intake-promote・learning-promote・inspect-promote）の判断が正規契約からの導出または委譲された裁量の範囲で確定できる対象はユーザー承認なしで確定する（自律確定）。人間に留保された判断が必要な対象のみを HITL 対象とする。
+同一実行内に自律確定可能な対象と人間に留保された判断が必要な対象が混在する場合、未決項目に依存しない対象を先行確定する（部分自律確定）。
+自律確定はユーザー承認の擬制ではなく、保留・未処理の対象を自動削除しない安全境界は維持する。
+自律確定可否の詳細判定（確定権限3分類〔正規契約からの導出・委譲された裁量・人間に留保された判断〕の判定表、人間判断への引き上げ条件）は v4-responsibility-boundaries Design（extension 経由で解決）「ADF判断アーキテクチャ詳細基準」節が集約所有し、本節と各 command 定義・Workflow Skill は判定表を複製しない。
+
+### inspect-* コマンド選択 routing
+
+変更ファイル種別に基づき、実行する inspect-* コマンドを選ぶ。inspect-docs と inspect-skills は配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）の検出対象が一部重複する（inspect-docs の配布物整合性検査、inspect-skills の配布物構文健全性・責務整合診断）。変更範囲に応じて振り分けることで重複検出を防ぐ。
+
+| 変更ファイル種別 | 実行コマンド |
+|------|------|
+| docs の requirements・decisions 配下の文書 | inspect-docs |
+| docs の designs 配下の Design（command Design・skill Design 配下を除く） | inspect-docs |
+| docs の guides 配下の文書、README.md | inspect-docs |
+| `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md` | inspect-skills |
+| `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md`（実行時プロジェクション） | inspect-skills |
+| docs の designs 配下の command Design・skill Design 配下 | inspect-skills |
+| 上記両方（docs と command/skill にまたがる変更） | inspect-docs を先に実行し、続けて inspect-skills を実行 |
+
+振り分けは実行コマンド選択の目安であり、各コマンドの検出対象（既定のスキャン範囲）は変更しない。
+配布物のみの変更時は inspect-skills を優先する。
+
 ## See Also
 
 - **agentdev-issue-management**: Issue作成、更新、リンク、確認の安全手順（操作用Skill）
