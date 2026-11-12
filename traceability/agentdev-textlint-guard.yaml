@@ -28,6 +28,10 @@ implementation:
   src/opencode/plugins/agentdev-textlint-guard/lib/config.ts:
     - REQ-053-025
     - REQ-053-027
+  src/opencode/plugins/agentdev-textlint-guard/lib/edit-semantics.ts:
+    - REQ-053-025
+    - REQ-053-026
+    - REQ-053-027
   src/opencode/plugins/agentdev-textlint-guard/lib/engine-bundle.ts:
     - REQ-010-071
     - REQ-029-012
@@ -100,6 +104,9 @@ implementation:
     - REQ-053-041
 verification:
   src/opencode/plugins/agentdev-textlint-guard/tests/config.test.ts:
+    - REQ-053-025
+    - REQ-053-027
+  src/opencode/plugins/agentdev-textlint-guard/tests/edit-semantics.test.ts:
     - REQ-053-025
     - REQ-053-027
   src/opencode/plugins/agentdev-textlint-guard/tests/engine-bundle.test.ts:
