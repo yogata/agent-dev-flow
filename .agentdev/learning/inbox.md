@@ -1090,3 +1090,54 @@
 - **タグ**: #conditionId #stale判定 #受入評価 #機械工程 #fail-closed #A-12
 
 ---
+## 2026-11-12: 完了記録コメント投稿・本文更新で Issue revision が進み、終了判定記録の targetRevision と突合する issue_close が fail-closed 拒否される・機械工程の最終実行は Issue への書込み完了後（issue_close 直前）に最新 revision 对象で実行する順序が必須（Case 3989 正規終了処理）
+
+- **問題事象**: PR なし完了構成 Case のクローズで、機械工程 pre-merge（受理記録 accepted:true 生成）→ 完了記録コメント投稿 → 本文結果セクション更新 → issue_close の順で実行したところ、コメント投稿と本文更新で Issue の updated_at が進み、issue_close が「終了判定記録の対象版（旧 revision）と現在版が不一致・過去の受理結果の再利用拒否」で fail-closed 拒否された（計測: 2026-11-12T14:06:51Z revision で拒否）
+- **発生局面**: 実装（case-close STEP-5 の完了契機反映と終了操作の順序）
+- **検知方法**: Custom Tool agentdev_gh issue_close の verification-incomplete 拒否（targetRevision 2026-11-10T02:06:57Z vs 現在 revision 2026-11-12T14:06:51Z）
+- **根本原因**: 終了判定記録の freshness 契約（対象版 = issue_close 時点の Issue revision）と STEP-5 の記録反映順序（コメント→本文→クローズ）の組合せで、受理後に必ず revision が進む。機械工程を受理記録生成のために1回だけ実行する構成だと freshness が保てない
+- **自律対応内容**: Tool 拒否の指示（機械工程の再実行）に従い、記録中のタイムスタンプ記載を revision 非依存に修正した上で、最新 revision（再 issue_read）・現行本文を対象に機械工程をべき等再実行し、終了判定記録を accepted:true で再生成 → 直後に issue_close を実行して成功した（受理条件の迂回ではなく Tool 指示の正規経路）
+- **ユーザー確認有無**: なし（fail-closed 拒否と Tool 指示への従経路は正規手順）
+- **Decision/REQ/spec影響**: なし（freshness ゲートは設計どおりの動作）
+- **横展開観点**: Issue 書込みを伴う全終了処理で「最後の Issue 書込み → 最新 revision 取得 → 機械工程実行 → issue_close（間に書込みを挟まない）」の順序固定が安全
+- **再発条件**: 受理記録生成後に Issue へのコメント・本文更新を行ってから issue_close すると再発
+- **予防策候補**: case-close Skill の STEP-5 手順に freshness 再実行の明示（完了記録反映後の機械工程再実行を手順内に組み込む）を promote 判断で評価
+- **想定反映先**: agentdev-workflow-case-close（STEP-5 手順）・learning-promote
+- **関連**: close_mechanical_steps.ts（issueUpdatedAt 入力契約・終了判定記録 targetRevision）・agentdev_gh issue_close freshness ゲート・Case 3989 実行記録（issuecomment-6825808332）
+- **タグ**: #issue_close #freshnessゲート #終了判定記録 #機械工程 #べき等再実行 #順序契約
+
+---
+## 2026-11-12: 対象要件行なし Case（重複無力化クローズ等）で corpus 全域 traceability check は missing-implementation/missing-verification の corpus debt（advisory）で exit 2 となり機械工程が fail する・Case の主題要件行（集約先で対応完了した行）への --req スコープで lifecycle gate 完全性と corpus 診断を分離できる（Case 3989 正規終了処理）
+
+- **問題事象**: traceabilityGate を --req なし（corpus 全域）で構成したところ、main の corpus debt（missing-implementation: REQ-032-045・REQ-117-001〜010 等、missing-verification: REQ-032-045・REQ-113-001/002・REQ-117-* 等）により summary {pass:9, fail:2}・exit 2 となり、traceability-check step が fail して受理記録が accepted にならない構成になった（計測: main 230d714aa3259cb9b1e305606db21f7c0f6920d4・2026-11-12）
+- **発生局面**: 実装（case-close 機械工程のゲート構成）
+- **検知方法**: 事前実行した check.ts の exit 2 と report.checks の missing-implementation/missing-verification findings
+- **根本原因**: corpus 完全性の計数は到達目標状態の診断指標（advisory・fail-open）で lifecycle gate の完了条件ではないが、check CLI は fail>0 で exit 2 を返すため、完了阻止面（対象要件行の3完全性）と corpus 診断面がゲート終了コードで分離されていない。対象要件行が空の Case では --req スコープが空振りし corpus 全域しか選択肢がない
+- **自律対応内容**: 当該 Case の主題（重複対象で集約先 #3988 で対応完了した要件行）へ --req REQ-031-029,REQ-015-012 をスコープし、11 検査 pass・fail 0 でゲートを通過させた。スコープ構成の根拠は完了記録コメントに明記した
+- **ユーザー確認有無**: なし（SSoT 適用判断とは別の機械構成）
+- **Decision/REQ/spec影響**: なし（corpus advisory と lifecycle gate の2層判定は v4-traceability-model Design どおり）
+- **横展開観点**: 対象要件行なし Case の close では主題要件行への --req スコープ構成が必要。corpus debt の解消自体は別案件（REQ-117 の deferred 義務等）
+- **再発条件**: 対象要件行なし Case で --req なしの corpus check をゲートに使うと corpus debt がある限り再発
+- **予防策候補**: check CLI に構造検査のみ／完全性検査対象明示の実行モード分離、または case-close Skill の対象要件行なし構成時のスコープ導出手順の明記を promote 判断で評価
+- **想定反映先**: agentdev-traceability（check CLI）・agentdev-workflow-case-close（ゲート構成手順）・learning-promote
+- **関連**: traceability scripts/src/check.ts（exit 2 契約）・v4-traceability-model Design「completeness の 2 層」・Case 3989 完了記録コメント（スコープ構成記録）
+- **タグ**: #トレーサビリティ #corpus完全性 #advisory #lifecyclegate #スコープ構成 #機械工程
+
+---
+## 2026-11-12: close_mechanical_steps.ts の実 runner が MechanicalRunner.deleteFile を実装せず post-merge の終了判定記録回収（close-acceptance-reclamation）が常に fail-closed する・直近実績（Case 4002 r2 post-merge）でも同一 fail で回収は exported reclaimCloseAcceptanceRecord の直接呼出で履行した（Case 3989 正規終了処理）
+
+- **問題事象**: post-merge phase で reclamation.closeAcceptanceRecord を指定しても step が「mechanical runner does not provide deleteFile; reclamation cannot execute (fail-closed)」で fail する。verify-logs の直近実績（report-4002-postmerge-r2.json）でも同一メッセージで fail しており、回収が機械工程の外の手動経路に常態化している
+- **発生局面**: 実装（case-close 機械工程 post-merge の回収 step）
+- **検知方法**: post-merge 報告 JSON の close-acceptance-reclamation step fail
+- **根本原因**: MechanicalRunner の deleteFile は任意インターフェースだが実 runner が未提供で、reclaimCloseAcceptanceRecord の I/O 注入が構成できない
+- **自律対応内容**: 同一決定的関数（reclaimCloseAcceptanceRecord）に exists/deleteFile を注入した bun 直接呼出で回収を履行した（status: reclaimed・対象パス明示・terminalOperationCompleted: true）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（関数契約は不変・runner 実装の欠落）
+- **横展開観点**: post-merge を実行する全 Case で同一。runner への deleteFile 実装で解消する
+- **再発条件**: post-merge reclamation を機械工程で実行する全状況で再発
+- **予防策候補**: 実 runner への deleteFile（と writeTextFile 系の揃え込み）実装を promote 判断で評価
+- **想定反映先**: agentdev-workflow-case-close（close_mechanical_steps.ts 実 runner）・learning-promote
+- **関連**: close_mechanical_steps.ts（runReclamation・MechanicalRunner.deleteFile）・report-4002-postmerge-r2.json（先行実績の同一 fail）
+- **タグ**: #機械工程 #回収 #runnerインターフェース #post-merge #fail-closed
+
+---
