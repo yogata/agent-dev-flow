@@ -33,6 +33,12 @@ import {
 } from "./cli_utils.ts";
 import type { CheckResult, ScanSummary, IntegrityReport } from "./cli_utils.ts";
 import { globWalkRel } from "./lib/glob_walk.ts";
+import {
+  WORKFLOW_TRIGGER_ITEM,
+  WORKFLOW_TRIGGER_ITEM_FULL_FORM,
+  listCommandBoundWorkflowSkills,
+  parseSkillFrontMatterFields,
+} from "./lib/workflow_trigger.ts";
 
 const SCRIPT_NAME = "lint_skills.ts";
 const SCRIPT_DESCRIPTION = "Skill structure linter for AgentDevFlow";
@@ -48,18 +54,8 @@ interface FrontMatter {
 }
 
 function parseFrontMatter(content: string): FrontMatter | null {
-  const parts = content.split("---");
-  if (parts.length < 3) return null;
-  const body = parts[1].trim();
-  const fields: Record<string, string> = {};
-  for (const line of body.split("\n")) {
-    const colonIndex = line.indexOf(":");
-    if (colonIndex === -1) continue;
-    const key = line.slice(0, colonIndex).trim();
-    const value = line.slice(colonIndex + 1).trim();
-    fields[key] = value;
-  }
-  if (!fields.name) return null;
+  const fields = parseSkillFrontMatterFields(content);
+  if (!fields || !fields.name) return null;
   return {
     name: fields.name,
     description: fields.description || "",
@@ -117,24 +113,11 @@ const DESC_MARKER_WORD_RE = /soft guard|直接起動/i;
 const DESC_INTERNAL_ID_RE = /\b(?:REQ|ADR|DEC|IR|RU|TS|AG)-\d+/i;
 const BODY_USE_FOR_HEADING_RE = /^##\s+(?:USE FOR|DO NOT USE FOR)\s*$/gm;
 const DESC_USE_FOR_RE = /USE FOR/i;
-const WORKFLOW_TRIGGER_ITEM = "単独起動";
+// WORKFLOW_TRIGGER_ITEM（簡潔トリガー項の検出語）と対象集合導出の正本は
+// lib/workflow_trigger.ts（B3-5b 統合名簿。check_workflow_preventive.ts と共有）。
 const TOC_HEADING_RE = /^#{1,3}\s*(?:目次|Table of Contents)\s*$/mi;
 const TOC_ANCHOR_RE = /\]\(#/g;
 const TOC_ANCHOR_MIN_LINKS = 5;
-
-function listCommandBoundWorkflowSkills(repoRoot: string): Set<string> {
-  // Workflow Skill = agentdev-workflow-{X} where src/common/commands/agentdev/{X}.md
-  // exists（deriveSkillClassification と同一の決定的分類。CLI 直依存を避けるため
-  // lint_skills 内では同導出を維持する）。
-  const bound = new Set<string>();
-  const cmdDir = path.join(repoRoot, "src", "common", "commands", "agentdev");
-  if (!fs.existsSync(cmdDir)) return bound;
-  for (const f of fs.readdirSync(cmdDir)) {
-    if (!f.endsWith(".md") || f === "README.md") continue;
-    bound.add(`agentdev-workflow-${f.replace(/\.md$/, "")}`);
-  }
-  return bound;
-}
 
 function lintDescriptionAg005(
   dirName: string,
@@ -275,7 +258,7 @@ function lintDescriptionAg005(
         ng(
           AG005_CATEGORY,
           "workflow trigger item",
-          `Workflow Skill description lacks the concise trigger item "単独起動（対応する /agentdev/* コマンド経由で利用すること）" in DO NOT USE FOR (AG-004)`,
+          `Workflow Skill description lacks the concise trigger item "${WORKFLOW_TRIGGER_ITEM_FULL_FORM}" in DO NOT USE FOR (AG-004)`,
           dirName,
         ),
       );
