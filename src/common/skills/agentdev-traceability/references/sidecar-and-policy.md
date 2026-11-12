@@ -91,10 +91,18 @@ producer 側成果物の inline 宣言行（ADF-COVERS 宣言）は、対応す�
 
 ## 検証スコープポリシー（policy.yaml）の利用手順
 
-`traceability/policy.yaml` は project-level の正規情報源であり、検証対応の要否のみを宣言する。対応関係を保持しない。sidecar ではないため、component との関連も持たない。
+`traceability/policy.yaml` は project-level の正規情報源であり、design・implementation・verification の各軸（artifact role）の対応の要否区分のみを宣言する。対応関係を保持しない。sidecar ではないため、component との関連も持たない。
 
 ```yaml
 verification:
+  default: required
+  optional:
+    - REQ-{NNNN}-{MMM}
+design:
+  default: required
+  optional:
+    - REQ-{NNNN}-{MMM}
+implementation:
   default: required
   optional:
     - REQ-{NNNN}-{MMM}
@@ -102,12 +110,15 @@ verification:
 
 利用規約:
 
-- `verification.default` は文字列 `required` を取る。`verification.optional` は検証対応を任意とする要件行 ID の列挙とする。それ以外のキーは schema 違反（`policy-invalid`）とする
-- 未指定の要件行はすべて検証対応 required として扱う（未指定 = required）。検証対応を任意とするには、policy への明示登録のみが手段である
-- policy.yaml が存在しない場合、全現行要件行を検証対応 required として扱う（安全側既定）
-- policy.yaml が読取不能または schema 不適合の場合、check は検証対応の要否判定が不能となり当該検査を不合格にする（完全性判定不能を合格として扱わない、fail-closed）
-- optional 登録の目安は、当該要件行が恒続的に検証可能な対象を持つか（検証手段との対応付けが意味を持つか）とする。性質に応じて project が policy で宣言するものであり、判定状態を導出する分類モデルは存在しない
-- policy の optional 列挙に存在しない要件行 ID を含めない（`unknown-req-refs` の検出対象）
+- トップレベルキーは verification・design・implementation の3軸のみとする。各軸は default と optional を持ち、軸配下の未知のキーは schema 違反（`policy-invalid`）とする。design・implementation 軸は省略可能であり、省略時は区分登録なし（対応必須）の現行動作として扱う
+- 各軸とも required が既定であり、optional へ明示登録された現行要件行のみ対応欠落の missing 計上から除外される。未登録の要件行は全軸で対応必須として扱う（未指定 = required）
+- 対応を任意とするには、policy への明示登録のみが手段である。区分機構の用途は旧要件行（区分の根拠となる棚卸し時点で既に存在した行）の区分明示であり、新規行を本機構へ登録しない
+- 旧行の区分登録は policy.yaml への明示登録で行う。区分登録・解除は当該要件行の変更と同一の Definition 変更として扱い、単独の無関連変更として適用しない。区分登録は根拠記録（区分の棚卸し根拠）とともに policy.yaml のコメント等へ保持する
+- 区分機構は lifecycle gate completeness の判定対象 scope を除外しない（scope の限定方法は既存の `--req` による）
+- policy.yaml が存在しない場合、全現行要件行を全軸とも対応必須として扱う（安全側既定。実行時エラーで停止しない）
+- policy.yaml が読取不能または schema 不適合の場合、check は各軸の要否判定が不能となり当該検査を不合格にする（完全性判定不能を合格として扱わない、fail-closed）
+- optional 登録の目安は、当該要件行が恒続的に対応可能な対象を持つか（対応手段との対応付けが意味を持つか）とする。性質に応じて project が policy で宣言するものであり、判定状態を導出する分類モデルは存在しない
+- policy の optional 列挙に存在しない要件行 ID を含めない（`unknown-req-refs` の検出対象。検出された ID は任意集合から除外され対応必須のまま扱う）
 
 ## 要件・Design・実装・検証変更時の対応関係更新手順
 

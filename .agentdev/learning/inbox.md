@@ -920,3 +920,141 @@
 - **タグ**: #squashmerge #ブランチ削除 #並行case-auto #判定分解 #worktree-operations
 
 ---
+
+## 2026-11-12: agentdev-textlint-guard distribution test の archive install ケースが bun キャッシュ競合起因の疑いで不定期 fail する（基線 12 件外の新規出現・受入では不再現）(Case 4004・PR 4019 より回収)
+
+- **問題事象**: bun test ③ 分割（.opencode/plugins）で agentdev-textlint-guard distribution / consumer install の archive install 系テストが ENOENT: failed copying files from cache to destination for package has-symbols で fail（2026-11-11〜12・基線 2026-11-11 採取時は合格・既知不合格 12 件リスト外の新規出現）
+- **発生局面**: 検証（case-run 前置自己点検の 3 分割実行・Case 4004）
+- **検知方法**: bun test fail 明細の読み取り（has-symbols パッケージのキャッシュコピー失敗）
+- **根本原因**: bun install のキャッシュコピー段の競合レースの疑い（実行環境の同時実行・キャッシュ状態依存）。case-run は bun install 単独実行が plugin 配下で成功することを確認し環境由来と暫定分類したが、機械的なレース特定は未実施
+- **自律対応内容**: 受入検査（基線構成を再現した投影 worktree・同一環境ラベル）で当該テストが 2 回の独立観測（③ 全分割実行・plugin 単独 187 pass / 0 fail）で不再現であることを確認し、新規不合格 0 の判定を維持した。実装側の環境由来説を申告のまま受入証拠へ昇格させず、「新規失敗なし」の自側実測のみを受入根拠とした
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（本 Case 変更対象の plugin・install.ps1 は未変更。既知不合格リストへの追加登録は未実施・再発時に改めて判断）
+- **横展開観点**: bun キャッシュ競合の疑いがある失敗は、時間差再実行での不再現をフレーク分類の根拠にする前に同一環境での独立再観測回数を記録する。単独実行の成功だけでは環境由来の確定にならない
+- **再発条件**: 並行実行やキャッシュ共有環境で textlint-guard distribution テストを含む bun test を実行する場合
+- **予防策候補**: 失敗時の bun キャッシュ状態記録（cache dir の内容証跡）と、テスト内 bun install のキャッシュ分離（一時 cache dir 指定）の検討判断（promote 判断）
+- **想定反映先**: learning-promote（textlint-guard distribution テストの安定化判定）
+- **関連**: Case #4004・PR #4019 本文の Findings 節（検証詳細）・.agentdev/tmp/c-alpha2-baseline/known-failures-fixed.md（既知 12 件リスト・本件は含まない）
+- **タグ**: #bun-cache #distribution-test #フレーク疑い #textlint-guard #並行実行
+
+---
+
+## 2026-11-12: textlint 最終 gate の script 経由 spawn 起動で一時的に exit 9 が観測され得る（単独再実行 exit 0・由来分類未確定）(Case 4004 より回収)
+
+- **問題事象**: close_mechanical_steps pre-merge の textlint-final-check gate が exitCode 9・stderr 空 で 1 回だけ失敗（2026-11-12・同一構成の手動実行と単独再実行は exit 0・632 対象全件実行で合格）
+- **発生局面**: 検証（case-close pre-merge 機械工程・Case 4004）
+- **検知方法**: 機械工程報告 JSON の gate step FAIL（exitCode 9・stderrTail 空）
+- **根本原因**: 未確定。直前に打ち切られた別起動（バックグラウンド起動を harness が kill）の残留プロセス、または spawn 実行形態（timeout・stdio pipe の差）に由来する可能性。gate 本体の終了コード表に 9 は定義されていない
+- **自律対応内容**: 単独再実行（timing 隔離）で exit 0 を確認し、受入では exit 0 の独立実行 3 件（632 全件実行を含む）をもって textlint gate の合格証拠とし、exit 9 の失敗実行を隠蔽せず実値のまま記録した。merge 判断は再発なしの確認後に進めた
+- **ユーザー確認の有無**: なし（merge 前に再発なし確認を完了・停止条件の適用判断として記録）
+- **REQ/Decision/Design影響**: なし（gate 実装・契約の変更なし）
+- **横展開観点**: 機械 gate の一時的異常終了（未定義の終了コード・stderr 空）は、単独再実行で解消しても「由来分類未確定」として記録を残す。合格証拠は実行形態規律に適合した再実行の実値とし、失敗実行の握り潰しをしない
+- **再発条件**: 機械工程 script が外部 gate を spawn で起動し、同一環境に直近の打ち切り起動が残留する場合
+- **予防策候補**: 機械工程の gate 起動前の残留プロセス確認、未定義終了コード検出時の自動単独再実行手順の検討判断（promote 判断）
+- **想定反映先**: learning-promote（close_mechanical_steps の gate 起動堅牢化判定）
+- **関連**: Case #4004・対応記録コメント（残課題として記録済み）・docs/knowledge/checker-cli-stdout-loss-on-windows-bun.md（類型の既知事象）
+- **タグ**: #textlint-gate #exit9 #spawn #由来未確定 #fail-closed記録
+
+---
+
+## 2026-11-12: ADF-COVERS 宣言コメントの終端子（-->）欠落が Design 宣言をパース不能にし、case-close のトレーサビリティ完全性 gate（3完全性ゲート）で初検出・完了阻止となった
+
+- **問題事象**: docs/designs/responsibilities/custom-tool-contracts.md L8 の ADF-COVERS(design) 宣言行（REQ-011-034/035・A-7/A-8）に行末のコメント終端子 --> が欠落しており、agentdev-traceability check が当該行の design 対応を検出できず missing-design/missing-implementation/missing-verification の 3 findings が出た。REQ-011-034/035 の implementation/verification 対応は sidecar（traceability/agentdev-gh.yaml）にも未収録であった。case-close 機械工程（close_mechanical_steps pre-merge）の必須 gate で fail-closed に完了阻止され、子Issue/Epic クローズが阻断された
+- **発生局面**: 検証（case-close 機械工程・Root Case #4002 C-β2 実装系契約是正。2026-11-12）
+- **検知方法**: case-close の traceability-check gate（agentdev-traceability check --req 対象行限定）の exit 2・fail 3 findings。merge worktree と main root の双方で同一再現
+- **根本原因**: 設計PR（a7b86e7c1・2026-11-11・本 Case の case-open 段階の REQ・Design 変更）で宣言行を追記した際に終端子を書き漏らした。docs 検査系（textlint・integrity 既存検査）は終端子欠落を検出せず、 REQ 行の対応関係を実際に照合する traceability check の実行が初めての検出経路になった。implementation/verification の sidecar 収録漏れは、実装系 Case で traceability gate を case-run 段階で実行しない運用（#4008 の証跡に meta-traceability-check が存在しない）の下では完結判定まで気付けない構造
+- **自律対応内容**: case-close として対応関係の自動追加・Design 修正を行わず（禁止領域）、機械受理の fail-closed 拒否をそのまま受理してクローズを停止。根本原因を blame で確定し、main/worktree 両再現・実装 6PR 非起因（diffstat 29 files に当該ファイル不含）を機械的に確認し、監督者判断へ停止報告した
+- **ユーザー確認の有無**: なし（停止報告で監督者判断を待つ形。修正方針の決定は監督者）
+- **REQ/Decision/Design影響**: あり（要修正）。custom-tool-contracts.md L8 の終端子追記と traceability/agentdev-gh.yaml への REQ-011-034/035 の implementation（src/common/tools/agentdev-gh の specs-pr.ts・runner-cli.ts・runner-local.ts・contracts.ts）・verification（#4023 証跡・runner-cli.test.ts / runner-local.test.ts / engine-fail-closed.test.ts）対応の収録。修正は本 Case の case-run 側是正ラウンドまたは監督者判断での別 PR を想定
+- **横展開観点**: 実装系 Case（REQ 参照を src 本文に持てない IR-055 系）では、Design/implementation/verification の対応関係が sidecar 収録に依存するため、case-open の設計PR 時点で対象行の完全性 gate（check --req）を走らせないと完結判定まで発見できない。設計PR 受入時の完全性 gate 前置が同種欠落の最短発見経路
+- **再発条件**: ADF-COVERS 宣言行の手追記（特に括弧や注記付きの宣言）＋ docs 検査系が宣言構文を検査しない運用
+- **予防策候補**: ADF-COVERS 宣言行の構文検査（行末終端子の存在・ADR-COVERS/ADF-COVERS 形式チェック）を check_changed_docs または integrity 系へ追加する判断（promote 判断）。設計PR 受入（case-open STEP-4）での traceability 完全性 gate 実行の検討判断
+- **想定反映先**: learning-promote（docs 検査系への宣言構文検査追加判断）・intake（custom-tool-contracts.md 修正 + sidecar 収録の具体的作業候補として intake-capture で起票判断）
+- **関連**: Root Case #4002・PR #4023（REQ-011-034/035 の実装）・commit a7b86e7c1・.agentdev/verify-logs/qg4-close/blocker-analysis.md（阻断分析の証跡）・traceability/agentdev-gh.yaml
+- **タグ**: #ADF-COVERS #終端子欠落 #traceability #完全性ゲート #完了阻止 #case-close #sidecar
+
+---
+
+## 2026-11-12: PSModulePath 補正の部分修正（PS7 系 2 エントリ欠落）でも PS5.1 spawn 系テストは全て通過し、pwsh spawn 系 2 テストだけが静かに失敗する
+
+- **問題事象**: bun test 分割①で trusted-distribution-gate 配下の cli-e2e 2 テスト（PowerShell entry 経由・pwsh を明示 spawn）のみが「Cannot find an overload for ExtractToDirectory and the argument count: 3」で失敗。同一 merge HEAD・PSModulePath を 4013 証跡の 4 エントリ値（system32 WindowsPowerShell 先頭 + PS7 系 2 エントリを含む）へ修正して分割①のみ再実行したら両テストとも pass へ回帰した
+- **発生局面**: 検証（case-close 最終受入検査の環境再現・Root Case #4002。2026-11-12）
+- **検知方法**: 分割①の (fail) 行抽出で既知 12 件に含まれない 2 件を検出。stderr のエラー出力が PS7 の Microsoft.PowerShell.Archive モジュール path を示していた
+- **根本原因**: runner 側で設定した PSModulePath が 2 エントリ値（system32 WindowsPowerShell と Program Files\WindowsPowerShell のみ）で、4013/pass4 実績値の 4 エントリ（末尾に Program Files\PowerShell\Modules と c:\program files\powershell\7\Modules を含む）と異なっていた。PS5.1 を直接 spawn するテストは補正済み 2 エントリ値でも正しい Archive モジュールを解決して通過し、pwsh を spawn するテストだけがモジュール解決差で失敗する（環境の部分的な正しさが失敗面を縮小し、切り分けを惑わす）
+- **自律対応内容**: 失敗 2 件を新規不合格として即断せず、pass4 証跡（qg4-precheck-result.json）と 4013 の env-labels.json（.agentdev/verify-logs/4013/・4013 worktree 内）から実績 PSModulePath 値を特定して正確に再現し、分割①のみ再実行して cli-e2e 2 件の解消を確認。第1回の失敗ログを run1 として証跡保持し、環境由来（pass4 の environmentIncidentResolved と同一分類）として記録した
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（テスト・検査契約・比較基準の変更なし。PSModulePath は実行環境変数）
+- **横展開観点**: 環境変数系の既知事象対応では「正の値の完全再現」を確認するまで部分修正で中間判定しない。失敗テスト集合が既知集合の部分集合でも、実行環境差の証拠を先に確定してから由来分類する。証跡の env-labels（環境ラベル）に実行に使った env 値を残す運用が切り分けの要
+- **再発条件**: PSModulePath の補正値を記憶や要約から再構築して設定する場合（実績値の証跡参照を省いた場合）
+- **予防策候補**: 検証環境の再現手順に「4013 証跡 env-labels.json の PSModulePath 値をそのまま転写する」手順を明記（promote 判断）
+- **想定反映先**: learning-promote（case-close 検証環境再現手順の env 値転写指示化判定）
+- **関連**: Root Case #4002・.agentdev/verify-logs/qg4-close/（stdout-1-integrity-run1.log ほか）・.worktrees/4013-feature/.agentdev/verify-logs/4013/env-labels.json・.agentdev/verify-logs/qg4-precheck/qg4-precheck-result.json（pass4 environmentIncidentResolved）
+- **タグ**: #PSModulePath #Expand-Archive #環境再現 #部分修正の罠 #pwsh #分割テスト
+
+---
+
+## 2026-11-12: 実装系 Case の traceability sidecar（traceability/agentdev-gh.yaml）未更新が case-run を完結させ、対応関係収録漏れが case-close 完全性 gate まで未検出になった
+
+- **問題事象**: case-run #4008（PR #4023・REQ-011-034/035 の A-7/A-8 実装）が traceability sidecar（traceability/agentdev-gh.yaml）への対応関係収録を実施しないまま、実装・検証・push・マージまで完結した。IR-055 の inline 宣言制約により src/common/tools/agentdev-gh 配下のソース本文へ ADF-COVERS を書けないため sidecar が唯一の正規収録経路であるにもかかわらず、PR #4023 の変更ファイル（15ファイル）に traceability/ 配下が含まれなかった。収録漏れは case-close のトレーサビリティ完全性 gate で初めて検出された
+- **発生局面**: 実装（case-run #4008・Root Case #4002 C-β2 実装系契約是正。2026-11-11〜12）
+- **検知方法**: case-close pre-merge 機械工程の traceability-check gate（agentdev-traceability check --req 対象行限定）が REQ-011-034/035 で missing-design・missing-implementation・missing-verification の exit 2（このうち implementation/verification が sidecar 未収録に起因。missing-design は別因の ADF-COVERS 終端子欠落）
+- **根本原因**: 実装委譲（DEL-4008 系列）の過程で sidecar 収録が実施されなかったことに加え、case-run の最終ゲート（3点ゲート）に traceability 完全性（check --req）の検査項目が存在せず、case-open 設計PR 受入時にも対象行の完全性 gate が走らないため、収録漏れが完結判定（case-close）まで構造的に未検出となる工程構造だった
+- **自律対応内容**: case-close は対応関係の自動追加を禁止領域として実施せず fail-closed 停止報告。監督者の条件付き承認（修正は承認済み実装内容への sidecar 追記に限定・設計判断なし）を受けて親が PR #4025 で traceability/agentdev-gh.yaml へ REQ-011-034/035 の implementation（specs-pr.ts・contracts.ts・runner-local.ts・runner-cli.ts）・verification（runner-cli.test.ts・engine-fail-closed.test.ts）を PR #4023 実 diff の機能帰属で追記し、main 上で check --req 11行フルセット pass 11 / fail 0 を確認した
+- **ユーザー確認の有無**: あり（監督者の条件付き承認: 修正PRで前進・親直接実施・修正範囲を承認済み内容への復元と sidecar 追記に限定）
+- **REQ/Decision/Design影響**: なし（sidecar 追記は承認済み実装内容の収録であり新規の設計判断を含まない。二重宣言となる public-schema.ts〔senpi-tool-connection.yaml が単一所有〕・runner-local.test.ts〔本文 inline ADF-COVERS と重複〕は checker の duplicate-inconsistencies 検出で除外確定）
+- **横展開観点**: 実装系 Case（REQ 参照を src 本文に持てない IR-055 管理下の src 変更）では、実装委譲契約への sidecar 収録義務の明示と、case-run 最終ゲートまたは case-close 前置での check --req 実行が未収録の最短発見経路になる。同一構造は agentdev-gh 以外の sidecar 収録対象コンポーネント（tools・plugins の src 変換）に同一適用される
+- **再発条件**: REQ 参照を持つ src/common/tools 配下（sidecar 収録対象コンポーネント）の変更を、sidecar 収録工程を含まない委譲・ゲート構成のまま実装する場合
+- **予防策候補**: 実装委譲契約テンプレートへ「対象 REQ 行の sidecar 収録確認」の MUST DO 追加、case-run 3点ゲートへの traceability check --req（対象行限定）前置、設計PR 受入時の完全性 gate 前置（いずれも promote 判断）
+- **想定反映先**: learning-promote（委譲契約テンプレート・ゲート強化の要否判断）・agentdev-workflow-case-run（最終ゲート構成の検討判断）
+- **関連**: Root Case #4002・PR #4023（sidecar 未収録の実装）・PR #4025（sidecar 追記是正・事実記録）・traceability/agentdev-gh.yaml・.agentdev/verify-logs/qg4-close/blocker-analysis.md・前条の ADF-COVERS 終端子欠落学び（同時検出・別因）
+- **タグ**: #traceability #sidecar #case-run #工程逸脱 #委譲契約 #完全性ゲート #未検出構造
+
+## 2026-11-12: close_mechanical_steps.ts は bun 固有契約（import.meta.path）で node 実行不可・bash ハーネスが起動セッションのバックグラウンド子プロセスを終了時に kill するため機械工程の自動駆動は detached spawn が必須（Case #4002 case-close 再開）
+
+- **問題事象**: case-close 機械工程を自動駆動した際に3種の失敗が連鎖した。(1) bash ツールで `&` バックグラウンド起動した bun test 子プロセスがツール呼出し終了時にハーネスに kill された（受入検査の split 実行が途中終了・exit ファイル未書出し）。(2) ワークアラウンドで `process.execPath`（node.exe）から detached spawn した close_mechanical_steps.ts は、bun 固有の `import.meta.path`（isDirectExecution 判定）が node に存在せず path.resolve(undefined) の TypeError で即死した。(3) 直列チェーン駆動用 launcher で子プロセスに `p.unref()` を呼ぶと親のイベントループから子の参照が外れ、親が即終了して on("exit") コールバックが発火せず、#4009 以降の直列実行が開始されなかった（計測 baseline: main 0950de3de・case-close 再開実行 qg4-close-r2・2026-11-12・機械工程実行経路での観測）
+- **発生局面**: 実装（case-close 機械工程の自動駆動・検証 worktree 実行）
+- **検知方法**: stderr ログの TypeError 進行停止・progress.txt の DONE 行欠落・受理記録の provisional accepted:false 残存による手動確認
+- **根本原因**: (1) bash ツールは呼出し終了時に同一セッションの spawn 子プロセスを kill するハーネス仕様。(2) close_mechanical_steps.ts は `import.meta.path` による直接実行判定を前提とする bun 実行体であり node には同等 API がない。(3) detached spawn した子の完了待ちを unref で解除すると、待ちタスクを持たない親プロセスが exit しコールバックが発火しない
+- **自律対応内容**: (1) 長時間処理は child_process.spawn({detached: true, stdio: ファイルfd}) + unref でプロセスグループ分離して起動し、進捗はファイル（progress.txt・exit-{n}.txt）でポーリングする経路へ変更。(2) 機械工程の起動コマンドを bun に修正（spawn("bun", [script.ts, ...])）。(3) チェーン駆動の launcher 自体を detached で起動し、launcher 内では unref せず on("exit") で次実行を駆動する2段構成へ修正
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（機械工程 script の契約変更はなし・実行環境側の駆動経路の知見のみ）
+- **横展開観点**: 機械工程や受入検査の長時間自動駆動（bun script・複数プロセス直列チェーン）すべてに適用可能。bun 実行体は node から spawn しない（bun で起動）。進捗確認は stdout よりファイルプロトコル（完了マーカーファイル）が堅牢
+- **再発条件**: bash ツール内で `&` バックグラウンド起動した長時間コマンド・node から bun 固有 .ts 実行体を起動・unref を使ったチェーン駆動のいずれかを再び行うと再発
+- **予防策候補**: 機械工程の駆動手順（workflow skill references かコマンド側）に「bun 起動・detached spawn・unref 禁止（チェーン駆動時）・ファイルポーリング」の前置知見を追記する判断は promote 判断で評価
+- **想定反映先**: agentdev-workflow-case-close（機械工程の自動駆動手順）・learning-promote（機械工程駆動知見のゲート/参照反映の要否判断）
+- **関連**: src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts（isDirectExecution 判定 L2033-2034）・.agentdev/verify-logs/qg4-close/mechanical/stderr-4008-premerge-r2.log（TypeError 証跡）・.agentdev/integrity/reports/close-r2/launch-mechanical.js（最終動作版）
+- **タグ**: #機械工程 #bun #node差異 #detached-spawn #自動駆動 #bashハーネス
+
+## 2026-11-12: 3分割受入検査の同時並列実行がタイミング系テストを広域に flake させる・既知 flake 登録外の11件が負荷下のみで fail し単独（規律適合）再実行で全件解消（Case #4002 case-close 再開）
+
+- **問題事象**: 受入検査（実行条件 (1)・3分割正規形）を split1/2/3 を同時並列で実行したところ、既知不合格12件に加え11件のタイミング系 fail を観測した（split1: bootstrap-report 3件・cli-e2e PowerShell entry 2件・launcher protected-path 1件、split2: TS-009 並列短縮 timing 1件・TS-006 pipeline integration 1件、split3: misexecution stop REQ-050-006 3件）。全部で 23 fail と見え、既知12件との機械照合では11件が non-known に分類された。11件すべてを単独（負荷なし・直列）で再実行した結果、全件 pass して解消した（計測 baseline: main 0950de3de・bun 1.3.6・qg4-close-r2 worktree・2026-11-12・bun test 3011/1949/705 件の同時並列実行で観測）
+- **発生局面**: CI（case-close 受入検査・3分割正規形の実行）
+- **検知方法**: split ごとの fail 名一覧抽出と既知不合格 SSoT（.agentdev/tmp/c-alpha2-baseline/known-failures-fixed.md）との machine-match 照合（known-failures-comparison-r2.json・12/12 match・flake 11件）
+- **根本原因**: 3つの bun test プロセス（約5,665 tests）の同時並列実行が CPU 負荷を生み、タイミング計測系（並列短縮の速度比較・5秒系の待ち上限）と spawn を伴う実経路テスト（PowerShell entry・pipeline integration・install.ps1 起動）が劣化して fail した。既知 flake の登録は「misexecution stop 5000ms」1種のみで、同時並列負荷による他のタイミング系 flake は記録外だった
+- **自律対応内容**: プロンプト契約（既知 flake は単独再実行で origin 判定）に従い、11件をテスト名フィルタ（bun test -t）で負荷なし直列環境に単独再実行し、全件 pass を実測して環境由来（並列負荷 flake）と分類した。受入検査の判定は「規律適合再実行後の実効 fail = 既知12件のみ・新規0件」として確定し、機械受理記録に execution-form 分類の実体を保持する準備をした（最終的には機械工程内の直列実行で既知12件のみの観測となり observedFailCounts は既知のみで受理）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（合格条件「新しい不合格0件」の判定において規律適合再実行による解消確認は既存の execution-form 分類・プロンプトの既知 flake 契約の適用）
+- **横展開観点**: 3分割正規形や複数 test suite の並列実行では、タイミング系・spawn 系テストの負荷 flake を前提に、観測 fail を既知 SSoT と照合し non-known は単独再実行で origin 判定してから分類する。判定の順序は「並列観測 → 照合 → 単独再実行 → 分類確定」を守る
+- **再発条件**: 3分割以上の bun test 同時並列実行・CPU 負荷の高い環境でのタイミング系テスト実行
+- **予防策候補**: 受入検査の標準手順を split 直列実行に統一するか、並列実行時は機械照合後に必ず単独再実行で分類確定する手順を明記する判断は promote 判断で評価
+- **想定反映先**: agentdev-workflow-case-close（受入検査の実行手順・機械受理の分類手順）・learning-promote（並列負荷 flake の手順反映の要否判断）
+- **関連**: .agentdev/verify-logs/qg4-close/known-failures-comparison-r2.json・stderr-{1,2,3}-*-r2.log・stdout/stderr-rerun-*.log（単独再実行証跡）・.agentdev/tmp/c-alpha2-baseline/known-failures-fixed.md（既知 SSoT）
+- **タグ**: #受入検査 #3分割正規形 #並列実行 #flake #timing #origin分類 #規律適合再実行
+
+## 2026-11-12: 完了条件チェックボックス確定（テキスト変更）で conditionId が再導出され、更新前本文から導出した判定入力は stale 判定として fail-closed 拒否される・機械工程実行の直前に同一本文から再導出する運用が必須（Case #4002 case-close 再開）
+
+- **問題事象**: case-close 機械工程の受入評価で、checkbox 確定（[ ] → [x] + 判定記録追記）により本文テキストが変わった子 Issue（#4010〜#4013）に対し、更新前本文から事前導出した conditionId を判定入力（acceptanceVerdicts）に使った結果、verdict-for-unknown-condition（stale 判定）と verdict-missing-for-contract-condition で final-acceptance-evaluation が fail し、受理記録が accepted:false になった（#4010・#4011 の2件が1実行ずつ無駄になった。計測 baseline: main 0950de3de・2026-11-12・機械工程 pre-merge 実行での観測）
+- **発生局面**: 実装（case-close 機械工程の判定入力構築）
+- **検知方法**: 機械工程報告 JSON の final-acceptance-evaluation step fail（violations: verdict-for-unknown-condition・cond-036-a866a30d8b67f6c9 が母集団に不在）
+- **根本原因**: deriveCompletionConditionId は条件本文と本文内行位置の sha256 から決定的に導出するため、checkbox 確定によるテキスト変更（判定記録追記・行末変更）で conditionId が変わる。判定入力の構築を本文更新（issue_update）より前に行ったため stale になった。母集団は機械工程が「機械工程に渡した本文」から抽出するため、判定入力側は同一本文から再導出する必要がある
+- **自律対応内容**: GitHub の現行本文（gh issue view で再取得・本文 hash 照合済み）から deriveCompletionConditionId を再導出し、判定入力を再構築して input JSON を再生成。機械工程を再実行して受理記録を accepted に再生成した（fail-closed 拒否は A-12 個別対応化の正しい動作であり guard を迂回せず回復した）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（A-12 個別対応化の設計どおりの動作・恒久台帳なしの識別子再導出構造の実証）
+- **横展開観点**: 条件本文から hash 導出される識別子を判定入力に使うすべての工程で、「本文の最終確定後に識別子を再導出」する順序を守る。本文更新 → 判定入力導出 → 機械工程実行 の順序固定が安全
+- **再発条件**: checkbox 確定や結果セクション追加など本文変更を伴う更新後に、変更前本文から導出した判定入力を機械工程へ渡すと再発
+- **予防策候補**: 機械工程の判定入力構築手順に「issueBodyPath に渡す本文と同一の本文から conditionId を導出する」前置条件を明記する判断は promote 判断で評価
+- **想定反映先**: agentdev-workflow-case-close（機械工程の判定入力構築手順）・learning-promote（順序固定の手順反映の要否判断）
+- **関連**: deriveCompletionConditionId（close_mechanical_steps.ts L605-608）・final-acceptance.ts（verdict-for-unknown-condition 検査）・.agentdev/verify-logs/qg4-close/mechanical/report-4010-premerge-r2.json（stale 判定の fail 証跡）
+- **タグ**: #conditionId #stale判定 #受入評価 #機械工程 #fail-closed #A-12
+
+---

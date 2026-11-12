@@ -26,38 +26,45 @@ third-party 依存の実体（`vendor/` 配下の engine bundle と kuromoji 辞
 
 ## 導入手順
 
+展開元（archive を一時展開したディレクトリ）と導入先（製品リポジトリ）は別パスである。`-Target` は製品リポジトリ側の `.opencode` を指定し、一時展開先を指定しない。
+
 ```powershell
-# 1. archive を一時ディレクトリへ展開
+# 1. 導入先（製品リポジトリ）のルートを特定
+$repoRoot = "<導入先リポジトリのルート>"
+
+# 2. archive を一時ディレクトリへ展開（展開元。この配下は導入先ではない）
 $temp = "<任意の一時ディレクトリ>"
 Expand-Archive -LiteralPath "agentdev-release-<sha>.zip" -DestinationPath $temp -Force
 
-# 2. 展開先のルート（archive 内の agentdev-release-<sha>/）を特定
+# 3. 展開先のルート（archive 内の agentdev-release-<sha>/）を特定
 $unpackedRoot = Join-Path $temp "agentdev-release-<sha>"
 
-# 3. scripts/install.ps1（archive 版 installer）を実行
+# 4. scripts/install.ps1（archive 版 installer）を実行
+#    -Source: 展開元（一時展開ディレクトリ内の src/）
+#    -Target: 導入先（製品リポジトリ側の .opencode/）
 & (Join-Path $unpackedRoot "scripts\install.ps1") `
     -Source (Join-Path $unpackedRoot "src") `
-    -Target (Join-Path $unpackedRoot ".opencode") `
+    -Target (Join-Path $repoRoot ".opencode") `
     -Mode copy
 ```
 
-導入完了後、`<unpackedRoot>/.opencode/commands/agentdev/` と `<unpackedRoot>/.opencode/skills/agentdev-*/` が実ファイルとして配置される。
+導入完了後、`<repoRoot>/.opencode/commands/agentdev/` と `<repoRoot>/.opencode/skills/agentdev-*/` が実ファイルとして配置される。一時展開先（`$unpackedRoot`）には配置が発生しない。
 
 ## 導入時の依存生成手順（agentdev-textlint-guard plugin）
 
-installer は配置先に依存実体（`vendor/` 配下の engine bundle と kuromoji 辞書）が不完全な場合、終了コード 6 で停止し、導入手順を案内する。案内に従い、plugin package 配下（`<unpackedRoot>/.opencode/plugins/agentdev-textlint-guard/`）で依存を生成してから installer を再実行する。
+installer は導入先（`<repoRoot>/.opencode/`）に依存実体（`vendor/` 配下の engine bundle と kuromoji 辞書）が不完全な場合、終了コード 6 で停止し、導入手順を案内する。案内に従い、導入先の plugin package 配下（`<repoRoot>/.opencode/plugins/agentdev-textlint-guard/`）で依存を生成してから installer を再実行する。
 
 ```powershell
-# 依存生成（bun install はネットワーク取得を含む）
-Push-Location (Join-Path $unpackedRoot ".opencode\plugins\agentdev-textlint-guard")
+# 依存生成（bun install はネットワーク取得を含む。導入先側の plugin package で実施）
+Push-Location (Join-Path $repoRoot ".opencode\plugins\agentdev-textlint-guard")
 bun install
 bun run build:engine
 Pop-Location
 
-# installer 再実行（上記「導入手順」の 3 を再実行）
+# installer 再実行（上記「導入手順」の 4 を再実行）
 & (Join-Path $unpackedRoot "scripts\install.ps1") `
     -Source (Join-Path $unpackedRoot "src") `
-    -Target (Join-Path $unpackedRoot ".opencode") `
+    -Target (Join-Path $repoRoot ".opencode") `
     -Mode copy
 ```
 
@@ -119,8 +126,10 @@ installer（`scripts/install.ps1`）は宣言済み Skill が `.opencode/skills/
 ```powershell
 bun run <host>/.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts `
     --profile installed `
-    --root <unpackedRoot>
+    --root <repoRoot>
 ```
+
+`--root` には導入先リポジトリのルートを指定する（checker は `<root>/.opencode/` 配下の配置を検査する）。導入先リポジトリに正本ツリー（`src/common/`・`src/opencode/`）が存在しない環境では、checker は正本必須ディレクトリの欠落を環境由来の NG として報告する（checker 全体の終了コードは非ゼロになる）。配置の整合性は、投影系の finding（`projection_missing` / `projection_extra` / `content_mismatch` / `broken_junction`）が 0 件であることで確認する。
 
 ## 関連
 

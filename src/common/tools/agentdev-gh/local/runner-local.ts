@@ -61,6 +61,8 @@ const HEADING_FINDINGS = "## Findings / Capture候補";
 const HEADINGS_BEFORE_WORKLOG = [HEADING_MERGE_CHECK, HEADING_DESIGN_CANDIDATES, HEADING_FINDINGS];
 const PR_BODY_SECTIONS = [HEADING_MERGE_CHECK, HEADING_DESIGN_CANDIDATES, HEADING_FINDINGS];
 const PR_TITLE_PREFIX = "### PR title: ";
+const PR_BASE_PREFIX = "### PR base: ";
+const PR_HEAD_PREFIX = "### PR head: ";
 
 const CASE_NON_TERMINAL_STATUSES = ["open", "ready", "running", "blocked", "review"] as const;
 const CASE_TERMINAL_STATUSES = ["closed", "cancelled"] as const;
@@ -532,18 +534,12 @@ export class LocalRunner implements GhRunner {
     return this.latestIssueNumber() + 1;
   }
 
-  private latestIssueNumber(role?: IssueRole): number {
+  private latestIssueNumber(): number {
     fs.mkdirSync(this.issuesDir, { recursive: true });
     let max = 0;
     for (const entry of fs.readdirSync(this.issuesDir)) {
       const n = parseIssueNumber(entry);
       if (n === null || n <= max) continue;
-      if (role !== undefined) {
-        const parsed = parseIssue(
-          fs.readFileSync(path.join(this.issuesDir, entry), "utf8"),
-        );
-        if (parsed === null || parsed.fm.role !== role) continue;
-      }
       max = n;
     }
     return max;
@@ -1201,10 +1197,18 @@ export class LocalRunner implements GhRunner {
   private prCreate(args: Record<string, unknown>): GhRunnerReply {
     const title = typeof args.title === "string" ? args.title : null;
     const body = typeof args.body === "string" ? args.body : null;
-    if (title === null || body === null) return this.fail("pr_create requires title and body");
-    // 操作契約上 pr_create は番号を持たないため、ローカル版は最新の role: case ローカルIssueを対象とする。
-    const number = this.requireNumber(args) ?? this.latestIssueNumber("case");
-    if (number <= 0) return this.fail("pr_create requires an existing case issue");
+    const base = typeof args.base === "string" && args.base.length > 0 ? args.base : null;
+    const head = typeof args.head === "string" && args.head.length > 0 ? args.head : null;
+    if (title === null || body === null || base === null || head === null) {
+      return this.fail("pr_create requires title, body, base, and head", 0, "invalid-input");
+    }
+    // 対象識別（number）は必須。対象を最新Caseの推測で解決せず、対象識別を欠く
+    // 要求は副作用発生前に入力契約違反として拒否する（Design「対象操作の境界」節
+    // の pr_create 対象識別契約条項）。
+    const number = this.requireNumber(args);
+    if (number === null) {
+      return this.fail("pr_create requires number (target identification)", 0, "invalid-input");
+    }
     const target = this.requireCaseIssue(number);
     if (!("parsed" in target)) return target;
     const section = [
@@ -1212,6 +1216,8 @@ export class LocalRunner implements GhRunner {
       HEADING_MERGE_CHECK,
       "",
       `${PR_TITLE_PREFIX}${title}`,
+      `${PR_BASE_PREFIX}${base}`,
+      `${PR_HEAD_PREFIX}${head}`,
       "",
       toLf(body).replace(/\n+$/, ""),
       "",
@@ -1220,15 +1226,65 @@ export class LocalRunner implements GhRunner {
     return { ok: true, payload: { number, url: this.issuePath(number) } };
   }
 
+  /** PR base / PR head 行（物理表現）を論理 PR 本文から除外する。 */
+  private isPrPhysicalMetaLine(line: string): boolean {
+    return line.startsWith(PR_BASE_PREFIX) || line.startsWith(PR_HEAD_PREFIX);
+  }
+
   /** 論理 PR 本文: 3セクション（マージ前確認 / Design確定候補 / Findings / Capture候補）の定義順直列化。 */
   private serializePrBody(lines: readonly string[]): string {
     const blocks: string[] = [];
     for (const heading of PR_BODY_SECTIONS) {
       const span = lastSectionSpan(lines, heading);
       const content = span === null ? [] : sectionContentLines(lines, span);
-      blocks.push(content.length === 0 ? heading : `${heading}\n\n${content.join("\n")}`);
+      const logical = heading === HEADING_MERGE_CHECK
+        ? content.filter((l) => !this.isPrPhysicalMetaLine(l))
+        : content;
+      blocks.push(logical.length === 0 ? heading : `${heading}\n\n${logical.join("\n")}`);
     }
     return blocks.join("\n\n");
+  }
+
+  /**
+   * マージ前確認セクションの物理行から pr_create 読戻し照合の取得情報
+   * （base・head・createBody）を抽出する。createBody は PR タイトル行と
+   * PR base / PR head 行の後の本文部分（pr_create が書込んだ作成時送信値の
+   * 読戻し値）。タイトル行が存在しない場合は null（呼出側で失敗扱い）。
+   */
+  private mergeCheckReadBack(lines: readonly string[]): {
+    base: string | null;
+    head: string | null;
+    createBody: string | null;
+  } {
+    const span = lastSectionSpan(lines, HEADING_MERGE_CHECK);
+    if (span === null) return { base: null, head: null, createBody: null };
+    const content = sectionContentLines(lines, span);
+    let titleIdx = -1;
+    for (let i = 0; i < content.length; i++) {
+      if ((content[i] ?? "").startsWith(PR_TITLE_PREFIX)) {
+        titleIdx = i;
+        break;
+      }
+    }
+    if (titleIdx < 0) return { base: null, head: null, createBody: null };
+    let base: string | null = null;
+    let head: string | null = null;
+    const bodyLines: string[] = [];
+    for (let i = titleIdx + 1; i < content.length; i++) {
+      const line = content[i] ?? "";
+      if (line.startsWith(PR_BASE_PREFIX) && base === null) {
+        base = line.slice(PR_BASE_PREFIX.length).trim();
+        continue;
+      }
+      if (line.startsWith(PR_HEAD_PREFIX) && head === null) {
+        head = line.slice(PR_HEAD_PREFIX.length).trim();
+        continue;
+      }
+      bodyLines.push(line);
+    }
+    while (bodyLines.length > 0 && bodyLines[0] === "") bodyLines.shift();
+    while (bodyLines.length > 0 && bodyLines[bodyLines.length - 1] === "") bodyLines.pop();
+    return { base, head, createBody: bodyLines.join("\n") };
   }
 
   /** 論理 PR 本文の入力をセクション単位へ分解する（各見出しは最後の出現を正とする）。 */
@@ -1270,6 +1326,7 @@ export class LocalRunner implements GhRunner {
     if (state === null) {
       return this.fail(`unknown issue status: ${target.parsed.fm.status}`);
     }
+    const readBack = this.mergeCheckReadBack(lines);
     return {
       ok: true,
       payload: {
@@ -1279,6 +1336,9 @@ export class LocalRunner implements GhRunner {
         state,
         mergeable: this.mergeableOf(target.parsed),
         isDraft: false,
+        base: readBack.base,
+        head: readBack.head,
+        createBody: readBack.createBody,
       },
     };
   }

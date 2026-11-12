@@ -637,7 +637,10 @@ export class CliRunner implements GhRunner {
     });
   }
 
-  /** `gh pr view --json` を使う読み取り（pr_read / pr_mergeable）。mergeable は時間変動値のため単一読取の正規化結果を返す。isDraft は GitHub Draft 状態の観測値（設計PRの状態契約条項）。 */
+  /**
+   * `gh pr view --json` を使う読み取り（pr_read / pr_mergeable）。mergeable は時間変動値のため単一読取の正規化結果を返す。isDraft は GitHub Draft 状態の観測値（設計PRの状態契約条項）。
+   * base・head・createBody は pr_create の読戻し照合（VERIFY）に必要な取得情報であり、runner 実装が取得する（Design「対象操作の境界」節の pr_create 読戻し照合条項）。head は GitHub の物理表現（短縮形式 / owner:branch）をそのまま返し、正規化は照合側が行う。
+   */
   private prView(args: Record<string, unknown>): GhRunnerReply {
     const number = this.requireNumber(args);
     if (number === null) return this.fail("pr view requires number", 0, "invalid-input");
@@ -648,7 +651,7 @@ export class CliRunner implements GhRunner {
       "--repo",
       this.repo,
       "--json",
-      "number,title,body,state,mergeable,isDraft",
+      "number,title,body,state,mergeable,isDraft,baseRefName,headRefName",
     ]);
     if (!r.ok) return r;
     if (!isRecord(r.payload)) {
@@ -659,13 +662,21 @@ export class CliRunner implements GhRunner {
     const body = str(rec.body) ?? "";
     const state = normalizePrState(rec.state);
     const mergeable = str(rec.mergeable);
+    const base = str(rec.baseRefName);
+    const head = str(rec.headRefName);
     if (typeof rec.isDraft !== "boolean") {
       return this.fail("pr view reply missing isDraft", 0);
     }
     if (title === null || state === null || mergeable === null) {
       return this.fail("pr view reply missing title/state/mergeable", 0);
     }
-    return { ok: true, payload: { number, title, body, state, mergeable, isDraft: rec.isDraft } };
+    if (base === null || head === null) {
+      return this.fail("pr view reply missing baseRefName/headRefName", 0);
+    }
+    return {
+      ok: true,
+      payload: { number, title, body, state, mergeable, isDraft: rec.isDraft, base, head, createBody: body },
+    };
   }
 
   private prUpdate(args: Record<string, unknown>): GhRunnerReply {

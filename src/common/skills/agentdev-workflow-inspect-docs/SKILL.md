@@ -103,7 +103,7 @@ agentdev-traceability の coverage、impact、check を一般文書探索、構�
 
 - 検出事項ファイル（`.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md`）の出力が完了している
 - `.agentdev/inspect/` 配下の変更が commit/push 済みである（変更なし時は「変更なし」報告済み）
-- 完了報告 template（`.opencode/commands/agentdev/templates/inspect-docs/standard.md`）に従った報告を出力した
+- 完了報告 template（`.opencode/commands/agentdev/templates/inspect-docs/standard.md`）に従った報告を出力した（待ち行列滞留期間〔最古エントリ経過日数〕を付帯情報として含める）
 
 ## See Also
 

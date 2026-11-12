@@ -108,7 +108,7 @@ Case Issue 工程記録モデルの取りまとめ責務（本文・コメント
 
 完了報告には以下を含める（停止時フォーマットを含む）。
 
-- **停止理由分類**: STEP-4 経由、または adversarial-review 由来の user-decision-required
+- **停止理由分類**: STEP-4 経由（10分類。正は case-auto command Design「停止理由分類」節）。infra-transient（ツール基盤故障）が停止種別の判定条件を満たした場合は Case 失敗（blocked / failed）と区別して分類と回復経路を併記する（分類一覧の値ではなく、判定条件と回復経路の正は case-auto command Design「infra-transient（ツール基盤故障）停止分類」節）。adversarial-review 由来の user-decision-required は停止伝播に付随する報告として併記する（分類一覧の値ではない）
 - **HITL question の一括提示**: orchestration 中にスキップ可能キューへ投入された警告・確認・選択肢提示を、完了報告（または最後の stage 境界）で一括提示する。投入順を保持し、既定の安全側の挙動とともに提示する（取り出しは `scripts/src/hitl_queue.ts` の `drainSkippableQueue`）。人間に留保された判断の新規確定と、既存の安全境界が要求する操作承認を要する停止はキューに含めず、従来どおりブロッキング停止として報告する
 - **開始時刻・終了時刻・所要時間**: 人間が読みやすい形式
 - **工程別タイムスタンプ内訳（L1）**: case-open / case-ready / case-run / case-close（例外経路時は case-revise を含む）、スキップした工程は除外可、case-run の L2 内訳は case-run result から読み取って含める

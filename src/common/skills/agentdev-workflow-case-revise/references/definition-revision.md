@@ -22,7 +22,7 @@ case-revise workflow STEP-1〜STEP-3 の実行詳細（SKILL.md「制御平面�
 ## STEP-3 設計修正PR作成
 
 - pr_create の前段として head branch を push する（pr_create より手前に位置させる）: 作業 branch（`definition-amend/issue-{N}` 形式）を `git push -u origin definition-amend/issue-{N}` で remote へ push し、push 出力で push 先 refspec（remote branch 名と upstream 設定）が意図した先であることを確認する。pr_create は remote に存在する branch を head とする操作であり、未 push の branch での pr_create は失敗する（HTTP 422 由来の実失敗に基づく前段手順）
-- 再合意済みの実変更を設計修正PRとして通常 Pull Request（GitHub Draft PR ではない）で作成する（Custom Tool `agentdev_gh` の pr_create 操作。VERIFY は Tool 内部。canonical Definition に実変更がある場合のみ設計修正 PR を作成する case-revise 実行契約の規定）
+- 再合意済みの実変更を設計修正PRとして通常 Pull Request（GitHub Draft PR ではない）で作成する（Custom Tool `agentdev_gh` の pr_create 操作。要求には対象識別〔対象 Case Issue の番号を number で指定〕を含める。対象識別を欠く要求は Tool が受理しない。VERIFY は Tool 内部。canonical Definition に実変更がある場合のみ設計修正 PR を作成する case-revise 実行契約の規定）
 - PR 作成は Case 単位で同一再合意内容に対応するものを重複生成しない。作成前に既存 PR の再検索を実行し、検出時は新規作成を取りやめて再利用へ切り替える
 - REQ / Decision / Design 変更の保存実体は `agentdev-req-file-manager` / `agentdev-decision-file-manager` / `agentdev-design-file-manager` へ委譲する（case-revise は意味判断せず、合意済み内容を投影する）
 - 変更範囲は `agentdev-artifact-validation` の公開検証契約で検査する（frontmatter id↔filename 整合、README entry 存在、変更範囲検証）

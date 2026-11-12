@@ -22,11 +22,16 @@
 // 対象品質ゲート（traceability check、full integrity suite、AUTOGEN 再生成差分
 // 検出、textlint 最終検査）の省略は入力検証で拒否し、ゲート実行体は起動前に
 // 配布先での存在検査を行う（欠落時は正規の代替経路の案内を報告へ含めて
-// fail-closed で停止する）。
+// fail-closed で停止する）。実装は inspect_cross_dependencies.ts と同じ作り
+// （工程別個別 script）であり、ゲート実行体の解決と可用性検査、引数検査、
+// --validate-input 相当の入力検査実行など反復可能な機械処理に限り
+// agentdev-artifact-validation 所有の共有 lib を supported lib interface 経由で
+// 利用する。工程固有のゲート選択・順序・実行条件・結果解釈は本入口が所有し続ける。
 //
 
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import {
   countChildStatuses,
@@ -39,29 +44,48 @@ import {
   evaluateFinalAcceptance,
   type ConditionPopulation,
   type ConditionVerdict,
+  type ContractConditionIdentity,
   type CrossObligation,
   type SubjectKind,
 } from "./final-acceptance.ts";
 import { REQ_ROW_ID_LIST_PATTERN } from "../../../agentdev-workflow-case-open/scripts/lib/definition-traceability-gate.ts";
+import {
+  buildKnownGateArgContracts,
+  evaluateGateAvailability,
+  fail,
+  GATE_ALTERNATIVE_ROUTES,
+  MechanicalInputError,
+  parseGateCliArgs,
+  preValidateGateSpecWithContracts,
+  runGatePreValidation,
+  type CommandResult,
+  type CommandSpec,
+  type GateCommandSpec,
+  type KnownArgContract,
+} from "../lib/gate-execution.ts";
+
+// 正規所有1点（agentdev-artifact-validation scripts/lib/gate-execution.ts）への再エクスポート。
+// 入口の公開名と単体テストの import 名を維持する（supported lib interface 経由）。
+export {
+  evaluateGateAvailability,
+  extractFlagValue,
+  GATE_ALTERNATIVE_ROUTES,
+  MechanicalInputError,
+  resolveGateExecutablePath,
+} from "../lib/gate-execution.ts";
+export type {
+  CommandResult,
+  CommandSpec,
+  GateAvailabilityRecord,
+  GateCommandSpec,
+  KnownArgContract,
+} from "../lib/gate-execution.ts";
 
 const USAGE = `usage: bun ./src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts --input <input.json> [--validate-input]
   --input           機械工程入力 JSON（phase、worktree_root、PR番号、品質ゲート実行仕様等）
   --validate-input  検証専用経路。入力 JSON の契約検証・既知 gate 引数契約検査・ゲート実行体の
                     存在確認のみを行い（worktree 作成・ゲート実行・git/gh 操作・管理対象ファイル
                     変更なし）、報告 JSON を stdout へ出力する（合格 0 / 不合格 1）`;
-
-export interface CommandSpec {
-  command: string;
-  args: readonly string[];
-  cwd: string;
-  timeoutMs?: number;
-}
-
-export interface CommandResult {
-  exitCode: number;
-  stdout: string;
-  stderr: string;
-}
 
 /** script が外部処理を呼び出す経路。単体テストでは偽 runner を注入する。 */
 export interface MechanicalRunner {
@@ -77,14 +101,6 @@ export interface MechanicalRunner {
   gitCommonDir?(): string;
   /** 回収実行面（台帳回収・終了判定記録回収）で使用するファイル削除。未提供時は回収ステップを fail で報告する。 */
   deleteFile?(absolutePath: string): void;
-}
-
-export interface GateCommandSpec {
-  name: string;
-  command: string;
-  args: readonly string[];
-  cwd: string;
-  timeoutMs?: number;
 }
 
 /** full integrity suite の fail 1件あたりの由来分類記録（fail 単位の1:1対応。受理由件5・7）。 */
@@ -274,155 +290,24 @@ export const REQUIRED_STEPS_POST_MERGE = [
 ] as const;
 
 /**
- * 欠落時に報告 JSON で案内する正規の代替経路（REQ 行の語彙）。
- * 代替経路の履行なしに検査を省略して成功扱いとしないため、欠落時は fail-closed
- * で停止し案内のみを行う。
+ * 既知 gate 引数契約（正規所有1点の構成から組み立てる。--req の受理パターンのみ
+ * definition-traceability-gate の REQ_ROW_ID_LIST_PATTERN を注入する）。
  */
-export const GATE_ALTERNATIVE_ROUTES: readonly string[] = [
-  "evidence-preservation（証跡化）: ゲート実行体の欠落を検出事項として証跡化する（本報告 JSON の step detail と warnings、呼出側の検証差分記録への記録）",
-  "manual-equivalent-procedure（手動相当手順）: 手動相当の手順で同等の検査を実施し、実行証跡（終了コード、標準出力・標準エラー）を記録する",
-  "contrastive-no-worse-proof（対照実行による悪化ゼロ件の機械証明）: baseline 対照の対照実行で既知 fail の悪化ゼロ件を機械証明する",
-];
-
-/**
- * 既知 flag の値契約（配布下位検査の契約由来）。未知 flag は検証対象外とする。
- * case-open・case-ready の機械工程 script と同一前提の入力検証（--req の許容書式は
- * traceability checker 契約と同じ REQ-{NNNN}-{MMM} 形式、桁数を固定しない）。
- */
-export interface KnownArgContract {
-  flag: string;
-  values?: readonly string[];
-  pattern?: RegExp;
-  nonEmpty?: boolean;
-}
-
-export const KNOWN_GATE_ARG_CONTRACTS: readonly KnownArgContract[] = [
-  { flag: "--req", pattern: REQ_ROW_ID_LIST_PATTERN },
-  { flag: "--profile", values: ["source", "link"] },
-  { flag: "--fail-level", values: ["strict", "warning"] },
-  { flag: "--workflow", pattern: /^[a-z][a-z0-9-]*$/ },
-  { flag: "--root", nonEmpty: true },
-  { flag: "--input", nonEmpty: true },
-  { flag: "--artifact", nonEmpty: true },
-  { flag: "--evidence", nonEmpty: true },
-  { flag: "--revision", nonEmpty: true },
-  { flag: "--files", nonEmpty: true },
-  { flag: "--base-ref", nonEmpty: true },
-];
-
-/** 報告 JSON に記録する意味のある flag の値を抽出する（--flag value / --flag=value の両形式）。 */
-export function extractFlagValue(args: readonly string[], flag: string): string | null {
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    if (arg === undefined) continue;
-    if (arg === flag && args[i + 1] !== undefined) {
-      return args[i + 1] ?? null;
-    }
-    if (arg.startsWith(`${flag}=`)) {
-      return arg.slice(flag.length + 1);
-    }
-  }
-  return null;
-}
+export const KNOWN_GATE_ARG_CONTRACTS: readonly KnownArgContract[] =
+  buildKnownGateArgContracts(REQ_ROW_ID_LIST_PATTERN);
 
 /**
  * 既知 gate 入力の事前検証。高価な検査の開始前に必須引数・対象・パス・許容値を
- * 検証し、不正値は検査を開始せず MechanicalInputError で拒否する。未知 flag は
+ * 検証し、不正値は検査を開始せず MechanicalInputError で拒否する。形状検査だけでなく
+ * 下位引数の値（--req の範囲構文、許容集合外の値等）も拒否する。未知 flag は
  * 検証対象外とし、任意コマンドの汎用解釈器を作らない。
  */
 export function preValidateGateSpec(spec: GateCommandSpec): void {
-  for (const contract of KNOWN_GATE_ARG_CONTRACTS) {
-    const value = extractFlagValue(spec.args, contract.flag);
-    if (value === null) continue;
-    if (contract.nonEmpty === true && value.trim().length === 0) {
-      fail(`${contract.flag} requires a non-empty value`);
-    }
-    if (contract.values && !contract.values.includes(value)) {
-      fail(`${contract.flag} must be one of: ${contract.values.join(", ")} (got: ${value})`);
-    }
-    if (contract.pattern && !contract.pattern.test(value)) {
-      fail(`${contract.flag} value does not match the subordinate command contract: ${value}`);
-    }
-  }
-}
-
-const GATE_SCRIPT_EXTENSIONS = [".ts", ".mts", ".mjs", ".js", ".cjs"];
-
-/**
- * ゲート実行体ファイル（スクリプトパス）の解決。command と args[0] のうち
- * パス区切りまたはスクリプト拡張子をもつ最初の要素を gate cwd 基準で解決する。
- * 実行体ファイルを特定できない場合は null（存在検査対象なし。command 自体の
- * 解決は実行基盤の責務で、ENOENT 等の実行時失敗は既存の実行経路が扱う）。
- */
-export function resolveGateExecutablePath(spec: GateCommandSpec): string | null {
-  const candidates = [spec.command, spec.args[0]];
-  for (const candidate of candidates) {
-    if (typeof candidate !== "string" || candidate.length === 0) continue;
-    const hasSeparator = /[\\/]/.test(candidate);
-    const hasScriptExtension = GATE_SCRIPT_EXTENSIONS.some((ext) => candidate.toLowerCase().endsWith(ext));
-    if (hasSeparator || hasScriptExtension) {
-      return path.resolve(spec.cwd, candidate);
-    }
-  }
-  return null;
-}
-
-export interface GateAvailabilityRecord {
-  gate: string;
-  available: boolean;
-  resolvedExecutable: string | null;
-  alternativeRoutes: readonly string[];
-}
-
-/**
- * 必須ゲート実行体の配布先での存在検査。欠落時は fail-closed の対象として
- * 検出し、正規の代替経路の案内を報告へ含める。
- */
-export function evaluateGateAvailability(
-  gates: readonly GateCommandSpec[],
-  exists: (absolutePath: string) => boolean,
-): { records: readonly GateAvailabilityRecord[]; missing: readonly string[] } {
-  const records = gates.map((gate) => {
-    const executable = resolveGateExecutablePath(gate);
-    const available = executable === null || exists(executable);
-    return {
-      gate: gate.name,
-      available,
-      resolvedExecutable: executable,
-      alternativeRoutes: available ? [] : GATE_ALTERNATIVE_ROUTES,
-    };
-  });
-  return {
-    records,
-    missing: records.filter((record) => !record.available).map((record) => record.gate),
-  };
-}
-
-/** 入力・契約違反。CLI 入口はこのエラーを標準エラー出力と終了コード 1 へ変換する。 */
-export class MechanicalInputError extends Error {}
-
-function fail(message: string): never {
-  throw new MechanicalInputError(message);
+  preValidateGateSpecWithContracts(spec, KNOWN_GATE_ARG_CONTRACTS);
 }
 
 function parseArgs(argv: readonly string[]): { input: string; validateOnly: boolean } {
-  let input: string | null = null;
-  let validateOnly = false;
-  for (let i = 0; i < argv.length; i++) {
-    const arg = argv[i];
-    if (arg === "--input" && argv[i + 1] !== undefined) {
-      input = argv[++i] ?? null;
-    } else if (arg === "--validate-input") {
-      validateOnly = true;
-    } else if (arg === "--help" || arg === "-h") {
-      process.stdout.write(`${USAGE}\n`);
-      process.exit(0);
-    } else {
-      fail(`unknown argument: ${arg}\n${USAGE}`);
-    }
-  }
-  if (input === null) fail(`--input is required\n${USAGE}`);
-  return { input, validateOnly };
+  return parseGateCliArgs(argv, USAGE);
 }
 
 /**
@@ -444,20 +329,7 @@ export function runValidateInputOnly(
     validated.textlintGate,
     ...(validated.integrityGates ?? []),
   ].filter((gate): gate is GateCommandSpec => gate != null);
-  for (const gate of gates) {
-    preValidateGateSpec(gate);
-  }
-  const availability = evaluateGateAvailability(gates, exists);
-  const report = {
-    ok: availability.missing.length === 0,
-    mode: "validate-input",
-    script: "close_mechanical_steps",
-    inputValidation: "pass",
-    gatePreValidation: "pass",
-    gateAvailability: availability,
-    sideEffects: "none",
-  };
-  return { ok: availability.missing.length === 0, report };
+  return runGatePreValidation("close_mechanical_steps", gates, KNOWN_GATE_ARG_CONTRACTS, exists);
 }
 
 /** 入力 JSON を検証する。必須品質ゲートの欠落（省略）は失敗とする。 */
@@ -563,17 +435,46 @@ export function validateInput(value: unknown): CloseMechanicalInput {
  * 完了条件チェックボックスの機械的抽出（評価はモデルが担当する）。
  * 入力契約は LF 正規化済みの本文であり、CRLF は呼び出し側が
  * issueBodyPath 読取直後に LF へ正規化して渡す。
+ * 各項目には本文内位置（1 始まり行番号）を保持し、母集団導出の個別対応付け
+ * （条件本文と位置からの識別子導出）に使う。
  */
+export interface CompletionCheckboxItem {
+  text: string;
+  checked: boolean;
+  /** 抽出元本文（LF 正規化済み）内の 1 始まり行番号。 */
+  line: number;
+}
+
 export function extractCompletionCheckboxes(
   issueBody: string,
-): { total: number; checked: number; items: readonly { text: string; checked: boolean }[] } {
-  const items: { text: string; checked: boolean }[] = [];
-  for (const line of issueBody.split("\n")) {
+): { total: number; checked: number; items: readonly CompletionCheckboxItem[] } {
+  const items: CompletionCheckboxItem[] = [];
+  const lines = issueBody.split("\n");
+  for (let index = 0; index < lines.length; index++) {
+    const line = lines[index];
+    if (line === undefined) continue;
     const match = line.match(/^\s*-\s+\[([ xX])\]\s+(.*)$/);
     if (!match) continue;
-    items.push({ text: (match[2] ?? "").trim(), checked: match[1] !== " " });
+    items.push({
+      text: (match[2] ?? "").trim(),
+      checked: match[1] !== " ",
+      line: index + 1,
+    });
   }
   return { total: items.length, checked: items.filter((i) => i.checked).length, items };
+}
+
+/**
+ * 正規完了条件の個別識別子（条件本文と本文内位置の両方から決定的に導出）。
+ * 判定入力（ConditionVerdict.conditionId）との対応付けはこの識別子で行い、
+ * 条件数の突合だけでは個別対応しない（A-12）。識別子は本文の文言・位置の
+ * いずれかが変われば変わるため、変更前の完了条件へ紐付いた判定（stale 判定）は
+ * 現行の識別子集合に現れず、受入側で拒否される。恒久台帳は設けない
+ * （A-12 固定制約。識別子は常に正規本文から再導出可能）。
+ */
+export function deriveCompletionConditionId(text: string, line: number): string {
+  const digest = createHash("sha256").update(`${line}\u0000${text}`, "utf8").digest("hex");
+  return `cond-${String(line).padStart(3, "0")}-${digest.slice(0, 16)}`;
 }
 
 /**
@@ -582,10 +483,12 @@ export function extractCompletionCheckboxes(
  * 呼び出し契約」節）。抽出失敗は extractionSucceeded: false とし、空の抽出を
  * 「条件なし」へ変換しない（0 件抽出は emptyBasis を根拠に主張される）。
  * 完了条件チェックボックスはすべて必須完了条件であるため、総数を必須数として
- * 扱う。
+ * 扱う。母集団は正規の各完了条件を識別子（条件本文・位置から導出）で個別に
+ * 保持し、判定入力との対応照合（欠落・重複・無関係・stale 判定の拒否）に使う。
+ * 実行担当の報告（照合入力）からは作らない。
  */
 export function deriveAcceptancePopulation(
-  extraction: { total: number } | null,
+  extraction: { total: number; items: readonly { text: string; line: number }[] } | null,
   emptyBasis?: string,
 ): ConditionPopulation {
   if (extraction === null) {
@@ -595,10 +498,18 @@ export function deriveAcceptancePopulation(
       contractRequiredCount: null,
     };
   }
+  const conditions: ContractConditionIdentity[] = extraction.items.map((item) => ({
+    id: deriveCompletionConditionId(item.text, item.line),
+    text: item.text,
+    line: item.line,
+    required: true,
+  }));
   return {
     extractionSucceeded: true,
     contractConditionCount: extraction.total,
     contractRequiredCount: extraction.total,
+    contractRequiredConditionIds: conditions.map((condition) => condition.id),
+    contractConditions: conditions,
     emptyBasis: extraction.total === 0 ? emptyBasis : undefined,
   };
 }
@@ -1802,8 +1713,10 @@ export function runCloseMechanicalSteps(
       diff.reclamation = outcome.detail;
     }
     // main working tree 構成（worktreeRoot == repoRoot・Epic 最終close等）は worktree
-    // とその checkout ブランチが削除対象外（REQ-118-005）。removeWorktree: false も
+    // とその checkout ブランチが削除対象外。removeWorktree: false も
     // worktree 削除を機械工程の外で管理する明示指定。両者は削除試行しない。
+    // （main working tree 構成の削除対象外根拠は case-close Design「機械工程の
+    // script 呼び出し契約」節・repository top-level traceability/ 配下 sidecar 参照）
     const mainWorktreeClose = worktreeCwd === path.resolve(input.repoRoot);
     const worktreeRemovalSkipped = mainWorktreeClose || input.cleanup?.removeWorktree === false;
     const removed: CommandResult | null = worktreeRemovalSkipped

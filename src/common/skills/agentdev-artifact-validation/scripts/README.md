@@ -11,7 +11,8 @@ scripts/
 ├── lib/
 │   ├── result.ts                    # 結果型と stdout/stderr ヘルパー
 │   ├── frontmatter.ts               # frontmatter parse、ID 形式抽出（純粋関数）
-│   └── fs-helpers.ts                # ファイル名/番号/ゼロ埋めヘルパー
+│   ├── fs-helpers.ts                # ファイル名/番号/ゼロ埋めヘルパー
+│   └── gate-execution.ts            # ゲート機械処理共有 lib（case 系 workflow 入口が supported lib interface 経由で利用）
 ├── src/
 │   ├── check-frontmatter-consistency.ts  # frontmatter id ↔ ファイル名整合性（REQ/ADR 横断）
 │   ├── check-entry-existence.ts     # README エントリ存在
@@ -57,6 +58,7 @@ echo '{"root":"<repo-root>","files":[{"path":"<written-artifact-path>","content"
 
 本ディレクトリの script と lib は `agentdev-artifact-validation` が正規所有する（「Script 所有権と委譲契約」に基づく単一所有）。
 利用側 command、skill は内部 script パスを直接参照せず、公開検証契約（script の argv/stdin → stdout JSON）へ委譲する（「Script 所有権と委譲契約」の委譲規則）。
+共有 lib（fs-helpers、result、gate-execution）の正は本 skill が所有する。gate-execution は case 系 workflow 入口が共有するゲート機械処理です。利用側は supported lib interface（利用側 skill の `scripts/lib/` 配下の再エクスポート shim）経由でのみ利用する。本 skill の内部 lib パスを利用側が直接参照することはありません。共有 lib は検証操作の副作用を持ちません（agentdev-artifact-validation skill Design「現在の動作」「境界」節）。
 同一 script または共有 lib を複数 skill へ複製しない（「Script 所有権と委譲契約」の複製禁止規則）。
 
 公開検証契約への委譲とは別に、兄弟 skill は共有 lib（fs-helpers、result、frontmatter）を supported lib interface 経由で利用できる。

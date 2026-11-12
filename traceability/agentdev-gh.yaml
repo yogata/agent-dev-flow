@@ -12,6 +12,8 @@ implementation:
     - REQ-099-009
     - REQ-006-112
     - REQ-052-018
+    - REQ-011-034
+    - REQ-011-035
   src/common/tools/agentdev-gh/contracts.ts:
     - REQ-011-022
     - REQ-011-030
@@ -19,6 +21,8 @@ implementation:
     - REQ-083-004
     - REQ-114-010
     - REQ-114-016
+    - REQ-011-034
+    - REQ-011-035
   src/common/tools/agentdev-gh/engine.ts:
     - REQ-052-018
     - REQ-011-028
@@ -38,6 +42,7 @@ implementation:
     - REQ-083-001
     - REQ-114-010
     - REQ-114-016
+    - REQ-011-035
   src/common/tools/agentdev-gh/specs-issue.ts:
     - REQ-052-018
     - REQ-011-022
@@ -47,6 +52,8 @@ implementation:
     - REQ-011-030
     - REQ-083-001
     - REQ-083-005
+    - REQ-011-034
+    - REQ-011-035
   src/common/tools/agentdev-gh/specs-release.ts:
     - REQ-114-010
     - REQ-114-016
@@ -90,6 +97,7 @@ verification:
     - REQ-011-025
     - REQ-011-028
     - REQ-011-029
+    - REQ-011-034
   src/common/tools/agentdev-gh/tests/runner-cli.test.ts:
     - REQ-052-018
     - REQ-011-025
@@ -101,3 +109,5 @@ verification:
     - REQ-052-014
     - REQ-114-010
     - REQ-114-016
+    - REQ-011-034
+    - REQ-011-035

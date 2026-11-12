@@ -291,9 +291,9 @@ describe("case-close QG-4 の3完全性再検査（REQ-021-018、REQ-021-025、R
     expect(skill.includes("inline declaration と top-level `traceability/` 配下の sidecar を同一に扱う")).toBe(true);
   });
 
-  it("check 実行不能時に対応完全性を合格扱いしない（fail-closed）", () => {
+  it("check 実行不能時に対応完全性を合格扱いしない（fail-closed。検査不能と代替検証の統合文）", () => {
     const skill = read(CASE_CLOSE_SKILL);
-    expect(skill.includes("対応完全性の合格として扱わず")).toBe(true);
+    expect(skill.includes("の場合は合格として扱わず、検査不能の旨を報告して完了判定とマージへ進まない")).toBe(true);
   });
 
   it("worktree root と main 側 root の再実行と policy 登録 commit の時系列確認を記述する（REQ-021-027）", () => {

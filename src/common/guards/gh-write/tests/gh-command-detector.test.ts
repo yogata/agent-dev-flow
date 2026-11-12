@@ -27,6 +27,13 @@ describe("生 gh WRITE の検出（拒否）", () => {
     ["gh api repos/o/r/issues -X POST -f title=x", "gh api WRITE method"],
     ["gh api repos/o/r/issues/5 --method PATCH -f body=y", "gh api WRITE method"],
     ["gh api repos/o/r/issues/5 --method=DELETE", "gh api WRITE method"],
+    ["gh api repos/o/r/issues -f title=x", "gh api implicit POST"],
+    ["gh api repos/o/r/issues --raw-field body=y", "gh api implicit POST"],
+    ["gh api repos/o/r/issues/5 -F labels=bug", "gh api implicit POST"],
+    ["gh api repos/o/r/issues/5 --field milestone=1", "gh api implicit POST"],
+    ["gh api repos/o/r/issues/5 --input payload.json", "gh api implicit POST"],
+    ["gh api repos/o/r/issues/5 --method", "gh api ambiguous"],
+    ["gh api repos/o/r/issues/5 -X HEAD", "gh api ambiguous"],
     ["gh label create foo", "gh label WRITE"],
     ["gh release create v1", "gh release WRITE"],
     ["gh repo edit --description x", "gh repo WRITE"],
@@ -34,6 +41,19 @@ describe("生 gh WRITE の検出（拒否）", () => {
     ["gh gist create f.txt", "gh gist WRITE"],
     ["gh milestone create m", "gh milestone WRITE"],
     ["gh project create x", "gh project WRITE"],
+    // 引用符付きフラグ（シェル上では引用符はフラグ解釈に影響しないため拒否）。
+    ["gh api repos/o/r/issues '-f' 'title=x'", "gh api implicit POST"],
+    ["gh api repos/o/r/issues \"-f\" \"title=x\"", "gh api implicit POST"],
+    ["gh api repos/o/r/issues '-X' 'POST' -f title=x", "gh api WRITE method"],
+    // 引用符内の値はフラグ・メソッド指定として解釈しない。
+    ["gh api repos/o/r/issues --raw-field 'body=hello --method GET world'", "gh api implicit POST"],
+    ["gh api repos/o/r/issues -F 'note=--method=DELETE x'", "gh api WRITE method"],
+    ["gh api repos/o/r/issues --raw-field 'a=1 --input b.json'", "gh api implicit POST"],
+    // 単発 &（バックグラウンド実行）もコマンド区切りとして各セグメントを独立分類する。
+    ["gh api repos/o/r/issues -f title=x & gh api repos/o/r/issues -X GET", "gh api implicit POST"],
+    ["gh api repos/o/r/issues -X GET & gh api repos/o/r/issues -f title=x", "gh api implicit POST"],
+    ["gh api repos/o/r/issues -f title=x & git status && gh api repos/o/r/issues -X GET", "gh api implicit POST"],
+    ["git status && gh api repos/o/r/issues -X GET & gh api repos/o/r/issues --field a=b", "gh api implicit POST"],
   ])("%s を block する", (command, rule) => {
     const verdict = detectGhWriteCommand(command);
     expect(verdict.kind).toBe("block");
@@ -43,12 +63,20 @@ describe("生 gh WRITE の検出（拒否）", () => {
   test.each([
     "echo 'gh issue create --title x' | gh issue view 5",
     "cd /d && gh pr merge 7 --squash",
+    "git status && gh api repos/o/r/issues -f title=x",
+    "gh api repos/o/r/issues/5 | gh api repos/o/r/issues -f title=x",
+    "git status; gh api repos/o/r/issues -X POST -f title=x",
   ])("複合コマンド中の gh WRITE も block する（%s）", (command) => {
     expect(detectGhWriteCommand(command).kind).toBe("block");
   });
 
   test("複数行コマンドの2行目の gh WRITE を block する", () => {
     const command = "echo hello\ngit status\ngh issue comment 5 --body y";
+    expect(detectGhWriteCommand(command).kind).toBe("block");
+  });
+
+  test("複数行コマンドの2行目の暗黙 POST gh api を block する", () => {
+    const command = "echo hello\ngit status\ngh api repos/o/r/issues -f title=x";
     expect(detectGhWriteCommand(command).kind).toBe("block");
   });
 
@@ -81,6 +109,8 @@ describe("読み取り系の許容（Design 所有の禁止範囲）", () => {
     "gh api repos/o/r/issues/5",
     "gh api repos/o/r/issues/5 --method GET",
     "gh api repos/o/r/issues/5 -X GET",
+    "gh api repos/o/r/issues/5 --method GET -f title=x",
+    "gh api repos/o/r/issues/5 -X GET -f page=2",
     "gh label list",
     "gh release view v1",
     "gh release list",
@@ -95,6 +125,10 @@ describe("読み取り系の許容（Design 所有の禁止範囲）", () => {
     "echo hello",
     "bun test src/",
     "powershell -Command Get-Location",
+    // 引用符付きフラグの読取り許容（引用符はフラグ解釈に影響しない）。
+    "gh api repos/o/r/issues/5 '-X' 'GET'",
+    // 引用符内の値に --input 偽フラグを含んでも明示 GET 併用なら読取り許容。
+    "gh api repos/o/r/issues/5 --method GET -F 'q=--input x.json'",
   ])("%s は許容する", (command) => {
     expect(detectGhWriteCommand(command).kind).toBe("allow");
   });

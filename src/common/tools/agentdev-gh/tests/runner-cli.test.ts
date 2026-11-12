@@ -515,6 +515,8 @@ describe("CliRunner: 各操作の API 写像", () => {
         state: "MERGED",
         mergeable: "MERGEABLE",
         isDraft: false,
+        baseRefName: "main",
+        headRefName: "feature/x",
       }),
       stderr: "",
     }));
@@ -528,6 +530,9 @@ describe("CliRunner: 各操作の API 写像", () => {
         state: "merged",
         mergeable: "MERGEABLE",
         isDraft: false,
+        base: "main",
+        head: "feature/x",
+        createBody: "PR 本文",
       });
     }
   });
@@ -542,6 +547,8 @@ describe("CliRunner: 各操作の API 写像", () => {
         state: "OPEN",
         mergeable: "UNKNOWN",
         isDraft: false,
+        baseRefName: "main",
+        headRefName: "feature/x",
       }),
       stderr: "",
     }));
@@ -550,6 +557,7 @@ describe("CliRunner: 各操作の API 写像", () => {
     if (reply.ok) {
       const payload = reply.payload as Record<string, unknown>;
       expect(payload.body).toBe("");
+      expect(payload.createBody).toBe("");
     }
   });
 
@@ -639,6 +647,8 @@ describe("CliRunner: 各操作の API 写像", () => {
             state: "OPEN",
             mergeable: "MERGEABLE",
             isDraft,
+            baseRefName: "main",
+            headRefName: "feature/x",
           }),
           stderr: "",
         };
@@ -668,11 +678,33 @@ describe("CliRunner: 各操作の API 写像", () => {
     });
     const reply = await run(exec, tempDir, {
       operation: "pr_create",
-      args: { title: "P", body: "B", base: "main", head: "feature/x" },
+      args: { title: "P", body: "B", base: "main", head: "feature/x", number: 7 },
     });
     expect(reply.ok).toBe(true);
     const parsed = JSON.parse(body) as Record<string, unknown>;
     expect(Object.hasOwn(parsed, "draft")).toBe(false);
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("pr_create は対象識別（number）を受理して PR 作成要求へ投入しない（GitHub 版は対象を head branch で特定する Design 宣言例外・pr_merge の commitHash と同一形式）", async () => {
+    const tempDir = makeTempDir();
+    let body = "";
+    const { exec } = fakeExec((call) => {
+      const i = call.args.indexOf("--input");
+      if (i >= 0) body = fs.readFileSync(call.args[i + 1] as string, "utf8");
+      return {
+        status: 0,
+        stdout: JSON.stringify({ number: 10, html_url: "https://example/p/10" }),
+        stderr: "",
+      };
+    });
+    const reply = await run(exec, tempDir, {
+      operation: "pr_create",
+      args: { title: "P", body: "B", base: "main", head: "feature/x", number: 7 },
+    });
+    expect(reply.ok).toBe(true);
+    const parsed = JSON.parse(body) as Record<string, unknown>;
+    expect(Object.hasOwn(parsed, "number")).toBe(false);
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 });
@@ -707,6 +739,10 @@ interface StubPr {
   state: "open" | "closed" | "merged";
   mergeable: string;
   isDraft: boolean;
+  /** base branch 名（GitHub API 準拠の baseRefName 相当）。 */
+  base: string;
+  /** head branch 参照。GitHub API 準拠の物理表現（短縮形式 branch 名 / fork の owner:branch）。 */
+  head: string;
 }
 
 interface StubRelease {
@@ -807,6 +843,8 @@ function githubStub(init: {
               state: pr.state.toUpperCase(),
               mergeable: pr.mergeable,
               isDraft: pr.isDraft,
+              baseRefName: pr.base,
+              headRefName: pr.head,
             }),
             stderr: "",
           };
@@ -933,6 +971,30 @@ function githubStub(init: {
         return {
           status: 0,
           stdout: JSON.stringify({ number: n, html_url: `https://example/p/${n}` }),
+          stderr: "",
+        };
+      }
+      if (path === "repos/owner/repo/pulls" && method === "POST") {
+        const head = typeof inputBody.head === "string" ? inputBody.head : "";
+        if (head.length === 0) {
+          return { status: 1, stdout: "", stderr: "stub: pr create requires head" };
+        }
+        // GitHub API 準拠: head は送信値（短縮形式）を owner:branch の完全形式へ写像して保持する。
+        const storedHead = head.includes(":") ? head : `owner:${head}`;
+        const pr: StubPr = {
+          number: prs.length + 1,
+          title: typeof inputBody.title === "string" ? inputBody.title : "",
+          body: typeof inputBody.body === "string" ? inputBody.body : "",
+          state: "open",
+          mergeable: "MERGEABLE",
+          isDraft: false,
+          base: typeof inputBody.base === "string" ? inputBody.base : "",
+          head: storedHead,
+        };
+        prs.push(pr);
+        return {
+          status: 0,
+          stdout: JSON.stringify({ number: pr.number, html_url: `https://example/p/${pr.number}` }),
           stderr: "",
         };
       }
@@ -1424,7 +1486,16 @@ describe("CliRunner + engine: issue_list の search サーバ側推送（REQ-011
 
 describe("CliRunner + engine: pr_update と pr_read（TS-010 / TS-011）", () => {
   function stubPr(): StubPr {
-    return { number: 9, title: "旧タイトル", body: "旧本文", state: "open", mergeable: "MERGEABLE", isDraft: false };
+    return {
+      number: 9,
+      title: "旧タイトル",
+      body: "旧本文",
+      state: "open",
+      mergeable: "MERGEABLE",
+      isDraft: false,
+      base: "main",
+      head: "owner:feature/x",
+    };
   }
 
   test("(a) title のみ更新: 未指定の body は保持される", async () => {
@@ -1500,6 +1571,172 @@ describe("CliRunner + engine: pr_update と pr_read（TS-010 / TS-011）", () =>
     if (second.ok && second.success.operation === "pr_mergeable") {
       expect(second.success.mergeable).toBe("MERGEABLE");
     }
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+});
+
+describe("CliRunner + engine: pr_create 読戻し照合3項目（base・head・body 一致必須・TS-002）", () => {
+  /** pr_create の POST 成功直後にスタブ PR へ不一致値を注入する（読戻し照合の不一致再現用）。 */
+  function stubWithTamper(tamper: (pr: StubPr) => void): GithubStub {
+    const stub = githubStub({ prs: [] });
+    const innerExec = stub.exec;
+    const exec: GhExec = (file, args) => {
+      const r = innerExec(file, args);
+      const isPrCreate =
+        args[0] === "api" && args[1] === "-X" && args[2] === "POST" &&
+        args[3] === "repos/owner/repo/pulls";
+      if (isPrCreate && r.status === 0) {
+        const pr = stub.prs[0];
+        if (pr !== undefined) tamper(pr);
+      }
+      return r;
+    };
+    return { ...stub, exec };
+  }
+
+  async function createPr(exec: GhExec, tempDir: string): Promise<ReturnType<typeof runAgentdevGhOperation>> {
+    return runOp(exec, tempDir, {
+      operation: "pr_create",
+      title: "P",
+      body: "PR 本文",
+      base: "main",
+      head: "feature/x",
+      number: 7,
+    });
+  }
+
+  test("3項目すべて一致（head は短縮形式送信 → owner:branch 読戻し）で成功する（偽陰性なし）", async () => {
+    const tempDir = makeTempDir();
+    const stub = stubWithTamper(() => {});
+    const result = await createPr(stub.exec, tempDir);
+    expect(result.ok).toBe(true);
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("head を owner:branch 完全形式で送信しても正規化で成功する（物理表現の偽陽性なし）", async () => {
+    const tempDir = makeTempDir();
+    const stub = stubWithTamper(() => {});
+    const result = await runOp(stub.exec, tempDir, {
+      operation: "pr_create",
+      title: "P",
+      body: "PR 本文",
+      base: "main",
+      head: "owner:feature/x",
+      number: 7,
+    });
+    expect(result.ok).toBe(true);
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("base の読戻し不一致は成功確認を拒否する（verification-incomplete）", async () => {
+    const tempDir = makeTempDir();
+    const stub = stubWithTamper((pr) => { pr.base = "develop"; });
+    const result = await createPr(stub.exec, tempDir);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.failure.kind).toBe("verification-incomplete");
+      expect(stub.prs[0]?.base).toBe("develop");
+    }
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("head の読戻し不一致（別 branch・正規化後も不一致）は成功確認を拒否する", async () => {
+    const tempDir = makeTempDir();
+    const stub = stubWithTamper((pr) => { pr.head = "owner:other-branch"; });
+    const result = await createPr(stub.exec, tempDir);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.failure.kind).toBe("verification-incomplete");
+      expect(stub.prs[0]?.head).toBe("owner:other-branch");
+    }
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("body の読戻し不一致は成功確認を拒否する", async () => {
+    const tempDir = makeTempDir();
+    const stub = stubWithTamper((pr) => { pr.body = "改変本文"; });
+    const result = await createPr(stub.exec, tempDir);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.failure.kind).toBe("verification-incomplete");
+      expect(stub.prs[0]?.body).toBe("改変本文");
+    }
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("body は末尾改行と CRLF の物理差異を正規化して比較する", async () => {
+    const tempDir = makeTempDir();
+    const stub = stubWithTamper((pr) => { pr.body = "PR 本文\r\n\r\n"; });
+    const result = await createPr(stub.exec, tempDir);
+    expect(result.ok).toBe(true);
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("runner の取得情報が3項目（baseRefName・headRefName・body）を含む", async () => {
+    const tempDir = makeTempDir();
+    let requestedFields = "";
+    const { exec } = fakeExec((call) => {
+      const inputFlag = call.args.indexOf("--input");
+      if (inputFlag >= 0) {
+        return {
+          status: 0,
+          stdout: JSON.stringify({ number: 1, html_url: "https://example/p/1" }),
+          stderr: "",
+        };
+      }
+      const jsonFlag = call.args.indexOf("--json");
+      if (jsonFlag >= 0) requestedFields = String(call.args[jsonFlag + 1] ?? "");
+      return {
+        status: 0,
+        stdout: JSON.stringify({
+          number: 1,
+          title: "P",
+          body: "PR 本文",
+          state: "OPEN",
+          mergeable: "MERGEABLE",
+          isDraft: false,
+          baseRefName: "main",
+          headRefName: "owner:feature/x",
+        }),
+        stderr: "",
+      };
+    });
+    const result = await createPr(exec, tempDir);
+    expect(result.ok).toBe(true);
+    expect(requestedFields).toContain("title");
+    expect(requestedFields).toContain("body");
+    expect(requestedFields).toContain("baseRefName");
+    expect(requestedFields).toContain("headRefName");
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test("取得情報（base・head・createBody）を欠く読戻しは検証未了として成功を返さない（fail-closed）", async () => {
+    const tempDir = makeTempDir();
+    const { exec } = fakeExec((call) => {
+      const inputFlag = call.args.indexOf("--input");
+      if (inputFlag >= 0) {
+        return {
+          status: 0,
+          stdout: JSON.stringify({ number: 1, html_url: "https://example/p/1" }),
+          stderr: "",
+        };
+      }
+      return {
+        status: 0,
+        stdout: JSON.stringify({
+          number: 1,
+          title: "P",
+          body: "PR 本文",
+          state: "OPEN",
+          mergeable: "MERGEABLE",
+          isDraft: false,
+        }),
+        stderr: "",
+      };
+    });
+    const result = await createPr(exec, tempDir);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.failure.kind).toBe("verification-incomplete");
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 });

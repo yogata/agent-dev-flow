@@ -1,7 +1,8 @@
 //
 // 依存配布のテスト（TS-009 の package 単位側面）。
-// vendored engine bundle は package の node_modules に依存せず、コミット済みの
-// JSON エンベロープから data: URL import で読み込まれる。bundle に配布境界検査の
+// 依存は版固定情報（package.json と bun.lock）のみが配布され、vendored engine bundle は
+// 導入時に生成した依存実体（git 管理対象外・配布物非同梱）であり、package の node_modules
+// に依存せず JSON エンベロープから data: URL import で読み込まれる。bundle に配布境界検査の
 // 検出パターン（ID / docs パス / GitHub URL）が出現しないことを検証する。
 
 import { describe, expect, test } from "bun:test";
@@ -17,8 +18,8 @@ import { composeRuleDescriptors, describeEngineVersions } from "../lib/rules.ts"
 
 const pluginDir = path.resolve(import.meta.dir, "..");
 
-describe("vendored engine bundle（配布前解決済み依存）", () => {
-  test("bundle ファイルはコミット済み配布物として存在する", () => {
+describe("vendored engine bundle（導入時生成の依存実体）", () => {
+  test("bundle ファイルは導入時生成済みの依存実体として存在する", () => {
     const p = bundlePathFor(pluginDir);
     expect(fs.existsSync(p)).toBe(true);
     const stat = fs.statSync(p);

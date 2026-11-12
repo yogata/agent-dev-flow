@@ -2,7 +2,7 @@
 title: 文書モデル
 status: accepted
 created: 2026-08-20
-updated: 2026-10-26
+updated: 2026-11-12
 ---
 <!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006, REQ-001-007, REQ-001-020, REQ-001-035, REQ-001-038, REQ-001-039, REQ-001-040, REQ-001-041, REQ-001-052, REQ-056-001 -->
 <!-- ADF-COVERS(implementation): REQ-001-066, REQ-001-067, REQ-001-068 -->
@@ -345,7 +345,7 @@ consumer 境界は producer、direct consumer、orchestration pre-reader、inval
 3. Design
 4. guides
 
-v4 移行期間中、accepted の v4 モデル定義 Design と未置換の v3 accepted Design の衝突は、当該 v3 Design の処遇実行段階まで v3 を正とする（v3-v4-crosswalk.md 処遇実行原則）。
+v3 → v4 移行期間中は、accepted の v4 モデル定義 Design と未置換の v3 accepted Design の衝突について、当該 v3 Design の処遇実行段階まで v3 を正とする扱いとした（v3-v4-crosswalk.md 処遇実行原則）。処遇記録 crosswalk-inventory.md の全行 executed と実際の処遇状態の確認をもって移行は完了しており、この規則は現行規範ではなく歴史的説明として保持する（REQ-103-020）。
 
 ## 設定規則
 

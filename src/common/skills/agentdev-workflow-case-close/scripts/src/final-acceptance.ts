@@ -78,6 +78,23 @@ export interface ConditionGrounds {
   };
 }
 
+/**
+ * 正規完了条件1件の個別識別。母集団導出（抽出フェーズ）が正規本文の
+ * 条件本文と本文内位置から決定的に導出した情報であり、判定入力との
+ * 対応付けは id で行う。識別子は常に正規本文から再導出可能であり、
+ * 恒久台帳は設けない。
+ */
+export interface ContractConditionIdentity {
+  /** 条件本文と本文内位置から決定的に導出した個別識別子。 */
+  id: string;
+  /** 抽出した条件本文（正規完了条件の文言）。 */
+  text: string;
+  /** 抽出元本文内の 1 始まり行番号。 */
+  line: number;
+  /** 必須完了条件か。 */
+  required: boolean;
+}
+
 /** 完了条件1件の判定レコード。 */
 export interface ConditionVerdict {
   conditionId: string;
@@ -117,6 +134,14 @@ export interface ConditionPopulation {
    * 欠落を検出する。
    */
   contractRequiredConditionIds?: readonly string[];
+  /**
+   * 正規完了条件の個別識別の一覧（条件本文・位置から導出した識別子を含む）。
+   * 提供された場合、判定配列との個別対応照合で、必須条件の判定欠落・重複に
+   * 加えて、母集団に存在しない識別子への判定（無関係な条件への判定・変更前の
+   * 完了条件への stale 判定）を検出する。contractRequiredConditionIds より
+   * 優先して照合に使う。
+   */
+  contractConditions?: readonly ContractConditionIdentity[];
   /**
    * 正規契約上の完了条件が存在しないことの根拠（contractConditionCount が 0
    * の場合に正として要求する）。根拠が正規契約から説明できない空の抽出を
@@ -180,6 +205,11 @@ export type ViolationCode =
   | "verdict-missing-for-contract-condition"
   /** 同一条件への判定が重複している。 */
   | "duplicate-condition-verdicts"
+  /**
+   * 判定が母集団（正規完了条件の個別識別子集合）に存在しない条件を指している
+   * （無関係な条件への判定・変更前の完了条件への stale 判定）。
+   */
+  | "verdict-for-unknown-condition"
   /** 判定根拠が正規契約から導出されていない（自己申告依存・未確認を含む）。 */
   | "verdict-derived-from-self-report"
   /** not applicable に正規契約上の根拠がない。 */
@@ -221,8 +251,10 @@ export interface FinalAcceptanceResult {
  * - 完了条件 0 件 → 根拠（emptyBasis）が正として存在すれば既存契約どおりの
  *   処遇に委ね、根拠がなければ empty-population-without-basis（close 拒否）
  * - 必須条件があるのに判定配列が空 → required-condition-verdict-empty
- * - 必須条件の判定欠落・重複（ID 一覧または必須条件数との突合）→
+ * - 必須条件の判定欠落・重複（個別識別子・ID 一覧または必須条件数との突合）→
  *   verdict-missing-for-contract-condition / duplicate-condition-verdicts
+ * - 個別識別子（contractConditions）が提供された場合、母集団に存在しない
+ *   識別子への判定（無関係・stale 判定）→ verdict-for-unknown-condition
  */
 function inspectPopulation(
   population: ConditionPopulation | undefined,
@@ -272,6 +304,44 @@ function inspectPopulation(
       conditionId: "population",
       detail: `必須完了条件が ${population.contractRequiredCount} 件存在するのに判定配列が空である（空の判定入力を許可扱いにしない）`,
     });
+    return violations;
+  }
+  if (population.contractConditions !== undefined) {
+    const allIds = new Set(population.contractConditions.map((c) => c.id));
+    const requiredIds = new Set(
+      population.contractConditions.filter((c) => c.required).map((c) => c.id),
+    );
+    const seen = new Map<string, number>();
+    for (const verdict of verdicts) {
+      seen.set(verdict.conditionId, (seen.get(verdict.conditionId) ?? 0) + 1);
+      if (!allIds.has(verdict.conditionId)) {
+        violations.push({
+          code: "verdict-for-unknown-condition",
+          conditionId: verdict.conditionId,
+          detail: "判定が母集団（正規完了条件の個別識別子集合）に存在しない条件を指している（無関係な条件への判定・変更前の完了条件への stale 判定を受理しない）",
+        });
+      }
+    }
+    for (const id of requiredIds) {
+      if (!seen.has(id)) {
+        violations.push({
+          code: "verdict-missing-for-contract-condition",
+          conditionId: id,
+          detail: "正規必須完了条件に対応する判定が存在しない（照合入力から必須条件を削除しても母集団から欠落を検出する）",
+        });
+      }
+    }
+    for (const verdict of verdicts) {
+      if (verdict.required && requiredIds.has(verdict.conditionId)) {
+        if ((seen.get(verdict.conditionId) ?? 0) > 1) {
+          violations.push({
+            code: "duplicate-condition-verdicts",
+            conditionId: verdict.conditionId,
+            detail: "同一条件への判定が重複している（重複した判定で必須条件の欠落を隠せない）",
+          });
+        }
+      }
+    }
     return violations;
   }
   if (population.contractRequiredConditionIds !== undefined) {

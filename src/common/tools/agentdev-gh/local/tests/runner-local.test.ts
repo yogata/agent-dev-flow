@@ -21,7 +21,8 @@ import {
   type LocalIssueFrontmatter,
 } from "../runner-local.ts";
 import { buildGhToolEnv, type GhToolEnv } from "../../engine.ts";
-import { runAgentdevGhOperation } from "../../index.ts";
+import { AGENTDEV_GH_OPERATION_SPECS, runAgentdevGhOperation } from "../../index.ts";
+import { prNumber } from "../../contracts.ts";
 import type { CloseAcceptanceIo } from "../../close-acceptance.ts";
 import {
   localIssueUpdatedAt,
@@ -932,7 +933,7 @@ describe("LocalRunner: PR 系操作の role: case 限定", () => {
     fs.rmSync(issuesDir, { recursive: true, force: true });
   });
 
-  test("pr_create は番号指定がなくても最新の role: case ローカルIssueを対象にする", async () => {
+  test("pr_create は対象識別を欠く要求を副作用発生前に invalid-input で拒否する（A-7・最新Case推測廃止）", async () => {
     const issuesDir = makeIssuesDir();
     await run(issuesDir, { operation: "issue_create", args: { title: "Case", body: "b", labels: [], role: "case" } });
     await run(issuesDir, {
@@ -942,6 +943,26 @@ describe("LocalRunner: PR 系操作の role: case 限定", () => {
     const reply = await run(issuesDir, {
       operation: "pr_create",
       args: { title: "PR", body: "本文", base: "main", head: "feature/x" },
+    });
+    expect(reply.ok).toBe(false);
+    if (!reply.ok) {
+      expect(reply.failureClass).toBe("invalid-input");
+      expect(reply.error).toContain("number");
+    }
+    // 副作用発生前の拒否: どのローカルIssueにもマージ前確認セクションが書込まれない。
+    expect(readIssueFile(issuesDir, 1)).not.toContain("## マージ前確認");
+    expect(readIssueFile(issuesDir, 2)).not.toContain("## マージ前確認");
+    fs.rmSync(issuesDir, { recursive: true, force: true });
+  });
+
+  test("pr_create は対象識別（number）で対象を解決する（TS-001 誤対象シナリオ: 最新Caseではなく指定Caseを対象にする）", async () => {
+    const issuesDir = makeIssuesDir();
+    await run(issuesDir, { operation: "issue_create", args: { title: "Case A", body: "b", labels: [], role: "case" } });
+    await run(issuesDir, { operation: "issue_create", args: { title: "Case B", body: "b", labels: [], role: "case" } });
+    // Case B（番号2）が最新の状態で、対象識別付きで Case A（番号1）への pr_create を実行する。
+    const reply = await run(issuesDir, {
+      operation: "pr_create",
+      args: { title: "PR", body: "本文", base: "main", head: "feature/x", number: 1 },
     });
     expect(reply.ok).toBe(true);
     if (reply.ok) {
@@ -957,7 +978,7 @@ describe("LocalRunner: PR 系操作の role: case 限定", () => {
     await run(issuesDir, { operation: "issue_create", args: { title: "Case", body: "b", labels: [], role: "case" } });
     await run(issuesDir, {
       operation: "pr_create",
-      args: { title: "PR", body: "本文", base: "main", head: "feature/x" },
+      args: { title: "PR", body: "本文", base: "main", head: "feature/x", number: 1 },
     });
     const merged = await run(issuesDir, {
       operation: "pr_merge",
@@ -1011,7 +1032,7 @@ describe("LocalRunner: PR 系操作の role: case 限定", () => {
     await run(issuesDir, { operation: "issue_create", args: { title: "Case", body: "b", labels: [], role: "case" } });
     await run(issuesDir, {
       operation: "pr_create",
-      args: { title: "PR", body: "本文", base: "main", head: "feature/x" },
+      args: { title: "PR", body: "本文", base: "main", head: "feature/x", number: 1 },
     });
     const first = await run(issuesDir, { operation: "pr_merge", args: { number: 1, commitHash } });
     expect(first.ok).toBe(true);
@@ -1178,6 +1199,7 @@ describe("LocalRunner: GitHub 版共通契約 parity（TS-015）", () => {
       body: "マージ前確認本文",
       base: "main",
       head: "feature/parity",
+      number: 2,
     });
     expect(prCreated.ok).toBe(true);
     const prRead = await runAgentdevGhOperation(env, {
@@ -1210,6 +1232,147 @@ describe("LocalRunner: GitHub 版共通契約 parity（TS-015）", () => {
       number: 2,
     });
     expect(caseReopen.ok).toBe(false);
+    fs.rmSync(issuesDir, { recursive: true, force: true });
+  });
+});
+
+describe("LocalRunner: pr_create 対象識別と読戻し照合3項目（A-7 / A-8・TS-001 / TS-002）", () => {
+  const prCreateSpec = AGENTDEV_GH_OPERATION_SPECS.find((s) => s.operation === "pr_create");
+  if (prCreateSpec === undefined) throw new Error("pr_create spec missing");
+
+  function caseBody(): string {
+    return [
+      "## Design確定候補",
+      "",
+      "- なし",
+      "",
+      "## Findings / Capture候補",
+      "",
+      "### intake",
+      "",
+      "- なし",
+      "",
+      "### learning",
+      "",
+      "- なし",
+    ].join("\n");
+  }
+
+  async function setupTwoCases(issuesDir: string): Promise<GhToolEnv> {
+    await run(issuesDir, { operation: "issue_create", args: { title: "Case A", body: "b", labels: [], role: "case" } });
+    await run(issuesDir, { operation: "issue_create", args: { title: "Case B", body: "b", labels: [], role: "case" } });
+    return makeEnv(issuesDir);
+  }
+
+  test("engine 経由: 対象識別欠落の pr_create は副作用発生前に invalid-input で拒否されローカルIssueを変更しない（TS-001）", async () => {
+    const issuesDir = makeIssuesDir();
+    await setupTwoCases(issuesDir);
+    const before1 = readIssueFile(issuesDir, 1);
+    const before2 = readIssueFile(issuesDir, 2);
+    const result = await runAgentdevGhOperation(makeEnv(issuesDir), {
+      operation: "pr_create",
+      title: "PR",
+      body: "本文",
+      base: "main",
+      head: "feature/x",
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.failure.kind).toBe("invalid-input");
+      expect(result.failure.detail).toContain("number");
+    }
+    expect(readIssueFile(issuesDir, 1)).toBe(before1);
+    expect(readIssueFile(issuesDir, 2)).toBe(before2);
+    fs.rmSync(issuesDir, { recursive: true, force: true });
+  });
+
+  test("engine 経由: Case B が最新でも対象識別付き pr_create は Case A を対象に VERIFY を通過する（誤対象シナリオ・TS-001）", async () => {
+    const issuesDir = makeIssuesDir();
+    await setupTwoCases(issuesDir);
+    const result = await runAgentdevGhOperation(makeEnv(issuesDir), {
+      operation: "pr_create",
+      title: "Case A の PR",
+      body: "A へのマージ前確認本文",
+      base: "main",
+      head: "feature/a",
+      number: 1,
+    });
+    expect(result.ok).toBe(true);
+    expect(readIssueFile(issuesDir, 1)).toContain("### PR title: Case A の PR");
+    expect(readIssueFile(issuesDir, 1)).toContain("### PR base: main");
+    expect(readIssueFile(issuesDir, 1)).toContain("### PR head: feature/a");
+    expect(readIssueFile(issuesDir, 2)).not.toContain("## マージ前確認");
+    fs.rmSync(issuesDir, { recursive: true, force: true });
+  });
+
+  test("pr_read は読戻し照合の取得情報（base・head・createBody）を返し、物理行を論理本文から除外する（TS-002 Local 分）", async () => {
+    const issuesDir = makeIssuesDir();
+    await run(issuesDir, { operation: "issue_create", args: { title: "Case", body: caseBody(), labels: [], role: "case" } });
+    await run(issuesDir, {
+      operation: "pr_create",
+      args: { title: "PR", body: "マージ前確認本文", base: "main", head: "owner:feature/x", number: 1 },
+    });
+    const read = await run(issuesDir, { operation: "pr_read", args: { number: 1 } });
+    expect(read.ok).toBe(true);
+    if (read.ok) {
+      const payload = read.payload as Record<string, unknown>;
+      expect(payload.base).toBe("main");
+      expect(payload.head).toBe("owner:feature/x");
+      expect(payload.createBody).toBe("マージ前確認本文");
+      const body = String(payload.body);
+      expect(body).toContain("### PR title: PR");
+      expect(body).toContain("マージ前確認本文");
+      expect(body).not.toContain("### PR base:");
+      expect(body).not.toContain("### PR head:");
+    }
+    fs.rmSync(issuesDir, { recursive: true, force: true });
+  });
+
+  test("共有 spec の verify は base・head・body の読戻し不一致を個別に拒否し、head の正規化で偽陽性・偽陰性がない（TS-002 Local 分）", async () => {
+    const issuesDir = makeIssuesDir();
+    const runner = createLocalRunner({ issuesDir });
+    await run(issuesDir, { operation: "issue_create", args: { title: "Case", body: caseBody(), labels: [], role: "case" } });
+    const created = await run(issuesDir, {
+      operation: "pr_create",
+      args: { title: "PR", body: "マージ前確認本文", base: "main", head: "feature/x", number: 1 },
+    });
+    expect(created.ok).toBe(true);
+    const request = {
+      operation: "pr_create",
+      title: "PR",
+      body: "マージ前確認本文",
+      base: "main",
+      head: "feature/x",
+      number: 1,
+    } as const;
+    const success = { operation: "pr_create", number: prNumber(1), url: "/tmp/issue-0001.md" } as const;
+    const replyPayload = { number: 1, url: "/tmp/issue-0001.md" };
+
+    // head: 読戻しが owner:branch 完全形式でも正規化で一致（偽陰性なし）。
+    const rewritten = readIssueFile(issuesDir, 1)
+      .replace("### PR head: feature/x", "### PR head: owner:feature/x");
+    fs.writeFileSync(path.join(issuesDir, "issue-0001.md"), rewritten, "utf8");
+    expect(await prCreateSpec.verify(runner, request, success, replyPayload)).toBe(true);
+
+    // base 不一致: 個別に拒否。
+    const baseTampered = rewritten.replace("### PR base: main", "### PR base: develop");
+    fs.writeFileSync(path.join(issuesDir, "issue-0001.md"), baseTampered, "utf8");
+    expect(await prCreateSpec.verify(runner, request, success, replyPayload)).toBe(false);
+
+    // head 不一致（正規化後も不一致）: 個別に拒否（偽陽性なし）。
+    const headTampered = rewritten.replace("### PR head: owner:feature/x", "### PR head: owner:other");
+    fs.writeFileSync(path.join(issuesDir, "issue-0001.md"), headTampered, "utf8");
+    expect(await prCreateSpec.verify(runner, request, success, replyPayload)).toBe(false);
+
+    // body 不一致: 個別に拒否。
+    fs.writeFileSync(path.join(issuesDir, "issue-0001.md"), rewritten, "utf8");
+    const bodyTampered = rewritten.replace("マージ前確認本文", "改変本文");
+    fs.writeFileSync(path.join(issuesDir, "issue-0001.md"), bodyTampered, "utf8");
+    expect(await prCreateSpec.verify(runner, request, success, replyPayload)).toBe(false);
+
+    // 全項目一致（正規化なしの同一値）: 成功。
+    fs.writeFileSync(path.join(issuesDir, "issue-0001.md"), rewritten, "utf8");
+    expect(await prCreateSpec.verify(runner, request, success, replyPayload)).toBe(true);
     fs.rmSync(issuesDir, { recursive: true, force: true });
   });
 });

@@ -500,6 +500,19 @@ describe("操作単位の入力定義（構造化 invalid-input・フィール�
   });
 
   test.each([
+    ["非整数", 1.5],
+    ["0", 0],
+    ["負数", -3],
+    ["非数値", "7"],
+  ])("pr_create の対象識別 number が %s の場合は invalid-field で拒否される", async (_label, number) => {
+    const r = await invalidInput({ operation: "pr_create", title: "T", body: "B", base: "main", head: "x", number });
+    expect(r.kind).toBe("invalid-input");
+    expect(r.detail).toContain("invalid-field");
+    expect(r.detail).toContain("number");
+    expect(r.runnerCalls).toBe(0);
+  });
+
+  test.each([
     ["非文字列", 123],
     ["空文字列", ""],
   ])("pr_merge の commitHash が %s の場合は invalid-field で拒否される", async (_label, commitHash) => {
