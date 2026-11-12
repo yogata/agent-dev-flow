@@ -58,3 +58,7 @@ implementation:
     - REQ-098-014
   src/common/skills/agentdev-project-extensions/scripts/lib/extension_state.ts:
     - REQ-098-011
+verification:
+  .opencode/skills/repo-agentdev-integrity/scripts/tests/writing-quality-aggregation-pins.test.ts:
+    - REQ-098-001
+    - REQ-098-006
