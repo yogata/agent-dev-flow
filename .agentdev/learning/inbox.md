@@ -992,3 +992,21 @@
 - **タグ**: #PSModulePath #Expand-Archive #環境再現 #部分修正の罠 #pwsh #分割テスト
 
 ---
+
+## 2026-11-12: 実装系 Case の traceability sidecar（traceability/agentdev-gh.yaml）未更新が case-run を完結させ、対応関係収録漏れが case-close 完全性 gate まで未検出になった
+
+- **問題事象**: case-run #4008（PR #4023・REQ-011-034/035 の A-7/A-8 実装）が traceability sidecar（traceability/agentdev-gh.yaml）への対応関係収録を実施しないまま、実装・検証・push・マージまで完結した。IR-055 の inline 宣言制約により src/common/tools/agentdev-gh 配下のソース本文へ ADF-COVERS を書けないため sidecar が唯一の正規収録経路であるにもかかわらず、PR #4023 の変更ファイル（15ファイル）に traceability/ 配下が含まれなかった。収録漏れは case-close のトレーサビリティ完全性 gate で初めて検出された
+- **発生局面**: 実装（case-run #4008・Root Case #4002 C-β2 実装系契約是正。2026-11-11〜12）
+- **検知方法**: case-close pre-merge 機械工程の traceability-check gate（agentdev-traceability check --req 対象行限定）が REQ-011-034/035 で missing-design・missing-implementation・missing-verification の exit 2（このうち implementation/verification が sidecar 未収録に起因。missing-design は別因の ADF-COVERS 終端子欠落）
+- **根本原因**: 実装委譲（DEL-4008 系列）の過程で sidecar 収録が実施されなかったことに加え、case-run の最終ゲート（3点ゲート）に traceability 完全性（check --req）の検査項目が存在せず、case-open 設計PR 受入時にも対象行の完全性 gate が走らないため、収録漏れが完結判定（case-close）まで構造的に未検出となる工程構造だった
+- **自律対応内容**: case-close は対応関係の自動追加を禁止領域として実施せず fail-closed 停止報告。監督者の条件付き承認（修正は承認済み実装内容への sidecar 追記に限定・設計判断なし）を受けて親が PR #4025 で traceability/agentdev-gh.yaml へ REQ-011-034/035 の implementation（specs-pr.ts・contracts.ts・runner-local.ts・runner-cli.ts）・verification（runner-cli.test.ts・engine-fail-closed.test.ts）を PR #4023 実 diff の機能帰属で追記し、main 上で check --req 11行フルセット pass 11 / fail 0 を確認した
+- **ユーザー確認の有無**: あり（監督者の条件付き承認: 修正PRで前進・親直接実施・修正範囲を承認済み内容への復元と sidecar 追記に限定）
+- **REQ/Decision/Design影響**: なし（sidecar 追記は承認済み実装内容の収録であり新規の設計判断を含まない。二重宣言となる public-schema.ts〔senpi-tool-connection.yaml が単一所有〕・runner-local.test.ts〔本文 inline ADF-COVERS と重複〕は checker の duplicate-inconsistencies 検出で除外確定）
+- **横展開観点**: 実装系 Case（REQ 参照を src 本文に持てない IR-055 管理下の src 変更）では、実装委譲契約への sidecar 収録義務の明示と、case-run 最終ゲートまたは case-close 前置での check --req 実行が未収録の最短発見経路になる。同一構造は agentdev-gh 以外の sidecar 収録対象コンポーネント（tools・plugins の src 変換）に同一適用される
+- **再発条件**: REQ 参照を持つ src/common/tools 配下（sidecar 収録対象コンポーネント）の変更を、sidecar 収録工程を含まない委譲・ゲート構成のまま実装する場合
+- **予防策候補**: 実装委譲契約テンプレートへ「対象 REQ 行の sidecar 収録確認」の MUST DO 追加、case-run 3点ゲートへの traceability check --req（対象行限定）前置、設計PR 受入時の完全性 gate 前置（いずれも promote 判断）
+- **想定反映先**: learning-promote（委譲契約テンプレート・ゲート強化の要否判断）・agentdev-workflow-case-run（最終ゲート構成の検討判断）
+- **関連**: Root Case #4002・PR #4023（sidecar 未収録の実装）・PR #4025（sidecar 追記是正・事実記録）・traceability/agentdev-gh.yaml・.agentdev/verify-logs/qg4-close/blocker-analysis.md・前条の ADF-COVERS 終端子欠落学び（同時検出・別因）
+- **タグ**: #traceability #sidecar #case-run #工程逸脱 #委譲契約 #完全性ゲート #未検出構造
+
+---
