@@ -956,3 +956,39 @@
 - **タグ**: #textlint-gate #exit9 #spawn #由来未確定 #fail-closed記録
 
 ---
+
+## 2026-11-12: ADF-COVERS 宣言コメントの終端子（-->）欠落が Design 宣言をパース不能にし、case-close のトレーサビリティ完全性 gate（3完全性ゲート）で初検出・完了阻止となった
+
+- **問題事象**: docs/designs/responsibilities/custom-tool-contracts.md L8 の ADF-COVERS(design) 宣言行（REQ-011-034/035・A-7/A-8）に行末のコメント終端子 --> が欠落しており、agentdev-traceability check が当該行の design 対応を検出できず missing-design/missing-implementation/missing-verification の 3 findings が出た。REQ-011-034/035 の implementation/verification 対応は sidecar（traceability/agentdev-gh.yaml）にも未収録であった。case-close 機械工程（close_mechanical_steps pre-merge）の必須 gate で fail-closed に完了阻止され、子Issue/Epic クローズが阻断された
+- **発生局面**: 検証（case-close 機械工程・Root Case #4002 C-β2 実装系契約是正。2026-11-12）
+- **検知方法**: case-close の traceability-check gate（agentdev-traceability check --req 対象行限定）の exit 2・fail 3 findings。merge worktree と main root の双方で同一再現
+- **根本原因**: 設計PR（a7b86e7c1・2026-11-11・本 Case の case-open 段階の REQ・Design 変更）で宣言行を追記した際に終端子を書き漏らした。docs 検査系（textlint・integrity 既存検査）は終端子欠落を検出せず、 REQ 行の対応関係を実際に照合する traceability check の実行が初めての検出経路になった。implementation/verification の sidecar 収録漏れは、実装系 Case で traceability gate を case-run 段階で実行しない運用（#4008 の証跡に meta-traceability-check が存在しない）の下では完結判定まで気付けない構造
+- **自律対応内容**: case-close として対応関係の自動追加・Design 修正を行わず（禁止領域）、機械受理の fail-closed 拒否をそのまま受理してクローズを停止。根本原因を blame で確定し、main/worktree 両再現・実装 6PR 非起因（diffstat 29 files に当該ファイル不含）を機械的に確認し、監督者判断へ停止報告した
+- **ユーザー確認の有無**: なし（停止報告で監督者判断を待つ形。修正方針の決定は監督者）
+- **REQ/Decision/Design影響**: あり（要修正）。custom-tool-contracts.md L8 の終端子追記と traceability/agentdev-gh.yaml への REQ-011-034/035 の implementation（src/common/tools/agentdev-gh の specs-pr.ts・runner-cli.ts・runner-local.ts・contracts.ts）・verification（#4023 証跡・runner-cli.test.ts / runner-local.test.ts / engine-fail-closed.test.ts）対応の収録。修正は本 Case の case-run 側是正ラウンドまたは監督者判断での別 PR を想定
+- **横展開観点**: 実装系 Case（REQ 参照を src 本文に持てない IR-055 系）では、Design/implementation/verification の対応関係が sidecar 収録に依存するため、case-open の設計PR 時点で対象行の完全性 gate（check --req）を走らせないと完結判定まで発見できない。設計PR 受入時の完全性 gate 前置が同種欠落の最短発見経路
+- **再発条件**: ADF-COVERS 宣言行の手追記（特に括弧や注記付きの宣言）＋ docs 検査系が宣言構文を検査しない運用
+- **予防策候補**: ADF-COVERS 宣言行の構文検査（行末終端子の存在・ADR-COVERS/ADF-COVERS 形式チェック）を check_changed_docs または integrity 系へ追加する判断（promote 判断）。設計PR 受入（case-open STEP-4）での traceability 完全性 gate 実行の検討判断
+- **想定反映先**: learning-promote（docs 検査系への宣言構文検査追加判断）・intake（custom-tool-contracts.md 修正 + sidecar 収録の具体的作業候補として intake-capture で起票判断）
+- **関連**: Root Case #4002・PR #4023（REQ-011-034/035 の実装）・commit a7b86e7c1・.agentdev/verify-logs/qg4-close/blocker-analysis.md（阻断分析の証跡）・traceability/agentdev-gh.yaml
+- **タグ**: #ADF-COVERS #終端子欠落 #traceability #完全性ゲート #完了阻止 #case-close #sidecar
+
+---
+
+## 2026-11-12: PSModulePath 補正の部分修正（PS7 系 2 エントリ欠落）でも PS5.1 spawn 系テストは全て通過し、pwsh spawn 系 2 テストだけが静かに失敗する
+
+- **問題事象**: bun test 分割①で trusted-distribution-gate 配下の cli-e2e 2 テスト（PowerShell entry 経由・pwsh を明示 spawn）のみが「Cannot find an overload for ExtractToDirectory and the argument count: 3」で失敗。同一 merge HEAD・PSModulePath を 4013 証跡の 4 エントリ値（system32 WindowsPowerShell 先頭 + PS7 系 2 エントリを含む）へ修正して分割①のみ再実行したら両テストとも pass へ回帰した
+- **発生局面**: 検証（case-close 最終受入検査の環境再現・Root Case #4002。2026-11-12）
+- **検知方法**: 分割①の (fail) 行抽出で既知 12 件に含まれない 2 件を検出。stderr のエラー出力が PS7 の Microsoft.PowerShell.Archive モジュール path を示していた
+- **根本原因**: runner 側で設定した PSModulePath が 2 エントリ値（system32 WindowsPowerShell と Program Files\WindowsPowerShell のみ）で、4013/pass4 実績値の 4 エントリ（末尾に Program Files\PowerShell\Modules と c:\program files\powershell\7\Modules を含む）と異なっていた。PS5.1 を直接 spawn するテストは補正済み 2 エントリ値でも正しい Archive モジュールを解決して通過し、pwsh を spawn するテストだけがモジュール解決差で失敗する（環境の部分的な正しさが失敗面を縮小し、切り分けを惑わす）
+- **自律対応内容**: 失敗 2 件を新規不合格として即断せず、pass4 証跡（qg4-precheck-result.json）と 4013 の env-labels.json（.agentdev/verify-logs/4013/・4013 worktree 内）から実績 PSModulePath 値を特定して正確に再現し、分割①のみ再実行して cli-e2e 2 件の解消を確認。第1回の失敗ログを run1 として証跡保持し、環境由来（pass4 の environmentIncidentResolved と同一分類）として記録した
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（テスト・検査契約・比較基準の変更なし。PSModulePath は実行環境変数）
+- **横展開観点**: 環境変数系の既知事象対応では「正の値の完全再現」を確認するまで部分修正で中間判定しない。失敗テスト集合が既知集合の部分集合でも、実行環境差の証拠を先に確定してから由来分類する。証跡の env-labels（環境ラベル）に実行に使った env 値を残す運用が切り分けの要
+- **再発条件**: PSModulePath の補正値を記憶や要約から再構築して設定する場合（実績値の証跡参照を省いた場合）
+- **予防策候補**: 検証環境の再現手順に「4013 証跡 env-labels.json の PSModulePath 値をそのまま転写する」手順を明記（promote 判断）
+- **想定反映先**: learning-promote（case-close 検証環境再現手順の env 値転写指示化判定）
+- **関連**: Root Case #4002・.agentdev/verify-logs/qg4-close/（stdout-1-integrity-run1.log ほか）・.worktrees/4013-feature/.agentdev/verify-logs/4013/env-labels.json・.agentdev/verify-logs/qg4-precheck/qg4-precheck-result.json（pass4 environmentIncidentResolved）
+- **タグ**: #PSModulePath #Expand-Archive #環境再現 #部分修正の罠 #pwsh #分割テスト
+
+---
