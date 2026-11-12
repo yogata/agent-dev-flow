@@ -2,7 +2,7 @@
 title: Custom Tool 操作契約
 status: accepted
 created: 2026-08-24
-updated: "2026-11-11"
+updated: "2026-11-12"
 ---
 <!-- ADF-COVERS(design): REQ-090-001, REQ-090-002, REQ-090-003, REQ-090-004, REQ-090-009, REQ-090-010, REQ-090-011, REQ-090-012, REQ-090-013, REQ-090-014, REQ-090-015, REQ-090-016, REQ-090-017, REQ-090-018, REQ-090-019, REQ-090-020, REQ-090-021, REQ-090-022, REQ-090-023, REQ-090-024, REQ-090-025, REQ-090-026, REQ-090-027, REQ-090-028, REQ-090-029, REQ-090-030, REQ-011-022, REQ-011-025, REQ-011-026, REQ-011-033 -->
 <!-- ADF-COVERS(design): REQ-011-034, REQ-011-035（pr_create の対象識別契約と読戻し照合3項目。custom-tool-contracts「対象操作の境界（初期セット）」節対応） -->
@@ -78,6 +78,10 @@ GitHub版 / Local版等価性:
 - Release 操作（release_create、release_list、release_read、release_publish）は GitHub 接続専用とし、Local 版は構造化失敗（operation-failed。ローカル環境では GitHub Release 相当の状態を持たない旨を詳細に含む）を返す。失敗分類は既存の値域を維持する。この例外は本 Design が明示する
 
 操作カタログの完全列挙（20操作）は契約テストで固定し、対象外機能の追加を検出する。
+
+- agentdev-gh の操作一覧と定型入力検査の複数箇所管理（contracts.ts の名称配列と副作用分類、public-schema.ts の説明文列挙、specs-pr.ts・specs-release.ts・specs-issue.ts の定型入力検査）を、単一の正本へ一元化する（B3-5c）。操作の模擬追加で、正本1箇所の更新だけで全利用側へ反映されることを確認する。実装内部の変更箇所の数は合格基準としない
+- 危険な操作が追加されないこと・操作種別・互換性の独立外部契約検査は現行のまま維持する
+- ローカル版 rules yaml（frontmatter・headings・labels・status）は操作用スキーマの記述にとどまらず、実行器が実行時に消費する機械可読定義として運用する（機械可読定義の記述と実行時の強制箇所の分離の解消、G-007）
 
 「third-party Skill 取得」操作契約:
 

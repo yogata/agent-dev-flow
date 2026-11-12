@@ -2,7 +2,7 @@
 title: validator 分割基準
 status: accepted
 created: 2026-07-07
-updated: 2026-08-20
+updated: 2026-11-12
 ---
 
 # validator 分割基準
@@ -19,6 +19,9 @@ check_changed_docs.ts の validator を分割する基準を実装詳細Design �
 各 validator は単一の検査関心を担う。
 検査関心が異なる場合は別 validator へ分割する。
 検査関心と IR ルールの対応は 1:1 を要求せず、1 validator が複数の IR ルールを包括カバーしてよい（REQ-010-009）。
+
+- Workflow Skill 構造検査（「単独起動」禁止等）の正本を1箇所に寄せ、check_workflow_preventive.ts と lint_skills.ts が独立保持する同一検査の重複を解消する（B3-5b）。大規模検査器（check_integrity）と専用検査器の責務境界を確定する
+- 統合対象として削除する検査と、判定段階が異なるため意図的に残す検査を名簿として区別し、残す根拠を記録する
 
 ## ファイルサイズ上限
 

@@ -2,7 +2,7 @@
 title: "配布依存境界"
 status: accepted
 created: "2026-08-11"
-updated: 2026-10-22
+updated: 2026-11-12
 ---
 <!-- ADF-COVERS(implementation): REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-045 -->
@@ -111,6 +111,9 @@ check_distribution_boundary と check_integrity は、重複する検出対象�
 共有 detector は副作用なし（side-effect-free）とし、複数経路から同一入力に対し同一判定を返す（DEC-014）。
 adapter は detector の判定を書き込み前に反映する fail-fast な経路である。
 両者の契約は本 Design が正規所有し、実装詳細は Epic が所有する。
+
+- ガード間（textlint 書込み前 guard と配布境界ガード等）で重複する編集意味論の解析・再構成部（write/edit/apply_patch の引数解析と完成予定全文の再構成）は、共通部として1箇所で管理する（B3-5a）。各ガードは固有の拒否条件のみを所有する
+- 共通部の試験は1箇所で管理し、各ガードの拒否条件の試験は現行のまま各ガードが保持する。解析不能・検査不能を許可へ変えない保証は双方のガードで維持する
 
 ## 検査エラーの意味
 
