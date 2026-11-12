@@ -1009,4 +1009,52 @@
 - **関連**: Root Case #4002・PR #4023（sidecar 未収録の実装）・PR #4025（sidecar 追記是正・事実記録）・traceability/agentdev-gh.yaml・.agentdev/verify-logs/qg4-close/blocker-analysis.md・前条の ADF-COVERS 終端子欠落学び（同時検出・別因）
 - **タグ**: #traceability #sidecar #case-run #工程逸脱 #委譲契約 #完全性ゲート #未検出構造
 
+## 2026-11-12: close_mechanical_steps.ts は bun 固有契約（import.meta.path）で node 実行不可・bash ハーネスが起動セッションのバックグラウンド子プロセスを終了時に kill するため機械工程の自動駆動は detached spawn が必須（Case #4002 case-close 再開）
+
+- **問題事象**: case-close 機械工程を自動駆動した際に3種の失敗が連鎖した。(1) bash ツールで `&` バックグラウンド起動した bun test 子プロセスがツール呼出し終了時にハーネスに kill された（受入検査の split 実行が途中終了・exit ファイル未書出し）。(2) ワークアラウンドで `process.execPath`（node.exe）から detached spawn した close_mechanical_steps.ts は、bun 固有の `import.meta.path`（isDirectExecution 判定）が node に存在せず path.resolve(undefined) の TypeError で即死した。(3) 直列チェーン駆動用 launcher で子プロセスに `p.unref()` を呼ぶと親のイベントループから子の参照が外れ、親が即終了して on("exit") コールバックが発火せず、#4009 以降の直列実行が開始されなかった（計測 baseline: main 0950de3de・case-close 再開実行 qg4-close-r2・2026-11-12・機械工程実行経路での観測）
+- **発生局面**: 実装（case-close 機械工程の自動駆動・検証 worktree 実行）
+- **検知方法**: stderr ログの TypeError 進行停止・progress.txt の DONE 行欠落・受理記録の provisional accepted:false 残存による手動確認
+- **根本原因**: (1) bash ツールは呼出し終了時に同一セッションの spawn 子プロセスを kill するハーネス仕様。(2) close_mechanical_steps.ts は `import.meta.path` による直接実行判定を前提とする bun 実行体であり node には同等 API がない。(3) detached spawn した子の完了待ちを unref で解除すると、待ちタスクを持たない親プロセスが exit しコールバックが発火しない
+- **自律対応内容**: (1) 長時間処理は child_process.spawn({detached: true, stdio: ファイルfd}) + unref でプロセスグループ分離して起動し、進捗はファイル（progress.txt・exit-{n}.txt）でポーリングする経路へ変更。(2) 機械工程の起動コマンドを bun に修正（spawn("bun", [script.ts, ...])）。(3) チェーン駆動の launcher 自体を detached で起動し、launcher 内では unref せず on("exit") で次実行を駆動する2段構成へ修正
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（機械工程 script の契約変更はなし・実行環境側の駆動経路の知見のみ）
+- **横展開観点**: 機械工程や受入検査の長時間自動駆動（bun script・複数プロセス直列チェーン）すべてに適用可能。bun 実行体は node から spawn しない（bun で起動）。進捗確認は stdout よりファイルプロトコル（完了マーカーファイル）が堅牢
+- **再発条件**: bash ツール内で `&` バックグラウンド起動した長時間コマンド・node から bun 固有 .ts 実行体を起動・unref を使ったチェーン駆動のいずれかを再び行うと再発
+- **予防策候補**: 機械工程の駆動手順（workflow skill references かコマンド側）に「bun 起動・detached spawn・unref 禁止（チェーン駆動時）・ファイルポーリング」の前置知見を追記する判断は promote 判断で評価
+- **想定反映先**: agentdev-workflow-case-close（機械工程の自動駆動手順）・learning-promote（機械工程駆動知見のゲート/参照反映の要否判断）
+- **関連**: src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts（isDirectExecution 判定 L2033-2034）・.agentdev/verify-logs/qg4-close/mechanical/stderr-4008-premerge-r2.log（TypeError 証跡）・.agentdev/integrity/reports/close-r2/launch-mechanical.js（最終動作版）
+- **タグ**: #機械工程 #bun #node差異 #detached-spawn #自動駆動 #bashハーネス
+
+## 2026-11-12: 3分割受入検査の同時並列実行がタイミング系テストを広域に flake させる・既知 flake 登録外の11件が負荷下のみで fail し単独（規律適合）再実行で全件解消（Case #4002 case-close 再開）
+
+- **問題事象**: 受入検査（実行条件 (1)・3分割正規形）を split1/2/3 を同時並列で実行したところ、既知不合格12件に加え11件のタイミング系 fail を観測した（split1: bootstrap-report 3件・cli-e2e PowerShell entry 2件・launcher protected-path 1件、split2: TS-009 並列短縮 timing 1件・TS-006 pipeline integration 1件、split3: misexecution stop REQ-050-006 3件）。全部で 23 fail と見え、既知12件との機械照合では11件が non-known に分類された。11件すべてを単独（負荷なし・直列）で再実行した結果、全件 pass して解消した（計測 baseline: main 0950de3de・bun 1.3.6・qg4-close-r2 worktree・2026-11-12・bun test 3011/1949/705 件の同時並列実行で観測）
+- **発生局面**: CI（case-close 受入検査・3分割正規形の実行）
+- **検知方法**: split ごとの fail 名一覧抽出と既知不合格 SSoT（.agentdev/tmp/c-alpha2-baseline/known-failures-fixed.md）との machine-match 照合（known-failures-comparison-r2.json・12/12 match・flake 11件）
+- **根本原因**: 3つの bun test プロセス（約5,665 tests）の同時並列実行が CPU 負荷を生み、タイミング計測系（並列短縮の速度比較・5秒系の待ち上限）と spawn を伴う実経路テスト（PowerShell entry・pipeline integration・install.ps1 起動）が劣化して fail した。既知 flake の登録は「misexecution stop 5000ms」1種のみで、同時並列負荷による他のタイミング系 flake は記録外だった
+- **自律対応内容**: プロンプト契約（既知 flake は単独再実行で origin 判定）に従い、11件をテスト名フィルタ（bun test -t）で負荷なし直列環境に単独再実行し、全件 pass を実測して環境由来（並列負荷 flake）と分類した。受入検査の判定は「規律適合再実行後の実効 fail = 既知12件のみ・新規0件」として確定し、機械受理記録に execution-form 分類の実体を保持する準備をした（最終的には機械工程内の直列実行で既知12件のみの観測となり observedFailCounts は既知のみで受理）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（合格条件「新しい不合格0件」の判定において規律適合再実行による解消確認は既存の execution-form 分類・プロンプトの既知 flake 契約の適用）
+- **横展開観点**: 3分割正規形や複数 test suite の並列実行では、タイミング系・spawn 系テストの負荷 flake を前提に、観測 fail を既知 SSoT と照合し non-known は単独再実行で origin 判定してから分類する。判定の順序は「並列観測 → 照合 → 単独再実行 → 分類確定」を守る
+- **再発条件**: 3分割以上の bun test 同時並列実行・CPU 負荷の高い環境でのタイミング系テスト実行
+- **予防策候補**: 受入検査の標準手順を split 直列実行に統一するか、並列実行時は機械照合後に必ず単独再実行で分類確定する手順を明記する判断は promote 判断で評価
+- **想定反映先**: agentdev-workflow-case-close（受入検査の実行手順・機械受理の分類手順）・learning-promote（並列負荷 flake の手順反映の要否判断）
+- **関連**: .agentdev/verify-logs/qg4-close/known-failures-comparison-r2.json・stderr-{1,2,3}-*-r2.log・stdout/stderr-rerun-*.log（単独再実行証跡）・.agentdev/tmp/c-alpha2-baseline/known-failures-fixed.md（既知 SSoT）
+- **タグ**: #受入検査 #3分割正規形 #並列実行 #flake #timing #origin分類 #規律適合再実行
+
+## 2026-11-12: 完了条件チェックボックス確定（テキスト変更）で conditionId が再導出され、更新前本文から導出した判定入力は stale 判定として fail-closed 拒否される・機械工程実行の直前に同一本文から再導出する運用が必須（Case #4002 case-close 再開）
+
+- **問題事象**: case-close 機械工程の受入評価で、checkbox 確定（[ ] → [x] + 判定記録追記）により本文テキストが変わった子 Issue（#4010〜#4013）に対し、更新前本文から事前導出した conditionId を判定入力（acceptanceVerdicts）に使った結果、verdict-for-unknown-condition（stale 判定）と verdict-missing-for-contract-condition で final-acceptance-evaluation が fail し、受理記録が accepted:false になった（#4010・#4011 の2件が1実行ずつ無駄になった。計測 baseline: main 0950de3de・2026-11-12・機械工程 pre-merge 実行での観測）
+- **発生局面**: 実装（case-close 機械工程の判定入力構築）
+- **検知方法**: 機械工程報告 JSON の final-acceptance-evaluation step fail（violations: verdict-for-unknown-condition・cond-036-a866a30d8b67f6c9 が母集団に不在）
+- **根本原因**: deriveCompletionConditionId は条件本文と本文内行位置の sha256 から決定的に導出するため、checkbox 確定によるテキスト変更（判定記録追記・行末変更）で conditionId が変わる。判定入力の構築を本文更新（issue_update）より前に行ったため stale になった。母集団は機械工程が「機械工程に渡した本文」から抽出するため、判定入力側は同一本文から再導出する必要がある
+- **自律対応内容**: GitHub の現行本文（gh issue view で再取得・本文 hash 照合済み）から deriveCompletionConditionId を再導出し、判定入力を再構築して input JSON を再生成。機械工程を再実行して受理記録を accepted に再生成した（fail-closed 拒否は A-12 個別対応化の正しい動作であり guard を迂回せず回復した）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（A-12 個別対応化の設計どおりの動作・恒久台帳なしの識別子再導出構造の実証）
+- **横展開観点**: 条件本文から hash 導出される識別子を判定入力に使うすべての工程で、「本文の最終確定後に識別子を再導出」する順序を守る。本文更新 → 判定入力導出 → 機械工程実行 の順序固定が安全
+- **再発条件**: checkbox 確定や結果セクション追加など本文変更を伴う更新後に、変更前本文から導出した判定入力を機械工程へ渡すと再発
+- **予防策候補**: 機械工程の判定入力構築手順に「issueBodyPath に渡す本文と同一の本文から conditionId を導出する」前置条件を明記する判断は promote 判断で評価
+- **想定反映先**: agentdev-workflow-case-close（機械工程の判定入力構築手順）・learning-promote（順序固定の手順反映の要否判断）
+- **関連**: deriveCompletionConditionId（close_mechanical_steps.ts L605-608）・final-acceptance.ts（verdict-for-unknown-condition 検査）・.agentdev/verify-logs/qg4-close/mechanical/report-4010-premerge-r2.json（stale 判定の fail 証跡）
+- **タグ**: #conditionId #stale判定 #受入評価 #機械工程 #fail-closed #A-12
+
 ---
