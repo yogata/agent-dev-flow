@@ -5,6 +5,38 @@
 
 ---
 
+## 2026-11-12: bun run --cwd による tsc 実行が worktree で node_modules 解決に失敗する（package 単位 bun install の前置が安全）
+
+- **問題事象**: `bun run --cwd <package> typecheck`（tsc 実行）が worktree 内で node_modules 解決に失敗する。package 直下の node_modules が未整備の場合、tsc 自体が起動しない
+- **発生局面**: Case #4005 / PR #4017（B1-2）の typecheck ×4 利用側 package 実行（PR 本文 learning 候補から回収）
+- **検知方法**: typecheck 実行の終了コード異常と node_modules 解決エラー
+- **根本原因**: worktree は node_modules を伝播しない構造的制約に加え、`--cwd` 経由の bun run は当該 package 配下の node_modules/.bin 解決を要求する
+- **自律対応内容**: skill scripts 配下で bun install（package 単位整備）を事前実行してから typecheck を実行する手順に統一
+- **ユーザー確認の有無**: なし（実行手順の自律調整）
+- **REQ/Decision/Design影響**: なし（運用手順の知見）
+- **横展開観点**: typecheck・bun run を含む検証手順の委譲 prompt・機械工程で同型の前置が必要になり得る
+- **再発条件**: 新規 worktree または node_modules 未整備の package で bun run --cwd を実行する条件
+- **予防策候補**: 検証手順テンプレートへの package 単位 bun install 前置の明記
+- **想定反映先**: learning-promote（運用手順の知見として整理）
+- **関連**: Case #4005 / PR #4017・REQ-113-002・worktree の node_modules 非伝播構造
+- **タグ**: #bun-run #node_modules #worktree #typecheck #依存復元
+
+## 2026-11-12: detached worktree を相対パスで作ると現在 worktree 配下にネストする（worktree add は main root から実行・絶対パス指定）
+
+- **問題事象**: `git worktree add` に相対パスを渡すと、実行時の cwd（検証中の worktree 配下）を起点に解決され、意図せず既存 worktree 配下に新 worktree がネストする
+- **発生局面**: Case #4005 / PR #4017（B1-2）の baseline 対照実行用 detached worktree 作成（PR 本文 learning 候補から回収）
+- **検知方法**: 作成後の worktree パス確認（ネスト先に作成されていることを観測）
+- **根本原因**: git worktree add のパス解決が cwd 基準の相対解決であることと、検証実行中の cwd が検証対象 worktree であることの組み合わせ
+- **自律対応内容**: worktree add は main root から実行するか、絶対パスで指定する手順に統一
+- **ユーザー確認の有無**: なし（実行手順の自律調整）
+- **REQ/Decision/Design影響**: なし（運用手順の知見）
+- **横展開観点**: baseline 対照実行（detached worktree 標準手順）を実行する全委譲・機械工程で同型の注意が必要
+- **再発条件**: worktree 配下の cwd から相対パスで git worktree add を実行する条件
+- **予防策候補**: agentdev-git-worktree の detached 対照手順への絶対パス指定の明記
+- **想定反映先**: learning-promote（運用手順の知見として整理）・agentdev-git-worktree の参照更新候補
+- **関連**: Case #4005 / PR #4017・baseline 対照実行（detached worktree 標準手順）
+- **タグ**: #git-worktree #detached #baseline-対照 #パス解決
+
 ## 2026-11-11: accept_definition_checks.ts の integrity gate が既出債務 warning で機械 fail となり後続ゲートが後続抑止される構造
 
 - **問題事象**: case-ready 受入検査（accept_definition_checks.ts phase: acceptance-checks）の integrity gate（check_integrity --profile source）が、本 Case 変更と無関係の既出債務 warning（gh-direct-invocation・case-close scripts README の記述行・IR baseline 管理下）により exit 1 となり、script の後続抑止設計（非ゼロ終了の integrity gate は証拠保存後に後続ゲートを実行しない）により overlap 突合・AUTOGEN 再生成差分検出・traceability check が同一呼出しで実行できなかった
