@@ -29,7 +29,7 @@
 
 ### 入口の untracked domain state 検出と先行明示パス commit
 
-case-open 入口（STEP-1）で、当該 Case が消費する untracked domain state を検出し、Root Case 作成・削除操作に先立って明示パス commit で永続化する。req-define は git コマンド実行禁止制約（req-define 実行契約）により draft・Jev 観測を保存時点で commit できないため、git 実行権限を持つ後続工程の入口が永続化の対を担う。draft/RU 削除は case-ready が git rm と明示パス commit を同一ステップで完結する Form Zero 契約で実行する。入口の先行 commit によりこの削除契約との対を担保する。
+case-open 入口（STEP-1）で、当該 Case が消費する untracked domain state を検出し、Root Case 作成・削除操作に先立って明示パス commit で永続化する。req-define 実行契約では git コマンドを実行しないが、保存した draft ファイルを対象とする明示パス指定の commit は制約の対象外（許可）であり、req-define が draft の保存時永続化を担う。draft 以外の未追跡 domain state（引渡し対象 RU・関連 Jev 観測等）の commit は git 実行権限を持つ後続工程の入口が担い、永続化の対を完結させる。draft/RU 削除は case-ready が git rm と明示パス commit を同一ステップで完結する Form Zero 契約で実行する。入口の先行 commit によりこの削除契約との対を担保する。本節の手順は STEP-2 / STEP-3 の前提整備の commit（Root Case 作成前）から参照される正本である。
 
 1. **検出**: `git status --short` で `.agentdev/drafts/`（要件doc）、`.agentdev/backlog/req-units/`（RU）、`.agentdev/jev-observations/`（Jev 観測）の untracked 分を検出する。検出は当該 Case が消費する分（要件doc・引渡し対象 RU・関連 Jev 観測）に限定し、無関係な untracked ファイルを commit 対象に含めない
 2. **gitignore 状態の事前確認**: 検出したパスが git 管理対象であることを事前確認する（`.agentdev/integrity/reports/` 等の git 管理対象外パスは commit 対象としない）

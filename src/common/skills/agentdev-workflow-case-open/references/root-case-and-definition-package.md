@@ -30,10 +30,10 @@ Root Case 本文候補の生成を含む最初の docs 編集・GitHub 書込み
 
 #### 前提整備の commit（Root Case 作成前）
 
-Root Case の作成に先立って、入力 RU・要件doc draft・および当該要件定義に伴い生成された git 管理契約の状態記録（jev 観測等、正規契約で git 管理対象と宣言される記録）に未追跡分がある場合は、これらを commit して git 管理状態へ置く（対応関係は repository top-level `traceability/` 配下 sidecar を参照）。
+Root Case の作成に先立って、入力 RU・要件doc draft・および当該要件定義に伴い生成された git 管理契約の状態記録（jev 観測等、正規契約で git 管理対象と宣言される記録）に未追跡分がないことを確認し、残存する場合は STEP-1 の入口 commit 手順で commit して git 管理状態へ置く（対応関係は repository top-level `traceability/` 配下 sidecar を参照）。検出・先行明示パス commit の手順の正は STEP-1（handoff）「入口の untracked domain state 検出と先行明示パス commit」節であり、本節は手順を複製しない。
 
-1. 未追跡分の確認: 対象とする入力 RU・要件doc draft・状態記録パスについて未追跡の有無を確認する。確認範囲は当該要件定義に伴い生成された前提整備対象全体であり（全称条件は正規契約から導出した評価範囲で確認する）、実装担当が選択した一部のみの確認では代替しない
-2. 明示パス指定の commit: 未追跡分がある場合は、対象パスを明示指定して commit する。前提整備の commit は明示パス指定とし、スイープ操作（`.agentdev/` 全体の一括 add 等の無差別取り込み）を行わない。commit 手順は `agentdev-git-worktree` の並列実行安全ステージングプロシージャ（明示パスでステージ）に従う
+1. 未追跡分の確認: STEP-1 の入口 commit 済み分を含め、この時点で残存する未追跡分の有無を確認する。確認範囲は当該要件定義に伴い生成された前提整備対象全体であり（全称条件は正規契約から導出した評価範囲で確認する）、実装担当が選択した一部のみの確認では代替しない
+2. 残存未追跡分の commit: STEP-1（handoff）「入口の untracked domain state 検出と先行明示パス commit」節の手順（明示パス指定、スイープ操作の禁止、Root Case 作成・削除操作への先行）に従い commit する
 3. 未追跡分がない場合は確認結果を記録するのみとし、空 commit を作成しない
 
 #### preflight 設定検証（Root Case 確立の preflight）

@@ -159,8 +159,8 @@ describe("case-open 前提整備の commit（REQ-030-031）", () => {
   test("reference の前提整備手順（未追跡分確認・明示パス commit・空 commit 不作成）を保持する", () => {
     expect(reference).toContain("前提整備の commit（Root Case 作成前）");
     expect(reference).toContain("git 管理状態へ置く");
-    expect(reference).toContain("対象パスを明示指定して commit する");
-    expect(reference).toContain("スイープ操作（`.agentdev/` 全体の一括 add 等の無差別取り込み）を行わない");
+    expect(reference).toContain("STEP-1（handoff）「入口の untracked domain state 検出と先行明示パス commit」節の手順（明示パス指定、スイープ操作の禁止、Root Case 作成・削除操作への先行）に従い commit する");
+    expect(reference).toContain("本節は手順を複製しない");
     expect(reference).toContain("空 commit を作成しない");
   });
 });

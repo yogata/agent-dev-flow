@@ -2,3 +2,10 @@ component: agentdev-workflow-lifecycle
 implementation:
   src/common/skills/agentdev-workflow-lifecycle/references/structured-stage-handoff.md:
     - REQ-017-019
+  src/common/skills/agentdev-workflow-lifecycle/SKILL.md:
+    - REQ-110-034
+    - REQ-110-035
+    - REQ-110-036
+    - REQ-110-037
+    - REQ-110-038
+    - REQ-110-039

@@ -27,22 +27,7 @@ docs全体（REQ/Decision/Design/guides）の意味整合性を診断し、検�
 
 ## inspect-* コマンド選択 routing
 
-変更ファイル種別に基づき、実行する inspect-* コマンドを選ぶ。
-本コマンド（inspect-docs）と inspect-skills は配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）の検出対象が一部重複する（inspect-docs の配布物整合性検査、inspect-skills の配布物構文健全性・責務整合診断）。
-変更範囲に応じて振り分けることで重複検出を防ぐ。
-
-| 変更ファイル種別 | 実行コマンド |
-|------|------|
-| `docs/requirements/<*>.md`、`docs/decisions/<*>.md` | inspect-docs |
-| `docs/designs/<**/*>.md`（`docs/designs/commands/`、`docs/designs/skills/` 配下を除く） | inspect-docs |
-| `docs/guides/*.md`、`README.md` | inspect-docs |
-| `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md` | inspect-skills |
-| `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md`（実行時プロジェクション） | inspect-skills |
-| `docs/designs/<commands/**/*>.md`、`docs/designs/<skills/**/*>.md` | inspect-skills |
-| 上記両方（docs と command/skill にまたがる変更） | inspect-docs を先に実行し、続けて inspect-skills を実行 |
-
-振り分けは実行コマンド選択の目安であり、各コマンドの検出対象（既定のスキャン範囲）は変更しない。
-配布物のみの変更時は inspect-skills を優先する。
+変更ファイル種別に基づく inspect-* コマンドの選択表と振り分け規律（本コマンドと inspect-skills の配布物検出対象の重複の扱いを含む）は、`agentdev-workflow-lifecycle` スキル「共通報告・Decision・自律確定規約」節「inspect-* コマンド選択 routing」を正本として参照する。
 
 ## workflow
 
