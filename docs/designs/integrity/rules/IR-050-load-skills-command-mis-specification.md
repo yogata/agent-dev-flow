@@ -3,6 +3,9 @@ title: "IR-050: load_skills command 誤指定検出"
 status: accepted
 created: 2026-08-20
 updated: 2026-08-20
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_executor_notation.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/walk_enumeration_contract.test.ts
 ---
 
 # IR-050: load_skills command 誤指定検出

@@ -3,6 +3,9 @@ title: "IR-034: Skill 内部 section / protocol / Step 参照検出"
 status: accepted
 created: 2026-08-20
 updated: 2026-08-20
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts
 ---
 
 # IR-034: Skill 内部 section / protocol / Step 参照検出

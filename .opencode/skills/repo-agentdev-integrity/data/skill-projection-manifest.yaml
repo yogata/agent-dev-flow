@@ -9,8 +9,9 @@
 # 投影（.opencode/skills junction）の契約は docs/designs/local/runtime-package-boundary.md
 # が正規所有する。
 #
-# 同期条件: src/common/skills/ へのスキル追加・削除・リネームは本マニフェストを
-# 同一 PR で更新すること。manifest ↔ src の不一致は check_integrity.ts
+# 同期条件: src/common/skills/ へのスキル追加・削除・リネームは skills: セクションへ
+# 自動追随する（generate_indexes.ts が配置列挙から再生成する。B3-3。手動更新を要しない）。
+# manifest ↔ src の不一致は check_integrity.ts
 # （IR-068 skill-projection-manifest）が strict fail として検出する。
 # 投影比較は junction 環境（.opencode/skills に非 repo-* ディレクトリが存在する場合）
 # のみ実施し、worktree（junction 未伝播、REQ-018）では info で skip する。
@@ -25,11 +26,11 @@
 # （docs/designs/local/third-party-skill-management.md）。
 
 schema_version: 1
-generated_at: 2026-10-03
+generated_at: 2026-11-12
 
 skills:
-  - agentdev-adversarial-review
   - agentdev-adopted-conventions
+  - agentdev-adversarial-review
   - agentdev-architecture-advisory
   - agentdev-artifact-semantics
   - agentdev-artifact-validation

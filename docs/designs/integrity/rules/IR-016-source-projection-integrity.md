@@ -3,6 +3,9 @@ title: "IR-016: Source/projection 整合性"
 status: accepted
 created: 2026-08-20
 updated: 2026-10-22
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts
 ---
 
 # IR-016: Source/projection 整合性

@@ -3,6 +3,9 @@ title: "IR-071: integrity-rule-related-req-existence"
 status: accepted
 created: 2026-09-24
 updated: 2026-09-24
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts
 ---
 
 # IR-071: integrity-rule-related-req-existence

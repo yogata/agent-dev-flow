@@ -3,6 +3,9 @@ title: "IR-073: untracked-residue"
 status: accepted
 created: 2026-10-22
 updated: 2026-10-22
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts
 ---
 
 # IR-073: untracked-residue

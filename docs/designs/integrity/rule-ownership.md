@@ -2,7 +2,7 @@
 title: ルール所有権マトリックス
 status: accepted
 created: 2026-08-20
-updated: "2026-11-12"
+updated: "2026-11-13"
 ---
 
 <!-- ADF-COVERS(design): REQ-047-013 -->
@@ -16,10 +16,10 @@ updated: "2026-11-12"
 
 本ファイル（ルールドメイン → canonical REQ/Design）と `../responsibilities/req-impact-map.md`（REQ → 影響するルール/アーティファクト）は逆方向の対応マップである。両者の整合性維持運用:
 
-- 新規 IR 追加時: 両ファイルの対応行列を同期更新する
-- IR の物理削除時（AG-008、retired REQ-028-008）: 両ファイルで対応行を削除し、交叉参照は `../responsibilities/req-impact-map.md` の Retired cross-references 節へ再配置する
-- canonical owner 変更時: 両ファイルで参照先を更新する
-- 新規 REQ 追加、廃止時: 本ファイルの対応行を追加、削除し、`req-impact-map.md` で影響先ルールドメインの整合を確認する
+- IR 別関連マッピング（本ファイルの `rule-ownership-ir-crossref` AUTOGEN ブロック）と req-impact-map の REQ → 影響する Rule IDs（`req-impact-map-req-ir-crossref` AUTOGEN ブロック）は、いずれも IR 文書の frontmatter / Field-Value 表の related_req から `generate_indexes.ts` が自動生成する。新規 IR 追加時は IR 文書の related_req を更新すれば両ブロックが自動追随し、対応行列の手動同期義務はない（「対応表の機械検証への移行（B3-1）」節、REQ-047-013）
+- IR の物理削除時（AG-008、retired REQ-028-008）: IR 文書の物理削除に伴い両 AUTOGEN ブロックから自動除外される。交叉参照は `../responsibilities/req-impact-map.md` の Retired cross-references 節へ再配置する（人手管理を維持する節）
+- canonical owner 変更時: 対応する IR 文書の related_req / related_design を更新し、次回の `generate_indexes.ts` 実行で両ブロックへ反映する
+- 新規 REQ 追加、廃止時: REQ README 系の AUTOGEN（docs/requirements/README.md 等）と req-impact-map の導出ビューが実ファイル状態から自動更新される。影響先ルールドメインと rule-ownership.md の整合は IR-061 検査が機械検証する
 
 req-impact-map.md の配置の原本は `../responsibilities/req-impact-map.md` 冒頭の配置記述であり、本ファイルはそこへの参照導線を保持する。`responsibilities/` 残置を現行配置として維持する。
 本節では関係整理のみを扱い、配置判断の原本を当該ファイルへ集約する。
@@ -189,6 +189,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-071 | integrity-rule-related-req-existence | REQ-051-009 | ../integrity-rule-catalog.md, ../checker-execution-contracts.md |
 | IR-072 | req-updated-freshness | REQ-010-068 | ../integrity-rule-catalog.md, ../../foundations/patterns.md, ../checker-execution-contracts.md |
 | IR-073 | untracked-residue | REQ-010-084 | ../checker-execution-contracts.md, ../integrity-rule-catalog.md |
+| IR-074 | ir-rule-classification-traceability（IR 分類と実装・試験パスの機械対応） | REQ-047-011, REQ-047-012, REQ-047-013 | integrity-rule-catalog.md, checker-execution-contracts.md |
 <!-- AUTOGEN:END -->
 
 > **IR-019, IR-022, IR-026, IR-036 について（2026-08-11 移管）**: 4件の意味判断系 IR は docs-check 機械検出層から除外し、inspect/diagnostics 層（`/agentdev/inspect-docs`、`/agentdev/inspect-skills`）へ移管した（文意品質の意味診断は docs 横断診断・inspect 系診断が、文章表層品質は textlint 共通基盤が担う。retired REQ-028-007、DEC-006、Phase 3 §5.2）。

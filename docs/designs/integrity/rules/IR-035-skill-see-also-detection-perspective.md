@@ -3,6 +3,9 @@ title: "IR-035: Skill See Also 検出観点"
 status: accepted
 created: 2026-08-20
 updated: 2026-08-20
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts
 ---
 
 # IR-035: Skill See Also 検出観点

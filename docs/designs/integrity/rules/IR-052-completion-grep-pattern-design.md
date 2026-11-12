@@ -3,6 +3,9 @@ title: "IR-052: 完了条件 grep パターン設計（REQ-010-011）"
 status: accepted
 created: 2026-08-20
 updated: 2026-09-19
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_content_corruption.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_content_corruption.test.ts
 ---
 
 # IR-052: 完了条件 grep パターン設計（REQ-010-011）

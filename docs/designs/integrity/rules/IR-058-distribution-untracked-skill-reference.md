@@ -3,6 +3,9 @@ title: "IR-058: distribution-untracked-skill-reference"
 status: accepted
 created: 2026-08-20
 updated: 2026-10-05
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts
 ---
 
 # IR-058: distribution-untracked-skill-reference

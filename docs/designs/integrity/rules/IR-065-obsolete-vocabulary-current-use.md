@@ -3,6 +3,9 @@ title: "IR-065: obsolete-vocabulary-current-use"
 status: accepted
 created: 2026-08-22
 updated: 2026-09-09
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts
 ---
 
 # IR-065: obsolete-vocabulary-current-use

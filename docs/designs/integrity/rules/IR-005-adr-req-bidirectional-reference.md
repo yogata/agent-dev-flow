@@ -3,6 +3,9 @@ title: "IR-005: Decision ↔ REQ 相互参照存在"
 status: accepted
 created: 2026-08-20
 updated: 2026-10-22
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts
 ---
 
 # IR-005: Decision ↔ REQ 相互参照存在

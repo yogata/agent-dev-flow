@@ -3,6 +3,9 @@ title: "IR-012: Template 必須セクション"
 status: accepted
 created: 2026-08-20
 updated: 2026-08-20
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_templates.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_templates.test.ts
 ---
 
 # IR-012: Template 必須セクション

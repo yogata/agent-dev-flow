@@ -3,6 +3,7 @@ title: "IR-023: Integrity artifact validator drift"
 status: accepted
 created: 2026-08-20
 updated: 2026-08-20
+detection_method_class: prose-only
 ---
 
 # IR-023: Integrity artifact validator drift

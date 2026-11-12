@@ -3,6 +3,7 @@ title: "IR-038: Decision-index-consistency"
 status: accepted
 created: 2026-08-20
 updated: 2026-10-22
+detection_method_class: prose-only
 ---
 
 # IR-038: Decision-index-consistency

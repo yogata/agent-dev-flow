@@ -3,6 +3,9 @@ title: "IR-043: retired-readme-coverage"
 status: accepted
 created: 2026-08-20
 updated: 2026-08-20
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_retired_artifact_residual.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/tests/delegation_retired_residual.test.ts
 ---
 
 # IR-043: retired-readme-coverage

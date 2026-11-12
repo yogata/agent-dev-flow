@@ -3,6 +3,9 @@ title: "IR-009: 旧 namespace 残存"
 status: accepted
 created: 2026-08-20
 updated: 2026-10-22
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/commands_e2e.test.ts
 ---
 
 # IR-009: 旧 namespace 残存

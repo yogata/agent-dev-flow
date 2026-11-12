@@ -3,6 +3,9 @@ title: "IR-060: forbidden Japanese word detection"
 status: accepted
 created: 2026-08-20
 updated: 2026-10-04
+detection_method_class: machine-check
+implementation_path: src/opencode/plugins/agentdev-textlint-guard/rules/default-prh.yml
+verification_path: src/opencode/plugins/agentdev-textlint-guard/tests/standard-dictionary.test.ts
 ---
 
 # IR-060: forbidden Japanese word detection

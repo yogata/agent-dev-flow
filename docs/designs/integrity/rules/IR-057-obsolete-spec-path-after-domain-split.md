@@ -3,6 +3,9 @@ title: "IR-057: obsolete-spec-path-after-domain-split"
 status: accepted
 created: 2026-08-20
 updated: 2026-10-03
+detection_method_class: machine-check
+implementation_path: [.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts, .opencode/skills/repo-agentdev-integrity/scripts/ir057_history_exemption.ts]
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/regression_ir057_rule_exemption.test.ts
 ---
 
 # IR-057: obsolete-spec-path-after-domain-split

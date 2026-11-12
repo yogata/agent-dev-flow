@@ -3,6 +3,9 @@ title: "IR-032: delegation_type/on_result 必須 envelope 禁止"
 status: accepted
 created: 2026-08-20
 updated: "2026-09-19"
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_delegation_contract_residual.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/tests/delegation_retired_residual.test.ts
 ---
 
 # IR-032: delegation_type/on_result 必須 envelope 禁止

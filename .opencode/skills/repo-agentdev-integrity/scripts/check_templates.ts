@@ -1,3 +1,4 @@
+// ADF-COVERS(implementation): REQ-047-011
 // ADF-COVERS(verification): REQ-002-005
 // ADF-COVERS(verification): REQ-007-002, REQ-007-003, REQ-007-005
 const fs = require("fs");
@@ -19,6 +20,7 @@ import {
   formatMarkdownReport,
   determineExitCode,
   findRepoRoot,
+  annotateIrIds,
 } from "./cli_utils.ts";
 
 const SCRIPT_NAME = "check_templates";
@@ -113,7 +115,9 @@ function main(): void {
     }
   }
   checkSkillTemplateReferences(templatesDir, repoRoot, results);
-  const report = buildReport(scanned, results);
+  // REQ-047-011: template validator（IR-012 の検出実装）の出力へ IR ID を付与する。
+  const annotatedResults = annotateIrIds(results, ["IR-012"]);
+  const report = buildReport(scanned, annotatedResults);
   outputReport(report, options.json);
   process.exit(determineExitCode(report.summary));
 }

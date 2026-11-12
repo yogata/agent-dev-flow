@@ -14,6 +14,9 @@ implementation:
     - REQ-052-018
     - REQ-011-034
     - REQ-011-035
+    - REQ-047-012
+  src/common/tools/agentdev-gh/local/local-schema-loader.ts:
+    - REQ-047-012
   src/common/tools/agentdev-gh/contracts.ts:
     - REQ-011-022
     - REQ-011-030

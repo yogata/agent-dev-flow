@@ -3,6 +3,9 @@ title: "IR-006: Command frontmatter 許可フィールド"
 status: accepted
 created: 2026-08-20
 updated: 2026-10-22
+detection_method_class: machine-check
+implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
+verification_path: .opencode/skills/repo-agentdev-integrity/scripts/command_fixtures.test.ts
 ---
 
 # IR-006: Command frontmatter 許可フィールド
