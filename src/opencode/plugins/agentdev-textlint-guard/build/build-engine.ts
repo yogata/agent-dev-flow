@@ -9,9 +9,12 @@
 // バンドル後コードには焼き付き絶対パスの検出・無害化自己検査
 // （build/absolute-path-guard.ts、runtime-package-boundary.md 契約）を適用する。
 //
-// 依存は配布前に解決した成果物として供給する（導入系スクリプトはネットワーク取得を
-// 行わない）。node_modules を除外するアーカイブ経路でも本 bundle が同梱されるため、
-// 空キャッシュ・ネットワーク遮断下で追加操作なしに起動できる。
+// 依存は版固定情報（package.json と bun.lock）のみが配布され、依存実体（本スクリプトが
+// 生成する vendor 成果物）は導入時に利用者が bun install && bun run build:engine で
+// 再生成する（git 管理対象外・配布物非同梱。導入系スクリプトは生成もネットワーク取得も
+// 行わず、vendor 成果物の欠落を検知した場合に fail-closed で停止して依存生成手順を
+// 案内する）。生成完了後は空キャッシュ・ネットワーク遮断下で node_modules なしに
+// 追加操作なしに起動できる。
 
 import * as fs from "node:fs";
 import * as path from "node:path";

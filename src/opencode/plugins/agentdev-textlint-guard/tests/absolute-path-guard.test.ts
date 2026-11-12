@@ -102,7 +102,7 @@ describe("焼き付き絶対パス無害化（buildRoot 配下は相対化・配
 });
 
 describe("実 vendored bundle の焼き付き残存検査", () => {
-  test("コミット済み bundle コードに焼き付き絶対パスが残存しない", () => {
+  test("生成済み bundle コードに焼き付き絶対パスが残存しない", () => {
     const envelope = JSON.parse(fs.readFileSync(bundlePathFor(pluginDir), "utf8")) as {
       codeBase64?: unknown;
     };
