@@ -59,7 +59,7 @@
 
 - **委譲前疎通確認**: 実行担当サブエージェントへの委譲の前に、軽量な読み取り操作（issue_read 1 件等）で gh 呼出経路の疎通を確認してから再試行する。委譲内で初めて障害を検知する構成を避ける
 - **最小副作用単位分割と durable state 先行**: gh 呼出を伴う処理は副作用 1 件単位へ分割し、各呼出の前に durable state（Issue コメントへの経過記録、worktree 内の commit 等）を先行して残す。障害で中断されても「障害中断時の再開手順」の残骸確認と冪等再実行で再開できる
-- **write-proxy payload の標準配置**: issue_create、issue_update、comment_create、pr_create 等の書込み payload（本文・タイトル）は、呼出に先立って標準配置（worktree root 相対 `.agentdev/tmp/` 配下の payload ファイル）へ保存する。書込み操作が障害で中断された場合も、payload ファイルを送信元として同一内容の再試行（「障害中断時の再開手順」の残骸確認後再実行）が可能になる
+- **write-proxy payload の標準配置**: issue_create、issue_update、comment_create、pr_create 等の書込み payload（本文・タイトル、pr_create の場合は対象識別〔対象 Case Issue の番号〕を含む要求全体）は、呼出に先立って標準配置（worktree root 相対 `.agentdev/tmp/` 配下の payload ファイル）へ保存する。書込み操作が障害で中断された場合も、payload ファイルを送信元として同一内容の再試行（「障害中断時の再開手順」の残骸確認後再実行）が可能になる
 - **gh exit 66 恒常失敗時の bash gh 例外手順**: gh が終了コード 66（gh exit 66）で恒常的に失敗し、再試行と回復手段で解消しない場合は、読み取り系操作に限り bash から gh CLI を直接実行する例外手順で補完する。書込み系は引き続き Custom Tool `agentdev_gh` 正規経路に限定する。証跡様式は次のとおりで検証記録へ残す: 失敗した操作と failure detail の要点（終了コード、stderr の空・非空）、代替実行した gh コマンド、取得結果の要約
 - **tool 内部モジュールの書込み直接起動禁止**: gh exit 66 等の恒常失敗時の bash gh 例外手順を含む障害局面では、tool 内部モジュール（CliRunner 等の tool 内部 API）の直接起動を、診断手順の読み取り切り分けに限定する。書込みを含む操作での tool 内部 API の直接起動は非許容であり、書込み系の正規経路は Custom Tool `agentdev_gh` に限定する。本規律は、bash gh 読取例外・書込みの正規経路限定・2段分離試験（読み取り系の切り分け）・Custom Tool 操作契約が許容する読取 contingency と矛盾しない
 

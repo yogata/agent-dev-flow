@@ -5,12 +5,23 @@
 
 
 import {
+  normalizeHeadRef,
   prNumber,
   type GhToolRequest,
   type GhToolSuccess,
 } from "./contracts.ts";
 import type { GhRunner, GhRunnerRequest } from "./runner.ts";
 import type { OperationSpec, ValidateOutcome } from "./engine.ts";
+
+/**
+ * pr_create 読戻し照合の body 正規化。改行コード（CRLF→LF）と末尾改行は
+ * 物理表現の差異として吸収し、正規化後の論理値で比較する（Design
+ * 「対象操作の境界」節の pr_create 読戻し照合条項。head の物理表現正規化と
+ * 同一の規律）。
+ */
+function normalizeCreateBody(v: string): string {
+  return v.replace(/\r\n/g, "\n").replace(/\n+$/, "");
+}
 
 function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === "object" && v !== null;
@@ -108,6 +119,7 @@ const prCreateSpec: OperationSpec = {
       "body",
       "base",
       "head",
+      "number",
     ]);
     if (unknown !== null) return unknown;
     for (const field of ["title", "body", "base", "head"] as const) {
@@ -138,13 +150,45 @@ const prCreateSpec: OperationSpec = {
     if (head === null || head.length === 0) {
       return { ok: false, error: { code: "invalid-field", field: "head", detail: "head must be a non-empty string" } };
     }
-    return { ok: true, request: { operation: "pr_create", title, body, base, head } };
+    // 対象識別（number）は公開契約上は任意。Local 実装は runner 境界で必須検証する
+    // （実行時検証が公開スキーマより厳密であることを許容する入力契約条項）。
+    let number: number | null = null;
+    if (raw.number !== undefined) {
+      number = positiveInt(raw.number);
+      if (number === null) {
+        return {
+          ok: false,
+          error: {
+            code: "invalid-field",
+            field: "number",
+            detail: "number must be a positive integer when present",
+          },
+        };
+      }
+    }
+    return {
+      ok: true,
+      request: {
+        operation: "pr_create",
+        title,
+        body,
+        base,
+        head,
+        ...(number !== null ? { number } : {}),
+      },
+    };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "pr_create" }>;
     return {
       operation: "pr_create",
-      args: { title: r.title, body: r.body, base: r.base, head: r.head },
+      args: {
+        title: r.title,
+        body: r.body,
+        base: r.base,
+        head: r.head,
+        ...(r.number !== undefined ? { number: r.number } : {}),
+      },
     };
   },
   parseSuccess(payload): GhToolSuccess | null {
@@ -159,7 +203,21 @@ const prCreateSpec: OperationSpec = {
     const created = success as Extract<GhToolSuccess, { operation: "pr_create" }>;
     const pr = await readPr(runner, created.number);
     if (pr === null) return false;
-    return str(pr.title) === req.title && str(pr.state) === "open";
+    // 読戻し照合: base・head・body の3項目の一致を必須とし、いずれか1項目の
+    // 不一致も成功確認を拒否する。head の物理表現（短縮形式 / owner:branch）は
+    // 正規化後の論理値で比較する。runner が取得情報（base・head・createBody）を
+    // 返さない場合は検証未了として成功を返さない（fail-closed）。
+    const base = str(pr.base);
+    const head = str(pr.head);
+    const createBody = str(pr.createBody);
+    if (base === null || head === null || createBody === null) return false;
+    return (
+      base === req.base &&
+      normalizeHeadRef(head) === normalizeHeadRef(req.head) &&
+      normalizeCreateBody(createBody) === normalizeCreateBody(req.body) &&
+      str(pr.title) === req.title &&
+      str(pr.state) === "open"
+    );
   },
 };
 
