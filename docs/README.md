@@ -180,8 +180,8 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-056](decisions/DEC-056.md) | ADF v5 移行と互換性の境界（後方互換非必須・意味保存移行・未処理改善情報の継続） |
 | [DEC-057](decisions/DEC-057.md) | 工程駆動コラボレーションモデル（検討テーマ・外部検討・段階形成）の採用 |
 | [DEC-058](decisions/DEC-058.md) | 工程遷移と双経路併存モデルの採用（REQ-005-001/010/011 改訂を含む） |
-| [DEC-059](decisions/DEC-059.md) | backlog-auto 一気通貫実行のパッチリリース規則 |
-| [DEC-060](decisions/DEC-060.md) | ADF本体の GitHub Release 記録と公開承認境界 |
+| [DEC-059](decisions/DEC-059.md) | backlog-auto 一気通貫実行のパッチリリース規則（superseded by DEC-060〔決定(1)の「公開操作」規則（GitHub Release 等の追加公開成果物の実行経路）は、後継 Decision DEC-060（ADF本体の GitHub Release 記録と公開承認境界）が部分置換する。版番号規則、正式リリースの基準、リリース条件、完遂済み・リリース保留、タグ権威・不移動の各決定は本 Decision が維持する。〕） |
+| [DEC-060](decisions/DEC-060.md) | ADF本体の GitHub Release 記録と公開承認境界（superseded by DEC-061〔決定(1)のうち公開の実行経路・実行主体に関わる部分と決定(3)（カタログへの追加範囲）は、後継 Decision DEC-061（Release 公開操作のカタログ正規化（承認後の workflow 実行経路））が部分置換する。承認境界（公開は利用者が草稿作成とは別に明確に認めた場合に限る）、release_create の入力契約に公開モードを含めない規則、草稿作成・読み戻しのカタログ限定経路、決定(2)（DEC-059 / DEC-039 系譜の維持）は本 Decision が維持する。〕） |
 | [DEC-061](decisions/DEC-061.md) | Release 公開操作のカタログ正規化（承認後の workflow 実行経路） |
 | [DEC-062](decisions/DEC-062.md) | 要件ID桁数の受理上限撤廃と表示ゼロ埋め・受理検証の分離 |
 <!-- AUTOGEN:END -->
