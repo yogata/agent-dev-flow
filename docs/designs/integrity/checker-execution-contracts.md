@@ -16,6 +16,7 @@ updated: 2026-10-27
 <!-- ADF-COVERS(design): REQ-007-016, REQ-060-001, REQ-060-002, REQ-060-003, REQ-060-007 -->
 <!-- ADF-COVERS(design): REQ-010-078, REQ-010-079, REQ-010-082 -->
 <!-- ADF-COVERS(implementation): REQ-010-078, REQ-010-079 -->
+<!-- ADF-COVERS(design): REQ-047-011 -->
 
 # checker 実行契約と検出基盤規則
 
@@ -35,6 +36,7 @@ updated: 2026-10-27
 実行プロファイルは対象変更（extension、command、skill）の種別に応じて選択する
 - 共通 CLI 契約（--help、--json、--dry-run、exit code 0/1/2、stdout 機械可読出力）に従う
 - CLI 用分割スクリプト（`*_cli.ts` 等）は直接起動時にも検査を実行する top-level エントリポイントを持つことを標準とする。export-only のスクリプトは直接起動で無出力・exit 0 の無検証成功を生むため採用しない。check_distribution_boundary_cli.ts の正規起動経路は check_distribution_boundary.ts 経由（bun run、exit 0/1/2）であることを明示する
+- integrity 規則を機械検査する checker（check_integrity、専用検査器、lint 系検査を含む）の出力は、適用した規則の識別子（IR ID）を必ず含める。出力から当該規則文書（rules/IR-NNN-*.md）へ機械的に対応できることを checker 実行契約の一部とする（B3-1、REQ-047-011）
 
 ## パターンマッチ・網羅検査設計の標準規約
 
@@ -102,6 +104,7 @@ data yaml の新設は、当該 yaml を読み込む消費者実装（checker �
   黙って読み飛ばさない
 - **検出ビュー**: data yaml は検出用ビューであり、正規契約の情報源とはしない
   （「宣言的データ YAML の schema 原則」準拠）
+- skill-projection-manifest.yaml は、正規情報源（src/common/skills/ のスキル配置）から機械導出された検出ビューとして再定義する（B3-3）。承認対象の独立期待値ではなく再計算できる検出ビューであることを契約に明記し、checker は配置からの導出結果と一覧の差分を厳格検出する。スキルの追加・削除・改名を行う代表的な変更で一覧が自動追随し手動更新を要しないことを確認し、初回の導出結果と現行一覧の差分は説明つきで処理する
 
 実装実例（新設時の消費者実装同時確定の参照例）:
 

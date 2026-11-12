@@ -79,6 +79,10 @@ GitHub版 / Local版等価性:
 
 操作カタログの完全列挙（20操作）は契約テストで固定し、対象外機能の追加を検出する。
 
+- agentdev-gh の操作一覧と定型入力検査の複数箇所管理（contracts.ts の名称配列と副作用分類、public-schema.ts の説明文列挙、specs-pr.ts・specs-release.ts・specs-issue.ts の定型入力検査）を、単一の正本へ一元化する（B3-5c）。操作の模擬追加で、正本1箇所の更新だけで全利用側へ反映されることを確認する。実装内部の変更箇所の数は合格基準としない
+- 危険な操作が追加されないこと・操作種別・互換性の独立外部契約検査は現行のまま維持する
+- ローカル版 rules yaml（frontmatter・headings・labels・status）は操作用スキーマの記述にとどまらず、実行器が実行時に消費する機械可読定義として運用する（機械可読定義の記述と実行時の強制箇所の分離の解消、G-007）
+
 「third-party Skill 取得」操作契約:
 
 - 入力: third-party 宣言（skills.yaml）の対象 Skill 名（省略時は全件）、dry-run 指定

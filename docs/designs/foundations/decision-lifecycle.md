@@ -88,6 +88,11 @@ relations:
 - 後継 Decision が `supersedes` を宣言した場合、前任 Decision の frontmatter `superseded_by` フィールドへ後継 Decision のパスを記録する（双方向からの参照整合）
 - `reaffirms` は原本 Decision の status を変更せず、再確認の事実だけを frontmatter へ記録する
 
+### 部分置換関係の表記と到達（B3-4）
+
+- ある Decision の一部条項が後続 Decision によって置換され、他の条項が現行有効のまま残る関係（部分置換）を、対象となる関係全件について確定した上で表記する。確定時点の既知対象は DEC-041（一部判断が DEC-051 で置換）および docs/README.md Decision 表の注記から判明する候補群（DEC-028・DEC-036・DEC-044・DEC-045 等）とし、全件確定の結果を固定して記録する
+- 部分置換された旧条項から現行の有効条項へ、相互参照で到達できるようにする。旧 Decision を読んだ実行主体が、置換後の現行条項へ到達できることを参照追跡で確認する
+
 ## Decision 粒度管理
 
 Decision の SPLIT / MERGE は固定件数ではなく意味的健全性で評価する（REQ-001-063、AG-006）。

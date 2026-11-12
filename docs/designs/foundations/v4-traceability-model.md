@@ -9,6 +9,7 @@ updated: "2026-11-12"
 <!-- ADF-COVERS(implementation): REQ-012-027, REQ-012-028, REQ-012-029, REQ-012-030, REQ-012-031, REQ-012-032, REQ-012-033, REQ-012-034, REQ-012-035, REQ-012-036, REQ-012-037, REQ-012-038, REQ-012-039, REQ-012-040, REQ-012-041, REQ-012-042 -->
 <!-- ADF-COVERS(design): REQ-106-001, REQ-106-002, REQ-106-003, REQ-106-004, REQ-106-005, REQ-106-006, REQ-106-007, REQ-106-008, REQ-106-009, REQ-107-001, REQ-107-002, REQ-107-003, REQ-107-004, REQ-107-005, REQ-107-006, REQ-107-007, REQ-107-008 -->
 <!-- ADF-COVERS(design): REQ-021-031, REQ-021-032（corpus completeness の optional 明示方針と policy optional 区分機構の設計対応） -->
+<!-- ADF-COVERS(design): REQ-012-060, REQ-012-061 -->
 <!-- ADF-COVERS(implementation): REQ-106-001, REQ-106-002, REQ-106-003, REQ-106-004, REQ-106-005, REQ-106-006, REQ-106-007, REQ-106-008, REQ-106-009, REQ-107-001, REQ-107-002, REQ-107-003, REQ-107-004, REQ-107-005, REQ-107-006, REQ-107-007, REQ-107-008（v5 変更影響・追跡品質検証の語義は本 Design 本文の v5 語義更新節が所有し、REQ-106 の差分影響評価の構成実体は agentdev-traceability Design の impact 拡張節が、その利用側接続は case-revise Design が所有する） -->
 
 # ADF v4 Traceability モデル（Change / Evidence 中心）
@@ -68,6 +69,8 @@ v4 の意味モデルから永続すべき関係（Change の Evidence・impact�
 
 - Case/Change の Evidence と impact を第一級とする
 - DEC-030 の sidecar/policy/producer-consumer 機構は、永続情報として価値がある範囲で拡張して搬送する（機構の廃止ではなく、中心の移動と必要永続情報/導出可能情報の分離）
+- traceability sidecar の対応宣言のうち、正規成果物の配置と内容から機械導出できる対応（実装・試験ファイルの対応等）は導出によって宣言でき、手動保守をなくなった分だけ縮小する（B3-6、REQ-012-060/061）。導出対象と手動付与対象（人間が根拠を確認して付与すべき対応）の境界は本分離契約の一部として明記する
+- 対応宣言の存在を受け入れ証明としない原則（T-003、REQ-012-032）は維持する。代表する変更（ファイル新設・改名）で、導入前に手動更新していた sidecar 行が導入後は不要になることと、引き続き手動が必要な行の種類を記録する
 
 ### 永続・導出分離判定結果
 
