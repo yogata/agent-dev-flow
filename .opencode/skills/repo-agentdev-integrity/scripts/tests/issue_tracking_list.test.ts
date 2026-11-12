@@ -462,10 +462,11 @@ describe("ローカルIssueの role 条件付きスキーマ（単一採番空�
       body: "b",
       base: "main",
       head: "feature/x",
+      number: 1,
     });
     expect(onlyTracking.ok).toBe(false);
     if (!onlyTracking.ok) {
-      expect(onlyTracking.ok).toBe(false);
+      expect(onlyTracking.failure.kind).toBe("operation-failed");
     }
 
     await runAgentdevGhOperation(env, {
@@ -480,6 +481,7 @@ describe("ローカルIssueの role 条件付きスキーマ（単一採番空�
       body: "b",
       base: "main",
       head: "feature/x",
+      number: 2,
     });
     expect(pr.ok).toBe(true);
     if (pr.ok && pr.success.operation === "pr_create") {
@@ -518,6 +520,7 @@ describe("ローカルIssueの role 条件付きスキーマ（単一採番空�
       body: "本文",
       base: "main",
       head: "feature/x",
+      number: 1,
     });
     expect(pr.ok).toBe(true);
     const merged = await runAgentdevGhOperation(env, {
