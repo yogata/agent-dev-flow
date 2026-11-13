@@ -6,6 +6,7 @@ updated: 2026-11-13
 ---
 
 <!-- ADF-COVERS(design): REQ-121-001 -->
+<!-- ADF-COVERS(implementation): REQ-121-001 -->
 
 # ADF全体簡素化計画の見送り記録
 
