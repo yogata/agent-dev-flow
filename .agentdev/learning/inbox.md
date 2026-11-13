@@ -5,6 +5,24 @@
 
 ---
 
+## 2026-11-13: agentdev_jev evaluate の observationMetadata.references.digest に sha256 形式外の値を渡すと evaluator 成功後に観測書込みが invalid_input で失敗する（Case #4049・case-ready）
+
+- **問題事象**: case-ready のスコープ重複判定（Jev 先行評価）で observationMetadata.references の digest に sha256 hex 64文字でない説明用プレースホルダ文字列を渡したところ、evaluator 自体は成功（scope-overlap=false・確率 0.93）したものの、評価直後の観測永続化が invalid_input（input reference digest must be a sha256 hex digest）で失敗し、観測 JSON が .agentdev/jev-observations/ に保存されなかった。evaluate の成功応答には observation write 失敗が warning として付与される
+- **発生局面**: case-ready STEP-5（実行構造確定・既存オープン Issue とのスコープ重複判定の Jev 先行評価。Case #4049 / C-ω）
+- **検知方法**: evaluate 応答内の observation.warning（observation write failed: invalid_input）と .agentdev/jev-observations/ の最新ファイル mtime の突合（当該評価の観測ファイルが新規作成されていないことで確認）
+- **根本原因**: 呼出側（本実行）が references.digest に実ファイルの sha256 計算値ではなく説明的なプレースホルダ文字列を渡したこと。Tool 側の入力検証（sha256 hex 64文字）は正しく機能し、観測契約（再構成可能な入力は path + digest で保持）の要件を満たさない入力を fail-closed で拒否した
+- **自律対応内容**: 契約どおり観測の再実行・擬似再生成は行わず、観測書込み失敗を独立 warning として完了報告に記録（evaluator 結果と LLM 最終判断の一致: scope-overlap=false）。次回以降は references を渡す前に sha256sum 等で実 digest を計算するか、references を省略して snapshot のみで構成する
+- **ユーザー確認の有無**: なし（workflow 内自律処置・warning 記録）
+- **REQ/Decision/Design影響**: なし（呼出側入力構成の注意喚起。Tool の fail-closed 検証自体は正常動作）
+- **横展開観点**: Jev 先行評価を行う6系統 Workflow（learning-promote、req-define、case-ready、intake-promote、inspect-promote、backlog-review）の evaluate 呼出しで references を構成する全経路で同型の失敗が発生し得る
+- **再発条件**: observationMetadata.references.digest に実計算値でない文字列を渡して evaluate を呼ぶ条件
+- **予防策候補**: evaluate 呼出し前の references 構成手順への sha256 実計算の明示（または references 省略時の snapshot 構成への統一）
+- **想定反映先**: learning-promote（運用手順の知見として整理）・execution-structure.md「Jev 評価経路」の呼出側規律参照候補
+- **関連**: Case #4049 / case-ready STEP-5・REQ-090 系（Jev 先行評価の実運用組込み）
+- **タグ**: #agentdev-jev #observation-metadata #invalid-input #fail-closed #case-ready
+
+---
+
 ## 2026-11-13: agentdev_gh pr_create の number フィールド取扱いが reference 規約と Tool 実挙動で矛盾（Case #4049・case-open 設計PR作成）
 
 - **問題事象**: case-open の設計PR作成で reference 規約（definition-pr-and-idempotency.md「要求には対象識別（対象 Root Case Issue の番号を number で指定）を含める。対象識別を欠く要求は Tool が受理しない」）に従い number を含めて pr_create を呼んだところ、Tool が当該要求を fail-closed で拒否した（拒否応報は pr_create 契約が number フィールドを受理しない旨）。number を除いて再実行したところ作成に成功した（PR #4050）
