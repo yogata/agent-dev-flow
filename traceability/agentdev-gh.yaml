@@ -26,6 +26,9 @@ implementation:
     - REQ-114-016
     - REQ-011-034
     - REQ-011-035
+  src/common/tools/agentdev-gh/operation-catalog.ts:
+    - REQ-011-022
+    - REQ-011-028
   src/common/tools/agentdev-gh/engine.ts:
     - REQ-052-018
     - REQ-011-028
@@ -95,6 +98,9 @@ verification:
     - REQ-011-023
     - REQ-114-010
     - REQ-114-016
+  src/common/tools/agentdev-gh/tests/operation-catalog.test.ts:
+    - REQ-011-022
+    - REQ-011-028
   src/common/tools/agentdev-gh/tests/engine-fail-closed.test.ts:
     - REQ-011-023
     - REQ-011-025

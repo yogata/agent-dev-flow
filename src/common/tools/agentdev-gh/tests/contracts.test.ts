@@ -27,6 +27,12 @@ import {
   AGENTDEV_GH_TOOL_DESCRIPTION,
   AGENTDEV_GH_TOOL_NAME,
 } from "../index.ts";
+import {
+  GH_TOOL_OPERATION_DEFINITIONS,
+  operationDefinition,
+  validateOperationInput,
+} from "../operation-catalog.ts";
+import { AGENTDEV_GH_REQUEST_PROPERTY_SCHEMA } from "../public-schema.ts";
 
 describe("操作カタログ（Design 対象操作との一致）", () => {
   test("20操作カタログを完全列挙で固定する", () => {
@@ -102,6 +108,49 @@ describe("操作カタログ（Design 対象操作との一致）", () => {
     const catalogOps = GH_TOOL_OPERATION_CATALOG.map((e) => e.operation);
     expect(new Set(catalogOps).size).toBe(GH_TOOL_OPERATIONS.length);
     expect(catalogOps.sort()).toEqual([...GH_TOOL_OPERATIONS].sort());
+  });
+
+  test("操作一覧と副作用分類は正本テーブル（operation-catalog）から派生する", () => {
+    expect([...GH_TOOL_OPERATIONS]).toEqual(
+      GH_TOOL_OPERATION_DEFINITIONS.map((d) => d.operation),
+    );
+    for (const definition of GH_TOOL_OPERATION_DEFINITIONS) {
+      const entry = GH_TOOL_OPERATION_CATALOG.find((e) => e.operation === definition.operation);
+      expect(entry).toBeDefined();
+      expect(entry?.kind).toBe(definition.kind);
+    }
+  });
+
+  test("公開スキーマの operation enum と説明文列挙は正本テーブルから派生する", () => {
+    const schema = AGENTDEV_GH_REQUEST_PROPERTY_SCHEMA;
+    expect(schema.properties.operation.enum).toEqual([...GH_TOOL_OPERATIONS]);
+    const description = schema.description;
+    for (const op of GH_TOOL_OPERATIONS) {
+      expect(description).toContain(op);
+    }
+  });
+
+  test("全操作スペックが正本テーブルの操作定義に対応する", () => {
+    for (const spec of AGENTDEV_GH_OPERATION_SPECS) {
+      expect(operationDefinition(spec.operation)).toBeDefined();
+    }
+    expect(AGENTDEV_GH_OPERATION_SPECS.length).toBe(GH_TOOL_OPERATION_DEFINITIONS.length);
+  });
+
+  test("共通入力検査は正本テーブルの宣言から契約外フィールドを検出する（全操作）", () => {
+    for (const definition of GH_TOOL_OPERATION_DEFINITIONS) {
+      const raw = { operation: definition.operation, __undeclared_probe__: 1 };
+      const outcome = validateOperationInput(definition.operation, raw);
+      expect(outcome).not.toBeNull();
+      if (outcome !== null) {
+        expect(outcome.error.code).toBe("unknown-field");
+        expect(outcome.error.field).toBe("__undeclared_probe__");
+      }
+    }
+  });
+
+  test("validateOperationInput は正本テーブルに存在しない操作名を検査しない（specs 登録の専管）", () => {
+    expect(validateOperationInput("nonexistent_operation", { operation: "nonexistent_operation" })).toBeNull();
   });
 
   test("Comment WRITE は side-effect、comment_list は read-only", () => {

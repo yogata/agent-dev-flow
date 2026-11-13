@@ -1,8 +1,9 @@
 // agentdev-gh Custom Tool の host 非依存公開スキーマ（Tool 引数の JSON Schema）。
 //
 // 公開される Tool スキーマは操作契約（contracts.ts）に追従する。operation の
-// enum は操作カタログ（GH_TOOL_OPERATIONS）から生成し、スキーマと validator の
-// 漂流を防ぐ。OpenCode（plugins/agentdev-gh-tool）と Senpi（src/senpi/tools/）
+// enum と説明文の操作名列挙は正本テーブル（operation-catalog.ts 経由の
+// GH_TOOL_OPERATIONS）から派生し、スキーマと validator の漂流を防ぐ
+// （B3-5c 一元化）。OpenCode（plugins/agentdev-gh-tool）と Senpi（src/senpi/tools/）
 // の両ホスト接続が本モジュールを参照し、ホスト別にスキーマを複製しない。
 
 import { GH_TOOL_OPERATIONS } from "./contracts.ts";
@@ -12,9 +13,7 @@ export const AGENTDEV_GH_REQUEST_PROPERTY_SCHEMA = {
   type: "object",
   description:
     "Structured GitHub issue/PR operation request. See the agentdev_gh operation contract " +
-    "(issue_create, issue_read, issue_update, issue_close, pr_create, pr_read, pr_merge, pr_changed_files, " +
-    "pr_mergeable, pr_update, issue_list, issue_reopen, comment_create, comment_list, comment_update, " +
-    "comment_delete, release_create, release_list, release_read, release_publish). " +
+    `(${GH_TOOL_OPERATIONS.join(", ")}). ` +
     "Tracking-issue operations expose the logical role; physical label mapping " +
     "is applied inside the tool. Tracking-issue kind and non-terminal state are held in the issue body " +
     "standard structure, not accepted or derived by the tool. Comments are a shared logical resource " +

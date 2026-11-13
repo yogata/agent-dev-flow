@@ -55,8 +55,9 @@ const ISSUE_FILE_SUFFIX = ".md";
 const FRONTMATTER_DELIMITER = "---";
 
 // case-schema rules yaml の実行時消費（REQ-047-012、G-007 解消）。
-// status 値域・labels 値域・終端状態・本文見出しの実行時強制箇所は
-// case-schema/rules/{status,labels,headings}.yaml を runtime 読込で消費する。
+// frontmatter 必須フィールド・id パターン・role 値域・forbidden フィールド・
+// comment_seq 最小値、status 値域・labels 値域・終端状態・本文見出しの実行時強制箇所は
+// case-schema/rules/{frontmatter,status,labels,headings}.yaml を runtime 読込で消費する。
 // yaml 欠損・スキーマ不適合時は import 時に fail-closed で停止する。
 const RUNNER_DIR = path.dirname(fileURLToPath(import.meta.url));
 const CASE_SCHEMA_RULES_DIR = path.join(RUNNER_DIR, "case-schema", "rules");
@@ -71,6 +72,18 @@ if (SCHEMA.trackingStatusValues.join("|") !== LOCAL_TRACKING_STATUS_VALUES.join(
       `does not match tracking-schema.ts LOCAL_TRACKING_STATUS_VALUES (${LOCAL_TRACKING_STATUS_VALUES.join(", ")})`,
   );
 }
+
+// role 値域は frontmatter.yaml（fields.role.enum）を正として消費する。実行時分岐の
+// 型（IssueRole）と値域の不一致は起動時に fail-closed で検出する。
+if (SCHEMA.frontmatter.roleValues.join("|") !== "tracking|case") {
+  throw new Error(
+    `local case-schema frontmatter.yaml fields.role.enum (${SCHEMA.frontmatter.roleValues.join(", ")}) ` +
+      `does not match the runner role values (tracking, case)`,
+  );
+}
+
+// id パターン（^issue-[0-9]{4}$）は frontmatter.yaml fields.id.pattern を正として消費する。
+const ISSUE_ID_PATTERN = new RegExp(SCHEMA.frontmatter.idPattern);
 
 const HEADING_WORKLOG = SCHEMA.caseHeadingsByNumber[8] ?? "";
 const HEADING_DISCUSSION = SCHEMA.commentSections.tracking;
@@ -161,7 +174,7 @@ export function validateLocalIssue(
   if (fm.id !== fileName.replace(ISSUE_FILE_SUFFIX, "") && fm.id !== expectedId) {
     errors.push(`id must match the file name (${fileName})`);
   }
-  if (!new RegExp(`^${ISSUE_FILE_PREFIX}[0-9]{4}$`).test(fm.id)) {
+  if (!ISSUE_ID_PATTERN.test(fm.id)) {
     errors.push(`id must be ${ISSUE_FILE_PREFIX}{NNNN}: ${fm.id}`);
   }
   if (fm.title.length === 0) errors.push("title must not be empty");
@@ -189,8 +202,9 @@ export function validateLocalIssue(
   if (!terminal && fm.closed_at.length > 0) {
     errors.push("non-terminal status must not have closed_at");
   }
-  if (fm.comment_seq !== undefined && (!Number.isInteger(fm.comment_seq) || fm.comment_seq < 0)) {
-    errors.push(`comment_seq must be a non-negative integer: ${String(fm.comment_seq)}`);
+  const commentSeqMinimum = SCHEMA.frontmatter.commentSeqMinimum ?? 0;
+  if (fm.comment_seq !== undefined && (!Number.isInteger(fm.comment_seq) || fm.comment_seq < commentSeqMinimum)) {
+    errors.push(`comment_seq must be an integer of at least ${commentSeqMinimum}: ${String(fm.comment_seq)}`);
   }
   return { valid: errors.length === 0, errors };
 }
@@ -294,19 +308,22 @@ function parseIssue(raw: string): ParsedIssue | null {
     if (colon <= 0) continue;
     fields.set(line.slice(0, colon), line.slice(colon + 2).trim());
   }
-  const id = fields.get("id");
-  const title = fields.get("title");
-  const role = fields.get("role");
-  const status = fields.get("status");
-  const created = fields.get("created_at");
-  const updated = fields.get("updated_at");
-  if (
-    id === undefined || title === undefined || role === undefined ||
-    status === undefined || created === undefined || updated === undefined
-  ) {
-    return null;
+  // frontmatter.yaml の機械可読定義による実行時強制（G-007 解消）。
+  // forbidden_fields（前書き禁止フィールド）の混入と required: true フィールドの
+  // 欠落はスキーマ違反として読取を fail-closed で拒否する。
+  for (const key of fields.keys()) {
+    if (SCHEMA.frontmatter.forbiddenFields.includes(key)) return null;
   }
-  if (role !== "tracking" && role !== "case") return null;
+  for (const name of SCHEMA.frontmatter.requiredFields) {
+    if (!fields.has(name)) return null;
+  }
+  const id = fields.get("id") as string;
+  const title = fields.get("title") as string;
+  const role = fields.get("role") as string;
+  const status = fields.get("status") as string;
+  const created = fields.get("created_at") as string;
+  const updated = fields.get("updated_at") as string;
+  if (!SCHEMA.frontmatter.roleValues.includes(role)) return null;
   const labelsRaw = fields.get("labels") ?? "[]";
   const labelsInner = labelsRaw.replace(/^\[/, "").replace(/\]$/, "").trim();
   const labels = labelsInner.length > 0 ? labelsInner.split(",").map((s) => s.trim()) : [];
@@ -319,7 +336,7 @@ function parseIssue(raw: string): ParsedIssue | null {
     fm: {
       id,
       title: unquoteYamlString(title),
-      role,
+      role: role as IssueRole,
       status,
       created_at: unquoteYamlString(created),
       updated_at: unquoteYamlString(updated),

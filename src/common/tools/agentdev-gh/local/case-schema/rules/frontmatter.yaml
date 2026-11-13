@@ -8,13 +8,13 @@
 # 値域を持つ（role 条件付きスキーマ）。
 # 本ファイルは docs/designs/local/local-case-file.md と矛盾してはならない。
 #
-# 実行時消費の位置付け（REQ-047-012）: 本ファイルは frontmatter フィールドの
-# 操作用定義（検出ビューとして独立所有）であり、実行時の強制箇所は
-# runner-local.ts の LocalIssueFrontmatter 型と検証ロジックが消費する。
-# 同期条件: フィールドの追加・削除・型変更は同一 PR で本ファイルと
-# runner-local.ts を更新する。status / labels / headings の値域は
-# status.yaml / labels.yaml / headings.yaml が runner-local.ts から
-# 実行時消費される（G-007 解消）。
+# 実行時消費（REQ-047-012、G-007 解消）: runner-local.ts が本ファイルの
+# 必須フィールド（required: true）、フィールド型、fields.id.pattern、
+# fields.role.enum、forbidden_fields、fields.comment_seq.minimum を
+# runtime 読込で消費する（local-schema-loader.ts）。フィールドの追加・削除・
+# 型変更は runner-local.ts の強制箇所へ自動反映される。
+# status / labels / headings の値域は status.yaml / labels.yaml / headings.yaml が
+# runner-local.ts から実行時消費される。
 
 schema_version: "2.0"
 target: ".agentdev/issues/issue-{NNNN}.md の YAML 前書き"
