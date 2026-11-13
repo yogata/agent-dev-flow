@@ -1,4 +1,4 @@
-// check CLI。対応関係コーパスの9種検査（lib/check.ts の公開契約）。
+// check CLI。対応関係コーパスの12種検査（lib/check.ts の公開契約）。
 // 検証スコープポリシー（traceability/policy.yaml、不在時は全要件行が検証対応必須）も
 // 自動的に読み込む。policy または sidecar の解決が実行不能な場合、対応完全性の
 // 合格を返さない（fail-closed）。

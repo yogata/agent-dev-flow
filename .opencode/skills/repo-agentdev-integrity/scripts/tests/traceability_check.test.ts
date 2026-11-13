@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-012-047, REQ-021-031, REQ-021-032
+// ADF-COVERS(verification): REQ-012-047
 //
 // agentdev-traceability 配布スキル check の9種検査の検証（TS-007、DEC-030 決定6）。
 // 不正な対応関係記述（inline + sidecar）、未知の成果物役割、存在しない要件への参照、

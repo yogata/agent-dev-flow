@@ -1,0 +1,15 @@
+# 対応宣言の導出規約（REQ-012-060）。
+# 導出対象と手動付与対象の境界は docs/designs/foundations/v4-traceability-model.md
+# 「永続情報と導出可能情報の分離」節の契約に従う。
+# 本ファイルは対応関係データ（REQ ↔ 成果物の対応）を保持せず、導出の対象範囲のみを
+# 宣言する。対応関係の実体は正規成果物の配置と内容（import 実測と対応宣言）から
+# 決定的に導出される。
+# 検証対応要否（REQ-012-030・REQ-012-051）は traceability/policy.yaml が所有し、
+# 本ファイルから導出しない（T-003・REQ-012-032 の原則維持）。
+test-verifications:
+  # 各テストディレクトリ配下の .test.ts の verification 対応を、
+  # テスト本文の import 実測と検証対象モジュールの対応宣言から導出する。
+  # 導出根拠がないテスト（import 先に対応宣言がない・対応 REQ が空）は導出せず、
+  # 手動付与対象として sidecar 宣言のまま残る。
+  tests-dirs:
+  - .opencode/skills/repo-agentdev-integrity/scripts/tests

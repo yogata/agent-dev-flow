@@ -30,10 +30,14 @@ export interface CoverDeclaration {
   readonly reqIds: readonly string[];
   /** 対応対象成果物のリポジトリ相対パス（inline / sidecar 正規化後も同一軸）。 */
   readonly file: string;
-  /** 宣言位置。inline は 1-based 行番号、sidecar 正規化分は 0（位置情報を保持しない）。 */
+  /** 宣言位置。inline は 1-based 行番号、sidecar・導出正規化分は 0（位置情報を保持しない）。 */
   readonly line: number;
-  /** 正規化前の直列化種別（同一論理対応関係の正規化、重複整合検証の情報源区分）。 */
-  readonly source: "inline" | "sidecar";
+  /**
+   * 正規化前の直列化種別（同一論理対応関係の正規化、重複整合検証の情報源区分）。
+   * derived は正規成果物の配置と内容から導出した対応宣言
+   * （traceability/derivations.yaml の導出規約に基づく決定的導出分）を示す。
+   */
+  readonly source: "inline" | "sidecar" | "derived";
   /** 宣言を保持するファイル（inline は file と同一、sidecar は sidecar パス）。 */
   readonly sourceFile: string;
 }

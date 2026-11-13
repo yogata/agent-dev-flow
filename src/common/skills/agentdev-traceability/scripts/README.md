@@ -16,9 +16,10 @@ scripts/
 │   ├── requirements.ts       # 現行要件行ID（docs/requirements/REQ-{NNNN}.md）の収集
 │   ├── verification_scope.ts # 検証スコープポリシー（traceability/policy.yaml）の解析・解決（不在時は全行必須、fail-closed）
 │   ├── query.ts              # coverage・impact の公開契約（純粋関数、4役割の役割付き対応関係）
-│   ├── check.ts              # check の11種検査（純粋関数、Decision 欠落非計上、links 完全性検査なし、structuralOnly）
+│   ├── check.ts              # check の12種検査（純粋関数、Decision 欠落非計上、links 完全性検査なし、structuralOnly）
 │   ├── inventory.ts          # 棚卸し（直接走査での宣言外候補発見、advisory）
 │   ├── reuse.ts              # 証拠再利用の構造的適用可否確認（合格判定なし、manualConfirmation 明示）
+│   ├── derivations.ts        # 対応宣言の導出機構（traceability/derivations.yaml の導出規約に基づく検証対応の決定的導出）
 │   └── cli_utils.ts          # argv 解析、JSON 出力、エラー終了
 └── src/
     ├── coverage.ts       # CLI: coverage
@@ -26,7 +27,8 @@ scripts/
     ├── check.ts          # CLI: check
     ├── links.ts          # CLI: links（隣接工程間対応の双方向追跡）
     ├── inventory.ts      # CLI: inventory（棚卸し）
-    └── reuse.ts          # CLI: reuse（証拠再利用確認）
+    ├── reuse.ts          # CLI: reuse（証拠再利用確認）
+    └── derivations.ts    # CLI: derivations（導出実行と重複・矛盾の決定的検出、恒常 checker）
 ```
 
 `lib/`（解析コア）と `src/`（CLI）の分離により、coverage、impact、check、links、inventory、reuse の外部契約を変えずに、将来キャッシュまたは索引を追加できる。
@@ -48,7 +50,8 @@ scripts/
 - `--req` は要件行ID（`REQ-{NNNN}-{MMM}`）の個別カンマ指定のみを受理する。`..` 形式の範囲構文は範囲展開されずリテラルの reqId として扱われるため、check の完全性検査（`missing-design` / `missing-implementation` / `missing-verification`）の対象限定が空振りし、未検査の行が存在しないかのような結果を返す。対象行は1つずつ列挙すること
 - 本 README のコマンド例は scripts ディレクトリを cwd に起動することを前提とする。worktree を検証対象とする場合は `--root` にその worktree のルートを明示する（相対パス指定の注意は前段のとおり）
 - inline 宣言の走査対象は拡張子 `.md` / `.ts` のファイルのみで、除外ディレクトリは `.git`、`.agentdev`、`.agentdev-plugin`、`.worktrees`、`node_modules`。`docs/reports/` 配下は履歴記録領域として走査対象から除外する（checker 実行契約 Design「検出対象除外規定」）。除外ディレクトリ配下や対象拡張子以外のファイルに配置した宣言は計上されない
-- sidecar の走査対象は top-level `traceability/` 配下の `.yaml` / `.yml`（`policy.yaml` を除く）。sidecar が参照する成果物はリポジトリ相対パスで存在確認される（checker 実行契約 Design の走査対象方針）
+- sidecar の走査対象は top-level `traceability/` 配下の `.yaml` / `.yml`（`policy.yaml` と `derivations.yaml` を除く。それぞれ検証スコープポリシー・導出規約であり対応関係データではない）。sidecar が参照する成果物はリポジトリ相対パスで存在確認される（checker 実行契約 Design の走査対象方針）
+- 導出機構は `traceability/derivations.yaml`（repository-local 導出規約）が存在する場合のみ活性化する。規約不在時は導出が不活性（導出宣言 0・issue 0）。規約の解析不能・schema 不備は check の `derived-declaration-conflicts` として fail-closed に計上する
 
 ```bash
 # 型チェック
@@ -75,6 +78,9 @@ bun src/inventory.ts --root <repo-root>
 
 # reuse（証拠再利用の構造的適用可否確認）
 bun src/reuse.ts --root <repo-root> --evidence <repo-relative-path> --revision <identifier>
+
+# derivations（導出実行と重複・矛盾の決定的検出。恒常 checker。検出ありで終了コード 2）
+bun src/derivations.ts --root <repo-root>
 ```
 
 各 CLI の詳細な出力契約は親 SKILL.md の「公開操作契約（スクリプト一覧）」参照。

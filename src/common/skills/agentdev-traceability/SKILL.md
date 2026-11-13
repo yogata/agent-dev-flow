@@ -95,12 +95,15 @@ description: Requirement-artifact traceability (coverage, impact, check) resolvi
 | `src/coverage.ts` | coverage | `--root` + `--req` または `--artifact` | 要件起点: 役割付き対応関係の全件（`relations`, `counts`, `truncated: false`）/ 成果物起点: 当該成果物の対応要件（`relations`, `emptyResult`） |
 | `src/impact.ts` | impact | `--root` + `--req` または `--artifact` | 要件起点: 再確認候補 / 成果物起点: `viaRequirements` + `recheckCandidates`。空結果は `emptyResult: true` と `note`（影響なしの証明ではない旨）で明示 |
 | `src/relied-diff.ts` | impact 拡張（差分候補） | `--root`（依拠版 `--relied`、現行版 `--head`、対象 `--paths`、下流 `--downstream`、証拠対象版 `--evidence-basis`、代替確認の根拠記録 `--basis-note`） | 依拠版に基づく影響分類（`impacts` の4区分 `update` / `up-to-date` / `create` / `unverified` と根拠 `basis`、中間変更の伝播対象 `propagationRequired`）、下流不在の `create`（`downstream`）、再利用証拠の上流整合（`evidence`）、全体反映完了判定（`fullyPropagated`: yes / no / undetermined）。比較基準（依拠版）を特定できない場合は分類を実行せず `fullyPropagated: undetermined` を返す（根拠なしに「影響なし」・「完了」と判定しない） |
-| `src/check.ts` | check | `--root`（任意: `--req` で完全性検査対象限定、`--artifact` で根拠検査追加） | 11種検査の `checks`（項目ごと pass / fail と findings）、`summary`、`structuralOnly: true`（構造検査のみの明示） |
+| `src/check.ts` | check | `--root`（任意: `--req` で完全性検査対象限定、`--artifact` で根拠検査追加） | 12種検査の `checks`（項目ごと pass / fail と findings）、`summary`、`structuralOnly: true`（構造検査のみの明示） |
+| `src/derivations.ts` | derivations（導出 checker） | `--root` | 導出された対応宣言（`derivedDeclarations`）、導出機構の issues（`derivationIssues`）、導出結果と手動宣言の重複・矛盾検査結果（`conflicts`）、`summary`。検出ありで終了コード 2 |
 | `src/links.ts` | links | `--root` + `--artifact` | 当該成果物の `upstream`（下流→上流）と `downstream`（上流→下流・逆引き）の双方向列挙。固定 1 ホップ。空結果は `emptyResult` と `note` |
 | `src/inventory.ts` | inventory | `--root` | 直接走査で発見した実在成果物の全件（`corpusArtifacts`）、宣言済み集合（`declaredArtifacts`, `linkedArtifacts`）、宣言外の実在成果物の発見候補（`discoveredCandidates`。advisory・欠落と誤判定しない `note` 付き） |
 | `src/reuse.ts` | reuse | `--root` + `--evidence`（任意: `--revision`） | 証拠成果物の存在・読取可能性、証拠自身の対応関係（`declaredRelations`）、links の双方向（`upstreamArtifacts`, `downstreamArtifacts`）、構造検査で解決しない確認事項（`manualConfirmation`）。適用可否の合格判定は返さない |
 
-check の11種検査: `malformed-declarations`（sidecar および inline declaration の形式・構文違反）、`unknown-roles`（未知の成果物役割）、`unknown-req-refs`（存在しない要件行への参照。sidecar、inline declaration、policy.yaml の optional 列挙を含む）、`invalid-artifact-paths`（存在しない、または取得不能な artifact path）、`missing-design`（Design 対応の欠落。現行要件行で0件）、`missing-implementation`（実装対応の欠落。現行要件行で0件）、`missing-verification`（検証対応の欠落。検証スコープポリシーが required と判定する現行要件行のみ計上）、`policy-invalid`（検証スコープポリシーの不正。schema 違反、default 値不正、optional 列挙の要件行 ID 形式違反、存在しない要件行の列挙、policy 読取不能）、`duplicate-inconsistencies`（同一論理関係の不整合な重複。同一 artifact パス × role × 要件行 ID の組み合わせが sidecar と inline declaration の間、または同一情報源内で矛盾する状態）、`malformed-links`（隣接工程間対応の宣言形式・構文違反。inline 宣言の形式不備・不明方向、sidecar links セクションの schema 不正）、`dangling-links`（links の source / target 参照先の不存在）。
+check の12種検査: `malformed-declarations`（sidecar および inline declaration の形式・構文違反）、`unknown-roles`（未知の成果物役割）、`unknown-req-refs`（存在しない要件行への参照。sidecar、inline declaration、policy.yaml の optional 列挙を含む）、`invalid-artifact-paths`（存在しない、または取得不能な artifact path）、`missing-design`（Design 対応の欠落。現行要件行で0件）、`missing-implementation`（実装対応の欠落。現行要件行で0件）、`missing-verification`（検証対応の欠落。検証スコープポリシーが required と判定する現行要件行のみ計上）、`policy-invalid`（検証スコープポリシーの不正。schema 違反、default 値不正、optional 列挙の要件行 ID 形式違反、存在しない要件行の列挙、policy 読取不能）、`duplicate-inconsistencies`（同一論理関係の不整合な重複。同一 artifact パス × role × 要件行 ID の組み合わせが sidecar と inline declaration の間、または同一情報源内で矛盾する状態）、`malformed-links`（隣接工程間対応の宣言形式・構文違反。inline 宣言の形式不備・不明方向、sidecar links セクションの schema 不正）、`dangling-links`（links の source / target 参照先の不存在）、`derived-declaration-conflicts`（導出対応宣言と手動宣言の重複・矛盾。導出された論理関係と同一の手動宣言の共存〔重複〕、導出対象範囲の論理関係で手動宣言と導出結果が部分重複しつつ要件行 ID 集合が一致しない状態〔矛盾〕、導出規約 traceability/derivations.yaml の解析不能・schema 不備を計上。交差なしの共存〔導出に含まれない要件行 ID のみの手動宣言〕は手動付与対象の正当な残存として検出しない）。
+
+対応宣言の導出: `traceability/derivations.yaml`（repository-local 導出規約）が宣言するテストディレクトリ配下の `.test.ts` について、テスト本文の import 実測と検証対象モジュールへの手動対応宣言（inline + sidecar）から verification 対応を決定的に導出する。導出根拠のないテストは導出せず手動付与対象として残る。導出対象と手動付与対象の境界は v4-traceability-model Design「永続情報と導出可能情報の分離」節が所有する。検証対応要否はトレーサビリティポリシー（policy.yaml）が所有し導出しない。導出された対応宣言も対応関係の存在であり、対応宣言の存在だけを根拠に実現または検証の成立を推定しない（T-003）。
 
 - Decision 対応の欠落は不合格に計上しない（対応完全性規則の任意役割）
 - links の完全性検査は存在しない。links 宣言の不在は不合格に計上せず、links 対応は missing-* 判定の入力にしない（グループ化しても子要件行単位の検証義務が消えない）
@@ -149,6 +152,9 @@ bun .opencode/skills/agentdev-traceability/scripts/src/inventory.ts --root <repo
 
 # reuse: 変更前の証拠を再利用する場合の構造的適用可否確認
 bun .opencode/skills/agentdev-traceability/scripts/src/reuse.ts --root <repo-root> --evidence <repo-relative-path> --revision <identifier>
+
+# derivations: 対応宣言の導出と重複・矛盾の決定的検出（恒常 checker）
+bun .opencode/skills/agentdev-traceability/scripts/src/derivations.ts --root <repo-root>
 ```
 
 スクリプト構成の詳細は [scripts/README.md](scripts/README.md) 参照。
