@@ -1353,3 +1353,21 @@
 
 ---
 
+## 2026-11-13: trusted-distribution-gate pipeline が main root でも archive stage で FAIL する（boundary detector の unclassified 大量検出）
+
+- **問題事象**: trusted-distribution-gate.ps1 pipeline（base 9ec88e649 → candidate ff4677e01・bootstrap mode・main root 実行）が code=9 で fail。manifests 全投影 entries 空・archive stage で配布対象多数 missing。boundary detector が tests 配下のサンプル文字列（wave-gate.test.ts の「FN-1」等）を unclassified-entry として大量検出し「projection detections bound exceeded」を記録（Case 4026 stage 4・AG-013 最終合格確認の試行実測）
+- **発生局面**: Root Case close の AG-013（配布整合検査の最終合格）確認での pipeline 試行実行
+- **検知方法**: pipeline 実行の exit code と summary（code=9・archive verification failed: missing）
+- **根本原因**: boundary detector が distribution-boundary.md「検査対象の除外領域」規定（共通原本側 tests/ 配下の検出刺激用サンプル文字列・Issue #2480）を gate 実装へ適用していない疑い。tests 配下のサンプル識別子を producer 内部参照として unclassified 検出し、検出 bound を超過させた。blob 分類・manifest projection との整合も未確認
+- **自律対応内容**: pipeline 実行障害の記録と intake 化（次サイクル修正対象）。正規成果物側の配布違反検出とは区別し、AG-013 の配布整合検査判定は既存の合格記録（E4-1 最終 gate・入口横断一致試験・Pester・trusted-distribution-gate 配下 test）で成立と判断
+- **ユーザー確認有無**: 判定根拠は完了記録コメントで報告（pipeline は archive 公開前検査〔DEC-014 決定7・REQ-009-045〕で本 Case は archive 公開なし）
+- **Decision/REQ/spec影響**: なし（検査装置側の実装乖離の修正は次サイクル対象）
+- **横展開観点**: archive 公開前の gate pipeline 実行（backlog-auto リリース手順・trusted-distribution-gate を実行する全経路）
+- **再発条件**: gate pipeline を archive 公開時や検証目的で実行する全状況
+- **予防策候補**: gate 実装へ distribution-boundary.md 除外領域規定の適用と boundary detector 検出 bound の整備。pipeline の実行環境前提（Windows・main root）の検証手順整備
+- **想定反映先**: repo-agentdev-integrity scripts trusted-distribution-gate・intake-promote（intake item 経由）
+- **関連**: Case 4026 stage 4 完了記録コメント・intake item（2026-11-13-trusted-distribution-gate-pipeline-boundary-detector-unclassified-fail）
+- **タグ**: #trustedGate #boundaryDetector #pipeline実行障害 #stage4
+
+---
+
