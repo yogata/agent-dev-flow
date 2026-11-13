@@ -245,7 +245,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | local/local-case-file.md | accepted | ローカルIssue共通スキーマ | ローカルIssueの共通メタデータ、role 条件付きスキーマ、状態遷移 |
 | local/install-script-usability.md | accepted | 導入スクリプトの使いやすさ詳細 | install/check/sync-self の使いやすさ詳細（対話ウィザード、cwd 安全化、ヘルプ、上級者向けオプション） |
 | local/third-party-skill-management.md | accepted | third-party Skill 管理 | third-party Skill の宣言（skills.yaml）と取得機構の正規仕様（source 形式判定、取得プロファイル、非破壊性、個別特例統合、参照点集約） |
-| local/adf-simplification-deferred-records.md | draft | ADF全体簡素化計画の見送り記録 | ADF全体簡素化計画（第53報告）§3の見送り記録（見送りの意味の定義、第52報告 A-3・A-4 の処置確定、対応関係の注記、見送り表14行）の正規保存と再評価条件の保持。REQ-121-001 の design 対応 |
+| local/adf-simplification-deferred-records.md | accepted | ADF全体簡素化計画の見送り記録 | ADF全体簡素化計画（第53報告）§3の見送り記録（見送りの意味の定義、第52報告 A-3・A-4 の処置確定、対応関係の注記、見送り表14行）の正規保存と再評価条件の保持。REQ-121-001 の design 対応 |
 
 #### authoring/（執筆規約）
 
