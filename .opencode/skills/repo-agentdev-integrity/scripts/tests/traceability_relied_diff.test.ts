@@ -1,7 +1,7 @@
-// ADF-COVERS(verification): REQ-106-001, REQ-106-002, REQ-106-003, REQ-106-004, REQ-106-005, REQ-106-006, REQ-106-007, REQ-106-008, REQ-106-009, REQ-106-010, REQ-106-011
-//
 // agentdev-traceability 配布スキル relied-diff（依拠版に基づく差分・変更影響・増分更新）の
 // 公開契約検証（REQ-106、agentdev-traceability Design「impact 拡張（差分候補）」節）。
+// 本テストの verification 対応（REQ-106-001〜011）は、relied_diff.ts への import 実測から
+// 導出機構が宣言する（導出への移行済み。inline・sidecar 宣言は保持しない）。
 // 分類決定表（update / up-to-date / create / unverified）、変更起点の後続伝播
 // （正味差分ゼロでも中間変更を後続へ引き継ぐ）、個別工程確定と全体反映完了の分離判定、
 // 再利用証拠の上流整合確認を、テンポラリ git リポジトリの実 Git 事実で検証する。

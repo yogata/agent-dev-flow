@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-012-053, REQ-012-055
+// ADF-COVERS(verification): REQ-012-053
 //
 // agentdev-traceability 配布スキルの sidecar 読込と種別非依存走査の検証
 // （TS-002、TS-005）。top-level traceability/ 配下の component / package 単位

@@ -1,5 +1,5 @@
 // ADF-COVERS(implementation): REQ-119-003
-// ADF-COVERS(verification): REQ-009-053, REQ-119-003
+// ADF-COVERS(verification): REQ-119-003
 import { afterAll, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";

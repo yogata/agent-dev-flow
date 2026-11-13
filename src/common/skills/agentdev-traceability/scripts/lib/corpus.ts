@@ -25,6 +25,8 @@ import { parseLinkDeclarations } from "./links.ts";
 import type { LinkRelation, LinkIssue } from "./links.ts";
 import { parseSidecar, TRACEABILITY_DIR } from "./sidecar.ts";
 import type { SidecarIssue } from "./sidecar.ts";
+import { DERIVATIONS_FILE_REL, deriveFromManualDeclarations } from "./derivations.ts";
+import type { DerivationIssue } from "./derivations.ts";
 
 export const DEFAULT_SCAN_EXTENSIONS = [".md", ".ts"] as const;
 export const SIDECAR_SCAN_EXTENSIONS = [".yaml", ".yml"] as const;
@@ -73,6 +75,10 @@ export interface ScanResult {
   readonly linkIssues: readonly LinkIssue[];
   /** links の source / target のうち存在しないもの（check の dangling-links 入力）。 */
   readonly linkMissingArtifacts: readonly LinkMissingArtifact[];
+  /** 導出された対応宣言（traceability/derivations.yaml の導出規約に基づく決定的導出分）。 */
+  readonly derivedDeclarations: readonly CoverDeclaration[];
+  /** 導出機構の解析・実行 issues（check の fail-closed 判定入力）。 */
+  readonly derivationIssues: readonly DerivationIssue[];
   readonly unreadableFiles: readonly string[];
   readonly fileCount: number;
 }
@@ -177,6 +183,8 @@ export function scanCorpus(root: string, options: ScanOptions = {}): ScanResult 
   for (const rel of enumerateSidecarFiles(root)) {
     // policy.yaml は検証スコープポリシーであり sidecar ではない
     if (rel === POLICY_FILE_REL) continue;
+    // derivations.yaml は導出規約であり対応関係データではない
+    if (rel === DERIVATIONS_FILE_REL) continue;
     try {
       statSync(join(root, rel));
       const content = readFileSync(join(root, rel), "utf-8");
@@ -240,6 +248,10 @@ export function scanCorpus(root: string, options: ScanOptions = {}): ScanResult 
       linkMissingArtifacts.push({ artifact: link.target, linkFile: link.source, role: "target" });
     }
   }
+  // 導出規約（traceability/derivations.yaml）に基づく検証対応の決定的導出。
+  // 導出根拠は手動宣言（inline + sidecar 正規化分）のみ。規約不在時は不活性。
+  const derivation = deriveFromManualDeclarations(root, declarations);
+  declarations.push(...derivation.declarations);
   return {
     declarations,
     issues,
@@ -248,6 +260,8 @@ export function scanCorpus(root: string, options: ScanOptions = {}): ScanResult 
     links,
     linkIssues,
     linkMissingArtifacts,
+    derivedDeclarations: derivation.declarations,
+    derivationIssues: derivation.issues,
     unreadableFiles,
     fileCount: files.length,
   };

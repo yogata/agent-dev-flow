@@ -1,4 +1,4 @@
-// check の11種検査（agentdev-traceability Design「公開能力 check」の実装）。
+// check の12種検査（agentdev-traceability Design「公開能力 check」の実装）。
 //
 // 1. malformed-declarations: 不正な対応関係記述（inline 宣言の形式・構文違反 +
 //    sidecar の形式・構文違反）
@@ -18,13 +18,24 @@
 // 10. malformed-links: 採用された隣接工程間対応（links）の宣言形式・構文違反
 //     （inline 宣言の形式不備・不明方向、sidecar links セクションの schema 不正）
 // 11. dangling-links: links の source / target 参照先の不存在
+// 12. derived-declaration-conflicts: 導出対応宣言と手動宣言の
+//     重複・矛盾の決定的検出（導出規約の解析不能・schema 不備を
+//     含む fail-closed 計上）。
+//     - 重複: 導出された論理関係（artifact パス × role × 要件行 ID）と同一の
+//       手動宣言が共存（導出への移行が完了していない手動残存）
+//     - 矛盾: 導出対象範囲の論理関係で手動宣言が導出結果に含まれない要件行 ID
+//       を主張（導出結果と手動宣言の内容不一致）
+//     - 導出規約不在時は不活性（不活性自体は不合格に計上しない）。規約の解析
+//       不能・schema 不備は fail-closed で計上する
 //
 // Decision 対応の欠落は不合格に計上しない（対応完全性規則の任意役割）。
 // links の完全性検査は存在しない（links 宣言の不在は不合格に計上せず、採用されて
 // いない詳細工程への対応を強制しない）。links 対応は missing-* 判定の入力にしない
 // （グループ化しても子要件行単位の検証義務が消えない）。
 // check は構造検査（対応関係の存在と参照整合）のみを担い、pass は要求内容の
-// 充足（意味的品質）の証明ではない。出力の structuralOnly がその境界を明示する。
+// 充足（意味的品質）の証明ではない。出力の structuralOnly がその境界を明示する
+// （T-003。導出された対応宣言も対応関係の存在であり、対応宣言の
+// 存在だけを根拠に実現または検証の成立を推定しない）。
 // policy の要否判定が実行不能な場合、または sidecar の解析が実行不能な場合、
 // 対応完全性の合格を返さない（fail-closed、agentdev-traceability Design
 // 「advisory 能力と品質ゲートとしての check の境界」）。
@@ -44,7 +55,8 @@ export type CheckKind =
   | "policy-invalid"
   | "duplicate-inconsistencies"
   | "malformed-links"
-  | "dangling-links";
+  | "dangling-links"
+  | "derived-declaration-conflicts";
 
 export interface CheckFinding {
   readonly file?: string;
@@ -127,7 +139,7 @@ function item(kind: CheckKind, findings: readonly CheckFinding[]): CheckResultIt
 }
 
 /**
- * 11種検査を実行する。scan は正規成果物の直接走査結果（sidecar 正規化分を含む）、
+ * 12種検査を実行する。scan は正規成果物の直接走査結果（sidecar 正規化分を含む）、
  * knownReqIds は現行要件行ID。verificationPolicy を省略した場合（policy 不在と同等）、
  * 全要件行が検証対応必須となる。policy の要否判定が実行不能、または sidecar の
  * 解析が実行不能な場合、対応完全性の合格を返さない（fail-closed）。
@@ -263,6 +275,7 @@ export function runChecks(
   }
 
   const duplicateFindings = detectDuplicateInconsistencies(scan);
+  const derivedConflictFindings = detectDerivedDeclarationConflicts(scan);
 
   const malformedLinks: CheckFinding[] = scan.linkIssues.map((i) => ({
     file: i.file,
@@ -290,6 +303,7 @@ export function runChecks(
     "duplicate-inconsistencies": item("duplicate-inconsistencies", duplicateFindings),
     "malformed-links": item("malformed-links", malformedLinks),
     "dangling-links": item("dangling-links", danglingLinks),
+    "derived-declaration-conflicts": item("derived-declaration-conflicts", derivedConflictFindings),
   };
 
   const values = Object.values(checks);
@@ -316,6 +330,9 @@ function detectDuplicateInconsistencies(
 ): CheckFinding[] {
   const byKey = new Map<string, Map<string, Set<string>>>();
   for (const d of scan.declarations) {
+    // 導出宣言と手動宣言の整合は derived-declaration-conflicts が単一所有するため、
+    // 本検査（手動情報源間の矛盾検査）の入力から除外する
+    if (d.source === "derived") continue;
     const key = `${d.file}\u0000${d.role}`;
     let bySource = byKey.get(key);
     if (bySource === undefined) {
@@ -347,5 +364,80 @@ function detectDuplicateInconsistencies(
   }
   return findings.sort((a, b) =>
     (a.artifact ?? "") === (b.artifact ?? "") ? (a.reason ?? "").localeCompare(b.reason ?? "") : (a.artifact ?? "").localeCompare(b.artifact ?? ""),
+  );
+}
+
+/**
+ * 導出対応宣言と手動宣言の重複・矛盾を決定的に検出する
+ * - 導出機構の解析不能・規約 schema 不備は fail-closed で計上する
+ * - 重複: 導出された論理関係（artifact パス × role × 要件行 ID）と同一の手動宣言
+ *   （inline / sidecar）が共存している状態。導出への移行が完了していない手動残存
+ * - 矛盾: 導出対象範囲の論理関係について手動宣言と導出結果が部分重複しつつ
+ *   要件行 ID 集合が一致しない状態（同一論理関係で内容の主張が不一致）
+ * - 導出対象範囲の論理関係で導出に含まれない要件行 ID のみを手動宣言している
+ *   状態（交差なしの共存）は手動付与対象の正当な残存であり、矛盾として検出
+ *   しない（導出対象と手動付与対象の境界。手動付与対象の廃止をしない）
+ */
+function detectDerivedDeclarationConflicts(
+  scan: ScanResult,
+): CheckFinding[] {
+  const findings: CheckFinding[] = [];
+  for (const issue of scan.derivationIssues) {
+    findings.push({
+      file: issue.file,
+      ...(issue.text !== undefined ? { text: issue.text } : {}),
+      reason: issue.reason,
+      detail: issue.detail,
+    });
+  }
+  const derivedByKey = new Map<string, Set<string>>();
+  for (const d of scan.derivedDeclarations) {
+    const key = `${d.file}\u0000${d.role}`;
+    let set = derivedByKey.get(key);
+    if (set === undefined) {
+      set = new Set();
+      derivedByKey.set(key, set);
+    }
+    for (const reqId of d.reqIds) set.add(reqId);
+  }
+  const manualByKey = new Map<string, Set<string>>();
+  for (const d of scan.declarations) {
+    if (d.source === "derived") continue;
+    const key = `${d.file}\u0000${d.role}`;
+    let set = manualByKey.get(key);
+    if (set === undefined) {
+      set = new Set();
+      manualByKey.set(key, set);
+    }
+    for (const reqId of d.reqIds) set.add(reqId);
+  }
+  for (const [key, derivedSet] of derivedByKey) {
+    const manualSet = manualByKey.get(key);
+    if (manualSet === undefined || manualSet.size === 0) continue;
+    const [artifact, role] = key.split("\u0000");
+    const intersection = [...derivedSet].filter((reqId) => manualSet.has(reqId));
+    for (const reqId of intersection) {
+      findings.push({
+        artifact,
+        reason: role,
+        reqId,
+        detail: "導出された対応宣言と同一論理関係（artifact パス × role × 要件行 ID）の手動宣言が共存している（導出への移行が完了していない重複）",
+      });
+    }
+    const equal = derivedSet.size === manualSet.size && [...derivedSet].every((reqId) => manualSet.has(reqId));
+    if (intersection.length > 0 && !equal) {
+      findings.push({
+        artifact,
+        reason: role,
+        detail: `導出対象の論理関係（artifact パス × role）で手動宣言と導出結果の要件行 ID 集合が部分重複しつつ不一致（手動: ${[...manualSet].sort().join(", ")} / 導出: ${[...derivedSet].sort().join(", ")}）（導出結果と手動宣言の矛盾）`,
+      });
+    }
+  }
+  return findings.sort((a, b) =>
+    (a.artifact ?? "") === (b.artifact ?? "")
+      ? (a.reason ?? "") === (b.reason ?? "")
+        ? (a.reqId ?? "").localeCompare(b.reqId ?? "")
+        : (a.reason ?? "").localeCompare(b.reason ?? "")
+      : (a.artifact ?? "").localeCompare(b.artifact ?? ""),
   );
 }
