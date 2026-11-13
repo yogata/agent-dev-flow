@@ -8,7 +8,8 @@
 //
 // 配置契約: 本モジュールは consumer 配布対象 plugin（agentdev-textlint-guard）
 // の package 内に配置する。配布物は導入先で解決不能な producer 内部領域
-// （src/common/ 等）へ依存しない（REQ-029-001、IR-055）。repo-local の
+// （src/common/ 等）へ依存しない（producer 側の配布制約と、配布ソース面の
+// 解決不能参照を防ぐ契約による）。repo-local の
 // 配布依存境界 guard 側（src/common/guards/distribution-boundary/）からは
 // canonical detector への逆向き参照と同種の repo-local 間参照で本モジュールを
 // 参照する。本モジュール本文は host 非依存（ホスト名、起動 API、実行制御を
