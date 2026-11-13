@@ -146,6 +146,54 @@ promote 系コマンド（intake-promote・learning-promote・inspect-promote）
 振り分けは実行コマンド選択の目安であり、各コマンドの検出対象（既定のスキャン範囲）は変更しない。
 配布物のみの変更時は inspect-skills を優先する。
 
+## 文章品質・書込み規約（反復規則の単一正本）
+
+本節は、case 系 workflow 拡張（agentdev-workflow-case-auto、case-open、case-ready、case-revise、case-run、case-close、workflow-issue の project extension rules）に反復していた文章品質規則（yomiyasu 推敲と書込み guard の説明）の本文の正本である。
+各 workflow 拡張と工程側 references は対象範囲と呼出条件のみを保持し、本節への名レベル参照により規則本文を消費する。規則本文を各ファイルへ複製しない。本節の配置変更は公開契約の変更として扱う。
+
+### yomiyasu 推敲の適用規律
+
+docs/** の日本語文章を変更する場合、編集前に yomiyasu を読み込み、内容変更が揃った後に変更文章と周辺文脈を推敲し、同梱 lint を実行して指摘を確認してから提出する。各 edit ごと・既存文書全体の一括推敲は不要。
+
+lint の実行経路: `.opencode/skills/yomiyasu/scripts/yomiyasu_lint.py` を、環境で利用可能な Python コマンド（python3 に固定しない）で実行する。標準入力・パイプ・リダイレクト経由の本文渡しは使わず、検査専用本文ファイルを非永続領域（リポジトリ外の一時ディレクトリ等）に新規作成して lint のファイル引数実行を行い、検査後に当該ファイルを削除する。パイプ・リダイレクト経由の本文渡しが Windows 環境の文字コード再符号化により本文を破損し得る事象の詳細と標準回避手段は、docs/knowledge/windows-powershell-bulk-io-corruption.md を参照する（必要なときだけ参照する条件付き参照）。
+
+GitHub 文章（Issue/PR タイトル・本文、説明・レビュー・完了コメント。委譲先能力スキル〔agentdev-issue-management、agentdev-workflow-templates、agentdev-epic-tracker、agentdev-quality-gates、agentdev-case-run-execution-adapter〕経由の書込みを含む）は agentdev_gh へ渡す前に推敲する。本文は lint・指摘確認後、タイトルは本文向け文長・箇条書き比率を合否条件にしない。書込み後 VERIFY は維持する。
+
+更新は変更文章と周辺文脈を対象とし、他者の文章・引用・ログを無断でリライトしない。ラベル・状態・チェックボックスのみの変更は再推敲不要。
+
+推敲は要件の必須性、条件、責任主体、数値、否定条件を保持し、識別子、リンク、コード、引用、固定テンプレート、表構造、AUTOGEN 部分を保護する。既存の用語辞書と文書契約を優先し、曖昧な主体を推測で補わない。箇条書きの削減と否定対比の肯定化を機械的に適用しない。
+
+適用済みは推敲・lint・指摘確認までを指す（修正不要の確認を含む）。警告ゼロ・スコア閾値・--strict を要求せず、lint の通常終了コード 0 を指摘なし・推敲済みの証明として扱わない。正当な用語への指摘は理由を記録して保持できる。修正試行は最大 2 回。
+
+yomiyasu 未導入・lint 実行失敗の場合は対象文章の提出・投稿・マージを停止する。適用確認は最後の文章変更後に行い、親セッションの読込事実のみで委譲先の適用を省略しない。
+
+記録は既存 PR 検証欄等へ対象・実施結果・保持した指摘理由を最小限残し、記録のためだけの再帰的コメント投稿や追加永続管理を作らない。
+
+### 書込み guard の拒否対象・許可対象と拒否後の回復
+
+書込み規律を強制する guard の検出対象（実効範囲）は次のとおりであり、文書が規定する拒否対象・許可対象はこの実効範囲と一致する。
+
+| guard | 拒否対象 | 許可対象 |
+|---|---|---|
+| textlint 書込み前 guard（pre-write plugin） | docs/** を対象とする書込みのうち、拒否対象（hard）違反を含む内容のディスク反映。プロジェクトルート外パスへの書込み（いずれも fail-closed） | プロジェクトルート内の標準対象外ファイルへの書込み |
+| 配布依存境界 guard | src/common/commands/agentdev/** と src/common/skills/agentdev-*/** への書込みのうち、producer 側 concrete ID（要件・Decision・ADR 系 ID と未分類の大文字-数字系 ID）、docs の要件・Decision・ADR 系パス、producer リポジトリの blob/raw URL、producer 側トレーサビリティ metadata の直書き（いずれも fail-closed。検査不能も拒否） | リポジトリ top-level の traceability/ 配下 sidecar への対応宣言登録。OS の一時ディレクトリ等の配布対象外パスへの書込み |
+| GitHub 書込み guard | agentdev_gh Custom Tool を迂回する生 gh WRITE コマンド（issue・pr・label・release 等の WRITE 系サブコマンドと gh api の書込みメソッド）の bash 経由実行（fail-closed） | gh の読み取り系コマンドと、agentdev_gh Custom Tool 経由の書込み |
+
+guard による書込みブロックは fail-closed として維持し、guard の解除・迂回を行わない。
+拒否後の回復は、許可された配置先への変更による: プロジェクトルート外への書込みが拒否された場合は、作成先をプロジェクトルート内の実行時作業領域（worktree 実行時は worktree root 配下。退避ファイルの分類規律に従う）へ変更する。別の書込み手段で同じプロジェクトルート外の配置先へ書き込む選択肢（別 API 経路での迂回書込み）は案内しない。配布物本文への直書きが拒否された場合は、対応関係を traceability sidecar へ登録する（書込み手段の代替ではなく配置先の変更）。
+worktree 操作文脈での標準手段への切替と退避配置の分類規律は、`agentdev-git-worktree` スキル「書込み guard 運用指針」節を参照する（必要なときだけ参照する条件付き参照）。
+
+### 障害対応知識の条件付き参照
+
+例外回復・検証の障害知識は本文へ複製せず、次の条件が発生したときだけ参照先を読む。通常工程の常時手順は縮小してよいが、次の参照経路を通じて障害時の回復手順へ到達できることを維持する:
+
+- shell inline・heredoc に起因するコンテンツ伝達破損（3機構）の別個の検知方法と判別、切替手段: docs/knowledge/windows-git-bash-inline-content-corruption.md
+- bun test の実行形態逸脱（3分割正規形からの逸脱）の検知条件と判別観点: docs/knowledge/bun-test-execution-form-drift-signals.md
+- checker CLI の stdout 証跡が Windows + bun で失われる問題の安定実行経路: docs/knowledge/checker-cli-stdout-loss-on-windows-bun.md
+- 長時間機械工程の timeout 切断耐性と証跡の stdout/stderr 分離退避: docs/knowledge/long-running-mechanical-step-background-execution.md
+- worktree 環境差 fail の由来分離手順と依存前提の実行形態知見: docs/knowledge/worktree-environment-fail-classification.md
+- PowerShell 経由の UTF-8 破壊（一括読み書き・パイプ・リダイレクト）の標準回避手段: docs/knowledge/windows-powershell-bulk-io-corruption.md
+
 ## See Also
 
 - **agentdev-issue-management**: Issue作成、更新、リンク、確認の安全手順（操作用Skill）
