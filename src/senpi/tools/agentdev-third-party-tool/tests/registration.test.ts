@@ -14,7 +14,7 @@ import { afterEach, beforeEach } from "bun:test";
 import { createAgentdevThirdPartySenpiRegistration } from "../registration.ts";
 import type { SenpiToolContext } from "../../tool-registration.ts";
 import { AGENTDEV_THIRD_PARTY_REQUEST_PROPERTY_SCHEMA } from "../../../../common/tools/agentdev-third-party/public-schema.ts";
-import { createGitHubSourceFetcher } from "../../../../common/tools/agentdev-third-party/index.ts";
+import { AGENTDEV_THIRD_PARTY_TOOL_DESCRIPTION, createGitHubSourceFetcher } from "../../../../common/tools/agentdev-third-party/index.ts";
 import { startMockGitHubSource, type MockSourceServer } from "../../../../common/tools/agentdev-third-party/tests/mock-source.ts";
 
 let testRoot: string;
@@ -61,6 +61,11 @@ describe("登録単位の構造", () => {
     expect(registration.args.request).toBe(AGENTDEV_THIRD_PARTY_REQUEST_PROPERTY_SCHEMA);
     const schema = registration.args.request as typeof AGENTDEV_THIRD_PARTY_REQUEST_PROPERTY_SCHEMA;
     expect(schema.properties.operation.enum).toEqual(["acquire"]);
+  });
+
+  test("説明文は engine 正本（AGENTDEV_THIRD_PARTY_TOOL_DESCRIPTION）と同一である（B3-5e 正本参照の固定）", () => {
+    const registration = createAgentdevThirdPartySenpiRegistration();
+    expect(registration.description).toBe(AGENTDEV_THIRD_PARTY_TOOL_DESCRIPTION);
   });
 });
 

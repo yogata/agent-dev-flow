@@ -77,6 +77,36 @@ export const AGENTDEV_JEV_PUBLIC_CONTRACTS: ReadonlyArray<{
   },
 ];
 
+/**
+ * Tool の説明（利用者への公開契約の要約）。
+ * 両ホストの登録単位（OpenCode plugin・Senpi registration）が本正本を単一参照する
+ * （B3-5e 配線整理。J-001 型のホスト別複製による更新漏れ〔Senpi 側の説明文陈腐化〕の
+ * 再発防止構造）。
+ */
+export const AGENTDEV_JEV_TOOL_DESCRIPTION =
+  "Jev prior evaluation with a verified provider/SDK-independent operation contract. " +
+  "Operations: " +
+  AGENTDEV_JEV_PUBLIC_CONTRACTS.map((c) => `${c.operation} (side-effect, fail-closed)`).join(", ") +
+  ". When the credentials are unset the tool returns a distinct not_configured failure without calling " +
+  "the API (no observation generated); on evaluator failures (including not_configured/unset credentials) a " +
+  "mandatory closed semantic evaluation must not fall back to LLM reasoning — the judgment stays undetermined " +
+  "and dependent successors are suppressed (caller workflow contract); API failures are never auto-retried and are returned " +
+  "as structured failures. One semantic evaluation = one observation: evaluate persists the observation (one " +
+  "JSON per evaluation) under .agentdev/jev-observations/ right after the evaluator succeeds — before the " +
+  "caller proceeds to the reasoning model — and persists a failure observation when a call fails after " +
+  "starting; not_configured and input validation failures generate no observation. observation_write appends " +
+  "the reasoning model's final judgment to an evaluator-success observation. Observation persistence failures " +
+  "stay an independent warning on the evaluation result (fail-open) and observation writes are independent of " +
+  "workflow success. Conditional evaluation trigger control: the caller generates a follow-up semantic " +
+  "evaluation only when the parent judgment's final confirmed result satisfies the trigger condition (a Jev " +
+  "prior result of the parent judgment alone never triggers it); when the condition is not met the caller " +
+  "composes neither the follow-up questions nor any observation, so this tool generates an observation only " +
+  "when it is actually invoked. Observation identifier stability: continuing the same semantic judgment keeps " +
+  "the workflow, evaluationKind, and questionId identifiers; when the judgment subject, result space, or " +
+  "criteria changes meaning (or judgments are merged) new questionIds are required; input and contract " +
+  "version differences are distinguished by sourceRevision and requestDigest; existing observations are never " +
+  "migrated, rewritten, or re-keyed.";
+
 /** 操作要求の実行時検証（observation_write）。evaluate の検証は engine が副作用発生前に実施する。 */
 type OperationDispatch =
   | { operation: "evaluate"; request: JevEvaluateRequest; observationMetadata: unknown }

@@ -8,7 +8,7 @@
 // Design「Jev 先行評価」節である。
 
 import {
-  AGENTDEV_JEV_PUBLIC_CONTRACTS,
+  AGENTDEV_JEV_TOOL_DESCRIPTION,
   runAgentdevJevOperation,
 } from "../../../common/tools/agentdev-jev/index.ts";
 import { AGENTDEV_JEV_REQUEST_PROPERTY_SCHEMA } from "../../../common/tools/agentdev-jev/public-schema.ts";
@@ -24,15 +24,7 @@ export interface AgentdevJevSenpiDeps {
 export function createAgentdevJevSenpiRegistration(deps: AgentdevJevSenpiDeps = {}): SenpiToolDefinition {
   return {
     name: "agentdev_jev",
-    description:
-      "Jev prior evaluation with a verified provider/SDK-independent operation contract. " +
-      "Operations: " +
-      AGENTDEV_JEV_PUBLIC_CONTRACTS.map((c) => `${c.operation} (side-effect, fail-closed)`).join(", ") +
-      ". When the credentials are unset the tool returns a distinct not_configured failure without calling " +
-      "the API (no observation generated); on evaluator failures (including not_configured/unset credentials) a " +
-      "mandatory closed semantic evaluation must not fall back to LLM reasoning — the judgment stays undetermined " +
-      "and dependent successors are suppressed (caller workflow contract); API failures are never auto-retried and are returned " +
-      "as structured failures.",
+    description: AGENTDEV_JEV_TOOL_DESCRIPTION,
     args: {
       request: AGENTDEV_JEV_REQUEST_PROPERTY_SCHEMA,
     },

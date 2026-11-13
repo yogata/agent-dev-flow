@@ -10,6 +10,7 @@ import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
 import { createAgentdevJevToolDefinition, createAgentdevJevToolPlugin, REQUEST_PROPERTY_SCHEMA } from "../plugin.ts";
+import { AGENTDEV_JEV_TOOL_DESCRIPTION } from "../../../../common/tools/agentdev-jev/index.ts";
 import { validateFinalResultObservation } from "../../../../common/tools/agentdev-jev/observation.ts";
 import type { JevProvider } from "../../../../common/tools/agentdev-jev/provider.ts";
 
@@ -36,6 +37,11 @@ describe("plugin structure", () => {
   test("agentdev_jev tool を hooks として登録する", async () => {
     const hooks = await createAgentdevJevToolPlugin()({ worktree: "/tmp", directory: "/tmp" });
     expect(Object.keys(hooks.tool ?? {})).toEqual(["agentdev_jev"]);
+  });
+
+  test("説明文は engine 正本（AGENTDEV_JEV_TOOL_DESCRIPTION）と同一である（B3-5e 正本参照の固定）", () => {
+    const definition = createAgentdevJevToolDefinition();
+    expect(definition.description).toBe(AGENTDEV_JEV_TOOL_DESCRIPTION);
   });
 
   test("公開スキーマは操作カタログ（evaluate / observation_write）を固定する", () => {

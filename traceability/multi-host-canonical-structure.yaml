@@ -61,6 +61,8 @@ verification:
     - REQ-099-015
   src/senpi/tools/agentdev-gh-tool/tests/missing-capability.test.ts:
     - REQ-099-015
+  src/common/tools/agentdev-gh/tests/missing-capability-shared.ts:
+    - REQ-099-015
   src/common/skills/agentdev-workflow-case-run/scripts/tests/process-conformance.test.ts:
     - REQ-099-015
     - REQ-099-016

@@ -2,7 +2,7 @@
 title: マルチホスト原本モデル（共通原本とホスト別接続の分離）
 status: accepted
 created: 2026-10-02
-updated: 2026-11-12
+updated: 2026-11-13
 ---
 <!-- ADF-COVERS(design): REQ-099-001, REQ-099-002, REQ-099-003, REQ-099-004, REQ-099-005, REQ-099-006, REQ-099-007, REQ-099-008, REQ-099-009, REQ-099-010, REQ-099-011, REQ-099-012, REQ-099-013, REQ-099-014, REQ-099-015, REQ-099-016, REQ-099-017, REQ-099-018, REQ-099-019, REQ-099-020 -->
 <!-- ADF-COVERS(design): REQ-002-007, REQ-002-008, REQ-002-009, REQ-002-019, REQ-002-043, REQ-002-045, REQ-002-047（REQ-002-047 の配備形態面。配布依存境界の検査モデル面は runtime-package-boundary.md が維持） -->
@@ -41,6 +41,8 @@ ADF 共通原本（src/common/）とホスト別接続領域（src/opencode/、s
 
 - agentdev-gh、agentdev-jev、agentdev-third-party の3系統のホスト間接続について、共通処理（Tool engine への変換、入力検査、契約解釈）とホスト固有処理（OpenCode・Senpi 各自の登録、権限、実行文脈、失敗処理）を区別する（B3-5e）。共通処理は共通原本領域が所有し、ホスト固有処理は各ホスト接続領域が所有する
 - 同等試験の共通判定部分は共通側へ移設し、接続差の試験は各ホストが保持する。公開契約が両ホストで同一に保たれること（現行の主要接続試験の水準を下げないこと）、共通契約の検証とホスト固有の検証の区別、共通エンジンの試験と接続試験の目的の区別の文書化、重複していた管理箇所の削減を確認する。実ホストでの実測は要求しない（実施計画の前提条件1）
+- 試験の目的区別（共通エンジン試験と接続試験）: 共通エンジンの試験（`src/common/` 配下。Tool 操作契約・fail-closed ゲート・VERIFY・バックエンド実装、および両ホストの登録 surface 経由で同一となる共通判定〔読み戻し検証、物理ラベル写像、終了経路、能力欠落の fail-closed。移設先は `src/common/tools/agentdev-gh/tests/four-combination-shared.ts`、`src/common/tools/agentdev-gh/tests/missing-capability-shared.ts`〕）と接続試験（`src/opencode/`・`src/senpi/` 配下。登録 surface の構築、実行 context 形の変換、ホスト向け投影パスの解決）を区別する。共通判定の本体は共通側 helper へ一元化し、各ホスト試験は接続差の検証のみを保持する
+- 両ホストのツール説明（description）は共通正本の定数（`AGENTDEV_GH_TOOL_DESCRIPTION`、`AGENTDEV_JEV_TOOL_DESCRIPTION`、`AGENTDEV_THIRD_PARTY_TOOL_DESCRIPTION`）を単一参照とし、公開スキーマ（各 `REQUEST_PROPERTY_SCHEMA`）と併せて各ホストの契約テストが正本同一参照を固定する（J-001 型のツール説明・試験条件の二重保守による更新漏れの再発防止構造）
 
 ## guard 編集解釈の分離
 

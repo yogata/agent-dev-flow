@@ -11,6 +11,7 @@ import { describe, expect, test } from "bun:test";
 import { createAgentdevJevSenpiRegistration } from "../registration.ts";
 import type { SenpiToolContext } from "../../tool-registration.ts";
 import { AGENTDEV_JEV_REQUEST_PROPERTY_SCHEMA } from "../../../../common/tools/agentdev-jev/public-schema.ts";
+import { AGENTDEV_JEV_TOOL_DESCRIPTION } from "../../../../common/tools/agentdev-jev/index.ts";
 import type { JevProvider } from "../../../../common/tools/agentdev-jev/provider.ts";
 
 function makeContext(worktree: string): SenpiToolContext {
@@ -34,6 +35,11 @@ describe("登録単位の構造", () => {
     const schema = registration.args.request as typeof AGENTDEV_JEV_REQUEST_PROPERTY_SCHEMA;
     expect(schema.properties.operation.enum).toContain("evaluate");
     expect(schema.properties.operation.enum).toContain("observation_write");
+  });
+
+  test("説明文は engine 正本（AGENTDEV_JEV_TOOL_DESCRIPTION）と同一である（B3-5e 正本参照の固定）", () => {
+    const registration = createAgentdevJevSenpiRegistration();
+    expect(registration.description).toBe(AGENTDEV_JEV_TOOL_DESCRIPTION);
   });
 });
 
