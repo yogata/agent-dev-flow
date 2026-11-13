@@ -5,6 +5,24 @@
 
 ---
 
+## 2026-11-13: agentdev_gh pr_create の number フィールド取扱いが reference 規約と Tool 実挙動で矛盾（Case #4049・case-open 設計PR作成）
+
+- **問題事象**: case-open の設計PR作成で reference 規約（definition-pr-and-idempotency.md「要求には対象識別（対象 Root Case Issue の番号を number で指定）を含める。対象識別を欠く要求は Tool が受理しない」）に従い number を含めて pr_create を呼んだところ、Tool が当該要求を fail-closed で拒否した（拒否応報は pr_create 契約が number フィールドを受理しない旨）。number を除いて再実行したところ作成に成功した（PR #4050）
+- **発生局面**: case-open STEP-4 設計PR作成（Case #4049 / PR #4050・C-ω）
+- **検知方法**: pr_create の失敗応答（fail-closed 拒否）と number 除去後の成功の対比。Tool の公開契約（request schema）は pr_create の number を「対象識別として受理する（GitHub 実装は head branch で対象解決するため作成対象解決には使用しない）」と記述しており、実挙動・reference・schema の三者が不一致
+- **根本原因**: 確定不能（要検証）。Tool 実装の入力検証が schema 記述と乖離しているか、拒否理由の報告文が不正確である可能性。委譲セッションが glm-5.3 利用上限に伴うサーバー再起動で消失し、拒否応答の原文が採取できないため、原文に基づく原因特定は未実施
+- **自律対応内容**: Tool 契約（実挙動）を正として number を除いて再作成し、reference と Tool 契約の不整合を逸脱として報告に記録した（本 entry が当該記録の正規 Capture）
+- **ユーザー確認の有無**: なし（workflow 内自律処置・逸脱記録）
+- **REQ/Decision/Design影響**: case-open の definition-pr-and-idempotency.md（pr_create の対象識別要件）と agentdev_gh 公開契約・実装の三者整合の確認要求
+- **横展開観点**: write-proxy payload 標準配置（issue-operation-recovery.md）も「pr_create の場合は対象識別を含める要求全体」と規定しており、同規約に従う全経路で同一の拒否に遭遇し得る
+- **再発条件**: number を含めて pr_create を呼ぶ全ての case-open / case-revise 実行
+- **予防策候補**: agentdev_gh の入力検証と schema 記述の整合修正、または reference 2件（definition-pr-and-idempotency.md・issue-operation-recovery.md）の対象識別要件の実装追従
+- **想定反映先**: agentdev-workflow-case-open references・agentdev-issue-management references・agentdev_gh Tool 契約
+- **関連**: Case #4049 / PR #4050・case-open STEP-4
+- **タグ**: #agentdev-gh #pr_create #契約不一致 #fail-closed #case-open
+
+---
+
 ## 2026-11-12: bun run --cwd による tsc 実行が worktree で node_modules 解決に失敗する（package 単位 bun install の前置が安全）
 
 - **問題事象**: `bun run --cwd <package> typecheck`（tsc 実行）が worktree 内で node_modules 解決に失敗する。package 直下の node_modules が未整備の場合、tsc 自体が起動しない
