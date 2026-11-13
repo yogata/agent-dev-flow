@@ -160,14 +160,36 @@ describe("buildSourceManifest / required bootstrap scripts", () => {
     expect(() => buildSourceManifest(inputs)).toThrow();
   });
 
-  test("succeeds when both bootstrap scripts are present", () => {
+  test("succeeds when the full bootstrap set is present", () => {
     const inputs = [
       entry("scripts/install.ps1", SHA, 10),
       entry("scripts/consumer/common.ps1", SHA, 10),
+      entry("scripts/consumer/install-sync-common.ps1", SHA, 10),
+      entry("scripts/consumer/distribution-exclusion.ps1", SHA, 10),
       entry("src/common/skills/agentdev-foo/SKILL.md", SHA, 10),
     ];
     const m = buildSourceManifest(inputs);
-    expect(m.entries.length).toBe(3);
+    expect(m.entries.length).toBe(5);
+  });
+
+  test("throws when the shared judgment module is missing", () => {
+    const inputs = [
+      entry("scripts/install.ps1", SHA, 10),
+      entry("scripts/consumer/common.ps1", SHA, 10),
+      entry("scripts/consumer/distribution-exclusion.ps1", SHA, 10),
+      entry("src/common/skills/agentdev-foo/SKILL.md", SHA, 10),
+    ];
+    expect(() => buildSourceManifest(inputs)).toThrow(/install-sync-common\.ps1/);
+  });
+
+  test("throws when the distribution exclusion canon is missing", () => {
+    const inputs = [
+      entry("scripts/install.ps1", SHA, 10),
+      entry("scripts/consumer/common.ps1", SHA, 10),
+      entry("scripts/consumer/install-sync-common.ps1", SHA, 10),
+      entry("src/common/skills/agentdev-foo/SKILL.md", SHA, 10),
+    ];
+    expect(() => buildSourceManifest(inputs)).toThrow(/distribution-exclusion\.ps1/);
   });
 });
 

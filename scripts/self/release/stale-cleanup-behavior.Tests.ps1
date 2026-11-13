@@ -195,6 +195,8 @@ function New-ConsumerRepo {
     New-Item -ItemType Directory -Path (Join-Path $root 'scripts\consumer') -Force | Out-Null
     Copy-Item -LiteralPath $InstallScript -Destination (Join-Path $root 'scripts\install.ps1')
     Copy-Item -LiteralPath (Join-Path $RepoRoot 'scripts\consumer\common.ps1') -Destination (Join-Path $root 'scripts\consumer\common.ps1')
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'scripts\consumer\install-sync-common.ps1') -Destination (Join-Path $root 'scripts\consumer\install-sync-common.ps1')
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'scripts\consumer\distribution-exclusion.ps1') -Destination (Join-Path $root 'scripts\consumer\distribution-exclusion.ps1')
     git init -q $root
     if ($LASTEXITCODE -ne 0) { throw "git init failed: $root" }
     return $root
@@ -208,8 +210,10 @@ function New-SelfRepo {
     #>
     $root = New-TempRepo 'adf-stale-self'
     New-SourceTree -CommonSourceDir (Join-Path $root 'src\common') -OpencodeSourceDir (Join-Path $root 'src\opencode') -SenpiSourceDir (Join-Path $root 'src\senpi')
-    New-Item -ItemType Directory -Path (Join-Path $root 'scripts') -Force | Out-Null
+    New-Item -ItemType Directory -Path (Join-Path $root 'scripts\consumer') -Force | Out-Null
     Copy-Item -LiteralPath $SelfSyncScript -Destination (Join-Path $root 'scripts\self-sync.ps1')
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'scripts\consumer\install-sync-common.ps1') -Destination (Join-Path $root 'scripts\consumer\install-sync-common.ps1')
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'scripts\consumer\distribution-exclusion.ps1') -Destination (Join-Path $root 'scripts\consumer\distribution-exclusion.ps1')
     return $root
 }
 

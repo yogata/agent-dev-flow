@@ -112,6 +112,8 @@ function makeConsumerRepo(zipCheckout: boolean, localSource = false): string {
   fs.mkdirSync(path.join(root, "scripts", "consumer"), { recursive: true });
   fs.copyFileSync(INSTALL_PS1, path.join(root, "scripts", "install.ps1"));
   fs.copyFileSync(path.join(REPO_ROOT, "scripts", "consumer", "common.ps1"), path.join(root, "scripts", "consumer", "common.ps1"));
+  fs.copyFileSync(path.join(REPO_ROOT, "scripts", "consumer", "install-sync-common.ps1"), path.join(root, "scripts", "consumer", "install-sync-common.ps1"));
+  fs.copyFileSync(path.join(REPO_ROOT, "scripts", "consumer", "distribution-exclusion.ps1"), path.join(root, "scripts", "consumer", "distribution-exclusion.ps1"));
 
   // The consumer repo root is always a git repository (cwd safety requires
   // .git). The checkout form differs only inside .agentdev-plugin:
@@ -424,8 +426,10 @@ describe("scripts behavior / third-party skill drift detection", () => {
   test("declared but missing placement: self-sync.ps1 check stops with exit 7 and guides the CLI", () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), "adf-self-"));
     try {
-      fs.mkdirSync(path.join(root, "scripts"), { recursive: true });
+      fs.mkdirSync(path.join(root, "scripts", "consumer"), { recursive: true });
       fs.copyFileSync(SELF_SYNC_PS1, path.join(root, "scripts", "self-sync.ps1"));
+      fs.copyFileSync(path.join(REPO_ROOT, "scripts", "consumer", "install-sync-common.ps1"), path.join(root, "scripts", "consumer", "install-sync-common.ps1"));
+      fs.copyFileSync(path.join(REPO_ROOT, "scripts", "consumer", "distribution-exclusion.ps1"), path.join(root, "scripts", "consumer", "distribution-exclusion.ps1"));
       fs.mkdirSync(path.join(root, "src", "common", "skills", "agentdev-x"), { recursive: true });
       fs.mkdirSync(path.join(root, "src", "opencode", "plugins"), { recursive: true });
       fs.writeFileSync(path.join(root, "src", "common", "skills", "agentdev-x", "SKILL.md"), "# x\n", "utf-8");

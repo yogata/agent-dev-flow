@@ -56,6 +56,18 @@ export interface ManifestEntryInput {
 
 // ---------------------------------------------------------------------------
 // Source path predicates (internal subsets)
+//
+// AUDIT EXPECTATION INDEPENDENCE (I-004 reservation): the lists below are
+// the audit side's INDEPENDENTLY DEFINED distribution expectations. They are
+// deliberately NOT derived from the distribution exclusion canon
+// (scripts/consumer/distribution-exclusion.ps1) or from any installer
+// enumeration, and the canon must never be derived from them. Deriving the
+// audit expectation from the same definition that drives actual distribution
+// would let a wrongly canonicalized set be rubber-stamped by its own check.
+// Three distinct concerns are kept separate:
+//   - what the installers actually distribute (the installer entries + canon)
+//   - what SHOULD be distributed (this manifest's independent audit lists)
+//   - what must be protected against tampering (protected-paths.ts)
 // ---------------------------------------------------------------------------
 
 const RUNTIME_PREFIXES: readonly string[] = [
@@ -69,6 +81,12 @@ const RUNTIME_PREFIXES: readonly string[] = [
 const BOOTSTRAP_PATHS: readonly string[] = [
   "scripts/install.ps1",
   "scripts/consumer/common.ps1",
+  // Runtime dependency modules of the checkout consumer entry
+  // (REQ-050-011: the entry's execution dependency set must be fully
+  // represented). Independently maintained audit expectation - the shared
+  // judgment module and the distribution exclusion canon.
+  "scripts/consumer/install-sync-common.ps1",
+  "scripts/consumer/distribution-exclusion.ps1",
 ];
 
 const ARCHIVE_EXTRA_REQUIRED: readonly string[] = [
@@ -79,6 +97,15 @@ const ARCHIVE_EXTRA_REQUIRED: readonly string[] = [
   // Archive-bundled install guide. The manifest tracks the repository root
   // original; the packager bundles it as README-INSTALL.md at archive root.
   "README-INSTALL.md",
+  // The distribution exclusion canon
+  // (scripts/consumer/distribution-exclusion.ps1) travels inside the
+  // consumer release archive via packager staging, yet belongs ONLY in
+  // BOOTSTRAP_PATHS above: the blob loader assigns each shipped entry a
+  // single subset and bootstrap takes precedence over archive-extra, so
+  // listing it here would make buildArchiveManifest require an entry that
+  // never arrives in the archive-extra subset. Its in-archive presence is
+  // owned by the packager staging contract and the distribution-exclusion
+  // consistency tests.
 ];
 
 export function isRequiredRuntimePath(path: string): boolean {
@@ -182,6 +209,9 @@ export function buildSourceManifest(
 // Canonical runtime sources map to their .opencode/** link paths by dropping
 // the canonical root segment: src/common/{commands,skills,tools} and
 // src/opencode/plugins project 1:1 under .opencode/ (DEC-049 layout).
+// The mapping below is the audit side's independently maintained 配置写像
+// (placement mapping) expectation: it is not derived from any installer
+// enumeration and the installers must not derive their enumeration from it.
 const RUNTIME_LINK_PREFIXES: ReadonlyArray<readonly [string, string]> = [
   ["src/common/commands/agentdev/", ".opencode/commands/agentdev/"],
   ["src/common/skills/", ".opencode/skills/"],

@@ -92,6 +92,8 @@ describe("scripts layout / public entry boundary (REQ-050-001, REQ-050-007, REQ-
 
   test("internal processing lives under scripts/consumer/ and scripts/self/", () => {
     expect(fs.existsSync(path.join(SCRIPTS_DIR, "consumer", "common.ps1"))).toBe(true);
+    expect(fs.existsSync(path.join(SCRIPTS_DIR, "consumer", "install-sync-common.ps1"))).toBe(true);
+    expect(fs.existsSync(path.join(SCRIPTS_DIR, "consumer", "distribution-exclusion.ps1"))).toBe(true);
     expect(fs.existsSync(path.join(SCRIPTS_DIR, "consumer", "archive", "install.ps1"))).toBe(true);
     expect(fs.existsSync(path.join(SCRIPTS_DIR, "self", "release", "package-release-archive.ps1"))).toBe(true);
     expect(fs.existsSync(path.join(SCRIPTS_DIR, "self", "release", "trusted-distribution-gate.ps1"))).toBe(true);

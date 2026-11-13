@@ -58,6 +58,8 @@ describe("launcher / real first-bootstrap base to candidate (parent defect #5)",
       writeFix(repo, "src/common/skills/japanese-tech-writing/SKILL.md", "# jtw\n");
       writeFix(repo, "scripts/install.ps1", "# install\n");
       writeFix(repo, "scripts/consumer/common.ps1", "# check\n");
+      writeFix(repo, "scripts/consumer/install-sync-common.ps1", "# shared\n");
+      writeFix(repo, "scripts/consumer/distribution-exclusion.ps1", "# canon\n");
       writeFix(
         repo,
         "scripts/consumer/archive/install.ps1",
@@ -136,6 +138,8 @@ describe("launcher / real first-bootstrap base to candidate (parent defect #5)",
       writeFix(repo, "src/common/skills/japanese-tech-writing/SKILL.md", "# jtw\n");
       writeFix(repo, "scripts/install.ps1", "# install\n");
       writeFix(repo, "scripts/consumer/common.ps1", "# check\n");
+      writeFix(repo, "scripts/consumer/install-sync-common.ps1", "# shared\n");
+      writeFix(repo, "scripts/consumer/distribution-exclusion.ps1", "# canon\n");
       writeFix(repo, "scripts/consumer/archive/install.ps1", "# placeholder installer\n");
       writeFix(repo, "README-INSTALL.md", "# install\n");
       writeFix(repo, "scripts/self/release/package-release-archive.ps1", "# placeholder\n");

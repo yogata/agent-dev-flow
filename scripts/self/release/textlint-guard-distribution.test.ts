@@ -185,6 +185,14 @@ describe("agentdev-textlint-guard distribution / consumer install (TS-005 / TS-0
         fs.mkdirSync(path.join(root, "scripts", "consumer"), { recursive: true });
         fs.copyFileSync(INSTALL_PS1, path.join(root, "scripts", "install.ps1"));
         fs.copyFileSync(path.join(REPO_ROOT, "scripts", "consumer", "common.ps1"), path.join(root, "scripts", "consumer", "common.ps1"));
+        fs.copyFileSync(
+          path.join(REPO_ROOT, "scripts", "consumer", "install-sync-common.ps1"),
+          path.join(root, "scripts", "consumer", "install-sync-common.ps1"),
+        );
+        fs.copyFileSync(
+          path.join(REPO_ROOT, "scripts", "consumer", "distribution-exclusion.ps1"),
+          path.join(root, "scripts", "consumer", "distribution-exclusion.ps1"),
+        );
         execFileSync("git", ["init", "-q", "-b", "main"], { cwd: root });
         execFileSync("git", ["config", "user.email", "t@t"], { cwd: root });
         execFileSync("git", ["config", "user.name", "t"], { cwd: root });
@@ -355,7 +363,9 @@ describe("agentdev-textlint-guard engine-bundle error guidance (TS-005)", () => 
 });
 
 describe("agentdev-textlint-guard distribution / generic enumeration contract (TS-005)", () => {
-  test("install.ps1 and package-release-archive.ps1 keep the plugin out of repo-local exclusions", () => {
+  const CANON_PS1 = path.join(REPO_ROOT, "scripts", "consumer", "distribution-exclusion.ps1");
+
+  test("consumer distribution entries derive the exclusion set from the single canon", () => {
     const install = fs.readFileSync(INSTALL_PS1, "utf8");
     const release = fs.readFileSync(
       path.join(REPO_ROOT, "scripts", "self", "release", "package-release-archive.ps1"),
@@ -367,15 +377,27 @@ describe("agentdev-textlint-guard distribution / generic enumeration contract (T
       ["package-release-archive.ps1", release],
       ["archive install.ps1", archiveInstall],
     ] as const) {
-      // repo-local 除外リストは agentdev-distribution-boundary-guard のみ（追加禁止）
-      const repoLocalMatch = text.match(/\$repoLocalPluginNames?\s*=\s*@\(([^)]*)\)/i);
-      expect(repoLocalMatch).not.toBeNull();
-      if (repoLocalMatch !== null) {
-        expect(repoLocalMatch[1]).not.toContain("agentdev-textlint-guard");
-      }
+      // 除外集合は配布除外正本モジュールの参照・導出で決定される（正本1箇所化）。
+      // 各入口は inline の除外リスト定義を持たない。
+      expect(text).toMatch(/distribution-exclusion\.ps1/);
+      expect(text).not.toMatch(/\$repoLocalPluginNames?\s*=\s*@\(/i);
       // 汎用列挙（agentdev-* フィルタ）が存在する
       expect(text).toMatch(/agentdev-\*/);
       void name;
+    }
+    const canon = fs.readFileSync(CANON_PS1, "utf8");
+    // 正本の除外リストは agentdev-distribution-boundary-guard のみ（追加禁止）
+    const repoLocalMatch = canon.match(/\$RepoLocalPluginNames\s*=\s*@\(([^)]*)\)/);
+    expect(repoLocalMatch).not.toBeNull();
+    if (repoLocalMatch !== null) {
+      expect(repoLocalMatch[1]).toContain("agentdev-distribution-boundary-guard");
+      expect(repoLocalMatch[1]).not.toContain("agentdev-textlint-guard");
+    }
+    // 正本ファイルは純 ASCII であること（archive installer が Windows PowerShell 5.1
+    // で読むため、非 ASCII バイトがあると cp1252 解釈で破損する）
+    const canonBytes = fs.readFileSync(CANON_PS1);
+    for (const b of canonBytes) {
+      expect(b).toBeLessThanOrEqual(0x7f);
     }
   });
 

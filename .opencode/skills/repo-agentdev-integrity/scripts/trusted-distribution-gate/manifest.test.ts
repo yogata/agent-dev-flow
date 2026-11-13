@@ -64,9 +64,11 @@ describe("manifest / isRequiredRuntimePath", () => {
 });
 
 describe("manifest / isRequiredBootstrapPath", () => {
-  test("accepts the public entry and its runtime dependency module (REQ-050-011)", () => {
+  test("accepts the public entry and its runtime dependency modules (REQ-050-011)", () => {
     expect(isRequiredBootstrapPath("scripts/install.ps1")).toBe(true);
     expect(isRequiredBootstrapPath("scripts/consumer/common.ps1")).toBe(true);
+    expect(isRequiredBootstrapPath("scripts/consumer/install-sync-common.ps1")).toBe(true);
+    expect(isRequiredBootstrapPath("scripts/consumer/distribution-exclusion.ps1")).toBe(true);
   });
   test("rejects unrelated scripts", () => {
     expect(isRequiredBootstrapPath("scripts/self/release/trusted-distribution-gate.ps1")).toBe(false);
@@ -79,13 +81,19 @@ describe("manifest / classifySourceSubset", () => {
     expect(classifySourceSubset("src/common/commands/agentdev/x.md")).toBe("runtime");
     expect(classifySourceSubset("src/common/skills/agentdev-foo/SKILL.md")).toBe("runtime");
   });
-  test("bootstrap for the public entry and its dependency module", () => {
+  test("bootstrap for the public entry and its dependency modules", () => {
     expect(classifySourceSubset("scripts/install.ps1")).toBe("bootstrap");
     expect(classifySourceSubset("scripts/consumer/common.ps1")).toBe("bootstrap");
+    expect(classifySourceSubset("scripts/consumer/install-sync-common.ps1")).toBe("bootstrap");
+    expect(classifySourceSubset("scripts/consumer/distribution-exclusion.ps1")).toBe("bootstrap");
   });
   test("archive-extra for the archive installer original and README-INSTALL", () => {
     expect(classifySourceSubset("scripts/consumer/archive/install.ps1")).toBe("archive-extra");
     expect(classifySourceSubset("README-INSTALL.md")).toBe("archive-extra");
+    // The exclusion canon travels in the consumer archive via packager
+    // staging but classifies as bootstrap (bootstrap wins over archive-extra);
+    // it must never be double-listed in ARCHIVE_EXTRA_REQUIRED.
+    expect(classifySourceSubset("scripts/consumer/distribution-exclusion.ps1")).not.toBe("archive-extra");
   });
   test("null for unrelated paths", () => {
     expect(classifySourceSubset("docs/specs/foo.md")).toBeNull();
@@ -101,12 +109,16 @@ describe("manifest / buildSourceManifest", () => {
       entry("src/common/skills/japanese-tech-writing/SKILL.md", "c".repeat(64), 30),
       entry("scripts/install.ps1", "d".repeat(64), 40),
       entry("scripts/consumer/common.ps1", "e".repeat(64), 50),
+      entry("scripts/consumer/install-sync-common.ps1", "0".repeat(64), 55),
+      entry("scripts/consumer/distribution-exclusion.ps1", "1".repeat(64), 56),
       entry("README.md", "f".repeat(64), 60),
     ];
     const m = buildSourceManifest(inputs);
     expect(m.projection).toBe("source");
     expect(m.entries.map((e) => e.path).sort()).toEqual([
       "scripts/consumer/common.ps1",
+      "scripts/consumer/distribution-exclusion.ps1",
+      "scripts/consumer/install-sync-common.ps1",
       "scripts/install.ps1",
       "src/common/commands/agentdev/case-run.md",
       "src/common/skills/agentdev-foo/SKILL.md",

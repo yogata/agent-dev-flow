@@ -103,8 +103,8 @@ describe("launcher / all FOUR canonical projection labels and counts (parent def
       for (const label of labels) {
         expect(result.manifests[label]?.projection).toBe(label);
       }
-      // source has 3 runtime + 2 bootstrap = 5 fixtures.
-      expect(result.manifests["source"].entries.length).toBe(5);
+      // source has 3 runtime + 4 bootstrap = 7 fixtures.
+      expect(result.manifests["source"].entries.length).toBe(7);
       // archive = source-runtime (3) + 2 extras = 5.
       expect(result.manifests["archive"].entries.length).toBe(5);
       // link and archive-installed share the .opencode/** mapping of the

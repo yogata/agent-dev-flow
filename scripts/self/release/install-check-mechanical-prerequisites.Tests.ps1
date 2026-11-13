@@ -166,6 +166,8 @@ function New-MechanicalProbeConsumerRepo {
     New-Item -ItemType Directory -Path (Join-Path $root 'scripts\consumer') -Force | Out-Null
     Copy-Item -LiteralPath $InstallScript -Destination (Join-Path $root 'scripts\install.ps1')
     Copy-Item -LiteralPath (Join-Path $RepoRoot 'scripts\consumer\common.ps1') -Destination (Join-Path $root 'scripts\consumer\common.ps1')
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'scripts\consumer\install-sync-common.ps1') -Destination (Join-Path $root 'scripts\consumer\install-sync-common.ps1')
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'scripts\consumer\distribution-exclusion.ps1') -Destination (Join-Path $root 'scripts\consumer\distribution-exclusion.ps1')
     git init -q $root
     if ($LASTEXITCODE -ne 0) { throw "git init failed: $root" }
     return $root

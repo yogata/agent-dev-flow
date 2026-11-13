@@ -97,6 +97,8 @@ export function makeFixtureRepo(): string {
   writeFix(repo, "src/common/skills/japanese-tech-writing/SKILL.md", "# jtw\n");
   writeFix(repo, "scripts/install.ps1", "# install\n");
   writeFix(repo, "scripts/consumer/common.ps1", "# common\n");
+  writeFix(repo, "scripts/consumer/install-sync-common.ps1", "# shared\n");
+  writeFix(repo, "scripts/consumer/distribution-exclusion.ps1", "# canon\n");
   // scripts/consumer/archive/install.ps1 (archive-dedicated installer
   // original) is needed by the archive-installed physical verifier (read
   // from BASE oid) but is NOT a protected Stage A path (Stage B owns it).
