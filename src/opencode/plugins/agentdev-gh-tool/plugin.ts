@@ -20,7 +20,7 @@ import * as os from "node:os";
 import * as path from "node:path";
 import { pathToFileURL } from "node:url";
 import {
-  AGENTDEV_GH_PUBLIC_CONTRACTS,
+  AGENTDEV_GH_TOOL_DESCRIPTION,
   runAgentdevGhOperation,
 } from "../../../common/tools/agentdev-gh/index.ts";
 import { createCliRunner } from "../../../common/tools/agentdev-gh/runner-cli.ts";
@@ -96,12 +96,6 @@ async function defaultCreateRunner(worktree: string, repo: string, closeAcceptan
   return createCliRunner({ repo, tempDir: os.tmpdir(), workspaceRoot: worktree, ...(closeAcceptanceIo !== undefined ? { closeAcceptanceIo } : {}) });
 }
 
-function describeOperations(): string {
-  return AGENTDEV_GH_PUBLIC_CONTRACTS.map(
-    (c) => `${c.operation} (${c.sideEffect ? "side-effect, fail-closed" : "read-only, canContinue"})`,
-  ).join(", ");
-}
-
 /** 登録する Tool 定義（構造的定義。zod 非依存）。 */
 export function createAgentdevGhToolDefinition(deps: AgentdevGhToolDeps = {}): {
   readonly description: string;
@@ -142,12 +136,7 @@ export function createAgentdevGhToolDefinition(deps: AgentdevGhToolDeps = {}): {
   }
 
   return {
-    description:
-      "Structured GitHub issue/PR operations with a verified operation contract. " +
-      "Operations: " +
-      describeOperations() +
-      ". Every side-effect operation is read back and verified before success is returned; " +
-      "verification failures never return success (fail-closed).",
+    description: AGENTDEV_GH_TOOL_DESCRIPTION,
     args: {
       request: REQUEST_PROPERTY_SCHEMA,
     },

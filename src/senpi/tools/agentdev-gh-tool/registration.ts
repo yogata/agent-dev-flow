@@ -18,7 +18,7 @@ import * as os from "node:os";
 import * as path from "node:path";
 import { pathToFileURL } from "node:url";
 import {
-  AGENTDEV_GH_PUBLIC_CONTRACTS,
+  AGENTDEV_GH_TOOL_DESCRIPTION,
   runAgentdevGhOperation,
 } from "../../../common/tools/agentdev-gh/index.ts";
 import { createCliRunner } from "../../../common/tools/agentdev-gh/runner-cli.ts";
@@ -73,12 +73,6 @@ function createDefaultRunner(
   };
 }
 
-function describeOperations(): string {
-  return AGENTDEV_GH_PUBLIC_CONTRACTS.map(
-    (c) => `${c.operation} (${c.sideEffect ? "side-effect, fail-closed" : "read-only, canContinue"})`,
-  ).join(", ");
-}
-
 /** 登録する Tool 定義（host 非依存の構造的定義。zod 非依存）。 */
 export function createAgentdevGhSenpiRegistration(deps: AgentdevGhSenpiDeps = {}): SenpiToolDefinition {
   // 単一 runner のみ構築・保持する（バックエンドの同時有効化を行わない構造の中心）。
@@ -106,12 +100,7 @@ export function createAgentdevGhSenpiRegistration(deps: AgentdevGhSenpiDeps = {}
 
   return {
     name: "agentdev_gh",
-    description:
-      "Structured GitHub issue/PR operations with a verified operation contract. " +
-      "Operations: " +
-      describeOperations() +
-      ". Every side-effect operation is read back and verified before success is returned; " +
-      "verification failures never return success (fail-closed).",
+    description: AGENTDEV_GH_TOOL_DESCRIPTION,
     args: {
       request: AGENTDEV_GH_REQUEST_PROPERTY_SCHEMA,
     },

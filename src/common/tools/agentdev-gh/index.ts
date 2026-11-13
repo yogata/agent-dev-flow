@@ -22,13 +22,6 @@ import { RELEASE_OPERATION_SPECS } from "./specs-release.ts";
 /** Tool の公開名。命名は Design の所有事項（仮確定、Design確定候補参照）。 */
 export const AGENTDEV_GH_TOOL_NAME = "agentdev_gh";
 
-/** Tool の説明（利用者への公開契約の要約）。 */
-export const AGENTDEV_GH_TOOL_DESCRIPTION =
-  "Structured GitHub issue/PR/release operations with a verified operation contract. " +
-  "Release draft creation and read-back are catalog-only; publishing an approved draft " +
-  "is release_publish with a mandatory approval basis (fail-closed input contract). " +
-  "Each side-effect operation is read back and verified before success is returned.";
-
 /** 操作ごとの入力説明（JSON Schema の description 相当の公開メタデータ）。 */
 export interface OperationPublicContract {
   readonly operation: string;
@@ -45,6 +38,20 @@ export const AGENTDEV_GH_PUBLIC_CONTRACTS: readonly OperationPublicContract[] =
     fallbacks: entry.contingency.fallbacks,
     canContinue: entry.contingency.canContinue,
   }));
+
+/**
+ * Tool の説明（利用者への公開契約の要約）。
+ * 両ホストの登録単位（OpenCode plugin・Senpi registration）が本正本を単一参照する
+ * （B3-5e 配線整理。J-001 型のホスト別複製による更新漏れの再発防止構造）。
+ */
+export const AGENTDEV_GH_TOOL_DESCRIPTION =
+  "Structured GitHub issue/PR operations with a verified operation contract. " +
+  "Operations: " +
+  AGENTDEV_GH_PUBLIC_CONTRACTS.map(
+    (c) => `${c.operation} (${c.sideEffect ? "side-effect, fail-closed" : "read-only, canContinue"})`,
+  ).join(", ") +
+  ". Every side-effect operation is read back and verified before success is returned; " +
+  "verification failures never return success (fail-closed).";
 
 /** 全操作スペック（登録順はカタログ順に従う）。 */
 export const AGENTDEV_GH_OPERATION_SPECS: readonly OperationSpec[] = [

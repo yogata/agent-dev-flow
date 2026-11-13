@@ -7,22 +7,30 @@
 // （.opencode/tools/agentdev-gh/runner-local.ts が共通正本の Local 実装へ接続）
 // を一時 worktree に再現し、既定の runner 選択経路（投影検出 → LocalRunner 構築）
 // まで含めて実行する。
+//
+// 判定の所属（B3-5e）: 一連の実行、読み戻し検証、物理ラベル写像、終了経路の
+// 判定は共通側 helper（src/common/tools/agentdev-gh/tests/four-combination-shared.ts、
+// missing-capability-shared.ts）へ移設済みである。本ファイルは接続差の試験のみを
+// 保持する（OpenCode 登録 surface の構築、ToolContext 形、投影パス
+// .opencode/tools/agentdev-gh/ の解決）。
 
-import { describe, expect, test } from "bun:test";
+import { describe, test } from "bun:test";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 import { createAgentdevGhToolDefinition, type ToolContext } from "../plugin.ts";
 import { createCliRunner } from "../../../../common/tools/agentdev-gh/runner-cli.ts";
 import {
+  assertCaseIssueCloseRoute,
+  assertGitHubSequenceOutcomes,
+  assertLocalSequenceOutcomes,
   createGitHubStub,
+  executeStepOnSurface,
   localIssueUpdatedAt,
   makeCloseAcceptanceFixture,
-  mainOperationSequence,
   runCaseIssueCloseRoute,
-  toStepResult,
-  type StepOutcome,
-  type StepResult,
+  runSurfaceSequence,
+  type HostToolSurface,
 } from "../../../../common/tools/agentdev-gh/tests/four-combination-shared.ts";
 
 const CANONICAL_LOCAL_RUNNER = path.resolve(
@@ -57,20 +65,9 @@ function writeLocalRunnerProjection(worktree: string): void {
   );
 }
 
-async function runSequence(
-  def: ReturnType<typeof createAgentdevGhToolDefinition>,
-  worktree: string,
-  commentRef: string,
-): Promise<StepOutcome[]> {
-  const outcomes: StepOutcome[] = [];
-  for (const step of mainOperationSequence(commentRef)) {
-    const result = await def.execute(
-      { request: { operation: step.operation, ...step.args } },
-      makeContext(worktree),
-    );
-    outcomes.push({ step, result: toStepResult(step.operation, JSON.parse(result.output)) });
-  }
-  return outcomes;
+/** OpenCode 登録 surface を共通判定 helper の共通形へ接続する（接続差の接続点）。 */
+function opencodeSurface(def: ReturnType<typeof createAgentdevGhToolDefinition>): HostToolSurface {
+  return (args, worktree) => def.execute(args, makeContext(worktree));
 }
 
 describe("TS-003 OpenCode×GitHub（Tool 操作契約の主要操作一連と読み戻し検証）", () => {
@@ -82,29 +79,8 @@ describe("TS-003 OpenCode×GitHub（Tool 操作契約の主要操作一連と読
       resolveRepo: () => "owner/repo",
       createRunner: () => createCliRunner({ repo: "owner/repo", tempDir, exec: stub.exec }),
     });
-    const outcomes = await runSequence(def, worktree, "1");
-    const failed = outcomes.filter((o) => !o.result.ok);
-    expect(failed).toEqual([]);
-    const read = outcomes.find((o) => o.step.operation === "issue_read")?.result.payload as Record<string, unknown>;
-    expect(read?.title).toBe("統合試験 追跡Issue");
-    expect(read?.role).toBe("tracking");
-    expect(read?.closeReason).toBeNull();
-    const update = outcomes.find((o) => o.step.operation === "issue_update")?.result.payload as Record<string, unknown>;
-    expect(update?.number).toBe(1);
-    const close = outcomes.find((o) => o.step.operation === "issue_close")?.result.payload as Record<string, unknown>;
-    expect(close?.state).toBe("closed");
-    const reopen = outcomes.find((o) => o.step.operation === "issue_reopen")?.result.payload as Record<string, unknown>;
-    expect(reopen?.state).toBe("open");
-    const commentCreate = outcomes.find((o) => o.step.operation === "comment_create")?.result.payload as Record<string, unknown>;
-    expect(String(commentCreate?.commentId)).toBe("1");
-    const commentList = outcomes.find((o) => o.step.operation === "comment_list")?.result.payload as Record<string, unknown>;
-    expect((commentList?.comments as unknown[]).length).toBe(1);
-    const commentDelete = outcomes.find((o) => o.step.operation === "comment_delete")?.result;
-    expect(commentDelete?.ok).toBe(true);
-    expect(stub.comments.length).toBe(0);
-    expect(stub.issues[0]?.labels).toContain("tracking");
-    expect(stub.issues[0]?.labels).not.toContain("agentdev-tracking");
-    expect(stub.issues[0]?.labels.filter((l: string) => l.startsWith("agentdev-"))).toEqual([]);
+    const outcomes = await runSurfaceSequence(opencodeSurface(def), worktree, "1");
+    assertGitHubSequenceOutcomes(outcomes, stub);
     fs.rmSync(worktree, { recursive: true, force: true });
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -115,47 +91,13 @@ describe("TS-003 OpenCode×ローカルIssue（投影検出 → LocalRunner に�
     const worktree = makeWorktree();
     writeLocalRunnerProjection(worktree);
     const def = createAgentdevGhToolDefinition({ resolveRepo: () => "local/issues" });
-    const outcomes = await runSequence(def, worktree, "issue-0001-c01");
-    const failed = outcomes.filter((o) => !o.result.ok);
-    expect(failed).toEqual([]);
-    const issueFile = path.join(worktree, ".agentdev", "issues", "issue-0001.md");
-    expect(fs.existsSync(issueFile)).toBe(true);
-    const raw = fs.readFileSync(issueFile, "utf8");
-    expect(raw).toContain("title: \"統合試験 追跡Issue 更新後\"");
-    expect(raw).toContain("status: in-discussion");
-    expect(raw).toContain("labels: []");
-    expect(raw).toContain("## 検討経過");
-    expect(raw.includes("\r\n")).toBe(false);
-    const bytes = fs.readFileSync(issueFile);
-    expect(bytes[0]).toBe(0x2d);
-    const read = outcomes.find((o) => o.step.operation === "issue_read")?.result.payload as Record<string, unknown>;
-    expect(read?.role).toBe("tracking");
-    expect(read?.closeReason).toBeNull();
-    const update = outcomes.find((o) => o.step.operation === "issue_update")?.result.payload as Record<string, unknown>;
-    expect(update?.number).toBe(1);
-    const close = outcomes.find((o) => o.step.operation === "issue_close")?.result.payload as Record<string, unknown>;
-    expect(close?.state).toBe("closed");
-    const reopen = outcomes.find((o) => o.step.operation === "issue_reopen")?.result.payload as Record<string, unknown>;
-    expect(reopen?.state).toBe("open");
-    const commentList = outcomes.find((o) => o.step.operation === "comment_list")?.result.payload as Record<string, unknown>;
-    expect((commentList?.comments as unknown[]).length).toBe(1);
+    const outcomes = await runSurfaceSequence(opencodeSurface(def), worktree, "issue-0001-c01");
+    assertLocalSequenceOutcomes(outcomes, worktree);
     fs.rmSync(worktree, { recursive: true, force: true });
   });
 });
 
 describe("TS-007 終了経路シナリオ（issue_close の終了前提検証・公開Tool表面）", () => {
-  function expectRefused(
-    outcomes: { label: string; result: StepResult; stateAfterRefusal?: unknown }[],
-    label: string,
-    kind: string,
-  ): void {
-    const refused = outcomes.find((o) => o.label === label);
-    expect(refused).toBeDefined();
-    expect(refused?.result.ok).toBe(false);
-    expect(refused?.result.failure?.kind).toBe(kind);
-    expect(refused?.stateAfterRefusal).toBe("open");
-  }
-
   test("公開Toolへの直接呼出し経路: GitHub バックエンドで機械受理不成立時の終了操作が実行されない", async () => {
     const worktree = makeWorktree();
     const tempDir = makeWorktree();
@@ -166,39 +108,13 @@ describe("TS-007 終了経路シナリオ（issue_close の終了前提検証・
       createRunner: () => createCliRunner({ repo: "owner/repo", tempDir, exec: stub.exec, closeAcceptanceIo: fixture.io }),
       closeAcceptanceIo: fixture.io,
     });
-    const outcomes = await runCaseIssueCloseRoute(async (step) => {
-      const result = await def.execute(
-        { request: { operation: step.operation, ...step.args } },
-        makeContext(worktree),
-      );
-      return toStepResult(step.operation, JSON.parse(result.output));
-    }, fixture, () => stub.issues[0]?.updated_at ?? "2026-10-01T00:00:00Z");
-    expect(outcomes.map((o) => o.label)).toEqual([
-      "起票(case)",
-      "〔1〕記録なし拒否",
-      "〔2〕形式不正拒否",
-      "〔3〕対象不一致拒否",
-      "〔4〕判定不成立拒否",
-      "〔5〕判定対象版不一致（過去の合格結果の再利用）拒否",
-      "〔6〕旧様式（台帳照合結果のみ）の受理なし拒否",
-      "検証成立時の終了",
-      "読み戻し(closed)",
-    ]);
-    for (const label of [
-      "〔1〕記録なし拒否",
-      "〔2〕形式不正拒否",
-      "〔3〕対象不一致拒否",
-      "〔4〕判定不成立拒否",
-      "〔5〕判定対象版不一致（過去の合格結果の再利用）拒否",
-      "〔6〕旧様式（台帳照合結果のみ）の受理なし拒否",
-    ]) {
-      expectRefused(outcomes, label, "verification-incomplete");
-    }
-    const closed = outcomes.find((o) => o.label === "検証成立時の終了");
-    expect(closed?.result.ok).toBe(true);
-    const read = outcomes.find((o) => o.label === "読み戻し(closed)");
-    expect((read?.result.payload as Record<string, unknown> | null)?.state).toBe("closed");
-    expect(stub.issues[0]?.labels).toContain("feature");
+    const surface = opencodeSurface(def);
+    const outcomes = await runCaseIssueCloseRoute(
+      (step) => executeStepOnSurface(surface, worktree, step),
+      fixture,
+      () => stub.issues[0]?.updated_at ?? "2026-10-01T00:00:00Z",
+    );
+    assertCaseIssueCloseRoute(outcomes, { githubStub: stub });
     fs.rmSync(worktree, { recursive: true, force: true });
     fs.rmSync(tempDir, { recursive: true, force: true });
     fs.rmSync(fixture.mainRoot, { recursive: true, force: true });
@@ -212,27 +128,13 @@ describe("TS-007 終了経路シナリオ（issue_close の終了前提検証・
       resolveRepo: () => "local/issues",
       closeAcceptanceIo: fixture.io,
     });
-    const outcomes = await runCaseIssueCloseRoute(async (step) => {
-      const result = await def.execute(
-        { request: { operation: step.operation, ...step.args } },
-        makeContext(worktree),
-      );
-      return toStepResult(step.operation, JSON.parse(result.output));
-    }, fixture, () => localIssueUpdatedAt(path.join(worktree, ".agentdev", "issues"), 1));
-    for (const label of [
-      "〔1〕記録なし拒否",
-      "〔2〕形式不正拒否",
-      "〔3〕対象不一致拒否",
-      "〔4〕判定不成立拒否",
-      "〔5〕判定対象版不一致（過去の合格結果の再利用）拒否",
-      "〔6〕旧様式（台帳照合結果のみ）の受理なし拒否",
-    ]) {
-      expectRefused(outcomes, label, "verification-incomplete");
-    }
-    const closed = outcomes.find((o) => o.label === "検証成立時の終了");
-    expect(closed?.result.ok).toBe(true);
-    const issueFile = path.join(worktree, ".agentdev", "issues", "issue-0001.md");
-    expect(fs.readFileSync(issueFile, "utf8")).toContain("status: closed");
+    const surface = opencodeSurface(def);
+    const outcomes = await runCaseIssueCloseRoute(
+      (step) => executeStepOnSurface(surface, worktree, step),
+      fixture,
+      () => localIssueUpdatedAt(path.join(worktree, ".agentdev", "issues"), 1),
+    );
+    assertCaseIssueCloseRoute(outcomes, { localIssuesDir: path.join(worktree, ".agentdev", "issues") });
     fs.rmSync(worktree, { recursive: true, force: true });
     fs.rmSync(fixture.mainRoot, { recursive: true, force: true });
   });

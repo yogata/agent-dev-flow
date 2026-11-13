@@ -14,6 +14,7 @@
 // （fail-closed）。記録の書出し本体は case-close 機械工程（別実行単位）の責務であり、
 // 本シナリオは書出し相当の fixture で記録を用意して読み取り検証側を検証する。
 
+import { expect } from "bun:test";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
@@ -376,4 +377,150 @@ export async function runCaseIssueCloseRoute(
   await run("検証成立時の終了", close());
   await run("読み戻し(closed)", { operation: "issue_read", args: { number: issueNumber } });
   return outcomes;
+}
+
+// -------------------------------------------------------------------------
+// B3-5e ホスト接続の同等試験・共通判定部分（移設先: 共通原本領域の既存共通試験資産）。
+//
+// OpenCode（src/opencode/plugins/agentdev-gh-tool/tests/）と Senpi
+// （src/senpi/tools/agentdev-gh-tool/tests/）の four-combination.test.ts が
+// 独立保持していた同一判定（主要操作一連の読み戻し検証、物理ラベル写像、
+// 終了経路の fail-closed）を一箇所へ集約する。各ホスト試験は接続差の試験のみを
+// 保持し（登録 surface の構築、実行 context 形、ホスト向け投影パスの解決）、
+// 同一判定の二重保守（J-001 型の更新漏れ構造）を解消する。
+// -------------------------------------------------------------------------
+
+/** ホスト接続の登録 surface（各ホストの登録単位 execute を worktree 注入で呼ぶ共通形）。 */
+export type HostToolSurface = (
+  args: { request: Record<string, unknown> },
+  worktree: string,
+) => Promise<{ output: string; metadata?: Record<string, unknown> }>;
+
+/** 1操作を登録 surface 経由で実行し StepResult へ正規化する（共通判定）。 */
+export async function executeStepOnSurface(
+  surface: HostToolSurface,
+  worktree: string,
+  step: OperationStep,
+): Promise<StepResult> {
+  const raw = await surface({ request: { operation: step.operation, ...step.args } }, worktree);
+  return toStepResult(step.operation, JSON.parse(raw.output));
+}
+
+/** TS-003 の主要操作一連を登録 surface 経由で実行する（共通判定）。 */
+export async function runSurfaceSequence(
+  surface: HostToolSurface,
+  worktree: string,
+  commentRef: string,
+): Promise<StepOutcome[]> {
+  const outcomes: StepOutcome[] = [];
+  for (const step of mainOperationSequence(commentRef)) {
+    outcomes.push({ step, result: await executeStepOnSurface(surface, worktree, step) });
+  }
+  return outcomes;
+}
+
+/** TS-003 GitHub 組合せの共通判定（読み戻し検証・物理ラベル写像・Comment 操作・削除後の残存なし）。 */
+export function assertGitHubSequenceOutcomes(outcomes: StepOutcome[], stub: GitHubStub): void {
+  const failed = outcomes.filter((o) => !o.result.ok);
+  expect(failed).toEqual([]);
+  const read = outcomes.find((o) => o.step.operation === "issue_read")?.result.payload as Record<string, unknown>;
+  expect(read?.title).toBe("統合試験 追跡Issue");
+  expect(read?.role).toBe("tracking");
+  expect(read?.closeReason).toBeNull();
+  const update = outcomes.find((o) => o.step.operation === "issue_update")?.result.payload as Record<string, unknown>;
+  expect(update?.number).toBe(1);
+  const close = outcomes.find((o) => o.step.operation === "issue_close")?.result.payload as Record<string, unknown>;
+  expect(close?.state).toBe("closed");
+  const reopen = outcomes.find((o) => o.step.operation === "issue_reopen")?.result.payload as Record<string, unknown>;
+  expect(reopen?.state).toBe("open");
+  const commentCreate = outcomes.find((o) => o.step.operation === "comment_create")?.result.payload as Record<string, unknown>;
+  expect(String(commentCreate?.commentId)).toBe("1");
+  const commentList = outcomes.find((o) => o.step.operation === "comment_list")?.result.payload as Record<string, unknown>;
+  expect((commentList?.comments as unknown[]).length).toBe(1);
+  const commentDelete = outcomes.find((o) => o.step.operation === "comment_delete")?.result;
+  expect(commentDelete?.ok).toBe(true);
+  expect(stub.comments.length).toBe(0);
+  expect(stub.issues[0]?.labels).toContain("tracking");
+  expect(stub.issues[0]?.labels).not.toContain("agentdev-tracking");
+  expect(stub.issues[0]?.labels.filter((l: string) => l.startsWith("agentdev-"))).toEqual([]);
+}
+
+/** TS-003 ローカルIssue組合せの共通判定（実ファイルの読み書き・LF・BOM なし・読み戻し検証）。 */
+export function assertLocalSequenceOutcomes(outcomes: StepOutcome[], worktree: string): void {
+  const failed = outcomes.filter((o) => !o.result.ok);
+  expect(failed).toEqual([]);
+  const issueFile = path.join(worktree, ".agentdev", "issues", "issue-0001.md");
+  expect(fs.existsSync(issueFile)).toBe(true);
+  const raw = fs.readFileSync(issueFile, "utf8");
+  expect(raw).toContain("title: \"統合試験 追跡Issue 更新後\"");
+  expect(raw).toContain("status: in-discussion");
+  expect(raw).toContain("labels: []");
+  expect(raw).toContain("## 検討経過");
+  expect(raw.includes("\r\n")).toBe(false);
+  const bytes = fs.readFileSync(issueFile);
+  expect(bytes[0]).toBe(0x2d);
+  const read = outcomes.find((o) => o.step.operation === "issue_read")?.result.payload as Record<string, unknown>;
+  expect(read?.role).toBe("tracking");
+  expect(read?.closeReason).toBeNull();
+  const update = outcomes.find((o) => o.step.operation === "issue_update")?.result.payload as Record<string, unknown>;
+  expect(update?.number).toBe(1);
+  const close = outcomes.find((o) => o.step.operation === "issue_close")?.result.payload as Record<string, unknown>;
+  expect(close?.state).toBe("closed");
+  const reopen = outcomes.find((o) => o.step.operation === "issue_reopen")?.result.payload as Record<string, unknown>;
+  expect(reopen?.state).toBe("open");
+  const commentList = outcomes.find((o) => o.step.operation === "comment_list")?.result.payload as Record<string, unknown>;
+  expect((commentList?.comments as unknown[]).length).toBe(1);
+}
+
+/** TS-007 終了経路シナリオのラベル列（共通判定。両ホストで同一経路を固定する）。 */
+export const TS007_ROUTE_LABELS: readonly string[] = [
+  "起票(case)",
+  "〔1〕記録なし拒否",
+  "〔2〕形式不正拒否",
+  "〔3〕対象不一致拒否",
+  "〔4〕判定不成立拒否",
+  "〔5〕判定対象版不一致（過去の合格結果の再利用）拒否",
+  "〔6〕旧様式（台帳照合結果のみ）の受理なし拒否",
+  "検証成立時の終了",
+  "読み戻し(closed)",
+];
+
+const TS007_REFUSED_LABELS: readonly string[] = TS007_ROUTE_LABELS.slice(1, 7);
+
+/** assertCaseIssueCloseRoute の組合せ別追加判定（接続差に依存しないバックエンド実測の確認）。 */
+export interface CaseIssueCloseRouteAssertions {
+  /** GitHub 組合せの追加判定（起票ラベルの残存確認）。 */
+  readonly githubStub?: GitHubStub;
+  /** ローカル組合せの追加判定（終了後のローカルIssue状態確認）。issuesDir を指定する。 */
+  readonly localIssuesDir?: string;
+}
+
+function expectRefused(outcomes: CaseCloseRouteOutcome[], label: string, kind: string): void {
+  const refused = outcomes.find((o) => o.label === label);
+  expect(refused).toBeDefined();
+  expect(refused?.result.ok).toBe(false);
+  expect(refused?.result.failure?.kind).toBe(kind);
+  expect(refused?.stateAfterRefusal).toBe("open");
+}
+
+/** TS-007 終了経路の共通判定（全拒否ラベルの fail-closed・検証成立時の終了・読み戻し）。 */
+export function assertCaseIssueCloseRoute(
+  outcomes: CaseCloseRouteOutcome[],
+  opts: CaseIssueCloseRouteAssertions = {},
+): void {
+  expect(outcomes.map((o) => o.label)).toEqual([...TS007_ROUTE_LABELS]);
+  for (const label of TS007_REFUSED_LABELS) {
+    expectRefused(outcomes, label, "verification-incomplete");
+  }
+  const closed = outcomes.find((o) => o.label === "検証成立時の終了");
+  expect(closed?.result.ok).toBe(true);
+  const read = outcomes.find((o) => o.label === "読み戻し(closed)");
+  expect((read?.result.payload as Record<string, unknown> | null)?.state).toBe("closed");
+  if (opts.githubStub !== undefined) {
+    expect(opts.githubStub.issues[0]?.labels).toContain("feature");
+  }
+  if (opts.localIssuesDir !== undefined) {
+    const issueFile = path.join(opts.localIssuesDir, "issue-0001.md");
+    expect(fs.readFileSync(issueFile, "utf8")).toContain("status: closed");
+  }
 }

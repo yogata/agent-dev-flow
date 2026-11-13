@@ -20,7 +20,7 @@ import {
 import type { SenpiToolContext } from "../../tool-registration.ts";
 import { AGENTDEV_GH_REQUEST_PROPERTY_SCHEMA } from "../../../../common/tools/agentdev-gh/public-schema.ts";
 import type { GhRunner, GhRunnerReply, GhRunnerRequest } from "../../../../common/tools/agentdev-gh/runner.ts";
-import { AGENTDEV_GH_OPERATION_SPECS } from "../../../../common/tools/agentdev-gh/index.ts";
+import { AGENTDEV_GH_OPERATION_SPECS, AGENTDEV_GH_TOOL_DESCRIPTION } from "../../../../common/tools/agentdev-gh/index.ts";
 import { GH_TOOL_OPERATIONS } from "../../../../common/tools/agentdev-gh/contracts.ts";
 
 function makeContext(worktree: string): SenpiToolContext {
@@ -76,6 +76,14 @@ describe("登録単位の構造", () => {
     const specOperations = AGENTDEV_GH_OPERATION_SPECS.map((s) => s.operation).sort();
     const schemaEnum = [...(AGENTDEV_GH_REQUEST_PROPERTY_SCHEMA.properties.operation.enum as readonly string[])].sort();
     expect(schemaEnum).toEqual(specOperations);
+  });
+
+  test("説明文は engine 正本（AGENTDEV_GH_TOOL_DESCRIPTION）と同一である（B3-5e 正本参照の固定）", () => {
+    const registration = createAgentdevGhSenpiRegistration({
+      resolveRepo: () => "owner/repo",
+      createRunner: () => failingRunner(),
+    });
+    expect(registration.description).toBe(AGENTDEV_GH_TOOL_DESCRIPTION);
   });
 });
 

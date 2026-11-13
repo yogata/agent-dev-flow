@@ -19,7 +19,7 @@ import {
   type ToolContext,
 } from "../plugin.ts";
 import type { GhRunner, GhRunnerReply, GhRunnerRequest } from "../../../../common/tools/agentdev-gh/runner.ts";
-import { AGENTDEV_GH_OPERATION_SPECS } from "../../../../common/tools/agentdev-gh/index.ts";
+import { AGENTDEV_GH_OPERATION_SPECS, AGENTDEV_GH_TOOL_DESCRIPTION } from "../../../../common/tools/agentdev-gh/index.ts";
 import { GH_TOOL_OPERATIONS } from "../../../../common/tools/agentdev-gh/contracts.ts";
 
 function makeContext(worktree: string): ToolContext {
@@ -96,6 +96,15 @@ describe("登録形状（OpenCode registry が要求する構造）", () => {
   test("公開スキーマの operation enum は操作カタログと一致する", () => {
     const schemaEnum = REQUEST_PROPERTY_SCHEMA.properties.operation.enum;
     expect([...schemaEnum].sort()).toEqual([...GH_TOOL_OPERATIONS].sort());
+  });
+
+  test("説明文は engine 正本（AGENTDEV_GH_TOOL_DESCRIPTION）と同一である（B3-5e 正本参照の固定）", () => {
+    const def = createAgentdevGhToolDefinition({
+      resolveRepo: () => "owner/repo",
+      createRunner: () =>
+        fakeRunner(async () => ({ ok: false, error: "unused", exitCode: 1, failureClass: "operation-failed" })),
+    });
+    expect(def.description).toBe(AGENTDEV_GH_TOOL_DESCRIPTION);
   });
 });
 

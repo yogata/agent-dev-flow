@@ -9,7 +9,7 @@ import {
   createAgentdevThirdPartyToolDefinition,
   createAgentdevThirdPartyToolPlugin,
 } from "../plugin.ts";
-import { createGitHubSourceFetcher } from "../../../../common/tools/agentdev-third-party/index.ts";
+import { AGENTDEV_THIRD_PARTY_TOOL_DESCRIPTION, createGitHubSourceFetcher } from "../../../../common/tools/agentdev-third-party/index.ts";
 import { startMockGitHubSource, type MockSourceServer } from "../../../../common/tools/agentdev-third-party/tests/mock-source.ts";
 
 let testRoot: string;
@@ -59,6 +59,11 @@ describe("Plugin 登録配線", () => {
     const definition = createAgentdevThirdPartyToolDefinition(makeDeps());
     expect(definition.description).toContain("third-party");
     expect(definition.args.request).toBeDefined();
+  });
+
+  test("説明文は engine 正本（AGENTDEV_THIRD_PARTY_TOOL_DESCRIPTION）と同一である（B3-5e 正本参照の固定）", () => {
+    const definition = createAgentdevThirdPartyToolDefinition(makeDeps());
+    expect(definition.description).toBe(AGENTDEV_THIRD_PARTY_TOOL_DESCRIPTION);
   });
 });
 
