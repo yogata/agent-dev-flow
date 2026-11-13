@@ -922,6 +922,8 @@ verification:
   - REQ-120-001
   - REQ-120-002
   - REQ-120-003
+  # REQ-121-001 は Case #4049（C-ω・2026-11-13）で REQ 行作成と同一の Definition 変更として登録（区分C: 恒常 checker を所有しない配布物文面の契約行、検証は Case 実行時の対比突合〔TS-001〕で補完）。
+  - REQ-121-001
 
 design:
   default: required
