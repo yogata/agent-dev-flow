@@ -5,6 +5,60 @@
 
 ---
 
+## 2026-11-13: 依存整備済み worktree の git worktree remove は gitignore 対象の深いパスで「Filename too long」によりディレクトリ削除だけ失敗し、worktree 登録は解除された状態で残骸ディレクトリが残る（Case #4049・case-close）
+
+- **問題事象**: bun install ＋ vendor 生成（textlint-guard plugin 配下等・node_modules と vendor は gitignore 対象）を実施した worktree .worktrees/4049-feature の削除で、git worktree remove が「failed to delete ...: Filename too long」を返した。この際 worktree 登録（metadata）は解除済みとなり、git worktree list から対象は消えるが .worktrees/4049-feature ディレクトリが node_modules 残骸付きで残存する
+- **発生局面**: case-close STEP-6-1（worktree・branch 削除・Case #4049・C-ω）
+- **検知方法**: git worktree remove のエラー出力と git worktree list・ディレクトリ実在確認の突合（登録解除とディレクトリ残存の乖離）
+- **根本原因**: Windows の MAX_PATH 制限。依存整備で作成した node_modules/vendor 配下の深いパスが削除対象になり、git worktree remove のディレクトリ削除段階が失敗する。メタデータ段階は先に完了するため登録解除だけが進む
+- **自律対応内容**: remove 前退避ファイル掃除規律の延長として、依存整備で自分が作成した gitignore 対象物（node_modules・vendor・4パス）を明示パス指定で fs.rmSync により削除 → 残骸ディレクトリを merge 済み・clean 確認のうえ削除 → git worktree prune。worktree 登録解除・branch 削除・remote 自動削除の確認と合わせ cleanup を完了
+- **ユーザー確認の有無**: なし（workflow 内自律処置）
+- **REQ/Decision/Design影響**: なし（cleanup 手順の運用知見。agentdev-git-worktree の remove 手順への補足候補）
+- **横展開観点**: 依存整備（bun install・build:engine）を実施した worktree の cleanup は全 Case で同型の失敗が起こり得る（case-run で整備し case-close で削除する構成は常にこの組合せを含む）
+- **再発条件**: worktree 内で node_modules 等の深いパスを持つ依存物を生成した後に git worktree remove を実行する条件
+- **予防策候補**: worktree remove 前に依存整備物（node_modules・vendor 等の gitignore 対象・明示パス）を掃除する前置を cleanup 手順に明記（remove 前退避ファイル掃除節の対象に依存整備物を含める）
+- **想定反映先**: agentdev-git-worktree references（worktree-operations.md「remove 前退避ファイル掃除」節への補足候補）
+- **関連**: Case #4049・case-close STEP-6-1
+- **タグ**: #git-worktree #worktree-remove #filename-too-long #windows #cleanup
+
+---
+
+## 2026-11-13: check_integrity の applyNgBaseline は ng と warning の両方を対象とし、ng-baseline 未登録の既知 warning が「new unmanaged NG (delta, exit code driver)」として exit=1 を駆動する（Case #4049・case-run）
+
+- **問題事象**: check_integrity（--profile source）で NG 0件・Warning 1件（gh-direct-invocation・main と同一の既存債務）の実質合格状態でも、applyNgBaseline が warning も対象とするため ng-baseline 未登録の warning が「new unmanaged NG (delta, exit code driver)」に計上され exit=1 となる。NG 0件の実質合格と exit code の乖離により、Definition PR #4050 と実装 PR #4051 の2工程連続で同一の解釈コストを発生させた
+- **発生局面**: case-open STEP-4（PR #4050）と case-run（PR #4051）の check_integrity 実行（Case #4049・C-ω）
+- **検知方法**: exit code と JSON レポートの実検出状態の突合（NG 0件なのに exit=1）
+- **根本原因**: applyNgBaseline の対象集合（ng ＋ warning）と exit code 契約（delta 有無で駆動）の設計により、実質合格状態でも exit 1 が返る。warning は baseline 登録対象外の運用で正当な未登録状態なのに、exit code が不合格風に振る舞う
+- **自律対応内容**: JSON レポートの実検出状態（NG 0件・Warning 1件・main 対照で同一既存債務・本変更起因の悪化 0件）を検証記録へ明記して exit=1 を解釈し、checker は変更せず改善候補として本 entry に記録
+- **ユーザー確認の有無**: なし（workflow 内自律処置・capture 記録）
+- **REQ/Decision/Design影響**: checker 実行契約（checker 実行契約と検出基盤規則 Design）の exit code 契約と applyNgBaseline 対象集合の明示化候補。checker 改善候補（本 Case では checker を変更しない）
+- **横展開観点**: check_integrity を exit code 駆動の gate として消費する全 workflow（case-open/case-run/case-close・inspect 系）で同型の解釈コストが発生し得る
+- **再発条件**: ng-baseline 未登録の warning が存在する状態で check_integrity を exit code 駆動の gate として消費する条件
+- **予防策候補**: warning の baseline 登録対応、または exit code 契約の明示化（NG のみを exit driver にする・warning は報告のみ）のいずれか
+- **想定反映先**: integrity checker 実行契約 Design・check_integrity 実装（改善候補）
+- **関連**: Case #4049・PR #4050・PR #4051・PR 本文 Findings より回収（case-close STEP-6-4）
+- **タグ**: #check_integrity #ng-baseline #exit-code #warning #checker-improvement
+
+---
+
+## 2026-11-13: textlint の advice 指摘は逐語保存契約の本文では修正不能であり、「hard 0件＋保持理由記録」の運用が逐語保存文書の実務上の合格条件として成立している（Case #4049・case-run）
+
+- **問題事象**: 計画書§3 を逐語保存する Design 文書（docs/designs/local/adf-simplification-deferred-records.md）の textlint gate（--purpose final）で advice 3件（sentence-length・no-mix-dearu-desumasu・ja-no-redundant-expression）が出た。逐語保存契約（計画書§3 本文を正とし変更禁止）により修正対象外の本文への指摘であり、修正も保持も契約上の判断が必要
+- **発生局面**: case-run（PR #4051）の textlint gate 実行（Case #4049・C-ω）
+- **検知方法**: textlint gate の JSON 出力の指摘レベル分類（hard vs advice）と指摘対象行の契約属性（逐語保存部分かどうか）の突合
+- **根本原因**: 障害ではない。逐語保存契約の本文は textlint の advice 改善対象外であり、advice レベルの指摘は保持理由の記録を伴う運用で処理するのが実務上の成立形
+- **自律対応内容**: advice 3件は保持し、保持理由（逐語保存契約部分・REQ-121-001 の要件文言）を PR 本文の検証欄に記録した。hard 0件を合格条件として扱う運用の実績を本 entry に記録
+- **ユーザー確認の有無**: なし（workflow 内自律処置・運用実績の記録）
+- **REQ/Decision/Design影響**: REQ-053（文書と配布物の文章品質契約）の合格条件解釈と、逐語保存を伴う文書種別（見送り記録・転記系 Design）の textlint 運用の知見
+- **横展開観点**: 計画書・外部文書の逐語転記を契約とする Case（C-α2 の REQ-120 系・将来の転記系記録保存）で同型の判断が必要になる
+- **再発条件**: 逐語保存契約の本文が textlint の advice 指摘対象に含まれる条件
+- **予防策候補**: 逐語保存文書の textlint 合格条件の明文化（hard 0件＋advice 保持理由記録）を REQ-053 系の運用知見へ整理
+- **想定反映先**: agentdev-textlint-guard 運用文書・REQ-053 関連の知見整理
+- **関連**: Case #4049・PR #4051・PR 本文 Findings より回収（case-close STEP-6-4）
+- **タグ**: #textlint #advice #逐語保存 #運用知見 #case-run
+
+---
+
 ## 2026-11-13: agentdev_jev evaluate の observationMetadata.references.digest に sha256 形式外の値を渡すと evaluator 成功後に観測書込みが invalid_input で失敗する（Case #4049・case-ready）
 
 - **問題事象**: case-ready のスコープ重複判定（Jev 先行評価）で observationMetadata.references の digest に sha256 hex 64文字でない説明用プレースホルダ文字列を渡したところ、evaluator 自体は成功（scope-overlap=false・確率 0.93）したものの、評価直後の観測永続化が invalid_input（input reference digest must be a sha256 hex digest）で失敗し、観測 JSON が .agentdev/jev-observations/ に保存されなかった。evaluate の成功応答には observation write 失敗が warning として付与される
