@@ -162,6 +162,8 @@ function New-ConsumerRepo {
     New-Item -ItemType Directory -Path (Join-Path $root 'scripts\consumer') -Force | Out-Null
     Copy-Item -LiteralPath $InstallScript -Destination (Join-Path $root 'scripts\install.ps1')
     Copy-Item -LiteralPath (Join-Path $RepoRoot 'scripts\consumer\common.ps1') -Destination (Join-Path $root 'scripts\consumer\common.ps1')
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'scripts\consumer\install-sync-common.ps1') -Destination (Join-Path $root 'scripts\consumer\install-sync-common.ps1')
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'scripts\consumer\distribution-exclusion.ps1') -Destination (Join-Path $root 'scripts\consumer\distribution-exclusion.ps1')
     git init -q $root
     if ($LASTEXITCODE -ne 0) { throw "git init failed: $root" }
     return $root
@@ -175,8 +177,10 @@ function New-SelfRepo {
     param([string]$Prefix = 'adf-host-self')
     $root = New-TempRepo $Prefix
     New-CanonicalCheckout -PluginDir $root
-    New-Item -ItemType Directory -Path (Join-Path $root 'scripts') -Force | Out-Null
+    New-Item -ItemType Directory -Path (Join-Path $root 'scripts\consumer') -Force | Out-Null
     Copy-Item -LiteralPath $SelfSyncScript -Destination (Join-Path $root 'scripts\self-sync.ps1')
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'scripts\consumer\install-sync-common.ps1') -Destination (Join-Path $root 'scripts\consumer\install-sync-common.ps1')
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'scripts\consumer\distribution-exclusion.ps1') -Destination (Join-Path $root 'scripts\consumer\distribution-exclusion.ps1')
     return $root
 }
 

@@ -17,7 +17,8 @@ param(
 # Exit codes:
 #   0  success (every file placed, content matches)
 #   4  destination already has a file with different content (do not overwrite)
-#   5  required directory creation failed / source missing
+#   5  required directory creation failed / source missing (including the
+#      distribution exclusion canon not found - a broken bundle is fail-closed)
 #   6  textlint guard plugin dependency (vendor) missing or incomplete at the
 #      target (run the resolution steps: bun install && bun run build:engine
 #      under the installed plugin package, then re-run this installer)
@@ -114,13 +115,25 @@ foreach ($skillDir in $skillDirs) {
 # Tools are canonical (src/common/tools/); Plugins/Hooks stay in the OpenCode
 # host connection area (src/opencode/plugins/). Optional kinds: archives
 # without a kind directory simply skip it.
-# Repo-local Plugin (agentdev-distribution-boundary-guard, REQ-{NNNN}-{NNN} /
-# REQ-{NNNN}-{NNN}) is excluded from consumer projection. SYNC OBLIGATION
-# (runtime-package-boundary Design「repo-local Plugin の配布・投影契約」):
-# keep this exclusion in sync across the 3 consumer distribution paths:
-# scripts/install.ps1, scripts/self/release/package-release-archive.ps1,
-# this file. self-sync.ps1 must NOT exclude it (self-host projection is kept).
-$repoLocalPluginNames = @("agentdev-distribution-boundary-guard")
+# Repo-local Plugin exclusion is resolved from the distribution exclusion
+# canon (scripts/consumer/distribution-exclusion.ps1), which travels inside
+# the release archive next to this installer. The canon is the single source
+# of the exclusion set across the consumer distribution entries (checkout
+# install, self-sync exception basis, release archive staging, this
+# installer). self-sync.ps1 references the canon but does NOT apply the
+# exclusion (self-host projection is kept).
+$distExclusionCanonPath = $null
+foreach ($canonCandidate in @(
+    (Join-Path $PSScriptRoot "consumer\distribution-exclusion.ps1"),
+    (Join-Path $PSScriptRoot "..\distribution-exclusion.ps1")
+)) {
+    if (Test-Path -LiteralPath $canonCandidate) { $distExclusionCanonPath = $canonCandidate; break }
+}
+if ($null -eq $distExclusionCanonPath) {
+    Write-Host "install-from-archive: distribution exclusion canon not found (fail-closed, exit 5): consumer\distribution-exclusion.ps1" -ForegroundColor Red
+    exit 5
+}
+. $distExclusionCanonPath
 foreach ($kindSpec in @(
     @{ Kind = "tools";   Src = (Join-Path $commonSrc "tools") },
     @{ Kind = "plugins"; Src = (Join-Path $opencodeSrc "plugins") }

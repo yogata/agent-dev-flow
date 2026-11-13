@@ -103,12 +103,17 @@ const TRUSTED_INSTALLATION_SCRIPTS: readonly string[] = [
   // companion, if any, would also be protected.
   "scripts/self/release/trusted-distribution-gate.ps1",
   // Trusted consumer install entry (public entry, REQ-050-001) plus its
-  // runtime dependency module (scripts/consumer/common.ps1). The entry's
-  // execution dependency set is part of the trust root so a tampered or
-  // missing internal module cannot bootstrap a consumer (REQ-050-011,
-  // REQ-050-012).
+  // runtime dependency set (scripts/consumer/common.ps1, the shared
+  // judgment module scripts/consumer/install-sync-common.ps1, and the
+  // distribution exclusion canon scripts/consumer/distribution-exclusion.ps1).
+  // The entry's execution dependency set is part of the trust root so a
+  // tampered or missing internal module cannot bootstrap a consumer
+  // (REQ-050-011, REQ-050-012). This list is the audit side's independently
+  // maintained trust boundary; it is not derived from the exclusion canon.
   "scripts/install.ps1",
   "scripts/consumer/common.ps1",
+  "scripts/consumer/install-sync-common.ps1",
+  "scripts/consumer/distribution-exclusion.ps1",
   // NOTE: scripts/consumer/archive/install.ps1 (archive-dedicated installer
   // original) and scripts/self/release/package-release-archive.ps1 are
   // Stage B canonical scripts and are intentionally NOT protected by

@@ -83,6 +83,13 @@ function Fail-Exit {
 # scripts/self/release/ -> repo root is three levels up.
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
 
+# Distribution exclusion canon (single source of the repo-local plugin
+# exclusion across the consumer distribution entries). This release archive
+# packager derives its staging filter from the canon and stages the canon
+# file itself into the archive so the archive-edition installer resolves the
+# same exclusion set at consumer install time.
+. (Join-Path $repoRoot "scripts\consumer\distribution-exclusion.ps1")
+
 # Canonical sources (DEC-049, REQ-099-020): commands/skills and Custom Tools
 # live under the host-independent canonical tree src/common/; Plugins/Hooks
 # stay in the OpenCode host connection area (src/opencode/plugins).
@@ -204,13 +211,11 @@ try {
     # Custom Tools are canonical (src/common/tools/); Plugins/Hooks stay in
     # the OpenCode host connection area (src/opencode/plugins/). Optional at
     # this stage — repos without these kinds simply skip them.
-    # Repo-local Plugin (agentdev-distribution-boundary-guard, REQ-052-006 /
-    # REQ-002-045) is excluded from consumer distribution. SYNC OBLIGATION
-    # (runtime-package-boundary Design「repo-local Plugin の配布・投影契約」):
-    # keep this exclusion in sync across the 3 consumer distribution paths:
-    # scripts/install.ps1, scripts/consumer/archive/install.ps1, this file.
-    # self-sync.ps1 must NOT exclude it (self-host projection is kept).
-    $repoLocalPluginNames = @("agentdev-distribution-boundary-guard")
+    # Repo-local Plugin (the distribution exclusion canon's names) is
+    # excluded from consumer distribution. The exclusion set is derived from
+    # the canon module (scripts/consumer/distribution-exclusion.ps1,
+    # dot-sourced above); self-sync.ps1 references the canon but does NOT
+    # apply it (self-host projection is kept).
     foreach ($kindSpec in @(
         @{ Kind = "tools";   Source = (Join-Path $repoRoot "src\common\tools");      Stage = (Join-Path $stageSrcCommon "tools") },
         @{ Kind = "plugins"; Source = (Join-Path $repoRoot "src\opencode\plugins"); Stage = (Join-Path $stageSrcOpencode "plugins") }
@@ -260,6 +265,14 @@ try {
     # installation projection and must NOT be forced into this archive.
     Copy-Item -LiteralPath $installScript -Destination (Join-Path $stageScripts "install.ps1") -Force
 
+    # The distribution exclusion canon travels inside the archive at its
+    # repository-relative location so the archive-edition installer
+    # (projected scripts/install.ps1) resolves the consumer exclusion set
+    # from the same single canon the packager used at staging time.
+    $stageScriptsConsumer = Join-Path $stageScripts "consumer"
+    New-Item -ItemType Directory -Path $stageScriptsConsumer -Force | Out-Null
+    Copy-Item -LiteralPath (Join-Path $repoRoot "scripts\consumer\distribution-exclusion.ps1") -Destination (Join-Path $stageScriptsConsumer "distribution-exclusion.ps1") -Force
+
     $readmePresent = $false
     if (Test-Path -LiteralPath $readmeInstall) {
         Copy-Item -LiteralPath $readmeInstall -Destination (Join-Path $stageArchiveRoot "README-INSTALL.md") -Force
@@ -290,6 +303,7 @@ try {
     $extrasScanCommands = Join-Path $extrasScanRoot "src\common\commands\agentdev"
     New-Item -ItemType Directory -Path $extrasScanCommands -Force | Out-Null
     Copy-Item -LiteralPath (Join-Path $stageScripts "install.ps1") -Destination (Join-Path $extrasScanCommands "install.ps1.archive-extra.ps1") -Force
+    Copy-Item -LiteralPath (Join-Path $stageScriptsConsumer "distribution-exclusion.ps1") -Destination (Join-Path $extrasScanCommands "distribution-exclusion.archive-extra.ps1") -Force
     if ($readmePresent) {
         Copy-Item -LiteralPath (Join-Path $stageArchiveRoot "README-INSTALL.md") -Destination (Join-Path $extrasScanCommands "README-INSTALL.md") -Force
     }

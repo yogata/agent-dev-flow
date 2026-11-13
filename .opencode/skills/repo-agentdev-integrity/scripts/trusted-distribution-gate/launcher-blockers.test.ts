@@ -111,6 +111,8 @@ describe("launcher / publish-after-verify ordering (parent blocker #1, #8)", () 
       writeFix(repo, "src/common/skills/japanese-tech-writing/SKILL.md", "# jtw\n");
       writeFix(repo, "scripts/install.ps1", "# install\n");
       writeFix(repo, "scripts/consumer/common.ps1", "# check\n");
+      writeFix(repo, "scripts/consumer/install-sync-common.ps1", "# shared\n");
+      writeFix(repo, "scripts/consumer/distribution-exclusion.ps1", "# canon\n");
       writeFix(repo, "README-INSTALL.md", "# readme\n");
       writeFix(repo, "scripts/self/release/package-release-archive.ps1", "# placeholder\n");
       // BASE installer: intentionally broken (exit 5). The launcher's

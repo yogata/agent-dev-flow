@@ -34,6 +34,7 @@ const REPO_ROOT = path.resolve(__dirname, "..", "..", "..", "..");
 const REAL_SCRIPT = path.join(REPO_ROOT, "scripts", "self", "release", "package-release-archive.ps1");
 const REAL_INSTALLER = path.join(REPO_ROOT, "scripts", "consumer", "archive", "install.ps1");
 const REAL_PUBLISHER = path.join(REPO_ROOT, "scripts", "self", "release", "publish-hard-link.ts");
+const CANON_PS1 = path.join(REPO_ROOT, "scripts", "consumer", "distribution-exclusion.ps1");
 
 // Stub boundary checker used by every scenario. The real
 // check_distribution_boundary.ts is a heavy TS module that pulls in lib/;
@@ -143,6 +144,7 @@ function makeFakeRepo(): RepoPaths {
   fs.copyFileSync(REAL_SCRIPT, path.join(root, "scripts", "self", "release", "package-release-archive.ps1"));
   fs.copyFileSync(REAL_INSTALLER, path.join(root, "scripts", "consumer", "archive", "install.ps1"));
   fs.copyFileSync(REAL_PUBLISHER, path.join(root, "scripts", "self", "release", "publish-hard-link.ts"));
+  fs.copyFileSync(CANON_PS1, path.join(root, "scripts", "consumer", "distribution-exclusion.ps1"));
   fs.writeFileSync(
     path.join(root, ".opencode", "skills", "repo-agentdev-integrity", "scripts", "check_distribution_boundary.ts"),
     STUB_CHECKER_TS,

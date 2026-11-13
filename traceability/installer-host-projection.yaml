@@ -35,6 +35,16 @@ implementation:
     - REQ-029-012
     - REQ-097-002
     - REQ-099-020
+  scripts/consumer/install-sync-common.ps1:
+    - REQ-058-001
+    - REQ-058-008
+    - REQ-058-012
+    - REQ-097-002
+    - REQ-099-010
+    - REQ-099-011
+    - REQ-099-012
+  scripts/consumer/distribution-exclusion.ps1:
+    - REQ-052-006
 verification:
   scripts/self/release/installer-host-projection.Tests.ps1:
     - REQ-099-010
@@ -45,3 +55,8 @@ verification:
   scripts/self/release/install-check-mechanical-prerequisites.Tests.ps1:
     - REQ-009-053
     - REQ-009-054
+  scripts/self/release/distribution-exclusion-consistency.test.ts:
+    - REQ-052-006
+    - REQ-058-001
+    - REQ-058-008
+    - REQ-058-012

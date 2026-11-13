@@ -67,6 +67,8 @@ describe("cleanup warning preservation / per-call injected remover", () => {
       writeFix(repo, "src/common/skills/japanese-tech-writing/SKILL.md", "# jtw\n");
       writeFix(repo, "scripts/install.ps1", "# install\n");
       writeFix(repo, "scripts/consumer/common.ps1", "# check\n");
+      writeFix(repo, "scripts/consumer/install-sync-common.ps1", "# shared\n");
+      writeFix(repo, "scripts/consumer/distribution-exclusion.ps1", "# canon\n");
       writeFix(repo, "README-INSTALL.md", "# readme\n");
       writeFix(repo, "scripts/self/release/package-release-archive.ps1", "# placeholder\n");
       writeFix(repo, "scripts/self/release/trusted-distribution-gate.ps1", "# placeholder\n");
@@ -144,6 +146,8 @@ describe("launcher / both-missing protected bootstrap scripts in seed mode", () 
     ].join("\n"));
     if (!missing.includes("install-entry")) writeFix(repo, "scripts/install.ps1", "# install\n");
     if (!missing.includes("common-module")) writeFix(repo, "scripts/consumer/common.ps1", "# check\n");
+    writeFix(repo, "scripts/consumer/install-sync-common.ps1", "# shared\n");
+    writeFix(repo, "scripts/consumer/distribution-exclusion.ps1", "# canon\n");
     execFileSync("git", ["add", "-A"], { cwd: repo });
     execFileSync("git", ["commit", "-q", "-m", "base"], { cwd: repo });
     const base = execFileSync("git", ["rev-parse", "HEAD"], { cwd: repo }).toString().trim();

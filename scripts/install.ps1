@@ -120,6 +120,15 @@ $ErrorActionPreference = 'Stop'
 # 共有定義（URL・ブランチ定数、cwd 安全化、チェックアウト案内）
 . (Join-Path $PSScriptRoot 'consumer\common.ps1')
 
+# 共有判定の単一定義モジュール（両公開入口共有。ジャンクション正本判定、所有権判定、
+# stale / 管理外投影の判定、正本解決、配置対象ホストの検出・確定、plugin loader shim
+# 内容、実行環境診断、third-party Skill 宣言の解決と drift 検知）
+. (Join-Path $PSScriptRoot 'consumer\install-sync-common.ps1')
+
+# 配布除外の正本（repo-local Plugin の consumer 配布除外。3 consumer 配布経路の
+# 単一導出）。本入口は当該正本を参照して除外集合を決定する。
+. (Join-Path $PSScriptRoot 'consumer\distribution-exclusion.ps1')
+
 $RepoRoot = $PWD.Path
 $PluginPath = Join-Path $RepoRoot $PluginDir
 
@@ -149,17 +158,13 @@ $PluginsDir = Join-Path $ProjectionDir 'plugins'
 $ProjectionParentDirs = @($CommandsDir, $SkillsDir, $ToolsDir, $PluginsDir)
 $ProjectionParentRels = @('commands', 'skills', 'tools', 'plugins')
 
-# Repo-local patterns excluded from junction management
-$RepoLocalCommandNames = @('repo')
-$RepoLocalSkillPrefix = 'repo-'
-
-# Repo-local Plugin excluded from consumer distribution (REQ-052-006, REQ-002-045).
-# SYNC OBLIGATION (runtime-package-boundary Design「repo-local Plugin の配布・投影契約」):
-# keep this exclusion in sync across the 3 consumer distribution paths:
-# scripts/install.ps1 (this file), scripts/consumer/archive/install.ps1,
-# scripts/self/release/package-release-archive.ps1. self-sync.ps1 must NOT
-# exclude it (self-host projection is kept).
-$RepoLocalPluginNames = @('agentdev-distribution-boundary-guard')
+# Repo-local patterns（$RepoLocalCommandNames / $RepoLocalSkillPrefix）と配布除外正本
+# （$RepoLocalPluginNames）は共有定義モジュールと配布除外正本モジュールから供給される
+# （consumer\install-sync-common.ps1 / consumer\distribution-exclusion.ps1）。
+# 配布除外の正本は1箇所に定義され、3 consumer 配布経路（本入口、archive installer、
+# package-release-archive.ps1）が当該正本の参照・導出によって除外集合を決定する
+# （runtime-package-boundary Design「repo-local Plugin の配布・投影契約」）。
+# self-sync.ps1 は正本を参照しつつ適用しない例外入口である（自己ホスト投影の維持）。
 
 # In LocalMode the agentdev-gh Custom Tool implementation is redirected from
 # src/common/tools/agentdev-gh/local/ (REQ-009-020).
@@ -216,7 +221,7 @@ function Invoke-InstallWizard {
     # 配置対象ホストの選択（REQ-099-010、REQ-009-040）。現在の配置対象を検出して
     # 案内し、既存導入では既定（空入力）で現在の配置対象を維持する。
     # 実行環境の CLI 導入有無を配置対象の選択に使わない（REQ-099-011）。
-    $detectedHosts = Get-DetectedHosts
+    $detectedHosts = Get-DetectedHosts -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir
     Write-Host 'Q3. 配置対象ホストを選んでください（番号を入力）:'
     if ($detectedHosts -eq 'none') {
         Write-Host '  現在の配置対象の検出結果: なし（新規導入）'
@@ -242,48 +247,6 @@ function Invoke-InstallWizard {
         }
     }
     Write-Host ''
-}
-
-function Test-Junction {
-    param([string]$Path)
-    $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
-    if (-not $item) { return $false }
-    return $item.Attributes -band [System.IO.FileAttributes]::ReparsePoint
-}
-
-function Get-JunctionTarget {
-    param([string]$Path)
-    $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
-    if (-not $item) { return $null }
-    if (-not ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint)) { return $null }
-    return $item.Target
-}
-
-function Test-JunctionTargetMatchesSource {
-    <#
-    .SYNOPSIS
-        junction の解決先が正本解決パス（Get-TargetSourcePath の現行正本解決。LocalMode
-        を含む）と一致するか判定する（両公開入口・両ホスト・全モード共通の正本一致検査。
-        「ジャンクション状態の判定と自己修復」Design 参照）。リンク先実体が存在しない場合
-        （broken）は解決に失敗するため不一致扱いとなり、管理物確定は
-        Test-ManagedProjectionJunction / Test-ManagedSenpiJunction が reparse data の
-        リンク先文字列で行う。
-    #>
-    param([string]$JunctionFullName, [string]$SourcePath)
-    $targetObj = Get-JunctionTarget -Path $JunctionFullName
-    $targetList = @($targetObj) | ForEach-Object { [string]$_ } | Where-Object { $_ }
-    if ($targetList.Count -eq 0) { return $false }
-    $expectedFull = [System.IO.Path]::GetFullPath($SourcePath).TrimEnd('\', '/')
-    foreach ($target in $targetList) {
-        $resolved = $null
-        try {
-            $resolved = (Resolve-Path -LiteralPath $target -ErrorAction Stop).Path
-        } catch {
-            $resolved = $target
-        }
-        if ($resolved.TrimEnd('\', '/') -ieq $expectedFull) { return $true }
-    }
-    return $false
 }
 
 function Get-ConsumerJunctionTargets {
@@ -341,278 +304,6 @@ function Get-ConsumerJunctionTargets {
     }
 
     return ($targets | Sort-Object)
-}
-
-function Get-HostsDisplay {
-    <#
-    .SYNOPSIS
-        Human-readable placement-target label for messages.
-    #>
-    param([string]$HostsValue)
-    switch ($HostsValue) {
-        'opencode' { return 'OpenCode のみ' }
-        'senpi'    { return 'Senpi のみ' }
-        'both'     { return '両方（OpenCode + Senpi）' }
-        'none'     { return 'なし（新規導入）' }
-        default    { return $HostsValue }
-    }
-}
-
-function Resolve-SenpiTargetRel {
-    <#
-    .SYNOPSIS
-        Convert a managed enumeration entry ('senpi:<subdir>') to its Senpi
-        projection relative path ('<subdir>'). Non-senpi entries return $null.
-    #>
-    param([string]$TargetEntry)
-    if ($TargetEntry -like 'senpi:*') { return $TargetEntry.Substring('senpi:'.Length) }
-    return $null
-}
-
-function Get-DetectedHosts {
-    <#
-    .SYNOPSIS
-        現在の配置対象を配置先の状態から検出する（REQ-099-010）。
-        管理物と確定できる ADF 管理投影物が存在するホストのみ検出対象とし、
-        利用者が自前で配置した無関係な junction を誤検出しない。
-    #>
-    $hasOpenCode = $false
-    foreach ($parentRel in $ProjectionParentRels) {
-        $parentPath = Join-Path $ProjectionDir $parentRel
-        if (-not (Test-Path -LiteralPath $parentPath)) { continue }
-        $found = Get-ChildItem -LiteralPath $parentPath -Directory -Force -ErrorAction SilentlyContinue |
-            Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
-            Where-Object {
-                Test-ManagedProjectionJunction -JunctionRel "$parentRel\$($_.Name)" -JunctionFullName $_.FullName
-            }
-        if ($found) { $hasOpenCode = $true; break }
-    }
-    $hasSenpi = $false
-    if (Test-Path -LiteralPath $SenpiProjectionDir) {
-        $senpiFound = Get-ChildItem -LiteralPath $SenpiProjectionDir -Directory -Force -ErrorAction SilentlyContinue |
-            Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
-            Where-Object {
-                Test-ManagedSenpiJunction -JunctionName $_.Name -JunctionFullName $_.FullName
-            }
-        if ($senpiFound) { $hasSenpi = $true }
-    }
-    if ($hasOpenCode -and $hasSenpi) { return 'both' }
-    if ($hasOpenCode) { return 'opencode' }
-    if ($hasSenpi) { return 'senpi' }
-    return 'none'
-}
-
-function Resolve-TargetHosts {
-    <#
-    .SYNOPSIS
-        配置対象ホストを確定する（REQ-099-010、DEC-049 決定(3)）。
-        明示指定（-Hosts パラメータまたはウィザード選択）を最優先し、未指定時は
-        現在の配置対象を検出して維持する。検出不能（新規導入）は both（推奨）。
-    #>
-    if ($Hosts) {
-        if ($Hosts -eq 'both') { return @('opencode', 'senpi') }
-        return @($Hosts)
-    }
-    $detected = Get-DetectedHosts
-    if ($detected -eq 'none') { return @('opencode', 'senpi') }
-    switch ($detected) {
-        'opencode' { return @('opencode') }
-        'senpi'    { return @('senpi') }
-        'both'     { return @('opencode', 'senpi') }
-    }
-    return @('opencode', 'senpi')
-}
-
-function Get-TargetSourcePath {
-    <#
-    .SYNOPSIS
-        Resolve the absolute source path backing a projection relative path.
-        OpenCode targets back to the canonical sources (src/common/ for
-        commands/skills/tools, src/opencode/ for plugins). In LocalMode,
-        tools\agentdev-gh is redirected to src/common/tools/agentdev-gh/local/
-        (REQ-009-020). Senpi targets back to src/senpi/<subdir>.
-    #>
-    param([string]$RelPath)
-    $senpiRel = Resolve-SenpiTargetRel -TargetEntry $RelPath
-    if ($null -ne $senpiRel) {
-        return Join-Path $SenpiHostSourceDir $senpiRel
-    }
-    if ($LocalMode -and $RelPath -eq $LocalModeRedirectToolRel) {
-        return $LocalSourceDir
-    }
-    if ($RelPath -like 'plugins\*') {
-        return Join-Path $OpencodeHostSourceDir $RelPath
-    }
-    return Join-Path $CommonSourceDir $RelPath
-}
-
-function Test-ManagedProjectionJunction {
-    <#
-    .SYNOPSIS
-        配置先の junction が ADF 管理投影物（本スクリプト系が配置した物）であることを
-        確定する（REQ-058-001、REQ-058-008）。
-
-    .DESCRIPTION
-        確定基準: リンク先が、当該 junction の相対パスに対応する正本パス候補
-        （現行正本: src/common/ または src/opencode/plugins/、旧単一正本:
-        src/opencode/<相対パス>、または LocalMode リダイレクト先 tools\agentdev-gh のみ）
-        に一致する場合のみ管理物とみなす。旧単一正本候補は、旧構成で配置された既存
-        consumer の管理投影物を確定し、更新時に安全に扱うために残す（REQ-099-012）。
-        正本以外を向く junction やリンク先を確定できない junction は管理物判定不能と
-        して扱い、自動削除の対象にしない非破壊境界である（REQ-058-008）。
-    #>
-    param([string]$JunctionRel, [string]$JunctionFullName)
-    $targetObj = Get-JunctionTarget -Path $JunctionFullName
-    $targetList = @($targetObj) | ForEach-Object { [string]$_ } | Where-Object { $_ }
-    if ($targetList.Count -eq 0) { return $false }
-    $expectedSources = @()
-    if ($JunctionRel -like 'plugins\*') {
-        $expectedSources += (Join-Path $OpencodeHostSourceDir $JunctionRel)
-    } else {
-        $expectedSources += (Join-Path $CommonSourceDir $JunctionRel)
-    }
-    # 旧単一正本候補（旧構成 consumer の管理物確定用。REQ-099-012 更新互換）
-    $expectedSources += (Join-Path $LegacyUnifiedSourceDir $JunctionRel)
-    if ($JunctionRel -eq $LocalModeRedirectToolRel) {
-        $expectedSources += ($LocalSourceDir)
-    }
-    foreach ($target in $targetList) {
-        $resolved = $null
-        try {
-            $resolved = (Resolve-Path -LiteralPath $target -ErrorAction Stop).Path
-        } catch {
-            # 正本から削除された管理対象 junction はリンク先解決に失敗する（broken）。
-            # リンク先の文字列自体は reparse data に残るため判定に使える。
-            $resolved = $target
-        }
-        foreach ($expected in $expectedSources) {
-            $expectedFull = [System.IO.Path]::GetFullPath($expected).TrimEnd('\', '/')
-            if ($resolved.TrimEnd('\', '/') -ieq $expectedFull) { return $true }
-        }
-    }
-    return $false
-}
-
-function Test-ManagedSenpiJunction {
-    <#
-    .SYNOPSIS
-        .senpi/ 配下の junction が ADF 管理投影物（Senpi 投影）であることを確定する
-        （REQ-058-001、REQ-058-008）。
-
-    .DESCRIPTION
-        確定基準: リンク先が、当該 junction 名に対応する Senpi 正本パス
-        （src/senpi/<名前>）に一致する場合のみ管理物とみなす。正本以外を向く
-        junction やリンク先を確定できない junction は管理物判定不能として扱い、
-        自動削除の対象にしない非破壊境界である（REQ-058-008）。
-    #>
-    param([string]$JunctionName, [string]$JunctionFullName)
-    $targetObj = Get-JunctionTarget -Path $JunctionFullName
-    $targetList = @($targetObj) | ForEach-Object { [string]$_ } | Where-Object { $_ }
-    if ($targetList.Count -eq 0) { return $false }
-    $expectedFull = [System.IO.Path]::GetFullPath((Join-Path $SenpiHostSourceDir $JunctionName)).TrimEnd('\', '/')
-    foreach ($target in $targetList) {
-        $resolved = $null
-        try {
-            $resolved = (Resolve-Path -LiteralPath $target -ErrorAction Stop).Path
-        } catch {
-            $resolved = $target
-        }
-        if ($resolved.TrimEnd('\', '/') -ieq $expectedFull) { return $true }
-    }
-    return $false
-}
-
-function Get-StaleManagedJunctions {
-    <#
-    .SYNOPSIS
-        ADF 管理投影物のうち正本の管理対象列挙から外れたもの（stale、削除対象）を返す
-        （REQ-058-001、REQ-058-002）。
-
-    .DESCRIPTION
-        返却要素は RelPath（管理列挙の相対パス表現）と FullName（絶対パス）を持つ。
-        正本の管理対象列挙（追加・修復対象を含む現行対象）に含まれない junction のうち、
-        管理物と確定できるものだけを返す。対象範囲は OpenCode 投影（.opencode/ の
-        commands/skills/tools/plugins 配下）と Senpi 投影（.senpi/ 直下）の両方であり、
-        配置対象から外れたホストの管理投影物も stale として扱う（REQ-099-012 の
-        対象別除去）。管理物判定不能な junction は返さない（REQ-058-008 の非破壊境界）。
-    #>
-    param([string[]]$CurrentTargets)
-    $stale = [System.Collections.Generic.List[object]]::new()
-    foreach ($parentRel in $ProjectionParentRels) {
-        $parentPath = Join-Path $ProjectionDir $parentRel
-        if (-not (Test-Path -LiteralPath $parentPath)) { continue }
-        Get-ChildItem -LiteralPath $parentPath -Directory -Force |
-            Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
-            ForEach-Object {
-                $junctionRel = "$parentRel\$($_.Name)"
-                if ($junctionRel -notin $CurrentTargets) {
-                    if (Test-ManagedProjectionJunction -JunctionRel $junctionRel -JunctionFullName $_.FullName) {
-                        $stale.Add([PSCustomObject]@{ RelPath = $junctionRel; FullName = $_.FullName })
-                    }
-                }
-            }
-    }
-    if (Test-Path -LiteralPath $SenpiProjectionDir) {
-        Get-ChildItem -LiteralPath $SenpiProjectionDir -Directory -Force |
-            Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
-            ForEach-Object {
-                $targetEntry = "senpi:$($_.Name)"
-                if ($targetEntry -notin $CurrentTargets) {
-                    if (Test-ManagedSenpiJunction -JunctionName $_.Name -JunctionFullName $_.FullName) {
-                        $stale.Add([PSCustomObject]@{ RelPath = $targetEntry; FullName = $_.FullName })
-                    }
-                }
-            }
-    }
-    return $stale
-}
-
-function Get-UnmanagedProjectionJunctionRels {
-    <#
-    .SYNOPSIS
-        配置先の junction のうち、正本の管理対象列挙にも stale 管理投影物にも該当しない
-        （管理物判定不能な）ものの相対パス一覧を返す（REQ-058-008）。
-    #>
-    param([string[]]$CurrentTargets)
-    $staleRels = @(Get-StaleManagedJunctions -CurrentTargets $CurrentTargets) | ForEach-Object { $_.RelPath }
-    $unmanaged = [System.Collections.Generic.List[string]]::new()
-    foreach ($parentRel in $ProjectionParentRels) {
-        $parentPath = Join-Path $ProjectionDir $parentRel
-        if (-not (Test-Path -LiteralPath $parentPath)) { continue }
-        Get-ChildItem -LiteralPath $parentPath -Directory -Force |
-            Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
-            ForEach-Object {
-                $junctionRel = "$parentRel\$($_.Name)"
-                if ($junctionRel -notin $CurrentTargets -and $junctionRel -notin $staleRels) {
-                    $unmanaged.Add($junctionRel)
-                }
-            }
-    }
-    if (Test-Path -LiteralPath $SenpiProjectionDir) {
-        Get-ChildItem -LiteralPath $SenpiProjectionDir -Directory -Force |
-            Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
-            ForEach-Object {
-                $targetEntry = "senpi:$($_.Name)"
-                if ($targetEntry -notin $CurrentTargets -and $targetEntry -notin $staleRels) {
-                    $unmanaged.Add($targetEntry)
-                }
-            }
-    }
-    return $unmanaged
-}
-
-function New-PluginLoaderShimContent {
-    <#
-    .SYNOPSIS
-        OpenCode は .opencode/plugins/ 直下（depth-1）のファイルのみ自動読み込みする。
-        ディレクトリ型プラグインパッケージ（plugins/agentdev-*/）のローダーシムとして
-        plugin.ts の default を再エクスポートする固定内容を返す。
-    #>
-    param([string]$PackageName)
-    return (
-        "// Generated by scripts/install.ps1 / scripts/self-sync.ps1 - do not edit.`n" +
-        "export { default } from `"./$PackageName/plugin.ts`";`n"
-    )
 }
 
 function Test-TextlintGuardPluginPresent {
@@ -692,116 +383,6 @@ function Test-TextlintBundleVersionsMatchPin {
         }
     }
     return $true, ''
-}
-
-# --- Runtime diagnostics (REQ-099-011) ---
-
-function Show-RuntimeDiagnostics {
-    <#
-    .SYNOPSIS
-        実行環境診断（CLI 導入有無の確認）を配置検査と区別して報告する（REQ-099-011）。
-
-    .DESCRIPTION
-        配置検査（junction・投影・乖離の検査）と実行環境診断を別セクションで報告する。
-        CLI 未導入でも配置と配置検査は可能であり、診断結果は乖離（divergence）に
-        数えない。診断は配置対象の選択・変更に使用せず、対応済み組合せの宣言も
-        行わない（OmO 版は診断・互換確認にのみ使用）。
-    #>
-    Write-Host ''
-    Write-Host '--- Runtime diagnostics (placement inspection is reported separately above) ---'
-    foreach ($cliSpec in @(
-        @{ Name = 'opencode'; Label = 'OpenCode CLI (opencode)' },
-        @{ Name = 'omo'; Label = 'OmO native CLI (omo)' }
-    )) {
-        $cmd = Get-Command -Name $cliSpec.Name -ErrorAction SilentlyContinue
-        if ($cmd) {
-            Write-Host "[INFO] Runtime diagnostic: $($cliSpec.Label): installed ($($cmd.Source))"
-        } else {
-            Write-Host "[INFO] Runtime diagnostic: $($cliSpec.Label): not found in PATH (placement and placement checks do not require the CLI; runtime behavior cannot be verified here)"
-        }
-    }
-    Write-Host '[INFO] Runtime diagnostics never select or change placement targets (host placement is user-selected or inherited from the current placement).'
-    Write-Host '[INFO] This script does not report verified host/CLI compatibility claims; verified combinations are maintained in the guides (REQ-099-018).'
-}
-
-# --- Third-party Skill drift detection ---
-
-# 宣言ファイル（src/third-party/skills.yaml、不在時は .agentdev/third-party/skills.yaml
-# の2候補解決）と .opencode/skills/<name>/ の配置（SKILL.md と provenance マーカー）の
-# 突合。宣言ファイルが解決できない環境は検査対象外として正常扱いし、宣言済みで配置が
-# 欠落する場合は ERROR 停止（終了コード 7）して取得機構 CLI を案内する。取得と
-# network access は本スクリプトが行わない。name 列挙の抽出に限定し、宣言の構文検証は
-# 取得機構のパーサーを正本とする。3経路同期契約: scripts/self-sync.ps1 と
-# scripts/consumer/archive/install.ps1 の同名検知と同期して維持すること。
-$ThirdPartyDeclRelCandidates = @('src\third-party\skills.yaml', '.agentdev\third-party\skills.yaml')
-$ThirdPartyProvenanceMarker = '.agentdev-third-party.json'
-$ThirdPartyDriftExitCode = 7
-
-function Get-ThirdPartyDeclaredNames {
-    <#
-    .SYNOPSIS
-        宣言ファイルから name 列挙を抽出する（最小 yaml 解析。name 列挙の抽出に限定）。
-    #>
-    param([string]$DeclarationPath)
-    $names = @()
-    $inSkills = $false
-    foreach ($line in [System.IO.File]::ReadAllLines($DeclarationPath)) {
-        $t = $line.Trim()
-        if ($t.Length -eq 0 -or $t.StartsWith('#')) { continue }
-        if (-not $inSkills) {
-            if ($t -match '^skills:\s*(.*)$') {
-                $rest = $Matches[1].Trim()
-                if ($rest -eq '') { $inSkills = $true }
-                elseif ($rest -eq '[]') { return @() }
-                else { throw "unsupported skills value in declaration: $rest" }
-            } elseif (-not $t.StartsWith('schema_version:')) {
-                throw "unsupported declaration line: $t"
-            }
-            continue
-        }
-        if ($t.StartsWith('- name:')) {
-            $name = $t.Substring('- name:'.Length).Trim().Trim('"', "'")
-            if ($name) { $names += $name }
-        } elseif (-not ($t.StartsWith('source:') -or $t.StartsWith('-'))) {
-            throw "unsupported declaration line: $t"
-        }
-    }
-    return $names
-}
-
-function Invoke-ThirdPartyDriftCheck {
-    <#
-    .SYNOPSIS
-        third-party Skill の drift 検知（宣言済みで配置欠落の ERROR 停止と案内）。
-    #>
-    param([string]$RootDir, [string]$SkillsRootDir, [string]$CliCommandHint)
-    $declarationPath = $null
-    foreach ($rel in $ThirdPartyDeclRelCandidates) {
-        $candidate = Join-Path $RootDir $rel
-        if (Test-Path -LiteralPath $candidate) { $declarationPath = $candidate; break }
-    }
-    if (-not $declarationPath) {
-        Write-Host '[INFO] third-party Skill declaration not found (src/third-party/skills.yaml or .agentdev/third-party/skills.yaml); third-party drift check skipped'
-        return
-    }
-    Write-Host "=== third-party Skill drift check ($declarationPath) ==="
-    $declaredNames = @(Get-ThirdPartyDeclaredNames -DeclarationPath $declarationPath)
-    $missing = @()
-    foreach ($name in $declaredNames) {
-        $skillDir = Join-Path $SkillsRootDir $name
-        $hasSkillMd = Test-Path -LiteralPath (Join-Path $skillDir 'SKILL.md')
-        $hasProvenance = Test-Path -LiteralPath (Join-Path $skillDir $ThirdPartyProvenanceMarker)
-        if ($hasSkillMd -and $hasProvenance) {
-            Write-Host "[OK] third-party Skill placed: $name"
-        } else {
-            Write-Host "[ERROR] third-party Skill declared but not placed: $name ($skillDir)"
-            $missing += $name
-        }
-    }
-    if ($missing.Count -gt 0) {
-        Write-Host "導入手順: 取得機構の CLI で third-party Skill を取得してください: $CliCommandHint"
-        exit $ThirdPartyDriftExitCode
-    }
 }
 
 # --- Mechanical-step script prerequisite check (REQ-009-053) ---
@@ -1030,7 +611,8 @@ if (-not $Mode) {
 # 配置対象ホストの確定（REQ-099-010、DEC-049 決定(3)）。明示指定（-Hosts パラメータ
 # またはウィザード選択）を最優先し、未指定時は現在の配置対象を検出して維持する。
 # 検出不能（新規導入）は both（新規導入の推奨）。
-$ResolvedHosts = @(Resolve-TargetHosts)
+$ResolvedHosts = @(Resolve-TargetHosts -ExplicitHosts $Hosts -FallbackHosts @('opencode', 'senpi') `
+    -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir)
 Write-Host "[INFO] Placement targets: $(Get-HostsDisplay -HostsValue $(if ($ResolvedHosts -contains 'opencode' -and $ResolvedHosts -contains 'senpi') { 'both' } elseif ($ResolvedHosts -contains 'opencode') { 'opencode' } else { 'senpi' }))"
 if ($Hosts) {
     Write-Host '[INFO] Placement targets were set by explicit selection.'
@@ -1278,7 +860,7 @@ if ($Mode -eq 'check') {
             $expectedSource = if ($ExpectedLocalMode -and $relPath -eq $LocalModeRedirectToolRel) {
                 $LocalSourceDir
             } else {
-                Get-TargetSourcePath -RelPath $relPath
+                Get-TargetSourcePath -RelPath $relPath -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir
             }
             $actualTarget = Get-JunctionTarget -Path $targetPath
             if ($actualTarget -and (Test-Path -LiteralPath $actualTarget) -and ((Resolve-Path -LiteralPath $actualTarget).Path -eq (Resolve-Path -LiteralPath $expectedSource).Path)) {
@@ -1299,12 +881,12 @@ if ($Mode -eq 'check') {
     # 管理物判定不能な junction（正本以外を向く等）は報告のみで非破壊とする（REQ-058-008）。
     Write-Host ''
     Write-Host '--- Orphan junctions ---'
-    $staleJunctions = @(Get-StaleManagedJunctions -CurrentTargets $targets)
+    $staleJunctions = @(Get-StaleManagedJunctions -CurrentTargets $targets -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir)
     foreach ($staleItem in $staleJunctions) {
         Write-Host "[ORPHAN] Stale managed junction (apply removes it): $($staleItem.RelPath)"
         $divergences++
     }
-    foreach ($unmanagedRel in (Get-UnmanagedProjectionJunctionRels -CurrentTargets $targets)) {
+    foreach ($unmanagedRel in (Get-UnmanagedProjectionJunctionRels -CurrentTargets $targets -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir)) {
         Write-Host "[INFO] Junction not managed by AgentDevFlow (left untouched): $unmanagedRel"
     }
     if ($staleJunctions.Count -eq 0) {
@@ -1621,12 +1203,12 @@ if ($Mode -eq 'dry-run') {
             continue
         }
         $targetPath = Join-Path $ProjectionDir $relPath
-        $expectedSource = Get-TargetSourcePath -RelPath $relPath
+        $expectedSource = Get-TargetSourcePath -RelPath $relPath -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir
         if (Test-Junction -Path $targetPath) {
             $actualTarget = Get-JunctionTarget -Path $targetPath
             if (Test-JunctionTargetMatchesSource -JunctionFullName $targetPath -SourcePath $expectedSource) {
                 Write-Host "[OK] Already junctioned: $relPath"
-            } elseif (Test-ManagedProjectionJunction -JunctionRel $relPath -JunctionFullName $targetPath) {
+            } elseif (Test-ManagedProjectionJunction -JunctionRel $relPath -JunctionFullName $targetPath -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir) {
                 # wrong target（管理物）: 旧正本・消失済み正本を含む修復対象（REQ-058-004、REQ-099-012）
                 if ($actualTarget -and (Test-Path -LiteralPath (@($actualTarget) | Select-Object -First 1))) {
                     Write-Host "[WOULD REMOVE] Wrong-target junction: $relPath (actual: $actualTarget)"
@@ -1670,7 +1252,7 @@ if ($Mode -eq 'dry-run') {
     # 配置対象から明示変更により外れたホストの管理投影物）の削除予測を報告する（変更はしない）。
     Write-Host ''
     Write-Host '--- Planned stale junction cleanup ---'
-    $dryRunStale = @(Get-StaleManagedJunctions -CurrentTargets $targets)
+    $dryRunStale = @(Get-StaleManagedJunctions -CurrentTargets $targets -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir)
     foreach ($staleItem in $dryRunStale) {
         if ((Resolve-SenpiTargetRel -TargetEntry $staleItem.RelPath)) {
             Write-Host "[WOULD REMOVE] Stale managed junction: .senpi/$((Resolve-SenpiTargetRel -TargetEntry $staleItem.RelPath))"
@@ -1678,7 +1260,7 @@ if ($Mode -eq 'dry-run') {
             Write-Host "[WOULD REMOVE] Stale managed junction: $($staleItem.RelPath)"
         }
     }
-    foreach ($unmanagedRel in (Get-UnmanagedProjectionJunctionRels -CurrentTargets $targets)) {
+    foreach ($unmanagedRel in (Get-UnmanagedProjectionJunctionRels -CurrentTargets $targets -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir)) {
         Write-Host "[INFO] Junction not managed by AgentDevFlow (would be left untouched): $unmanagedRel"
     }
     if ($dryRunStale.Count -eq 0) {
@@ -1800,13 +1382,13 @@ if ($Mode -eq 'apply') {
             continue
         }
         $targetPath = Join-Path $ProjectionDir $relPath
-        $sourcePath = Get-TargetSourcePath -RelPath $relPath
+        $sourcePath = Get-TargetSourcePath -RelPath $relPath -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir
 
         if (Test-Junction -Path $targetPath) {
             if (Test-JunctionTargetMatchesSource -JunctionFullName $targetPath -SourcePath $sourcePath) {
                 Write-Host "[OK] Already junctioned: $relPath"
                 continue
-            } elseif (Test-ManagedProjectionJunction -JunctionRel $relPath -JunctionFullName $targetPath) {
+            } elseif (Test-ManagedProjectionJunction -JunctionRel $relPath -JunctionFullName $targetPath -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir) {
                 # wrong target（管理物）: 旧正本・消失済み正本を含む修復対象（REQ-099-012）。
                 # check で検出された乖離をここで解消する（REQ-050-015）。
                 $actualTarget = Get-JunctionTarget -Path $targetPath
@@ -1888,7 +1470,7 @@ if ($Mode -eq 'apply') {
     # 処理する（REQ-099-012）。管理物判定不能な物は削除しない（REQ-058-008）。
     Write-Host ''
     Write-Host '--- Stale managed junction cleanup ---'
-    $applyStale = @(Get-StaleManagedJunctions -CurrentTargets $targets)
+    $applyStale = @(Get-StaleManagedJunctions -CurrentTargets $targets -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir)
     foreach ($staleItem in $applyStale) {
         $senpiStaleRel = (Resolve-SenpiTargetRel -TargetEntry $staleItem.RelPath)
         if ($senpiStaleRel) {
@@ -1903,7 +1485,7 @@ if ($Mode -eq 'apply') {
         }
     }
     # 管理物判定不能な junction は削除せず報告のみ（REQ-058-008）
-    foreach ($unmanagedRel in (Get-UnmanagedProjectionJunctionRels -CurrentTargets $targets)) {
+    foreach ($unmanagedRel in (Get-UnmanagedProjectionJunctionRels -CurrentTargets $targets -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir)) {
         Write-Host "[INFO] Junction not managed by AgentDevFlow (left untouched): $unmanagedRel"
     }
     if ($applyStale.Count -eq 0) {
