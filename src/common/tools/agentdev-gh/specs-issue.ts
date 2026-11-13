@@ -27,6 +27,7 @@ import {
 import type { GhRunner, GhRunnerRequest } from "./runner.ts";
 import type { InputContractError, OperationDeps, OperationSpec, PreconditionFailure, ValidateOutcome } from "./engine.ts";
 import { verifyCloseAcceptanceForClose } from "./close-acceptance.ts";
+import { validateOperationInput } from "./operation-catalog.ts";
 import {
   deriveCloseReason,
   deriveRole,
@@ -63,52 +64,15 @@ function parseCloseReason(v: unknown): CloseReason | null {
 }
 
 // ---------------------------------------------------------------------------
-// 操作単位の入力定義（Design「入力契約」）。契約外フィールドと必須欠落を
-// 構造化エラーとして特定可能にする。
+// 操作単位の入力定義（Design「入力契約」）。操作名称・必須・型・enum 値域の
+// 定型検査（契約外フィールドと必須欠落の構造化エラー特定を含む）は正本
+// operation-catalog.ts の validateOperationInput が単一実装で提供する
+// （B3-5c 一元化）。本ファイルの各 validate は定型検査を消費した後、
+// 操作固有の差分検査（空更新等）と要求の組立てのみを所有する。
 // ---------------------------------------------------------------------------
 
 function invalidOutcome(error: InputContractError): ValidateOutcome {
   return { ok: false, error };
-}
-
-function unknownFieldOutcome(
-  operation: string,
-  field: string,
-): ValidateOutcome {
-  return invalidOutcome({
-    code: "unknown-field",
-    field,
-    detail: `field '${field}' is not part of the ${operation} input contract`,
-  });
-}
-
-function missingFieldOutcome(
-  operation: string,
-  field: string,
-): ValidateOutcome {
-  return invalidOutcome({
-    code: "missing-field",
-    field,
-    detail: `required field '${field}' is missing for ${operation}`,
-  });
-}
-
-function invalidFieldOutcome(
-  field: string,
-  detail: string,
-): ValidateOutcome {
-  return invalidOutcome({ code: "invalid-field", field, detail });
-}
-
-/** 要求が操作の入力定義（許容フィールド一覧）に反していないか検査する。 */
-function checkUnknownFields(
-  raw: Record<string, unknown>,
-  allowed: readonly string[],
-): ValidateOutcome | null {
-  for (const key of Object.keys(raw)) {
-    if (!allowed.includes(key)) return unknownFieldOutcome(String(raw.operation), key);
-  }
-  return null;
 }
 
 /** issue_read / issue_list 共通の追跡Issueメタデータ導出（応答の自己整合の部品）。 */
@@ -172,45 +136,23 @@ async function readIssue(
 const issueCreateSpec: OperationSpec = {
   operation: "issue_create",
   validate(raw): ValidateOutcome {
-    if (!isRecord(raw)) return missingFieldOutcome("issue_create", "operation");
-    const unknown = checkUnknownFields(raw, [
-      "operation",
-      "title",
-      "body",
-      "labels",
-      "role",
-    ]);
-    if (unknown !== null) return unknown;
-    const title = str(raw.title);
-    if (raw.title === undefined) return missingFieldOutcome("issue_create", "title");
-    if (title === null || title.length === 0) {
-      return invalidFieldOutcome("title", "title must be a non-empty string");
-    }
-    if (raw.body === undefined) return missingFieldOutcome("issue_create", "body");
-    const body = str(raw.body);
-    if (body === null || body.length === 0) {
-      return invalidFieldOutcome("body", "body must be a non-empty string");
-    }
-    if (raw.labels === undefined) return missingFieldOutcome("issue_create", "labels");
-    if (!Array.isArray(raw.labels)) {
-      return invalidFieldOutcome("labels", "labels must be an array of strings");
-    }
-    if (!raw.labels.every((l) => typeof l === "string")) {
-      return invalidFieldOutcome("labels", "labels must be an array of strings");
-    }
+    const declared = validateOperationInput("issue_create", raw);
+    if (declared !== null) return declared;
+    const record = raw as Record<string, unknown>;
     const request: {
       operation: "issue_create";
       title: string;
       body: string;
       labels: string[];
       role?: "tracking" | "case";
-    } = { operation: "issue_create", title, body, labels: raw.labels };
-    if (raw.role !== undefined) {
-      const role = parseRole(raw.role);
-      if (role === null) {
-        return invalidFieldOutcome("role", "role must be 'tracking' or 'case'");
-      }
-      request.role = role;
+    } = {
+      operation: "issue_create",
+      title: record.title as string,
+      body: record.body as string,
+      labels: [...(record.labels as string[])],
+    };
+    if (record.role !== undefined) {
+      request.role = record.role as "tracking" | "case";
     }
     return { ok: true, request };
   },
@@ -279,15 +221,10 @@ function parseIssueRead(payload: unknown, number: number): GhToolSuccess | null 
 const issueReadSpec: OperationSpec = {
   operation: "issue_read",
   validate(raw): ValidateOutcome {
-    if (!isRecord(raw)) return missingFieldOutcome("issue_read", "operation");
-    const unknown = checkUnknownFields(raw, ["operation", "number"]);
-    if (unknown !== null) return unknown;
-    if (raw.number === undefined) return missingFieldOutcome("issue_read", "number");
-    const number = positiveInt(raw.number);
-    if (number === null) {
-      return invalidFieldOutcome("number", "number must be a positive integer");
-    }
-    return { ok: true, request: { operation: "issue_read", number: issueNumber(number) } };
+    const declared = validateOperationInput("issue_read", raw);
+    if (declared !== null) return declared;
+    const record = raw as Record<string, unknown>;
+    return { ok: true, request: { operation: "issue_read", number: issueNumber(record.number as number) } };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "issue_read" }>;
@@ -318,33 +255,13 @@ const issueReadSpec: OperationSpec = {
 const issueUpdateSpec: OperationSpec = {
   operation: "issue_update",
   validate(raw): ValidateOutcome {
-    if (!isRecord(raw)) return missingFieldOutcome("issue_update", "operation");
-    const unknown = checkUnknownFields(raw, [
-      "operation",
-      "number",
-      "title",
-      "body",
-      "labels",
-    ]);
-    if (unknown !== null) return unknown;
-    if (raw.number === undefined) return missingFieldOutcome("issue_update", "number");
-    const number = positiveInt(raw.number);
-    if (number === null) {
-      return invalidFieldOutcome("number", "number must be a positive integer");
-    }
-    const title = raw.title === undefined ? null : str(raw.title);
-    if (raw.title !== undefined && (title === null || title.length === 0)) {
-      return invalidFieldOutcome("title", "title must be a non-empty string when present");
-    }
-    const body = raw.body === undefined ? null : str(raw.body);
-    if (raw.body !== undefined && (body === null || body.length === 0)) {
-      return invalidFieldOutcome("body", "body must be a non-empty string when present");
-    }
-    const labels = raw.labels === undefined ? null : stringArray(raw.labels);
-    if (raw.labels !== undefined && labels === null) {
-      return invalidFieldOutcome("labels", "labels must be an array of strings");
-    }
-    if (title === null && body === null && labels === null) {
+    const declared = validateOperationInput("issue_update", raw);
+    if (declared !== null) return declared;
+    const record = raw as Record<string, unknown>;
+    if (
+      record.title === undefined && record.body === undefined &&
+      record.labels === undefined
+    ) {
       return invalidOutcome({
         code: "empty-update",
         field: "title",
@@ -353,7 +270,7 @@ const issueUpdateSpec: OperationSpec = {
     }
     const request = {
       operation: "issue_update",
-      number: issueNumber(number),
+      number: issueNumber(record.number as number),
     } as {
       operation: "issue_update";
       number: ReturnType<typeof issueNumber>;
@@ -361,9 +278,9 @@ const issueUpdateSpec: OperationSpec = {
       body?: string;
       labels?: string[];
     };
-    if (title !== null) request.title = title;
-    if (body !== null) request.body = body;
-    if (labels !== null) request.labels = labels;
+    if (record.title !== undefined) request.title = record.title as string;
+    if (record.body !== undefined) request.body = record.body as string;
+    if (record.labels !== undefined) request.labels = [...(record.labels as string[])];
     return { ok: true, request };
   },
   buildRequest(request): GhRunnerRequest {
@@ -472,22 +389,17 @@ const issueCloseSpec: OperationSpec = {
     return { kind: outcome.kind, retryable: false, detail: outcome.detail };
   },
   validate(raw): ValidateOutcome {
-    if (!isRecord(raw)) return missingFieldOutcome("issue_close", "operation");
-    const unknown = checkUnknownFields(raw, ["operation", "number", "reason"]);
-    if (unknown !== null) return unknown;
-    if (raw.number === undefined) return missingFieldOutcome("issue_close", "number");
-    const number = positiveInt(raw.number);
-    if (number === null) {
-      return invalidFieldOutcome("number", "number must be a positive integer");
+    const declared = validateOperationInput("issue_close", raw);
+    if (declared !== null) return declared;
+    const record = raw as Record<string, unknown>;
+    const number = issueNumber(record.number as number);
+    if (record.reason === undefined) {
+      return { ok: true, request: { operation: "issue_close", number } };
     }
-    if (raw.reason === undefined) {
-      return { ok: true, request: { operation: "issue_close", number: issueNumber(number) } };
-    }
-    const reason = parseCloseReason(raw.reason);
-    if (reason === null) {
-      return invalidFieldOutcome("reason", "reason must be 'completed' or 'not_planned'");
-    }
-    return { ok: true, request: { operation: "issue_close", number: issueNumber(number), reason } };
+    return {
+      ok: true,
+      request: { operation: "issue_close", number, reason: record.reason as "completed" | "not_planned" },
+    };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "issue_close" }>;
@@ -514,15 +426,9 @@ const issueCloseSpec: OperationSpec = {
 const issueListSpec: OperationSpec = {
   operation: "issue_list",
   validate(raw): ValidateOutcome {
-    if (!isRecord(raw)) return missingFieldOutcome("issue_list", "operation");
-    const unknown = checkUnknownFields(raw, [
-      "operation",
-      "role",
-      "state",
-      "labels",
-      "search",
-    ]);
-    if (unknown !== null) return unknown;
+    const declared = validateOperationInput("issue_list", raw);
+    if (declared !== null) return declared;
+    const record = raw as Record<string, unknown>;
     const request = { operation: "issue_list" } as {
       operation: "issue_list";
       role?: IssueRole;
@@ -530,33 +436,10 @@ const issueListSpec: OperationSpec = {
       labels?: string[];
       search?: string;
     };
-    if (raw.role !== undefined) {
-      const role = parseRole(raw.role);
-      if (role === null) {
-        return invalidFieldOutcome("role", "role must be 'tracking' or 'case'");
-      }
-      request.role = role;
-    }
-    if (raw.state !== undefined) {
-      if (raw.state !== "open" && raw.state !== "closed") {
-        return invalidFieldOutcome("state", "state must be 'open' or 'closed'");
-      }
-      request.state = raw.state;
-    }
-    if (raw.labels !== undefined) {
-      const labels = stringArray(raw.labels);
-      if (labels === null) {
-        return invalidFieldOutcome("labels", "labels must be an array of strings");
-      }
-      request.labels = labels;
-    }
-    if (raw.search !== undefined) {
-      const search = str(raw.search);
-      if (search === null || search.length === 0) {
-        return invalidFieldOutcome("search", "search must be a non-empty string");
-      }
-      request.search = search;
-    }
+    if (record.role !== undefined) request.role = record.role as IssueRole;
+    if (record.state !== undefined) request.state = record.state as "open" | "closed";
+    if (record.labels !== undefined) request.labels = [...(record.labels as string[])];
+    if (record.search !== undefined) request.search = record.search as string;
     return { ok: true, request };
   },
   buildRequest(request): GhRunnerRequest {
@@ -612,15 +495,10 @@ const issueListSpec: OperationSpec = {
 const issueReopenSpec: OperationSpec = {
   operation: "issue_reopen",
   validate(raw): ValidateOutcome {
-    if (!isRecord(raw)) return missingFieldOutcome("issue_reopen", "operation");
-    const unknown = checkUnknownFields(raw, ["operation", "number"]);
-    if (unknown !== null) return unknown;
-    if (raw.number === undefined) return missingFieldOutcome("issue_reopen", "number");
-    const number = positiveInt(raw.number);
-    if (number === null) {
-      return invalidFieldOutcome("number", "number must be a positive integer");
-    }
-    return { ok: true, request: { operation: "issue_reopen", number: issueNumber(number) } };
+    const declared = validateOperationInput("issue_reopen", raw);
+    if (declared !== null) return declared;
+    const record = raw as Record<string, unknown>;
+    return { ok: true, request: { operation: "issue_reopen", number: issueNumber(record.number as number) } };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "issue_reopen" }>;
@@ -696,22 +574,16 @@ async function listComments(
 const commentCreateSpec: OperationSpec = {
   operation: "comment_create",
   validate(raw): ValidateOutcome {
-    if (!isRecord(raw)) return missingFieldOutcome("comment_create", "operation");
-    const unknown = checkUnknownFields(raw, ["operation", "number", "body"]);
-    if (unknown !== null) return unknown;
-    if (raw.number === undefined) return missingFieldOutcome("comment_create", "number");
-    const number = positiveInt(raw.number);
-    if (number === null) {
-      return invalidFieldOutcome("number", "number must be a positive integer");
-    }
-    if (raw.body === undefined) return missingFieldOutcome("comment_create", "body");
-    const body = str(raw.body);
-    if (body === null || body.length === 0) {
-      return invalidFieldOutcome("body", "body must be a non-empty string");
-    }
+    const declared = validateOperationInput("comment_create", raw);
+    if (declared !== null) return declared;
+    const record = raw as Record<string, unknown>;
     return {
       ok: true,
-      request: { operation: "comment_create", number: issueNumber(number), body },
+      request: {
+        operation: "comment_create",
+        number: issueNumber(record.number as number),
+        body: record.body as string,
+      },
     };
   },
   buildRequest(request): GhRunnerRequest {
@@ -741,15 +613,10 @@ const commentCreateSpec: OperationSpec = {
 const commentListSpec: OperationSpec = {
   operation: "comment_list",
   validate(raw): ValidateOutcome {
-    if (!isRecord(raw)) return missingFieldOutcome("comment_list", "operation");
-    const unknown = checkUnknownFields(raw, ["operation", "number"]);
-    if (unknown !== null) return unknown;
-    if (raw.number === undefined) return missingFieldOutcome("comment_list", "number");
-    const number = positiveInt(raw.number);
-    if (number === null) {
-      return invalidFieldOutcome("number", "number must be a positive integer");
-    }
-    return { ok: true, request: { operation: "comment_list", number: issueNumber(number) } };
+    const declared = validateOperationInput("comment_list", raw);
+    if (declared !== null) return declared;
+    const record = raw as Record<string, unknown>;
+    return { ok: true, request: { operation: "comment_list", number: issueNumber(record.number as number) } };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "comment_list" }>;
@@ -773,22 +640,13 @@ const commentListSpec: OperationSpec = {
 const commentUpdateSpec: OperationSpec = {
   operation: "comment_update",
   validate(raw): ValidateOutcome {
-    if (!isRecord(raw)) return missingFieldOutcome("comment_update", "operation");
-    const unknown = checkUnknownFields(raw, ["operation", "commentId", "body"]);
-    if (unknown !== null) return unknown;
-    if (raw.commentId === undefined) {
-      return missingFieldOutcome("comment_update", "commentId");
-    }
-    const commentId = str(raw.commentId);
-    if (commentId === null || commentId.length === 0) {
-      return invalidFieldOutcome("commentId", "commentId must be a non-empty string");
-    }
-    if (raw.body === undefined) return missingFieldOutcome("comment_update", "body");
-    const body = str(raw.body);
-    if (body === null || body.length === 0) {
-      return invalidFieldOutcome("body", "body must be a non-empty string");
-    }
-    return { ok: true, request: { operation: "comment_update", commentId, body } };
+    const declared = validateOperationInput("comment_update", raw);
+    if (declared !== null) return declared;
+    const record = raw as Record<string, unknown>;
+    return {
+      ok: true,
+      request: { operation: "comment_update", commentId: record.commentId as string, body: record.body as string },
+    };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "comment_update" }>;
@@ -818,17 +676,10 @@ const commentUpdateSpec: OperationSpec = {
 const commentDeleteSpec: OperationSpec = {
   operation: "comment_delete",
   validate(raw): ValidateOutcome {
-    if (!isRecord(raw)) return missingFieldOutcome("comment_delete", "operation");
-    const unknown = checkUnknownFields(raw, ["operation", "commentId"]);
-    if (unknown !== null) return unknown;
-    if (raw.commentId === undefined) {
-      return missingFieldOutcome("comment_delete", "commentId");
-    }
-    const commentId = str(raw.commentId);
-    if (commentId === null || commentId.length === 0) {
-      return invalidFieldOutcome("commentId", "commentId must be a non-empty string");
-    }
-    return { ok: true, request: { operation: "comment_delete", commentId } };
+    const declared = validateOperationInput("comment_delete", raw);
+    if (declared !== null) return declared;
+    const record = raw as Record<string, unknown>;
+    return { ok: true, request: { operation: "comment_delete", commentId: record.commentId as string } };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "comment_delete" }>;

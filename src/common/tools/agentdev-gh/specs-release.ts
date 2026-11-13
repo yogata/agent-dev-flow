@@ -1,7 +1,9 @@
 // Release 系操作（4 操作）のスペック実装。
 //
-// 各スペックは操作ごとの差分（入力検証、runner 要求の組立て、応答解釈、
-// 読み戻し照合）のみを所有する。fail-closed の制御順序は engine.ts が所有する。
+// 各スペックは操作ごとの差分（操作固有の入力検査、runner 要求の組立て、応答解釈、
+// 読み戻し照合）のみを所有する。操作名称・必須・型・enum 値域の定型入力検査は
+// 正本 operation-catalog.ts の validateOperationInput を消費する（B3-5c 一元化）。
+// fail-closed の制御順序は engine.ts が所有する。
 // release_create の入力契約に公開モード（draft の解除、publish 相当フィールド）
 // は存在せず、契約外の公開指定フィールドを含む要求は副作用発生前に unknown-field
 // として拒否される。公開は release_publish（タグ名と承認根拠必須の fail-closed
@@ -12,6 +14,7 @@
 import type { GhToolRequest, GhToolSuccess, ReleaseListItem } from "./contracts.ts";
 import type { GhRunner, GhRunnerRequest } from "./runner.ts";
 import type { OperationSpec, ValidateOutcome } from "./engine.ts";
+import { validateOperationInput } from "./operation-catalog.ts";
 
 function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === "object" && v !== null;
@@ -25,25 +28,6 @@ function str(v: unknown): string | null {
 // ローカル実装の絶対パス識別子は生じない。
 function isHttpUrl(v: string): boolean {
   return /^https:\/\//.test(v);
-}
-
-function checkUnknownFields(
-  raw: Record<string, unknown>,
-  allowed: readonly string[],
-): ValidateOutcome | null {
-  for (const key of Object.keys(raw)) {
-    if (!allowed.includes(key)) {
-      return {
-        ok: false,
-        error: {
-          code: "unknown-field",
-          field: key,
-          detail: `field '${key}' is not part of the ${String(raw.operation)} input contract`,
-        },
-      };
-    }
-  }
-  return null;
 }
 
 function releaseReadRunnerRequest(tagName: string): GhRunnerRequest {
@@ -99,50 +83,18 @@ function readRelease(
 const releaseCreateSpec: OperationSpec = {
   operation: "release_create",
   validate(raw): ValidateOutcome {
-    if (!isRecord(raw)) {
-      return {
-        ok: false,
-        error: { code: "missing-field", field: "tagName", detail: "required field 'tagName' is missing for release_create" },
-      };
-    }
-    const unknown = checkUnknownFields(raw, [
-      "operation",
-      "tagName",
-      "title",
-      "body",
-      "prerelease",
-    ]);
-    if (unknown !== null) return unknown;
-    for (const field of ["tagName", "title", "body", "prerelease"] as const) {
-      if (raw[field] === undefined) {
-        return {
-          ok: false,
-          error: {
-            code: "missing-field",
-            field,
-            detail: `required field '${field}' is missing for release_create`,
-          },
-        };
-      }
-    }
-    const tagName = str(raw.tagName);
-    const title = str(raw.title);
-    const body = str(raw.body);
-    if (tagName === null || tagName.length === 0) {
-      return { ok: false, error: { code: "invalid-field", field: "tagName", detail: "tagName must be a non-empty string" } };
-    }
-    if (title === null || title.length === 0) {
-      return { ok: false, error: { code: "invalid-field", field: "title", detail: "title must be a non-empty string" } };
-    }
-    if (body === null) {
-      return { ok: false, error: { code: "invalid-field", field: "body", detail: "body must be a string" } };
-    }
-    if (typeof raw.prerelease !== "boolean") {
-      return { ok: false, error: { code: "invalid-field", field: "prerelease", detail: "prerelease must be a boolean" } };
-    }
+    const declared = validateOperationInput("release_create", raw);
+    if (declared !== null) return declared;
+    const record = raw as Record<string, unknown>;
     return {
       ok: true,
-      request: { operation: "release_create", tagName, title, body, prerelease: raw.prerelease },
+      request: {
+        operation: "release_create",
+        tagName: record.tagName as string,
+        title: record.title as string,
+        body: record.body as string,
+        prerelease: record.prerelease as boolean,
+      },
     };
   },
   buildRequest(request): GhRunnerRequest {
@@ -198,14 +150,8 @@ function parseReleaseListItem(v: unknown): ReleaseListItem | null {
 const releaseListSpec: OperationSpec = {
   operation: "release_list",
   validate(raw): ValidateOutcome {
-    if (!isRecord(raw)) {
-      return {
-        ok: false,
-        error: { code: "missing-field", field: "operation", detail: "request must be an object with an operation field" },
-      };
-    }
-    const unknown = checkUnknownFields(raw, ["operation"]);
-    if (unknown !== null) return unknown;
+    const declared = validateOperationInput("release_list", raw);
+    if (declared !== null) return declared;
     return { ok: true, request: { operation: "release_list" } };
   },
   buildRequest(): GhRunnerRequest {
@@ -236,25 +182,10 @@ const releaseListSpec: OperationSpec = {
 const releaseReadSpec: OperationSpec = {
   operation: "release_read",
   validate(raw): ValidateOutcome {
-    if (!isRecord(raw)) {
-      return {
-        ok: false,
-        error: { code: "missing-field", field: "tagName", detail: "required field 'tagName' is missing for release_read" },
-      };
-    }
-    const unknown = checkUnknownFields(raw, ["operation", "tagName"]);
-    if (unknown !== null) return unknown;
-    if (raw.tagName === undefined) {
-      return {
-        ok: false,
-        error: { code: "missing-field", field: "tagName", detail: "required field 'tagName' is missing for release_read" },
-      };
-    }
-    const tagName = str(raw.tagName);
-    if (tagName === null || tagName.length === 0) {
-      return { ok: false, error: { code: "invalid-field", field: "tagName", detail: "tagName must be a non-empty string" } };
-    }
-    return { ok: true, request: { operation: "release_read", tagName } };
+    const declared = validateOperationInput("release_read", raw);
+    if (declared !== null) return declared;
+    const record = raw as Record<string, unknown>;
+    return { ok: true, request: { operation: "release_read", tagName: record.tagName as string } };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "release_read" }>;
@@ -316,31 +247,10 @@ function validApprovalBasis(v: unknown): v is string {
 const releasePublishSpec: OperationSpec = {
   operation: "release_publish",
   validate(raw): ValidateOutcome {
-    if (!isRecord(raw)) {
-      return {
-        ok: false,
-        error: { code: "missing-field", field: "tagName", detail: "required field 'tagName' is missing for release_publish" },
-      };
-    }
-    const unknown = checkUnknownFields(raw, ["operation", "tagName", "approvalBasis"]);
-    if (unknown !== null) return unknown;
-    for (const field of ["tagName", "approvalBasis"] as const) {
-      if (raw[field] === undefined) {
-        return {
-          ok: false,
-          error: {
-            code: "missing-field",
-            field,
-            detail: `required field '${field}' is missing for release_publish`,
-          },
-        };
-      }
-    }
-    const tagName = str(raw.tagName);
-    if (tagName === null || tagName.length === 0) {
-      return { ok: false, error: { code: "invalid-field", field: "tagName", detail: "tagName must be a non-empty string" } };
-    }
-    if (!validApprovalBasis(raw.approvalBasis)) {
+    const declared = validateOperationInput("release_publish", raw);
+    if (declared !== null) return declared;
+    const record = raw as Record<string, unknown>;
+    if (!validApprovalBasis(record.approvalBasis)) {
       return {
         ok: false,
         error: {
@@ -352,7 +262,11 @@ const releasePublishSpec: OperationSpec = {
     }
     return {
       ok: true,
-      request: { operation: "release_publish", tagName, approvalBasis: raw.approvalBasis },
+      request: {
+        operation: "release_publish",
+        tagName: record.tagName as string,
+        approvalBasis: record.approvalBasis as string,
+      },
     };
   },
   buildRequest(request): GhRunnerRequest {

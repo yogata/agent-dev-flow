@@ -239,6 +239,58 @@ describe("LocalRunner: role 条件付きスキーマの機械検証", () => {
   });
 });
 
+describe("frontmatter.yaml の実行時消費（G-007 解消）", () => {
+  /** tools の書込み経路を使わず、frontmatter を直接書いたローカルIssueを用意する。 */
+  function writeRawIssue(issuesDir: string, frontmatterLines: readonly string[]): void {
+    const content = ["---", ...frontmatterLines, "---", "", "本文", ""].join("\n");
+    fs.writeFileSync(path.join(issuesDir, "issue-0001.md"), content, "utf8");
+  }
+
+  const validFrontmatter = [
+    `id: issue-0001`,
+    `title: "件名"`,
+    `role: tracking`,
+    `status: created`,
+    `created_at: "2026-08-25T00:00:00Z"`,
+    `updated_at: "2026-08-25T00:00:00Z"`,
+    `closed_at: ""`,
+    `labels: []`,
+  ];
+
+  test("forbidden_fields（frontmatter.yaml 禁止フィールド）を含む前書きの読取は fail-closed で拒否される", async () => {
+    const issuesDir = makeIssuesDir();
+    writeRawIssue(issuesDir, [
+      ...validFrontmatter.slice(0, 6),
+      `branch: feature/probe`,
+      ...validFrontmatter.slice(6),
+    ]);
+    const reply = await run(issuesDir, { operation: "issue_read", args: { number: 1 } });
+    expect(reply.ok).toBe(false);
+    fs.rmSync(issuesDir, { recursive: true, force: true });
+  });
+
+  test("required: true フィールド（labels）の欠落は frontmatter.yaml の必須定義により読取を拒否される", async () => {
+    const issuesDir = makeIssuesDir();
+    writeRawIssue(issuesDir, validFrontmatter.filter((line) => !line.startsWith("labels:")));
+    const reply = await run(issuesDir, { operation: "issue_read", args: { number: 1 } });
+    expect(reply.ok).toBe(false);
+    fs.rmSync(issuesDir, { recursive: true, force: true });
+  });
+
+  test("required 全充足・forbidden なしの前書きは読取できる（対照）", async () => {
+    const issuesDir = makeIssuesDir();
+    writeRawIssue(issuesDir, validFrontmatter);
+    const reply = await run(issuesDir, { operation: "issue_read", args: { number: 1 } });
+    expect(reply.ok).toBe(true);
+    if (reply.ok) {
+      const payload = reply.payload as Record<string, unknown>;
+      expect(payload.role).toBe("tracking");
+      expect(payload.state).toBe("open");
+    }
+    fs.rmSync(issuesDir, { recursive: true, force: true });
+  });
+});
+
 describe("LocalRunner: issue_read / issue_update / issue_list", () => {
   test("issue_read は全文と role メタデータを state 写像付きで返す", async () => {
     const issuesDir = makeIssuesDir();

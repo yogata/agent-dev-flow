@@ -1,7 +1,9 @@
 // PR 系操作（6 操作）のスペック実装。
 //
-// 各スペックは操作ごとの差分（入力検証、runner 要求の組立て、応答解釈、
-// 読み戻し照合）のみを所有する。fail-closed の制御順序は engine.ts が所有する。
+// 各スペックは操作ごとの差分（操作固有の入力検査、runner 要求の組立て、応答解釈、
+// 読み戻し照合）のみを所有する。操作名称・必須・型・enum 値域の定型入力検査は
+// 正本 operation-catalog.ts の validateOperationInput を消費する（B3-5c 一元化）。
+// fail-closed の制御順序は engine.ts が所有する。
 
 
 import {
@@ -12,6 +14,7 @@ import {
 } from "./contracts.ts";
 import type { GhRunner, GhRunnerRequest } from "./runner.ts";
 import type { OperationSpec, ValidateOutcome } from "./engine.ts";
+import { validateOperationInput } from "./operation-catalog.ts";
 
 /**
  * pr_create 読戻し照合の body 正規化。改行コード（CRLF→LF）と末尾改行は
@@ -64,47 +67,6 @@ function parsePrState(v: unknown): "open" | "closed" | "merged" | null {
   return null;
 }
 
-function missingNumberOutcome(operation: string): ValidateOutcome {
-  return {
-    ok: false,
-    error: {
-      code: "missing-field",
-      field: "number",
-      detail: `required field 'number' is missing for ${operation}`,
-    },
-  };
-}
-
-function invalidNumberOutcome(): ValidateOutcome {
-  return {
-    ok: false,
-    error: {
-      code: "invalid-field",
-      field: "number",
-      detail: "number must be a positive integer",
-    },
-  };
-}
-
-function checkUnknownFields(
-  raw: Record<string, unknown>,
-  allowed: readonly string[],
-): ValidateOutcome | null {
-  for (const key of Object.keys(raw)) {
-    if (!allowed.includes(key)) {
-      return {
-        ok: false,
-        error: {
-          code: "unknown-field",
-          field: key,
-          detail: `field '${key}' is not part of the ${String(raw.operation)} input contract`,
-        },
-      };
-    }
-  }
-  return null;
-}
-
 // ---------------------------------------------------------------------------
 // pr_create
 // ---------------------------------------------------------------------------
@@ -112,71 +74,27 @@ function checkUnknownFields(
 const prCreateSpec: OperationSpec = {
   operation: "pr_create",
   validate(raw): ValidateOutcome {
-    if (!isRecord(raw)) return missingNumberOutcome("pr_create");
-    const unknown = checkUnknownFields(raw, [
-      "operation",
-      "title",
-      "body",
-      "base",
-      "head",
-      "number",
-    ]);
-    if (unknown !== null) return unknown;
-    for (const field of ["title", "body", "base", "head"] as const) {
-      if (raw[field] === undefined) {
-        return {
-          ok: false,
-          error: {
-            code: "missing-field",
-            field,
-            detail: `required field '${field}' is missing for pr_create`,
-          },
-        };
-      }
-    }
-    const title = str(raw.title);
-    const body = str(raw.body);
-    const base = str(raw.base);
-    const head = str(raw.head);
-    if (title === null || title.length === 0) {
-      return { ok: false, error: { code: "invalid-field", field: "title", detail: "title must be a non-empty string" } };
-    }
-    if (body === null) {
-      return { ok: false, error: { code: "invalid-field", field: "body", detail: "body must be a string" } };
-    }
-    if (base === null || base.length === 0) {
-      return { ok: false, error: { code: "invalid-field", field: "base", detail: "base must be a non-empty string" } };
-    }
-    if (head === null || head.length === 0) {
-      return { ok: false, error: { code: "invalid-field", field: "head", detail: "head must be a non-empty string" } };
-    }
+    const declared = validateOperationInput("pr_create", raw);
+    if (declared !== null) return declared;
+    const record = raw as Record<string, unknown>;
     // 対象識別（number）は公開契約上は任意。Local 実装は runner 境界で必須検証する
     // （実行時検証が公開スキーマより厳密であることを許容する入力契約条項）。
-    let number: number | null = null;
-    if (raw.number !== undefined) {
-      number = positiveInt(raw.number);
-      if (number === null) {
-        return {
-          ok: false,
-          error: {
-            code: "invalid-field",
-            field: "number",
-            detail: "number must be a positive integer when present",
-          },
-        };
-      }
-    }
-    return {
-      ok: true,
-      request: {
-        operation: "pr_create",
-        title,
-        body,
-        base,
-        head,
-        ...(number !== null ? { number } : {}),
-      },
+    const request: {
+      operation: "pr_create";
+      title: string;
+      body: string;
+      base: string;
+      head: string;
+      number?: number;
+    } = {
+      operation: "pr_create",
+      title: record.title as string,
+      body: record.body as string,
+      base: record.base as string,
+      head: record.head as string,
     };
+    if (record.number !== undefined) request.number = record.number as number;
+    return { ok: true, request };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "pr_create" }>;
@@ -228,13 +146,10 @@ const prCreateSpec: OperationSpec = {
 const prReadSpec: OperationSpec = {
   operation: "pr_read",
   validate(raw): ValidateOutcome {
-    if (!isRecord(raw)) return missingNumberOutcome("pr_read");
-    const unknown = checkUnknownFields(raw, ["operation", "number"]);
-    if (unknown !== null) return unknown;
-    if (raw.number === undefined) return missingNumberOutcome("pr_read");
-    const number = positiveInt(raw.number);
-    if (number === null) return invalidNumberOutcome();
-    return { ok: true, request: { operation: "pr_read", number: prNumber(number) } };
+    const declared = validateOperationInput("pr_read", raw);
+    if (declared !== null) return declared;
+    const record = raw as Record<string, unknown>;
+    return { ok: true, request: { operation: "pr_read", number: prNumber(record.number as number) } };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "pr_read" }>;
@@ -274,55 +189,23 @@ const prReadSpec: OperationSpec = {
 const prMergeSpec: OperationSpec = {
   operation: "pr_merge",
   validate(raw): ValidateOutcome {
-    if (!isRecord(raw)) return missingNumberOutcome("pr_merge");
-    const unknown = checkUnknownFields(raw, ["operation", "number", "method", "commitHash"]);
-    if (unknown !== null) return unknown;
-    if (raw.number === undefined) return missingNumberOutcome("pr_merge");
-    const number = positiveInt(raw.number);
-    if (number === null) return invalidNumberOutcome();
-    if (raw.method === undefined) {
-      return {
-        ok: false,
-        error: {
-          code: "missing-field",
-          field: "method",
-          detail: "required field 'method' is missing for pr_merge",
-        },
-      };
-    }
-    const method = str(raw.method);
-    if (method !== "merge" && method !== "squash" && method !== "rebase") {
-      return {
-        ok: false,
-        error: {
-          code: "invalid-field",
-          field: "method",
-          detail: "method must be merge, squash, or rebase",
-        },
-      };
-    }
+    const declared = validateOperationInput("pr_merge", raw);
+    if (declared !== null) return declared;
+    const record = raw as Record<string, unknown>;
+    const request: {
+      operation: "pr_merge";
+      number: ReturnType<typeof prNumber>;
+      method: "merge" | "squash" | "rebase";
+      commitHash?: string;
+    } = {
+      operation: "pr_merge",
+      number: prNumber(record.number as number),
+      method: record.method as "merge" | "squash" | "rebase",
+    };
     // commitHash は任意フィールド（ローカル版の取り込み確認情報）。
     // 指定時は非空文字列のみ受理し、GitHub 版 runner は値をマージ動作に使用しない。
-    const commitHash = raw.commitHash === undefined ? null : str(raw.commitHash);
-    if (raw.commitHash !== undefined && (commitHash === null || commitHash.length === 0)) {
-      return {
-        ok: false,
-        error: {
-          code: "invalid-field",
-          field: "commitHash",
-          detail: "commitHash must be a non-empty string when present",
-        },
-      };
-    }
-    return {
-      ok: true,
-      request: {
-        operation: "pr_merge",
-        number: prNumber(number),
-        method,
-        ...(commitHash !== null ? { commitHash } : {}),
-      },
-    };
+    if (record.commitHash !== undefined) request.commitHash = record.commitHash as string;
+    return { ok: true, request };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "pr_merge" }>;
@@ -356,13 +239,13 @@ const prMergeSpec: OperationSpec = {
 const prChangedFilesSpec: OperationSpec = {
   operation: "pr_changed_files",
   validate(raw): ValidateOutcome {
-    if (!isRecord(raw)) return missingNumberOutcome("pr_changed_files");
-    const unknown = checkUnknownFields(raw, ["operation", "number"]);
-    if (unknown !== null) return unknown;
-    if (raw.number === undefined) return missingNumberOutcome("pr_changed_files");
-    const number = positiveInt(raw.number);
-    if (number === null) return invalidNumberOutcome();
-    return { ok: true, request: { operation: "pr_changed_files", number: prNumber(number) } };
+    const declared = validateOperationInput("pr_changed_files", raw);
+    if (declared !== null) return declared;
+    const record = raw as Record<string, unknown>;
+    return {
+      ok: true,
+      request: { operation: "pr_changed_files", number: prNumber(record.number as number) },
+    };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "pr_changed_files" }>;
@@ -390,13 +273,13 @@ const prChangedFilesSpec: OperationSpec = {
 const prMergeableSpec: OperationSpec = {
   operation: "pr_mergeable",
   validate(raw): ValidateOutcome {
-    if (!isRecord(raw)) return missingNumberOutcome("pr_mergeable");
-    const unknown = checkUnknownFields(raw, ["operation", "number"]);
-    if (unknown !== null) return unknown;
-    if (raw.number === undefined) return missingNumberOutcome("pr_mergeable");
-    const number = positiveInt(raw.number);
-    if (number === null) return invalidNumberOutcome();
-    return { ok: true, request: { operation: "pr_mergeable", number: prNumber(number) } };
+    const declared = validateOperationInput("pr_mergeable", raw);
+    if (declared !== null) return declared;
+    const record = raw as Record<string, unknown>;
+    return {
+      ok: true,
+      request: { operation: "pr_mergeable", number: prNumber(record.number as number) },
+    };
   },
   buildRequest(request): GhRunnerRequest {
     const r = request as Extract<GhToolRequest, { operation: "pr_mergeable" }>;
@@ -425,27 +308,10 @@ const prMergeableSpec: OperationSpec = {
 const prUpdateSpec: OperationSpec = {
   operation: "pr_update",
   validate(raw): ValidateOutcome {
-    if (!isRecord(raw)) return missingNumberOutcome("pr_update");
-    const unknown = checkUnknownFields(raw, ["operation", "number", "title", "body"]);
-    if (unknown !== null) return unknown;
-    if (raw.number === undefined) return missingNumberOutcome("pr_update");
-    const number = positiveInt(raw.number);
-    if (number === null) return invalidNumberOutcome();
-    const title = raw.title === undefined ? null : str(raw.title);
-    if (raw.title !== undefined && (title === null || title.length === 0)) {
-      return {
-        ok: false,
-        error: { code: "invalid-field", field: "title", detail: "title must be a non-empty string when present" },
-      };
-    }
-    const body = raw.body === undefined ? null : str(raw.body);
-    if (raw.body !== undefined && body === null) {
-      return {
-        ok: false,
-        error: { code: "invalid-field", field: "body", detail: "body must be a string when present" },
-      };
-    }
-    if (title === null && body === null) {
+    const declared = validateOperationInput("pr_update", raw);
+    if (declared !== null) return declared;
+    const record = raw as Record<string, unknown>;
+    if (record.title === undefined && record.body === undefined) {
       return {
         ok: false,
         error: {
@@ -457,15 +323,15 @@ const prUpdateSpec: OperationSpec = {
     }
     const request = {
       operation: "pr_update",
-      number: prNumber(number),
+      number: prNumber(record.number as number),
     } as {
       operation: "pr_update";
       number: ReturnType<typeof prNumber>;
       title?: string;
       body?: string;
     };
-    if (title !== null) request.title = title;
-    if (body !== null) request.body = body;
+    if (record.title !== undefined) request.title = record.title as string;
+    if (record.body !== undefined) request.body = record.body as string;
     return { ok: true, request };
   },
   buildRequest(request): GhRunnerRequest {

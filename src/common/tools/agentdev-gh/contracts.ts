@@ -5,11 +5,22 @@
 // 操作カタログとして公開する。ツール名・公開単位・ファイル構成の詳細は
 // 同 Design の所有事項である。
 //
+// 操作名称・副作用分類・共通入力検査の正本は operation-catalog.ts
+// （単一テーブル。B3-5c 一元化）であり、本ファイルの操作カタログ（名称一覧と
+// 副作用分類のエントリ）は正本から派生する。操作の追加は operation-catalog.ts
+// の1箇所更新だけで本ファイル・public-schema.ts・各 specs へ反映される。
+//
 // 保証: 副作用操作は操作の結果を検証（読み戻し）してから成功を返す。
 // 検証は engine.ts が所有し、各操作の読み戻し照合は specs が定義する。
 //
 // 失敗: 設定解釈不能、パス解決不能、強制処理異常終了、必須検証未了の
 // いずれかの場合、対象副作用を実行せず成功扱いとしない（fail-closed）。
+
+import {
+  GH_TOOL_OPERATION_DEFINITIONS,
+  GH_TOOL_OPERATION_NAMES,
+  type OperationKindName,
+} from "./operation-catalog.ts";
 
 
 /** Issue 番号（GitHub Issue の識別数値）。PrNumber と型上の混入を防ぐ。 */
@@ -48,42 +59,22 @@ export function prNumber(n: number): PrNumber {
 }
 
 /**
- * 操作名。Design「対象操作の境界」が所有する20操作
- * （基本操作10: issue_create、issue_read、issue_update、issue_close、pr_create、
- * pr_read、pr_merge、pr_changed_files、pr_mergeable、pr_update、
- * 追跡Issue操作2: issue_list、issue_reopen、
- * Comment 操作4: comment_create、comment_list、comment_update、comment_delete、
- * Release 操作4: release_create、release_list、release_read、release_publish）。
- * Comment は Issue と Pull Request の会話コメントを同一の論理リソースとして扱い、
- * commentId（公開型は文字列）で対象識別する。
- * Release 操作は GitHub 接続専用（Local 版は構造化失敗）であり、release_create は
- * 公開モード（draft の解除、publish 相当フィールド）を入力契約に含めない。
- * 公開は release_publish（タグ名と承認根拠必須の fail-closed 入力契約）が所有する。
+ * 操作名。Design「対象操作の境界」が所有する20操作の名称一覧。
+ * 正本（operation-catalog.ts の操作定義テーブル）から派生し、独自の列挙を
+ * 保持しない（B3-5c 一元化）。操作の意味論（Comment の共通論理リソース扱い、
+ * Release 操作の GitHub 接続専用と公開モード非包含等）の正は Design と
+ * 本ファイル上部の契約コメントが所有する。
  */
-export const GH_TOOL_OPERATIONS = [
-  "issue_create",
-  "issue_read",
-  "issue_update",
-  "issue_close",
-  "pr_create",
-  "pr_read",
-  "pr_merge",
-  "pr_changed_files",
-  "pr_mergeable",
-  "pr_update",
-  "issue_list",
-  "issue_reopen",
-  "comment_create",
-  "comment_list",
-  "comment_update",
-  "comment_delete",
-  "release_create",
-  "release_list",
-  "release_read",
-  "release_publish",
-] as const;
+/**
+ * 操作名。Design「対象操作の境界」が所有する20操作の名称一覧。
+ * 正本（operation-catalog.ts の操作定義テーブル）から派生し、独自の列挙を
+ * 保持しない（B3-5c 一元化）。操作の意味論（Comment の共通論理リソース扱い、
+ * Release 操作の GitHub 接続専用と公開モード非包含等）の正は Design と
+ * 本ファイル上部の契約コメントが所有する。
+ */
+export type GhToolOperation = (typeof GH_TOOL_OPERATION_DEFINITIONS)[number]["operation"];
 
-export type GhToolOperation = (typeof GH_TOOL_OPERATIONS)[number];
+export const GH_TOOL_OPERATIONS: readonly GhToolOperation[] = GH_TOOL_OPERATION_NAMES;
 
 /** 操作の副作用分類。side-effect 操作は VERIFY（読み戻し）を必須とする。 */
 export type OperationKind = "side-effect" | "read-only";
@@ -119,37 +110,21 @@ const READ_CONTINGENCY: CapabilityContingency = {
   canContinue: true,
 };
 
-function sideEffect(operation: GhToolOperation): OperationCatalogEntry {
-  return { operation, kind: "side-effect", contingency: SIDE_EFFECT_CONTINGENCY };
+function contingencyOf(kind: OperationKindName): CapabilityContingency {
+  return kind === "side-effect" ? SIDE_EFFECT_CONTINGENCY : READ_CONTINGENCY;
 }
 
-function readOnly(operation: GhToolOperation): OperationCatalogEntry {
-  return { operation, kind: "read-only", contingency: READ_CONTINGENCY };
-}
-
-/** 操作カタログ（Design の対象操作の境界に対応）。 */
-export const GH_TOOL_OPERATION_CATALOG: readonly OperationCatalogEntry[] = [
-  sideEffect("issue_create"),
-  readOnly("issue_read"),
-  sideEffect("issue_update"),
-  sideEffect("issue_close"),
-  sideEffect("pr_create"),
-  readOnly("pr_read"),
-  sideEffect("pr_merge"),
-  readOnly("pr_changed_files"),
-  readOnly("pr_mergeable"),
-  sideEffect("pr_update"),
-  readOnly("issue_list"),
-  sideEffect("issue_reopen"),
-  sideEffect("comment_create"),
-  readOnly("comment_list"),
-  sideEffect("comment_update"),
-  sideEffect("comment_delete"),
-  sideEffect("release_create"),
-  readOnly("release_list"),
-  readOnly("release_read"),
-  sideEffect("release_publish"),
-];
+/**
+ * 操作カタログ（Design の対象操作の境界に対応）。操作名・副作用分類は
+ * 正本（operation-catalog.ts）から派生する。継続契約は種別ごとの既定
+ * （side-effect: 代替なし・継続不可、read-only: 代替手段あり・継続可）を適用する。
+ */
+export const GH_TOOL_OPERATION_CATALOG: readonly OperationCatalogEntry[] =
+  GH_TOOL_OPERATION_DEFINITIONS.map((definition) => ({
+    operation: definition.operation,
+    kind: definition.kind,
+    contingency: contingencyOf(definition.kind),
+  }));
 
 /** fail-closed 4異常系と運用上の失敗種別。 */
 export type GhToolFailureKind =
