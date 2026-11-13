@@ -169,6 +169,7 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 | REQ-120 | 3 | +0 |  |
 | REQ-055 | 2 | +0 |  |
 | REQ-113 | 2 | +0 |  |
+| REQ-121 | 1 | +0 |  |
 
 計測日: 2026-11-13。
 <!-- AUTOGEN:END -->
