@@ -10,6 +10,22 @@
 // boundary DEC, decision 5).
 //
 // Pure: no fs/path/I/O imports; same input => same output.
+//
+// The edit-semantics parsing/reconstruction itself is owned by the shared
+// guard-common part (lib/edit-semantics.ts of the agentdev-textlint-guard
+// package; Design "共有 detector と adapter の契約" section, B3-5a). This
+// module keeps the plugin-facing types and the guard-specific rejection
+// conditions: unrecognized patch lines are inspection errors (malformed)
+// for this guard, and missing/typed-unsupported args are null (fail closed).
+
+import {
+  extractAddedLines,
+  parseApplyPatchToolArgs,
+  parseEditToolArgs,
+  parsePatch,
+  parseWriteToolArgs,
+  type UnknownPatchLine,
+} from "../../../opencode/plugins/agentdev-textlint-guard/lib/edit-semantics.ts";
 
 // ---------------------------------------------------------------------------
 // Argument parsing (from OpenCode tool.execute.before output.args)
@@ -41,14 +57,6 @@ export interface ParsedApplyPatch {
   readonly patchText: string;
 }
 
-function isString(v: unknown): v is string {
-  return typeof v === "string";
-}
-
-function isBoolean(v: unknown): v is boolean {
-  return typeof v === "boolean";
-}
-
 /**
  * Parse the `write` tool args. Returns null when `path` or `content` is
  * absent, non-string, or `path` is empty. Null is interpreted by the plugin
@@ -63,11 +71,9 @@ function isBoolean(v: unknown): v is boolean {
 export function parseWriteArgs(
   args: Record<string, unknown>,
 ): ParsedWrite | null {
-  const filePath = args["path"] ?? args["filePath"];
-  const content = args["content"];
-  if (!isString(filePath) || !isString(content)) return null;
-  if (filePath.length === 0) return null;
-  return { filePath, content };
+  const parsed = parseWriteToolArgs(args);
+  if (parsed.filePath === undefined || parsed.content === undefined) return null;
+  return { filePath: parsed.filePath, content: parsed.content };
 }
 
 /**
@@ -79,16 +85,13 @@ export function parseWriteArgs(
 export function parseEditArgs(
   args: Record<string, unknown>,
 ): ParsedEdit | null {
-  const filePath = args["path"] ?? args["filePath"];
-  if (!isString(filePath) || filePath.length === 0) return null;
-  const oldString = args["oldString"];
-  const newString = args["newString"];
-  const replaceAll = args["replaceAll"];
+  const parsed = parseEditToolArgs(args);
+  if (parsed.filePath === undefined) return null;
   return {
-    filePath,
-    oldString: isString(oldString) ? oldString : "",
-    newString: isString(newString) ? newString : "",
-    replaceAll: isBoolean(replaceAll) ? replaceAll : false,
+    filePath: parsed.filePath,
+    oldString: parsed.oldString ?? "",
+    newString: parsed.newString ?? "",
+    replaceAll: parsed.replaceAll ?? false,
   };
 }
 
@@ -99,9 +102,9 @@ export function parseEditArgs(
 export function parseApplyPatchArgs(
   args: Record<string, unknown>,
 ): ParsedApplyPatch | null {
-  const patchText = args["patchText"];
-  if (!isString(patchText)) return null;
-  return { patchText };
+  const parsed = parseApplyPatchToolArgs(args);
+  if (parsed.patchText === undefined) return null;
+  return { patchText: parsed.patchText };
 }
 
 // ---------------------------------------------------------------------------
@@ -128,11 +131,6 @@ export type ParsedPatch =
   | { kind: "ok"; entries: readonly PatchEntry[] }
   | { kind: "malformed"; reason: string };
 
-const HEADER_RE = /^\*\*\* (Add|Update|Delete) File: (.+)$/;
-const MOVE_RE = /^\*\*\* Move to: (.+)$/;
-const BEGIN_RE = /^\*\*\* Begin Patch$/;
-const END_RE = /^\*\*\* End Patch$/;
-
 /**
  * Parse the OpenCode apply_patch text format. Recognized headers:
  *   *** Begin Patch / *** End Patch    — required wrappers
@@ -142,103 +140,25 @@ const END_RE = /^\*\*\* End Patch$/;
  *   *** Delete File: <path>            — no body
  *
  * Malformed inputs return a structured result so the gate layer fail-closes.
+ * Unrecognized (bare) lines are this guard's inspection errors, unlike the
+ * textlint guard which skips them.
  */
 export function parseApplyPatchText(patchText: string): ParsedPatch {
-  if (!isString(patchText) || patchText.length === 0) {
-    return { kind: "malformed", reason: "empty patch text" };
-  }
-  const lines = patchText.split(/\r?\n/);
-  if (lines.length === 0) return { kind: "malformed", reason: "no lines" };
-
-  let beginSeen = false;
-  let endSeen = false;
-  const entries: PatchEntry[] = [];
-  let current: {
-    kind: PatchOpKind;
-    path: string;
-    moveTo: string | null;
-    bodyLines: string[];
-  } | null = null;
-
-  const flushCurrent = (): void => {
-    if (current === null) return;
-    entries.push({
-      kind: current.kind,
-      path: current.path,
-      moveTo: current.moveTo,
-      bodyLines: current.bodyLines,
-    });
-    current = null;
-  };
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i] ?? "";
-    if (BEGIN_RE.test(line)) {
-      beginSeen = true;
-      continue;
-    }
-    if (END_RE.test(line)) {
-      endSeen = true;
-      flushCurrent();
-      continue;
-    }
-    const headerMatch = line.match(HEADER_RE);
-    if (headerMatch) {
-      const op = headerMatch[1];
-      const path = (headerMatch[2] ?? "").trim();
-      if (path.length === 0) {
-        return { kind: "malformed", reason: `missing path at line ${i + 1}` };
-      }
-      flushCurrent();
-      if (op === "Add") current = { kind: "add", path, moveTo: null, bodyLines: [] };
-      else if (op === "Update") current = { kind: "update", path, moveTo: null, bodyLines: [] };
-      else if (op === "Delete") current = { kind: "delete", path, moveTo: null, bodyLines: [] };
-      continue;
-    }
-    const moveMatch = line.match(MOVE_RE);
-    if (moveMatch) {
-      const dest = (moveMatch[1] ?? "").trim();
-      if (dest.length === 0) {
-        return { kind: "malformed", reason: `missing move destination at line ${i + 1}` };
-      }
-      if (current === null || current.kind !== "update") {
-        return {
-          kind: "malformed",
-          reason: `Move to: outside Update File context at line ${i + 1}`,
-        };
-      }
-      current.moveTo = dest;
-      continue;
-    }
-    if (line.startsWith("@@")) {
-      // Context anchor — kept in body so reconstruction can preserve ordering.
-      if (current !== null) current.bodyLines.push(line);
-      continue;
-    }
-    if (
-      line.startsWith("+") ||
-      line.startsWith("-") ||
-      line.startsWith(" ")
-    ) {
-      if (current !== null) current.bodyLines.push(line);
-      continue;
-    }
-    // Unknown line — malformed.
+  const outcome = parsePatch(patchText);
+  if (!outcome.ok) return { kind: "malformed", reason: outcome.reason };
+  const firstUnknown: UnknownPatchLine | undefined = outcome.patch.unknownLines[0];
+  if (firstUnknown !== undefined) {
     return {
       kind: "malformed",
-      reason: `unrecognized patch line ${i + 1}: ${line.slice(0, 60)}`,
+      reason: `unrecognized patch line ${firstUnknown.line}: ${firstUnknown.text.slice(0, 60)}`,
     };
   }
-
-  if (!beginSeen || !endSeen) {
-    return {
-      kind: "malformed",
-      reason: beginSeen ? "missing *** End Patch marker" : "missing *** Begin Patch marker",
-    };
-  }
-  if (entries.length === 0) {
-    return { kind: "malformed", reason: "no operation entries" };
-  }
+  const entries: PatchEntry[] = outcome.patch.entries.map((entry) => ({
+    kind: entry.kind,
+    path: entry.path,
+    moveTo: entry.moveTo,
+    bodyLines: entry.bodyLines,
+  }));
   return { kind: "ok", entries };
 }
 
@@ -249,11 +169,5 @@ export function parseApplyPatchText(patchText: string): ParsedPatch {
  * the new file.
  */
 export function extractAddedContent(entry: PatchEntry): string[] {
-  const out: string[] = [];
-  for (const raw of entry.bodyLines) {
-    if (raw.startsWith("+")) {
-      out.push(raw.slice(1));
-    }
-  }
-  return out;
+  return extractAddedLines(entry.bodyLines);
 }

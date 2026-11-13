@@ -10,15 +10,25 @@
 //
 // Pure except for the injected readFile callback: same input + same readFile
 // output => same reconstruction.
+//
+// The reconstruction mechanics (edit substitution, chunk application) are
+// owned by the shared guard-common part (lib/edit-semantics.ts of the
+// agentdev-textlint-guard package; Design "共有 detector と adapter の契約"
+// section, B3-5a). This module keeps the plugin-facing result shapes and the
+// guard-specific fail-closed normalization (every reconstruction failure is
+// a ReconstructResult failure, never a silent clean).
 
+import {
+  applyEditToContent,
+  applyUpdateChunks,
+  joinAddContent,
+  splitUpdateChunks,
+  safeReadFile,
+  type FileReader,
+} from "../../../opencode/plugins/agentdev-textlint-guard/lib/edit-semantics.ts";
 import type { PatchEntry } from "./distribution-boundary-guard-parser.ts";
 
-/**
- * File reader contract. Returns the file content as a string, or null if the
- * file cannot be read (missing, permission denied, etc.). Throw is permitted;
- * the orchestrator catches and fail-closes.
- */
-export type FileReader = (path: string) => string | null;
+export type { FileReader } from "../../../opencode/plugins/agentdev-textlint-guard/lib/edit-semantics.ts";
 
 export type ReconstructResult =
   | { ok: true; content: string }
@@ -30,7 +40,8 @@ export type ReconstructResult =
 
 /**
  * Reconstruct the post-edit file content from current content + edit args.
- * Fail-closes when oldString is not found in currentContent.
+ * Fail-closes when oldString is not found in currentContent (or when the
+ * combination cannot be applied at all, e.g. empty oldString with replaceAll).
  */
 export function reconstructEdit(args: {
   currentContent: string;
@@ -38,31 +49,9 @@ export function reconstructEdit(args: {
   newString: string;
   replaceAll: boolean;
 }): ReconstructResult {
-  if (args.oldString.length === 0 && !args.replaceAll) {
-    // Insert at start (edit tool contract: empty oldString inserts newString
-    // at the beginning).
-    return { ok: true, content: args.newString + args.currentContent };
-  }
-  if (args.replaceAll) {
-    if (!args.currentContent.includes(args.oldString)) {
-      return { ok: false, reason: "old-string-not-found" };
-    }
-    return {
-      ok: true,
-      content: args.currentContent.split(args.oldString).join(args.newString),
-    };
-  }
-  const idx = args.currentContent.indexOf(args.oldString);
-  if (idx < 0) {
-    return { ok: false, reason: "old-string-not-found" };
-  }
-  return {
-    ok: true,
-    content:
-      args.currentContent.slice(0, idx) +
-      args.newString +
-      args.currentContent.slice(idx + args.oldString.length),
-  };
+  const applied = applyEditToContent(args.currentContent, args.oldString, args.newString, args.replaceAll);
+  if (!applied.ok) return { ok: false, reason: "old-string-not-found" };
+  return { ok: true, content: applied.result.content };
 }
 
 // ---------------------------------------------------------------------------
@@ -71,22 +60,15 @@ export function reconstructEdit(args: {
 
 /**
  * Reconstruct the full content for an Add File entry. The body is the new
- * file content as `+`-prefixed lines.
+ * file content as `+`-prefixed lines. A non-`+`, non-anchor body line is
+ * this guard's malformed-input signal (fail closed).
  */
 export function reconstructAddFile(entry: PatchEntry): ReconstructResult {
-  const lines: string[] = [];
   for (const raw of entry.bodyLines) {
-    if (raw.startsWith("+")) {
-      lines.push(raw.slice(1));
-    } else if (raw.startsWith("@@")) {
-      // Context anchors are ignored for Add: body is full content.
-      continue;
-    } else {
-      // Add body should only have `+` lines; anything else is malformed.
-      return { ok: false, reason: "apply-failed" };
-    }
+    if (raw.startsWith("+") || raw.startsWith("@@")) continue;
+    return { ok: false, reason: "apply-failed" };
   }
-  return { ok: true, content: lines.join("\n") };
+  return { ok: true, content: joinAddContent(entry.bodyLines) };
 }
 
 // ---------------------------------------------------------------------------
@@ -95,67 +77,28 @@ export function reconstructAddFile(entry: PatchEntry): ReconstructResult {
 
 /**
  * Reconstruct the post-patch content for an Update File entry by applying
- * context/add/remove hunks against the current file content.
+ * the parsed chunks against the current file content (exact match first,
+ * then trailing-whitespace-insensitive, then trimmed — the OpenCode tool's
+ * matching passes). Any apply failure fail-closes.
  *
- * The OpenCode apply_patch format uses these body-line prefixes:
- *   ` ` (single space) — context line (must match current content)
- *   `-`                — line removed from current content
- *   `+`                — line added to the result
- *   `@@ ...`           — hunk anchor (informational, not enforced here)
- *
- * The reconstruction is hunk-aware: for each hunk (delimited by `@@`), we
- * walk context+removed lines against the current content and emit context+
- * added lines to the result. If the current content does not match the
- * context+removed sequence, fail-closed.
+ * The `@@` hunk anchors stay informational for this guard (not enforced):
+ * the chunks are applied without the context-anchor seek so existing
+ * classifications are preserved.
  */
 export function reconstructUpdateFile(
   entry: PatchEntry,
   currentContent: string,
 ): ReconstructResult {
-  const currentLines = currentContent.split(/\r?\n/);
-  const result: string[] = [];
-  let cursor = 0;
-  let i = 0;
-  const body = entry.bodyLines;
-
-  while (i < body.length) {
-    const line = body[i] ?? "";
-    if (line.startsWith("@@")) {
-      i++;
-      continue;
-    }
-    if (line.startsWith(" ")) {
-      const expected = line.slice(1);
-      const got = currentLines[cursor] ?? null;
-      if (got !== expected) return { ok: false, reason: "apply-failed" };
-      result.push(expected);
-      cursor++;
-      i++;
-      continue;
-    }
-    if (line.startsWith("-")) {
-      const expected = line.slice(1);
-      const got = currentLines[cursor] ?? null;
-      if (got !== expected) return { ok: false, reason: "apply-failed" };
-      cursor++;
-      i++;
-      continue;
-    }
-    if (line.startsWith("+")) {
-      result.push(line.slice(1));
-      i++;
-      continue;
-    }
+  const chunks = splitUpdateChunks(entry.bodyLines).map((chunk) => ({
+    oldLines: chunk.oldLines,
+    newLines: chunk.newLines,
+    ...(chunk.isEndOfFile === true ? { isEndOfFile: true } : {}),
+  }));
+  try {
+    return { ok: true, content: applyUpdateChunks(currentContent, chunks, entry.path) };
+  } catch {
     return { ok: false, reason: "apply-failed" };
   }
-
-  // Append any remaining current content beyond the last hunk.
-  while (cursor < currentLines.length) {
-    result.push(currentLines[cursor] ?? "");
-    cursor++;
-  }
-
-  return { ok: true, content: result.join("\n") };
 }
 
 // ---------------------------------------------------------------------------
@@ -176,7 +119,7 @@ export function resolveMoveSource(
   if (entry.kind !== "update" || entry.moveTo === null) {
     return { ok: false, reason: "not-a-move" };
   }
-  const source = safeRead(readFile, entry.path);
+  const source = safeReadFile(readFile, entry.path);
   if (source === null) return { ok: false, reason: "read-failed" };
   return {
     ok: true,
@@ -195,9 +138,5 @@ export function resolveMoveSource(
  * a thrown read as "no violations".
  */
 export function safeRead(readFile: FileReader, path: string): string | null {
-  try {
-    return readFile(path);
-  } catch {
-    return null;
-  }
+  return safeReadFile(readFile, path);
 }

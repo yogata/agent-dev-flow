@@ -99,11 +99,11 @@ export async function guardOperation(
   // 2) 完成予定全文の再構成
   let reconstruction: ReconstructionResult;
   if (tool === "write") {
-    reconstruction = reconstructWrite(args as never);
+    reconstruction = reconstructWrite(args);
   } else if (tool === "edit") {
-    reconstruction = reconstructEdit(args as never);
+    reconstruction = reconstructEdit(args);
   } else {
-    reconstruction = reconstructApplyPatch(args as never, projectRoot);
+    reconstruction = reconstructApplyPatch(args, projectRoot);
   }
   if (!reconstruction.ok) {
     return `agentdev-textlint-guard: cannot verify ${tool} (${reconstruction.detail}); blocked per fail-closed`;
