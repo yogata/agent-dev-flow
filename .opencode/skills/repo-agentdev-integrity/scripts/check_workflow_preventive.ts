@@ -49,6 +49,12 @@ import * as fs from "fs";
 import * as path from "path";
 import { deriveSkillClassification } from "./check_extensions.ts";
 import { globWalkRel } from "./lib/glob_walk.ts";
+import {
+  WORKFLOW_TRIGGER_ITEM,
+  WORKFLOW_TRIGGER_ITEM_FULL_FORM,
+  commandBoundWorkflowSkillName,
+  parseSkillFrontMatterFields,
+} from "./lib/workflow_trigger.ts";
 
 export interface PreventiveFailure {
   check: number;
@@ -103,13 +109,12 @@ const COMMAND_FORMAT_RULES_PATH = path.join(
 
 const LEGACY_EXTENSION_KINDS = ["command-extension", "skill-extension"];
 const LEGACY_EXTENSIONS_PATH = ".agentdev/extensions/commands";
-// AG-004 concise trigger item detection word (the Design-authoritative soft
-// guard form: the description's DO NOT USE FOR entry "単独起動（対応する
-// /agentdev/* コマンド経由で利用すること）"). Must stay identical to
-// WORKFLOW_TRIGGER_ITEM in lint_skills.ts (the AG-004 implementation) so both
-// checkers assert the same form. lint_skills.ts runs main() at module top
-// level and cannot be imported here, hence the duplicated constant.
-const WORKFLOW_TRIGGER_ITEM = "単独起動";
+// AG-004 concise trigger item detection word (WORKFLOW_TRIGGER_ITEM) and the
+// command-bound Workflow Skill derivation are canonicalized in
+// lib/workflow_trigger.ts (B3-5b consolidation roster; shared with
+// lint_skills.ts AG-005). The lint_skills module-load main() concern is
+// obsolete: main() is import.meta.main-guarded and the canonical assets live
+// in the shared lib, not in a checker-to-checker import.
 
 // check 5: a specific internal reference file (references/<file>.md|.ts).
 // The generic "`references/` 配下を参照" declaration names no file and is the
@@ -190,22 +195,6 @@ export function listFilesRecursive(dirPath: string, extensions?: string[]): stri
 function extractYamlField(text: string, field: string): string | null {
   const m = text.match(new RegExp(`^${field}:\\s*(\\S+)\\s*$`, "m"));
   return m ? m[1] : null;
-}
-
-// Frontmatter description extraction with the same single-line semantics as
-// lint_skills.ts parseFrontMatter (all distribution SKILL.md files keep the
-// description as one quoted line).
-function extractFrontMatterDescription(text: string): string {
-  const parts = text.split("---");
-  if (parts.length < 3) return "";
-  for (const line of parts[1].split(/\r?\n/)) {
-    const colonIndex = line.indexOf(":");
-    if (colonIndex === -1) continue;
-    if (line.slice(0, colonIndex).trim() === "description") {
-      return line.slice(colonIndex + 1).trim();
-    }
-  }
-  return "";
 }
 
 /**
@@ -304,7 +293,7 @@ export function checkWorkflowPreventive(repoRoot: string): PreventiveReport {
     // Checks 1-3 + 5: per-command structural invariants
     for (const cf of commandFiles) {
       const base = path.basename(cf).replace(/\.md$/, "");
-      const workflowSkill = `agentdev-workflow-${base}`;
+      const workflowSkill = commandBoundWorkflowSkillName(base);
       const text = readText(cf) ?? "";
 
       // Check 1: dispatch presence (name-level reference to the dedicated Workflow Skill)
@@ -333,7 +322,8 @@ export function checkWorkflowPreventive(repoRoot: string): PreventiveReport {
       } else {
         // Check 3: AG-004 concise trigger item in the Workflow Skill description
         const skillText = readText(skillMd) ?? "";
-        const skillDescription = extractFrontMatterDescription(skillText);
+        const skillDescription =
+          parseSkillFrontMatterFields(skillText)?.description ?? "";
         if (!skillDescription.includes(WORKFLOW_TRIGGER_ITEM)) {
           failures.push({
             check: 3,
@@ -341,7 +331,7 @@ export function checkWorkflowPreventive(repoRoot: string): PreventiveReport {
             severity: "strict",
             classification: "consistency",
             file: skillMd,
-            message: `Workflow Skill '${workflowSkill}' description lacks the concise trigger item "単独起動（対応する /agentdev/* コマンド経由で利用すること）" in DO NOT USE FOR (AG-004, detection word unified with lint_skills.ts)`,
+            message: `Workflow Skill '${workflowSkill}' description lacks the concise trigger item "${WORKFLOW_TRIGGER_ITEM_FULL_FORM}" in DO NOT USE FOR (AG-004, canonical detection word: lib/workflow_trigger.ts)`,
           });
         }
       }
