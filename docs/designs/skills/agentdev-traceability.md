@@ -2,7 +2,7 @@
 title: agentdev-traceability Design
 status: accepted
 created: "2026-08-21"
-updated: "2026-11-04"
+updated: "2026-11-13"
 ---
 
 <!-- ADF-COVERS(design): REQ-012-027, REQ-012-028, REQ-012-033, REQ-012-042, REQ-012-045, REQ-012-046, REQ-012-047, REQ-012-048, REQ-012-051, REQ-012-054, REQ-012-055 -->
@@ -87,6 +87,7 @@ impact は明示的な対応関係に基づく再確認候補取得であり、�
 - 検証対応の欠落（検証スコープポリシーが required と判定する現行要件行で0件。Decision 対応の欠落は計上しない）
 - 検証スコープポリシーの不正（`traceability/policy.yaml` のスキーマ違反、default 値不正、optional 列挙の要件行 ID 形式違反、存在しない要件行の列挙、policy 読取不能）
 - 同一対応関係の重複宣言の不整合（同一 artifact パス × role × 要件行 ID の組み合わせが sidecar と inline declaration の間、または同一情報源内で矛盾する状態）
+- 導出済み対応宣言と手動宣言の整合（B3-6・Epic #4026）: 重複は導出と同一論理関係の手動残存、矛盾は導出対象範囲の論理関係で部分重複しつつ集合不一致、交差なしの共存は手動付与対象の正当な残存として非検出とする
 
 check は構造検査（対応関係の存在と参照整合）のみを担い、check の pass は要求内容の充足（意味的品質）の証明ではない（REQ-107-004）。トレーサビリティ機構に恒久的な意味品質検証ゲートを追加しない（DEC-054、REQ-107-005）。見出しや説明節の存在だけで孤立設計事項として一律に不合格としない。計上は子要件行 ID 単位であり、追跡関係の粒度（グループ化、範囲宣言）によって、グループ内の個別に有効な要求・受け入れ条件の計上と検証義務を消さない（REQ-107-006）。
 
@@ -128,6 +129,7 @@ Decision 対応の欠落は不合格としない。
 - sidecar および policy.yaml の読み込みは決定的な YAML 解析で行い、スキーマ不適合・未知キーを黙って読み飛ばさない（checker 実行契約 Design の宣言的データの silent skip 禁止と同一規定）
 - 将来、直接走査が実運用上の問題として観測された場合、coverage、impact、check の外部契約を変えずにキャッシュまたは索引を追加できる構造とする
 - OpenFastTrace、Eclipse Capra、専用グラフDBを標準実行依存として導入しない
+- 導出規約は `traceability/derivations.yaml`（repository-local 配置。REQ-012-057 の配布スキルは個別プロジェクトデータを含まない契約との整合）で宣言する。schema は test-verifications 配下の tests-dirs 配列であり、本ファイルは対応関係データを保持せず導出の対象範囲のみを宣言する（B3-6・Epic #4026）
 
 ## 対象外
 

@@ -2,7 +2,7 @@
 title: validator 分割基準
 status: accepted
 created: 2026-07-07
-updated: 2026-11-12
+updated: 2026-11-13
 ---
 
 # validator 分割基準
@@ -22,6 +22,7 @@ check_changed_docs.ts の validator を分割する基準を実装詳細Design �
 
 - Workflow Skill 構造検査（「単独起動」禁止等）の正本を1箇所に寄せ、check_workflow_preventive.ts と lint_skills.ts が独立保持する同一検査の重複を解消する（B3-5b）。大規模検査器（check_integrity）と専用検査器の責務境界を確定する
 - 統合対象として削除する検査と、判定段階が異なるため意図的に残す検査を名簿として区別し、残す根拠を記録する
+- Workflow Skill 構造検査の正本所在は `.opencode/skills/repo-agentdev-integrity/scripts/lib/workflow_trigger.ts` 冒頭の統合名簿と正本共有モジュールである（B3-5b・Epic #4026）。名簿と実態の一致は `lib/workflow_trigger.test.ts` が機械検証する
 
 ## ファイルサイズ上限
 

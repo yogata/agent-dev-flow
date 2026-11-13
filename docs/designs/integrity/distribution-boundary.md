@@ -2,7 +2,7 @@
 title: "配布依存境界"
 status: accepted
 created: "2026-08-11"
-updated: 2026-11-12
+updated: 2026-11-13
 ---
 <!-- ADF-COVERS(implementation): REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-045 -->
@@ -114,6 +114,8 @@ adapter は detector の判定を書き込み前に反映する fail-fast な経
 
 - ガード間（textlint 書込み前 guard と配布境界ガード等）で重複する編集意味論の解析・再構成部（write/edit/apply_patch の引数解析と完成予定全文の再構成）は、共通部として1箇所で管理する（B3-5a）。各ガードは固有の拒否条件のみを所有する
 - 共通部の試験は1箇所で管理し、各ガードの拒否条件の試験は現行のまま各ガードが保持する。解析不能・検査不能を許可へ変えない保証は双方のガードで維持する
+- 共通部（編集意味論の解析・再構成）の配置は、consumer 配布対象 plugin package 内の共有モジュール（lib/edit-semantics.ts）へ置き、repo-local ガード側から参照する形式とする（B3-5a・Epic #4026）。配布物の producer 内部参照排除（REQ-029-001）と baseline 変更禁止の制約から、src/common/guards/ 配下への配置は採用しない
+- 各ガードの固有条件は、解析結果の消費方法で分離する。matchCount の消費有無、unknownLines の malformed 化有無、`@@` anchor の強制有無、replaceAll の無効型拒否有無をガード固有の差異として扱い、将来の第3ガード接続時も同パターンの適用候補とする（Epic #4026 の確定記録）
 
 ## 検査エラーの意味
 

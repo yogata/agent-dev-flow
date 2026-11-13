@@ -2,7 +2,7 @@
 title: ADF v4 Traceability モデル（Change / Evidence 中心）
 status: accepted
 created: 2026-09-18
-updated: "2026-11-12"
+updated: "2026-11-13"
 ---
 
 <!-- ADF-COVERS(design): REQ-012-026, REQ-012-027, REQ-012-028, REQ-012-029, REQ-012-030, REQ-012-031, REQ-012-032, REQ-012-033, REQ-012-034, REQ-012-035, REQ-012-036, REQ-012-037, REQ-012-038, REQ-012-039, REQ-012-040, REQ-012-041, REQ-012-042, REQ-012-054, REQ-012-052, REQ-012-053, REQ-012-056, REQ-012-057, REQ-012-058, REQ-012-059, REQ-002-048 -->
@@ -81,6 +81,9 @@ v4 の意味モデルから永続すべき関係（Change の Evidence・impact�
 | 導出 | 影響範囲（impact の実行結果） | 正規成果物の直接走査からその場で再計算できる（REQ-012-048） |
 | 導出 | Evidence 実行結果（Issue / PR / QG の記録） | Issue / PR / QG が所有し、DEC-038 の durable state 配置に従う（REQ-021-019） |
 | 導出 | corpus 集計値（missing-design、missing-implementation 等の計数） | 宣言からの集計で再現できる診断指標である（completeness の 2 層節） |
+
+- B3-6 の導出・手動境界の実装列挙（Epic #4026）: 導出対象はテスト本文の import 実測と検証対象モジュールの対応宣言から導出できる verification 対応である。手動不要化の対比証明（新設・改名の模擬テスト、4 sidecar 行〔19 要件行〕と 7 テストの inline 重複宣言の導出移行）は Epic #4026 実装PR の「代表変更の対比記録」が正とする
+- 引き続き手動付与対象は次の6分類である（Epic #4026）。(1) implementation 対応（人間の根拠確認を要する）。(2) design 対応の付与判断（producer 側文書の inline 宣言として運用）。(3) 検証対応要否（policy.yaml。REQ-012-051 により導出禁止）。(4) import 解析で検証対象が解決できない検証手段の verification 対応。(5) decision 対応。(6) 配布境界対象の src/common 配下テスト（repository-local tests のみ導出対象化）
 
 ## DEC-030 機構の搬送範囲
 
