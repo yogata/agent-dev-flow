@@ -1209,3 +1209,147 @@
 - **タグ**: #checker出力 #契約テスト #spawnSync #results統合 #Wave2
 
 ---
+## 2026-11-13: 後片付けの削除は wildcard を使わず自分が作成した具体ファイル名を個別指定する（wildcard 誤削除事故）
+
+- **問題事象**: main root .agentdev/integrity/reports/ の後片付けで wildcard パターン（2026-11-12-integrity-report-*.md）を使用した結果、自分の生成分だけでなく同日の他工程起因の同名連番 scratch report も誤削除した（Case 4026 Wave 2・PR 4040 の実行過程。対象は gitignore 対象の派生 scratch 出力で恒久証跡チャネル参照なし・base 版と他日付分は無傷）
+- **発生局面**: 実装検証の後片付け（check_integrity の report 生成物の回収）
+- **検知方法**: 実行担当の自己申告（PR 4040 本文 Findings・報告義務の履行）
+- **根本原因**: 共有領域の連番生成物に対する wildcard 一括削除は、同時刻に他工程が生成する同名パターンを区別できない
+- **自律対応内容**: 誤削除対象は scratch 出力のため恒久影響なしと確認のうえ報告。再発防止策を自分への禁止事項として記録
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 共有領域（.agentdev/integrity/reports/ 等）で生成物の後片付けを行う全工程
+- **再発条件**: 連番・タイムスタンプ等の衝突し得るパターンで共有領域の生成物を wildcard 削除する全状況
+- **予防策候補**: 後片付けの削除は自分が作成した具体ファイル名を個別指定し wildcard を使用しない（実行時禁止事項として worktree-operations 系指針への追加候補）
+- **想定反映先**: agentdev-git-worktree（worktree-operations 後片付け規律）・learning-promote
+- **関連**: PR 4040 本文 Findings（DEL-4034-1）
+- **タグ**: #後片付け #誤削除 #wildcard #共有領域 #Wave2
+
+---
+
+## 2026-11-13: worktree で依存 junction を作る場合は fs.symlinkSync(target, link, junction) 経由が信頼できる
+
+- **問題事象**: worktree 内で bun test 3分割正規形の依存 junction を cmd /c mklink /J の bash 経由呼出しで作成すると引数 quoting の問題で対話モード起動に落ちる事例を確認（Case 4026 Wave 2・PR 4042 実測。4038 学びの補完）
+- **発生局面**: worktree 検証環境の依存整備（bun test 分割実行の junction 準備）
+- **検知方法**: 実行担当の実測（mklink 経由の失敗と symlinkSync 経由の成功）
+- **根本原因**: bash 経由の cmd 呼出しでの mklink /J 引数 quoting が環境依存で破綻する
+- **自律対応内容**: fs.symlinkSync(target, link, "junction") 経由へ統一（失敗ゼロを確認）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree で .opencode/plugins 等 junction 非伝播依存を補う全検証環境構築
+- **再発条件**: cmd /c mklink /J を bash から呼び出す全状況
+- **予防策候補**: 依存 junction 作成手順の正規形を fs.symlinkSync("junction") に固定し文書化
+- **想定反映先**: agentdev-git-worktree（worktree-operations bun test 実行の環境前提）・learning-promote
+- **関連**: PR 4042 本文 Findings learning・PR 4038 学び
+- **タグ**: #worktree #junction #bunTest #Windows #Wave2
+
+---
+
+## 2026-11-13: plugins 分割（bun test ./.opencode/plugins/）の full-run は実行順序・負荷依存の flakiness を含む（個別再実行で確定する運用）
+
+- **問題事象**: textlint-guard の parallel・pipeline-integration・runs の3テストが負荷下の full-run で fail し、個別実行と再実行では 0 fail（Case 4026 Wave 2・PR 4042 で 2回の full-run 実測。4038 実績と同一パターン）
+- **発生局面**: bun test 分割③（plugins 分割）の full-run 実行と fail 由来分類
+- **検知方法**: 同環境再実行と個別実行での pass 実証（fail の非再現）
+- **根本原因**: plugin テスト群の実行順序・負荷依存の flakiness（full-run 固有）
+- **自律対応内容**: full-run の fail は個別再実行での確定を証跡に含める運用で分類（REQ-018 環境差 fail 分類の拡張運用）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: plugins 分割を含む検証（QG-4 正規形・Wave 境界受入検査）全般
+- **再発条件**: bun test ./.opencode/plugins/ の full-run を負荷がある環境で実行する全状況
+- **予防策候補**: REQ-018 の環境差 fail 分類に plugin 分割の flakiness 観点（full-run fail は個別再実行で確定）を追加
+- **想定反映先**: worktree-environment-fail-classification 知識・agentdev-quality-gates（実行形態契約の運用注意）・learning-promote
+- **関連**: PR 4042 本文 Findings learning・PR 4038 実績
+- **タグ**: #bunTest #flaky #plugins分割 #fail由来分類 #Wave2
+
+---
+
+## 2026-11-13: bun test の pass 行は非 TTY 時の退避ログに現れず、件数サマリーと fail 行のみが証跡になる（file-level split が有効）
+
+- **問題事象**: 非 TTY 時の bun test 退避ログに pass 行が記録されず、fail 検出対象の特定は件数サマリー・fail 行・file-level split（対象ファイル単独実行の2段構成）に依存する（Case 4026 Wave 2・PR 4044 実測）
+- **発生局面**: bun test 分割実行の証跡退避と fail set 比較
+- **検知方法**: 退避ログの実観測（pass 行不在・fail 行とサマリーのみ）
+- **根本原因**: bun test の出力形式が TTY/非 TTY で異なり、非 TTY では pass 行が省略される
+- **自律対応内容**: fail 検出対象が明確な場合は file-level split（QG-4 の2段構成）を併用して特定
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: bun test の証跡退避を伴う全検証（case-run・case-close・QG-4）
+- **再発条件**: 非 TTY の bun test 実行で pass 行を証跡に期待する全状況
+- **予防策候補**: 証跡要件を件数サマリー・fail 行基準で定義し（QG-4 正規形の既定どおり stdout/stderr 分離退避）、fail 特定が必要な場合は file-level split を標準採用
+- **想定反映先**: agentdev-quality-gates（bun test 正規形の運用注意）・learning-promote
+- **関連**: PR 4044 本文 Findings・QG-4 file-level split 規定
+- **タグ**: #bunTest #証跡 #fileLevelSplit #非TTY #Wave2
+
+---
+
+## 2026-11-13: fail set 比較は fail 名でなく fail クラスで対照する（git fixture 系の非決定性を吸収）
+
+- **問題事象**: trusted-distribution-gate launcher 系試験の git fixture（makeFixtureRepo）が Windows 環境で非決定的に失敗し、baseline と worktree で fail 名の分布が変わる（fail 名の完全一致比較が偽差分を生む）
+- **発生局面**: Wave 境界の fail set 対照（base vs 変更側）
+- **検知方法**: PR 4043 実測（baseline/worktree で fail 名分布が変動）
+- **根本原因**: git fixture の環境依存で fail の現れ方（どのテストが fail になるか）が非決定的
+- **自律対応内容**: fail set 比較を fail クラス単位へ変更し、Epic 4026 最終受入検査（2026-11-13）でも同一 fail クラス集合で突合
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: bun test fail set 対照を伴う全受入検査・Wave 境界処理
+- **再発条件**: 非決定的 fixture を含む suite の fail set を fail 名で機械突合する全状況
+- **予防策候補**: fail set 対照手順に fail クラス正規化（既知 fail クラス集合との突合）を明記
+- **想定反映先**: agentdev-quality-gates（fail 由来分類）・learning-promote
+- **関連**: PR 4043 本文 Findings・2026-11-08-bun-test-preexisting-baseline-fails intake
+- **タグ**: #failSet対照 #flaky #受入検査 #Windows #Wave2
+
+---
+
+## 2026-11-13: stash push/pop は同一 worktree の cwd で実行する（main worktree cwd からの pop は変更の誤適用を生む）
+
+- **問題事象**: worktree 内 stash 対照で git stash pop を main worktree の cwd から実行してしまい、変更 11 ファイルが一時的に main worktree へ適用された（Case 4026 Wave 2・PR 4045 で発生・同手順で完全復旧）
+- **発生局面**: IR-055 対照実行のための stash push/pop
+- **検知方法**: pop 後の git status で main 側の変更集合異常を検知
+- **根本原因**: stash はリポジトリ共通だが pop は実行 cwd の worktree に適用されるため、cwd 選択を誤ると別 worktree へ適用される
+- **自律対応内容**: git diff 退避（patch）→ main 側 git restore（対象 11 パス指定）→ worktree 側 git apply で完全復旧。復旧後 bun test（286+63 pass/0 fail）と変更集合一致（13ファイル）を確認し報告
+- **ユーザー確認有無**: なし（PR 本文へ報告義務の履行）
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree + stash を使う対照実行全般（IR-055 対照・baseline 対照）
+- **再発条件**: stash 操作の cwd を実行対象 worktree と取り違える全状況
+- **予防策候補**: stash push/pop は同一 worktree の cwd で実行するか、patch 退避方式を採用する（実行時禁止事項として明記）
+- **想定反映先**: agentdev-git-worktree（worktree-operations）・learning-promote
+- **関連**: PR 4045 本文 Findings（DEL-4035-1）
+- **タグ**: #worktree #stash #事故復旧 #対照実行 #Wave2
+
+---
+
+## 2026-11-13: trusted-distribution-gate launcher 系 3件は worktree で非決定的に fail する（main root では pass）
+
+- **問題事象**: trusted-distribution-gate launcher 系 3テストが worktree では依存整備の前後で fail 数が変動（skip 相当 → fail）し、同一コードが main root では pass（Case 4026 Wave 2・PR 4046 実測）
+- **発生局面**: worktree での bun test 分割①実行と fail 由来分類
+- **検知方法**: main root での同一コード pass 実測（環境差の切り分け）
+- **根本原因**: worktree 環境固有の依存・junction 状態が launcher テストの前提と不一致
+- **自律対応内容**: worktree 環境 fail 分類知識への追加候補として記録し、対照は main root または fail クラスで実施
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree で integrity suite（分割①）を実行する全検証
+- **再発条件**: worktree で trusted-distribution-gate launcher 系を実行する全状況
+- **予防策候補**: worktree-environment-fail-classification.md 知識へ本 fail クラスを追加
+- **想定反映先**: docs/knowledge/worktree-environment-fail-classification.md・learning-promote
+- **関連**: PR 4046 本文 Findings
+- **タグ**: #worktree環境差 #trustedGate #fail由来分類 #Wave2
+
+---
+
+## 2026-11-13: 共通正本側の定数も陳腐化する（J-001 の逆方向）・正本を採用する場合は鮮度担保が両方向で必要
+
+- **問題事象**: 共通正本の AGENTDEV_GH_TOOL_DESCRIPTION が実公開文から陳腐化した未参照定数として残存していた（release 初期段階の文言。Case 4026 Wave 2・PR 4046 で発見）。ホスト別複製の陳腐化（J-001 の想定方向）と逆方向の正本側陳腐化
+- **発生局面**: 3系統ホスト接続の正本参照化（B3-5e）の実装検査
+- **検知方法**: 正本参照化の実装中の実公開文との突合
+- **根本原因**: 正本定数が未参照のまま放置され、鮮度が担保されていなかった
+- **自律対応内容**: 正本参照化と契約テスト固定 6件で再発防止構造を構築（PR 4046）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 正本定数・単一正本へ集約した全資産（C-ε の集約対象全般）
+- **再発条件**: 正本定数が参照されず放置される全状況（集約後に参照経路が切れた場合を含む）
+- **予防策候補**: 正本を採用する変更では、正本側の鮮度担保（参照されない定数の放置検知・未参照定数の削除検査）を同時に整備する
+- **想定反映先**: agentdev-workflow-lifecycle（共通報告・Decision・自律確定規約の集約運用）・custom-tool-contracts Design・learning-promote
+- **関連**: PR 4046 本文 Findings（J-001 正本側実例）
+- **タグ**: #正本鮮度 #J001 #ホスト接続 #Wave2
+
+---
+
