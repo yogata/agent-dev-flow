@@ -25,4 +25,4 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integr
 | regression_test | (未実装) |
 | finding_route | req-define |
 | triage_action | 参照先を正規の公開 API（SKILL.md description / USE FOR）に置き換える |
-| last_verified | 2026-06-14 |
+| last_verified | 2026-11-14（検証根拠: PR #4039 での検証、2026-11-14 調査での統合機械確認） |

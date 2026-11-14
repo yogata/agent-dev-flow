@@ -25,4 +25,4 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/commands_str
 | regression_test | commands_structure.test.ts |
 | finding_route | intake |
 | triage_action | README に REQ 追加/削除 |
-| last_verified | 2026-06-06 |
+| last_verified | 2026-11-14（検証根拠: PR #4039 での検証、2026-11-14 調査での統合機械確認） |
