@@ -3,12 +3,14 @@
 > 本 reference は `agentdev-workflow-req-define` SKILL.md の STEP-8 詳細である。
 > req-define の adversarial-review 挿入境界を提供する。
 > 挿入境界の正規所有者は req-define command Design（extension 経由）「adversarial-review 挿入境界（req-define）」節であり、本 reference は実行時詳細である。
+> 発動条件判定、review 呼出、結果反映、unresolved 処理の一般形、呼出失敗時取扱い等の共通実行手続の正本は `src/common/skills/agentdev-case-run-execution-adapter/references/adversarial-review-integration.md` である。本 reference は req-define 固有の適用内容のみを保持し、共通契約の意味所有は adversarial-review Design「adversarial-review caller integration 共通契約」節が維持する。
 
 ## STEP-8: adversarial-review
 
 ### Purpose
 
 要件候補に対して adversarial-review を原則実行し（default-on）、本質的争点を要件確定前に解消する。
+default-on 原則、発動条件判定と review 呼出の分離、skip 条件の一般形、呼出契約、accepted finding 反映の呼出元責務、再 review 条件、呼出失敗時取扱い、非発動時の記録義務は正本（`src/common/skills/agentdev-case-run-execution-adapter/references/adversarial-review-integration.md`）を参照する。
 
 ### Input Resolution
 
@@ -26,16 +28,15 @@
 
 review に進む前に、ドラフトの構造検査、決定的組立、組立後の差分検査をこの順で完了する（詳細と戻り値契約は [draft-generation.md](draft-generation.md)「決定的な局所組立・検査」を参照）。その後に意味レビューを行い、accepted finding の反映後は構造検査・組立・差分検査を再実行してから意味を再評価する。検査証拠は draft-data 内の `assembly_evidence` へ記録し、再開時は現在条件照合（`evidence-match.ts`）で有効な証拠のみ再利用する。欠損・不一致の証拠は検証済みと扱わず、影響する検査を再実行してから意味レビューへ進む。
 
-req-define は adversarial-review を原則実行する（default-on）。
-発動条件判定と review 呼出を分離する。
+req-define 固有の手続を次に示す。共通実行手続（発動条件判定と review 呼出の分離、default-on 原則、skip 条件の一般形、呼出契約、accepted finding 反映の呼出元責務、再 review 条件、unresolved 処理の一般形、呼出失敗時取扱い）は正本（`src/common/skills/agentdev-case-run-execution-adapter/references/adversarial-review-integration.md`）を参照する。
 
 adversarial-review は構造・変更前提検査、組立、差分・完結性検査の後に行う意味レビューである。機械検査の成功で意味レビューを代替せず、指摘を反映した場合は影響する依存判断を再評価する。
 
-- **発動条件判定**: default-on で発動する。skip 条件（Scale=L0 で Decision判断対象なし、意味的決定なし）該当時は省略して従来フロー（review を挿入せず STEP-9 へ進む）を継続できる。ユーザーが review の実施を明示的に指示した場合は通常のユーザー指示としてその場で実行する（専用の検出・フラグ・保存・伝播・skip 条件の専用上書き処理を持たない）。skip 判断のためだけの新規 HITL、承認点は追加しない
-- **review 呼出**: 発動条件判定で発動と判定された場合、要件候補（draft-data、`agreed_items`、`artifact_actions`、Decision判断結果、Scale判断結果）を対象に adversarial-review を呼び出す。委譲契約は v4-delegation-contracts Design（extension 経由）「adversarial-review との委譲契約接続」節に従う
-  - Decision finding は STEP-5（Decision判断）へ戻し再評価する。要件展開に関わる finding は該当 STEP へ戻す。accepted finding の反映は呼出元の責務である
+- **発動条件判定（req-define 固有条件）**: default-on で発動する。req-define 固有の skip 条件（Scale=L0 で Decision判断対象なし、意味的決定なし）該当時は省略して従来フロー（review を挿入せず STEP-9 へ進む）を継続できる。skip する場合は正本「非発動時の判定理由記録と代替自己反証」の記録義務に従う
+- **review 呼出（req-define 固有対象と戻り先）**: 発動条件判定で発動と判定された場合、要件候補（draft-data、`agreed_items`、`artifact_actions`、Decision判断結果、Scale判断結果）を対象に adversarial-review を呼び出す。委譲契約は v4-delegation-contracts Design（extension 経由）「adversarial-review との委譲契約接続」節に従う
+  - Decision finding は STEP-5（Decision判断）へ戻し再評価する。要件展開に関わる finding は該当 STEP へ戻す。accepted finding の反映は呼出元の責務である（正本「結果反映」を参照）
   - 未解決のユーザー判断事項が残る場合、STEP-9（ドラフト保存）へ進まない。工程委譲起源であるため既存 status に unresolved 判断事項を付加する
-  - 呼出失敗時は silent skip を禁止し、従来フローを維持する
+  - 呼出失敗時は silent skip を禁止し、従来フローを維持する（記録経路と禁止事項の詳細は正本「従来フロー（review 非発動時）」を参照）
 
 詳細な挿入境界は req-define command Design（extension 経由）「adversarial-review 挿入境界（req-define）」節を正とする。
 
@@ -49,7 +50,7 @@ adversarial-review は構造・変更前提検査、組立、差分・完結性�
 
 ### Completion Verification
 
-- 発動時: unresolved なユーザー判断事項が残っていないこと（残る場合は STEP-9 へ進まない）。skip 時: skip 条件該当の根拠が記録されていること
+- 発動時: unresolved なユーザー判断事項が残っていないこと（残る場合は STEP-9 へ進まない）。skip 時: skip 条件該当の根拠が正本の記録義務に従い記録されていること
 
 ### Resume-Idempotency
 
