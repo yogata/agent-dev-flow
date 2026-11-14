@@ -37,7 +37,6 @@ skills:
   - agentdev-backlog-integration
   - agentdev-case-run-execution-adapter
   - agentdev-command-authoring
-  - agentdev-command-creator
   - agentdev-conventional-commits
   - agentdev-decision-file-manager
   - agentdev-decision-guidelines
