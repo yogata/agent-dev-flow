@@ -2,7 +2,7 @@
 title: 整合性契約
 status: accepted
 created: 2026-08-20
-updated: 2026-10-22
+updated: 2026-11-15
 ---
 <!-- ADF-COVERS(implementation): REQ-010-006 -->
 <!-- ADF-COVERS(implementation): REQ-036-022 -->
@@ -636,3 +636,7 @@ junction は作成しない。
 
 profile 分離によって検出力が低下していないことを保証するため、意図的 violation を各 profile へ投入し、期待する NG が必ず発生することを baseline 更新前に照合する。
 このマトリクスは baseline 更新前の必須ゲートであり、いずれかのセルで期待 NG が発生しなければ baseline を更新せず WP-3 を完了扱いにしない。
+
+## IR-020 移管に伴う追記（2026-11-15）
+
+IR-020（基準既知（baseline-known）と新規 finding の区別）は本 Design へ移管して廃止した（Epic #4054、RU-0278）。IR-020 が担っていた「baseline 既知と新規 finding の区別」は、「finding-baseline 分類」節（new/known/resolved 判定）と「RuntimeReference baseline 運用手順」「NG baseline 運用手順」各節（baseline 集合管理と新規検出事項の区別、REQ-010-007）が現行で正規所有する。IR-020 は独立の機械検出を持たず、検出器名義は IR-055（checkRuntimeUnresolvedReference）と共用であったため、本移管に伴う検出器変更はない（annotateIrIds の IR-020 名義除去は検出挙動不変の参照整理である）。IR-020 本文が基準集合として参照していた旧パス記述は移管対象から除外した。現行の基準集合は ng-baseline.json と ir-055-baseline.json が担い、更新タイミング・根因特定手順・報告分類は本 Design の各節が定義する。

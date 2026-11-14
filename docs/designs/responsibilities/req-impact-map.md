@@ -2,7 +2,7 @@
 title: REQ 影響マップ
 status: accepted
 created: 2026-08-20
-updated: 2026-11-13
+updated: 2026-11-15
 ---
 
 # REQ 影響マップ
@@ -30,7 +30,7 @@ updated: 2026-11-13
 | [REQ-002](../../requirements/REQ-002.md) | 配布成果物の責務境界 | IR-006, IR-014, IR-056, IR-058 |
 | [REQ-003](../../requirements/REQ-003.md) | 委譲時の判断・承認・副作用境界 | IR-030, IR-031, IR-032, IR-033 |
 | [REQ-009](../../requirements/REQ-009.md) | 配布基盤と導入モデル | IR-046, IR-048, IR-057 |
-| [REQ-010](../../requirements/REQ-010.md) | 自己監査コマンド（docs-check） | IR-001, IR-002, IR-003, IR-004, IR-005, IR-007, IR-010, IR-012, IR-015, IR-018, IR-020, IR-021, IR-023, IR-024, IR-034, IR-035, IR-039, IR-044, IR-049, IR-050, IR-051, IR-052, IR-060, IR-062, IR-063, IR-064, IR-065, IR-066, IR-067, IR-068, IR-069, IR-070, IR-072, IR-073 |
+| [REQ-010](../../requirements/REQ-010.md) | 自己監査コマンド（docs-check） | IR-001, IR-002, IR-003, IR-004, IR-005, IR-007, IR-010, IR-012, IR-015, IR-018, IR-021, IR-024, IR-034, IR-035, IR-039, IR-044, IR-049, IR-050, IR-051, IR-052, IR-060, IR-062, IR-063, IR-064, IR-065, IR-066, IR-067, IR-068, IR-069, IR-070, IR-072, IR-073 |
 | [REQ-011](../../requirements/REQ-011.md) | I/O境界と外部連携手段 | IR-053 |
 | [REQ-018](../../requirements/REQ-018.md) | worktree 構造的制約とテスト fallback | IR-068 |
 | [REQ-029](../../requirements/REQ-029.md) | 配布依存境界 | IR-055, IR-059 |
@@ -117,3 +117,19 @@ IR-047（src/opencode-local link origin dir structure）は、実行検出が配
 | 旧交叉参照 | 旧タイトル | 再配置元 | 再配置日 | 後継 |
 |---|---|---|---|---|
 | `IR-047` | src/opencode-local link origin dir structure | 影響マトリクス REQ-009 行・影響カテゴリ REQ-009 行（PR #3347 で tombstone 削除時に未更新の残存参照） | 2026-11-11 | なし（実行検出は IR-046・IR-048 の配布境界 checker lib 実装へ統合済み） |
+
+### IR-023 削除に伴う交叉参照再配置
+
+IR-023（Integrity artifact validator drift）は prose-only 規則であり、独立の機械検出を持ち得なかった（回帰試験名 `prevention_gates.test.ts` は不存在）。実際の drift 抑制は IR-074（checkIrRuleClassification、check_integrity.ts）が担う。各条項を IR-074 と integrity-contracts.md「3層検出構造の責務分担」節（REQ-010-008 の Design 対応）へ移管し、規則文書を物理削除した。
+
+| 旧交叉参照 | 旧タイトル | 再配置元 | 再配置日 | 後継 |
+|---|---|---|---|---|
+| `IR-023` | Integrity artifact validator drift | integrity-rule-catalog.md ルールインデックス AUTOGEN（`catalog-ir-entries-pre-045`）・影響マトリクス REQ-010 行 AUTOGEN・rule-ownership.md「同期条件と独立所有の明示」節の現行機構引用記述・rule-ownership.md IR 別関連マッピング AUTOGEN | 2026-11-15 | IR-074（ir-rule-classification-traceability）+ integrity-contracts.md「3層検出構造の責務分担」節 |
+
+### IR-020 削除に伴う交叉参照再配置
+
+IR-020（基準既知（baseline-known）と新規 finding の区別）は独立の機械検出を持たず、検出器名義は IR-055（checkRuntimeUnresolvedReference）と共用であった。baseline 運用契約の正規所有者は integrity-contracts.md（「finding-baseline 分類」「RuntimeReference baseline 運用手順」「NG baseline 運用手順」各節）である。各条項を integrity-contracts.md へ移管し、規則文書を物理削除した。check_integrity.ts annotateIrIds の IR-020 名義は検出挙動不変の参照整理として除去し、IR-055 共用名義は維持した。
+
+| 旧交叉参照 | 旧タイトル | 再配置元 | 再配置日 | 後継 |
+|---|---|---|---|---|
+| `IR-020` | 基準既知（baseline-known）と新規 finding の区別 | integrity-rule-catalog.md ルールインデックス AUTOGEN（`catalog-ir-entries-pre-045`）・影響マトリクス REQ-010 行 AUTOGEN・rule-ownership.md IR 別関連マッピング AUTOGEN・check_integrity.ts annotateIrIds の IR-020 名義 | 2026-11-15 | integrity-contracts.md「finding-baseline 分類」「RuntimeReference baseline 運用手順」「NG baseline 運用手順」各節 |

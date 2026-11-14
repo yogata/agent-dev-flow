@@ -12077,7 +12077,7 @@ async function main(): Promise<void> {
     ...annotateIrIds(checkGhDirectInvocation(root), ["IR-053"]), // IR-053 (v2:REQ-0152-001/002)
     ...annotateIrIds(checkDraftSpecStaleness(designsDir, root), ["IR-054"]), // IR-054 (v2:REQ-0154-002)
     ...annotateIrIds(checkSisyphusJuniorUlwLoopMisclassification(root), []),
-    ...annotateIrIds(checkRuntimeUnresolvedReference(root), ["IR-055", "IR-020"]), // IR-055 (v2:REQ-0108-263/264)。baseline-known 判別は IR-020 実装
+    ...annotateIrIds(checkRuntimeUnresolvedReference(root), ["IR-055"]), // IR-055 (v2:REQ-0108-263/264)。baseline-known 判別の現行契約は integrity-contracts.md（finding-baseline 分類・NG baseline 運用手順）
     ...annotateIrIds(checkObsoleteSpecPath(root), ["IR-057"]), // IR-057 (v2:REQ-0158-002)
     ...annotateIrIds(checkIndexGenerationConsistency(root), ["IR-061"]), // IR-061 (SC-002 Phase C, 索引類自動生成整合性)
     ...annotateIrIds(checkCommonPolicyIdentifierInvariant(root), ["IR-063"]), // IR-063 (REQ-051-005, REQ-010-064, Issue #2429)
