@@ -50,7 +50,7 @@
 
   ```bash
   bun test ./.opencode/skills/<integrity-detector-skill>/scripts/
-  bun test ./src/common/skills/
+  bun test ./src/
   bun test ./.opencode/plugins/ ./scripts/
   ```
 - **引き渡し**: 割り当てられた1 Issue の Issue番号、worktree root（相対パス指定、worktree 内制約）、ブランチ名、PR base（main。rebase・同期基準も main を参照）
