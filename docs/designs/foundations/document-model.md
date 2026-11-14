@@ -2,7 +2,7 @@
 title: 文書モデル
 status: accepted
 created: 2026-08-20
-updated: 2026-11-12
+updated: 2026-11-15
 ---
 <!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006, REQ-001-007, REQ-001-020, REQ-001-035, REQ-001-038, REQ-001-039, REQ-001-040, REQ-001-041, REQ-001-052, REQ-056-001 -->
 <!-- ADF-COVERS(implementation): REQ-001-066, REQ-001-067, REQ-001-068 -->
@@ -603,7 +603,7 @@ agent-dev-flow リポジトリの docs/designs/ 直下の基盤Designは、既�
 | foundations/ | 基盤モデル、システム構成、文書フォーマット、設計原則 | numbering-policy.md, system.md, document-model.md, decision-lifecycle.md, patterns.md, design-principles.md, project-extensions.md, harness-separation-model.md, v4-operating-model.md, v4-runtime-execution-model.md, v3-v4-crosswalk.md |
 | responsibilities/ | 文書種別責務、成果物責任、アーティファクト契約、REQ影響マップ | document-type-responsibilities.md, artifact-responsibilities.md, artifact-contracts.md, req-impact-map.md |
 | quality/ | 品質仕様、品質ゲート、健全性メトリクス（REQ/Design 双方向） | quality-specs.md, v4-quality-gate-model.md, req-health-metrics.md, design-health-metrics.md, textlint-quality-runtime.md |
-| integrity/ | 整合性契約、整合性ルールカタログ、ルール所有権、配布物整合性、backticks 判定閾値 | integrity-contracts.md, integrity-rule-catalog.md, rule-ownership.md, docs-spec-rebuild-integrity.md, backticks-identifier-threshold.md, checker-execution-contracts.md |
+| integrity/ | 整合性契約、整合性ルールカタログ、ルール所有権、配布物整合性 | integrity-contracts.md, integrity-rule-catalog.md, rule-ownership.md, docs-spec-rebuild-integrity.md, checker-execution-contracts.md |
 | local/ | ローカル版 Design 群（実行時パッケージ境界、link mode、Case ファイル） | runtime-package-boundary.md, local-case-file.md, install-script-usability.md, third-party-skill-management.md |
 | authoring/ | コマンドファイル執筆規約 | command-file-format.md, vocabulary-registry.md |
 
