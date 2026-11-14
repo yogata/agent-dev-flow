@@ -2,7 +2,7 @@
 title: 文書種別責務・配置基準
 status: accepted
 created: 2026-06-23
-updated: 2026-11-04
+updated: 2026-11-15
 ---
 <!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006, REQ-056-003 -->
 <!-- ADF-COVERS(implementation): REQ-094-003, REQ-094-005 -->
@@ -318,6 +318,47 @@ ADF 本体も同じ仕組みを利用する。
 - 履歴上その文字列自体を保持する必要がある記録内の文字列（過去の実際の名称、識別子、状態値）
 - check 名の固定複合表現（staleness check 等。REQ-031-009 等で操作名として使用する）
 
+### 識別子と散文普通名詞の区別
+
+docs/** 配下の自然言語記述（Markdown 本文）における識別子（バッククォート〔backticks〕による囲みが必須）と散文普通名詞（バッククォートによる囲みは任意）の区別基準を本節が所有する。
+runtime-package-boundary.md「5 種のリポジトリ種別」表の Type ID 列（識別子は backticks、名称は日本語）を良パターン基準とする。
+
+#### 識別子（バッククォート必須）
+
+以下のいずれかに該当する語句は識別子とし、バッククォートで囲むことを必須とする。
+
+- コマンド名、スキル名、ファイル名、ディレクトリパス（`/agentdev/req-define`、`agentdev-req-analysis`、`docs/designs/foundations/system.md`）
+- REQ/Decision/Design/RU/OU/IR 等の成果物 ID（`REQ-001`、`DEC-001`、`RU-0005`）
+- frontmatter キー、YAML フィールド名、enum 値
+- 英字 kebab-case / snake_case / CamelCase の技術識別子（`self-hosting`、`work_type`、`auto_ready`）
+
+#### 散文普通名詞（バッククォート任意）
+
+以下の語句は散文普通名詞とし、バッククォートを必須としない。
+
+- 日本語一般名詞（要件定義、品質ゲート）
+- 和訳済み技術用語で定着したもの（本節の訳語表参照）
+- 文中の普通名詞としての英語（baseline、provider 等の散文使用）
+
+#### 判定の考え方
+
+語句が識別子条件のいずれかに合致する場合はバッククォートを必須とし、非合致の場合は任意とする。
+文脈依存の境界ケース（英字複合語の識別子/普通名詞揺らぎ）は機械判定対象外とし、サンプリング査読へ委譲する。
+
+#### バッククォート付与の適用対象外（構造データ）
+
+バッククォートの付与対象は自然言語記述（Markdown 本文）のみであり、以下の構造データは適用対象外とする。
+機械横断是正でこれらにバッククォートを付与してはならない。
+
+- YAML frontmatter のキーおよび値（`name:`、`description:`、`id:` 等）。frontmatter 値は YAML スカラー値であり、Markdown インラインコード表記ではない。
+- fenced code block の内側の字句。code block 内は既にコード文脈であり、バッククォートによる追加修飾をしない。
+- inline code の内側の字句。既にバッククォートで囲まれているため二重付与しない。
+- URL、ファイルパスそのもの（リンクテキスト部は自然言語記述として扱う）。
+
+この対象外範囲は src/opencode/{commands,skills}/**/SKILL.md 等の配布物原本 frontmatter にも適用する。
+PR #1334 では src/opencode/skills/agentdev-*/SKILL.md の frontmatter `name:` 行に誤ってバッククォートが付与され、opencode がスキル名を不正に認識する不具合を引き起こした。
+本条項により同種の回帰を防止する。frontmatter `name:` 行の検出基準の詳細は `agentdev-inspect-skills` skill の「SKILL.md frontmatter `name:` バッククォート検出」診断観点を参照する。
+
 ### 意味説明すべき概念の文章説明方針
 
 canonical、deterministic、semantic、owner、fail-open、fail-closed 等の意味説明型語は、短い訳語への置換ではなく、当該文脈での実際の契約を日本語の文章で表現する。例: fail-open は「フェイルオープン」ではなく「当該処理だけが失敗した場合も本体処理を継続する」等の契約表現とする。短い訳語で意味を正確に保持できない場合は、単語を置き換えるのではなく文章そのものを書き換える。語自体の説明が必要な箇所では、日本語の説明に続けて原語を併記できる。
@@ -344,7 +385,6 @@ prh 機械辞書への新語登録は、文脈非依存性と誤検出ゼロの�
 
 - 用語選択基準の正規 REQ: REQ-094（4分類要約、対象語管理、固定置換限定の REQ 側所有）
 - 語彙レジストリ Design: [../authoring/vocabulary-registry.md](../authoring/vocabulary-registry.md)（用語選択基準の区別軸契約、実体対照表の配置基準）
-- backticks 識別子判定閾値 Design: [../integrity/backticks-identifier-threshold.md](../integrity/backticks-identifier-threshold.md)（識別子と一般名詞の機械判定）
 
 ### 横断検索における経路識別子の検出基準
 

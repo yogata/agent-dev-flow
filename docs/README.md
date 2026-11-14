@@ -262,7 +262,6 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 - [ルール所有権マトリックス](designs/integrity/rule-ownership.md)
 - [配布物整合性検査ルール](designs/integrity/docs-spec-rebuild-integrity.md)
 - [配布依存境界](designs/integrity/distribution-boundary.md)
-- [backticks 識別子/一般名詞 判定閾値](designs/integrity/backticks-identifier-threshold.md)
 - [validator 分割基準](designs/integrity/validator-split-criteria.md)
 - [Targeted Docs Guard 実装詳細](designs/integrity/targeted-docs-guard-implementation.md)
 - [AUTOGEN ブロック鮮度検出 gate](designs/integrity/autogen-freshness-gate.md)
