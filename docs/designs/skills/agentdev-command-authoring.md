@@ -2,7 +2,7 @@
 title: `agentdev-command-authoring` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-10-22
+updated: 2026-11-15
 ---
 <!-- ADF-COVERS(implementation): REQ-053-011 -->
 
@@ -55,7 +55,6 @@ OpenCode コマンド定義（`.opencode/commands/`）の品質基準とベス�
 ## See Also
 
 - [agentdev-skill-authoring.md](agentdev-skill-authoring.md)
-- [agentdev-command-creator.md](agentdev-command-creator.md)
 - REQ-002（Artifact責任分界）
 - REQ-003（コマンド、スキル、サブエージェント責務分界）
 

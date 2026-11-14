@@ -132,7 +132,6 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [skills/agentdev-quality-gates.md](skills/agentdev-quality-gates.md) | accepted | 補助 | quality gates |
 | [skills/agentdev-inspect-skills.md](skills/agentdev-inspect-skills.md) | accepted | 補助 | inspect-skills |
 | [skills/agentdev-command-authoring.md](skills/agentdev-command-authoring.md) | accepted | 補助 | command authoring |
-| [skills/agentdev-command-creator.md](skills/agentdev-command-creator.md) | accepted | 補助 | command creator |
 | [skills/agentdev-conventional-commits.md](skills/agentdev-conventional-commits.md) | accepted | 補助 | conventional commits |
 | [skills/agentdev-skill-authoring.md](skills/agentdev-skill-authoring.md) | accepted | 補助 | skill authoring |
 | [skills/agentdev-backlog-integration.md](skills/agentdev-backlog-integration.md) | accepted | 補助 | backlog integration |

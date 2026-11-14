@@ -28,6 +28,21 @@ description: コマンドの簡潔な説明
 
 これらの情報は参照用文書で管理し、frontmatter には混入させない。
 
+## ファイル名とプレースホルダー
+
+command 定義ファイルの命名と、本文で利用できる引数プレースホルダーの規約である。
+
+- 配置場所: `.opencode/commands/` 配下の Markdown 形式（`.md`）ファイル
+- ファイル名がコマンド名になる（例: `my-command.md` → `/my-command`）。複数語の区切りにはハイフンを使用する
+- frontmatter 後の本文は必須であり、LLM に送信するプロンプトとして機能する
+
+| プレースホルダー | 例 |
+|------------------|-----|
+| `$ARGUMENTS` | `/component Button` → `Button` |
+| `$1`, `$2` | `/create-file config.json src` → `$1=config.json`, `$2=src` |
+| `` !`command` `` | `` !`npm test` `` でシェルコマンド出力を注入 |
+| `@filename` | `@src/components/Button.tsx` でファイル参照 |
+
 ## ガードレール記述と共通ポリシー識別子
 
 ガードレール番号 Gxx の連番制度は廃止済みである（起点番号・欠番なし・重複なし・変換対照表の保持を要求しない）。

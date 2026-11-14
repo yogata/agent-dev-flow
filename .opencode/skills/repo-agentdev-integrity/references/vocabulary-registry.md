@@ -100,7 +100,6 @@ IR-050・IR-051 の対象 skill 名（`agentdev-*` プレフィックス形式�
 | `agentdev-backlog-integration` | backlog 統合 |
 | `agentdev-case-run-execution-adapter` | case-run 外部実行アダプター |
 | `agentdev-command-authoring` | command 作成支援 |
-| `agentdev-command-creator` | command 生成 |
 | `agentdev-conventional-commits` | conventional commits 規約 |
 | `agentdev-epic-tracker` | Epic 状態追跡 |
 | `agentdev-git-worktree` | git worktree 管理 |
