@@ -445,11 +445,11 @@ function completeMachineAcceptanceRecord(
     suiteRunRecords: [
       {
         split: "分割①",
-        command: "bun test ./src/common/skills/",
+        command: "bun test ./src/",
         cwd: "<repo>",
         testCountSummary: "Ran 2909 tests across 96 files",
         exitCode: 0,
-        scope: "./src/common/skills/",
+        scope: "./src/",
       },
       {
         split: "分割②",
@@ -673,11 +673,11 @@ describe("full integrity suite の機械受理基準（記録実体の検証と�
         suiteRunRecords: [
           {
             split: "分割①",
-            command: "bun test ./src/common/skills/",
+            command: "bun test ./src/",
             cwd: "<repo>",
             testCountSummary: "",
             exitCode: 0,
-            scope: "./src/common/skills/",
+            scope: "./src/",
           },
         ],
       }),

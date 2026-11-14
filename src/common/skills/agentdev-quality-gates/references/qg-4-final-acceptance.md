@@ -327,7 +327,7 @@ full integrity suite 合格判定に用いる bun test フル suite の実行形
 
 ```bash
 bun test ./.opencode/skills/<integrity-detector-skill>/scripts/ >stdout-1.log 2>stderr-1.log
-bun test ./src/common/skills/ >stdout-2.log 2>stderr-2.log
+bun test ./src/ >stdout-2.log 2>stderr-2.log
 bun test ./.opencode/plugins/ ./scripts/ >stdout-3.log 2>stderr-3.log
 ```
 
