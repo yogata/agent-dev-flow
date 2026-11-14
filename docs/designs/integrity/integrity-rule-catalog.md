@@ -2,7 +2,7 @@
 title: 整合性ルールカタログ
 status: accepted
 created: 2026-08-20
-updated: 2026-11-13
+updated: 2026-11-15
 ---
 <!-- ADF-COVERS(implementation): REQ-010-009 -->
 <!-- ADF-COVERS(design): REQ-051-009 -->
@@ -102,9 +102,7 @@ IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 か
 - [IR-015: 廃止 REQ 現行参照検出](rules/IR-015-retired-req-current-ref-detection.md)
 - [IR-016: Source/projection 整合性](rules/IR-016-source-projection-integrity.md)
 - [IR-018: REQ 範囲表記鮮度](rules/IR-018-req-range-notation-freshness.md)
-- [IR-020: 基準既知（baseline-known）と新規 finding の区別](rules/IR-020-baseline-known-vs-new-finding.md)
 - [IR-021: 廃止済み skill 参照検出](rules/IR-021-retired-skill-reference-detection.md)
-- [IR-023: Integrity artifact validator drift](rules/IR-023-integrity-artifact-validator-drift.md)
 - [IR-024: Command README ↔ 実体](rules/IR-024-command-readme-actual.md)
 - [IR-025: 廃止 Decision path 規則](rules/IR-025-retired-adr-path-rule.md)
 - [IR-027: 廃止 ADR 現行根拠引用検出](rules/IR-027-retired-adr-current-authority-citation.md)

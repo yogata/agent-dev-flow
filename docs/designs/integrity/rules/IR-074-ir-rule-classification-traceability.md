@@ -2,7 +2,7 @@
 title: "IR-074: ir-rule-classification-traceability（IR 分類と実装・試験パスの機械対応）"
 status: accepted
 created: 2026-11-13
-updated: 2026-11-13
+updated: 2026-11-15
 detection_method_class: machine-check
 implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
 verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts
@@ -33,3 +33,7 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integr
 - machine-check 分類の IR 文書の frontmatter に `implementation_path`（checker ソースの repo root 相対パス）と `verification_path`（試験資産の repo root 相対パス）を保持する
 - prose-only 分類の IR 文書はパス記載を要求しない
 - 実装パスに宣言的データ語彙（yaml）を記載する場合（検出語自体をデータとして保持し実行時の強制箇所が消費する形態。IR-060 の prh 語彙等）、当該 IR ID の checker 出力識別子との静的一致確認は要求しない
+
+## IR-023 移管に伴う追記（2026-11-15）
+
+IR-023（Integrity artifact validator drift、prose-only）は本ルールへ移管して廃止した（Epic #4054、RU-0278）。IR-023 が担っていた「integrity scripts/tests/fixtures/SKILL.md/Design 間の drift 抑制」観点は、本ルールの機械検査（rules/IR-*.md 全件 frontmatter 走査による分類確定、実装・試験パスの実在確認、checker 出力識別子との静的一致確認）が現行で実現する。IR-023 の回帰試験名（prevention_gates.test.ts）は不存在の死んだ参照であり、現行の回帰試験は本ルールの regression_test（check_integrity.test.ts describe "IR-074 ir-rule-classification-traceability"）が所有する。drift 検出時の対応は本ルールの finding_route（intake）と triage_action（分類確定・パス更新・annotateIrIds 付与）に従う。IR-023 の REQ-010-008 対応は integrity-contracts.md「3層検出構造の責務分担」節が Design 対応として所有する。

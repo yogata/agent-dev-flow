@@ -2,7 +2,7 @@
 title: ルール所有権マトリックス
 status: accepted
 created: 2026-08-20
-updated: "2026-11-13"
+updated: "2026-11-15"
 ---
 
 <!-- ADF-COVERS(design): REQ-047-013 -->
@@ -102,7 +102,7 @@ REQ-047 が定める対象規則（command format、ガードレール番号、�
 | obsolete-vocabulary-map.yaml ↔ `check_integrity.ts` | 許容条件の運用データ（probe、exemption、否定文脈）は yaml が、検出シグナル正規表現は checker が所有する（IR-065/066 の宣言どおり） | 語彙 ID 集合と rule 割当は yaml の `vocabulary[]` と checker の IR065_/IR066_ 定数で一致させる | `check_integrity.ts` の drift 検査（`obsolete-vocabulary-map-drift`）が双方向の差分を strict fail として検出（Issue #2373） |
 | distribution-targets.yaml ↔ `lib/distribution-boundary-rules.ts` | 検出定義データ（IR-046 の self-hosting-only markers、IR-047 の allowed サブディレクトリ、IR-048 の marker prefix）は yaml が canonical source であり（REQ-047-009）、lib 実装の `loadDistributionTargets` が fail-closed 読込して IR-046〜048 検出に使用する。検出の実行と finding 出力契約（rule 名・description 文言）は lib 実装が所有する | 検出規則変更は同一 PR で yaml・lib 実装・IR-046〜048 ルールファイルを更新する。yaml 読込は `loadDistributionTargets` の単一読込点として統合済み。yaml の廃止または読込経路変更は配布境界 checker の内部構成変更を伴うため追加判断とする | `check_distribution_boundary.test.ts` の `loadDistributionTargets: canonical yaml loading (REQ-047-009)` describe が canonical yaml 読込と yaml 欠損時の fail-closed を検証 |
 
-正規契約変更時の派生検査の陳腐化検出は、上表の機械検証に加え、既存の IR-061（AUTOGEN ブロック鮮度）、IR-023（validator drift）、各 checker の回帰テスト（REQ-010-068）が担う。
+正規契約変更時の派生検査の陳腐化検出は、上表の機械検証に加え、既存の IR-061（AUTOGEN ブロック鮮度）、IR-074（ir-rule-classification-traceability。IR 分類と実装・試験パスの機械対応検査）、各 checker の回帰テスト（REQ-010-068）が担う。
 新規の生成機構やルールエンジンは導入しない（REQ-047-007）。
 
 ### 対応表の機械検証への移行（B3-1）
@@ -140,9 +140,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-015 | 廃止 REQ 現行参照検出 | REQ-010 | integrity-contracts.md |
 | IR-016 | Source/projection 整合性 | REQ-002-048-052 | system.md |
 | IR-018 | REQ 範囲表記鮮度 | REQ-010 | integrity-contracts.md |
-| IR-020 | 基準既知（baseline-known）と新規 finding の区別 | REQ-010-007 | integrity-contracts.md |
 | IR-021 | 廃止済み skill 参照検出 | REQ-010 | integrity-contracts.md |
-| IR-023 | Integrity artifact validator drift | REQ-010-008 | integrity-contracts.md |
 | IR-024 | Command README ↔ 実体 | REQ-001-026, REQ-010-003 | integrity-contracts.md |
 | IR-025 | 廃止 Decision path 規則 | REQ-001-047, REQ-001-048 | integrity-contracts.md, document-model.md |
 | IR-027 | 廃止 ADR 現行根拠引用検出 | REQ-001-048, REQ-001-050 | integrity-contracts.md, document-model.md |
