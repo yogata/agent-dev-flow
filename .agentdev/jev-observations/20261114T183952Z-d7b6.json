@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261114T183952Z-d7b6",
+  "workflow": "case-ready",
+  "evaluationKind": "standard-epic-attribution",
+  "subject": "Root Case #4054（ADF簡素化調査是正7件）の実行構造 Standard/Epic 帰属判断",
+  "sourceRevision": "05eeea8a9",
+  "durationMs": 1144,
+  "inputTokens": 1937,
+  "inputs": {
+    "requestDigest": "8ea1cb1e1e4b5960f5aede74ec923e80b23998b150bc8ddfe89fef572f0d1f6f"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-attribution",
+      "questionForm": "choice",
+      "value": "Epic",
+      "probabilityDistribution": {
+        "Standard": 0.02,
+        "Epic": 0.98
+      }
+    },
+    {
+      "questionId": "q-dependency-strength",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "関連": 0.43,
+        "弱": 0.57,
+        "必須": 0
+      }
+    },
+    {
+      "questionId": "q-functional-coherence",
+      "questionForm": "score",
+      "value": 1,
+      "probabilityDistribution": {
+        "分散": 0.04,
+        "部分的": 0.63,
+        "一貫": 0.33
+      }
+    }
+  ],
+  "confidence": 0.96,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-attribution",
+        "value": "Epic"
+      },
+      {
+        "questionId": "q-dependency-strength",
+        "value": 1
+      },
+      {
+        "questionId": "q-functional-coherence",
+        "value": 1
+      }
+    ]
+  }
+}
