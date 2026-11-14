@@ -1461,3 +1461,21 @@
 
 ---
 
+## 2026-11-15: case-open 委譲実行で agentdev_gh の全操作が gh exit 66 で失敗し、gh CLI 読取は正常という環境差が発生
+
+- **問題事象**: case-open 工程（adf-simplification-remediation draft・委譲実行 2026-11-15）で Custom Tool agentdev_gh の issue_read（2回）と issue_create（2回）が全て「gh exited with code 66; stderr is empty（startup environment failure 疑い）」で失敗。同一セッションの bash からの gh CLI 直接実行（gh repo view、gh issue list、gh issue view、gh auth status）は全て正常（gh v2.104.0、/c/Program Files/GitHub CLI/gh、認証済み、AGENTDEV_GH_REPO=yogata/agent-dev-flow 設定済み）。Root Case 起票は重複起票なしを確認した上で blocked となった
+- **発生局面**: 実装（case-open STEP-2 の Root Case 起票と冪等検出）
+- **検知方法**: agentdev_gh 操作の構造化失敗返却（operation-failed、retryable、contingency に gh CLI 読取切替と canContinue false を含む）
+- **根本原因**: Tool プロセスから gh を spawn する実行環境の不具合（bash セッションとは別のプロセス環境で gh が起動失敗。exit 66・stderr 空）。Tool 実装・認証・リポジトリ設定自体は正常（gh CLI 実績と AGENTDEV_GH_REPO 正値から判断）
+- **自律対応内容**: Tool 契約に従い各操作を1回再試行（2操作とも2連続失敗で再試行消費）。読み取りは contingency どおり gh CLI 読み取り専用切替（重複検知と冪等検出を gh issue list/view で完遂）。書込みは gh CLI 代替禁止（GitHub 書込み guard の迂回対象）のため Root Case 起票を停止し、前提整備 commit（jev 観測2件・commit 349e74cb4）と yomiyasu 推敲済み Root Case 本文の用意まで完了した状態で中断。偏差を本 learning へ記録
+- **ユーザー確認有無**: なし（停止報告を完了報告で行う）
+- **Decision/REQ/spec影響**: なし（操作契約と guard は正常に機能。Tool 実行環境側の問題）
+- **横展開観点**: agentdev_gh を用いる全 workflow（case-open/case-ready/case-run/case-close、issue、intake-from-github 等）で同じ環境問題が発生すると、書込み操作には contingency が存在しない（fallbacks 空・canContinue false）ため同型の停止に至る。読み取りのみ contingency で継続可能
+- **再発条件**: agentdev_gh が gh を spawn するプロセス環境で gh の起動が失敗する状態（MCP/Tool プロセス環境の PATH・gh 可用性の欠如等）
+- **予防策候補**: agentdev_gh 起動環境の gh 可用性ヘルスチェックの前置（起動時に gh --version 相当の読取診断を実行し、起動環境失敗を明示報告する）。失敗時に Tool 側の gh 解決先と bash 側 PATH の差分を診断できる証跡を出力する
+- **想定反映先**: agentdev_gh Tool 実装（src/common/tools/agentdev-gh/）、Custom Tool 操作契約 Design の障害種別（startup environment failure の区別報告）
+- **関連**: .agentdev/drafts/req-draft-adf-simplification-remediation.md、commit 349e74cb4（前提整備）、Issue #4052（OU-001 再利用対象・OPEN）
+- **タグ**: #agentdevGh #ghExit66 #startupEnvironmentFailure #caseOpen
+
+---
+
