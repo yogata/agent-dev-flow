@@ -1,0 +1,253 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261114T171758Z-67a9",
+  "workflow": "req-define",
+  "evaluationKind": "requirement-development-classification",
+  "subject": "RU-0272〜RU-0278 バッチの要件展開最終分類・Design 分離判断（7 RU×帰属先）",
+  "sourceRevision": "ee3a14c49650e784f799d8377e7434f51ad3707e",
+  "durationMs": 219,
+  "inputTokens": 3694,
+  "inputs": {
+    "requestDigest": "8cc4f471167aeb153ce233fbd68e57adfdb3afd4b0338b411b3e49b91d673e3d",
+    "references": [
+      {
+        "digest": "f1458ff4d928109f000d86db0640d17318dfb07c5322f24c5488a09be928814b",
+        "label": "RU-0272",
+        "path": ".agentdev/backlog/req-units/RU-0272.md"
+      },
+      {
+        "digest": "c5729a639176741ee09578350ce6ffa3a8df1eb3d7e012894dc8452c66bde125",
+        "label": "RU-0273",
+        "path": ".agentdev/backlog/req-units/RU-0273.md"
+      },
+      {
+        "digest": "9500486e7f16ed8c584e8a451ae58a61244688aaf7aef758f0ff15f4a9ed6c72",
+        "label": "RU-0274",
+        "path": ".agentdev/backlog/req-units/RU-0274.md"
+      },
+      {
+        "digest": "c9490ab47f82c752eff5c95a130d43e459c159d6abe38b01abe0bcf1dd95424c",
+        "label": "RU-0275",
+        "path": ".agentdev/backlog/req-units/RU-0275.md"
+      },
+      {
+        "digest": "37da1dd315ab62b775b1f11b17fca7ccf7efbfd66cd033f97381a25744bc0275",
+        "label": "RU-0276",
+        "path": ".agentdev/backlog/req-units/RU-0276.md"
+      },
+      {
+        "digest": "f072603948d0edd96117fdc98bf3e7953fcefb947da775f46400f4a587c2b64c",
+        "label": "RU-0277",
+        "path": ".agentdev/backlog/req-units/RU-0277.md"
+      },
+      {
+        "digest": "1fc811ffa56505692ab0337b79a949bf23c8f326fcae96527da86a3c2aa347ac",
+        "label": "RU-0278",
+        "path": ".agentdev/backlog/req-units/RU-0278.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-ru0272-class",
+      "questionForm": "choice",
+      "value": "実現面変更のみ（artifact_actions なし）",
+      "probabilityDistribution": {
+        "REQ行として保存": 0,
+        "Design 保存（artifact: design）": 0.01,
+        "実現面変更のみ（artifact_actions なし）": 0.99
+      }
+    },
+    {
+      "questionId": "q2-ru0273-class",
+      "questionForm": "choice",
+      "value": "Design 保存（artifact: design）",
+      "probabilityDistribution": {
+        "REQ行として保存": 0.01,
+        "Design 保存（artifact: design）": 0.64,
+        "実現面変更のみ（artifact_actions なし）": 0.35
+      }
+    },
+    {
+      "questionId": "q3-ru0274-class",
+      "questionForm": "choice",
+      "value": "Design 保存（artifact: design）",
+      "probabilityDistribution": {
+        "REQ行として保存": 0,
+        "Design 保存（artifact: design）": 0.75,
+        "実現面変更のみ（artifact_actions なし）": 0.25
+      }
+    },
+    {
+      "questionId": "q4-ru0275-class",
+      "questionForm": "choice",
+      "value": "実現面変更のみ（artifact_actions なし）",
+      "probabilityDistribution": {
+        "REQ行として保存": 0,
+        "Design 保存（artifact: design）": 0.24,
+        "実現面変更のみ（artifact_actions なし）": 0.76
+      }
+    },
+    {
+      "questionId": "q5-ru0276-class",
+      "questionForm": "choice",
+      "value": "実現面変更のみ（artifact_actions なし）",
+      "probabilityDistribution": {
+        "REQ行として保存": 0,
+        "Design 保存（artifact: design）": 0.35,
+        "実現面変更のみ（artifact_actions なし）": 0.65
+      }
+    },
+    {
+      "questionId": "q6-ru0277-class",
+      "questionForm": "choice",
+      "value": "Design 保存（artifact: design）",
+      "probabilityDistribution": {
+        "REQ行として保存": 0.01,
+        "Design 保存（artifact: design）": 0.52,
+        "実現面変更のみ（artifact_actions なし）": 0.47
+      }
+    },
+    {
+      "questionId": "q7-ru0278-class",
+      "questionForm": "choice",
+      "value": "Design 保存（artifact: design）",
+      "probabilityDistribution": {
+        "REQ行として保存": 0,
+        "Design 保存（artifact: design）": 0.74,
+        "実現面変更のみ（artifact_actions なし）": 0.26
+      }
+    },
+    {
+      "questionId": "q8-ru0272-sep",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.06,
+        "false": 0.94
+      }
+    },
+    {
+      "questionId": "q9-ru0273-sep",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.08,
+        "false": 0.92
+      }
+    },
+    {
+      "questionId": "q10-ru0274-sep",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.11,
+        "false": 0.89
+      }
+    },
+    {
+      "questionId": "q11-ru0275-sep",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.11,
+        "false": 0.89
+      }
+    },
+    {
+      "questionId": "q12-ru0276-sep",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.08,
+        "false": 0.92
+      }
+    },
+    {
+      "questionId": "q13-ru0277-sep",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.12,
+        "false": 0.88
+      }
+    },
+    {
+      "questionId": "q14-ru0278-sep",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.1,
+        "false": 0.9
+      }
+    }
+  ],
+  "confidence": 0.98,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-ru0272-class",
+        "value": "実現面変更のみ（artifact_actions なし）"
+      },
+      {
+        "questionId": "q2-ru0273-class",
+        "differenceReason": "semantic_disagreement",
+        "value": "実現面変更のみ（artifact_actions なし）"
+      },
+      {
+        "questionId": "q3-ru0274-class",
+        "differenceReason": "semantic_disagreement",
+        "value": "実現面変更のみ（artifact_actions なし）"
+      },
+      {
+        "questionId": "q4-ru0275-class",
+        "value": "実現面変更のみ（artifact_actions なし）"
+      },
+      {
+        "questionId": "q5-ru0276-class",
+        "value": "実現面変更のみ（artifact_actions なし）"
+      },
+      {
+        "questionId": "q6-ru0277-class",
+        "differenceReason": "semantic_disagreement",
+        "value": "実現面変更のみ（artifact_actions なし）"
+      },
+      {
+        "questionId": "q7-ru0278-class",
+        "differenceReason": "semantic_disagreement",
+        "value": "実現面変更のみ（artifact_actions なし）"
+      },
+      {
+        "questionId": "q8-ru0272-sep",
+        "value": false
+      },
+      {
+        "questionId": "q9-ru0273-sep",
+        "value": false
+      },
+      {
+        "questionId": "q10-ru0274-sep",
+        "value": false
+      },
+      {
+        "questionId": "q11-ru0275-sep",
+        "value": false
+      },
+      {
+        "questionId": "q12-ru0276-sep",
+        "value": false
+      },
+      {
+        "questionId": "q13-ru0277-sep",
+        "value": false
+      },
+      {
+        "questionId": "q14-ru0278-sep",
+        "value": false
+      }
+    ]
+  }
+}
