@@ -2,10 +2,12 @@
 
 > 本 reference は `agentdev-workflow-case-open` SKILL.md の adversarial-review 挿入境界の実行詳細である。
 > case-open の caller integration 挿入境界の正典は case-open Design「adversarial-review 挿入境界（case-open）」節であり、本 reference はその実行時手順を提供する。
+> 発動条件判定、review 呼出、結果反映、unresolved 処理の一般形、呼出失敗時取扱い等の共通実行手続の正本は `src/common/skills/agentdev-case-run-execution-adapter/references/adversarial-review-integration.md` である。本 reference は case-open 固有の適用内容のみを保持し、共通契約の意味所有は adversarial-review Design「adversarial-review caller integration 共通契約」節が維持する。
 
 ## Purpose
 
 Root Case 本文候補と Definition Package 構成案を対象に adversarial-review を default-on 原則で実行し、Root Case 作成（最初の GitHub Issue 作成）前の本質的争点を解消する。
+default-on 原則、発動条件判定と review 呼出の分離、skip 条件の一般形、呼出契約、accepted finding 反映の呼出元責務、再 review 条件、呼出失敗時取扱い、非発動時の記録義務は正本（`src/common/skills/agentdev-case-run-execution-adapter/references/adversarial-review-integration.md`）を参照する。
 
 ## Input Resolution
 
@@ -25,30 +27,26 @@ Root Case 本文候補と Definition Package 構成案を対象に adversarial-r
 
 Root Case 本文候補と Definition Package 構成案を確定した後、**最初の GitHub Issue 作成（Root Case 作成）の前**に挿入する。
 
-### 発動条件判定
+### 発動条件判定（case-open 固有条件）
 
-発動条件判定と review 呼出を分離する。
-case-open は adversarial-review を**原則実行する**（default-on）。
+case-open 固有の skip 条件は、Root Case 本文候補が合意済み入力（draft-data）の機械的投影のみで、新しい意味的決定を含まない場合であり、この場合省略して STEP-2 の Root Case 作成へ進む。
+skip する場合は正本「非発動時の判定理由記録と代替自己反証」の記録義務に従う。
 
-- **skip 条件**: Root Case 本文候補が合意済み入力（draft-data）の機械的投影のみで、新しい意味的決定を含まない場合、省略して STEP-2 の Root Case 作成へ進む
-- **ユーザー明示指示時**: ユーザーが review の実施を明示的に指示した場合は通常のユーザー指示としてその場で実行する（専用の検出・フラグ・保存・伝播・skip 条件の専用上書き処理を持たない）
-- **skip 判断のためだけの新規 HITL、承認点は追加しない**
-
-### review 呼出
+### review 呼出（case-open 固有対象）
 
 発動条件判定で発動と判定された場合、次の2者を対象に adversarial-review を呼び出す。
 
 1. Root Case 本文候補
 2. Definition Package 構成案
 
-委譲契約は v4-delegation-contracts Design「adversarial-review との委譲契約接続」節に従い、`semantic_review`（書き込み禁止型）として適用する。
-adversarial-review 自身はファイル、Issue、PR、git 操作を行わない。
+呼出契約、副作用境界（`semantic_review` 書き込み禁止型、対象ファイル・Issue・PR・git 操作の禁止、新規正規 artifact 非生成）は正本「発動条件判定と review 呼出」「副作用境界と委譲契約」を参照する。
 
-### 結果反映
+### 結果反映（case-open 固有の戻り先）
 
 - Root Case 本文候補に関わる finding は本文候補生成へ戻し再評価する
 - Definition Package 構成案に関わる finding は構成案評価へ戻す
-- accepted finding の対象候補への反映は呼出元の責務である
+
+accepted finding の対象候補への反映は呼出元の責務である（正本「結果反映」を参照）。
 
 ### 変更影響別の再実行ルール
 
@@ -61,17 +59,17 @@ review の結果反映で review 対象の意味内容が変更された場合�
 | 両方が変更 | 本文候補の再生成と構成案の再評価 |
 | 意味内容変更なし | 再実行不要、STEP-2 の Root Case 作成へ進む |
 
-意味内容変更から新たな本質的争点が生じ得る場合のみ再 review を発動できる。
-同一 finding を新証拠・新前提・異なる failure condition・未評価範囲なしに再起票しない。
+再 review の発動条件と同一 finding 再起票禁止は正本「結果反映」を参照する。
 
 ### unresolved 判断事項
 
 未解決のユーザー判断事項が残る場合、Root Case 作成へ進まない。
 工程委譲起源であるため、既存 status（pass/warn/fail/partial）に unresolved 判断事項を付加する。
+unresolved 処理の一般形（恒久的統制ゲート化しない、既存 HITL・blocker・停止理由分類への振り向け）は正本「blocked 遷移」内の「unresolved 争点の残存」を参照する。
 
 ### 呼出失敗時の扱い
 
-呼出失敗時は silent skip を禁止し、利用不能を報告した上で従来フローを維持する。
+呼出失敗時の取扱い（silent skip 禁止、従来フロー維持、自動承認・自動棄却・QG 飛ばし禁止、記録経路）は正本「従来フロー（review 非発動時）」を参照する。
 
 ## Result
 
@@ -83,7 +81,7 @@ review の結果反映で review 対象の意味内容が変更された場合�
 
 ## Completion Verification
 
-- 発動時: unresolved なユーザー判断事項が残っていないこと（残る場合は Root Case 作成へ進まない）。skip 時: skip 条件該当の根拠が記録されていること
+- 発動時: unresolved なユーザー判断事項が残っていないこと（残る場合は Root Case 作成へ進まない）。skip 時: skip 条件該当の根拠が正本の記録義務に従い記録されていること
 
 ## Resume-Idempotency
 

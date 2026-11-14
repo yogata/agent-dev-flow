@@ -248,7 +248,7 @@ STEP reference 8 要素は `<foundations/v4-durable-state-and-recovery>` Design 
 
 本スキルは case-run の adapter 委譲内（case-run 実行契約の実装担当サブエージェント委譲規律）における adversarial-review 統合（実装方針形成、review 呼出、結果反映、blocked 遷移）の実行時参照を提供する。
 正規原本は `agentdev-case-run-execution-adapter` Design「adversarial-review 統合（実装方針→review→結果反映）」節である（caller 統合要件の case-run 実装方針条項、重複定義禁止〔一つの意味を一つの正本へ〕）。
-本 SKILL.md は重複定義せず、詳細は `references/adversarial-review-integration.md`「adversarial-review 統合（adapter 委譲内）」節を参照。
+本 SKILL.md は重複定義せず、詳細は `references/adversarial-review-integration.md`（adversarial-review 統合実行手続の正本。case-run adapter 委譲内適用範囲を含む）を参照。
 
 呼出元（case-run command）と本スキルの主な契約（詳細は Design と reference を正とする）:
 
