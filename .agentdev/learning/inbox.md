@@ -1479,3 +1479,19 @@
 
 ---
 
+
+## 2026-11-15: yomiyasu lint 用一時ファイルの規約配置指示（リポジトリ外一時ディレクトリ）が textlint 書込み guard の fail-closed 拒否（プロジェクトルート外）と衝突する（Case #4054・case-open）
+
+- **問題事象**: write ツールで C:\Users\ogatay\AppData\Local\Temp\opencode（外部一時領域）へ検査専用本文ファイルを作成しようとしたところ、agentdev-textlint-guard が「write targets a path outside the project root; blocked per fail-closed」で拒否した。lifecycle「文章品質・書込み規約」節の yomiyasu lint 実行手順は「検査専用本文ファイルを非永続領域（リポジトリ外の一時ディレクトリ等）に新規作成」を指示しており、指示に従うと guard 拒否が毎回発生する
+- **発生局面**: 実装（case-open STEP-2・Root Case 本文候補の yomiyasu lint）
+- **検知方法**: write ツールの fail-closed 拒否メッセージ
+- **根本原因**: lifecycle「yomiyasu 推敲の適用規律」節の lint 一時ファイル配置指示（「リポジトリ外の一時ディレクトリ等」）と、同節の書込み guard 実効範囲（textlint guard: プロジェクトルート外への書込みは fail-closed で拒否）が衝突している。同節「書込み guard の拒否対象・許可対象と拒否後の回復」は許可された配置先への変更を正規回復として規定しているため、規約内で矛盾は解決可能だが lint 手順の指示文言が拒否を誘発し続ける
+- **自律対応内容**: guard の解除・迂回を行わず、配置先を project root 内の gitignore 対象実行時作業領域（.agentdev/tmp/）へ変更して回復。lint は通常終了（EXIT 0）、検査後に一時ファイルを削除
+- **ユーザー確認有無**: なし（workflow 内自律処置）
+- **Decision/REQ/spec影響**: なし（運用知見。agentdev-workflow-lifecycle「文章品質・書込み規約」節の lint 一時ファイル配置指示文言の整合候補を予防策候補に記録）
+- **横展開観点**: yomiyasu lint を実行する全工程（docs 推敲・GitHub 文章推敲）で同型の拒否が発生し得る。同一問題への正しい配置指針は scripts/README.md「検査入力 JSON の置き場所指針」（workspace 外 temp 禁止・project root 内限定・commit 対象外・検査後削除）が既に実装している
+- **再発条件**: lifecycle lint 手順の指示どおりリポジトリ外へ一時ファイルを作成しようとする工程
+- **予防策候補**: lifecycle「yomiyasu 推敲の適用規律」節の配置指示を「project root 内の gitignore 対象領域（.agentdev/tmp/ 等）」へ統一する（scripts/README.md の4方針に整合させる）
+- **想定反映先**: agentdev-workflow-lifecycle SKILL.md「文章品質・書込み規約」節（yomiyasu 推敲の適用規律）
+- **関連**: Case #4054・case-open STEP-2・.agentdev/tmp/（.gitignore:18）
+- **タグ**: `#yomiyasu` `#write-guard` `#fail-closed`
