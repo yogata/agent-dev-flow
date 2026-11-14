@@ -2,7 +2,7 @@
 
 本ファイルは、adversarial-review caller integration の共通実行手続の正本である。正本化対象の caller は case-run adapter 委譲内、case-open、req-define（STEP-8）であり、各 caller は本ファイルを参照する。
 case-run adapter 委譲内の正規原本は `agentdev-case-run-execution-adapter` Design「adversarial-review 統合（実装方針→review→結果反映）」節である。
-本ファイルは Design を補完する実行手続きのみを保持する正本であり、共通 caller integration 契約の意味所有は adversarial-review Design（`docs/designs/skills/agentdev-adversarial-review.md`「adversarial-review caller integration 共通契約」節）が維持する。本ファイルは Design と矛盾する場合は Design を正とし、意味所有へ昇格しない。本ファイルは共通契約を再定義しない。
+本ファイルは Design を補完する実行手続きのみを保持する正本であり、共通 caller integration 契約の意味所有は adversarial-review skill Design「adversarial-review caller integration 共通契約」節が維持する。本ファイルは Design と矛盾する場合は Design を正とし、意味所有へ昇格しない。本ファイルは共通契約を再定義しない。
 caller 固有の挿入境界、審議対象、戻り先、記録先等は各 caller の参照ファイルに残す: `src/common/skills/agentdev-workflow-case-open/references/adversarial-review-integration.md`、`src/common/skills/agentdev-workflow-req-define/references/adversarial-review-integration.md`。
 case-run adapter 委譲内では、挿入境界、委譲内実施、実装方針限定、blocked 遷移の契約は case-run command Design「adversarial-review 挿入境界（case-run: adapter 委譲内）」節が正であり、本ファイルは参照レベルに留める。
 各節の適用範囲: 「実装方針形成」「blocked 遷移」および「発動条件判定と review 呼出」内の実装方針に紐づく詳細は case-run adapter 委譲内に適用し、他節は全 caller に適用する。
