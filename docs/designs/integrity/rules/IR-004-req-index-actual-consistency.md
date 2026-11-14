@@ -2,7 +2,7 @@
 title: "IR-004: REQ index ↔ 現行 REQ 一致"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-11-14
 detection_method_class: machine-check
 implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
 verification_path: .opencode/skills/repo-agentdev-integrity/scripts/commands_structure.test.ts
@@ -25,4 +25,4 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/commands_str
 | regression_test | commands_structure.test.ts |
 | finding_route | intake |
 | triage_action | README に REQ 追加/削除 |
-| last_verified | 2026-06-06 |
+| last_verified | 2026-11-14 |

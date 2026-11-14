@@ -2,7 +2,7 @@
 title: "IR-034: Skill 内部 section / protocol / Step 参照検出"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-11-14
 detection_method_class: machine-check
 implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
 verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts
@@ -25,4 +25,4 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integr
 | regression_test | (未実装) |
 | finding_route | req-define |
 | triage_action | 参照先を正規の公開 API（SKILL.md description / USE FOR）に置き換える |
-| last_verified | 2026-06-14 |
+| last_verified | 2026-11-14 |
