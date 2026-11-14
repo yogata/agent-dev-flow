@@ -2,7 +2,7 @@
 title: "IR-018: REQ 範囲表記鮮度"
 status: accepted
 created: 2026-08-20
-updated: 2026-10-22
+updated: 2026-11-15
 detection_method_class: machine-check
 implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
 verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts

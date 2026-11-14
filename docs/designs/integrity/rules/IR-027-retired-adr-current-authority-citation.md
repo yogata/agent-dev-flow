@@ -2,7 +2,7 @@
 title: "IR-027: 廃止 ADR 現行根拠引用検出"
 status: accepted
 created: 2026-08-20
-updated: 2026-08-20
+updated: 2026-11-15
 detection_method_class: machine-check
 implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
 verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts
