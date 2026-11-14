@@ -2,7 +2,7 @@
 title: "IR-018: REQ 範囲表記鮮度"
 status: accepted
 created: 2026-08-20
-updated: 2026-10-22
+updated: 2026-11-15
 detection_method_class: machine-check
 implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
 verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts
@@ -25,4 +25,4 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integr
 | regression_test | (手動確認) |
 | finding_route | intake |
 | triage_action | 表記を実際の REQ 数に更新 |
-| last_verified | 2026-06-06 |
+| last_verified | 2026-11-14（検証根拠: PR #4039 での検証、2026-11-14 調査での統合機械確認） |
