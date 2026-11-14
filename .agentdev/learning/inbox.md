@@ -1495,3 +1495,212 @@
 - **想定反映先**: agentdev-workflow-lifecycle SKILL.md「文章品質・書込み規約」節（yomiyasu 推敲の適用規律）
 - **関連**: Case #4054・case-open STEP-2・.agentdev/tmp/（.gitignore:18）
 - **タグ**: `#yomiyasu` `#write-guard` `#fail-closed`
+
+---
+
+
+## 2026-11-15: close_mechanical_steps.test.ts の機械受理基準標本（completeMachineAcceptanceRecord）の分割番号割当が QG-4 正規形と入れ替わっている（Case #4054・OU-001）
+
+- **問題事象**: close_mechanical_steps.test.ts の機械受理基準標本では分割①=src 側・分割②=integrity の割当になっている。QG-4 正規形（qg-4-final-acceptance.md）は分割①=integrity suite・分割②=src 側で、番号割当が入れ替わっている
+- **発生局面**: 実装（OU-001 の表記是正 PR #4062 で周辺記述の整合確認を実施した際に発見）
+- **検知方法**: PR #4062 本文の周辺記述整合確認（検証差分セクション）
+- **根本原因**: 標本 fixture 作成時の分割番号の写し違い。既存の不一致であり、OU-001 の表記是正では番号割当を変更していない（fixture は構造標本値で判定に件数の実在性を含まないため現行維持）
+- **自律対応内容**: 本 Issue スコープ外のため変更せず、Capture を提案（PR 本文 Findings に記録）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（fixture 標本値の整理。正規形への整合は別の判断対象）
+- **横展開観点**: 機械受理基準の標本を流用する実装・文書で同じ入れ替わりが再現される恐れがある
+- **再発条件**: 標本 fixture を参照して分割番号を解釈する工程
+- **予防策候補**: 標本 fixture の分割番号を QG-4 正規形へ整合させる（fixture 変更とテスト期待値の同時更新）
+- **想定反映先**: src/common/skills/agentdev-workflow-case-close/scripts/tests/close_mechanical_steps.test.ts（completeMachineAcceptanceRecord）
+- **関連**: Epic #4054・Issue #4052・PR #4062 本文 Findings
+- **タグ**: #closeMechanicalSteps #機械受理 #fixture
+
+---
+
+
+## 2026-11-15: yomiyasu lint スクリプトは worktree からは参照できず main root 実体から実行する（Case #4054・OU-001）
+
+- **問題事象**: yomiyasu_lint.py は .opencode/skills/yomiyasu/scripts/ 配下にあるが、worktree 内の .opencode/skills には yomiyasu の junction が未伝播のため、worktree cwd からはスクリプトが見えない
+- **発生局面**: 実装（docs 変更委譲内の文章表層検査）
+- **検知方法**: worktree 内からのスクリプト不存在（path 解決失敗）
+- **根本原因**: worktree 構造的制約（.opencode/skills の agentdev-* junction は main root にのみ存在）
+- **自律対応内容**: worktree 配下の検査対象ファイルを引数に、main root 実体側からスクリプトを実行して回避
+- **ユーザー確認有無**: なし（workflow 内自律処置）
+- **Decision/REQ/spec影響**: なし（運用知見）
+- **横展開観点**: yomiyasu lint 以外の main root 実体配置ツール（.opencode/skills/yomiyasu 配下全般）で同型の参照不能が発生し得る
+- **再発条件**: worktree cwd から yomiyasu 系スクリプトを相対参照する工程
+- **予防策候補**: worktree 実行手順に「main root 実体配置ツールは main root 起点で実行」の前置を明記する
+- **想定反映先**: yomiyasu 利用工程の手順参照（agentdev-workflow-lifecycle「文章品質・書込み規約」節の実行手順補記候補）
+- **関連**: Epic #4054・Issue #4052・PR #4062 本文 Findings・worktree-operations.md（worktree 構造的制約）
+- **タグ**: #yomiyasu #worktree #junction
+
+---
+
+
+## 2026-11-15: IR-072（req-updated-freshness）は commit 済み状態を照合するため commit 前検証で NG になる（Case #4054・OU-003）
+
+- **問題事象**: updated を進行させた Design を含む case-run では、commit 前の check_integrity 実行で IR-072 が NG になる（未 commit 変更が旧 commit date と比較される）
+- **発生局面**: 実装（OU-003 の統合先・document-model の updated 進行。PR #4064 で commit 前1回＋commit 後2回の実行で確認）
+- **検知方法**: check_integrity の commit 前後結果差分
+- **根本原因**: IR-072 の照合基準が commit 済み content-change commit date と frontmatter updated の一致であるため、commit 前は updated だけ先に進んでいても一致判定が成立しない
+- **自律対応内容**: commit 後に check_integrity を再実行して解消を確認（commit 前の NG を変更起因と誤分類しない）
+- **ユーザー確認有無**: なし（workflow 内自律処置）
+- **Decision/REQ/spec影響**: なし（検証手順の運用知見）
+- **横展開観点**: updated を進行させる Design 変更を含む全 case-run で同型の commit 前 NG が発生し得る
+- **再発条件**: Design frontmatter updated を進行させた変更の commit 前 check_integrity 実行
+- **予防策候補**: updated 進行を含む case-run の検証手順に「commit 後の check_integrity 再実行」を含める
+- **想定反映先**: case-run の検証手順参照・IR-072 関連の checker 実行契約補記候補
+- **関連**: Epic #4054・Issue #4056・PR #4064 本文 Findings
+- **タグ**: #ir072 #checkIntegrity #commit前後
+
+---
+
+
+## 2026-11-15: worktree で link profile の配布依存境界 checker は zero-targets invalid execution になる。main root からの読取専用実行が実証済みの回避経路（Case #4054・OU-005/OU-006）
+
+- **問題事象**: worktree 内で check_distribution_boundary / check_integrity の link profile を実行すると、.opencode/skills の junction 未伝播により走査対象 0件（zero-targets）または projection-missing の大量 NG になり、checker 自身が検査不成立を明示する
+- **発生局面**: 実装（OU-005・OU-006 の配布依存境界検証）
+- **検知方法**: checker の zero-targets pre-warning / projection-missing NG
+- **根本原因**: worktree 構造的制約（.opencode/skills の agentdev-* junction は worktree に伝播しない）
+- **自律対応内容**: 2経路を実証。(1) 読み取り専用 checker を main root から実行し BEFORE/AFTER の git status clean を証跡化（OU-005 link profile）。(2) worktree 内へ検査用 junction を一時作成して成立させ、検証後に全削除（OU-006）。checker 自身の --root / junction 伝播状態の検証指示に従い、zero-targets 実行を合格として扱わない
+- **ユーザー確認有無**: なし（workflow 内自律処置）
+- **Decision/REQ/spec影響**: なし（既知制約の実運用面の補強）
+- **横展開観点**: link profile を伴う全委譲で同型の検査不成立が発生し得る。無効実行を合格扱いにすると検査省略になる
+- **再発条件**: worktree 内での link profile 実行
+- **予防策候補**: worktree 検証手順の定型として、junction 補完手段（一時作成と fs.rmdirSync 等での回収）と main root 読取専用実行の2経路を明記する knowledge 化
+- **想定反映先**: worktree-operations.md（checker 実行手順節）または checker-execution-contracts 関連の運用参照
+- **関連**: Epic #4054・Issue #4058・PR #4063 Findings・Issue #4059・PR #4065 checker 実行記録・worktree-operations.md
+- **タグ**: #配布依存境界 #linkProfile #worktree #zeroTargets
+
+---
+
+
+## 2026-11-15: checker の終了コードを pipe 経由で計測すると pipe 後段コマンドの終了コードを記録してしまう（Case #4054・OU-006）
+
+- **問題事象**: `cmd | tail -N; echo $?` 形式で checker の終了コードを計測すると、$? が tail の終了コードになる。CLI 直実行では exit 0 と記録したが、node spawnSync での再計測で checker 本体は exit 1（環境差 NG）だった
+- **発生局面**: 実装（OU-006 の checker 実行記録）
+- **検知方法**: spawnSync による再計測での終了コード不一致
+- **根本原因**: shell pipe 後段の終了コードを $? が保持する shell の仕様を、checker 本体の終了コード計測に誤用
+- **自律対応内容**: checker 本体の終了コードを spawnSync 等の pipe を介さない直接実行で再計測し、検証記録を訂正
+- **ユーザー確認有無**: なし（workflow 内自律処置）
+- **Decision/REQ/spec影響**: なし（計測規律の運用知見）
+- **横展開観点**: 終了コードが意味を持つ checker（非ゼロ exit = 違反検出）の全計測で同型の誤記録が発生し得る
+- **再発条件**: pipe を介した checker 終了コードの記録
+- **予防策候補**: 終了コード計測は pipe を介さない直接実行（spawnSync 等）で行う規律を checker 実行契約の補記候補とする
+- **想定反映先**: checker 実行契約（checker-execution-contracts）の計測手順補記候補
+- **関連**: Epic #4054・Issue #4059・PR #4065 本文 Findings
+- **タグ**: #終了コード #計測規律 #checker
+
+---
+
+
+## 2026-11-15: AUTOGEN 再生成後の frontmatter 値は生観測が陳腐化しやすく、edit の oldString は実取得から組み立てる（Case #4054・OU-007）
+
+- **問題事象**: integrity-rule-catalog.md の frontmatter updated 編集時、現行値を再確認せず旧観測（2026-10-22）に基づく oldString を用いたところ、書込み guard が再構成不能で拒否した
+- **発生局面**: 実装（OU-007 の AUTOGEN 再生成後の frontmatter 更新）
+- **検知方法**: 書込み guard による fail-closed 拒否
+- **根本原因**: 遅延した AUTOGEN 再生成の後に frontmatter 値（updated: 2026-11-13）が変わっており、生観測が古いまま edit を組み立てた
+- **自律対応内容**: guard の解除・迂回を行わず、実取得（updated: 2026-11-13）後に oldString を組み立てて再適用し成功（既存規約「同一ファイルへの複数 edit の規律」節どおりの挙動）
+- **ユーザー確認有無**: なし（workflow 内自律処置）
+- **Decision/REQ/spec影響**: なし（既存規約どおりの挙動の有効事例）
+- **横展開観点**: AUTOGEN 再生成を伴う工程全般で frontmatter 生観測の陳腐化が発生し得る
+- **再発条件**: AUTOGEN 再生成後の同一ファイル frontmatter 編集で、再取得せずに旧観測を使う工程
+- **予防策候補**: AUTOGEN 再生成直後のファイル編集では、edit の oldString を必ず直近の実取得から組み立てる
+- **想定反映先**: worktree-operations.md「同一ファイルへの複数 edit の規律」節の補強候補（repeat 予防の観察対象）
+- **関連**: Epic #4054・Issue #4060・PR #4066 本文 Findings
+- **タグ**: #書込みGuard #AUTOGEN #edit規律
+
+---
+
+
+## 2026-11-15: yomiyasu lint の unnatural_halfwidth_space 規則が英字前後半角空白のリポジトリ正規スタイル（REQ-094・textlint 共通基盤）と恒常的に衝突する（Case #4054・OU-004）
+
+- **問題事象**: yomiyasu lint の unnatural_halfwidth_space が、英字前後に半角空白を置くリポジトリ正規スタイル（REQ-094 用語選択基準・textlint 共通基盤、既存行も同一スタイル）を毎回警告する。docs 変更の yomiyasu 必須化（REQ-098）の運用で、この規則の警告を毎回採否判断する負担が生じる
+- **発生局面**: 実装（OU-004 の system.md と PR 本文の yomiyasu lint）
+- **検知方法**: yomiyasu lint 警告の内訳分析（警告クラスが既存行にも大量出現）
+- **根本原因**: yomiyasu 規則の日本語一般基準と、技術文書での英字表記に関するリポジトリ正規スタイルの基準差
+- **自律対応内容**: 新規行も既存スタイルと同一のため対応なしと判断し、既存文書一貫のスタイル維持を優先（lint 終了コード 0、必須不合格なし）
+- **ユーザー確認有無**: なし（workflow 内自律処置）
+- **Decision/REQ/spec影響**: なし（採否判断の運用負担の観察）
+- **横展開観点**: docs 変更の yomiyasu 必須化（REQ-098）を適用する全工程で毎回同型の採否判断が発生する
+- **再発条件**: 英字を含む docs 文への yomiyasu lint 適用
+- **予防策候補**: yomiyasu 規則と textlint 共通基盤の整合（技術文書モードの追加等）の検討
+- **想定反映先**: yomiyasu skill（規則構成）・REQ-098 運用参照
+- **関連**: Epic #4054・Issue #4057・PR #4067 本文 Findings
+- **タグ**: #yomiyasu #REQ094 #採否判断
+
+---
+
+
+## 2026-11-15: integrity markdown レポートは OK 明細を省略するため特定 check の OK 確認に --json 再実行が必要になる（Case #4054・OU-004）
+
+- **問題事象**: .agentdev/integrity/reports/ 配下の markdown レポートは OK 明細を列挙せずサマリのみのため、expanded-readme-sync 等の特定 check の OK 確認には --json 出力の再実行が必要になる
+- **発生局面**: 実装（OU-004 の機械参照対応確認）
+- **検知方法**: レポート読み戻しでの OK 明細欠落
+- **根本原因**: markdown レポートの様式がサマリ中心で、個別 check の OK 根拠を保持しない
+- **自律対応内容**: --json 出力の再実行で特定 check の OK を確認（checker は読取系のため再実行コストは限定的）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（レポート様式の改善候補）
+- **横展開観点**: check_integrity の個別結果を引用する検証記録で再実行コストが反復発生する
+- **再発条件**: markdown レポートからの特定 check OK 確認
+- **予防策候補**: レポートへの OK 明細オプション（特定 check 合格確認の低コスト化）の実装
+- **想定反映先**: check_integrity.ts のレポート生成・docs-check 関連
+- **関連**: Epic #4054・Issue #4057・PR #4067 本文 Findings
+- **タグ**: #integrity レポート #改善候補
+
+---
+
+
+## 2026-11-15: agentdev_gh の issue_close は Case Issue で close-acceptance 記録の targetRevision と現在 updated_at の完全一致を要求する（Case #4054・case-close）
+
+- **問題事象**: case-close 機械工程で close-acceptance 記録を書き出した後に子 Issue への完了記録コメント投稿と本文更新を行うと、issue_close が「the close acceptance record targets revision X, but the current issue revision is Y; reusing a past acceptance result is refused」で拒否される
+- **発生局面**: case-close（Epic #4054 の子 Issue クローズ。OU-002 の issue_close で初検出）
+- **検知方法**: agentdev_gh issue_close の verification-incomplete 構造化失敗（fail-closed）
+- **根本原因**: 記録の targetRevision と close 時点の対象 Issue updated_at の完全一致検査（過去の合格結果の再利用拒否）により、記録生成後の Issue 更新（コメント・本文）が版を進行させて記録を陳腐化させる
+- **自律対応内容**: 順序を修正して回復。完了記録コメント投稿と本文更新（チェックボックス確定・終了日時設定）をすべて完了した後に、fresh な updated_at で機械工程を再実行して記録を再生成し、issue_close を実行
+- **ユーザー確認有無**: なし（workflow 内自律処置）
+- **Decision/REQ/spec影響**: なし（Tool 検査契約は正常に機能。工程側の実行順序の運用知見）
+- **横展開観点**: case-close の全ルート（単一 Issue・Epic Wave）で同型の拒否が発生し得る。OU-001 の issue_close が偶然成功したのは close 時点の updated_at 観測のタイミングによる
+- **再発条件**: 機械工程の記録生成後に対象 Issue を更新して issue_close する順序
+- **予防策候補**: case-close の実行順序を「コメント投稿・本文更新を完了 → fresh revision で機械工程（記録生成） → issue_close」に固定する
+- **想定反映先**: case-close references/cleanup-and-capture.md（STEP-5 完了記録反映と受入評価確認の順序補記）
+- **関連**: Epic #4054・src/common/tools/agentdev-gh/close-acceptance.ts（版一致検査）
+- **タグ**: #agentdevGh #closeAcceptance #実行順序 #failClosed
+
+---
+
+
+## 2026-11-15: bun run と backslash 形 cwd の組合せで bun のモジュール解決が失敗する（Module not found）。forward slash cwd + 直接実行形式が安定（Case #4054・case-close）
+
+- **問題事象**: spawnSync('bun', ['run', '.opencode/.../script.ts'], {cwd: 'C:\\...\\agent-dev-flow'})（backslash 形 cwd）が error: Module not found で exit 1 になる。同一コマンドでも cwd を forward slash 形（C:/...）にするか、bun run を使わず bun <path> の直接実行にすると成功する
+- **発生局面**: case-close（Epic #4054 の Epic 受入機械工程の再実行。 freshness gate が exit 1 を返して受入拒否）
+- **検知方法**: 機械工程報告 JSON の autogen-regeneration-diff fail（exitCode 1）と spawnSync 再現による切分け
+- **根本原因**: bun run のモジュール解決と backslash 形 cwd パスの組合せにおける環境差（MSYS/Windows パス解釈）。checker・script 自体は正常
+- **自律対応内容**: 実証済みの安定形式（bun <path> 直接実行 + forward slash 形 cwd）へ gate spec を統一して再実行し回復。checker 実行契約の Windows 絶対パス前置規律（MSYS 形式禁止・forward slash 推奨）と整合
+- **ユーザー確認有無**: なし（workflow 内自律処置）
+- **Decision/REQ/spec影響**: なし（環境差の運用知見）
+- **横展開観点**: gate spec・checker 起動を bun run + backslash cwd で構成する全工程で同型の偽失敗が発生し得る（検査不能を fail と誤認する恐れ）
+- **再発条件**: spawnSync による bun run 相対パス実行と backslash 形 cwd の組合せ
+- **予防策候補**: 機械工程入力の gate spec は bun <path> 直接実行 + forward slash 形 cwd で構成する。checker 実行契約の Windows パス前置規律を gate spec へも適用する
+- **想定反映先**: case-close scripts README（機械工程入力の構成例）・checker-execution-contracts の一般化規定への接続
+- **関連**: Epic #4054・mechanical-report-epic-final の再実行記録・checker 実行契約「link profile 実効実行要件」節（--root 絶対パス前置規律）
+- **タグ**: #bun #spawnSync #パス形式 #gateSpec
+
+---
+
+
+## 2026-11-15: close_mechanical_steps.ts の CLI runner が deleteFile を提供せず post-merge reclamation が実行面で成立しない（Case #4054・case-close）
+
+- **問題事象**: post-merge 入力（reclamation.closeAcceptanceRecord 指定）で close_mechanical_steps.ts を CLI 実行すると、close-acceptance-reclamation step が「mechanical runner does not provide deleteFile; reclamation cannot execute (fail-closed)」で fail になる。終了判定記録の回収が CLI 経路で完遂できない
+- **発生局面**: case-close（Epic #4054 の post-merge 機械工程。8件の終了判定記録回収）
+- **検知方法**: post-merge 機械工程の報告 JSON step fail（fail-closed 詳細メッセージ）
+- **根本原因**: main() の CLI runner 注入が exists/run/readTextFile/writeTextFile/mkdirRecursive/removeFile/gitCommonDir/sleep を提供する一方、reclamation 実行面が必要とする deleteFile を提供していない。reclaimCloseAcceptanceRecord 自体は I/O 注入契約の exported 関数として設計されている
+- **自律対応内容**: exported 関数 reclaimCloseAcceptanceRecord へ fs ベースの deleteFile を注入して 8件を回収（全件 reclaimed）。CLI の fail-closed 報告に従い迂回や無理な成功変換はしない
+- **ユーザー確認有無**: なし（workflow 内自律処置）
+- **Decision/REQ/spec影響**: なし（Tool 実装側の接続漏れ。機械受理・終了操作許可の判定は影響なし）
+- **横展開観点**: post-merge reclamation を CLI で実行する全 case-close で同型の fail が発生する
+- **再発条件**: reclamation 指定つきの post-merge 機械工程 CLI 実行
+- **予防策候補**: main() の runner へ deleteFile 注入を追加する（removeFile と同一の fs 実装で足りる）
+- **想定反映先**: src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts（main() runner への deleteFile 接続）
+- **関連**: Epic #4054・reclaimCloseAcceptanceRecord（I/O 注入契約）・recl-report-4054.json（fail 証跡）
+- **タグ**: #closeMechanicalSteps #reclamation #CLI #failClosed
