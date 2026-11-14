@@ -2,7 +2,7 @@
 title: システム仕様
 status: accepted
 created: 2026-08-20
-updated: 2026-10-22
+updated: 2026-11-15
 ---
 <!-- ADF-COVERS(implementation): REQ-001-033 -->
 <!-- ADF-COVERS(implementation): REQ-002-009, REQ-002-010, REQ-002-012 -->
@@ -16,62 +16,40 @@ updated: 2026-10-22
 
 ## コマンドシステム
 
-### AgentDevFlow コマンド群
+### コマンドカタログ
 
-AgentDevFlow（`/agentdev/*` コマンド体系）は 3 つのパイプラインで構成され、開発ワークフローを提供する。
-各コマンドの目的、責務、入出力は後述の表および各コマンド専用 Design に記述する。
+AgentDevFlow（`/agentdev/*` コマンド体系）は req/case、intake、learning、backlog、inspect、課題管理、third-party、phase の各パイプラインで構成され、開発ワークフローを提供する。
+コマンドの構成、系統、主入力、主出力を次のカタログ表に統合する。各コマンドの目的と責務は専用 Design および Workflow Architecture Inventory（11分析軸）に記述する。
 実行エージェントの選定、起動方法は harness の責務であり、本 Design の対象外（v2:ADR-0136）。
 
-#### req/case パイプライン
+| コマンド/スキル | 系統 | 主入力 | 主出力 | 詳細 |
+|---|---|---|---|---|
+| `/agentdev/req-define` | req/case | セッション会話 / RU | 要件doc（draft） | [commands/req-define.md](../commands/req-define.md) |
+| case-open（内部 lifecycle 段階） | case-auto 駆動 | 要件doc | GitHub Issue（連結成分ベースの Standard/Epic 構成生成を含む） | [commands/case-open.md](../commands/case-open.md) |
+| case-ready（内部 lifecycle 段階） | case-auto 駆動 | Root Case Issue | ready 状態の Root Case + 実行構造（REQ/Decision/Design ファイル保存を含む） | [commands/case-ready.md](../commands/case-ready.md) |
+| case-revise（内部 lifecycle 例外経路段階） | case-auto 例外経路解決駆動 | 再合意済み Definition 差分（draft） | 設計修正PR + case-ready 引き継ぎ | [commands/case-revise.md](../commands/case-revise.md) |
+| case-run（内部 lifecycle 段階） | case-auto インライン実行 | Issue | 実装済みブランチ + PR | [commands/case-run.md](../commands/case-run.md) |
+| case-close（内部 lifecycle 段階） | case-auto 駆動 | Issue + PR | マージ済み + クローズ済み（QG-4 完了ゲート付き） | [commands/case-close.md](../commands/case-close.md) |
+| `/agentdev/case-auto` | req/case（標準実行コマンド） | 要件doc / Issue番号 | マージ済み + クローズ済み（blocked 部分停止あり） | [commands/case-auto.md](../commands/case-auto.md) |
+| `/agentdev/intake-capture` | intake | 手動入力 | `inbox/` item | [commands/intake-capture.md](../commands/intake-capture.md) |
+| `/agentdev/intake-from-github` | intake | クローズ済み Issue/PR | `inbox/` item | [commands/intake-from-github.md](../commands/intake-from-github.md) |
+| `/agentdev/intake-promote` | intake | inbox item | `promoted/` 成果物 | [commands/intake-promote.md](../commands/intake-promote.md) |
+| `agentdev-learning-capture`（スキル） | learning（キャプチャ層） | エージェント主体での学び検知 | `.agentdev/learning/inbox.md` | [skills/agentdev-learning-capture.md](../skills/agentdev-learning-capture.md) |
+| `/agentdev/learning-promote` | learning（昇華層） | `inbox.md` + `deferred.md` | `promoted/` 成果物 | [commands/learning-promote.md](../commands/learning-promote.md) |
+| `/agentdev/backlog-review` | backlog 層 | `promoted/` 成果物 | `RU-*.md` | [commands/backlog-review.md](../commands/backlog-review.md) |
+| `/agentdev/backlog-auto` | backlog | なし（durable state から解決） | 検出事項、採用済み成果物、`RU-*.md` | [commands/backlog-auto.md](../commands/backlog-auto.md) |
+| `/agentdev/inspect-docs` | inspect | docs 全体スキャン | 検出事項 | [commands/inspect-docs.md](../commands/inspect-docs.md) |
+| `/agentdev/inspect-skills` | inspect | Command/Skill 定義 | 検出事項 | [commands/inspect-skills.md](../commands/inspect-skills.md) |
+| `/agentdev/inspect-promote` | inspect | 検出事項 | 採用済み成果物 | [commands/inspect-promote.md](../commands/inspect-promote.md) |
+| `/agentdev/issue` | 横断（課題管理） | 自然言語による課題管理の指示 | 追跡Issue の作成・更新・検索・参照（Tool 操作契約経由。横断入口は REQ-049-015。Case Issue の操作は case-* 系内部 lifecycle が所有） | [commands/issue.md](../commands/issue.md) |
+| `/agentdev/third-party-sync` | third-party | 対象 Skill 名（省略時は全件）、dry-run 指定 | 取得結果報告（対象一覧、取得成否、配置パス、管理外衝突の検出状況） | [commands/third-party-sync.md](../commands/third-party-sync.md) |
+| `/agentdev/phase-tasks-create` | phase（工程駆動） | 自然言語による形成指示（工程目的、対象範囲、既知制約） | テーマ初回形成の結果（テーマ識別と一覧、参考候補と既知の必須事項の区別） | [workflows/v51-phase-driven-collaboration-model.md](../workflows/v51-phase-driven-collaboration-model.md) |
+| `/agentdev/phase-tasks-update` | phase（工程駆動） | 自然言語による更新指示（追加・具体化・分割・統合・廃止） | テーマ更新の結果（変更理由、旧新対応、未決事項の引継ぎ） | [workflows/v51-phase-driven-collaboration-model.md](../workflows/v51-phase-driven-collaboration-model.md) |
+| `/agentdev/phase-artifacts-update` | phase（工程駆動） | 自然言語による反映指示と採用内容（外部検討の戻り入力または利用者が直接採用した内容） | 反映の結果（反映・作成した項目と反映先、衝突・未確認・保存失敗の区別、記録の保存先〔外部戻り入力存在時は受領記録、直接採用時は採否記録〕） | [workflows/v51-phase-driven-collaboration-model.md](../workflows/v51-phase-driven-collaboration-model.md) |
+| `/agentdev/phase-review` | phase（工程駆動） | 自然言語によるレビュー・全体像の指示 | 4区分（確定違反・証拠不足・推測・未採用改善候補）に分けた所見と工程全体像（セッション内出力） | [workflows/v51-phase-transition-and-coexistence-model.md](../workflows/v51-phase-transition-and-coexistence-model.md) |
+| `/agentdev/phase-transition` | phase（工程駆動） | 自然言語による遷移の指示 | 遷移の記録結果（記録先、後続工程の解決結果、前工程の過去工程化の伝達） | [workflows/v51-phase-transition-and-coexistence-model.md](../workflows/v51-phase-transition-and-coexistence-model.md) |
 
-| コマンド | 役割 | 詳細 |
-|---|---|---|
-| `/agentdev/req-define` | 要件定義（壁打ち） | [commands/req-define.md](../commands/req-define.md) |
-| case-open（内部 lifecycle 段階、case-auto 駆動） | Issue 登録（連結成分ベース複数 Standard/Epic 構成生成、3軸判断） | [commands/case-open.md](../commands/case-open.md) |
-| case-ready（内部 lifecycle 段階、case-auto 駆動） | Definition 受入と実行準備完了への状態遷移（Definition 保存の内部責務を含む） | [commands/case-ready.md](../commands/case-ready.md) |
-| case-revise（内部 lifecycle 例外経路段階、case-auto 駆動） | 再合意済み Definition 変更の既存 Case 反映（例外経路） | [commands/case-revise.md](../commands/case-revise.md) |
-| case-run（内部 lifecycle 段階、case-auto インライン実行） | 実装パイプライン（3 フェーズ構成） | [commands/case-run.md](../commands/case-run.md) |
-| case-close（内部 lifecycle 段階、case-auto 駆動） | 完了処理（達成判定プロトコル付き完了ゲート） | [commands/case-close.md](../commands/case-close.md) |
-| `/agentdev/case-auto` | 標準実行コマンド（複数 execution_unit 並列 orchestration、blocked 部分停止） | [commands/case-auto.md](../commands/case-auto.md) |
-
-#### learning パイプライン
-
-| コマンド/スキル | 役割 | 層 | 詳細 |
-|---|---|---|---|
-| `agentdev-learning-capture`（スキル） | エージェント主体で学びを検知、抽出、自律蓄積 | キャプチャ層 | [skills/agentdev-learning-capture.md](../skills/agentdev-learning-capture.md) |
-| `/agentdev/learning-promote` | learning entry を分析、分類、昇華判定 | 昇華層 | [commands/learning-promote.md](../commands/learning-promote.md) |
-| `/agentdev/backlog-review` | 採用済み成果物を分析、統合し RU を生成 | backlog 層 | [commands/backlog-review.md](../commands/backlog-review.md) |
-
-#### intake ワークフロー
-
-| コマンド | 役割 | 詳細 |
-|---|---|---|
-| `/agentdev/intake-capture` | 手動で気づき、課題を inbox に記録 | [commands/intake-capture.md](../commands/intake-capture.md) |
-| `/agentdev/intake-from-github` | GitHub Issue/PR/コメントから改善候補を自動抽出 | [commands/intake-from-github.md](../commands/intake-from-github.md) |
-| `/agentdev/intake-promote` | inbox item を採用済み成果物に整形 | [commands/intake-promote.md](../commands/intake-promote.md) |
-
-#### integrity ワークフロー
-
-docs-check は `/repo/*` コマンド体系の配布対象リポジトリ内コマンドである（REQ-001、REQ-010-001）。
-AgentDevFlow の配布コマンドではなく、AgentDevFlow 本体リポジトリの自己監査コマンドである。
-
-| コマンド | 役割 |
-|---|---|
-| `/repo/docs-check` | AgentDevFlow 本体リポジトリの自己監査（配布対象外） |
-
-#### inspect ワークフロー
-
-| コマンド | 役割 | 詳細 |
-|---|---|---|
-| `/agentdev/inspect-docs` | docs 全体の意味整合レビューと REQ 再構成診断 | [commands/inspect-docs.md](../commands/inspect-docs.md) |
-| `/agentdev/inspect-skills` | Command/Skill 参照妥当性、構造の検出 | [commands/inspect-skills.md](../commands/inspect-skills.md) |
-| `/agentdev/inspect-promote` | 検出事項（finding）の分類、昇格 | [commands/inspect-promote.md](../commands/inspect-promote.md) |
-
-#### 課題管理（issue）
-
-| Command | 概要 | Design |
-|---|---|---|
-| `/agentdev/issue` | 追跡Issue の自然言語操作入口（起票・検索・参照・更新・コメント追加・保留・再評価・実行準備完了・解決・反映確認・クローズ・再オープン）。特定の単一 workflow に閉じない横断入口（REQ-049-015）。Case Issue の操作は case-* 系内部 lifecycle が所有する | commands/issue.md |
+`/repo/docs-check` は AgentDevFlow 本体リポジトリの自己監査コマンドである（REQ-001、REQ-010-001）。`/repo/*` コマンド体系の配布対象リポジトリ内コマンドであり、AgentDevFlow の配布コマンドではないため、カタログ表の対象外とする。
 
 ### 品質ゲート
 
@@ -101,8 +79,7 @@ case-run（内部 lifecycle 段階）が QG-1〜QG-3（ローカル検証、CI �
 
 ## Workflow Architecture Inventory
 
-公開 Command（18件）と内部 lifecycle 段階（case-* 5 段階）の Workflow Architecture Inventory を恒久カタログとして統合する。
-各Command の11分析軸（公開契約・主要処理段階・分岐・副作用・HITL・並列性・resume・durable state・Harness依存・Capability依存・内部workflow候補）を記載する。
+コマンド構成の恒久カタログ（一覧表）は「コマンドカタログ」節に統合した。本節は各Command の11分析軸（公開契約・主要処理段階・分岐・副作用・HITL・並列性・resume・durable state・Harness依存・Capability依存・内部workflow候補）をカタログ単位で記載する。
 個別Workflow Skill 移行（Wave 2）および Capability Skill 抽出の参照証拠とする。
 
 本カタログは architecture view である。
@@ -115,34 +92,6 @@ case-run（内部 lifecycle 段階）が QG-1〜QG-3（ローカル検証、CI �
 - durable state contract → Workflow / STEP Design
 
 Command 定義を権威情報源とする旧表現は、workflow 実装の権威情報源が Command 側にあると含意するため使用しない。
-
-### 一覧表
-
-| Command | 主入力 | 主出力 | workflow 系統 |
-|---|---|---|---|
-| `/agentdev/req-define` | セッション会話 / RU | 要件doc（draft） | req/case |
-| case-open（内部 lifecycle 段階） | 要件doc | GitHub Issue | case-auto 駆動 |
-| case-ready（内部 lifecycle 段階） | Root Case Issue | ready 状態の Root Case + 実行構造（REQ/Decision/Design ファイル保存を含む） | case-auto 駆動 |
-| case-revise（内部 lifecycle 例外経路段階） | 再合意済み Definition 差分（draft） | 設計修正PR + case-ready 引き継ぎ | case-auto 例外経路解決駆動 |
-| case-run（内部 lifecycle 段階） | Issue | 実装済みブランチ + PR | case-auto インライン実行 |
-| case-close（内部 lifecycle 段階） | Issue + PR | マージ済み + クローズ済み | case-auto 駆動 |
-| `/agentdev/case-auto` | 要件doc / Issue番号 | マージ済み + クローズ済み | req/case |
-| `/agentdev/intake-capture` | 手動入力 | `inbox/` item | intake |
-| `/agentdev/intake-from-github` | クローズ済み Issue/PR | `inbox/` item | intake |
-| `/agentdev/intake-promote` | inbox item | `promoted/` 成果物 | intake |
-| `/agentdev/learning-promote` | `inbox.md` + `deferred.md` | `promoted/` 成果物 | learning |
-| `/agentdev/backlog-review` | `promoted/` 成果物 | `RU-*.md` | backlog |
-| `/agentdev/backlog-auto` | なし（durable state から解決） | 検出事項、採用済み成果物、`RU-*.md` | backlog |
-| `/agentdev/inspect-docs` | docs 全体スキャン | 検出事項 | inspect |
-| `/agentdev/inspect-skills` | Command/Skill 定義 | 検出事項 | inspect |
-| `/agentdev/inspect-promote` | 検出事項 | 採用済み成果物 | inspect |
-| `/agentdev/issue` | 自然言語による課題管理の指示 | 追跡Issue の作成・更新・検索・参照（Tool 操作契約経由） | 横断（課題管理） |
-| `/agentdev/third-party-sync` | 対象 Skill 名（省略時は全件）、dry-run 指定 | 取得結果報告（対象一覧、取得成否、配置パス、管理外衝突の検出状況） | third-party |
-| `/agentdev/phase-tasks-create` | 自然言語による形成指示（工程目的、対象範囲、既知制約） | テーマ初回形成の結果（テーマ識別と一覧、参考候補と既知の必須事項の区別） | phase（工程駆動） |
-| `/agentdev/phase-tasks-update` | 自然言語による更新指示（追加・具体化・分割・統合・廃止） | テーマ更新の結果（変更理由、旧新対応、未決事項の引継ぎ） | phase（工程駆動） |
-| `/agentdev/phase-artifacts-update` | 自然言語による反映指示と採用内容（外部検討の戻り入力または利用者が直接採用した内容） | 反映の結果（反映・作成した項目と反映先、衝突・未確認・保存失敗の区別、記録の保存先〔外部戻り入力存在時は受領記録、直接採用時は採否記録〕） | phase（工程駆動） |
-| `/agentdev/phase-review` | 自然言語によるレビュー・全体像の指示 | 4区分（確定違反・証拠不足・推測・未採用改善候補）に分けた所見と工程全体像（セッション内出力） | phase（工程駆動） |
-| `/agentdev/phase-transition` | 自然言語による遷移の指示 | 遷移の記録結果（記録先、後続工程の解決結果、前工程の過去工程化の伝達） | phase（工程駆動） |
 
 ### `/agentdev/req-define`
 
