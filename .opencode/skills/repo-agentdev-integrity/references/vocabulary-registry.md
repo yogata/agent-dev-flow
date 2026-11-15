@@ -336,7 +336,7 @@ PR #1177 で候補語対照表に追加された 4 種（`baseline`, `provider`,
 
 ## IR-055 runtime-unresolved-reference 対照（REQ-0108-263/264）
 
-配布物（`src/opencode/commands/agentdev/**/*.md`、`src/opencode/skills/agentdev-*/**/*.md`）内の導入先未解決参照検出パターン。consumer 環境で解決できない参照を機械的パターンマッチングで検出する。検出対象パターンと severity 分類は [rules/IR-055-runtime-unresolved-reference.md](../../../docs/designs/integrity/rules/IR-055-runtime-unresolved-reference.md) が原本。
+配布物（`src/opencode/commands/agentdev/**/*.md`、`src/opencode/skills/agentdev-*/**/*.md`）内の導入先未解決参照検出パターン。consumer 環境で解決できない参照を機械的パターンマッチングで検出する。検出対象パターンと severity 分類は [rules/IR-055-runtime-unresolved-reference.md](../../../../docs/designs/integrity/rules/IR-055-runtime-unresolved-reference.md) が原本。
 
 | パターン | severity | 備考 |
 |----------|----------|------|
@@ -359,7 +359,7 @@ exemption: code block 内部、template placeholder（`{xxx}`）、`vocabulary-r
 
 ## IR-065/IR-066 廃止語彙・旧パス検出対照（REQ-010-066/067）
 
-IR-065（廃止語彙の現行使用検出）と IR-066（旧パス・削除済み名称検出）の検出語彙対照（Issue #2372）。検出シグナル（正規表現）は `check_integrity.ts` が、許容条件の運用データ（existence_probe、exemption_files、否定文脈語）は `data/obsolete-vocabulary-map.yaml` が所有する。詳細は [rules/IR-065-obsolete-vocabulary-current-use.md](../../../docs/designs/integrity/rules/IR-065-obsolete-vocabulary-current-use.md) と [rules/IR-066-legacy-path-removed-name.md](../../../docs/designs/integrity/rules/IR-066-legacy-path-removed-name.md) 参照。
+IR-065（廃止語彙の現行使用検出）と IR-066（旧パス・削除済み名称検出）の検出語彙対照（Issue #2372）。検出シグナル（正規表現）は `check_integrity.ts` が、許容条件の運用データ（existence_probe、exemption_files、否定文脈語）は `data/obsolete-vocabulary-map.yaml` が所有する。詳細は [rules/IR-065-obsolete-vocabulary-current-use.md](../../../../docs/designs/integrity/rules/IR-065-obsolete-vocabulary-current-use.md) と [rules/IR-066-legacy-path-removed-name.md](../../../../docs/designs/integrity/rules/IR-066-legacy-path-removed-name.md) 参照。
 
 | 旧語彙 | 現行語彙 | IR | 備考 |
 |--------|----------|----|------|

@@ -16,11 +16,11 @@ OpenCode は `.opencode/plugins/` 直下のファイル（depth-1）のみを自
 
 環境変数 `AGENTDEV_GH_REPO`（`owner/name` 形式）で対象リポジトリを指定できる。未指定の場合は `gh repo view` で解決する。解決不能な場合、全操作は `config-uninterpretable` として失敗する（fail-closed）。
 
-gh CLI の認証状態は `gh auth status` で確認できる。未認証やリモート不在のチェックアウトでは `gh repo view` による解決に失敗するため、`AGENTDEV_GH_REPO` を起動環境（launcher / .env 相当）へ設定する。設定手順は導入ガイド [Consumer Project 導入](../../../docs/guides/consumer-project-setup.md) の「AGENTDEV_GH_REPO の起動環境設定」節を参照する。
+gh CLI の認証状態は `gh auth status` で確認できる。未認証やリモート不在のチェックアウトでは `gh repo view` による解決に失敗するため、`AGENTDEV_GH_REPO` を起動環境（launcher / .env 相当）へ設定する。設定手順は導入ガイド「Consumer Project 導入」（agent-dev-flow 本体リポジトリのガイド文書）の「AGENTDEV_GH_REPO の起動環境設定」節を参照する。
 
 リポジトリ解決に失敗した場合の failure detail には、試行した解決手段、`gh repo view` の終了コードと stderr の要因が診断情報として含まれる。診断情報と併せて、`AGENTDEV_GH_REPO` 設定による解決手続きの導線が維持される。
 
-起動環境障害（`AGENTDEV_GH_REPO` 未設定、harness 内 spawnSync 失敗による起動不能）は全操作に及ぶ。障害発生後の診断・回復（harness 再起動）・blocked 時の resume 手順は、[Issue 操作安全性手順](../../../skills/agentdev-issue-management/references/issue-operation-safety.md) の「起動環境障害の known-issues」節を参照する。
+起動環境障害（`AGENTDEV_GH_REPO` 未設定、harness 内 spawnSync 失敗による起動不能）は全操作に及ぶ。障害発生後の診断・回復（harness 再起動）・blocked 時の resume 手順は、agentdev-issue-management skill の参照文書「Issue 操作安全性手順」の「起動環境障害の known-issues」節を参照する。
 
 ## 実行権限の所有者
 

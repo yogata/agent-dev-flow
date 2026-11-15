@@ -203,7 +203,7 @@ worktree を検査対象とする場合は、host 側配置の本 skill（メイ
 
 ## 新規カテゴリ追加判定フロー（REQ-0145-005）
 
-新規 NG ルール・検査カテゴリを追加する際、既存 NG への副作用を評価してから追加する。詳細手順は [integrity-rule-catalog.md](../../../../docs/designs/integrity-rule-catalog.md)「新規カテゴリ追加判定フロー」参照。本 SKILL.md は判定基準の提示のみを担い、追加可否の最終判断は運用者（HITL）が行う。
+新規 NG ルール・検査カテゴリを追加する際、既存 NG への副作用を評価してから追加する。詳細手順は [integrity-rule-catalog.md](../../../docs/designs/integrity/integrity-rule-catalog.md)「新規カテゴリ追加判定フロー」参照。本 SKILL.md は判定基準の提示のみを担い、追加可否の最終判断は運用者（HITL）が行う。
 
 判定項目（全て満たす必要あり）:
 
