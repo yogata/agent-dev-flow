@@ -1,0 +1,1144 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261115T110326Z-16c9",
+  "workflow": "learning-promote",
+  "evaluationKind": "eight-axis-scoring",
+  "subject": "promote候補10問題クラスの8軸評価（発生件数軸を除く7軸×10クラス=70問）",
+  "sourceRevision": "cf7ac3729",
+  "durationMs": 711,
+  "inputTokens": 8736,
+  "inputs": {
+    "requestDigest": "9cf47684c6b571dc9060e20fb097dd82c1f9ee285370c6aa9608298a80c71f61"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "PA-impact",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 軽微": 0,
+        "2 小": 0,
+        "3 中": 1,
+        "4 大": 0,
+        "5 致命的": 0
+      }
+    },
+    {
+      "questionId": "PA-cross",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 固有": 0,
+        "2 限定": 0.02,
+        "3 中程度": 0.02,
+        "4 高い": 0.49,
+        "5 汎用": 0.47
+      }
+    },
+    {
+      "questionId": "PA-reflect",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 不明": 0,
+        "2 曖昧": 0,
+        "3 概要あり": 0,
+        "4 明確": 0.01,
+        "5 自足的に整備済": 0.99
+      }
+    },
+    {
+      "questionId": "PA-auto",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 困難": 0,
+        "2 低い": 0,
+        "3 可能": 0.01,
+        "4 容易": 0.03,
+        "5 即自動化可": 0.96
+      }
+    },
+    {
+      "questionId": "PA-reuse",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 低い": 0.01,
+        "2 やや低い": 0.01,
+        "3 中程度": 0.02,
+        "4 高い": 0.62,
+        "5 高い": 0.34
+      }
+    },
+    {
+      "questionId": "PA-recurrence",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 極低": 0,
+        "2 低い": 0,
+        "3 中程度": 0,
+        "4 高い": 0.99,
+        "5 ほぼ確実": 0.01
+      }
+    },
+    {
+      "questionId": "PA-cost",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 割高": 0,
+        "2 やや割高": 0,
+        "3 妥当": 0,
+        "4 良い": 0.13,
+        "5 良い": 0.87
+      }
+    },
+    {
+      "questionId": "PB-impact",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 軽微": 0,
+        "2 小": 0.01,
+        "3 中": 0.99,
+        "4 大": 0,
+        "5 致命的": 0
+      }
+    },
+    {
+      "questionId": "PB-cross",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 固有": 0,
+        "2 限定": 0.16,
+        "3 中程度": 0.14,
+        "4 高い": 0.67,
+        "5 汎用": 0.03
+      }
+    },
+    {
+      "questionId": "PB-reflect",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 不明": 0,
+        "2 曖昧": 0,
+        "3 概要あり": 0,
+        "4 明確": 0.02,
+        "5 自足的に整備済": 0.98
+      }
+    },
+    {
+      "questionId": "PB-auto",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 困難": 0,
+        "2 低い": 0,
+        "3 可能": 0,
+        "4 容易": 1,
+        "5 即自動化可": 0
+      }
+    },
+    {
+      "questionId": "PB-reuse",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 低い": 0,
+        "2 やや低い": 0.01,
+        "3 中程度": 0.05,
+        "4 高い": 0.73,
+        "5 高い": 0.21
+      }
+    },
+    {
+      "questionId": "PB-recurrence",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 極低": 0,
+        "2 低い": 0,
+        "3 中程度": 0,
+        "4 高い": 0,
+        "5 ほぼ確実": 1
+      }
+    },
+    {
+      "questionId": "PB-cost",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 割高": 0,
+        "2 やや割高": 0,
+        "3 妥当": 0,
+        "4 良い": 0.4,
+        "5 良い": 0.6
+      }
+    },
+    {
+      "questionId": "PC-impact",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 軽微": 0,
+        "2 小": 0.01,
+        "3 中": 0.99,
+        "4 大": 0,
+        "5 致命的": 0
+      }
+    },
+    {
+      "questionId": "PC-cross",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 固有": 0,
+        "2 限定": 0.01,
+        "3 中程度": 0.09,
+        "4 高い": 0.75,
+        "5 汎用": 0.15
+      }
+    },
+    {
+      "questionId": "PC-reflect",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 不明": 0,
+        "2 曖昧": 0,
+        "3 概要あり": 0.06,
+        "4 明確": 0.51,
+        "5 自足的に整備済": 0.43
+      }
+    },
+    {
+      "questionId": "PC-auto",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 困難": 0,
+        "2 低い": 0,
+        "3 可能": 0.06,
+        "4 容易": 0.11,
+        "5 即自動化可": 0.83
+      }
+    },
+    {
+      "questionId": "PC-reuse",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 低い": 0.01,
+        "2 やや低い": 0,
+        "3 中程度": 0.1,
+        "4 高い": 0.63,
+        "5 高い": 0.26
+      }
+    },
+    {
+      "questionId": "PC-recurrence",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 極低": 0,
+        "2 低い": 0,
+        "3 中程度": 0,
+        "4 高い": 0.98,
+        "5 ほぼ確実": 0.02
+      }
+    },
+    {
+      "questionId": "PC-cost",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 割高": 0,
+        "2 やや割高": 0,
+        "3 妥当": 0.01,
+        "4 良い": 0.13,
+        "5 良い": 0.86
+      }
+    },
+    {
+      "questionId": "PD-impact",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 軽微": 0,
+        "2 小": 0,
+        "3 中": 1,
+        "4 大": 0,
+        "5 致命的": 0
+      }
+    },
+    {
+      "questionId": "PD-cross",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 固有": 0,
+        "2 限定": 0.06,
+        "3 中程度": 0.08,
+        "4 高い": 0.83,
+        "5 汎用": 0.03
+      }
+    },
+    {
+      "questionId": "PD-reflect",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 不明": 0,
+        "2 曖昧": 0,
+        "3 概要あり": 0.04,
+        "4 明確": 0.77,
+        "5 自足的に整備済": 0.19
+      }
+    },
+    {
+      "questionId": "PD-auto",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 困難": 0,
+        "2 低い": 0,
+        "3 可能": 0.04,
+        "4 容易": 0.1,
+        "5 即自動化可": 0.86
+      }
+    },
+    {
+      "questionId": "PD-reuse",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 低い": 0.01,
+        "2 やや低い": 0.01,
+        "3 中程度": 0.16,
+        "4 高い": 0.63,
+        "5 高い": 0.19
+      }
+    },
+    {
+      "questionId": "PD-recurrence",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 極低": 0,
+        "2 低い": 0,
+        "3 中程度": 0,
+        "4 高い": 0.99,
+        "5 ほぼ確実": 0.01
+      }
+    },
+    {
+      "questionId": "PD-cost",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 割高": 0,
+        "2 やや割高": 0,
+        "3 妥当": 0,
+        "4 良い": 0.24,
+        "5 良い": 0.76
+      }
+    },
+    {
+      "questionId": "PE-impact",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 軽微": 0,
+        "2 小": 0,
+        "3 中": 1,
+        "4 大": 0,
+        "5 致命的": 0
+      }
+    },
+    {
+      "questionId": "PE-cross",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 固有": 0,
+        "2 限定": 0,
+        "3 中程度": 0,
+        "4 高い": 0.3,
+        "5 汎用": 0.7
+      }
+    },
+    {
+      "questionId": "PE-reflect",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 不明": 0,
+        "2 曖昧": 0,
+        "3 概要あり": 0.02,
+        "4 明確": 0.2,
+        "5 自足的に整備済": 0.78
+      }
+    },
+    {
+      "questionId": "PE-auto",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 困難": 0,
+        "2 低い": 0.01,
+        "3 可能": 0.93,
+        "4 容易": 0.06,
+        "5 即自動化可": 0
+      }
+    },
+    {
+      "questionId": "PE-reuse",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 低い": 0,
+        "2 やや低い": 0,
+        "3 中程度": 0,
+        "4 高い": 0.61,
+        "5 高い": 0.39
+      }
+    },
+    {
+      "questionId": "PE-recurrence",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 極低": 0,
+        "2 低い": 0,
+        "3 中程度": 0,
+        "4 高い": 1,
+        "5 ほぼ確実": 0
+      }
+    },
+    {
+      "questionId": "PE-cost",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 割高": 0,
+        "2 やや割高": 0,
+        "3 妥当": 0.01,
+        "4 良い": 0.39,
+        "5 良い": 0.6
+      }
+    },
+    {
+      "questionId": "PF-impact",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 軽微": 0,
+        "2 小": 0,
+        "3 中": 1,
+        "4 大": 0,
+        "5 致命的": 0
+      }
+    },
+    {
+      "questionId": "PF-cross",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 固有": 0,
+        "2 限定": 0.02,
+        "3 中程度": 0.06,
+        "4 高い": 0.89,
+        "5 汎用": 0.03
+      }
+    },
+    {
+      "questionId": "PF-reflect",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 不明": 0,
+        "2 曖昧": 0,
+        "3 概要あり": 0.05,
+        "4 明確": 0.79,
+        "5 自足的に整備済": 0.16
+      }
+    },
+    {
+      "questionId": "PF-auto",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 困難": 0,
+        "2 低い": 0,
+        "3 可能": 0.04,
+        "4 容易": 0.12,
+        "5 即自動化可": 0.84
+      }
+    },
+    {
+      "questionId": "PF-reuse",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 低い": 0,
+        "2 やや低い": 0,
+        "3 中程度": 0.08,
+        "4 高い": 0.73,
+        "5 高い": 0.19
+      }
+    },
+    {
+      "questionId": "PF-recurrence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 極低": 0,
+        "2 低い": 0,
+        "3 中程度": 0.99,
+        "4 高い": 0.01,
+        "5 ほぼ確実": 0
+      }
+    },
+    {
+      "questionId": "PF-cost",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 割高": 0,
+        "2 やや割高": 0,
+        "3 妥当": 0.02,
+        "4 良い": 0.39,
+        "5 良い": 0.59
+      }
+    },
+    {
+      "questionId": "PG-impact",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 軽微": 0,
+        "2 小": 0,
+        "3 中": 1,
+        "4 大": 0,
+        "5 致命的": 0
+      }
+    },
+    {
+      "questionId": "PG-cross",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 固有": 0,
+        "2 限定": 0.11,
+        "3 中程度": 0.15,
+        "4 高い": 0.73,
+        "5 汎用": 0.01
+      }
+    },
+    {
+      "questionId": "PG-reflect",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 不明": 0,
+        "2 曖昧": 0,
+        "3 概要あり": 0.03,
+        "4 明確": 0.58,
+        "5 自足的に整備済": 0.39
+      }
+    },
+    {
+      "questionId": "PG-auto",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 困難": 0,
+        "2 低い": 0.01,
+        "3 可能": 0.07,
+        "4 容易": 0.13,
+        "5 即自動化可": 0.79
+      }
+    },
+    {
+      "questionId": "PG-reuse",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 低い": 0,
+        "2 やや低い": 0.01,
+        "3 中程度": 0.17,
+        "4 高い": 0.73,
+        "5 高い": 0.09
+      }
+    },
+    {
+      "questionId": "PG-recurrence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 極低": 0,
+        "2 低い": 0,
+        "3 中程度": 0.99,
+        "4 高い": 0.01,
+        "5 ほぼ確実": 0
+      }
+    },
+    {
+      "questionId": "PG-cost",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 割高": 0,
+        "2 やや割高": 0,
+        "3 妥当": 0.02,
+        "4 良い": 0.34,
+        "5 良い": 0.64
+      }
+    },
+    {
+      "questionId": "PH-impact",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 軽微": 0,
+        "2 小": 0.02,
+        "3 中": 0.98,
+        "4 大": 0,
+        "5 致命的": 0
+      }
+    },
+    {
+      "questionId": "PH-cross",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 固有": 0,
+        "2 限定": 0.13,
+        "3 中程度": 0.22,
+        "4 高い": 0.61,
+        "5 汎用": 0.04
+      }
+    },
+    {
+      "questionId": "PH-reflect",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 不明": 0,
+        "2 曖昧": 0,
+        "3 概要あり": 0.02,
+        "4 明確": 0.51,
+        "5 自足的に整備済": 0.47
+      }
+    },
+    {
+      "questionId": "PH-auto",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 困難": 0,
+        "2 低い": 0.01,
+        "3 可能": 0.02,
+        "4 容易": 0.1,
+        "5 即自動化可": 0.87
+      }
+    },
+    {
+      "questionId": "PH-reuse",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 低い": 0.01,
+        "2 やや低い": 0.02,
+        "3 中程度": 0.24,
+        "4 高い": 0.66,
+        "5 高い": 0.07
+      }
+    },
+    {
+      "questionId": "PH-recurrence",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 極低": 0,
+        "2 低い": 0,
+        "3 中程度": 0,
+        "4 高い": 0,
+        "5 ほぼ確実": 1
+      }
+    },
+    {
+      "questionId": "PH-cost",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 割高": 0,
+        "2 やや割高": 0,
+        "3 妥当": 0,
+        "4 良い": 0.12,
+        "5 良い": 0.88
+      }
+    },
+    {
+      "questionId": "PI-impact",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 軽微": 0,
+        "2 小": 0,
+        "3 中": 1,
+        "4 大": 0,
+        "5 致命的": 0
+      }
+    },
+    {
+      "questionId": "PI-cross",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 固有": 0,
+        "2 限定": 0,
+        "3 中程度": 0,
+        "4 高い": 0.23,
+        "5 汎用": 0.77
+      }
+    },
+    {
+      "questionId": "PI-reflect",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 不明": 0,
+        "2 曖昧": 0.11,
+        "3 概要あり": 0.34,
+        "4 明確": 0.51,
+        "5 自足的に整備済": 0.04
+      }
+    },
+    {
+      "questionId": "PI-auto",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 困難": 0,
+        "2 低い": 0.02,
+        "3 可能": 0.14,
+        "4 容易": 0.23,
+        "5 即自動化可": 0.61
+      }
+    },
+    {
+      "questionId": "PI-reuse",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 低い": 0,
+        "2 やや低い": 0,
+        "3 中程度": 0,
+        "4 高い": 0.54,
+        "5 高い": 0.46
+      }
+    },
+    {
+      "questionId": "PI-recurrence",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 極低": 0,
+        "2 低い": 0,
+        "3 中程度": 0,
+        "4 高い": 0.99,
+        "5 ほぼ確実": 0.01
+      }
+    },
+    {
+      "questionId": "PI-cost",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 割高": 0,
+        "2 やや割高": 0,
+        "3 妥当": 0.01,
+        "4 良い": 0.28,
+        "5 良い": 0.71
+      }
+    },
+    {
+      "questionId": "PJ-impact",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 軽微": 0,
+        "2 小": 0,
+        "3 中": 0,
+        "4 大": 1,
+        "5 致命的": 0
+      }
+    },
+    {
+      "questionId": "PJ-cross",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 固有": 0,
+        "2 限定": 0,
+        "3 中程度": 0.01,
+        "4 高い": 0.87,
+        "5 汎用": 0.12
+      }
+    },
+    {
+      "questionId": "PJ-reflect",
+      "questionForm": "score",
+      "value": 3,
+      "probabilityDistribution": {
+        "1 不明": 0,
+        "2 曖昧": 0,
+        "3 概要あり": 0.01,
+        "4 明確": 0.82,
+        "5 自足的に整備済": 0.17
+      }
+    },
+    {
+      "questionId": "PJ-auto",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 困難": 0,
+        "2 低い": 0,
+        "3 可能": 0.01,
+        "4 容易": 0.42,
+        "5 即自動化可": 0.57
+      }
+    },
+    {
+      "questionId": "PJ-reuse",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 低い": 0,
+        "2 やや低い": 0,
+        "3 中程度": 0.03,
+        "4 高い": 0.4,
+        "5 高い": 0.57
+      }
+    },
+    {
+      "questionId": "PJ-recurrence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "1 極低": 0,
+        "2 低い": 0,
+        "3 中程度": 0.99,
+        "4 高い": 0.01,
+        "5 ほぼ確実": 0
+      }
+    },
+    {
+      "questionId": "PJ-cost",
+      "questionForm": "score",
+      "value": 4,
+      "probabilityDistribution": {
+        "1 割高": 0,
+        "2 やや割高": 0,
+        "3 妥当": 0.01,
+        "4 良い": 0.31,
+        "5 良い": 0.68
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "PA-impact",
+        "value": 2
+      },
+      {
+        "questionId": "PA-cross",
+        "value": 3
+      },
+      {
+        "questionId": "PA-reflect",
+        "value": 4
+      },
+      {
+        "questionId": "PA-auto",
+        "value": 4
+      },
+      {
+        "questionId": "PA-reuse",
+        "value": 3
+      },
+      {
+        "questionId": "PA-recurrence",
+        "value": 3
+      },
+      {
+        "questionId": "PA-cost",
+        "value": 4
+      },
+      {
+        "questionId": "PB-impact",
+        "value": 2
+      },
+      {
+        "questionId": "PB-cross",
+        "value": 3
+      },
+      {
+        "questionId": "PB-reflect",
+        "value": 4
+      },
+      {
+        "questionId": "PB-auto",
+        "value": 3
+      },
+      {
+        "questionId": "PB-reuse",
+        "value": 3
+      },
+      {
+        "questionId": "PB-recurrence",
+        "value": 4
+      },
+      {
+        "questionId": "PB-cost",
+        "value": 4
+      },
+      {
+        "questionId": "PC-impact",
+        "value": 2
+      },
+      {
+        "questionId": "PC-cross",
+        "value": 3
+      },
+      {
+        "questionId": "PC-reflect",
+        "value": 3
+      },
+      {
+        "questionId": "PC-auto",
+        "value": 4
+      },
+      {
+        "questionId": "PC-reuse",
+        "value": 3
+      },
+      {
+        "questionId": "PC-recurrence",
+        "value": 3
+      },
+      {
+        "questionId": "PC-cost",
+        "value": 4
+      },
+      {
+        "questionId": "PD-impact",
+        "value": 2
+      },
+      {
+        "questionId": "PD-cross",
+        "value": 3
+      },
+      {
+        "questionId": "PD-reflect",
+        "value": 3
+      },
+      {
+        "questionId": "PD-auto",
+        "value": 4
+      },
+      {
+        "questionId": "PD-reuse",
+        "value": 3
+      },
+      {
+        "questionId": "PD-recurrence",
+        "value": 3
+      },
+      {
+        "questionId": "PD-cost",
+        "value": 4
+      },
+      {
+        "questionId": "PE-impact",
+        "value": 2
+      },
+      {
+        "questionId": "PE-cross",
+        "value": 4
+      },
+      {
+        "questionId": "PE-reflect",
+        "value": 4
+      },
+      {
+        "questionId": "PE-auto",
+        "value": 2
+      },
+      {
+        "questionId": "PE-reuse",
+        "value": 3
+      },
+      {
+        "questionId": "PE-recurrence",
+        "value": 3
+      },
+      {
+        "questionId": "PE-cost",
+        "value": 4
+      },
+      {
+        "questionId": "PF-impact",
+        "value": 2
+      },
+      {
+        "questionId": "PF-cross",
+        "value": 3
+      },
+      {
+        "questionId": "PF-reflect",
+        "value": 3
+      },
+      {
+        "questionId": "PF-auto",
+        "value": 4
+      },
+      {
+        "questionId": "PF-reuse",
+        "value": 3
+      },
+      {
+        "questionId": "PF-recurrence",
+        "value": 2
+      },
+      {
+        "questionId": "PF-cost",
+        "value": 4
+      },
+      {
+        "questionId": "PG-impact",
+        "value": 2
+      },
+      {
+        "questionId": "PG-cross",
+        "value": 3
+      },
+      {
+        "questionId": "PG-reflect",
+        "value": 3
+      },
+      {
+        "questionId": "PG-auto",
+        "value": 4
+      },
+      {
+        "questionId": "PG-reuse",
+        "value": 3
+      },
+      {
+        "questionId": "PG-recurrence",
+        "value": 2
+      },
+      {
+        "questionId": "PG-cost",
+        "value": 4
+      },
+      {
+        "questionId": "PH-impact",
+        "value": 2
+      },
+      {
+        "questionId": "PH-cross",
+        "value": 3
+      },
+      {
+        "questionId": "PH-reflect",
+        "value": 3
+      },
+      {
+        "questionId": "PH-auto",
+        "value": 4
+      },
+      {
+        "questionId": "PH-reuse",
+        "value": 3
+      },
+      {
+        "questionId": "PH-recurrence",
+        "value": 4
+      },
+      {
+        "questionId": "PH-cost",
+        "value": 4
+      },
+      {
+        "questionId": "PI-impact",
+        "value": 2
+      },
+      {
+        "questionId": "PI-cross",
+        "value": 4
+      },
+      {
+        "questionId": "PI-reflect",
+        "value": 3,
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "PI-auto",
+        "value": 3
+      },
+      {
+        "questionId": "PI-reuse",
+        "value": 3
+      },
+      {
+        "questionId": "PI-recurrence",
+        "value": 3
+      },
+      {
+        "questionId": "PI-cost",
+        "value": 4
+      },
+      {
+        "questionId": "PJ-impact",
+        "value": 3
+      },
+      {
+        "questionId": "PJ-cross",
+        "value": 3
+      },
+      {
+        "questionId": "PJ-reflect",
+        "value": 3
+      },
+      {
+        "questionId": "PJ-auto",
+        "value": 4
+      },
+      {
+        "questionId": "PJ-reuse",
+        "value": 4
+      },
+      {
+        "questionId": "PJ-recurrence",
+        "value": 2
+      },
+      {
+        "questionId": "PJ-cost",
+        "value": 4
+      }
+    ]
+  }
+}

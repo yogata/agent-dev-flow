@@ -3916,6 +3916,9 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 〔2026-11-07 learning-promote 統合追記・inbox 1 件（traceability sidecar 登録〔Case #3887・REQ-004-069〜075〕）〕: 同根（inline 宣言と sidecar の重複排除）の追加出現。sidecar 登録は inline 宣言との重複排除が前提で、duplicate-inconsistencies を必ず機械突合する。表記ゆれ（REQ 行 ID の桁・区切り）は機械検査でのみ発見でき手作業の目視照合に頼らない
 
 〔2026-11-07 learning-promote 統合追記・inbox 1 件（ADF-COVERS inline 宣言の ID 列挙かっこ付き説明黙示切断〔Case #3928〕）〕: inline 宣言記述規律クラスの失敗モード追加。ID 列挙のかっこ付き説明の後に続けた ID は黙示切断され、malformed-declarations には検出されず missing-design だけが現れる（coverage --req の単行実測で原因特定）。かっこ付き説明を持つ ID は既存行への連結ではなく独立行の宣言として追加する。sidecar-and-policy.md「inline 宣言行の記述形式（ID 列挙のみ）」節（恒久規定・L84-89 実測）への失敗モード注記は不在（2026-11-07 実測確定）
+
+- **統合追記（2026-11-15 learning-promote・inbox 1 件）**: inline 宣言記述規律クラスへの失敗モード追記 — ADF-COVERS 宣言行（docs/designs/responsibilities/custom-tool-contracts.md L8）に行末のコメント終端子 --> が欠落しており traceability check が当該行の design 対応を検出できず missing-design/missing-implementation/missing-verification の 3 findings が出て case-close のトレーサビリティ完全性 gate（3完全性ゲート）で初検出・完了阻止された（Case #4002/PR #4023 系・2026-11-12）。docs 検査系（textlint・integrity 既存検査）は宣言構文を検査せず、REQ 行の対応関係を実際に照合する traceability check の実行が初めての検出経路になる。宣言構文検査（行末終端子の存在・ADR-COVERS/ADF-COVERS 形式チェック）を check_changed_docs または integrity 系へ追加する判断・設計 PR 受入時の完全性 gate 前置を保持。詳細は evaluation-report.md Q-G 参照
+- **移動日**: 2026-11-15
 ---
 
 ## 2026-10-11: traceability check の unknown-req-refs findings が一時的に非決定的計上を示す
@@ -4583,6 +4586,9 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 
 - **統合追記（2026-10-27 learning-promote）**: duplicate 受理。2 件の同根出現を統合: (1) 実装 PR が配布物本文に concrete REQ-ID を 17 箇所直書きし case-close 正規形最終 gate で違反 17 件検出・case-run 側は別形式 CLI（check_distribution_boundary_cli.ts <worktree>）で violations 0 申告の乖離（Case #3841・是正 commit 2ac7e59ed）(2) Design 節本文の REQ ID（REQ-106、REQ-111-008）を phase-artifacts-update SKILL.md へ転記し checker source profile が 2 件検出（Root Case #3847・ID 除去表現へ書き直し再検証合格）。恒久被覆: harness-delegation.md L285-293 + distribution-concrete-id-placement.md + distribution-boundary.md「配布物本文の記述規則」（adversarial-review Stream B 実測）。残余観点: checker CLI 形式が case-run と case-close で分岐する点は L4988（スキャン集合 cwd 変動）と同系・正規形は reference 指定コマンド
 
+- **統合追記（2026-11-15 learning-promote・inbox 1 件）**: 同根 3 回目の再発 — 配布 skill scripts 配下のソース（実装コメント）へ要件行 ID（concrete ID）を直書きしたところ配布依存境界 checker（source profile）の baseline 比較で concrete-id 違反 1 件が即座に検出された（Case #3979/PR #3982・計測 2026-11-08・ID 除去で解消）。配布物変更 Case の実装時に checker baseline 比較を標準前置にする運用が実効的な予防ゲートとして機能する実績。詳細は evaluation-report.md Q-C 参照
+- **移動日**: 2026-11-15
+
 ## 並行 case-open 実行下で共通 Jev 観測の先行 commit が兄弟 Case に先取され commit メッセージと実体が乖離した
 
 - **問題事象**: case-open STEP-1 の先行明示パス commit で、draft と共通 Jev 観測（Batch 単位観測 2件）を add 後に commit したところ、commit 実体は draft のみ（1 file）で、メッセージ「RU-0210 由来 draft と req-define Jev 観測を永続化」と乖離した。Jev 観測 2件は並行兄弟 Case（RU-0208 由来、commit 8f224096）が先に commit しており、本 Case の commit 実行時点で既に tracked だった
@@ -4616,6 +4622,9 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **関連**: .agentdev/learning/inbox.md、PR #3687、Issue #3679、scripts/lib/definition-traceability-gate.ts、Issue #3684（phase 系 NG の処遇 Case）、Issue #3675（frontmatter 鮮度 NG の処遇 Case）
 - **タグ**: `#case-open` `#machine-gate` `#対照救済`
 - **移動日**: 2026-10-15
+
+- **統合追記（2026-11-15 learning-promote・inbox 6 件）**: warning 債務と checker 終了コード契約・補正値設計差・収束後継続分岐の 6 変異を本クラスへ統合追記。(1) check_integrity の applyNgBaseline は ng と warning の両方を対象とし ng-baseline 未登録の既知 warning が「new unmanaged NG (delta, exit code driver)」として exit=1 を駆動（Case #4049）(2) accept_definition_checks.ts の integrity gate が既出債務 warning で機械 fail となり後続ゲートが後続抑止される構造（Case #4004/#3994 系・対照救済＋手動相当手順への切替が毎回必要）(3) case-ready 受入検査の既存警告が機械工程の後続抑止を引き対照救済＋手動相当手順への切替が毎回必要（Case #3988）(4) measurement-convergence 補正値 (commitDate) と IR-072 検査値 (author date) の設計差で check_integrity NG 5件残存（Case #3961）(5) 収束補正を完結させた後も元の check_integrity 終了コードで後続 gate を抑止して終了し収束成立時の継続は呼出側の再実行と対照救済手順に依存（Case #4002）(6) IR-072 は commit 済み状態を照合するため commit 前検証で NG になる（Case #4054）。機構整理候補（checker 終了コード契約の明示化〔NG のみを exit driver に〕・script 側の対照救済自動突合 step・収束後再実行 step の追加）は REQ/Design/script 実装変更判断を含むため deferred 維持。統合先の核は対照救済クラスであり計測/終了コード系変異は「checker gate の fail 解釈・救済・継続手順の機構整理候補」という緩い束ね（同時点検対象）。詳細は evaluation-report.md Q-A 参照
+- **移動日**: 2026-11-15
 
 
 
@@ -5505,6 +5514,9 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **処分判定**: deferred（Q14〔traceability スコープ別実行と corpus 診断乖離〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
 - **移動日**: 2026-11-07
 
+- **統合追記（2026-11-15 learning-promote・inbox 1 件）**: 対象要件行なし Case（重複無力化クローズ等）で corpus 全域 traceability check は corpus debt（missing-implementation/missing-verification の advisory）で exit 2 となり機械工程が fail する（Case #3989）。Case の主題要件行（集約先で対応完了した行）への --req スコープ（REQ-031-029,REQ-015-012）で lifecycle gate 完全性と corpus 診断を分離できる。「対象要件行なし Case の close では主題要件行への --req スコープ構成が必要・corpus debt の解消自体は別案件」を保持。詳細は evaluation-report.md Q-E 参照
+- **移動日**: 2026-11-15
+
 ## [2026-11-05T21:23+09:00][learning_candidate][fail-first 申告が module-absence 失敗だった場合の mutation-based RED 感度検証による補完][Case #3928]
 - 検知: PR #3937（#3934）本文の fail-first 申告（RED 確認後 GREEN）の実体が新規モジュール不在時の module-absence 失敗であり、repo 規約（Epic 実現方針: テスト失敗は要求の拒否＝assertion 成立であることを確認し、import/構文/依存の失敗を拒否成立の証拠にしない）が要求する assertion-level RED の証跡がなかった。
 - 対処: #3933 クローズで確立した手法と同一の手順で新規感度証拠を追加生成した。検証対象境界を一時無効化（REQ-118-007 読み戻し拒否境界・REQ-118-009 targetIds 完全一致照合境界）して assertion-level RED（expect().toThrow の期待不成立）を観測し、バイト等価復元（sha256 一致・git status porcelain 空）を確認してからフルスイート再実行（214 pass / 0 fail）で GREEN を再確認。履歴の書き換えはせず新規証拠として完了記録へ正直に記録した。
@@ -5761,6 +5773,9 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - **処分判定**: deferred（Q13〔pin 期待文言滞留〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
 - **移動日**: 2026-11-07
 
+- **統合追記（2026-11-15 learning-promote・inbox 2 件）**: pin 期待文言クラスへの 2 変異追記。(1) pin テストの期待値が Design 本文の読点位置に依存しており読点差で baseline fail が発生（Case #3967・pin 期待値は句読点に依存しない正規化比較にすると安定・並列 Wave では「merge 後の fresh HEAD 再実測で解消確認してから撤回」運用）(2) 語句除去系変更の pin 事前確認を Issue 列挙語句で grep したため pin 期待値（「作成先確認」「環境指定TEMP」等の周辺語句）を事前検出できず bun test 後検出になった（Case #3968・事前確認は pin 期待値候補語句で grep する）。詳細は evaluation-report.md Q-D 参照
+- **移動日**: 2026-11-15
+
 ## [2026-11-05][learning_candidate][隔離検証セッション実行側の中間メッセージ中国語出力][Epic #3909]
 - 検知: TS-606 能力1（直接入力）の新規隔離実行セッション C1（/agentdev/req-define・4096 HTTP 投入・main 1cfc5ee56 投影）で、実行側セッションの STEP-5 中間メッセージに中国語出力「关键事实」が 1 箇所観測された（supplement-3909-ts606.md §7-6）。機能観測（STEP-6 決定的組立・STEP-9 読戻し検査合格）への影響なし。
 - 対処: 記録のみ（観測時点では処置せず・親判断により本 learning として回収）。
@@ -5840,3 +5855,825 @@ elated_spec フィールドを必須化する。(b) Phase E で IR-061 frontmatt
 - タグ: #learning-capture #detached起動 #二重実行 #launcher-shell #fail-closed #機械工程
 - **処分判定**: deferred（Q38〔機械工程起動 twin・2 件統合〕・learning-promote 2026-11-07・詳細根拠は evaluation-report 参照）
 - **移動日**: 2026-11-07
+
+- **統合追記（2026-11-15 learning-promote・inbox 1 件）**: 機械工程の bun 実行体自動駆動の 3 失敗連鎖を本クラスへ統合追記（Case #4002 case-close 再開）。(1) bash ツールで `&` バックグラウンド起動した bun test 子プロセスがツール呼出し終了時にハーネスに kill される (2) `process.execPath`（node.exe）から detached spawn した close_mechanical_steps.ts は bun 固有の import.meta.path（isDirectExecution 判定）が node に存在せず TypeError で即死 (3) detached spawn した子の完了待ちを unref で解除すると親のイベントループから参照が外れ親が即終了し on("exit") が発火しない。規律: 機械工程や受入検査の長時間自動駆動は「bun で起動（node から spawn しない）・child_process.spawn({detached: true, stdio: ファイルfd}) + unref・進捗はファイルプロトコル（progress.txt・exit-{n}.txt ポーリング）・チェーン駆動時は unref せず on("exit") で次実行」を前提に設計する。詳細は evaluation-report.md Q-F 参照
+- **移動日**: 2026-11-15
+
+## 2026-11-13: textlint の advice 指摘は逐語保存契約の本文では修正不能であり、「hard 0件＋保持理由記録」の運用が逐語保存文書の実務上の合格条件として成立している（Case #4049・case-run）
+
+- **問題事象**: 計画書§3 を逐語保存する Design 文書（docs/designs/local/adf-simplification-deferred-records.md）の textlint gate（--purpose final）で advice 3件（sentence-length・no-mix-dearu-desumasu・ja-no-redundant-expression）が出た。逐語保存契約（計画書§3 本文を正とし変更禁止）により修正対象外の本文への指摘であり、修正も保持も契約上の判断が必要
+- **発生局面**: case-run（PR #4051）の textlint gate 実行（Case #4049・C-ω）
+- **検知方法**: textlint gate の JSON 出力の指摘レベル分類（hard vs advice）と指摘対象行の契約属性（逐語保存部分かどうか）の突合
+- **根本原因**: 障害ではない。逐語保存契約の本文は textlint の advice 改善対象外であり、advice レベルの指摘は保持理由の記録を伴う運用で処理するのが実務上の成立形
+- **自律対応内容**: advice 3件は保持し、保持理由（逐語保存契約部分・REQ-121-001 の要件文言）を PR 本文の検証欄に記録した。hard 0件を合格条件として扱う運用の実績を本 entry に記録
+- **ユーザー確認の有無**: なし（workflow 内自律処置・運用実績の記録）
+- **REQ/Decision/Design影響**: REQ-053（文書と配布物の文章品質契約）の合格条件解釈と、逐語保存を伴う文書種別（見送り記録・転記系 Design）の textlint 運用の知見
+- **横展開観点**: 計画書・外部文書の逐語転記を契約とする Case（C-α2 の REQ-120 系・将来の転記系記録保存）で同型の判断が必要になる
+- **再発条件**: 逐語保存契約の本文が textlint の advice 指摘対象に含まれる条件
+- **予防策候補**: 逐語保存文書の textlint 合格条件の明文化（hard 0件＋advice 保持理由記録）を REQ-053 系の運用知見へ整理
+- **想定反映先**: agentdev-textlint-guard 運用文書・REQ-053 関連の知見整理
+- **関連**: Case #4049・PR #4051・PR 本文 Findings より回収（case-close STEP-6-4）
+- **タグ**: #textlint #advice #逐語保存 #運用知見 #case-run
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-13: agentdev_jev evaluate の observationMetadata.references.digest に sha256 形式外の値を渡すと evaluator 成功後に観測書込みが invalid_input で失敗する（Case #4049・case-ready）
+
+- **問題事象**: case-ready のスコープ重複判定（Jev 先行評価）で observationMetadata.references の digest に sha256 hex 64文字でない説明用プレースホルダ文字列を渡したところ、evaluator 自体は成功（scope-overlap=false・確率 0.93）したものの、評価直後の観測永続化が invalid_input（input reference digest must be a sha256 hex digest）で失敗し、観測 JSON が .agentdev/jev-observations/ に保存されなかった。evaluate の成功応答には observation write 失敗が warning として付与される
+- **発生局面**: case-ready STEP-5（実行構造確定・既存オープン Issue とのスコープ重複判定の Jev 先行評価。Case #4049 / C-ω）
+- **検知方法**: evaluate 応答内の observation.warning（observation write failed: invalid_input）と .agentdev/jev-observations/ の最新ファイル mtime の突合（当該評価の観測ファイルが新規作成されていないことで確認）
+- **根本原因**: 呼出側（本実行）が references.digest に実ファイルの sha256 計算値ではなく説明的なプレースホルダ文字列を渡したこと。Tool 側の入力検証（sha256 hex 64文字）は正しく機能し、観測契約（再構成可能な入力は path + digest で保持）の要件を満たさない入力を fail-closed で拒否した
+- **自律対応内容**: 契約どおり観測の再実行・擬似再生成は行わず、観測書込み失敗を独立 warning として完了報告に記録（evaluator 結果と LLM 最終判断の一致: scope-overlap=false）。次回以降は references を渡す前に sha256sum 等で実 digest を計算するか、references を省略して snapshot のみで構成する
+- **ユーザー確認の有無**: なし（workflow 内自律処置・warning 記録）
+- **REQ/Decision/Design影響**: なし（呼出側入力構成の注意喚起。Tool の fail-closed 検証自体は正常動作）
+- **横展開観点**: Jev 先行評価を行う6系統 Workflow（learning-promote、req-define、case-ready、intake-promote、inspect-promote、backlog-review）の evaluate 呼出しで references を構成する全経路で同型の失敗が発生し得る
+- **再発条件**: observationMetadata.references.digest に実計算値でない文字列を渡して evaluate を呼ぶ条件
+- **予防策候補**: evaluate 呼出し前の references 構成手順への sha256 実計算の明示（または references 省略時の snapshot 構成への統一）
+- **想定反映先**: learning-promote（運用手順の知見として整理）・execution-structure.md「Jev 評価経路」の呼出側規律参照候補
+- **関連**: Case #4049 / case-ready STEP-5・REQ-090 系（Jev 先行評価の実運用組込み）
+- **タグ**: #agentdev-jev #observation-metadata #invalid-input #fail-closed #case-ready
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-13: agentdev_gh pr_create の number フィールド取扱いが reference 規約と Tool 実挙動で矛盾（Case #4049・case-open 設計PR作成）
+
+- **問題事象**: case-open の設計PR作成で reference 規約（definition-pr-and-idempotency.md「要求には対象識別（対象 Root Case Issue の番号を number で指定）を含める。対象識別を欠く要求は Tool が受理しない」）に従い number を含めて pr_create を呼んだところ、Tool が当該要求を fail-closed で拒否した（拒否応報は pr_create 契約が number フィールドを受理しない旨）。number を除いて再実行したところ作成に成功した（PR #4050）
+- **発生局面**: case-open STEP-4 設計PR作成（Case #4049 / PR #4050・C-ω）
+- **検知方法**: pr_create の失敗応答（fail-closed 拒否）と number 除去後の成功の対比。Tool の公開契約（request schema）は pr_create の number を「対象識別として受理する（GitHub 実装は head branch で対象解決するため作成対象解決には使用しない）」と記述しており、実挙動・reference・schema の三者が不一致
+- **根本原因**: 確定不能（要検証）。Tool 実装の入力検証が schema 記述と乖離しているか、拒否理由の報告文が不正確である可能性。委譲セッションが glm-5.3 利用上限に伴うサーバー再起動で消失し、拒否応答の原文が採取できないため、原文に基づく原因特定は未実施
+- **自律対応内容**: Tool 契約（実挙動）を正として number を除いて再作成し、reference と Tool 契約の不整合を逸脱として報告に記録した（本 entry が当該記録の正規 Capture）
+- **ユーザー確認の有無**: なし（workflow 内自律処置・逸脱記録）
+- **REQ/Decision/Design影響**: case-open の definition-pr-and-idempotency.md（pr_create の対象識別要件）と agentdev_gh 公開契約・実装の三者整合の確認要求
+- **横展開観点**: write-proxy payload 標準配置（issue-operation-recovery.md）も「pr_create の場合は対象識別を含める要求全体」と規定しており、同規約に従う全経路で同一の拒否に遭遇し得る
+- **再発条件**: number を含めて pr_create を呼ぶ全ての case-open / case-revise 実行
+- **予防策候補**: agentdev_gh の入力検証と schema 記述の整合修正、または reference 2件（definition-pr-and-idempotency.md・issue-operation-recovery.md）の対象識別要件の実装追従
+- **想定反映先**: agentdev-workflow-case-open references・agentdev-issue-management references・agentdev_gh Tool 契約
+- **関連**: Case #4049 / PR #4050・case-open STEP-4
+- **タグ**: #agentdev-gh #pr_create #契約不一致 #fail-closed #case-open
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-12: detached worktree を相対パスで作ると現在 worktree 配下にネストする（worktree add は main root から実行・絶対パス指定）
+
+- **問題事象**: `git worktree add` に相対パスを渡すと、実行時の cwd（検証中の worktree 配下）を起点に解決され、意図せず既存 worktree 配下に新 worktree がネストする
+- **発生局面**: Case #4005 / PR #4017（B1-2）の baseline 対照実行用 detached worktree 作成（PR 本文 learning 候補から回収）
+- **検知方法**: 作成後の worktree パス確認（ネスト先に作成されていることを観測）
+- **根本原因**: git worktree add のパス解決が cwd 基準の相対解決であることと、検証実行中の cwd が検証対象 worktree であることの組み合わせ
+- **自律対応内容**: worktree add は main root から実行するか、絶対パスで指定する手順に統一
+- **ユーザー確認の有無**: なし（実行手順の自律調整）
+- **REQ/Decision/Design影響**: なし（運用手順の知見）
+- **横展開観点**: baseline 対照実行（detached worktree 標準手順）を実行する全委譲・機械工程で同型の注意が必要
+- **再発条件**: worktree 配下の cwd から相対パスで git worktree add を実行する条件
+- **予防策候補**: agentdev-git-worktree の detached 対照手順への絶対パス指定の明記
+- **想定反映先**: learning-promote（運用手順の知見として整理）・agentdev-git-worktree の参照更新候補
+- **関連**: Case #4005 / PR #4017・baseline 対照実行（detached worktree 標準手順）
+- **タグ**: #git-worktree #detached #baseline-対照 #パス解決
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-07: 検証用一時資材の台帳登録欠落が case-close 照合で 22件の未登録検出になり完了抑止
+
+- **問題事象**: case-run が検証証跡を環境指定TEMP（adf-del-3961-1・66件）と .agentdev/integrity/reports/（本 Case 由来 21件）へ退避したが、検証用一時資材台帳（.agentdev/tmp/verification-resources/3961.json）への登録を実施していなかった（PR 本文は「台帳登録は委譲元が実施」と申告していたが実態は未実施）。case-close 照合（verificationResourceCheck）が gitignore 対象出力走査・OS TEMP パターン走査・dedicated-area 観測で未登録 22件を検出し、完了を抑止した
+- **発生局面**: case-close STEP-2 完了判定工程（Case #3961）
+- **検知方法**: close_mechanical_steps.ts 報告 JSON の unregistered-resource findings（gitignored-output・dedicated-area source 別）
+- **根本原因**: 検証コマンドの stdout/stderr 分離退避が作成ヘルパー経由の作成時機械登録を経ていない
+- **自律対応内容**: case-close が台帳へ後追い記録（registrationBasis=evidenced-occurrence-record・94件）を登録して照合を成立させ、回収（削除）は利用者明示確認事項として対応記録コメントへ削除提案として提示（回収未了のため close は機械境界で抑止継続）
+- **ユーザー確認の有無**: なし（削除提案提示・確認待ち）
+- **REQ/Decision/Design影響**: 検証用一時資材ライフサイクル Design（作成ヘルパー経由登録の運用浸透）
+- **横展開観点**: case-run の証跡退避手順に台帳登録の接続が存在するかを全委譲契約で照合する
+- **再発条件**: 証跡退避を環境指定TEMP・reports/ 配下へ直接書き出し、close 時まで台帳登録を省略する運用
+- **予防策候補**: 検証コマンドの stdout/stderr 分離退避ヘルパーに台帳登録を統合する（退避と登録を同一手続で）
+- **想定反映先**: req-define（REQ-032 系への追加行候補）
+- **関連**: 検証用一時資材のライフサイクル Design「正規の作成経路」「回収」・Case #3961
+- **タグ**: #検証用一時資材 #台帳 #case-close-照合 #証跡退避
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-07: PR 本文検証差分の fail 明細粒度が機械受理基準の 1:1 突合に不足（記憶転記と実測転記の差）
+
+- **問題事象**: PR 本文の検証差分が split3 fail を「installer 系 11件（scripts-behavior.test.ts 10件 + textlint-guard-distribution.test.ts 1件）」と記録したが、証跡の実測明細は scripts-behavior 9件 + textlint-guard-distribution 2件の内訳であった。機械受理基準（observedFailCounts と failureOrigins の fail 単位 1:1 突合）では明細粒度の実測記録が必要で、記憶に基づく内訳転記では突合が成立しない
+- **発生局面**: case-close STEP-2 機械受理記録の組み立て（Case #3961）
+- **検知方法**: failure-origin-count-mismatch violation（expected 12 / actual 11）＋ stage 3 証跡（adf-del-3961-1/suite-split3-r2.err の fail 行明細）と baseline detached worktree 再現確認（sb 9件・tgd 2件）の実測
+- **根本原因**: PR 本文の fail 内訳が証跡の実測再確認ではなく記憶に基づく内訳で記録されていた
+- **自律対応内容**: 実測明細から内訳を確定し機械受理記録を組み立て直した（11件の failureOrigins に baseline 再現記録を付与）
+- **ユーザー確認の有無**: なし（workflow 内自律処置）
+- **REQ/Decision/Design影響**: checker 実行契約 Design（件数突合と明細記録の粒度）
+- **横展開観点**: 検証差分記録の fail 明細は必ず証跡ファイルの実測から転記する
+- **再発条件**: 記憶・要約に基づく fail 件数・内訳の記録
+- **予防策候補**: fail 明細転記に証跡参照義務（明細行の grep 出力添付）を検証差分規約へ明記
+- **想定反映先**: agentdev-quality-gates（QG-4 受理条件の明細粒度明記）
+- **関連**: checker 実行契約 Design「baseline 退避物と BaselineFile の役割分離と合否判定基準」・Case #3961
+- **タグ**: #検証差分 #fail明細 #機械受理 #qg4
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-07: pre-existing fail 3系統と対象範囲外 SKILL 旧文言残存 2件の問題記録（PR 本文 Findings の learning 転記・Case #3961 対象外）
+
+- **問題事象**: (1) traceability_relied_diff.test.ts T6「後続消費経路の文書接続が存在する」が現行 v51 Design 実文と不一致（baseline 90842e944 でも再現・REQ-119 対象外）。(2) installer 系 11件（scripts-behavior.test.ts 9件: git clone checkout 3・tools/plugins projection 3・third-party drift 3 ＋ textlint-guard-distribution.test.ts 2件: vendor 欠落系）が baseline でも再現。(3) PR 本文 Findings 3 の REQ-119.md:14 prh 違反は case-close で表層是正済み（commit 87829d9d4・解消）。(4) 対象範囲外 SKILL 2ファイル（agentdev-workflow-case-run/SKILL.md L150・agentdev-workflow-case-open/SKILL.md L107）に REQ-119-007 と同由来の旧境界文言（「案件スコープの専用領域へ作成し」等）が残存
+- **発生局面**: case-run Findings 記録と case-close 検証（Case #3961）
+- **検知方法**: full integrity suite・textlint・grep 実測
+- **根本原因**: (1)(2) は main 本体の既知欠陥。(4) は REQ-119 適用範囲（adapter SKILL.md と投影先）外の同種文言
+- **自律対応内容**: (1)(2)(4) は改変せず記録のみ。(3) は表層是正で解消
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: (4) は REQ-119.md 備考の文言整合対象一覧化知見の適用候補
+- **横展開観点**: (1)(2) は後続 Case（既知欠陥是正）の候補。(4) は文言整合の横断是正候補
+- **再発条件**: なし（既存欠陥の記録）
+- **予防策候補**: なし
+- **想定反映先**: req-define（後続要求候補の下地として保持）
+- **関連**: PR #3963 本文 Findings・Case #3961
+- **タグ**: #pre-existing #既知欠陥 #文言整合 #capture
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-08: prepare_definition_pr の計測日収束 trigger が checker 実出力の表記と不一致で発動せず、手動 contingency で救済（Case #3964）
+
+- **問題事象**: case-open STEP-4 機械工程で check_integrity が 1 NG（index-generation-consistency: req-metrics 計測日 AUTOGEN が commit 前基準の 2026-11-07 のまま・期待値 2026-11-08）で fail した。script の measurement-convergence step は generate_indexes rerun のみを実行し、rerun 結果の派生物補正 commit と frontmatter updated 追随が発動せず、派生物が uncommitted のまま残った。baseline: 計測対象 commit 6ba37c9f7（definition/issue-3964 の Definition commit HEAD・PR #3965）、計測 2026-11-08、実行コマンド bun prepare_definition_pr.ts --input（check_integrity は commit 済み HEAD 対象）
+- **発生局面**: 実装（case-open STEP-4 機械工程の check_integrity 後処理）
+- **検知方法**: prepare-definition-pr 報告 JSON の check_integrity step fail と、計測日収束補正 commit 後の check_integrity 再実行（NG 0件確認）の実測
+- **根本原因**: script の hasMeasurementDrift trigger 判定が正規表現 /IndexGenerationConsistency/（キャメル表記・reference 文書の表記に追従）である一方、checker（check_integrity.ts）の実出力は index-generation-consistency（ケバブ表記）で機械突合が成立せず、trigger 漏れとなった。trigger 条件の表記は下位 checker の実サンプル機械突合テストで固定されていなかった
+- **自律対応内容**: reference（definition-pr-and-idempotency.md）の計測日収束手動 contingency に従い、(a) rerun 済みの req-health-metrics.md 計測日 AUTOGEN を明示パス指定で補正 commit、(b) 同ファイルの frontmatter updated を 2026-11-08 へ追随補正 commit、の後 check_integrity 再実行で NG 0件・新規 unmanaged NG 0件を確認（コミット 8f4053eb4・bd215ec33）
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（既存 contingency 手順の履行。REQ-060 の bun test 実行形態契約・full integrity suite の3 cwd 分割正規形は変更なし）
+- **横展開観点**: 機械化 step の trigger 条件は対象 checker の実際の出力表記に対する実サンプル機械突合テストで固定する。reference 文書の表記を信頼した trigger 実装は実出力と乖離し得る
+- **再発条件**: commit 前実行の generate_indexes が旧 author date 基準の計測日を書く条件（計測日ずれ）が発生し、かつ checker 出力と trigger 正規表現の表記不一致が残る場合に再発する
+- **予防策候補**: prepare-definition-pr.test.ts に checker 実出力文字列（index-generation-consistency のケバブ表記）を trigger 判定が捕捉することの機械突合テストを追加する
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts（hasMeasurementDrift 判定）と scripts/tests/prepare_definition_pr.test.ts
+- **関連**: .agentdev/integrity/reports/prepare-report-3964.json・PR #3965 検証差分・Case #3964
+- **タグ**: #計測日収束 #機械工程 #表記差異 #trigger漏れ #case-open
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-08: 配布依存境界 source profile の対象は src/common/{commands,skills,tools}/** と src/opencode/plugins/** であり tools/** を含む（Case #3967・case-close STEP-3）
+
+- **問題事象**: PR 本文の品質メトリクス申告が「配布依存境界: 該当変更なし〔src/common/{commands,skills}/** に該当変更なし〕」としていたが、本 PR は src/common/tools/agentdev-gh/** を変更しており、source profile の正確な対象集合（lib/distribution-boundary-fs.ts の projection semantics: source/archive は src/common/{commands,skills,tools}/** + src/opencode/plugins/**）に含まれるため申告が見落としだった
+- **発生局面**: case-close STEP-3（配布依存境界 最終 gate の trigger 判定）
+- **検知方法**: STEP-3 実行時の detector 対象集合確認（distribution-boundary-fs.ts の projection 定義実読）
+- **根本原因**: source profile の対象集合の理解が commands・skills に限定されていた（tools を含まない誤解）
+- **自律対応内容**: case-close 側で gate を実行（check_distribution_boundary.ts --profile source・worktree HEAD 指定）し ok true・failures 0・rules ok を確認。検証差分（対応記録コメント）に申告の修正済みを記録
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（gate は合格・申告の見落としは工程間検証差分で補正済み）
+- **横展開観点**: case-run の STEP-S5（配布依存境界 gate trigger 判定）でも同一の見落としが起き得る。trigger 判定は PR 変更ファイルと source profile 対象集合の交差で機械的に判定する（集合は lib の projection 定義が正）のが安全
+- **再発条件**: src/common/tools/**・src/opencode/plugins/** を変更する PR で配布依存境界 gate をスキップ申告する case-run
+- **予防策候補**: PR テンプレートの品質メトリクス申告欄に source profile 対象集合の注記（tools・plugins 含む）を追加、または trigger 判定の機械化
+- **想定反映先**: agentdev-workflow-case-run SKILL・PR テンプレート（検証差分セクションの注記）・case-close references/docs-and-design-promotion.md
+- **関連**: PR #3973・対応記録コメント（検証差分行1）・Case #3967
+- **タグ**: #配布依存境界 #source-profile #trigger判定 #case-close #case-run
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-08: bun test の件数サマリー・fail 明細は stderr 出力のため機械工程報告 JSON に含まれず、fail 由来分類には stderr 分離退避付きの script 外直接実行が必須（Case #3967）
+
+- **問題事象**: close_mechanical_steps.ts の full-integrity-suite step は integrityResults に stdout のみを保持するため、bun test の fail 明細と件数サマリー（Ran N tests across M files）が報告 JSON から取得できない。fail 由来分類（IntegrityMachineAcceptanceRecord）の組み立てには 1 回目の実行だけでは fail 識別子が得られない
+- **発生局面**: case-close pre-merge 機械工程（fail 由来分類の組み立て）
+- **検知方法**: 1 回目の報告 JSON で failures 配列が空（fail 件数が不明）の実測
+- **根本原因**: bun test は結果サマリーと fail 詳細を stderr へ出力する。機械工程の spawnSync は stderr を内部捕捉して捨てる（reference「機械工程 script 呼び出し自体のリダイレクトラップは bun test の stderr を内部捕捉するため証跡成立手段にならない」どおり）
+- **自律対応内容**: script 外直接実行（stderr 分離退避・2> 常時付与）で 3 分割と file-level split を再実行し、fail 明細・N/M 件数を退避ファイルから取得して由来分類を組み立て、2 回目の機械工程実行で機械受理判定を確定。機械工程は（1）gates 実測・fail 観測（2）分類込み確定の 2 段階で実行した
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（reference の stderr 分離退避契約どおりの運用）
+- **横展開観点**: 機械工程の 2 段階実行（1回目 gates 実測で fail 件数観測・2回目 integrityMachineAcceptance 込み）は fail がある Case の標準手順になる。機械工程は resume-idempotent なため再実行で契約整合を保てる
+- **再発条件**: full integrity suite に fail が存在する全ての close 実行
+- **予防策候補**: close_mechanical_steps.ts の integrityResults へ stderr の併せ持ち、または README へ 2 段階実行手順の明記
+- **想定反映先**: src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts・scripts/README.md
+- **関連**: Case #3967・機械工程報告 JSON（pass1〜pass4）
+- **タグ**: #bun-test #stderr #機械工程 #fail由来分類 #2段階実行
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-a〔bun test stderr 件数抽出・2 段階実行・3 件統合〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-08: verify-only closure での full integrity suite 実行時の分割③ plugins 対象欠落（junction 未伝播）と bun install 前置・リダイレクト先の運用学び（Wave-4 再観測）
+
+- **問題事象**: verify-only closure（実装変更なし・main 同一内容に対する検証）でも 3 検査 + full integrity suite を通常 Case と同水準で実行した際、分割③（bun test ./.opencode/plugins/ ./scripts/）の .opencode/plugins 対象欠落（worktree junction 未伝播環境）が同様に発生する。未実行対象を実行済みとして扱わず環境差として記録する運用が verify-only closure の証跡にも必要。既存知識 worktree-environment-fail-classification.md と整合する再観測
+- **発生局面**: case-run Wave-4 検証実行（Case #3964 / Issue #3972・DEL-3972-1）・verify-only closure 証跡
+- **検知方法**: bun test 分割③の実行結果（348 tests / 21 files・11 fail・install projection check 系・.opencode/plugins junction 未伝播による対象欠落）
+- **根本原因**: worktree に .opencode/plugins の junction が伝播しない環境特性（既知・同一構成）
+- **自律対応内容**: fail 12 件（split1 T6 1件 + split3 11件）全件を pre-existing・環境依存として由来分類し、機械受理基準の記録要素（終了コード・件数突合・実行環境・検査範囲・退避先）を SSoT コメントに記録。Wave-1〜3 close と同一 fail 構成を baseline detached worktree 実測（PR #3978 close 記録・baseline 0baf5df4c）と突合
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（既存知識の再観測・契約変更なし）
+- **横展開観点**: verify-only closure の証跡にも環境差（junction 未伝播による対象欠落）の記録を必ず含める
+- **再発条件**: junction 未伝播環境の worktree で full integrity suite を実行する全 Case
+- **予防策候補**: 既存知識 worktree-environment-fail-classification.md に verify-only closure の記録要件を追記する（promote 判断）
+- **想定反映先**: learning-promote（既存知識への追記判定）
+- **関連**: Case #3964 / Issue #3972 SSoT コメント issuecomment-6717238931・worktree-environment-fail-classification.md
+- **タグ**: #junction未伝播 #integrity-suite #verify-only-closure #環境差記録
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（Q-B〔worktree junction/投影伝播の変異群・8 件統合〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-08: bun test 分割③の junction 未伝播環境差は件数安定でも実行対象数を検証差分へ明記する
+
+- **問題事象**: bun test 分割③（.opencode/plugins/ ./scripts/）の fail 数は junction 未伝播環境の worktree 実行でも baseline と同一件数（11件）に安定したが、実行対象ファイル数の環境差（worktree の .opencode/plugins/ は空・21 files 348 tests 実行）が件数突合だけでは判別できない（Case #3979 close 実測・計測 2026-11-08）
+- **発生局面**: case-close STEP-2/3 の bun test 3分割正規形実測（merge 直前 HEAD d9f7d2ead・worktree root cwd・timeout 600s 明示）
+- **検知方法**: stderr 件数サマリー（Ran N tests across M files）の M 値の環境差（main root では plugins 分割対象が含まれる・worktree では 21 files。未伝播のため plugins 分割が未実施である旨は検証差分の環境ラベルで明記）
+- **根本原因**: worktree junction 未伝播により分割③の plugins 対象が欠落する構造的環境差は fail 件数には反映されない（欠落対象のテストが実行されないだけ・未実行対象を実行済みとして扱わない規律が必要）
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（既存知識の記録要件確認・契約変更なし）
+- **横展開観点**: verify-only closure に限らず通常 Case の worktree 実行でも同様。検証差分へ実行対象数の環境差（M 値と plugins 分割実施の別）を明記する記録要件を維持する
+- **再発条件**: worktree で bun test 分割③正規形を実行する場合
+- **予防策候補**: 検証差分記録テンプレートに「分割③ 実行対象数と plugins 分割実施の別」の明記欄を追加する検討（promote 判断）
+- **想定反映先**: learning-promote（既存知識 worktree-environment-fail-classification.md への補強判定）
+- **関連**: docs/knowledge/worktree-environment-fail-classification.md・Case #3979 / PR #3982 本文検証差分（環境ラベル記録）
+- **タグ**: #bun-test #worktree #junction #件数突合 #環境差
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（Q-B〔worktree junction/投影伝播の変異群・8 件統合〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-08: verify-only closure（prNumber 0）の機械工程正規構成は事前観測→stage1（記録なし fail 観測）→stage2（記録完備・accepted）の 3 実行で、fail 件数は bun test stderr から抽出する
+
+- **問題事象**: verify-only closure（PR も carrier commit も存在しない完了・Issue #3972 再開実行）で機械工程の fail 12 件に対する機械受理記録（integrityMachineAcceptance）を構築する際、機械工程報告の full-integrity-suite detail は stdout 先頭行のみ（bun test v1.3.6 バナー）を記録し、fail 件数（1/0/11）が取得できない。bun 1.3.6 のサマリー行「Ran N tests across M files」には fail 件数が含まれない
+- **発生局面**: case-close STEP-5 再開・機械工程 2 段階実行（対象版 5d8446414・main 5d8446414 = 機構是正 ee1af14e4 反映済み・2026-11-08 実測）
+- **検知方法**: stage1 機械工程実行（integrityMachineAcceptance なし）の full-integrity-suite fail（machine-acceptance-record-missing・failedGateNames split1/split3）と事前観測（bun test 3 分割を機械工程と同一コマンド・同一 cwd で直接実行・stdout/stderr 分離退避・UTF-8 明示書出し）の突合
+- **根本原因**: bun test は fail 件数を stderr の「N pass / N fail」行に出すため、機械工程報告（stdout のみ detail 記録）からは fail 件数が抽出できない構造。機械受理記録の observedFailCounts・suiteRunRecords.testCountSummary の構築には事前観測の実測値が必須
+- **自律対応内容**: (1) 事前観測で 3 分割直接実行・stderr 退避・fail 件数を「(fail) 行数と N pass / N fail カウント行の双方突合」で決定的抽出（2998/1・979/0・337/11 実測・split2 は #3979 テスト追加 5 件で 974→979 件に増えているため前回記録の盲信は不可） (2) stage1 を機械受理記録なしで実行し fail 構成観測（MUST DO の機械工程 2 段階実行） (3) stage2 を記録完備で再実行 → exitCategory success・全 11 step pass・warnings 0・accepted=true 書出し成立。 Epic 表更新（epicBodyPath・epicChildStatusUpdates）は機械工程に渡さない（blocked 行は closing 適用対象外で epic-table-analysis が warn を出し exitCategory success を壊すため。省略は入力契約上正当）
+- **ユーザー確認の有なし**: なし
+- **REQ/Decision/Design影響**: なし（実行形態契約 REQ-060・機械受理基準 REQ-032-046 は変更せず維持）
+- **横展開観点**: docs_chore 特例等の他の PR なし完了構成でも同一構成が使える。prNumber 0 は PR 不在の合意表現として入力検証で受理される（mergeable-polling は prNotApplicable で N/A pass・gh pr view 非発行）
+- **再発条件**: verify-only closure・PR なし完了構成で fail ありの bun test を機械受理する場合
+- **予防策候補**: 機械工程入力構築スクリプト（.cjs）に事前観測モードと stage2 モード（stage1 報告 + 退避 stderr からの fail 件数抽出・exit code 突合）を標準実装する
+- **想定反映先**: learning-promote（verify-only closure 実行手順の知識化判定）
+- **関連**: Issue #3972 再開完了記録 comment 6720052233・機構是正 Case #3979 / PR #3982・.agentdev/integrity/reports/case-3972-reopen-observe-buntest.json
+- **タグ**: #verify-only-closure #close_mechanical_steps #bun-test #fail-件数抽出 #機械受理
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-a〔bun test stderr 件数抽出・2 段階実行・3 件統合〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-08: Epic 実行構成表の blocked 行への completed 適用は closing では拒否され（already-blocked skip）reset→closing の 2 段階が正規経路
+
+- **問題事象**: case-close 機械工程の epicChildStatusUpdates で #3972（blocked）に completed を適用したところ epic-table-analysis が warn（already-blocked skip）になり、warning 残存で exitCategory が success にならず isCloseAcceptanceReady が成立しない
+- **発生局面**: case-close STEP-5 再開・Epic #3964 実行構成表更新（#3972 blocked→completed・7/7 化・2026-11-08 実測）
+- **検知方法**: stage1 機械工程報告の warnings「epic child status update skipped: #3972(already-blocked)」と tracking-table.ts 契約（TERMINAL_STATUSES = completed・blocked・failed・applyClosingStatus は既に終端子状態の行を上書きしない）の照合
+- **根本原因**: blocked は終端子状態であり人間判断・再開条件を含む保留状態のため、機械的な closing 書換（pending→completed の冪等置換）は既に終端の行に適用されない安全設計。blocked からの正規遷移は resetChildToPending（blocked→pending の冪等戻し）を前置する 2 段階のみ
+- **自律対応内容**: (1) 機械工程からは Epic 表更新を除外（epicBodyPath・epicChildStatusUpdates を省略） (2) issue_close 後に agentdev-epic-tracker 正規手順（reflect.ts reset → closing・最新取得済み本文に対して決定的適用・行差分突合 [#3972 のみ変化]・terminal 7/7 確認）を実施し issue_update で書込み（case-close 単一書き手・per-Epic 排他制御） (3) Epic 自動クローズ判定は reflect.ts overall で実行 → overallCompleted false（完了条件 1〜5 未評価）を報告（Epic クローズ自体は次段 case-close(#epic) 委譲が所有）
+- **ユーザー確認の有なし**: なし
+- **REQ/Decision/Design影響**: なし（agentdev-epic-tracker scripts 契約の運用確認）
+- **横展開観点**: failed 行からの completed 適用も同一 2 段階。Wave 反復中の一時 blocked と終端 blocked の区別は表では表現されないため、戻し経路（reset）の前置が必須
+- **再発条件**: 停止（blocked）経由で完了した子 Issue の Epic 反映を機械工程の closing 適用で行おうとした場合
+- **予防策候補**: blocked→completed 更新が必要な Case では、機械工程の epicChildStatusUpdates に blocked 行を含めず、issue_close 後の reset→closing 2 段階を標準手順とする
+- **想定反映先**: learning-promote（agentdev-epic-tracker 運用手順の知識化判定）
+- **関連**: Issue #3972 再開完了記録 comment 6720052233・Epic #3964 実行構成表（#3972 行 completed 更新済み）・src/common/skills/agentdev-epic-tracker/scripts/lib/tracking-table.ts
+- **タグ**: #epic-tracker #実行構成表 #blocked-行 #reset-closing #機械工程
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-b〔Epic close 構成の機械工程 N/A 経路不在・2 件統合〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-08: Epic close 構成（worktreeRoot == main root）の post-merge cleanup は main worktree remove 拒否と branch=main 残存が構造的に warn になる
+
+- **問題事象**: Epic close の post-merge 機械工程で cleanup-worktree-branch が warn（worktreeRemoveExitCode 128・branchListOutput "* main"）になり exitCategory が needs-judgment になった。worktreeRoot == repoRoot == main root の構成では削除対象が存在しないため、この warn は構造的に避けられない
+- **発生局面**: case-close Epic Wave クローズ・STEP-E6 post-merge 機械工程（Epic #3964 close・2026-11-08 実測）
+- **検知方法**: 報告 JSON の cleanup-worktree-branch detail（worktreeRemoveExitCode 128 = main working tree への git 拒否・branchListOutput "* main"）と git worktree list / git branch list の独立実測の突合
+- **根本原因**: post-merge cleanup step は単一 Issue close（worktree + feature branch 削除）を前提とし、Epic close 構成（main root 直接・branch main）の N/A 経路を持たない。mergeable-polling の prNumber 0 N/A pass（#3979 で実装済み）と異なり、cleanup は cleanup.removeWorktree: false でも branchListOutput 判定が warn を出す
+- **自律対応内容**: 意味レビューで構造的 N/A と確定: (1) 本 Epic 由来の worktree/branch は全削除済み（git worktree list 実測・feature/issue-3972 は前段 STEP-6 で削除済み） (2) worktreeRemoveExitCode 128 は main worktree（remove 不可の正）への拒否で実害なし (3) branch=main の存在は Epic close 構成の正常状態であり cleanup 残存ではない。cleanup.removeWorktree: false・removeBranch: null の入力構成で機械実行記録を残し、needs-judgment を報告として受理
+- **ユーザー確認の有無**: なし（機械工程報告の意味レビューはモデル担当〔機械工程の script 呼び出し契約〕）
+- **REQ/Decision/Design影響**: なし（case-close Design「機械工程の script 呼び出し契約」の運用確認・Epic close 構成の cleanup N/A 経路は後続の機構整理候補）
+- **横展開観点**: Epic close（worktreeRoot == main root）をまたぐ Case の post-merge は常に同一 warn 構成になる。warn の意味レビューで参照する実測（git worktree list・branch list・本 Epic 由来 worktree/branch の不在）を報告に含める
+- **再発条件**: Epic Issue または PR なし完了構成で post-merge 機械工程を実行した場合（毎回構造的に発生）
+- **予防策候補**: close_mechanical_steps.ts の post-merge cleanup に Epic close 構成判定（worktreeRoot == repoRoot）を入力検証レベルで追加し、cleanup を N/A pass として記録する経路の整備
+- **想定反映先**: learning-promote（Epic close 構成の post-merge 機械工程運用の知識化判定）
+- **関連**: Issue #3964 Epic close 完了記録 comment 6720643954・機構是正 Case #3979 / PR #3982（mergeable-polling prNumber 0 N/A pass の先例）・.agentdev/integrity/reports/epic-3964-close-postmerge.json
+- **タグ**: #epic-close #post-merge #cleanup #機械工程 #needs-judgment
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-b〔Epic close 構成の機械工程 N/A 経路不在・2 件統合〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-10: case-ready 実行中に並行レーンが main worktree の domain state を commit・push 済みで、前置永続化が冪等に不要化する実観測（Case #3988）
+
+- **問題事象**: case-ready STEP-2 前置として、draft 未コミット修正（ACT-DESIGN-005 追加・case-open coverage 検出由来）と未追跡 jev 観測2件の明示パス指定 commit を実行しようとした時点で、working tree が clean になっており、並行レーンによる commit（c900bd9c6 draft 修正・f8e2a5570 learning）と push が完了していた。操作自体は失敗しないが、計画した前置永続化は不要になっていた
+- **発生局面**: 運用（case-ready STEP-2 前置。case-auto orchestration の並行レーンと本レーンの同一 domain state 操作競合）
+- **検知方法**: git branch --show-current・git status --short・git log の前置確認で、git status --short が空・c900bd9c6 が存在している事実を検出（git add が何もステージせず commit が nothing to commit で失敗する形で表面化）
+- **根本原因**: 複数レーンが同一 main worktree で domain state 永続化を行い得る構造であり、前置確認は永続化対象の存在確認だけでは並行レーンの進行を予測できない
+- **自律対応内容**: 重複実行なし。git status・git show で並行レーンの commit 内容を確認（draft 修正 18行追加・正規手順と同一の明示パス指定 commit 形式・push 済み）し、前置永続化を再実行せず STEP-2 以降を継続。結果的に競合・lost update なし
+- **ユーザー確認の有無**: なし（冪等前置確認からの機械的再利用判定）
+- **REQ/Decision/Design影響**: なし（並列実行安全ステージング手順の運用確認）
+- **横展開観点**: stage 間並行実行（case-auto orchestration）では同一 domain state 対象を複数レーンが扱い得る。domain state 永続化の前置は「存在すれば再利用・不在なら実行」の冪等形で実装し、実行直前の git status 再確認が競合防止の最小手順
+- **再発条件**: 同一対象の domain state を複数レーンが並行で永続化しようとした場合
+- **予防策候補**: domain state 永続化の所有レーン明確化、または並行レーン検知時の待機・再確認手順の明文化（ REQ/Design 判断は learning-promote に委譲）
+- **想定反映先**: learning-promote（並列実行レーン間の domain state 操作規律の知識化判定）
+- **関連**: Case #3988・commit c900bd9c6・f8e2a5570・f7392b9be・agentdev-git-worktree git-common-procedures.md 手順3（concurrent-safe staging）
+- **タグ**: #case-ready #並行実行 #domain-state #冪等前置
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-10: worktree の junction 投影伝播状態が bun test 基線突合の試験数に直結し、投影適用後は基線形態の再現前置が必要（Case #3988・PR #3992 本文 Findings より回収）
+
+- **問題事象**: worktree 環境の bun test 基線突合では、junction 投影の伝播状態（worktree-partial）が試験数に直接影響する（未投影時 3,000 試験 → 投影適用後 4,751 試験）。bun test ./.opencode/ を基線突合に使う worktree 実行では、`scripts/self-sync.ps1 -Mode apply` と third-party Skill 取得の前置が基線形態の再現に必要
+- **発生局面**: case-run DEL-3988-2 の QG-4 検証（3 分割 bun test・件数突合）
+- **検知方法**: 投影適用前後の bun test 試験数差（3,000 → 4,751）の実測
+- **根本原因**: worktree への junction 伝播は部分的に開始し、self-sync apply と third-party Skill 取得を経て基線形態へ回復する。伝播状態がそのまま bun test の実行対象数に現れる
+- **自律対応内容**: 検証差分に手順を記録済み（PR #3992 本文実行環境ラベル節）
+- **ユーザー確認の有無**: なし（capture 回収）
+- **REQ/Decision/Design影響**: なし（既存知識 worktree-environment-fail-classification.md の補強候補）
+- **横展開観点**: worktree での基線突合は投影伝播状態の環境ラベルと前置手順の記録を必須化する
+- **再発条件**: worktree の bun test 基線突合を投影状態を管理せずに実行する場合
+- **予防策候補**: worktree 環境 fail 分類 knowledge への投影前置手順の追記（promote 判断）
+- **想定反映先**: learning-promote（worktree-environment-fail-classification.md への補強判定）
+- **関連**: PR #3992 本文 Findings/learning・Case #3988
+- **タグ**: #worktree #junction #bun-test #基線突合 #投影前置
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（Q-B〔worktree junction/投影伝播の変異群・8 件統合〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-10: 分割③の .opencode/plugins junction は src/opencode/plugins の test files を重複走査する・tracked union と実行延べ件数を区別して件数突合する（Case #3988・PR #3992 本文 Findings より回収）
+
+- **問題事象**: 分割③の `.opencode/plugins` 配下 6 junction は src/opencode/plugins の 23 test files を重複走査する（44 files = scripts tracked 21 + 投影 23）。tracked union 253 と実行延べ件数 276 を区別する。旧 .opencode anchor 221 files も integrity 122 + skills 投影 58 + tools 投影 18 + plugins 投影 23 で説明でき、投影数を欠落や新規テストと誤認せず件数突合できる
+- **発生局面**: case-run DEL-3988-2 の bun test 3 分割・件数突合（投影伝播済み worktree 環境）
+- **検知方法**: 分割③の実行対象ファイル数（44）と tracked 列挙（21 scripts）の差分を投影 23 files として分離・union 突合
+- **根本原因**: 投影伝播済み環境では分割③に投影重複が含まれ、実行延べ件数が tracked union を超える。既存学び「bun test 分割③の junction 未伝播環境差は件数安定でも実行対象数を検証差分へ明記する」（未伝播の欠落側）の対の環境差（伝播済みの重複側）
+- **自律対応内容**: 件数突合に tracked union 全被覆と実行延べ件数の区別を記録（PR #3992 本文件数突合行）
+- **ユーザー確認の有無**: なし（capture 回収）
+- **REQ/Decision/Design影響**: なし（既存知識の対側環境差の補完）
+- **横展開観点**: 件数突合の説明モデルは「未伝播 = 欠落側」「伝播済み = 重複側」の双方を検証差分へ記録できると突合が完全になる
+- **再発条件**: 投影伝播済み worktree で bun test 分割③を実行し件数突合する場合
+- **予防策候補**: 既存知識 worktree-environment-fail-classification.md への重複側環境差の追記（promote 判断）
+- **想定反映先**: learning-promote（既存知識への補強判定）
+- **関連**: PR #3992 本文 Findings/learning・Case #3988・既存 learning「bun test 分割③の junction 未伝播環境差」（2026-11-08・対側環境差）
+- **タグ**: #bun-test #分割③ #junction投影 #重複走査 #件数突合
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（Q-B〔worktree junction/投影伝播の変異群・8 件統合〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-11: check_changed_docs.ts は docs workflow 対象外ファイルを --files に渡すと TARGET-EMPTY strict failure を報告する誤用検出挙動を持つ・docs 変更 0 件の実装 PR では実行経路側の事前確認が必要（Case #3994・PR #3998 本文 Findings より回収）
+
+- **問題事象**: check_changed_docs.ts は `--files` に docs workflow 対象外のファイル（.ps1 等）を渡すと TARGET-EMPTY strict failure を報告する誤用検出挙動を持つ。docs 変更 0 件の実装 PR では targeted docs guard は適用対象なしであり、実行経路側で docs 変更の有無を事前確認してから呼ぶ前提の設計である（計測 baseline: PR #3998 HEAD ea8b89cf3・case-run DEL-3994-1・2026-11-11・targeted docs guard 実行経路での観測）
+- **発生局面**: case-run DEL-3994-1 の targeted docs guard 実行経路判断（docs 変更 0 件の実装 PR）
+- **検知方法**: case-run の実行時実測と PR #3998 本文 Findings/learning への記録（case-close STEP-6-4 で回収）
+- **根本原因**: targeted docs guard の検査対象は docs workflow 対象ファイルに限定されており、対象外ファイルのみの指定は検査対象 0 件（TARGET-EMPTY）として strict failure になる設計。誤用検出としての挙動は正しいが、実行経路側の docs 変更有無の事前確認規律が明文化されていない
+- **自律対応内容**: docs 変更 0 件の本 PR では targeted docs guard を適用対象なしとして実行せず、PR #3998 本文検証差分へ「docs 変更 0 件のため適用対象なし」と記録した（guard 側の修正はしていない）
+- **ユーザー確認の有無**: なし（capture 回収）
+- **REQ/Decision/Design影響**: なし（実行経路側の事前確認運用の明確化候補のみ）
+- **横展開観点**: 対象限定型 checker 全般で、実行経路側は適用対象の有無を事前確認してから呼ぶ。zero-targets を検査省略ではなく無効実行として扱う既知契約と同型の運用注意
+- **再発条件**: docs 変更 0 件の実装 PR で targeted docs guard を `--files` 指定付きで実行する場合
+- **予防策候補**: 機械工程・workflow 側の実行経路に docs 変更有無の事前確認前置を追加する判断、および TARGET-EMPTY 時の案内に誤用検出である旨の明記（promote 判断）
+- **想定反映先**: learning-promote（checker 実行契約・機械工程手順への補強判定）
+- **関連**: PR #3998 本文 Findings/learning・Case #3994・check_changed_docs.ts
+- **タグ**: #targeted-docs-guard #check_changed_docs #対象限定 #誤用検出 #実行経路
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-11: generate_indexes 派生物は script 実行後に作業 tree へ未 commit で残るため、明示パス指定 commit の実行前に派生物の commit 状態を確認して含めるか分離するかを明示判断する（Case #4004 より回収）
+
+- **問題事象**: case-open STEP-4 の機械工程後、stagePaths 外の generate_indexes 派生物（req-health-metrics.md・requirements/README.md）が作業 tree へ未 commit で残存していた。その状態で docs/README.md 手動管理区間の件数照合補正を明示パス指定 commit（`git commit -- docs/README.md`）したところ、対象パス内に generate_indexes が書き換えた AUTOGEN 件数行と REQ-120 行が含まれており、補正 commit に派生物変更が意図せず混在した（計測: HEAD f8a2d9bb5・worktree .worktrees/4004-definition・branch definition/issue-4004・Case #4004・2026-11-11・`git show f8a2d9bb5 --stat` で 3 insertions/2 deletions を観測）
+- **発生局面**: 実装（case-open STEP-4・docs/README.md 手動管理区間の件数照合補正）
+- **検知方法**: 補正 commit の git show --stat で差分行数が手動区間1行置換より多いことの突合
+- **根本原因**: generate_indexes は commit 前配置契約で実行されるため派生物が script 実行後に作業 tree へ残る構造であり、明示パス指定 commit が対象パス内の派生物変更を含み得る点の実行時確認規律が手順に明文化されていない
+- **自律対応内容**: 混在した commit を取り消さず、同一 commit に含まれた派生物変更を標準 contingency（派生物の同一 PR 取り込み）どおりの正当な構成として記録し、残りの stagePaths 外派生物を別の明示パス指定補正 commit（e4453c82）で回収した
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（generate_indexes 派生物の事後突合 contingency の適用内。手順補強の候補のみ）
+- **横展開観点**: 明示パス指定 commit を行う機械工程手順では、commit 対象パス内の作業 tree 残存変更（特に generate_indexes 等の自動書換え派生物）の有無を `git status --short` で事前確認し、同一 commit へ含める contingency 適用か分離補正 commit かを明示的に判断してから commit する
+- **再発条件**: REQ 行追加を伴う Definition 変更で generate_indexes 派生物が stagePaths 外に残る状態で、派生物パスを含む別パスの明示パス指定補正 commit を実行する場合
+- **予防策候補**: 手動管理区間照合補正手順への派生物 commit 状態の事前確認前置の追加判断、および混在検出時の報告様式の明記（promote 判断）
+- **想定反映先**: learning-promote（機械工程手順・Definition PR 構成への補強判定）
+- **関連**: Case #4004・PR #4007・docs/designs/commands/case-open.md「機械工程の script 呼び出し契約（RU-0162）」節・definition-pr-and-idempotency.md「generate_indexes 派生物の事後突合」節
+- **タグ**: #generate_indexes #派生物 #明示パス指定commit #stagePaths #手動管理区間
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-11: 並行 case-auto 稼働環境では設計PR push 前に git fetch で origin/main の進行と重複パスを確認し、競合を push 前に解消して clean mergeable な PR を作成する手順が有効（Case #4004 より回収）
+
+- **問題事象**: 並行 case-auto（C-β2・Case #4002）の設計PR #4003 が本 Case の Definition 作業中に origin/main へ merge され（bc7c75aa0）、本 Case の definition branch（起点 474180ed7）との間で重複パス 2件（custom-tool-contracts.md・req-health-metrics.md）の競合が push 前に判明した（計測: merge-base 474180ed7・重複検出は `git diff --name-only` の双方 branch 間突合・Case #4004・2026-11-11）
+- **発生局面**: 実装（case-open STEP-4・設計PR push 直前）
+- **検知方法**: push 前の並行隔離検査で origin/main 進行の実測（git fetch 後の merge-base 再計算）と重複パス突合
+- **根本原因**: 並行 case-auto 複数稼働では Definition 作業中に base が進行し得るため、push 直前の base 進行確認が実質必須になる一方、作成元 origin/main HEAD 固定の隔離規律だけでは進行の追随時点を定めていない
+- **自律対応内容**: origin/main を definition branch へ merge し（merge commit 99c40b49）、競合を実際に重なる箇所だけ調整（custom-tool-contracts.md は両 Case の design 宣言を統合保持・req-health-metrics.md は AUTOGEN を generate_indexes 再実行で正規形復元）した後、check_integrity・traceability check を merge 後 HEAD で再実行してから push した。PR #4007 は clean mergeable で作成された
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（並行 case-open の作業隔離規律・MUST DO「競合は実際に重なる箇所だけ調整」の適用内。手順補強の候補のみ）
+- **横展開観点**: 並行 case-auto 稼働環境の Definition 工程では、push 直前に `git fetch` → merge-base 再計算 → 重複パス突合 → 重複ありなら branch へ merge・競合解消・ゲート再実行、の順を前置する。push 後の conflict は case-close/case-ready の同期リスク対応へ回帰するより実コストが低い
+- **再発条件**: 並行 case-auto が他 Case の Definition PR を merge し得る環境で、重複パスを持つ Definition branch を push する場合
+- **予防策候補**: case-open STEP-4 手順への「push 前の origin/main 進行確認と重複パス競合の解消前置」の明文化判断（promote 判断）
+- **想定反映先**: learning-promote（並行実行手順・Definition PR 作成への補強判定）
+- **関連**: Case #4004・Case #4002・PR #4007・PR #4003・definition-pr-and-idempotency.md「並行 case-open の作業隔離」節
+- **タグ**: #並行case-auto #設計PR #merge追随 #競合解消 #push前確認
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-11: 長文本文の bash heredoc 経由 node への渡しは終端解析に失敗し得るため、検査専用本文ファイルは extension rule 標準回復手段〔b〕（project root 内 git 管理対象外領域への作成）が安定（Case #4004 より回収）
+
+- **問題事象**: PR 本文（約6,000字）を bash の heredoc で node stdin へ渡して検査専用本文ファイルを作成しようとしたところ、heredoc の終端解析が失敗し（warning: here-document delimited by end-of-file と node の Unterminated template）、本文ファイルの作成に失敗した（計測: workspace 外一時ディレクトリ・Case #4004・2026-11-11・bash stderr と node SyntaxError で観測）
+- **発生局面**: 実装（case-open STEP-4・yomiyasu lint の検査専用本文ファイル作成）
+- **検知方法**: node の SyntaxError（Unterminated template）と bash の here-document warning
+- **根本原因**: 長文本文を heredoc 内のテンプレートリテラルへ組み込む構成は、本文中の記号や終端行の解析に脆弱であり、大文字サイズの本文には不向き
+- **自律対応内容**: extension rule の標準回復手段〔b〕（作成先を project root 内の git 管理対象外領域 .agentdev/integrity/reports/ へ変更）へ切替し、write ツールによる検査専用本文ファイルの作成・lint 実行・検査後削除で完結させた
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（yomiyasu application rule の標準回復手段の適用内）
+- **横展開観点**: 検査専用本文ファイルの作成は、workspace 外一時ディレクトリ経由の heredoc 渡しよりも project root 内 git 管理対象外領域（.agentdev/integrity/reports/）への直接作成が長文で安定する。切替は guard 違反の迂回ではなく rule 側が定義する正規の代替経路である
+- **再発条件**: 5,000字超級の本文を yomiyasu lint または同型の検査専用ファイル経路へ渡す場合
+- **予防策候補**: 長文本文の検査専用ファイル作成では project root 内領域を第一候補とする運用明記（promote 判断）
+- **想定反映先**: learning-promote（yomiyasu rule 運用・書込み guard 対応手順への補強判定）
+- **関連**: Case #4004・PR #4007・.agentdev/extensions/skills/agentdev-workflow-case-open.yaml「yomiyasu-application-before-write」rule
+- **タグ**: #heredoc #検査専用ファイル #yomiyasu-lint #書込みguard #標準回復手段
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-11: 並行 case-auto 稼働環境の squash merge 後ブランチ削除判定は diff 全体空ではなく、PR 変更ファイル単位の diff 空 + branch コミット変更ファイルの漏出 0 件で判定する（Case #4005 より回収）
+
+- **問題事象**: squash merge 後の definition branch 削除判定（複数コミット構成・git diff origin/main {branch} が空であること）で、並行 run の push（#4003 merge・draft 削除 commit・learning capture）により diff が非空（7 ファイル）となり、判定条件を文字どおり適用すると -D 前の過剰停止になる状態が生じた（計測: HEAD 4881550ee・branch definition/issue-4005・Case #4005・2026-11-11・git diff --name-only で観測）
+- **発生局面**: 実装（case-ready STEP-7・設計側 worktree とローカルブランチの削除）
+- **検知方法**: diff 非空差分 7 ファイルの帰属分析（diff-tree による branch コミット変更ファイルとの突合）
+- **根本原因**: worktree-operations.md「squash merge 後の条件付き -D 許可」の diff 空条件は単一 run 前提であり、並行 run が main を進行させる環境では branch 分岐後の main 側変更が恒常的に diff を非空にする
+- **自律対応内容**: 判定を分解して機械確認した。限定確認（origin/main..branch が自 Case 2 commit のみ）合格、PR 対象 4 ファイルの diff が空（branch 側変更は main へ squash merge で取り込み済み）、非空差分 7 ファイルすべてが main 側進行分（#4003 関連 4 ファイル・draft 削除 2 件・inbox.md 追加）で branch 独自変更の漏出 0 件を確認した上で squash merge 済みと判定し -D を実行した。判定根拠は検証記録へ記録済み
+- **ユーザー確認の有無**: なし（既存手順の趣旨〔branch 側未取り込み変更の不在確認〕を維持する分解検査の適用）
+- **REQ/Decision/Design影響**: なし（worktree-operations.md の判定手順の並行実行環境での適用補強の候補のみ）
+- **横展開観点**: 並行 case-auto 環境の squash merge 後ブランチ削除では、diff 全体空ではなく「PR 変更ファイル単位の diff 空 + branch コミット変更ファイル（diff-tree 出力）の diff 漏出 0 件」で判定する。非空差分は main 側進行分の帰属を機械突合で確認する
+- **再発条件**: 並行 case-auto run が main を進行させ得る環境で squash merge 済みブランチを削除する場合
+- **予防策候補**: worktree-operations.md「squash merge 後の条件付き -D 許可」への並行実行環境向け分解判定手順の追記判断（promote 判断）
+- **想定反映先**: learning-promote（agentdev-git-worktree 手順への補強判定）
+- **関連**: Case #4005・worktree-operations.md「squash merge 後の条件付き -D 許可」節・agentdev-git-worktree references git-common-procedures.md
+- **タグ**: #squashmerge #ブランチ削除 #並行case-auto #判定分解 #worktree-operations
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-12: PSModulePath 補正の部分修正（PS7 系 2 エントリ欠落）でも PS5.1 spawn 系テストは全て通過し、pwsh spawn 系 2 テストだけが静かに失敗する
+
+- **問題事象**: bun test 分割①で trusted-distribution-gate 配下の cli-e2e 2 テスト（PowerShell entry 経由・pwsh を明示 spawn）のみが「Cannot find an overload for ExtractToDirectory and the argument count: 3」で失敗。同一 merge HEAD・PSModulePath を 4013 証跡の 4 エントリ値（system32 WindowsPowerShell 先頭 + PS7 系 2 エントリを含む）へ修正して分割①のみ再実行したら両テストとも pass へ回帰した
+- **発生局面**: 検証（case-close 最終受入検査の環境再現・Root Case #4002。2026-11-12）
+- **検知方法**: 分割①の (fail) 行抽出で既知 12 件に含まれない 2 件を検出。stderr のエラー出力が PS7 の Microsoft.PowerShell.Archive モジュール path を示していた
+- **根本原因**: runner 側で設定した PSModulePath が 2 エントリ値（system32 WindowsPowerShell と Program Files\WindowsPowerShell のみ）で、4013/pass4 実績値の 4 エントリ（末尾に Program Files\PowerShell\Modules と c:\program files\powershell\7\Modules を含む）と異なっていた。PS5.1 を直接 spawn するテストは補正済み 2 エントリ値でも正しい Archive モジュールを解決して通過し、pwsh を spawn するテストだけがモジュール解決差で失敗する（環境の部分的な正しさが失敗面を縮小し、切り分けを惑わす）
+- **自律対応内容**: 失敗 2 件を新規不合格として即断せず、pass4 証跡（qg4-precheck-result.json）と 4013 の env-labels.json（.agentdev/verify-logs/4013/・4013 worktree 内）から実績 PSModulePath 値を特定して正確に再現し、分割①のみ再実行して cli-e2e 2 件の解消を確認。第1回の失敗ログを run1 として証跡保持し、環境由来（pass4 の environmentIncidentResolved と同一分類）として記録した
+- **ユーザー確認の有無**: なし
+- **REQ/Decision/Design影響**: なし（テスト・検査契約・比較基準の変更なし。PSModulePath は実行環境変数）
+- **横展開観点**: 環境変数系の既知事象対応では「正の値の完全再現」を確認するまで部分修正で中間判定しない。失敗テスト集合が既知集合の部分集合でも、実行環境差の証拠を先に確定してから由来分類する。証跡の env-labels（環境ラベル）に実行に使った env 値を残す運用が切り分けの要
+- **再発条件**: PSModulePath の補正値を記憶や要約から再構築して設定する場合（実績値の証跡参照を省いた場合）
+- **予防策候補**: 検証環境の再現手順に「4013 証跡 env-labels.json の PSModulePath 値をそのまま転写する」手順を明記（promote 判断）
+- **想定反映先**: learning-promote（case-close 検証環境再現手順の env 値転写指示化判定）
+- **関連**: Root Case #4002・.agentdev/verify-logs/qg4-close/（stdout-1-integrity-run1.log ほか）・.worktrees/4013-feature/.agentdev/verify-logs/4013/env-labels.json・.agentdev/verify-logs/qg4-precheck/qg4-precheck-result.json（pass4 environmentIncidentResolved）
+- **タグ**: #PSModulePath #Expand-Archive #環境再現 #部分修正の罠 #pwsh #分割テスト
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-12: 実装系 Case の traceability sidecar（traceability/agentdev-gh.yaml）未更新が case-run を完結させ、対応関係収録漏れが case-close 完全性 gate まで未検出になった
+
+- **問題事象**: case-run #4008（PR #4023・REQ-011-034/035 の A-7/A-8 実装）が traceability sidecar（traceability/agentdev-gh.yaml）への対応関係収録を実施しないまま、実装・検証・push・マージまで完結した。IR-055 の inline 宣言制約により src/common/tools/agentdev-gh 配下のソース本文へ ADF-COVERS を書けないため sidecar が唯一の正規収録経路であるにもかかわらず、PR #4023 の変更ファイル（15ファイル）に traceability/ 配下が含まれなかった。収録漏れは case-close のトレーサビリティ完全性 gate で初めて検出された
+- **発生局面**: 実装（case-run #4008・Root Case #4002 C-β2 実装系契約是正。2026-11-11〜12）
+- **検知方法**: case-close pre-merge 機械工程の traceability-check gate（agentdev-traceability check --req 対象行限定）が REQ-011-034/035 で missing-design・missing-implementation・missing-verification の exit 2（このうち implementation/verification が sidecar 未収録に起因。missing-design は別因の ADF-COVERS 終端子欠落）
+- **根本原因**: 実装委譲（DEL-4008 系列）の過程で sidecar 収録が実施されなかったことに加え、case-run の最終ゲート（3点ゲート）に traceability 完全性（check --req）の検査項目が存在せず、case-open 設計PR 受入時にも対象行の完全性 gate が走らないため、収録漏れが完結判定（case-close）まで構造的に未検出となる工程構造だった
+- **自律対応内容**: case-close は対応関係の自動追加を禁止領域として実施せず fail-closed 停止報告。監督者の条件付き承認（修正は承認済み実装内容への sidecar 追記に限定・設計判断なし）を受けて親が PR #4025 で traceability/agentdev-gh.yaml へ REQ-011-034/035 の implementation（specs-pr.ts・contracts.ts・runner-local.ts・runner-cli.ts）・verification（runner-cli.test.ts・engine-fail-closed.test.ts）を PR #4023 実 diff の機能帰属で追記し、main 上で check --req 11行フルセット pass 11 / fail 0 を確認した
+- **ユーザー確認の有無**: あり（監督者の条件付き承認: 修正PRで前進・親直接実施・修正範囲を承認済み内容への復元と sidecar 追記に限定）
+- **REQ/Decision/Design影響**: なし（sidecar 追記は承認済み実装内容の収録であり新規の設計判断を含まない。二重宣言となる public-schema.ts〔senpi-tool-connection.yaml が単一所有〕・runner-local.test.ts〔本文 inline ADF-COVERS と重複〕は checker の duplicate-inconsistencies 検出で除外確定）
+- **横展開観点**: 実装系 Case（REQ 参照を src 本文に持てない IR-055 管理下の src 変更）では、実装委譲契約への sidecar 収録義務の明示と、case-run 最終ゲートまたは case-close 前置での check --req 実行が未収録の最短発見経路になる。同一構造は agentdev-gh 以外の sidecar 収録対象コンポーネント（tools・plugins の src 変換）に同一適用される
+- **再発条件**: REQ 参照を持つ src/common/tools 配下（sidecar 収録対象コンポーネント）の変更を、sidecar 収録工程を含まない委譲・ゲート構成のまま実装する場合
+- **予防策候補**: 実装委譲契約テンプレートへ「対象 REQ 行の sidecar 収録確認」の MUST DO 追加、case-run 3点ゲートへの traceability check --req（対象行限定）前置、設計PR 受入時の完全性 gate 前置（いずれも promote 判断）
+- **想定反映先**: learning-promote（委譲契約テンプレート・ゲート強化の要否判断）・agentdev-workflow-case-run（最終ゲート構成の検討判断）
+- **関連**: Root Case #4002・PR #4023（sidecar 未収録の実装）・PR #4025（sidecar 追記是正・事実記録）・traceability/agentdev-gh.yaml・.agentdev/verify-logs/qg4-close/blocker-analysis.md・前条の ADF-COVERS 終端子欠落学び（同時検出・別因）
+- **タグ**: #traceability #sidecar #case-run #工程逸脱 #委譲契約 #完全性ゲート #未検出構造
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-12: 完了条件チェックボックス確定（テキスト変更）で conditionId が再導出され、更新前本文から導出した判定入力は stale 判定として fail-closed 拒否される・機械工程実行の直前に同一本文から再導出する運用が必須（Case #4002 case-close 再開）
+
+- **問題事象**: case-close 機械工程の受入評価で、checkbox 確定（[ ] → [x] + 判定記録追記）により本文テキストが変わった子 Issue（#4010〜#4013）に対し、更新前本文から事前導出した conditionId を判定入力（acceptanceVerdicts）に使った結果、verdict-for-unknown-condition（stale 判定）と verdict-missing-for-contract-condition で final-acceptance-evaluation が fail し、受理記録が accepted:false になった（#4010・#4011 の2件が1実行ずつ無駄になった。計測 baseline: main 0950de3de・2026-11-12・機械工程 pre-merge 実行での観測）
+- **発生局面**: 実装（case-close 機械工程の判定入力構築）
+- **検知方法**: 機械工程報告 JSON の final-acceptance-evaluation step fail（violations: verdict-for-unknown-condition・cond-036-a866a30d8b67f6c9 が母集団に不在）
+- **根本原因**: deriveCompletionConditionId は条件本文と本文内行位置の sha256 から決定的に導出するため、checkbox 確定によるテキスト変更（判定記録追記・行末変更）で conditionId が変わる。判定入力の構築を本文更新（issue_update）より前に行ったため stale になった。母集団は機械工程が「機械工程に渡した本文」から抽出するため、判定入力側は同一本文から再導出する必要がある
+- **自律対応内容**: GitHub の現行本文（gh issue view で再取得・本文 hash 照合済み）から deriveCompletionConditionId を再導出し、判定入力を再構築して input JSON を再生成。機械工程を再実行して受理記録を accepted に再生成した（fail-closed 拒否は A-12 個別対応化の正しい動作であり guard を迂回せず回復した）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（A-12 個別対応化の設計どおりの動作・恒久台帳なしの識別子再導出構造の実証）
+- **横展開観点**: 条件本文から hash 導出される識別子を判定入力に使うすべての工程で、「本文の最終確定後に識別子を再導出」する順序を守る。本文更新 → 判定入力導出 → 機械工程実行 の順序固定が安全
+- **再発条件**: checkbox 確定や結果セクション追加など本文変更を伴う更新後に、変更前本文から導出した判定入力を機械工程へ渡すと再発
+- **予防策候補**: 機械工程の判定入力構築手順に「issueBodyPath に渡す本文と同一の本文から conditionId を導出する」前置条件を明記する判断は promote 判断で評価
+- **想定反映先**: agentdev-workflow-case-close（機械工程の判定入力構築手順）・learning-promote（順序固定の手順反映の要否判断）
+- **関連**: deriveCompletionConditionId（close_mechanical_steps.ts L605-608）・final-acceptance.ts（verdict-for-unknown-condition 検査）・.agentdev/verify-logs/qg4-close/mechanical/report-4010-premerge-r2.json（stale 判定の fail 証跡）
+- **タグ**: #conditionId #stale判定 #受入評価 #機械工程 #fail-closed #A-12
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-13: 配布物へテーブル・節を移動・集約する際、docs 配下パス literal は IR-055（runtime-unresolved-reference）の新規違反検出対象になる（移動元から除去しても移動先で再検出される）
+
+- **問題事象**: 既存ファイルから配布物（src/common/skills・src/common/commands）へテーブル等を移動・集約する際、docs/designs/・docs/guides/ のパス literal をそのまま移すと IR-055 の新規違反として検出される。修正前 6 件検出（Case #4026 Wave 1・PR #4038 実績）
+- **発生局面**: 実装（B2-1 規則集約・lifecycle SKILL.md 新節への移動）
+- **検知方法**: check_integrity --json の IR-055 runtime-unresolved-reference 新規違反
+- **根本原因**: 配布物は docs 配下パスを runtime に解決できず、配布依存境界（distribution-reference-boundary）で未解決参照として検出される。移動元の除去だけでは移動先で新たに検出される
+- **自律対応内容**: 移動先の docs 配下パス literal を文書種別表現へ置換してから移動し、修正後 0 件に解消した（名レベル参照はパス非依存のため配布後環境でも機能する）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（IR-055 の検査の規則・比較基準・契約は未変更・ir-055-baseline.json 未変更）
+- **横展開観点**: B2-2 以降の規則集約（Wave 2 の #4030〜#4037）で配布物へ移動する全作業で再発し得る
+- **再発条件**: docs 配下パス literal を含むテーブル・節を配布物へ移動・集約する全状況
+- **予防策候補**: 配布物への移動前チェック（docs 配下パス literal の文書種別表現への置換を手順の一手順化）
+- **想定反映先**: agentdev-workflow-lifecycle（工程駆動の実装手順）・learning-promote
+- **関連**: PR #4038 本文 検証差分表（IR-055 行）・IR-055
+- **タグ**: #IR055 #配布依存境界 #規則集約 #名レベル参照 #Wave2
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-13: worktree で 3分割正規形 bun test を実行する場合の依存整備と plugins 分割の main root 読取専用代替（REQ-018-005 運用）
+
+- **問題事象**: worktree の .opencode 投影欠落（plugins 未伝播）のため、worktree 内での 3分割正規形実行は分割③の plugins 対象欠落と plugin 依存（textlint-guard node_modules・vendor junction）の未生成を招く
+- **発生局面**: 検証（case-run・case-close の bun test 実行形態契約の実施）
+- **検知方法**: bun test の Test filter no matches・依存解決失敗
+- **根本原因**: worktree は .opencode/plugins 投影と vendor 依存成果物を含まない（版固定情報のみ git 管理）
+- **自律対応内容**: 依存整備（junction 10箇所: src/common/skills 配下 skill scripts 7 + repo-agentdev-integrity 1 + textlint-guard 2）を前置し、plugins 分割は worktree の junction 未伝播のため main root 実体からの読取専用実行で代替した。bun は worktree 配下からメイン root の node_modules を parent lookup で解決できることを確認済み（2026-11-13 wave1-baseline worktree 実測・996 tests 0 fail）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（REQ-018-004 環境差運用・変更起因検出と混同しない）
+- **横展開観点**: Wave 2 の全子 Issue の検証と case-close の機械工程で継続利用
+- **再発条件**: worktree 内での bun test 3分割実行の全状況
+- **予防策候補**: worktree 作成手順の依存整備（junction 整備手順）の標準化。bun parent lookup の機能を前提にした junction 最小化の検討
+- **想定反映先**: agentdev-git-worktree（worktree 運用指針）・agentdev-workflow-case-run・learning-promote
+- **関連**: PR #4038 本文 検証差分表（実行環境ラベル）・REQ-018・worktree-operations.md「書込み guard 運用指針」
+- **タグ**: #bunTest #worktree #依存整備 #junction #分割③代替 #Wave2
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（Q-B〔worktree junction/投影伝播の変異群・8 件統合〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-13: generate_indexes.ts への新規セクション追加では最小構成 producer fixture（req-impact-map 等を持たない）を破壊しないため、ファイル不在・マーカー不在の扱いは既存 README 系と同一の skip 記録に統一すべき
+
+- **問題事象**: AUTOGEN 導出の新規セクションを fail-fast 実装した結果、最小構成 producer fixture（req-impact-map 等の AUTOGEN ブロックを持たないテスト用最小構成）を壊した（Case #4026 Wave 1・PR #4039 の実装過程。修正済み）
+- **発生局面**: 実装（REQ-047-013・generate_indexes.ts の req-impact-map 逆方向対応導出と manifest 導出処理）
+- **検知方法**: bun test 分割①の generate_indexes producer 関連テスト fail（変更起因 1 件・同一 PR で修正）
+- **根本原因**: 新規セクションの不在扱いが既存 README 系セクションの skip 記録契約と不整合の fail-fast だった
+- **自律対応内容**: ファイル不在・マーカー不在の扱いを既存 README 系と同一の skip 記録に統一して修正（該当テスト解消）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: AUTOGEN 導出セクションを追加する全変更（Wave 2 の B3-2〜B3-6 で索引導出を拡張する場合）で適用すべき
+- **再発条件**: generate_indexes.ts への新規セクション追加で最小構成 producer fixture と共存させる全状況
+- **予防策候補**: AUTOGEN セクション追加時の不在扱い規約（skip 記録統一）を generate_indexes.ts の README・規則文書へ明記
+- **想定反映先**: repo-agentdev-integrity（generate_indexes.ts 関連規則・README）・learning-promote
+- **関連**: PR #4039 本文 Findings learning（DEL-4029-1）・generate_indexes.test.ts
+- **タグ**: #AUTOGEN #索引導出 #producerFixture #skip記録 #Wave2
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-13: bun test の spawnSync 型テストが main results 配列の呼出形式を文字列照合している場合、results 統合の構造変更は該当テストの同一 PR での追随更新を要する
+
+- **問題事象**: check_integrity.ts の results 統合の構造変更（ir_ids 付与・annotateIrIds ラップ）に伴い、spawnSync 呼出形式を文字列照合する regression_issue616 型テスト 2 件が fail した（Case #4026 Wave 1・PR #4039 の実装過程。同一 PR で修正済み）
+- **発生局面**: 実装（REQ-047-011・checker 出力への IR ID 包含）
+- **検知方法**: bun test 分割①の regression_issue616 fail（変更起因 2 件・同一 PR で修正）
+- **根本原因**: テストが呼出形式（コマンド・引数列）の文字列照合に依存しており、構造変更（ラップ関数の追加）で照合が不整合になった
+- **自律対応内容**: 期待値を新呼出形式へ追随更新（契約テスト期待値の同一 PR 更新・REQ-047-012 の契約テスト追随に整合）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: checker 出力形式の構造変更を行う全 PR（Wave 2 の B3-2〜B3-6 で checker を拡張する場合）で再発し得る
+- **再発条件**: check_integrity.ts の results 統合・呼出形式を変更する全状況
+- **予防策候補**: 呼出形式の文字列照合テストを構造非依存のアサーション（ir_ids の存在・形式固定など PR #4039 で導入の ir_ids 出力形式固定テストと同様）へ移行
+- **想定反映先**: repo-agentdev-integrity（check_integrity.test.ts・regression_issue616）・learning-promote
+- **関連**: PR #4039 本文 Findings learning（DEL-4029-1）・regression_issue616.test.ts・ir_ids 出力形式固定テスト
+- **タグ**: #checker出力 #契約テスト #spawnSync #results統合 #Wave2
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-13: bun test の pass 行は非 TTY 時の退避ログに現れず、件数サマリーと fail 行のみが証跡になる（file-level split が有効）
+
+- **問題事象**: 非 TTY 時の bun test 退避ログに pass 行が記録されず、fail 検出対象の特定は件数サマリー・fail 行・file-level split（対象ファイル単独実行の2段構成）に依存する（Case 4026 Wave 2・PR 4044 実測）
+- **発生局面**: bun test 分割実行の証跡退避と fail set 比較
+- **検知方法**: 退避ログの実観測（pass 行不在・fail 行とサマリーのみ）
+- **根本原因**: bun test の出力形式が TTY/非 TTY で異なり、非 TTY では pass 行が省略される
+- **自律対応内容**: fail 検出対象が明確な場合は file-level split（QG-4 の2段構成）を併用して特定
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: bun test の証跡退避を伴う全検証（case-run・case-close・QG-4）
+- **再発条件**: 非 TTY の bun test 実行で pass 行を証跡に期待する全状況
+- **予防策候補**: 証跡要件を件数サマリー・fail 行基準で定義し（QG-4 正規形の既定どおり stdout/stderr 分離退避）、fail 特定が必要な場合は file-level split を標準採用
+- **想定反映先**: agentdev-quality-gates（bun test 正規形の運用注意）・learning-promote
+- **関連**: PR 4044 本文 Findings・QG-4 file-level split 規定
+- **タグ**: #bunTest #証跡 #fileLevelSplit #非TTY #Wave2
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-a〔bun test stderr 件数抽出・2 段階実行・3 件統合〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-13: stash push/pop は同一 worktree の cwd で実行する（main worktree cwd からの pop は変更の誤適用を生む）
+
+- **問題事象**: worktree 内 stash 対照で git stash pop を main worktree の cwd から実行してしまい、変更 11 ファイルが一時的に main worktree へ適用された（Case 4026 Wave 2・PR 4045 で発生・同手順で完全復旧）
+- **発生局面**: IR-055 対照実行のための stash push/pop
+- **検知方法**: pop 後の git status で main 側の変更集合異常を検知
+- **根本原因**: stash はリポジトリ共通だが pop は実行 cwd の worktree に適用されるため、cwd 選択を誤ると別 worktree へ適用される
+- **自律対応内容**: git diff 退避（patch）→ main 側 git restore（対象 11 パス指定）→ worktree 側 git apply で完全復旧。復旧後 bun test（286+63 pass/0 fail）と変更集合一致（13ファイル）を確認し報告
+- **ユーザー確認有無**: なし（PR 本文へ報告義務の履行）
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree + stash を使う対照実行全般（IR-055 対照・baseline 対照）
+- **再発条件**: stash 操作の cwd を実行対象 worktree と取り違える全状況
+- **予防策候補**: stash push/pop は同一 worktree の cwd で実行するか、patch 退避方式を採用する（実行時禁止事項として明記）
+- **想定反映先**: agentdev-git-worktree（worktree-operations）・learning-promote
+- **関連**: PR 4045 本文 Findings（DEL-4035-1）
+- **タグ**: #worktree #stash #事故復旧 #対照実行 #Wave2
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-13: trusted-distribution-gate launcher 系 3件は worktree で非決定的に fail する（main root では pass）
+
+- **問題事象**: trusted-distribution-gate launcher 系 3テストが worktree では依存整備の前後で fail 数が変動（skip 相当 → fail）し、同一コードが main root では pass（Case 4026 Wave 2・PR 4046 実測）
+- **発生局面**: worktree での bun test 分割①実行と fail 由来分類
+- **検知方法**: main root での同一コード pass 実測（環境差の切り分け）
+- **根本原因**: worktree 環境固有の依存・junction 状態が launcher テストの前提と不一致
+- **自律対応内容**: worktree 環境 fail 分類知識への追加候補として記録し、対照は main root または fail クラスで実施
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: worktree で integrity suite（分割①）を実行する全検証
+- **再発条件**: worktree で trusted-distribution-gate launcher 系を実行する全状況
+- **予防策候補**: worktree-environment-fail-classification.md 知識へ本 fail クラスを追加
+- **想定反映先**: docs/knowledge/worktree-environment-fail-classification.md・learning-promote
+- **関連**: PR 4046 本文 Findings
+- **タグ**: #worktree環境差 #trustedGate #fail由来分類 #Wave2
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（Q-B〔worktree junction/投影伝播の変異群・8 件統合〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-13: 共通正本側の定数も陳腐化する（J-001 の逆方向）・正本を採用する場合は鮮度担保が両方向で必要
+
+- **問題事象**: 共通正本の AGENTDEV_GH_TOOL_DESCRIPTION が実公開文から陳腐化した未参照定数として残存していた（release 初期段階の文言。Case 4026 Wave 2・PR 4046 で発見）。ホスト別複製の陳腐化（J-001 の想定方向）と逆方向の正本側陳腐化
+- **発生局面**: 3系統ホスト接続の正本参照化（B3-5e）の実装検査
+- **検知方法**: 正本参照化の実装中の実公開文との突合
+- **根本原因**: 正本定数が未参照のまま放置され、鮮度が担保されていなかった
+- **自律対応内容**: 正本参照化と契約テスト固定 6件で再発防止構造を構築（PR 4046）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 正本定数・単一正本へ集約した全資産（C-ε の集約対象全般）
+- **再発条件**: 正本定数が参照されず放置される全状況（集約後に参照経路が切れた場合を含む）
+- **予防策候補**: 正本を採用する変更では、正本側の鮮度担保（参照されない定数の放置検知・未参照定数の削除検査）を同時に整備する
+- **想定反映先**: agentdev-workflow-lifecycle（共通報告・Decision・自律確定規約の集約運用）・custom-tool-contracts Design・learning-promote
+- **関連**: PR 4046 本文 Findings（J-001 正本側実例）
+- **タグ**: #正本鮮度 #J001 #ホスト接続 #Wave2
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-13: trusted-distribution-gate pipeline が main root でも archive stage で FAIL する（boundary detector の unclassified 大量検出）
+
+- **問題事象**: trusted-distribution-gate.ps1 pipeline（base 9ec88e649 → candidate ff4677e01・bootstrap mode・main root 実行）が code=9 で fail。manifests 全投影 entries 空・archive stage で配布対象多数 missing。boundary detector が tests 配下のサンプル文字列（wave-gate.test.ts の「FN-1」等）を unclassified-entry として大量検出し「projection detections bound exceeded」を記録（Case 4026 stage 4・AG-013 最終合格確認の試行実測）
+- **発生局面**: Root Case close の AG-013（配布整合検査の最終合格）確認での pipeline 試行実行
+- **検知方法**: pipeline 実行の exit code と summary（code=9・archive verification failed: missing）
+- **根本原因**: boundary detector が distribution-boundary.md「検査対象の除外領域」規定（共通原本側 tests/ 配下の検出刺激用サンプル文字列・Issue #2480）を gate 実装へ適用していない疑い。tests 配下のサンプル識別子を producer 内部参照として unclassified 検出し、検出 bound を超過させた。blob 分類・manifest projection との整合も未確認
+- **自律対応内容**: pipeline 実行障害の記録と intake 化（次サイクル修正対象）。正規成果物側の配布違反検出とは区別し、AG-013 の配布整合検査判定は既存の合格記録（E4-1 最終 gate・入口横断一致試験・Pester・trusted-distribution-gate 配下 test）で成立と判断
+- **ユーザー確認有無**: 判定根拠は完了記録コメントで報告（pipeline は archive 公開前検査〔DEC-014 決定7・REQ-009-045〕で本 Case は archive 公開なし）
+- **Decision/REQ/spec影響**: なし（検査装置側の実装乖離の修正は次サイクル対象）
+- **横展開観点**: archive 公開前の gate pipeline 実行（backlog-auto リリース手順・trusted-distribution-gate を実行する全経路）
+- **再発条件**: gate pipeline を archive 公開時や検証目的で実行する全状況
+- **予防策候補**: gate 実装へ distribution-boundary.md 除外領域規定の適用と boundary detector 検出 bound の整備。pipeline の実行環境前提（Windows・main root）の検証手順整備
+- **想定反映先**: repo-agentdev-integrity scripts trusted-distribution-gate・intake-promote（intake item 経由）
+- **関連**: Case 4026 stage 4 完了記録コメント・intake item（2026-11-13-trusted-distribution-gate-pipeline-boundary-detector-unclassified-fail）
+- **タグ**: #trustedGate #boundaryDetector #pipeline実行障害 #stage4
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-15: case-open 委譲実行で agentdev_gh の全操作が gh exit 66 で失敗し、gh CLI 読取は正常という環境差が発生
+
+- **問題事象**: case-open 工程（adf-simplification-remediation draft・委譲実行 2026-11-15）で Custom Tool agentdev_gh の issue_read（2回）と issue_create（2回）が全て「gh exited with code 66; stderr is empty（startup environment failure 疑い）」で失敗。同一セッションの bash からの gh CLI 直接実行（gh repo view、gh issue list、gh issue view、gh auth status）は全て正常（gh v2.104.0、/c/Program Files/GitHub CLI/gh、認証済み、AGENTDEV_GH_REPO=yogata/agent-dev-flow 設定済み）。Root Case 起票は重複起票なしを確認した上で blocked となった
+- **発生局面**: 実装（case-open STEP-2 の Root Case 起票と冪等検出）
+- **検知方法**: agentdev_gh 操作の構造化失敗返却（operation-failed、retryable、contingency に gh CLI 読取切替と canContinue false を含む）
+- **根本原因**: Tool プロセスから gh を spawn する実行環境の不具合（bash セッションとは別のプロセス環境で gh が起動失敗。exit 66・stderr 空）。Tool 実装・認証・リポジトリ設定自体は正常（gh CLI 実績と AGENTDEV_GH_REPO 正値から判断）
+- **自律対応内容**: Tool 契約に従い各操作を1回再試行（2操作とも2連続失敗で再試行消費）。読み取りは contingency どおり gh CLI 読み取り専用切替（重複検知と冪等検出を gh issue list/view で完遂）。書込みは gh CLI 代替禁止（GitHub 書込み guard の迂回対象）のため Root Case 起票を停止し、前提整備 commit（jev 観測2件・commit 349e74cb4）と yomiyasu 推敲済み Root Case 本文の用意まで完了した状態で中断。偏差を本 learning へ記録
+- **ユーザー確認有無**: なし（停止報告を完了報告で行う）
+- **Decision/REQ/spec影響**: なし（操作契約と guard は正常に機能。Tool 実行環境側の問題）
+- **横展開観点**: agentdev_gh を用いる全 workflow（case-open/case-ready/case-run/case-close、issue、intake-from-github 等）で同じ環境問題が発生すると、書込み操作には contingency が存在しない（fallbacks 空・canContinue false）ため同型の停止に至る。読み取りのみ contingency で継続可能
+- **再発条件**: agentdev_gh が gh を spawn するプロセス環境で gh の起動が失敗する状態（MCP/Tool プロセス環境の PATH・gh 可用性の欠如等）
+- **予防策候補**: agentdev_gh 起動環境の gh 可用性ヘルスチェックの前置（起動時に gh --version 相当の読取診断を実行し、起動環境失敗を明示報告する）。失敗時に Tool 側の gh 解決先と bash 側 PATH の差分を診断できる証跡を出力する
+- **想定反映先**: agentdev_gh Tool 実装（src/common/tools/agentdev-gh/）、Custom Tool 操作契約 Design の障害種別（startup environment failure の区別報告）
+- **関連**: .agentdev/drafts/req-draft-adf-simplification-remediation.md、commit 349e74cb4（前提整備）、Issue #4052（OU-001 再利用対象・OPEN）
+- **タグ**: #agentdevGh #ghExit66 #startupEnvironmentFailure #caseOpen
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-15: yomiyasu lint スクリプトは worktree からは参照できず main root 実体から実行する（Case #4054・OU-001）
+
+- **問題事象**: yomiyasu_lint.py は .opencode/skills/yomiyasu/scripts/ 配下にあるが、worktree 内の .opencode/skills には yomiyasu の junction が未伝播のため、worktree cwd からはスクリプトが見えない
+- **発生局面**: 実装（docs 変更委譲内の文章表層検査）
+- **検知方法**: worktree 内からのスクリプト不存在（path 解決失敗）
+- **根本原因**: worktree 構造的制約（.opencode/skills の agentdev-* junction は main root にのみ存在）
+- **自律対応内容**: worktree 配下の検査対象ファイルを引数に、main root 実体側からスクリプトを実行して回避
+- **ユーザー確認有無**: なし（workflow 内自律処置）
+- **Decision/REQ/spec影響**: なし（運用知見）
+- **横展開観点**: yomiyasu lint 以外の main root 実体配置ツール（.opencode/skills/yomiyasu 配下全般）で同型の参照不能が発生し得る
+- **再発条件**: worktree cwd から yomiyasu 系スクリプトを相対参照する工程
+- **予防策候補**: worktree 実行手順に「main root 実体配置ツールは main root 起点で実行」の前置を明記する
+- **想定反映先**: yomiyasu 利用工程の手順参照（agentdev-workflow-lifecycle「文章品質・書込み規約」節の実行手順補記候補）
+- **関連**: Epic #4054・Issue #4052・PR #4062 本文 Findings・worktree-operations.md（worktree 構造的制約）
+- **タグ**: #yomiyasu #worktree #junction
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（Q-B〔worktree junction/投影伝播の変異群・8 件統合〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-15: worktree で link profile の配布依存境界 checker は zero-targets invalid execution になる。main root からの読取専用実行が実証済みの回避経路（Case #4054・OU-005/OU-006）
+
+- **問題事象**: worktree 内で check_distribution_boundary / check_integrity の link profile を実行すると、.opencode/skills の junction 未伝播により走査対象 0件（zero-targets）または projection-missing の大量 NG になり、checker 自身が検査不成立を明示する
+- **発生局面**: 実装（OU-005・OU-006 の配布依存境界検証）
+- **検知方法**: checker の zero-targets pre-warning / projection-missing NG
+- **根本原因**: worktree 構造的制約（.opencode/skills の agentdev-* junction は worktree に伝播しない）
+- **自律対応内容**: 2経路を実証。(1) 読み取り専用 checker を main root から実行し BEFORE/AFTER の git status clean を証跡化（OU-005 link profile）。(2) worktree 内へ検査用 junction を一時作成して成立させ、検証後に全削除（OU-006）。checker 自身の --root / junction 伝播状態の検証指示に従い、zero-targets 実行を合格として扱わない
+- **ユーザー確認有無**: なし（workflow 内自律処置）
+- **Decision/REQ/spec影響**: なし（既知制約の実運用面の補強）
+- **横展開観点**: link profile を伴う全委譲で同型の検査不成立が発生し得る。無効実行を合格扱いにすると検査省略になる
+- **再発条件**: worktree 内での link profile 実行
+- **予防策候補**: worktree 検証手順の定型として、junction 補完手段（一時作成と fs.rmdirSync 等での回収）と main root 読取専用実行の2経路を明記する knowledge 化
+- **想定反映先**: worktree-operations.md（checker 実行手順節）または checker-execution-contracts 関連の運用参照
+- **関連**: Epic #4054・Issue #4058・PR #4063 Findings・Issue #4059・PR #4065 checker 実行記録・worktree-operations.md
+- **タグ**: #配布依存境界 #linkProfile #worktree #zeroTargets
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（Q-B〔worktree junction/投影伝播の変異群・8 件統合〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-15: checker の終了コードを pipe 経由で計測すると pipe 後段コマンドの終了コードを記録してしまう（Case #4054・OU-006）
+
+- **問題事象**: `cmd | tail -N; echo $?` 形式で checker の終了コードを計測すると、$? が tail の終了コードになる。CLI 直実行では exit 0 と記録したが、node spawnSync での再計測で checker 本体は exit 1（環境差 NG）だった
+- **発生局面**: 実装（OU-006 の checker 実行記録）
+- **検知方法**: spawnSync による再計測での終了コード不一致
+- **根本原因**: shell pipe 後段の終了コードを $? が保持する shell の仕様を、checker 本体の終了コード計測に誤用
+- **自律対応内容**: checker 本体の終了コードを spawnSync 等の pipe を介さない直接実行で再計測し、検証記録を訂正
+- **ユーザー確認有無**: なし（workflow 内自律処置）
+- **Decision/REQ/spec影響**: なし（計測規律の運用知見）
+- **横展開観点**: 終了コードが意味を持つ checker（非ゼロ exit = 違反検出）の全計測で同型の誤記録が発生し得る
+- **再発条件**: pipe を介した checker 終了コードの記録
+- **予防策候補**: 終了コード計測は pipe を介さない直接実行（spawnSync 等）で行う規律を checker 実行契約の補記候補とする
+- **想定反映先**: checker 実行契約（checker-execution-contracts）の計測手順補記候補
+- **関連**: Epic #4054・Issue #4059・PR #4065 本文 Findings
+- **タグ**: #終了コード #計測規律 #checker
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-15: yomiyasu lint の unnatural_halfwidth_space 規則が英字前後半角空白のリポジトリ正規スタイル（REQ-094・textlint 共通基盤）と恒常的に衝突する（Case #4054・OU-004）
+
+- **問題事象**: yomiyasu lint の unnatural_halfwidth_space が、英字前後に半角空白を置くリポジトリ正規スタイル（REQ-094 用語選択基準・textlint 共通基盤、既存行も同一スタイル）を毎回警告する。docs 変更の yomiyasu 必須化（REQ-098）の運用で、この規則の警告を毎回採否判断する負担が生じる
+- **発生局面**: 実装（OU-004 の system.md と PR 本文の yomiyasu lint）
+- **検知方法**: yomiyasu lint 警告の内訳分析（警告クラスが既存行にも大量出現）
+- **根本原因**: yomiyasu 規則の日本語一般基準と、技術文書での英字表記に関するリポジトリ正規スタイルの基準差
+- **自律対応内容**: 新規行も既存スタイルと同一のため対応なしと判断し、既存文書一貫のスタイル維持を優先（lint 終了コード 0、必須不合格なし）
+- **ユーザー確認有無**: なし（workflow 内自律処置）
+- **Decision/REQ/spec影響**: なし（採否判断の運用負担の観察）
+- **横展開観点**: docs 変更の yomiyasu 必須化（REQ-098）を適用する全工程で毎回同型の採否判断が発生する
+- **再発条件**: 英字を含む docs 文への yomiyasu lint 適用
+- **予防策候補**: yomiyasu 規則と textlint 共通基盤の整合（技術文書モードの追加等）の検討
+- **想定反映先**: yomiyasu skill（規則構成）・REQ-098 運用参照
+- **関連**: Epic #4054・Issue #4057・PR #4067 本文 Findings
+- **タグ**: #yomiyasu #REQ094 #採否判断
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
+
+## 2026-11-15: integrity markdown レポートは OK 明細を省略するため特定 check の OK 確認に --json 再実行が必要になる（Case #4054・OU-004）
+
+- **問題事象**: .agentdev/integrity/reports/ 配下の markdown レポートは OK 明細を列挙せずサマリのみのため、expanded-readme-sync 等の特定 check の OK 確認には --json 出力の再実行が必要になる
+- **発生局面**: 実装（OU-004 の機械参照対応確認）
+- **検知方法**: レポート読み戻しでの OK 明細欠落
+- **根本原因**: markdown レポートの様式がサマリ中心で、個別 check の OK 根拠を保持しない
+- **自律対応内容**: --json 出力の再実行で特定 check の OK を確認（checker は読取系のため再実行コストは限定的）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（レポート様式の改善候補）
+- **横展開観点**: check_integrity の個別結果を引用する検証記録で再実行コストが反復発生する
+- **再発条件**: markdown レポートからの特定 check OK 確認
+- **予防策候補**: レポートへの OK 明細オプション（特定 check 合格確認の低コスト化）の実装
+- **想定反映先**: check_integrity.ts のレポート生成・docs-check 関連
+- **関連**: Epic #4054・Issue #4057・PR #4067 本文 Findings
+- **タグ**: #integrity レポート #改善候補
+- **移動日**: 2026-11-15
+- **処分判定**: deferred（R-c〔単発エントリ・R-c 28 件群〕・learning-promote 2026-11-15・詳細根拠は evaluation-report 参照）
+
+---
