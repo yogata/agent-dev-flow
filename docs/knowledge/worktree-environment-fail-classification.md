@@ -1,7 +1,7 @@
 ---
 title: worktree 環境差 fail の由来分離手順と依存前提の実行形態知見
 created: 2026-10-05
-updated: 2026-10-20
+updated: 2026-11-15
 ---
 
 # worktree 環境差 fail の由来分離手順と依存前提の実行形態知見
@@ -35,6 +35,13 @@ case-run/case-close の worktree 実行では、git 管理外の投影・生成�
 - fail 発生時は、fail 明細が依存関連（textlint-guard vendor・Module not found 等）に集中しているかを確認する。集中している場合は依存由来の可能性が高く、スイート分解により検査範囲を確定して変更起因の失敗と由来分離する
 - 本節は手順の明記に限定する。vendor 空化の検知導入と根本原因調査は「textlint vendor 空化の検知前提」節の未解決論点のまま維持する（範囲外を変更しない）
 
+### flake・並列負荷・依存生成順序由来の分類（追記）
+
+- flake（非決定性 fail）と「負荷由来」の分類ラベルを由来分類に加える。観測 fail の分類順序は「並列観測 → 既知 SSoT 照合 → 負荷なし単独再実行 → 分類確定」の順で行う（既知不合格 SSoT〔.agentdev/tmp/c-alpha2-baseline/known-failures-fixed.md 等〕の運用と整合させる）
+- 負荷 flake の分類は単独（負荷なし・直列）再実行での pass 実測を根拠とし、タイミング運を根拠にしない。独立再観測回数を記録する
+- 負荷・非決定性の変異列挙: 並列実行（3分割同時並列で負荷下のみ出現するタイミング系 fail）・キャッシュ共有（bun キャッシュ競合）・依存生成と並列起動（vendor bundle 生成完了前の並列起動による連鎖 fail）・実行順序依存（plugins 分割 full-run の順序・負荷依存 flakiness）
+- 依頼生成（bun install・build:engine 等）を伴う並列実行では、依存生成完了後に直列実行を前置する
+
 ### textlint vendor 空化の検知前提（未解決論点を含む）
 
 - textlint vendor（`vendor/textlint-engine.bundle.json`）は worktree へ伝播しない git 管理外の生成物であり、worktree 内での再生成手順は「依存前提の実行形態別判断」表のとおり前置が必要
@@ -62,6 +69,7 @@ case-run/case-close の worktree 実行では、git 管理外の投影・生成�
 - repo-agentdev-integrity scripts の node_modules 同梱直接実行（PR #3400）・bun:test + 標準モジュールのみの依存整備不要（PR #3451）
 - main root 側 textlint vendor 空化の観測と再生成による復旧（2026-10-05 worktree split3 運用。intake item 2026-10-05-textlint-vendor-drift-worktree-split3、backlog-review 2026-10-07 で追記）
 - 依存生成未実施環境での大量 fail の3回の再発（deferred L3617〔9-10 fail〕・L4037〔76 fail→依存生成後 184 pass〕・2026-10-19 実行分〔repo root 全体 76 fail〕。backlog-review 2026-10-20 で判別前置を追記）
+- 並列負荷・タイミング系・キャッシュ競合・依存生成順序による非決定性 fail 8 件の観測（Case #3961/#3968/#4002/#4004/#4026/#4068。3分割同時並列で既知 12 件外のタイミング系 fail 11 件が負荷下のみ出現し単独再実行で全件解消・vendor bundle 生成完了前の並列起動による連鎖 fail 等。backlog-review 2026-11-15 で flake 分類を追記）
 
 ## 関連知識
 
