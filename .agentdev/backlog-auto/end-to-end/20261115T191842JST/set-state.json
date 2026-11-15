@@ -1,0 +1,341 @@
+{
+  "一式識別子": "20261115T191842JST",
+  "作成日時": "2026-11-15T21:10:30.448+09:00",
+  "backlog_auto_started_at": "2026-11-15T19:18:42+09:00",
+  "義務スナップショット": {
+    "説明": "元 RU 一式（RU-0281〜RU-0302）の必須の要求と受け入れ義務のスナップショット。RU 本文から抽出。完了突合の正の一つである（RU・要件doc 削除後も本スナップショットから突合可能）。",
+    "RUs": {
+      "RU-0281": {
+        "タイトル": "RA-002 撤去追随の旧機構参照・文言・sidecar 対応行の整理",
+        "必須要求": "実施前に RA-002（#3970）の実施状況を確認する冪等確認を前置する（モジュール撤去済みなら追随の要否を実在確認から判断し、既に追随済みの項目は完了扱いとする）。",
+        "受け入れ義務": [
+          "adapter SKILL.md L94 の文言を作成ヘルパー・台帳参照から現行の受け入れ評価接続（後片付けは作業完遂責任の一部・報告義務は v4-delegation-contracts Design「検証用一時資材の作成・報告義務」節）へ現行化する。",
+          "AGENTS.md の作成ヘルパー関連文言を現行の受け入れ評価接続・後片付け責任（REQ-118）の文言へ現行化する。",
+          "RA-002 のモジュール削除に伴い、traceability/agentdev-workflow-case-close.yaml の旧機構モジュール対応行を削除し、REQ-118-001/002/003/004/006 等の撤去済み機構要件行の retired 判定を実施する。sidecar 更新後に traceability check（対象要件行限定）で missing 系 findings が新規に立たないことを確認する。"
+        ]
+      },
+      "RU-0282": {
+        "タイトル": "integrity suite 既存 fail の区分けと fixture・テスト条件是正",
+        "必須要求": "区分けを先行する: baseline 存在 fail 群（timeout 11件・consumer fixture 9件・vendor 依存 2件・checkExtensions 1件・split3 11件・T6）について、環境調整（vendor 生成・junction 適用・実行形態整備）で消える fail と真の欠陥を区分けし、別案件管理対象への追加要否を確定する。",
+        "受け入れ義務": [
+          "fixture 是正: makeConsumerRepo へ機械工程前提検証の対象 script（close_mechanical_steps.ts 等）を含める、または check ベースアサーションの実行条件を fixture 構成に応じて調整する。",
+          "vendor 依存是正: vendor 生成状態に依存しないテスト条件へ是正、または実行環境前提（vendor 生成済み/未生成）の明記と条件分岐を行う。",
+          "repo-state 依存是正: relied-diff・allocation・上位層 docs 検査系テストの独立性是正（fixture 化・docs 記述の実在確認への変換等）の要否を判断する。",
+          "pin 2件・T6 は撤去系実現単位（RU-0270・RA-002〔#3970〕/RA-006〔#3971〕）への投影漏れがないかを突合する。",
+          "check_extensions strict failure 2件（backticks-identifier-threshold.md 不存在）の実修復（Design 文書作成または参照削除）を含めて判断する。"
+        ]
+      },
+      "RU-0283": {
+        "タイトル": "suite 実行環境前提・標準実行形の整備（cd-form・依存復元前置・Windows CI runner）",
+        "必須要求": "正規 3 分割の実行手順（機械工程 script・委譲 prompt・基線固定記録）の実行形を cd-form に統一する。bun の directory 引数解決の挙動差を検査で明示する選択肢の要否を含めて判断する。",
+        "受け入れ義務": [
+          "worktree 作成手順（agentdev-git-worktree）への依頼復元前置（bun install --cwd・scripts/self-sync.ps1 -Mode apply 等）の明示、または suite 計数の環境前提（node_modules / junction / vendor 状態）の記録様式への追加を判断・実施する。",
+          "Windows CI runner での bun test 分割③（install.ps1 e2e 系）定期実行と、fail クラス baseline の機械突合（既知 fail クラス集合との差分検出）を整備する。実現により Wave 境界ごとの人手 fail set 突合を機械化する。"
+        ]
+      },
+      "RU-0284": {
+        "タイトル": "配布物参照・相対リンクの整合是正（未解決リンク・旧配置参照パス）",
+        "必須要求": "repo-agentdev-integrity SKILL.md の integrity-rule-catalog.md リンクを正しい相対パス（docs/designs/integrity/integrity-rule-catalog.md）へ修正する（1行）。あわせて検査器自身が .opencode 配下 skill 文書の相対リンクを検査対象にしているか確認し、対象外なら再発防止の検査範囲見直し候補を評価する。",
+        "受け入れ義務": [
+          "vocabulary-registry.md の IR-055・IR-065・IR-066 リンク3件を正しい深さ（../../../../docs/...）へ修正する。",
+          "委譲 prompt テンプレート（機械工程・checker 実行の指定箇所）のトレーサビリティ check 記載パスを正規実体（src/common/skills/agentdev-traceability/scripts/src/check.ts）へ是正する。または checker 指定の実在確認前置の追加を判断する。",
+          "Issue/Design/Skill 文面中の `scripts/src/` 旧配置参照を実配置（`.opencode/skills/repo-agentdev-integrity/scripts/` 等）へ更新する。存在しない機械工程 script への参照は実在する等価手続または削除の判断材料として精査する（inspect-skills・inspect-docs 経由の機械診断で列挙できる）。",
+          "agentdev-gh-tool README の2リンクについて consumer 環境の配置で解決するかを確認する。解決する場合は誤検出として扱い、解決しない場合は配布時の複写対応と参照不一致の是正を実施する。IR-055 の導入先未解決参照検出が相対 Markdown リンク形式を検出対象にしているかを確認する。",
+          "履歴報告（docs/reports/integrity/ 等）の参照リンク34件について、履歴報告に参照を追随させる義務があるかの契約上の確認を前提とする。許容されるなら不整合として扱わない判断を確定し、義務がある場合は追随修正の対象範囲を確定する。"
+        ]
+      },
+      "RU-0285": {
+        "タイトル": "配布境界検査の整備（gate 除外領域適用・相互参照解決可能性検査・backtick 運用明文化）",
+        "必須要求": "trusted-distribution-gate の boundary detector へ distribution-boundary.md「検査対象の除外領域」規定を適用する（tests 配下の検出刺激用サンプル文字列の除外）。検出 bound 設定と unclassified 扱いを見直す。",
+        "受け入れ義務": [
+          "blob 分類（loadAndClassify）と manifest projection entries が空になる経路を解明・整備する（main root・Windows 環境での pipeline 実行前提の検証手順整備を含む）。",
+          "配布物本文内の相互参照パスの解決可能性を検査する汎用 checker の候補設計を行う（配布レイアウトでの実在解決の検証・運用記述の `src/common` 形式を誤検出しない除外設計を含む）。採否判断（backlog-review・req-define 経路で評価済みの上で要件化する）。",
+          "配布境界 Design または正本化の手順参照へ「配布 skill 間の正本参照は backtick パスで記述し Markdown リンクを使用しない」運用を追記する。配布境界 checker の concrete path 検証（hits 0 確認）を併記する。"
+        ]
+      },
+      "RU-0286": {
+        "タイトル": "integrity 規則メタデータ・検査器・検査データの整合是正",
+        "必須要求": "IR-013: checkVariantPathExistence を check_integrity.ts の results 統合へ接続し machine-check へ再分類する（frontmatter detection_method_class・implementation_path・verification_path を IR-074 機械照合対象へ追随）、または関数を廃止して IR-013 を prose-only のまま規則文書へ明記する。分類と実装実態の乖離をどちらかで解消する（判断は req-define が確定する）。",
+        "受け入れ義務": [
+          "IR-018・IR-042: 検出関数に対する専用 fixture 試験（違反パターン・適合パターンの最小 fixture）を追加し、verification_path を専用試験へ限定する。IR-074 のパス実在・IR ID 参照一致検査との整合を維持する。",
+          "IR-045: check_integrity.test.ts の fixture 参照を現行の移管先規則（IR ID・語彙）へ更新するか、fixture を廃止する。IR-069 の欠番記録との整合を確認する。",
+          "IR-055: baseline entries と checker evidence の正規化規則（repo-* / repo-local 等）を明文化し、外部突合スクリプト実装時の注意書きとして収録する。",
+          "IR-066: agentdev-command-creator の retired 語彙追加（obsolete-vocabulary-map.yaml + check_integrity.ts IR066_VOCAB_PATTERNS 同一 PR 更新）の要否を検出コストと再発リスクの比較で判断し、実施する。",
+          "obsolete-path-map.yaml: backticks 2件の new 側を現行の統合先（document-type-responsibilities.md の識別子と散文普通名詞の区別節）へ更新する。または retired 様式に従い new 側不在の表現へ整理する。対照登録の現行様式と checker 同期条件を確認のうえ実施する。"
+        ]
+      },
+      "RU-0287": {
+        "タイトル": "IR-072 既知 NG 是正と frontmatter updated 運用規則の整備",
+        "必須要求": "IR-072 の NG 残存対象 REQ/Design（updated と最終内容変更 commit 日付の不一致）を洗出し、updated を実施日へ更新する実修復を基本とし、対価に見合わない対象は integrity-contracts.md「既知残存違反の統一選択基準」に従い baseline 登録（provenance 付き）へ分類する。個別対象 docs/designs/local/adf-simplification-deferred-records.md を含める。",
+        "受け入れ義務": [
+          "意図的な updated 進行を伴う PR で merge 後に IR-072 が新規検出される構造への運用規則（REQ 更新手順の一手順化・内容変更 PR での updated 同時進行）を整備し、検討のうえ許容幅規則（例: 同日内差分の扱い）の調整要否を判断する。"
+        ]
+      },
+      "RU-0288": {
+        "タイトル": "IR-053 検出器の否定文文脈許容改善（ng-baseline 登録は不採用）",
+        "必須要求": "IR-053 検出器に否定文文脈許容条件を追加する。設計は受け入れ条件（RT-3）の3点（否定形記述の構造的許容の設計・area-based 除外宣言方式（REQ-010-066 準拠）との整合検討・IR-053 正規検出条件と既知許容の照合）を検討対象とする。",
+        "受け入れ義務": [
+          "ng-baseline / exemptions への仮登録は行わない（検出側推奨どおり・正の検出器仕様を迂回しない）。改善実装までの間の warning 継続検出は許容する。",
+          "対象 README の `gh pr view` 記述そのものの文言是正は、agentdev_gh Custom Tool 境界の現行契約と整合するかの確認の下で req-define が判断する（否定文説明として正当なら文言は維持し、検出器側の許容で解消する）。"
+        ]
+      },
+      "RU-0289": {
+        "タイトル": "v4-v5-crosswalk.md の draft 放置解消（IR-054 triage (b): 内容更新 + updated 最新化）",
+        "必須要求": "triage (b) として v4-v5-crosswalk.md の内容更新と frontmatter updated の最新化を実施する。内容更新の範囲（親 v5-adopted-conventions.md の 2026-11-04「解決手順」節更新〔:68-79 target_area 追記〕の子側波及を含めるか）と、living tracking（planned → confirmed → executed）の長期休止期間と updated 最新化の併存整理（IR-054 false_positive_risk「中」への対応）は case 経路（case-ready/case-revise）での Design 更新判断として確定する。",
+        "受け入れ義務": [
+          "実施時に inbox 残置の R-1（REQ-035-006 旧 Wave 語彙の現行化）と S-2（REQ-111-013 covers 宣言重複の集約判断）を同時再評価対象として扱う（finding の後続処理相互参照どおり。両項の defer 記録は .agentdev/inspect/inbox/inspect-docs-finding-20261115T103843Z.md 側に保持）。",
+          "docs/designs/README.md:193 の親行備考へ joint triage 記録を追記する（finding 側推奨どおり）。"
+        ]
+      },
+      "RU-0290": {
+        "タイトル": "worktree 運用規律の整備（所有者確認・個別指定削除・remove 前掃除・frozen-lockfile 前置）",
+        "必須要求": "worktree-operations.md cleanup 系節へ「untracked ファイル削除判定は『内容確認 → 中止判断 → 削除実行』を別 bash コマンドに分離して実行する」「並行 case-auto 環境では .agentdev/jev-observations/ 等の当日タイムスタンプ物を自 run の一時物と断定せず、観測メタデータ（workflow・subject 等）で所有 run を照合する」を追記する。",
+        "受け入れ義務": [
+          "同じく cleanup 系節へ「後片付けの削除は自分が作成した具体ファイル名を個別指定し wildcard を使用しない（連番・タイムスタンプ等の衝突し得るパターンでの共有領域 wildcard 削除は禁止）」を追記する。",
+          "「1.5 remove 前退避ファイル掃除」節の掃除対象に依存整備物（node_modules・vendor 等 gitignore 対象・明示パス指定）を追加する。case-close 側 cleanup 参照行（cleanup-and-capture.md STEP-6-1）の文言追随を含める。",
+          "「bun test 実行の環境前提」節へ bun install --frozen-lockfile 前置の明記と、bun run --cwd の package 直下 node_modules/.bin 解決要件・tsc PATH 解決失敗時の node_modules/.bin/tsc 直接起動フォールバックを補記する。--frozen-lockfile 規律の正規配置先として QG-4（qg-4-final-acceptance.md 依存パッケージ前置節）側への配置の選択肢を含めて判断する。"
+        ]
+      },
+      "RU-0291": {
+        "タイトル": "case-close 機械工程規律の整備（入力構成・freshness 順序・標本整合・手動回収手順）",
+        "必須要求": "case-close SKILL.md「完了判定の契約状態記録・未追跡残存検証」節へ (1) 終了判定記録（.agentdev/close-acceptance/）は恒久 commit 対象の契約状態記録ではなく一時保護記録であり contractStatePaths の範囲導出に含めない旨の明示、(2) humanConfirmedPaths 指定前に git ls-files --others --exclude-standard で観測形（省略形ならディレクトリ接頭辞・ファイル形ならファイルパス）を確認する前置、を補記する。",
+        "受け入れ義務": [
+          "cleanup-and-capture.md STEP-5 へ「Issue 書込み（コメント投稿・本文更新）をすべて完了した後に、fresh revision（再 issue_read）で機械工程を冪等再実行して終了判定記録を再生成し、直後に issue_close を実行する（間に Issue 書込みを挟まない）」の順序を明記する。",
+          "同じく cleanup-and-capture.md STEP-5 の verify-only closure 時の機械工程入力組み立て手順を正規化する（ワークアラウンド構成〔mergeablePolling maxAttempts 0〕の除去・prNumber 0 正規構成への追随）。対象は workflow skill 本文（配布手順記述）であり機械工程 script 本体は対象外（PR #3982 で完結済み）。",
+          "close_mechanical_steps.test.ts の completeMachineAcceptanceRecord fixture の分割番号割当を QG-4 正規形（①=integrity suite・②=src 側・③=plugins 系）へ整合させる（fixture とテスト期待値の同時更新・bun test pass 確認込み）。",
+          "case-close scripts README.md へ「CLI runner は deleteFile を提供しないため reclamation 指定時は fail-closed 報告が正・手動回収経路（実在確認 → 証跡退避 → 明示パス削除 → 不存在確認）が現行正常系であること」の標準手順を明記する。あわせて main() runner への deleteFile 注入（removeFile と同一の fs 実装）を機構整理候補として保持する。"
+        ]
+      },
+      "RU-0292": {
+        "タイトル": "正規文書の表層・参照・鮮度の軽微是正（修正方向一意の6件一括整理）",
+        "必須要求": "textlint-guard plugin README（src/opencode/plugins/agentdev-textlint-guard/ 配下および配布物側）の最終検査コマンド例を bun <path> 直実行へ統一する。",
+        "受け入れ義務": [
+          "agentdev-artifact-validation scripts README.md 59行の textlint 助言（sentence-length）を文分割・文体調整で解消する。",
+          "req-define-detailed-gates.md 85行の req-impact-map.md 削除済み「影響する Artifact」列への語彙参照を、現行の正本（req-impact-map.md・IR frontmatter の AUTOGEN 導出対応表）への参照へ更新する。",
+          "archive-builder.test.ts・boundary-pipeline.test.ts の BOM を除去する（意図的な固定でないことを確認のうえ実施。両ファイルの本文に BOM 扱う試験記述なし）。",
+          "skill-projection-manifest.yaml を AUTOGEN 正規手順で再生成して main の手動残置分と導出結果の差分を解消する。手動残置が正当な理由がある場合はその根拠を記録し、dry-run が WOULD UPDATE を報告しない状態へ戻す。あわせて manifest 鮮度の機械検査（AUTOGEN freshness 系 checker への組み込み）の要否を評価する。",
+          "REQ-119.md:35・REQ-120.md:41 の採番仮記括弧句を除去する（採番確定済み・docs-check pass の維持確認込み）。"
+        ]
+      },
+      "RU-0293": {
+        "タイトル": "prepare_definition_pr.ts 計測日収束 trigger の表記不一致修正",
+        "必須要求": "prepare_definition_pr.ts の hasMeasurementDrift 判定（`/IndexGenerationConsistency/.test(checkStdout)`）を、check_integrity.ts の実出力表記 `index-generation-consistency` と突合するように修正する。",
+        "受け入れ義務": [
+          "対応する機械突合テスト（scripts/tests/prepare_definition_pr.test.ts または prepare-validate-input.test.ts）へ、checker 実出力文字列を trigger 判定が捕捉することのテストを追加する。"
+        ]
+      },
+      "RU-0294": {
+        "タイトル": "ADR 受理形式の権威ある契約の確定と正規 lib ADR helper 走査仕様の再評価",
+        "必須要求": "ADR 受理形式の権威ある契約を確定する（req-define 経由の要件化候補。DEC-009「ADR から Decision への正規成果物モデル移行」の状況を踏まえ、ADR の将来導入の要否を含めて判断する）。",
+        "受け入れ義務": [
+          "契約確定に伴い正規 lib（artifact-validation scripts/lib/frontmatter.ts）の ADR helper の歴史互換走査（4 桁固定）仕様を再評価する。ADR 導入を採用しない方向の場合は走査の意義と維持・廃止を判断する。"
+        ]
+      },
+      "RU-0295": {
+        "タイトル": "ガード編集意味論共通部の第3実装（Senpi edit-interpretation.ts）の収束",
+        "必須要求": "Senpi edit-interpretation.ts を lib/edit-semantics.ts（共通部）への参照または同等実装の移設へ収束させる。実施時は PR 4043 Design 確定候補の差異処理パターン（解析結果の消費方法での分離）を適用する。",
+        "受け入れ義務": [
+          "前提として PR 4043 自体の E4-1 gate 違反修正（コメント内 producer 内部 ID 除去）とマージの完了状況を確認する。実施時点で未完了の場合は前提完了を待つか、前提の再評価を case 経路で行う。"
+        ]
+      },
+      "RU-0296": {
+        "タイトル": "promote 系 workflow skill 等の lifecycle 正本節との本文複製境界精査",
+        "必須要求": "promote 系 workflow skill（agentdev-workflow-intake-promote・agentdev-workflow-learning-promote・agentdev-workflow-inspect-promote）・agentdev-doc-diagnostics・agentdev-workflow-inspect-docs の各記述が「呼出条件・工程位置の記述」に留まり、lifecycle 正本節（完了報告の必須要素 / decision 成果物の役割と正本の優先度への参照 / promote 系操作の自律確定と HITL 境界 / inspect-* コマンド選択 routing）と本文複製になっていないかを精査する。精査は inspect-skills（意味的重複検出）経由の機械診断で実施できる。",
+        "受け入れ義務": [
+          "複製が検出された場合は正本への名レベル参照へ置換する。"
+        ]
+      },
+      "RU-0297": {
+        "タイトル": "同名試験ファイル 2系統の残存評価（check_integrity.test.ts・package-release-archive.test.ts）",
+        "必須要求": "旧い側の試験が固有の検証義務を持つか、現行の試験が必要な範囲を代替できるか、bun test の収集範囲で実際に両方が実行されているかを確認した上で、削除・維持を判断する（判断は評価完了後に確定する。削除を前提としない）。",
+        "受け入れ義務": [
+          "2026-10 の src/common 正本化移行（#3325/#3326）の残骸である可能性の確認を含める。"
+        ]
+      },
+      "RU-0298": {
+        "タイトル": "senpi guard-connection 試験 1件不合格の通常配置追試と分類",
+        "必須要求": "通常の位置に checkout した環境での追試を前提とする。合格する場合は環境条件（worktree 配下での実行時の projectRoot 解釈差等）の明記のみを行う。",
+        "受け入れ義務": [
+          "どの環境でも不合格する場合は、isApprovedTemporaryPath の判定順序（一時領域判定の先行）と projectRoot 外パス分類の試験期待経路の不整合として、実装か試験のどちらを正とするかを判断・修正する。"
+        ]
+      },
+      "RU-0299": {
+        "タイトル": "textlint-guard gate 本体の vendor 未生成 crash に対する fail-closed 案内経路の整合",
+        "必須要求": "vendor 未生成時の gate 本体の起動検査（crash 前の fail-closed 停止と導入手順案内の表示）を追加するかの要否を判断し、必要なら実装する。導入形態ごとの実行場所は plugin README「導入時の依存生成手順」を参照先とする。",
+        "受け入れ義務": []
+      },
+      "RU-0300": {
+        "タイトル": "checker 実行ランタイム選択規律の Design 補強（vendored bundle → bun・依存 API 別対応表）",
+        "必須要求": "checker-execution-contracts.md「安定実行経路」節へ (1) vendored bundle（blob: URL 動的 import）を含む checker は bun 経由で実行する（node は vendor 非依存 checker 向けの選択肢）という実行ランタイム選択規律、(2) checker の依存 API（Bun.YAML・import.meta.path・require・vendored bundle）と実行経路の対応表を追記する。",
+        "受け入れ義務": [
+          "安定実行経路の標準（stdout 証跡を要する checker の module import 経由）は vendor 非依存 checker の規律として維持する。"
+        ]
+      },
+      "RU-0301": {
+        "タイトル": "case-open 円等検出の複数トークン・二段検証",
+        "必須要求": "issue-operation-safety.md「search トークンの選択性指針」節へ「ヒット 0 件時は合意済み対象・目的から導出した主題語と対象 REQ 番号による再検索を実施する二段検証」を追加する。",
+        "受け入れ義務": [
+          "case-open references（definition-pr-and-idempotency.md STEP-2 節等）の円等検出手順に複数トークン検索（topic_slug + 主題語 + REQ 番号）を明記する。",
+          "横展開として、既存成果物の円等検出を行う全 workflow（case-ready・case-revise・case-close）へ同種の複数トークン・二段検証の適用を検討対象に含める。"
+        ]
+      },
+      "RU-0302": {
+        "タイトル": "yomiyasu lint 一時ファイル配置指示と書込み guard 境界の整合",
+        "必須要求": "lifecycle SKILL.md「文章品質・書込み規約」節の yomiyasu lint 配置指示（L158）を「project root 内の gitignore 対象領域（.agentdev/tmp/ 等・検査後削除）へ新規作成」へ統一する。同文書の guard 実効範囲（L172-183）と scripts/README.md の配置指針（workspace 外 temp 禁止・project root 内限定・commit 対象外・検査後削除）の 4 方針に整合させる。",
+        "受け入れ義務": [
+          "書込み guard の fail-closed は維持する（guard の解除・迂回は行わない）。"
+        ]
+      }
+    }
+  },
+  "対応表": {
+    "説明": "RU・要件doc・operation_unit・実行単位の対応（統合・分割を含む）。stage 4 以降で追記。",
+    "初期状態": {
+      "RU-0281": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-001",
+        "実行単位": "未確定"
+      },
+      "RU-0282": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-002",
+        "実行単位": "未確定"
+      },
+      "RU-0283": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-003",
+        "実行単位": "未確定"
+      },
+      "RU-0284": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-004",
+        "実行単位": "未確定"
+      },
+      "RU-0285": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-005",
+        "実行単位": "未確定"
+      },
+      "RU-0286": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-006",
+        "実行単位": "未確定"
+      },
+      "RU-0287": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-007",
+        "実行単位": "未確定"
+      },
+      "RU-0288": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-008",
+        "実行単位": "未確定"
+      },
+      "RU-0289": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-009",
+        "実行単位": "未確定"
+      },
+      "RU-0290": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-010",
+        "実行単位": "未確定"
+      },
+      "RU-0291": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-011",
+        "実行単位": "未確定"
+      },
+      "RU-0292": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-012",
+        "実行単位": "未確定"
+      },
+      "RU-0293": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-013",
+        "実行単位": "未確定"
+      },
+      "RU-0294": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-014",
+        "実行単位": "未確定"
+      },
+      "RU-0295": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-015",
+        "実行単位": "未確定"
+      },
+      "RU-0296": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-016",
+        "実行単位": "未確定"
+      },
+      "RU-0297": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-017",
+        "実行単位": "未確定"
+      },
+      "RU-0298": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-018",
+        "実行単位": "未確定"
+      },
+      "RU-0299": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-019",
+        "実行単位": "未確定"
+      },
+      "RU-0300": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-020",
+        "実行単位": "未確定"
+      },
+      "RU-0301": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-021",
+        "実行単位": "未確定"
+      },
+      "RU-0302": {
+        "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+        "operation_unit": "OU-022",
+        "実行単位": "未確定"
+      }
+    }
+  },
+  "基準点情報": {
+    "確定日時": "2026-11-15T21:10:30.449+09:00",
+    "最後の正式リリース": {
+      "版番号": "5.2.0",
+      "タグ名": "v5.2.0",
+      "タグ対象コミット": "e0f551be331d3e25d18a7bff0de39cb453538086"
+    },
+    "開始コミットID": "aa5123e54ce6102255101a707de12fd812b57b22",
+    "確定手続の証拠": "正式 SemVer タグ列挙（git tag --list v* 47件中 rc 2件・baseline 1件を除外）・祖先到達判定（git merge-base --is-ancestor v5.2.0 HEAD〔a64d6ad07〕および開始コミット aa5123e54 の両方で到達可能を 2026-11-15 実測）・最大版算出（到達可能正式タグの SemVer 順序比較で v5.2.0 が最大）。利用者起動指示（2026-11-15）による固定指定（最後の正式リリースタグ v5.2.0・開始コミット aa5123e54 = backlog-auto 実行開始時 main HEAD・STEP-1 実測）と一致。"
+  },
+  "進捗": {
+    "整理サイクル": "完了（stage1 inspect-docs 検出13事項 commit cf7ac3729 / stage2 3系統並列 learning promoted13 commit 58de43d2b・intake promoted42 commit 746be8363・inspect promoted3 commit e2a30d283 / stage3 backlog-review RU-0281〜0302 生成22件・docs/knowledge 2件保存・promoted 58件削除 commit a64d6ad07・HITL承認 Q-BR-20261115-01/02 選択肢1〔Hermes監督中継・2026-10-02恒久指示による〕）",
+    "stage4_要件定義": "完了（2026-11-15T21:5x JST 単一 req-define 実行・入力 RU-0281〜0302 明示列挙・RU→OU 1:1 22/22 除外なし・壁打ち HITL 1件 Q-RD-20261115-01 選択肢A〔standing order relay〕・要件doc 1451行 auto_ready:true 確定・commit 1f1b6222b push済み・Jev STEP-4 観測 20261115T122103Z-05b8 永続化/STEP-3 は観測書込み失敗の warning 付記）",
+    "stage5_実行": "未着手",
+    "stage6_全体完了判定": "未着手",
+    "stage7_リリース": "未着手"
+  },
+  "リリース状態": {
+    "状態": "未着手"
+  },
+  "要件doc情報": {
+    "パス": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
+    "行数": 1451,
+    "work_type": "maintenance",
+    "scale": "large",
+    "auto_ready": true,
+    "受け入れゴール": "AG-001〜022（22件）",
+    "operation_units": "OU-001〜022（22件・全single・1:1・依存OU-004→OU-003のみ・recommended_order 1〜22）",
+    "test_strategy": "TS-001〜022（22件）",
+    "artifact_actions": "ACT 7件: REQ update 2（REQ-119・REQ-120 仮記括弧句除去）・REQ append 1（REQ-010-085 新規行）・Decision append 1（DEC-009 移行方針: ADR導入不採用確定）・Design append 2（distribution-boundary.md・checker-execution-contracts.md）・Design update 1（v4-v5-crosswalk.md）",
+    "epic_needed": true,
+    "壁打ちHITL回答": {
+      "Q-RD-20261115-01": "選択肢A（ADR導入不採用・DEC-009維持）【推奨】standing order relay により受理・provenance draft 記録済み"
+    }
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261115T122103Z-05b8",
+  "workflow": "req-define",
+  "evaluationKind": "expansion-final-classification-design-separation",
+  "subject": "backlog-auto 一式 20261115T191842JST の 22 RU のうち操作分類確定対象の最終分類・Design 分離",
+  "sourceRevision": "a64d6ad07",
+  "durationMs": 705,
+  "inputTokens": 2400,
+  "inputs": {
+    "requestDigest": "867eb9132f653343ecee55dc83d2dee246e891568e4134b0c44c6ecfd82b4a33",
+    "references": [
+      {
+        "digest": "471596f7a078e5aa363afdd0d1cb5b5d6bc338206dd7c5ae12dc97fd6ae23dc1",
+        "label": "input_rus_all",
+        "path": ".agentdev/backlog/req-units/RU-0281〜RU-0302.md"
+      },
+      {
+        "digest": "dc4824a1f9ecc6c11ecafa9e4cda342315743e67b0b2a5f4dd19a2b52a23d3b4",
+        "label": "design_distribution_boundary",
+        "path": "docs/designs/integrity/distribution-boundary.md"
+      },
+      {
+        "digest": "8faf9ddc8a9bd3f2ed79dff89d96a8575b6f16ea0c7b8a9b0cd06f7b5cb56a81",
+        "label": "design_crosswalk",
+        "path": "docs/designs/foundations/references/v4-v5-crosswalk.md"
+      },
+      {
+        "digest": "bfaf664a8bc1e04912cf9c2f7c14dc03a1f682fd87d6e801cb8ef72f26c97b56",
+        "label": "design_checker_execution_contracts",
+        "path": "docs/designs/integrity/checker-execution-contracts.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-sep-ru0281",
+      "questionForm": "choice",
+      "value": "実現面のみ",
+      "probabilityDistribution": {
+        "REQ行帰属": 0,
+        "Design行帰属": 0,
+        "実現面のみ": 1
+      }
+    },
+    {
+      "questionId": "q-sep-ru0285",
+      "questionForm": "choice",
+      "value": "Design行帰属",
+      "probabilityDistribution": {
+        "REQ行帰属": 0,
+        "Design行帰属": 0.99,
+        "実現面のみ": 0.01
+      }
+    },
+    {
+      "questionId": "q-sep-ru0287",
+      "questionForm": "choice",
+      "value": "REQ行帰属",
+      "probabilityDistribution": {
+        "REQ行帰属": 0.36,
+        "Design行帰属": 0.31,
+        "実現面のみ": 0.33
+      }
+    },
+    {
+      "questionId": "q-sep-ru0289",
+      "questionForm": "choice",
+      "value": "Design行帰属",
+      "probabilityDistribution": {
+        "REQ行帰属": 0,
+        "Design行帰属": 0.99,
+        "実現面のみ": 0.01
+      }
+    },
+    {
+      "questionId": "q-sep-ru0292",
+      "questionForm": "choice",
+      "value": "実現面のみ",
+      "probabilityDistribution": {
+        "REQ行帰属": 0.24,
+        "Design行帰属": 0,
+        "実現面のみ": 0.76
+      }
+    },
+    {
+      "questionId": "q-sep-ru0300",
+      "questionForm": "choice",
+      "value": "Design行帰属",
+      "probabilityDistribution": {
+        "REQ行帰属": 0,
+        "Design行帰属": 1,
+        "実現面のみ": 0
+      }
+    },
+    {
+      "questionId": "q-sep-needed",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.68,
+        "false": 0.31999999999999995
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-sep-ru0281",
+        "value": "実現面のみ"
+      },
+      {
+        "questionId": "q-sep-ru0285",
+        "value": "Design行帰属"
+      },
+      {
+        "questionId": "q-sep-ru0287",
+        "value": "REQ行帰属"
+      },
+      {
+        "questionId": "q-sep-ru0289",
+        "value": "Design行帰属"
+      },
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "q-sep-ru0292",
+        "value": "REQ行帰属"
+      },
+      {
+        "questionId": "q-sep-ru0300",
+        "value": "Design行帰属"
+      },
+      {
+        "questionId": "q-sep-needed",
+        "value": true
+      }
+    ]
+  }
+}
