@@ -1722,3 +1722,21 @@
 - **想定反映先**: learning-promote（運用手順の知見として整理）・QG-4 checker 実測手順の実行順序注記候補
 - **関連**: Case #4068・PR #4070 本文テスト結果セクション（split2 初回・serial 再実行・baseline 突合の記録）・PR 本文 Findings より回収（case-close STEP-6-4）
 - **タグ**: #bun-test #vendor生成 #並列起動 #連鎖fail #検証実行順序
+
+---
+
+## 2026-11-15: yomiyasu lint 専用本文ファイルの配置手順（リポジトリ外の一時ディレクトリ等）が textlint 書込み guard の project root 外書込み fail-closed 拒否と衝突し、.agentdev/tmp/ への切替で解消する（Case #4069・case-open 委譲段階）
+
+- **問題事象**: yomiyasu 推敲工程で lint 実行用の本文ファイルを lifecycle「文章品質・書込み規約」節が許容する「リポジトリ外の一時ディレクトリ等」（OS の TEMP 等）へ配置したところ、agentdev-textlint-guard の書込み guard が project root 外書込みを fail-closed で拒否し、lint 実行が完遂できなかった
+- **発生局面**: case-open stage 委譲（DEL-4069-1 前段の case-open 委譲実行内・yomiyasu 推敲の lint 前置。Case #4069・RU-0280）
+- **検知方法**: 書込み guard の fail-closed 拒否応答（project root 外パスへの書込み拒否）と配置手順の照合
+- **根本原因**: lifecycle の「リポジトリ外の一時ディレクトリ等」許容規定と、textlint 書込み guard の project root 外書込み拒否（fail-closed）の境界が衝突する。guard の拒否は正しい動作であり、配置手順側が workspace 外へ出ない標準手段へ整合すべき
+- **自律対応内容**: lint 専用本文ファイルの配置先を .agentdev/tmp/（project root 内・git 管理対象外〔.gitignore 18 行〕・検査後削除）へ切り替えて完遂。guard の解除・迂回は行わず、標準手段への切替で解消した（workflow deviation class・guard fail-closed の維持）
+- **ユーザー確認の有無**: なし（workflow 内自律処置・capture 記録）
+- **REQ/Decision/Design影響**: なし（配置手順の運用知見。lifecycle「文章品質・書込み規約」節の「リポジトリ外の一時ディレクトリ等」と textlint 書込み guard 境界の整合確認候補）
+- **横展開観点**: yomiyasu 工程や lint 前置を含む全 workflow（GitHub 文章の書込み前推敲の適用規律を適用する経路）で同型の衝突が発生し得る。Windows 環境で PowerShell リダイレクトを禁止する既存知見（windows-powershell-bulk-io-corruption）と並ぶ、一時ファイル配置先の選定知見
+- **再発条件**: lifecycle の「リポジトリ外の一時ディレクトリ等」許容規定に従って OS TEMP 等へ一時ファイルを配置し、textlint 書込み guard 経由で書込みを実行する条件
+- **予防策候補**: lint 実行用一時ファイルは .agentdev/tmp/（project root 内・git 管理対象外・検査後削除）へ配置する前置を手順に明記。リポジトリ外許容規定の参照時に書込み guard 境界の衝突を点検する
+- **想定反映先**: learning-promote（運用手順の知見として整理）・lifecycle「文章品質・書込み規約」節の参照更新候補
+- **関連**: Case #4069・SSoT 検証証拠コメント（commentId 6890620200・TS-004 の yomiyasu 推敲記録）・一時ファイル cleanup 規定（.agentdev/tmp/ は当該実行内で削除）
+- **タグ**: #textlint #書込みguard #fail-closed #yomiyasu #一時ファイル配置 #workflow-deviation
