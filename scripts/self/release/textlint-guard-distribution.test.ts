@@ -34,6 +34,7 @@ import * as os from "os";
 import * as path from "path";
 import { execFileSync, spawnSync } from "child_process";
 import { invalidateEngineCache, loadEngine } from "../../../src/opencode/plugins/agentdev-textlint-guard/lib/engine-bundle.ts";
+import { placeMechanicalStepSkillScripts } from "./mechanical-step-skills.ts";
 
 const REPO_ROOT = path.resolve(import.meta.dir, "..", "..", "..");
 const INSTALL_PS1 = path.join(REPO_ROOT, "scripts", "install.ps1");
@@ -181,6 +182,7 @@ describe("agentdev-textlint-guard distribution / consumer install (TS-005 / TS-0
         fs.mkdirSync(path.join(srcSenpi, "connection-demo"), { recursive: true });
         fs.writeFileSync(path.join(srcSenpi, "connection-demo", "connection.ts"), "// senpi connection\n", "utf8");
         fs.writeFileSync(path.join(srcSenpi, "README.md"), "# src/senpi/ (Senpi host connection area)\n", "utf8");
+        placeMechanicalStepSkillScripts(REPO_ROOT, path.join(srcCommon, "skills"));
         placeRealPlugin(path.join(srcOpencode, "plugins"));
         fs.mkdirSync(path.join(root, "scripts", "consumer"), { recursive: true });
         fs.copyFileSync(INSTALL_PS1, path.join(root, "scripts", "install.ps1"));
