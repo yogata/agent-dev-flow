@@ -2,7 +2,7 @@
 title: "配布依存境界"
 status: accepted
 created: "2026-08-11"
-updated: 2026-11-15
+updated: 2026-11-16
 ---
 <!-- ADF-COVERS(implementation): REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-045 -->
@@ -39,6 +39,7 @@ distribution は consumer 環境へ配布されるテキスト成果物の集合
 配布対象のテキスト成果物（command 定義、skill 定義、template、script ソース、附属するテキスト形式の設定や README）すべてへ適用する。
 テキストと判定可能な成果物とバイナリと判定される成果物を決定的に区別し、判定不能なエントリは unclassified として gate-not-passed 扱いとする。
 検査対象の除外領域: 共通原本側 tests/ 配下（検出刺激用のサンプル文字列を含むテスト。Issue #2480）と、tools/<name>/local/ 配下（通常版の同期・インストールの配布対象から除外された Local 実装領域。REQ-009-016）は配布テキスト成果物の対象外とする。
+この除外は配布依存境界検査の走査対象からの除外（4 projection 共通）であり、manifest の監査期待対象（tests を含み、manifest 側は除外しない）と配布アーカイブ内容には影響しない。除外判定は候補ツリーの共通原本パス（src/common 基準の path segment 一致）で行い、link・archive-installed 投影では .opencode 写像の前の段階で適用する。
 
 ## 配布物本文の記述規則
 
@@ -58,6 +59,8 @@ distribution purity check は、distribution-bound artifact 内の producer 側�
 配布入力となる製品ソース自体を clean な状態で保持し、変換工程を通さない配布形態（link projection を含む）でも同一の clean 状態が維持される。
 
 正本参照の backtick パス運用: 配布 skill 間の正本参照は backtick パス（Markdown リンクなし）で記述する運用を正とする。配布先でのリンク破損を回避するため、配布物本文内の skill 間正本参照は Markdown リンクを使用しない。配布境界 checker の concrete path 検証（hits 0 確認）を併記し、backtick パス記述の運用が concrete path 検出の誤検出源にならないことを確認する（PR #4065 本文の記録にのみ存在した運用の Design 様式への正規化）。
+
+相互参照パス解決可能性検査（候補設計と採否判断）: 配布物本文内の相互参照パスについて配布レイアウトでの実在解決を検査する汎用 checker の候補設計を次のとおり確定する。検出対象は配布テキスト成果物本文中の backtick 内パス参照（skill・command・reference 間の正本参照）とし、参照元ファイルの配置位置からの相対解決で実在性を判定する。Markdown リンク形式は backtick 運用違反の検出信号として区別して報告する。運用記述の誤検出除外は参照パスの先頭要素で機械区別する: src/、docs/、scripts/ 等の原本領域を指すパス記述は原本位置の案内記述として解決対象外とし、配布レイアウト内に解決される参照のみを検査する。採否判断: 本候補は採用とする（実装は別作業単位）。採用根拠は、backtick パス運用の正規化により参照形式が確定し機械検出の入力が安定したこと、配布先での参照破損は consumer 側でしか顕在化しないため公開前の機械検査が唯一の検出経路となることである。checker 実装単位は本節の区別規則（原本領域パスの案内記述扱い・相対解決）に従う。
 
 ## 候補抽出から決定までのパイプライン
 

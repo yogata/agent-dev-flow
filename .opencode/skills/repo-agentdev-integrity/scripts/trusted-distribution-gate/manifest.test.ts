@@ -130,6 +130,17 @@ describe("manifest / buildSourceManifest", () => {
     expect(() => buildSourceManifest([])).toThrow();
   });
 
+  // 空経路の fail-closed（loadAndClassify の blobs が空で届いた場合）:
+  // runtime エントリのみで必須 bootstrap スクリプトが欠ける候補ツリーは
+  // "missing required bootstrap script" で拒否され、空の source manifest
+  // が黙って成立する経路を残さない。
+  test("rejects when required bootstrap scripts are missing (empty-path guard)", () => {
+    const runtimeOnly: ManifestEntryInput[] = [
+      entry("src/common/skills/agentdev-foo/SKILL.md", "a".repeat(64), 20),
+    ];
+    expect(() => buildSourceManifest(runtimeOnly)).toThrow(/missing required bootstrap script/);
+  });
+
   test("rejects invalid sha256", () => {
     const inputs: ManifestEntryInput[] = [
       entry("src/common/skills/agentdev-foo/SKILL.md", "short", 1),
@@ -160,6 +171,14 @@ describe("manifest / buildLinkManifest", () => {
       const original = runtime.find((r) => r.sha256 === e.sha256);
       expect(original).toBeDefined();
     }
+  });
+
+  // 空経路の fail-closed: bootstrap エントリのみで runtime が空の候補ツリーは
+  // source manifest としては成立するが、link（runtime の .opencode 写像）が
+  // "zero target entries" で拒否され、空の link manifest が黙って成立する
+  // 経路を残さない。
+  test("rejects zero target entries (runtime-empty candidate tree)", () => {
+    expect(() => buildLinkManifest([])).toThrow(/zero target entries/);
   });
 });
 
