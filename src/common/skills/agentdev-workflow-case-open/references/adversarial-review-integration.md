@@ -2,12 +2,12 @@
 
 > 本 reference は `agentdev-workflow-case-open` SKILL.md の adversarial-review 挿入境界の実行詳細である。
 > case-open の caller integration 挿入境界の正典は case-open Design「adversarial-review 挿入境界（case-open）」節であり、本 reference はその実行時手順を提供する。
-> 発動条件判定、review 呼出、結果反映、unresolved 処理の一般形、呼出失敗時取扱い等の共通実行手続の正本は `src/common/skills/agentdev-case-run-execution-adapter/references/adversarial-review-integration.md` である。本 reference は case-open 固有の適用内容のみを保持し、共通契約の意味所有は adversarial-review Design「adversarial-review caller integration 共通契約」節が維持する。
+> 発動条件判定、review 呼出、結果反映、unresolved 処理の一般形、呼出失敗時取扱い等の共通実行手続の正本は `.opencode/skills/agentdev-case-run-execution-adapter/references/adversarial-review-integration.md` である。本 reference は case-open 固有の適用内容のみを保持し、共通契約の意味所有は adversarial-review Design「adversarial-review caller integration 共通契約」節が維持する。
 
 ## Purpose
 
 Root Case 本文候補と Definition Package 構成案を対象に adversarial-review を default-on 原則で実行し、Root Case 作成（最初の GitHub Issue 作成）前の本質的争点を解消する。
-default-on 原則、発動条件判定と review 呼出の分離、skip 条件の一般形、呼出契約、accepted finding 反映の呼出元責務、再 review 条件、呼出失敗時取扱い、非発動時の記録義務は正本（`src/common/skills/agentdev-case-run-execution-adapter/references/adversarial-review-integration.md`）を参照する。
+default-on 原則、発動条件判定と review 呼出の分離、skip 条件の一般形、呼出契約、accepted finding 反映の呼出元責務、再 review 条件、呼出失敗時取扱い、非発動時の記録義務は正本（`.opencode/skills/agentdev-case-run-execution-adapter/references/adversarial-review-integration.md`）を参照する。
 
 ## Input Resolution
 
