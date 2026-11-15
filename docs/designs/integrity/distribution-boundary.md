@@ -2,7 +2,7 @@
 title: "配布依存境界"
 status: accepted
 created: "2026-08-11"
-updated: 2026-11-13
+updated: 2026-11-15
 ---
 <!-- ADF-COVERS(implementation): REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-045 -->
@@ -56,6 +56,8 @@ distribution purity check は、distribution-bound artifact 内の producer 側�
 検出シグナルは distribution-bound テキスト成果物全文に対する ADF-COVERS 宣言マーカー一致とし、役割フィルタやパスフィルタによる例外許容を持たない。
 対象は配布テキスト成果物の全種別（command、skill、reference、tool、plugin / hook、template、runtime script、package 付随ファイル、その他 consumer distribution closure に含まれるテキスト成果物）とする。
 配布入力となる製品ソース自体を clean な状態で保持し、変換工程を通さない配布形態（link projection を含む）でも同一の clean 状態が維持される。
+
+正本参照の backtick パス運用: 配布 skill 間の正本参照は backtick パス（Markdown リンクなし）で記述する運用を正とする。配布先でのリンク破損を回避するため、配布物本文内の skill 間正本参照は Markdown リンクを使用しない。配布境界 checker の concrete path 検証（hits 0 確認）を併記し、backtick パス記述の運用が concrete path 検出の誤検出源にならないことを確認する（PR #4065 本文の記録にのみ存在した運用の Design 様式への正規化）。
 
 ## 候補抽出から決定までのパイプライン
 

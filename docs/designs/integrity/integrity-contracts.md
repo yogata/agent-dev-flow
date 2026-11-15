@@ -8,7 +8,7 @@ updated: 2026-11-15
 <!-- ADF-COVERS(implementation): REQ-036-022 -->
 <!-- ADF-COVERS(implementation): REQ-007-010 -->
 <!-- ADF-COVERS(implementation): REQ-099-020 -->
-<!-- ADF-COVERS(design): REQ-010-007, REQ-010-008, REQ-010-080, REQ-010-081 -->
+<!-- ADF-COVERS(design): REQ-010-007, REQ-010-008, REQ-010-080, REQ-010-081, REQ-010-085 -->
 
 # 整合性契約
 
@@ -273,6 +273,8 @@ gate 不合格の場合は新規 IR 登録を取り下げ、retired REQ-028-013�
 ### frontmatter updated 鮮度債務の検出時運用（REQ-010-081）
 
 frontmatter `updated` 鮮度債務（req-updated-freshness、req-range-staleness、IR-072）の検出時は、是正を実施単位・タイミングの運用判断に従って扱う。検出時都度の是正チケット扱いを既定とし、REQ 操作を伴わない Case での鮮度違反は自 Case 起因分離証明を要する一括是正候補として check_integrity 補正 commit の標準 contingency に位置づける。鮮度検査の緩和・迂回と updated の乖離恒久化は行わない。
+
+REQ-010-085 が所有する内容変更 PR での frontmatter updated 同時進行（REQ 更新手順の一手順化）は、本節の検出時運用の標準形である。意図的な updated 進行を含む内容変更 PR が merge された後に IR-072 が新規検出される構造に対しては、updated 進行を PR 本体と同一変更セットで行い、merge 後の補正 commit を既定としない。許容幅規則（同日内差分の扱い等）は REQ-010-085 行の実装時検討事項であり、確定結果を本節へ反映する。
 
 ## 一時移行検査 registry（retired REQ-028-006 から移管）
 
