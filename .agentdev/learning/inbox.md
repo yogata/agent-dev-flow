@@ -1704,3 +1704,21 @@
 - **想定反映先**: src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts（main() runner への deleteFile 接続）
 - **関連**: Epic #4054・reclaimCloseAcceptanceRecord（I/O 注入契約）・recl-report-4054.json（fail 証跡）
 - **タグ**: #closeMechanicalSteps #reclamation #CLI #failClosed
+
+---
+
+## 2026-11-15: worktree で bun test を複数スコープ並列起動すると、vendor bundle 生成完了前の実行になり vendored bundle 依存テストが連鎖 fail する（Case #4068・case-run）
+
+- **問題事象**: worktree（4068-case）で `bun test ./src/` を textlint plugin の `bun install && bun run build:engine`（vendor 生成）と並列起動したところ、vendor bundle（textlint-engine.bundle.json）生成完了前の実行になり、agentdev-textlint-guard tests 配下の vendored bundle 依存テスト（vendor bundle・identity・pipeline-integration 等）が 59件連鎖 fail した（実測: 1949 pass / 59 fail / exit 1）。fail は全件 ENOENT: vendor/textlint-engine.bundle.json で、変更対象3ファイルに非依存
+- **発生局面**: case-run（Case #4068・DEL-4068-1 委譲内の TS-005 integrity suite split2 実行）
+- **検知方法**: 初回実行の fail 明細（全件 vendored bundle ENOENT）と対象変更ファイルの非依存確認の突合
+- **根本原因**: bun test の依存スコープ実行と vendor 生成（build:engine）の並列起動により、テスト開始時点で vendor bundle が未生成の状態になった
+- **自律対応内容**: vendor 生成完了後に serial 再実行で 2008 pass / 0 fail / exit 0 を確認し、host root baseline 実測（2008 pass / 0 fail・同 HEAD bacd23d32・本変更未適用）と完全一致を突合して環境起因分類（本変更非起因）を確定
+- **ユーザー確認の有無**: なし（workflow 内自律処置・capture 記録）
+- **REQ/Decision/Design影響**: なし（検証実行順序の運用知見）
+- **横展開観点**: bun test の複数スコープ並列起動を行う全検証実行（QG-4 full integrity suite 3分割・case-run TS 系）で同型の連鎖 fail が発生し得る
+- **再発条件**: vendor 生成を要する plugin の依存生成と、vendored bundle 依存テストを含む bun test スコープの並列起動
+- **予防策候補**: bun test の複数スコープ起動時は依存生成（bun install・build:engine 等）を先に完了させてから実行する（直列化）。検証実行順序の前置として明記する
+- **想定反映先**: learning-promote（運用手順の知見として整理）・QG-4 checker 実測手順の実行順序注記候補
+- **関連**: Case #4068・PR #4070 本文テスト結果セクション（split2 初回・serial 再実行・baseline 突合の記録）・PR 本文 Findings より回収（case-close STEP-6-4）
+- **タグ**: #bun-test #vendor生成 #並列起動 #連鎖fail #検証実行順序
