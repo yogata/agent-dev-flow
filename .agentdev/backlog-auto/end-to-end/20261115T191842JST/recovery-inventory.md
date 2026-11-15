@@ -69,6 +69,17 @@
 - 再開手順 (harness 再起動後・障害中断時の再開手順どおり): ①軽量読取 (issue_read 4071) で疎通確認 → ②残骸確認 (委譲停止は書込み前のため追跡 Issue 未反映作成の有無を issue_list で再確認のみ) → ③委譲 2 件 (consumer 修復・構成是正) を同内容で再実行 → ④case-ready STEP-1 受入機械検査の再実行と構成検証へ復帰。
 - 補記: 構成是正委譲は停止前に契約読込を完了し、再導出 (連結成分 {#4075,#4076} + 20 単独根 → Epic 2 子 ≤ 上限 10 + 20 単独実行単位) が契約整合することを確認済み。consumer 修復委譲は実装前に停止 (変更ファイルなし)。
 
+## write-proxy payload の標準配置 (2026-11-16)
+
+縮退運用文書（issue-operation-recovery.md「write-proxy payload の標準配置」）に従い、回復後の同一内容再試行の送信元を `.agentdev/tmp/4071-restructure/` 配下に先行保存した（gitignore 対象・payload は送信元であり読み飛ばしの代替ではない。適用前に現行状態を再取得して一致確認をする）。
+
+- `4071-body-spec.md`: #4071 本文の節単位置換指示（実行構成表を2行へ・構成推論の根拠を再確定版へ・完了条件1つ目を2子構成へ。維持節の一覧付き）。タイトル更新案 `Epic: integrity suite の実行環境前提と標準実行形を依存順序どおりに整備する` を含む。
+- `4071-comment.md`: 再確定記録コメントの全文（本文更新後に投稿）。
+- `4071-titles.md`: 20 単独実行単位のタイトル同期表（現行 → `Case: 主題`）と本文冒頭 `親Epic: #4071` 行の除去指示。#4075・#4076 は同期対象外。
+- `tracking-issue-consumer-fix.md`: consumer 版ずれの追跡Issue 起票 payload（title `Tracking: ...`・body 内容要素。schema 整形は適用者が実施）。
+
+書式訂正（初回委譲プロンプトからの変更・issue-title-policy 判定表による）: 20 単独実行単位のタイトルは接頭辞除去ではなく **Standard Case 書式 `Case: 主題` への同期**が正。追跡Issue は `Tracking: 主題`。再実行時の委譲プロンプトは本訂正と payload を参照する。
+
 ## 取得経路
 
 - git worktree list --porcelain と22 worktree の git status --short / git log -1。
