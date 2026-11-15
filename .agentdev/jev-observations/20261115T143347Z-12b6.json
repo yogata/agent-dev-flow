@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261115T143347Z-12b6",
+  "workflow": "case-ready",
+  "evaluationKind": "execution-structure-wave-composition",
+  "subject": "Case #4071 Epic 化後の Wave 構成判断（並列可否・同一 Wave 内変更対象重複の処置）",
+  "sourceRevision": "574bdf9a58540c82fea373ff46adcab4fc4e86ed",
+  "durationMs": 781,
+  "inputTokens": 1464,
+  "inputs": {
+    "requestDigest": "2e8f9e34c8a68f66659b591141f47d02e41bbddd0ba6f636f591c94aa4443dda",
+    "references": [
+      {
+        "digest": "d614c3647f7252bfdba2efd61335155b09d64aafb4436b542bccb94b2b84a248",
+        "label": "要件doc draft (backlog-auto-e2e 20261115T191842JST・draft-data)",
+        "path": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "wave-parallel",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.7,
+        "false": 0.30000000000000004
+      }
+    },
+    {
+      "questionId": "duplicate-handling",
+      "questionForm": "choice",
+      "value": "重複許容",
+      "probabilityDistribution": {
+        "変更対象分割": 0.01,
+        "重複許容": 0.99
+      }
+    }
+  ],
+  "confidence": 0.98,
+  "finalResult": {
+    "results": [
+      {
+        "differenceReason": "semantic_disagreement",
+        "questionId": "wave-parallel",
+        "value": false
+      },
+      {
+        "questionId": "duplicate-handling",
+        "value": "重複許容"
+      }
+    ]
+  }
+}
