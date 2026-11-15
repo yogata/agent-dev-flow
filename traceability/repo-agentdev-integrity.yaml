@@ -12,6 +12,8 @@ implementation:
     - REQ-009-045
   .opencode/skills/repo-agentdev-integrity/scripts/trusted-distribution-gate/boundary-scan-scope.ts:
     - REQ-029-002
+  .opencode/skills/repo-agentdev-integrity/scripts/trusted-distribution-gate/boundary-runner.ts:
+    - REQ-029-002
 verification:
   .opencode/skills/repo-agentdev-integrity/scripts/traceability_sidecar_duplicate_key.test.ts:
     - REQ-117-006
