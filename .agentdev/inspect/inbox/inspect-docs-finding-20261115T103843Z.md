@@ -14,31 +14,6 @@
 
 ## 検出事項リスト
 
-### G-1【guides範囲超過】guides 層が guide 自身を「の正」と指定する矛盾
-
-- id: G-1
-- category: guides範囲超過（案内層が guide 自身を規範源として指定）
-- target: `docs/guides/README.md:70`、`docs/guides/intake-learning-backlog-flow.md:142`、`docs/guides/artifacts-and-state.md:149-157`
-- evidence: guides/README.md:70「[成果物、状態モデル](artifacts-and-state.md) | …（状態モデル制約、`.agentdev/` の位置づけ**の正**）」、intake-learning-backlog-flow.md:142「状態モデルの共通制約**の正**は [成果物、状態モデル](artifacts-and-state.md) を参照する」。一方 artifacts-and-state.md:55 は guides を「参照用読み物（案内層、**非基準**）」と自己定義し、guides/README.md:4-5 も「基準は各 REQ/Decision/Design ファイルであり、ガイドは基準への導線を提供する」と宣言。さらに artifacts-and-state.md:151 は「以下の制約を AgentDevFlow の状態モデルに**適用する**」と規範句（「frontmatter や status フィールドによる状態管理は行わず」「Issue / PR の状態を docs に複製しない」等）を guide 内で直接定義し、同節内に所有 REQ/Design への導線を持たない。guides 層が guide を「正」と指定する表現は、guide 層自身の非基準定義と直接矛盾する
-- severity: medium
-- confidence: medium（「guide 層内の参照ハブ」という擁護解釈が残る。ただし「の正」は規範源指定に使う語であり、非基準自己定義との矛盾は明確）
-- source_of_truth: docs/guides/README.md:4-5（guides 層の非基準原則）と docs/guides/artifacts-and-state.md:55（非基準自己定義）を正とし、「の正」指定側の記述を矛盾と判定
-- recommended_route: inspect-promote → backlog-review。状態モデル制約の規範所有者（REQ/Design）を特定し、guides 側を導線表現へ修正する後続調査を含める
-- ng_classification: pre-existing
-- notes: 同一節群を対象とした継続論点 GUIDE-6（inspect-docs-finding-20260914T214425Z.md、制約の一般化と document-model Design との冲突、defer 継続）と F-23（inspect-docs-finding-20261008T025952Z.md、出典非明示、defer 継続）および GR-06（20261004T162140Z 由来、継続指摘中）とは**観点が異なる**: 本件は「指定する側」（guides/README.md:70、intake-learning-backlog-flow.md:142）の問題であり、上記 defer 論点の再評価と混同しないこと
-
-### G-2【履歴混入】multi-host-operations.md 対応表の陳腐化（phase-* 5入口欠落）が現行値の正として権威指定されている
-
-- id: G-2
-- category: 履歴混入（陳腐化した「現行値」スナップショットが正と宣言される）
-- target: `docs/guides/multi-host-operations.md:93`、`docs/guides/consumer-project-setup.md:401`
-- evidence: multi-host-operations.md:93「全公開 command の対応表を次に示す（**2026-10-02 時点、13件**）」。現行の公開 command は `src/common/commands/agentdev/` 実在19件であり、phase-tasks-create / phase-tasks-update / phase-artifacts-update / phase-review / phase-transition の5件（v5.1、DEC-057/058、REQ-110/111 として 2026-10-12 以降 accepted）が欠落。この5件はリポジトリルート README の配布コマンド索引と docs/guides/glossary.md:29-33 に現行入口として掲載済み。consumer-project-setup.md:401「組合せと Command 対応表の**現行値はマルチホスト運用ガイドが正とする**」により、日付付きスナップショットが現行値の権威として指定されている。同 guide の :113-124「対応表の生成規律」は実ファイル列挙を検証手順と定めており、手順に従えば 19件になる
-- severity: medium
-- confidence: medium（phase-* 5件の Senpi 投影が未実装の可能性がある。その場合は「対応表の対象外」と明示的に除外宣言する記述が必要であり、現状は「全公開 command」と宣言しつつ欠落しているため除外理由の記述がない）
-- source_of_truth: 公開 command の正（`src/common/commands/agentdev/` 実ファイル列挙と各 command Design）を正とし、13件のスナップショットを陳腐化と判定
-- recommended_route: inspect-promote → backlog-review。対応表を現行19コマンドへ更新するか、phase-* の対象外区分を明記。consumer-project-setup.md:401 の「正」指定の見直しとセット
-- ng_classification: pre-existing（既知 defer F-25 の差分増悪。defer 時点 2026-10-08 には phase-* が存在せず、欠落5件と「正」権威指定は新 delta で発生）
-
 ### R-1【DRIFT】REQ-035-006 が DEC-055 が置換した「Wave＝実行スケジューリング単位」語彙を保持
 
 - id: R-1
@@ -87,18 +62,6 @@
 - recommended_route: inspect-promote → backlog-review（規則本体の単一正本を Design 側に明示し、REQ 側を同一性参照へ収縮する候補。IR-044 対象拡張の判断を含める）
 - ng_classification: pre-existing
 
-### R-5【DRIFT・軽微】一式 REQ の採番「仮記」文言の採番確定後残留
-
-- id: R-5
-- category: DRIFT（過去前提文言の残留）
-- target: `docs/requirements/REQ-119.md:35`、`docs/requirements/REQ-120.md:41`
-- evidence: REQ-119「REQ-119 の番号は決定的採番スクリプト（alloc-req-number.ts）の採番結果を正とする（本文は現行最大 REQ-118 時点の次番号を仮記）」、REQ-120「（本文は現行最大 REQ-119 時点の次番号 REQ-120 を仮記）」。採番は確定済み（frontmatter id、本文 REQ-119-xxx / REQ-120-xxx とも一致、docs-check pass）であり、文言は採番前の一時状態の記述がそのまま残留している
-- severity: low
-- confidence: high（前提文「採番結果を正とする」により意味は自己解決されるため軽微）
-- source_of_truth: REQ-001-014（現行文書の本文は過去前提を含まない）＋各行自身の「採番結果を正とする」前提文
-- recommended_route: inspect-promote → backlog-review（仮記括弧句の除去候補）
-- ng_classification: pre-existing
-
 ### R-6【SPLIT・観察レベル】REQ-108 の「重要変更通知」関心の追記蓄積（分割予兆）
 
 - id: R-6
@@ -110,31 +73,6 @@
 - source_of_truth: REQ-001-044（分割予兆の機械的定量化は req-health-metrics Design が所有）
 - recommended_route: 観察メモ（req-health-metrics の次回更新時に同系蓄積の閾値判断材料として参照）
 - ng_classification: pre-existing
-
-### R-7【分類・軽微】REQ-110 の「対象へ追記／対象外へ追記」ラベルの多段蓄積
-
-- id: R-7
-- category: 分類（DRIFT 境界、本文変更履歴表現の緊張関係）
-- target: `docs/requirements/REQ-110.md:83-87`（4 件の追記ラベル）
-- evidence: 適用範囲節に「対象へ追記」「対象外へ追記」が 4 世代分蓄積。「作業単位ラベル付きの適用範囲項目」は変更履歴そのものではないが、REQ-001-047「変更の追跡は更新日フィールドのみで扱い、本文中に変更履歴節を設けないこと」との緊張関係を持ち、世代を重ねるほど「現在の適用範囲」の一意な読みが崩れるリスクがある
-- severity: low
-- confidence: medium（追記ラベルの運用上限・整理時期の方針を規定した文書を本診断では確認していない）
-- source_of_truth: REQ-001-047（変更追跡は updated のみ）＋ REQ-120 の追記行保存方針（運用の正当化根拠）
-- recommended_route: inspect-promote → backlog-review（追記ラベルの整理方針の明文化候補）
-- ng_classification: pre-existing
-
-### S-1【IR-054放置】references 配下 Design の draft 放置（32日、閾値 30日超過）
-
-- id: S-1
-- category: Design DRIFT（draft Design 放置、IR-054 確認済み）
-- target: `docs/designs/foundations/references/v4-v5-crosswalk.md:3,5`（frontmatter status: draft、updated: 2026-10-14）
-- evidence: 基準日 2026-11-15 で経過 32日 > 閾値 30日。docs-check（check_integrity）が warning として検出済み（Draft Design stale: age=32d）。規則権威は docs/designs/integrity/rules/IR-054-draft-spec-abandonment-detection.md（:41 閾値 30日固定、:27 triage (a)昇格/(b)更新+updated最新化/(c)廃止）。親 `docs/designs/foundations/v5-adopted-conventions.md` 自身も draft（updated: 2026-11-04、11日で新鮮）であり、README.md:193 の親行備考が crosswalk 所有を言及。親は 2026-11-04 に「解決手順」節へ target_area 追記（:68-79）を更新したが子には波及していない
-- severity: low（heuristic warning 相当。high や medium に相当する現行判断への直接影響は確認できず、triage 明確のため low と判定）
-- confidence: high（機械的シグナル確定、frontmatter 実読確認済み）。triage 判断: (a) 昇格は親が draft のためライフサイクル順序に不整合、(c) 廃止は REQ-108-012（REQ-108.md:28「移行の棚卸し構造が優先順位を付けて処理すること」）が本 crosswalk 構造を現行義務として要求するため不適。よって **(b) 内容更新 + updated 最新化**を推奨。README.md:193 の親行備考への joint triage 記録を推奨。crosswalk は living tracking（planned → confirmed → executed）を担い v5 実行モデル確定までの長期休止が設計上あり得る点は IR-054 自身が false_positive_risk「中」を認める（規則 :24）ため、updated フィールドの実態乖離の可能性も付記
-- source_of_truth: docs/designs/README.md:21-22（IR-054 は基盤 Design を含む全 Design 対象、references/ 子は親行備考で言及）+ IR-054 規則本文 + REQ-108-012
-- recommended_route: inspect-promote → backlog-review（triage (b) の case 経路実行候補〔case-ready/case-revise での Design 更新〕）
-- ng_classification: pre-existing
-- notes: 既知 finding IDX-02（inspect-docs-finding-20261019T143944Z.md、references 配下の status 索引可視性、defer 継続）と**対象ファイルは同一だが論点は別**: IDX-02 は索引の状態表示契約、本件は放置そのもの。両者を混同しないこと
 
 ### S-2【宣言重複・観察】REQ-111-013 の implementation 宣言が 2 Design で重複
 
@@ -159,18 +97,6 @@
 - source_of_truth: なし（規定の有無自体が未確認）
 - recommended_route: 観察メモ（ADF-COVERS ヘッダ必須性の規定有無を別途確認のうえ、必要なら宣言追加を backlog 化）
 - ng_classification: 要ヒューマンレビュー
-
-### D-1【IR-053 false positive 候補】配布物の直接 gh CLI 記述 warning は否定文記述
-
-- id: D-1
-- category: 配布物整合性（docs-check warning の文脈確認、検出器文脈許容候補）
-- target: `src/common/skills/agentdev-workflow-case-close/scripts/README.md:7`
-- evidence: docs-check（check_integrity）が CanonicalConflict warning「Direct gh CLI invocation 'gh pr view' detected — route via the agentdev_gh Custom Tool (IR-053, v2:REQ-0152-001)」を報告。該当行はスクリプト仕様書の入力仕様記述であり、該当箇所は「0 の場合は mergeable-polling を N/A pass（prNotApplicable）とし **`gh pr view` を発行しない**」という**否定文の説明**である。実行コードでも迂回手順の記述でもない。本 warning は permanent exemptions（exemptions.json、7件 demote 対象外）にも baseline（NG baseline 1件+approved additions 24件）にも未登録で、新規検出として warning に留められている
-- severity: low
-- confidence: high（文脈は明確に否定文記述であり、迂回指示ではない。ただし検出器仕様（IR-053 の正規検出条件と既知許容）の詳細は未照合のため「検出器の許容条件追加」の妥当性は次段判断）
-- source_of_truth: IR-053（直接 gh CLI 迂回検出）の検出意図（実行迂りの検出）を正とし、README 説明文の否定文記述を false positive 候補と判定
-- recommended_route: docs-check 検査データ候補（STEP-3-2: 検出器の否定文文脈許容条件〔「発行しない」「〜しない」等の否定形記述の構造的許容、または area-based 除外宣言〕の検討。ng-baseline / exemptions への仮登録ではなく検出器改善を推奨）
-- ng_classification: false positive 候補（検査ルールの誤検知。検査ルールの修正対象。確定は inspect-promote の分類で行うため「候補」と表記）
 
 ## docs-check route 候補（STEP-3-2: 意味的疑いのうち機械的検査に落とせるもの）
 
@@ -227,3 +153,13 @@
 - 並列委譲診断担当: REQ 体系担当（STEP-2-2/2-3/2-4/2-9/2-10、6観点 6/6 実施）、Design 担当（STEP-2-5）、Decision/guides/README 担当（STEP-2-6/2-7/2-8）
 - 機械検査取り込み: docs-check（check_integrity --json、1071 checks、NG 1 / warning 2 / warning→info demote 7 / baseline demote 25）
 - 判定基準: source-of-truth priority（現行 REQ > 承認済み Decision > Design > guides）、finding 契約（`agentdev-doc-diagnostics` finding-output-contract.md）
+
+## 処理記録（2026-11-15 inspect-promote、backlog-auto stage 2 inspect 系統、--auto なし）
+
+- promote 3件（R-5・S-1・D-1。全件自律確定、HITL 対象なし・破壊的変更なし）→ `.agentdev/inspect/promoted/finding-20261115-req119-120-alloc-note-cleanup.md`、`finding-20261115-crosswalk-draft-stale-triage-b.md`、`finding-20261115-ir053-negative-context-tolerance-candidate.md` へ原状保存・本ファイルから削除。根拠: R-5 は明確な不整合（REQ-001-014 違反の表現残留）で修正方向一意〔仮記括弧句除去〕、S-1 は IR-054 機械的シグナル確定で triage (b) が IR-054 規則と REQ-108-012 からの決定的導出〔(a)(c) 不適理由記載済み〕、D-1 は否定文記述の誤検知確定〔false positive 確定は finding 契約上 inspect-promote の分類責務〕+ docs-check 検査データ候補を独立 route せず受け入れ条件に含める契約適用〔RT-3 包含〕。未決の実装判断〔S-1 内容更新範囲・D-1 検出器改善方式〕は各 promoted 成果物側に記載（IDX-04・FD-16 前例型）
+- reject 3件（既知 defer への統合により新規成果物を持たない重複。即時削除・却下理由は当該 commit message 参照）: G-1〔20261107T070520Z FD-13 と target 3箇所完全一致・同一矛盾構造。FD-13 側へ統合注記追記〕、G-2〔F-25→GR-12→FD-12 家族と同一対象表・同一論点。FD-12 側へ統合注記追記。orchestrator 依頼の delta 判断: G-2 の「新 delta」〔phase-* 5入口欠落 + consumer-project-setup.md:401 権威指定〕は FD-12 evidence に既に含まれ、19件計数は README.md 込みの誤差で実18件、REQ-099-018 と consumer-project-setup.md:401 の現物確認で「正」指定は REQ 由来の正規節構造〔見直しは REQ 変更を要する guide 表層修正でない〕、phase-* Senpi 投影不在を現物確認〔REQ-099-007 検証済み組合せの拡張を要する〕— delta 単独では新規 promote を正当化しない〕、R-7〔20261026T190542Z IDX-17 と target REQ-110.md:83-87 完全一致・同型指摘。IDX-17 側へ統合注記追記〕
+- defer 7件（本ファイルに残置）: R-1・R-2・R-3・R-4・R-6・S-2・S-3。再評価条件: R-1 は v4-v5-crosswalk 改訂時〔S-1 promote 実施時を含む〕または REQ-035 次回更新時、R-2 は用語政策照合時〔document-type-responsibilities.md 訳語表・REQ-103-022 対照。語彙レジストリに closing 登録なしを現物確認〕または REQ-035 次回更新時、R-3 は REQ-117-003 対応の完了確認時〔REQ-117 次回更新時。Case 証跡確認を要すため docs 上からは採否未確定〕、R-4 は IR-044 対象拡張判断時または REQ-004/REQ-001 次回更新時、R-6 は req-health-metrics 次回更新時〔観察メモ・分割判断材料〕、S-2 は v4-v5-crosswalk 改訂時〔S-1 promote 実施時を含む〕または v4-standard-lifecycle 次回更新時、S-3 は ADF-COVERS 被覆契約の明文化時〔IDX-14〔20261026T190542Z〕と同時再評価条件〕
+- docs-check route 候補（RT-1〜RT-3）の扱い: RT-3 は D-1 promote 成果物の受け入れ条件として包含。RT-1 は FD-12 側統合注記へ記録〔本側の G-2 対応・対応表件数突合検査候補で検出側ルール強化候補(2) と同一内容〕。RT-2 は FD-13 側統合注記へ記録〔G-1 対応・「の正」宣言センチネル検査候補〕
+- 対象外の確認: 機械的検査レイヤ所有の IR-072 freshness NG（docs/designs/local/adf-simplification-deferred-records.md）は対象外節どおり本実行で扱わない（route: intake は機械検査側で付与済み。再採用なし）
+- 分類は Jev 先行評価（観測 20261115T105719Z-9776。g1/g2/r7 reject 1.0・r1/r2/r4/r6/s2 defer 1.0・r5 promote 1.0・s1 promote 0.99・s3 defer 0.85・r3 reject 0.81・d1 promote 0.45/defer 0.32 近接対抗）＋ LLM 最終判断（R-3 のみ Jev reject から STEP-3 基準「不整合かどうか未確定 → defer」の直接適用により defer へ変更〔REQ-117-003 進行中の是正義務が残り対応不要の確定不可。differenceReason: semantic_disagreement〕、D-1 は DS18 前例〔20261015 近接対抗 promote 維持〕と同型で false positive 確定と改善方式未決の分離により promote 維持、他 11 項目は Jev 分類と一致）により全件自律確定。STEP-5 adversarial-review は条件付き化発動条件（手動分類対象が存在し本質的争点が残る）を満たさないため生成せず（観測なし=契約どおり）
+- prior 17 finding ファイルの既知 defer 項目は、delta window が空〔aa5123e54..cf7ac3729 は本 finding ファイル追加のみ〕のため対象変化の構造的不可能性を根拠に全件 defer 継続（自律確定）し、各側処理記録へ 2026-11-15 再評価記録を追記済み。F-25/GR-12/FD-12 家族には G-2 統合、FD-13 には G-1 統合、IDX-17 には R-7 統合の注記を各側へ追記

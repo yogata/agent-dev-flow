@@ -47,3 +47,4 @@
 - 2026-10-27 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: IDX-02 は defer 継続（自律確定）: 再評価条件（親子状態表示契約の判断〔DS-13 同時〕、references 配下 Design の status 遷移による実害顕在化）はいずれも未発火。stage 1 診断（20261026T190542Z）の既知項目照合で対象変化の報告なし
 
 - 2026-11-07 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: IDX-02 は defer 継続（自律確定）: 再評価条件（親子状態表示契約の判断〔DS-13 同時〕、references 配下 Design の status 遷移による実害顕在化）はいずれも未発火。stage 1 診断（20261107T070520Z）の既知項目照合で対象変化の報告なし
+- 2026-11-15 実施（backlog-auto stage 2 inspect 系統、--auto なし）再評価: IDX-02 は defer 継続（自律確定）: 再評価条件〔親子状態表示契約の判断〔DS-13 同時〕、references 配下 Design の status 遷移による実害顕在化〕はいずれも未発火。stage 1 診断（20261115T103843Z）の既知項目照合で対象変化の報告なし。増分: 同一ファイル対象の draft 放置論点〔20261115 S-1〕は triage (b) として promote 確定し case 経路で crosswalk 改訂が実施される際に status 遷移の可能性があり、実害顕在化条件の発火可能性が高まる点を注記〔IDX-02 自体の論点〔索引可視性〕は不変〕
