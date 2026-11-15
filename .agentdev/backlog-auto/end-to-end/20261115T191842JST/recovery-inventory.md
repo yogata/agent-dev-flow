@@ -80,6 +80,15 @@
 
 書式訂正（初回委譲プロンプトからの変更・issue-title-policy 判定表による）: 20 単独実行単位のタイトルは接頭辞除去ではなく **Standard Case 書式 `Case: 主題` への同期**が正。追跡Issue は `Tracking: 主題`。再実行時の委譲プロンプトは本訂正と payload を参照する。
 
+## payload 鮮度検証と残骸確認の事前完了 (2026-11-16・bash gh 読取例外手順で実施)
+
+再開手順の「残骸確認」と payload 鮮度検証を、回復前の読み取り切り分けとして事前完了した。
+
+- 残骸確認: consumer 版ずれの追跡Issue に該当する起票済み Issue は 0 件（`gh issue list --search "トレーサビリティ checker consumer in:title"` → 空配列）。両委譲は書込み前停止のため GitHub 側の残骸なし。
+- #4071 本文の構造アンカー 6 点（構成推論の根拠見出し・実行構成表の #4073 行と #4076 行・完了条件2項・進行状況 ready）とタイトルが payload 前提と一致。
+- 20 単独実行単位のタイトル突合: payload 20 行中 20 行一致・drift 0・全20件 OPEN 継続。#4075・#4076 は `[Epic #4071] Wave-N` 接頭辞を維持（同期対象外の前提どおり）。スナップショット証跡: `.agentdev/tmp/4071-restructure/live-titles-20261116.json`。
+- 結論: 回復後の再実行は「疎通確認 → payload 適用（読み戻し検証込み）」のみに短縮可能。payload の再構成は不要。
+
 ## 取得経路
 
 - git worktree list --porcelain と22 worktree の git status --short / git log -1。
