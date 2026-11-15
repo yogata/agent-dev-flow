@@ -2,7 +2,7 @@
 title: checker 実行契約と検出基盤規則
 status: accepted
 created: 2026-08-15
-updated: 2026-11-13
+updated: 2026-11-15
 ---
 <!-- ADF-COVERS(design): REQ-010-009 -->
 <!-- ADF-COVERS(implementation): REQ-002-035 -->
@@ -226,7 +226,7 @@ checker の stdout 証跡は、実行プロセスの終了状態と stdout を�
 command/skill の記述品質を所有し、worktree 汎用手順は `agentdev-git-worktree` の references が所有する。
 両者の手順を本 Design に重複記載せず、checker の実行結果解釈に必要な範囲だけを参照する。
 
-- Bun ランタイム API（Bun.YAML 等）に依存する checker は bun 経由（`bun run`）で実行する。node の安定実行経路は Bun ランタイム API に依存しない checker に適用され、依存する checker には適用されない
+- Bun ランタイム API への依存を含む checker の実行経路選択は、本節末尾の「実行ランタイム選択規律（依存 API 別対応表）」が正規所有する
 
 IR-072 の PR 期間判定は author date（git log %as）を基準とする。採用理由: 対象期間の実施として意味があるのは変更が書かれた日付（author date）であり、マージ時刻や rebase による commit 日付の付け替えの影響を受けないためである。既知限界: 複数日にまたがって作成された PR では author date が期間境界を跨ぎ得るため、境界日付の取り扱い（含む/含まない）は checker 出力の解釈時に注意を要する。
 
@@ -254,6 +254,21 @@ baseline 未整備環境での gate 実行に伴う対照実行（同一 detecto
 - 対照実行の両系統（baseline commit 側・変更 HEAD 側）の実行は、本 Design の checker 共通実行契約と worktree 検査対象 checker の起動契約（host 側起点、repoRoot 明示指定、読取専用）に従う
 - 両系統の実行には環境ラベルを必ず付す。環境ラベルが一致しない実行間の結果比較は delta 0 の証拠として採用しない（同一環境再実行の要求）
 - baseline commit 側の実行は detached worktree（worktree 汎用手順の baseline 比較手順）で行い、作業中 worktree の stash 往復を行わない
+
+### 実行ランタイム選択規律（依存 API 別対応表）
+
+vendored bundle（blob: URL 動的 import）を含む checker は bun 経由で実行する。node は vendor 非依存 checker 向けの選択肢である。node v26 の既定 ESM loader は blob: URL 動的 import を fail-closed ブロックするため、vendored engine bundle（textlint-engine.bundle.json）を含む checker ラッパを node --experimental-strip-types で実行すると検査不能（exit 1・0 inspected・Case #3970 実測）となる。
+
+checker の依存 API 別の実行経路は次の対応表に従う。
+
+| checker の依存 API | 実行経路 |
+|---|---|
+| Bun ランタイム API（Bun.YAML 等） | bun 経由（`bun run`） |
+| import.meta.path | bun 経由を標準とする（node 互換の import.meta.url 置換可） |
+| require（CommonJS） | createRequire 互換化後に node import 経由、または CLI 例外経路 |
+| vendored bundle（blob: URL 動的 import） | bun 経由のみ |
+
+安定実行経路の標準（stdout 記録を要する checker の module import 経由）は vendor 非依存 checker の規律として維持する。
 
 ## bun test 実行形態契約（単独実行・ファイル単体指定を含む）
 
