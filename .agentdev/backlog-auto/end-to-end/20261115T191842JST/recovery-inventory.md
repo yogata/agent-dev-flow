@@ -56,6 +56,19 @@
 - 復旧計画の委譲セッション (bg_91d96323) の記録は runtime DB から削除され、最終計画文は復元不能だった。復旧方針は統括が契約読解と 2 件の独立調査結果 (traceability 証拠・構成契約調査) から独自に確定した。方針: (1) traceability consumer の 11↔12 種目版ずれ修復は追跡 Issue を所有者として case-open/case-ready 共有 lib に適用し、case-ready STEP-1 受入機械検査を再実行する。(2) 構成は連結成分 (必須依存 #4076→#4075 のみ) から 20 Standard + 2子 Epic (#4075・#4076) へ再確定する。上限超過の例外記録は承認根拠から外し、正規の構成検証を通過させる。
 - main と origin/main の分岐は 2026-11-16 時点で解消済み (origin/main == 1f7faa35b・差分 0/0)。
 
+## gh exit 66 恒常失敗の診断記録 (2026-11-16)
+
+- 事象: `agentdev_gh` issue_read #4071 が親セッションと委譲子セッション 2 件で同一失敗 (operation-failed / gh exited with code 66 / stderr 空)。再試行を含め 5 回以上同一。委譲 2 件 (consumer 修復・構成是正) はいずれもゲート a (疎通確認) で停止し、GitHub 書込みは 0 件。残骸なし。
+- 2 段分離試験 (issue-operation-recovery.md 診断手順 4・読み取り切り分けに限定):
+  - 手順 1 (bash 直叩き): `gh issue view 4071 --repo yogata/agent-dev-flow --json number,state` → 成功 (exit 0)。
+  - 手順 2 (runner 経路): CliRunner 直接実行 (bun・同一 spawnSync 経路・診断目的の読取のみ) → 成功 (`{"ok":true}`)。診断スクリプトは検査後削除済み。
+  - `gh auth status`: 正常 (yogata・repo scope)。`AGENTDEV_GH_REPO`: 未設定 (未設定時の `gh repo view` 解決のため失敗の非原因)。
+- 判定: bash・runner の単体再現がいずれも成功し、Custom Tool 本体のみが再試行後も恒常的に非ゼロ終了 → issue-operation-recovery.md の分類基準による **plugin ホストプロセス固有の環境差**。回復手段は harness 再起動 (起動環境の再読込) であり、セッション内部からは実施不能。
+- 縮退運用 (同文書「gh exit 66 恒常失敗時の bash gh 例外手順」): 読取は bash gh 例外手順で補完 (証跡は本節のとおり)。書込みは agentdev_gh 正規経路に限定されるため、harness 再起動まで GitHub 書込みを停止中。tool 内部モジュールの書込み直接起動は行っていない。
+- 劣化サイクル定量観測: 再発局面は gh 実行 (非ゼロ終了コード 66・stderr 空) / operation-failed。回復手段未適用のため再発までの呼出数は計測対象外 (初回観測から継続失敗)。
+- 再開手順 (harness 再起動後・障害中断時の再開手順どおり): ①軽量読取 (issue_read 4071) で疎通確認 → ②残骸確認 (委譲停止は書込み前のため追跡 Issue 未反映作成の有無を issue_list で再確認のみ) → ③委譲 2 件 (consumer 修復・構成是正) を同内容で再実行 → ④case-ready STEP-1 受入機械検査の再実行と構成検証へ復帰。
+- 補記: 構成是正委譲は停止前に契約読込を完了し、再導出 (連結成分 {#4075,#4076} + 20 単独根 → Epic 2 子 ≤ 上限 10 + 20 単独実行単位) が契約整合することを確認済み。consumer 修復委譲は実装前に停止 (変更ファイルなし)。
+
 ## 取得経路
 
 - git worktree list --porcelain と22 worktree の git status --short / git log -1。
