@@ -378,7 +378,7 @@ function runSpec(runner: MechanicalRunner, spec: GateCommandSpec): CommandResult
 /**
  * 計測日収束補正。check_integrity 報告から
  * req-updated-freshness NG（frontmatter updated が commit author date と不一致の
- * 対象ファイル）と IndexGenerationConsistency（req-metrics 計測日 AUTOGEN の 1 日
+ * 対象ファイル）と index-generation-consistency（req-metrics 計測日 AUTOGEN の 1 日
  * 遅れ）を検出し、(a) generate_indexes 再実行、(b) frontmatter updated を commit
  * author date へ追随させる編集適用、(c) 明示パス指定の補正 commit、を script 内で
  * 完結させる。trigger 条件が満たされない場合は補正 step を生成しない（既存の
@@ -395,7 +395,10 @@ export function runMeasurementDateConvergence(
   const warnings: string[] = [];
 
   const freshnessTargets = extractFreshnessTargets(checkStdout);
-  const hasMeasurementDrift = /IndexGenerationConsistency/.test(checkStdout) &&
+  // trigger 判定は check_integrity 報告詳細行の実出力表記（check id のケバブ表記
+  // index-generation-consistency）と計測日のずれで検出する。category 見出し・
+  // ルーティング表の検査カテゴリ名（キャメル表記）には依存しない。
+  const hasMeasurementDrift = /index-generation-consistency/.test(checkStdout) &&
     /計測日/.test(checkStdout);
   if (freshnessTargets.length === 0 && !hasMeasurementDrift) {
     return { steps, warnings };
@@ -723,7 +726,7 @@ export function runPrepareDefinitionPr(
       });
 
       // 計測日収束補正。check_integrity 報告の計測日不整合
-      // （req-metrics-measurement-example の IndexGenerationConsistency）と
+      // （req-metrics-measurement-example の index-generation-consistency）と
       // req-updated-freshness NG を trigger 条件として検出し、
       // (a) generate_indexes 再実行（req-metrics 計測日 AUTOGEN 更新）と
       // (b) frontmatter updated の commit author date 追随を明示パス指定の

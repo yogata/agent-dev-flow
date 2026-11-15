@@ -654,13 +654,15 @@ describe("extractFreshnessTargets（REQ ファイル名のみ報告形式の捕�
 });
 
 describe("runMeasurementDateConvergence（補正適用と差分検査 fail-closed）", () => {
-  function convergenceRunner(files: Record<string, string>): MechanicalRunner & { written: Record<string, string> } {
+  function convergenceRunner(files: Record<string, string>): MechanicalRunner & { written: Record<string, string>; calls: { command: string; args: readonly string[] }[] } {
     // path.resolve は OS 正規化（Windows ではバックスラッシュ区切り）を返すため、files 辞書の
     // キー突合はフォワードスラッシュへ統一して行う。
     const normalize = (p: string) => p.replaceAll("\\", "/");
     const written: Record<string, string> = {};
+    const calls: { command: string; args: readonly string[] }[] = [];
     return {
-      run() {
+      run(spec) {
+        calls.push({ command: spec.command, args: spec.args });
         return { exitCode: 0, stdout: "", stderr: "" };
       },
       readTextFile(absolutePath) {
@@ -673,6 +675,7 @@ describe("runMeasurementDateConvergence（補正適用と差分検査 fail-close
         return files[normalize(absolutePath)] !== undefined;
       },
       written,
+      calls,
     };
   }
 
@@ -728,6 +731,53 @@ describe("runMeasurementDateConvergence（補正適用と差分検査 fail-close
     expect(step?.status).toBe("pass");
     expect(step?.detail.alreadyConvergedTargets).toEqual([reqTargetRel]);
     expect(step?.detail.frontmatterUpdatedTargets).toEqual([]);
+    expect(Object.keys(runner.written)).toHaveLength(0);
+  });
+
+  // checker 実出力突合: check_integrity の markdown 報告詳細行は check id（ケバブ表記）で
+  // 報告される。計測日ドリフト検出はこの実出力詳細行（index-generation-consistency 行と
+  // 計測日）を捕捉する。category 見出し・ルーティング表のキャメル表記を含まない入力で
+  // 検証し、詳細行の表記だけで trigger が成立することを機械突合で固定する。
+  const measurementDriftNgLine = "- **[NG]** index-generation-consistency: req-metrics-measurement-example AUTOGEN block out of sync. first mismatch at line 84 (current=計測日: 2026-11-07。, expected=計測日: 2026-11-08。). Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002) [IR-061] (docs/designs/quality/req-health-metrics.md:174) → route: intake";
+  const catalogDriftNgLine = "- **[NG]** index-generation-consistency: catalog pre-045 AUTOGEN block out of sync. first mismatch at line 1 (current=| REQ-001 | 例 |, expected=| REQ-002 | 例 |). Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002) [IR-061] (docs/designs/integrity/integrity-rule-catalog.md:24) → route: intake";
+
+  test("checker 実出力詳細行（ケバブ表記 index-generation-consistency）の計測日ドリフトを捕捉して収束 step を生成する", () => {
+    const runner = convergenceRunner({});
+    const { steps } = runMeasurementDateConvergence(runner, input(), worktreeCwd, measurementDriftNgLine, "head-sha");
+    const triggerStep = steps.find((s) => s.detail.trigger === "req-metrics-measurement-example");
+    expect(triggerStep).toBeDefined();
+    expect(triggerStep?.status).toBe("pass");
+    const rerunStep = steps.find((s) => s.detail.action === "generate_indexes rerun");
+    expect(rerunStep).toBeDefined();
+    expect(rerunStep?.status).toBe("pass");
+    expect(runner.calls.some((c) => c.args.includes("generate_indexes"))).toBe(true);
+  });
+
+  test("freshness NG と計測日ドリフトの同時報告で frontmatter 追従・補正 commit・generate_indexes 再実行を script 内で完結させる", () => {
+    const targetFile = `${worktreeCwd}/${reqTargetRel}`;
+    const runner = convergenceRunner({ [targetFile]: "---\ntitle: t\nupdated: \"2026-10-01\"\n---\n\n本文\n" });
+    const { steps, warnings } = runMeasurementDateConvergence(
+      runner,
+      input(),
+      worktreeCwd,
+      [convergenceCheckStdout, measurementDriftNgLine].join("\n"),
+      "head-sha",
+    );
+    expect(runner.written[targetFile]).toContain(`updated: "${commitDateToday()}"`);
+    expect(runner.calls.some((c) => c.args[0] === "add" && c.args[2] === reqTargetRel)).toBe(true);
+    expect(runner.calls.some((c) => c.args[0] === "commit")).toBe(true);
+    const convergedStep = steps.find((s) => s.detail.stage === "converged");
+    expect(convergedStep?.status).toBe("pass");
+    expect(convergedStep?.detail.stagedPaths).toEqual([reqTargetRel]);
+    const rerunStep = steps.find((s) => s.detail.action === "generate_indexes rerun");
+    expect(rerunStep?.status).toBe("pass");
+    expect(warnings).toHaveLength(0);
+  });
+
+  test("計測日を含まない index-generation-consistency 報告（他の AUTOGEN 不整合）では収束 step を生成しない", () => {
+    const runner = convergenceRunner({});
+    const { steps } = runMeasurementDateConvergence(runner, input(), worktreeCwd, catalogDriftNgLine, "head-sha");
+    expect(steps).toHaveLength(0);
     expect(Object.keys(runner.written)).toHaveLength(0);
   });
 });
