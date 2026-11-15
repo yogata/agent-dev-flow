@@ -2,7 +2,7 @@
 title: 整合性契約
 status: accepted
 created: 2026-08-20
-updated: 2026-11-15
+updated: 2026-11-16
 ---
 <!-- ADF-COVERS(implementation): REQ-010-006 -->
 <!-- ADF-COVERS(implementation): REQ-036-022 -->
@@ -523,6 +523,34 @@ docs-check は baseline 運用（IR-055）と path exemption（`IR055_EXEMPT_PAT
 3. 当該パスが検出原理上の技術的除外であること（テスト fixture 等、検出すると恒久的に false となる場合）
 
 根拠なしの exemption 追加は NG 隠蔽（REQ-010-009 違反）として扱い、レビューで却下する。
+
+## IR-053 検出器仕様と既知許容（否定文文脈許容、Case #4081）
+
+IR-053（gh 直接記述検出）の正規検出条件と既知許容を本節に集約する（導入経緯: RU-0288・inspect D-1 false positive 確定〔confidence high〕の継承）。ルール単位の15フィールド詳細は [rules/IR-053-gh-direct-invocation-detection.md](rules/IR-053-gh-direct-invocation-detection.md)、スキャン対象と除外対象の境界は [responsibilities/custom-tool-contracts.md](../responsibilities/custom-tool-contracts.md)「迂回防止」節が所有する。
+
+### 正規検出条件（検出器仕様）
+
+| 要素 | 契約 |
+|---|---|
+| スキャン対象 | `src/common/commands/agentdev/*.md`、`src/common/skills/agentdev-*/**/*.md` |
+| 検出パターン | `gh (issue|pr) (create|edit|view|comment|merge|close|list|status)`（大小文字無視） |
+| コードブロック除外 | fence 内部の記述は検出対象外（例示・パターン説明、v2:REQ-0108-254） |
+| ファイル単位例外 | IR053_EXEMPT_PATHS（読取系 contingency 2ファイル。登録は「迂回防止」節の宣言に従う） |
+| 否定文文脈許容（既知許容） | マッチ位置から次の文境界（。！？!? または行末）までの同一文中に否定述語（〜しない／しません／せず）が後続する記述は、gh 直接起動を行わない旨の行動契約の説明であり検出対象外とする |
+| severity | heuristic（warning） |
+
+### 否定文文脈許容の構造条件
+
+- 許容単位は文である。マッチ位置より後方・同一文中の否定述語のみを許容し、文をまたぐ否定（「`gh pr view` で mergeable を確認する。ラベルは付与しない。」の後半文など）とマッチ前方の否定は許容しない。肯定形の使用指示が別文の否定表現で隠れない構造を維持する
+- 否定述語は「する」の否定一般形（〜しない／しません／せず）とし、出現箇所個別の語彙列挙は行わない。`agentdev-workflow-case-close/scripts/README.md` の「`gh pr view` を発行しない」記述は文言を維持したまま本許容で解消する（inspect D-1 false positive 確定、Case #4081）
+
+### area-based 除外宣言方式（REQ-010-066 準拠）との整合
+
+REQ-010-066 は廃止語彙検出について、検出語彙の引用・記録領域を領域ベースの構造的除外として宣言・管理し、個別出現箇所の許容条件列挙で代替しないことを定める。本許容はこの原則と次の点で整合する。
+
+- 本許容の正当性の所在は引用・記録領域（領域スコープ）ではなく、否定述語が同一文中に後続するという文ローカルの構造条件である。このためファイル単位・領域単位の除外は採らず、当該領域内の真の violation を隠蔽しない
+- 個別出現箇所の許容（ng-baseline / exemptions への当該 warning 登録）も行わない（正の検出器仕様を迂回しない）。許容条件は検出器仕様として本節が宣言・管理し、baseline・exemptions は未登録のまま維持する
+- 既存の例外経路（読取系 contingency のファイル単位例外、恒久免除レジストリ、コードブロック除外）は本許容と独立に維持し、相互に置換しない
 
 ## catalog ↔ 実装双方向同期運用（REQ-010-003/004）
 

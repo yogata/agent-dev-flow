@@ -1770,6 +1770,35 @@ function buildIr053Fixture(root: string): void {
     "utf-8",
   );
 
+  // Negated-use tolerance (Case #4081, RU-0288 / inspect D-1):
+  //   - tolerated: negative predicate after the match within the same sentence
+  //     (発行しない / せず forms, README.md:7 wording class)
+  //   - still detected: negation that belongs to the following sentence
+  const negationSkillDir = join(
+    root,
+    "src",
+    "common",
+    "skills",
+    "agentdev-negation-sample",
+  );
+  mkdirp(negationSkillDir);
+  writeFileSync(
+    join(negationSkillDir, "SKILL.md"),
+    [
+      "---",
+      "name: agentdev-negation-sample",
+      "---",
+      "",
+      "# Negation sample skill",
+      "",
+      "- PR を伴わない完了構成では `gh pr view` を発行しない。",
+      "- `gh issue create` は直接実行せず、Custom Tool 経由で行う。",
+      "- `gh pr view` で mergeable を確認する。commit は squash しない。",
+      "",
+    ].join("\n"),
+    "utf-8",
+  );
+
   // The former agentdev-gh-cli skill (retired by the GitHub I/O migration,
   // REQ-011-001) owned the permitted-file exemption; no exemption fixture remains.
 }
@@ -1803,6 +1832,21 @@ describe("IR-053 gh-direct-invocation (REQ-0152-001/002)", () => {
         (res.file ?? "").includes("agentdev-sample-skill"),
     );
     expect(inCodeBlock.length).toBe(0);
+  });
+
+  it("tolerates negated-use mentions and keeps cross-sentence negations detected (Case #4081)", () => {
+    const r = getIr053JsonRun();
+    const parsed = JSON.parse(r.stdout);
+    const negationFindings = parsed.results.filter(
+      (res: { check: string; level: string; file?: string; line?: number }) =>
+        res.check === "gh-direct-invocation" &&
+        (res.file ?? "").includes("agentdev-negation-sample"),
+    );
+    // Same-sentence negation lines (7: 発行しない, 8: せず) are tolerated;
+    // line 9's negation sits in the following sentence, so only line 9 is reported.
+    expect(negationFindings.length).toBe(1);
+    expect(negationFindings[0].level).toBe("warning");
+    expect(negationFindings[0].line).toBe(9);
   });
 });
 

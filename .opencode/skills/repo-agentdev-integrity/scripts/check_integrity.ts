@@ -7192,12 +7192,36 @@ function checkReqDesignBoundaryViolation(root: string): CheckResult[] {
 //   src/common/commands/agentdev/*.md
 //   src/common/skills/agentdev-*/**/*.md
 // Code-block contents are exempt (example/pattern description, v2:REQ-0108-254).
+// Negated-use mentions (negative predicate after the match within the same
+// sentence, e.g. 「`gh pr view` を発行しない」) are exempt as behavioral
+// negative statements (Case #4081; see integrity-contracts.md
+// 「IR-053 検出器仕様と既知許容」).
 // The former agentdev-gh-cli skill owned the permitted-file exemption; the skill was
 // retired by the GitHub I/O migration (REQ-011-001) and no exemption path remains.
 // Severity: heuristic (warn / exit 1).
 
 const IR053_GH_DIRECT_PATTERN =
   /\bgh\s+(issue|pr)\s+(create|edit|view|comment|merge|close|list|status)\b/i;
+
+// Negated-use tolerance (Case #4081, RU-0288 / inspect D-1 false positive):
+// a match whose sentence remainder (from the match end to the next sentence
+// delimiter or EOL) contains a Japanese negative predicate (〜しない /
+// しません / せず) states that the gh invocation is NOT performed. Such a
+// mention is a behavioral negative statement about the Custom Tool boundary,
+// not an instruction to bypass it, and is tolerated structurally
+// (sentence-scoped; negations in other sentences stay detected). The
+// tolerance is declared in the detector spec (integrity-contracts.md
+// 「IR-053 検出器仕様と既知許容」) and involves no ng-baseline /
+// exemptions registration (per-occurrence enumeration would bypass the
+// positive detector spec).
+const IR053_NEGATED_USE_PATTERN = /(?:しません|しない|せず)/;
+
+function isNegatedUseMention(line: string, matchEndIndex: number): boolean {
+  const rest = line.slice(matchEndIndex);
+  const delimiter = rest.search(/[。！？!?]/);
+  const sentenceRest = delimiter === -1 ? rest : rest.slice(0, delimiter);
+  return IR053_NEGATED_USE_PATTERN.test(sentenceRest);
+}
 
 // Exemption paths (repo-root-relative, forward-slash normalized). Read-only
 // contingency allowance per Custom Tool 契約 Design「迂回防止」（REQ-095-003）:
@@ -7253,6 +7277,9 @@ function checkGhDirectInvocation(root: string): CheckResult[] {
       if (isInsideCodeBlock(lines, i)) continue;
       const match = lines[i].match(IR053_GH_DIRECT_PATTERN);
       if (match) {
+        if (isNegatedUseMention(lines[i], (match.index ?? 0) + match[0].length)) {
+          continue;
+        }
         foundViolation = true;
         results.push(
           warn(
