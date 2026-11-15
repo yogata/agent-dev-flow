@@ -78,6 +78,32 @@ const RUNTIME_PREFIXES: readonly string[] = [
   "src/opencode/plugins/agentdev-",
 ];
 
+// Repo-local plugins are excluded from every CONSUMER distribution entry
+// (checkout install, release archive staging, archive install) by the
+// distribution exclusion canon. The source projection keeps auditing the
+// originals, while the link / archive / archive-installed expectations must
+// exclude them or the physical install verification fails on files the
+// installer is contractually forbidden to place. Per the I-004 reservation
+// above, this list is an INDEPENDENTLY maintained audit expectation and is
+// deliberately NOT derived from the canon.
+const REPO_LOCAL_PLUGIN_PREFIXES: readonly string[] = [
+  "src/opencode/plugins/agentdev-distribution-boundary-guard/",
+];
+
+function isRepoLocalPluginPath(path: string): boolean {
+  return REPO_LOCAL_PLUGIN_PREFIXES.some((p) => path.startsWith(p));
+}
+
+/**
+ * Consumer-distributable runtime inputs: runtime paths minus repo-local
+ * plugins. Used by the link / archive / archive-installed manifest builders.
+ */
+export function filterConsumerDistributable(
+  inputs: readonly ManifestEntryInput[],
+): ManifestEntryInput[] {
+  return inputs.filter((i) => !isRepoLocalPluginPath(i.path));
+}
+
 const BOOTSTRAP_PATHS: readonly string[] = [
   "scripts/install.ps1",
   "scripts/consumer/common.ps1",
@@ -235,10 +261,11 @@ export function mapRuntimeToLinkPath(runtimePath: string): string {
 export function buildLinkManifest(
   runtimeInputs: readonly ManifestEntryInput[],
 ): ManifestSet {
-  if (runtimeInputs.length === 0) {
+  const distributable = filterConsumerDistributable(runtimeInputs);
+  if (distributable.length === 0) {
     throw new ManifestError("link", "zero target entries");
   }
-  const mapped: ManifestEntry[] = runtimeInputs.map((i) => {
+  const mapped: ManifestEntry[] = distributable.map((i) => {
     assertValidEntry(i, "link");
     return { path: mapRuntimeToLinkPath(i.path), sha256: i.sha256, size: i.size };
   });
@@ -249,13 +276,14 @@ export function buildArchiveManifest(
   runtimeInputs: readonly ManifestEntryInput[],
   extraInputs: readonly ManifestEntryInput[],
 ): ManifestSet {
+  const distributable = filterConsumerDistributable(runtimeInputs);
   const extras = extraInputs.filter((i) => isRequiredArchiveExtraPath(i.path));
   for (const required of ARCHIVE_EXTRA_REQUIRED) {
     if (!extras.some((e) => e.path === required)) {
       throw new ManifestError("archive", `missing required entry: ${required}`);
     }
   }
-  const combined = [...runtimeInputs, ...extras];
+  const combined = [...distributable, ...extras];
   if (combined.length === 0) {
     throw new ManifestError("archive", "zero target entries");
   }
@@ -269,10 +297,11 @@ export function buildArchiveManifest(
 export function buildArchiveInstalledManifest(
   runtimeInputs: readonly ManifestEntryInput[],
 ): ManifestSet {
-  if (runtimeInputs.length === 0) {
+  const distributable = filterConsumerDistributable(runtimeInputs);
+  if (distributable.length === 0) {
     throw new ManifestError("archive-installed", "zero target entries");
   }
-  const mapped: ManifestEntry[] = runtimeInputs.map((i) => {
+  const mapped: ManifestEntry[] = distributable.map((i) => {
     assertValidEntry(i, "archive-installed");
     return { path: mapRuntimeToLinkPath(i.path), sha256: i.sha256, size: i.size };
   });

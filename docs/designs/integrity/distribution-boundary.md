@@ -40,6 +40,7 @@ distribution は consumer 環境へ配布されるテキスト成果物の集合
 テキストと判定可能な成果物とバイナリと判定される成果物を決定的に区別し、判定不能なエントリは unclassified として gate-not-passed 扱いとする。
 検査対象の除外領域: 共通原本側 tests/ 配下（検出刺激用のサンプル文字列を含むテスト。Issue #2480）と、tools/<name>/local/ 配下（通常版の同期・インストールの配布対象から除外された Local 実装領域。REQ-009-016）は配布テキスト成果物の対象外とする。
 この除外は配布依存境界検査の走査対象からの除外（4 projection 共通）であり、manifest の監査期待対象（tests を含み、manifest 側は除外しない）と配布アーカイブ内容には影響しない。除外判定は候補ツリーの共通原本パス（src/common 基準の path segment 一致）で行い、link・archive-installed 投影では .opencode 写像の前の段階で適用する。
+repo-local plugin 原本（除外基準カノンにより consumer 配布全経路から除外される plugin。現行は agentdev-distribution-boundary-guard）は、source projection の原本検査対象には含めたまま、consumer 配布3投影（link・archive・archive-installed）の走査対象と監査期待対象から除外する。この除外リストは監査期待の独立性予約（I-004）どおり検査側が独立に保持し、除外基準カノンから導出しない。
 
 ## 配布物本文の記述規則
 

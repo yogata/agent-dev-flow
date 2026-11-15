@@ -30,3 +30,23 @@ export function isBoundaryScanTarget(sourcePath: string): boolean {
   if (seg.length > 4 && seg[2] === "tools" && seg[4] === "local") return false;
   return true;
 }
+
+// Repo-local plugin originals stay in the SOURCE projection (producer-side
+// audit of the canonical tree) but are excluded from every consumer
+// distribution projection (link / archive / archive-installed): the canon
+// forbids placing them in consumer environments, so they can never appear in
+// those projections' scan targets either. Kept as an independent scan-scope
+// list, consistent with the manifest audit expectation's I-004 reservation.
+const REPO_LOCAL_PLUGIN_PREFIXES: readonly string[] = [
+  "src/opencode/plugins/agentdev-distribution-boundary-guard/",
+];
+
+/**
+ * Decide whether a runtime source path is scanned in the consumer
+ * distribution projections (link / archive / archive-installed). Returns
+ * false for repo-local plugin originals (not distributed to consumers).
+ */
+export function isConsumerProjectionScanTarget(sourcePath: string): boolean {
+  const norm = sourcePath.replace(/\\/g, "/");
+  return !REPO_LOCAL_PLUGIN_PREFIXES.some((p) => norm.startsWith(p));
+}

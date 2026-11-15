@@ -180,6 +180,29 @@ describe("manifest / buildLinkManifest", () => {
   test("rejects zero target entries (runtime-empty candidate tree)", () => {
     expect(() => buildLinkManifest([])).toThrow(/zero target entries/);
   });
+
+  // repo-local plugin（consumer 配布対象外・独立監査リスト）は consumer 配布
+  // 3投影の監査期待から除外され、source projection の原本監査には残る。
+  test("excludes repo-local plugins from the link expectation", () => {
+    const runtime = [
+      entry("src/common/skills/agentdev-foo/SKILL.md", "a".repeat(64), 10),
+      entry("src/opencode/plugins/agentdev-distribution-boundary-guard/plugin.ts", "b".repeat(64), 20),
+    ];
+    const m = buildLinkManifest(runtime);
+    expect(m.entries.map((e) => e.path)).toEqual([
+      ".opencode/skills/agentdev-foo/SKILL.md",
+    ]);
+    const source = buildSourceManifest([
+      ...runtime,
+      entry("scripts/install.ps1", "d".repeat(64), 40),
+      entry("scripts/consumer/common.ps1", "e".repeat(64), 50),
+      entry("scripts/consumer/install-sync-common.ps1", "0".repeat(64), 55),
+      entry("scripts/consumer/distribution-exclusion.ps1", "1".repeat(64), 56),
+    ]);
+    expect(source.entries.map((e) => e.path)).toContain(
+      "src/opencode/plugins/agentdev-distribution-boundary-guard/plugin.ts",
+    );
+  });
 });
 
 describe("manifest / buildArchiveManifest", () => {

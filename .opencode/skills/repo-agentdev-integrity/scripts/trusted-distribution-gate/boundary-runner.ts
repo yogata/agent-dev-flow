@@ -26,7 +26,7 @@ import {
 } from "./boundary-gate.ts";
 import type { DetectorConfig } from "./boundary-pipeline.ts";
 import { mapRuntimeToLinkPath } from "./manifest.ts";
-import { isBoundaryScanTarget } from "./boundary-scan-scope.ts";
+import { isBoundaryScanTarget, isConsumerProjectionScanTarget } from "./boundary-scan-scope.ts";
 
 const PROJECTIONS: readonly Projection[] = [
   "source",
@@ -71,8 +71,10 @@ function buildProjectionFiles(
     if (b.subset !== "runtime") continue;
     // Exclusion is decided on the candidate source path (before the
     // .opencode/** link mapping) so it holds identically in the link and
-    // archive-installed projections.
+    // archive-installed projections. Repo-local plugin originals are
+    // consumer-undistributable and therefore absent from these projections.
     if (!isBoundaryScanTarget(b.entry.path)) continue;
+    if (!isConsumerProjectionScanTarget(b.entry.path)) continue;
     if (b.text !== null) {
       const mapped = mapRuntimeToLinkPath(b.entry.path);
       out.push({ filePath: mapped, projection, text: b.text });

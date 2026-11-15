@@ -8,7 +8,7 @@
 // source path before the .opencode/** link mapping).
 
 import { describe, expect, test } from "bun:test";
-import { isBoundaryScanTarget } from "./boundary-scan-scope.ts";
+import { isBoundaryScanTarget, isConsumerProjectionScanTarget } from "./boundary-scan-scope.ts";
 import { runBoundaryDetector } from "./boundary-runner.ts";
 import type { DetectorConfig } from "./boundary-pipeline.ts";
 import type { LoadedBlob } from "./blob-loader.ts";
@@ -67,6 +67,21 @@ describe("boundary-scan-scope / isBoundaryScanTarget", () => {
   test("normalizes backslash-separated paths", () => {
     expect(isBoundaryScanTarget("src\\common\\skills\\agentdev-x\\scripts\\tests\\foo.test.ts")).toBe(false);
     expect(isBoundaryScanTarget("src\\common\\tools\\agentdev-gh\\local\\runner-local.ts")).toBe(false);
+  });
+});
+
+describe("boundary-scan-scope / isConsumerProjectionScanTarget", () => {
+  test("keeps ordinary runtime paths as consumer scan targets", () => {
+    expect(isConsumerProjectionScanTarget("src/common/skills/agentdev-x/SKILL.md")).toBe(true);
+    expect(isConsumerProjectionScanTarget("src/opencode/plugins/agentdev-gh-write-guard/plugin.ts")).toBe(true);
+  });
+
+  // repo-local plugin 原本は source 投影では走査対象のまま、consumer 配布
+  // 3投影（link・archive・archive-installed）の走査対象からは除外される。
+  test("excludes repo-local plugin originals from consumer projections", () => {
+    expect(isConsumerProjectionScanTarget("src/opencode/plugins/agentdev-distribution-boundary-guard/plugin.ts")).toBe(false);
+    expect(isConsumerProjectionScanTarget("src/opencode/plugins/agentdev-distribution-boundary-guard/tests/plugin.test.ts")).toBe(false);
+    expect(isConsumerProjectionScanTarget("src\\opencode\\plugins\\agentdev-distribution-boundary-guard\\plugin.ts")).toBe(false);
   });
 });
 
