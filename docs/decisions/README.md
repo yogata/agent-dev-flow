@@ -10,7 +10,7 @@
 DEC-018 は欠番であり、対応する Decision ファイルは存在しない。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は52件、提案中の Decision は0件である。
+現行の承認済み Decision は52件、提案中の Decision は1件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -77,6 +77,7 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 | DEC-060 | ADF本体の GitHub Release 記録と公開承認境界 | accepted | 2026-10-16 |
 | DEC-061 | Release 公開操作のカタログ正規化（承認後の workflow 実行経路） | accepted | 2026-10-20 |
 | DEC-062 | 要件ID桁数の受理上限撤廃と表示ゼロ埋め・受理検証の分離 | accepted | 2026-10-26 |
+| DEC-063 | 分割③ CI 日次定期実行（cron schedule）の撤去 | proposed | 2026-11-16 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -146,6 +147,7 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
+- [DEC-063](DEC-063.md)（分割③ CI 日次定期実行（cron schedule）の撤去）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -333,6 +335,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-060 | [REQ-114](../requirements/REQ-114.md) | - |
 | DEC-061 | [REQ-114](../requirements/REQ-114.md) | - |
 | DEC-062 | [REQ-004](../requirements/REQ-004.md), [REQ-009](../requirements/REQ-009.md), [REQ-012](../requirements/REQ-012.md), [REQ-051](../requirements/REQ-051.md) | - |
+| DEC-063 | - | - |
 <!-- AUTOGEN:END -->
 
 ## 過去版の履歴基盤
