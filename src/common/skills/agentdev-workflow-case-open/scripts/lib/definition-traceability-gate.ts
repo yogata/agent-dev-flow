@@ -43,7 +43,7 @@ type ParsedReport = {
 };
 
 /**
- * 対象 REQ 行 0 件案件の正規経路（REQ-030-032）で対照基準とする main baseline の
+ * 対象 REQ 行 0 件案件の正規経路で対照基準とする main baseline の
  * 既知欠落（識別子集合）。missing-implementation と missing-verification の
  * 識別子集合を main 実測（全体実行）から保持する。
  */
@@ -106,7 +106,7 @@ function parseReport(value: unknown): ParsedReport | null {
 }
 
 /**
- * 全体を対象とする検査（--req 指定なし・REQ-029-017/REQ-030-032 の正規経路）の
+ * 全体を対象とする検査（--req 指定なし・対象 REQ 行 0 件案件の正規経路）の
  * checker 報告を解析する。全体実行の completenessScope は文字列 "all" であり、
  * 対象行配列形式とは受容契約が異なる。
  */
@@ -259,7 +259,7 @@ type WholeScopeTraceabilityInput = {
 };
 
 /**
- * 対象 REQ 行 0 件案件の正規の入力構成（REQ-029-017・case-open 段階の門）における
+ * 対象 REQ 行 0 件案件の正規の入力構成（case-open 段階の門）における
  * 全体を対象とする検査の実行結果を消費する。対象集合が空であるため Design 対応と
  * deferred 義務の適用対象はなく、missing-* の findings は他 Case の背景診断として
  * 不合格の原因にしない。構造・policy 系検査（missing-* 以外）の fail は
@@ -271,7 +271,7 @@ export function consumeDefinitionTraceabilityWholeScope(input: WholeScopeTraceab
 }
 
 /**
- * 対象 REQ 行 0 件案件の case-close 機械工程における正規の経路（REQ-030-032）:
+ * 対象 REQ 行 0 件案件の case-close 機械工程における正規の経路:
  * 全体実行の結果を main baseline の既知欠落（識別子集合）と対照し、悪化 0 件を
  * 機械証明する。missing-implementation / missing-verification の識別子集合が
  * baseline の集合の部分集合であるかぎり不合格の原因にせず、baseline 外の識別子

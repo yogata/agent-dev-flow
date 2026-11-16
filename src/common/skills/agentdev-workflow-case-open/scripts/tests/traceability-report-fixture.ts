@@ -46,7 +46,7 @@ export function traceabilityReportFromArgs(args: readonly string[]): string {
 }
 
 /**
- * 全体を対象とする検査（--req 指定なし・REQ-029-017/REQ-030-032 の正規経路）の
+ * 全体を対象とする検査（--req 指定なし・対象 REQ 行 0 件案件の正規経路）の
  * checker 報告。completenessScope は実 checker の全体実行出力に合わせて文字列 "all"。
  */
 export function wholeScopeTraceabilityReport(

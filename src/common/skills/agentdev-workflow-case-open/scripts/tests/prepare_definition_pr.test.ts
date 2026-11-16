@@ -140,7 +140,7 @@ describe("入力検証（品質ゲートの省略禁止・明示パス stage）"
     expect(() => validateInput(broken)).toThrow(/traceabilityReqIds is required/);
   });
 
-  test("対象 REQ 行 0 件の正規の入力構成（空集合の明示 + 全体を対象とする検査の gate spec）を受領する（REQ-029-017）", () => {
+  test("対象 REQ 行 0 件の正規の入力構成（空集合の明示 + 全体を対象とする検査の gate spec）を受領する", () => {
     const zeroTargetGate: GateCommandSpec = {
       ...gate("traceability-check"),
       args: ["./checker.ts", "--gate", "traceability-check"],

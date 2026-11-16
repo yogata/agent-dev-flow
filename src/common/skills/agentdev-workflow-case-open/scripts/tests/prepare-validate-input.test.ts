@@ -39,7 +39,7 @@ describe("runValidateInputOnly (verification-only entry)", () => {
     expect(report.gateAvailability.missing).toHaveLength(0);
   });
 
-  test("ok: true for the zero-target regular input configuration (REQ-029-017: explicit empty target set + whole-scope gate)", () => {
+  test("ok: true for the zero-target regular input configuration (explicit empty target set + whole-scope gate)", () => {
     const fixture = consumerFixture();
     const zeroTarget: PrepareDefinitionPrInput = {
       ...fixture,

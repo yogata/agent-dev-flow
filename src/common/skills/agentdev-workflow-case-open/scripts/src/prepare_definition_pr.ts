@@ -266,9 +266,9 @@ export function validateInput(value: unknown): PrepareDefinitionPrInput {
  * 形式）で行い、producer 固有の追加制約（reqRowIdPattern の設定値）が与えられた場合は
  * 許容書式の範囲内の追加照合として適用する。欠落・形式不正・gate 実行範囲（--req 指定）
  * との不整合は、検査や worktree 操作を開始せず MechanicalInputError で拒否する。
- * 空配列への暗黙正規化は行わない。空配列の明示（対象 REQ 行 0 件案件・REQ-029-017）
- * は正規の入力構成として受理し、全体を対象とする検査（gate spec の --req 不在）を
- * 要求する。既存の代替経路（REQ-029-014〜016）の受理挙動は変更しない。
+ * 空配列への暗黙正規化は行わない。空配列の明示（対象 REQ 行 0 件案件の
+ * 正規の入力構成）は受理し、全体を対象とする検査（gate spec の --req 不在）を
+ * 要求する。既存の代替経路の受理挙動は変更しない。
  */
 function validateTraceabilityReqIds(
   value: unknown,
