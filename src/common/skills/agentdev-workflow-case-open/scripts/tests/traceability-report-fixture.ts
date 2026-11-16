@@ -10,6 +10,7 @@ const CHECK_KINDS = [
   "duplicate-inconsistencies",
   "malformed-links",
   "dangling-links",
+  "derived-declaration-conflicts",
 ] as const;
 
 type CheckKind = typeof CHECK_KINDS[number];

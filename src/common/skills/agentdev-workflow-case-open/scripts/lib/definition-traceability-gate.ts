@@ -10,6 +10,7 @@ const CHECK_KINDS = [
   "duplicate-inconsistencies",
   "malformed-links",
   "dangling-links",
+  "derived-declaration-conflicts",
 ] as const;
 
 type CheckKind = typeof CHECK_KINDS[number];
@@ -194,6 +195,7 @@ export function consumeDefinitionTraceability(input: TraceabilityInput): Traceab
           case "duplicate-inconsistencies":
           case "malformed-links":
           case "dangling-links":
+          case "derived-declaration-conflicts":
             return fail(`non-deferrable traceability check failed: ${check.kind}`);
           default:
             return assertNever(check.kind);
