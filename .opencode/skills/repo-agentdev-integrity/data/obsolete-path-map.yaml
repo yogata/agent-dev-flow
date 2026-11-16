@@ -106,7 +106,9 @@ entries:
     new: "docs/designs/integrity/docs-spec-rebuild-integrity.md"
     severity: "ng"
   - old: "docs/specs/backticks-identifier-threshold.md"
-    new: "docs/designs/integrity/backticks-identifier-threshold.md"
+    # 統合先は document-type-responsibilities.md「識別子と散文普通名詞の区別」節
+    # （PR #4064 で統合・廃止済み。Case #4079 で new 側を現行統合先へ更新）。
+    new: "docs/designs/responsibilities/document-type-responsibilities.md"
     severity: "ng"
 
   # local/（ローカル版 SPEC）
@@ -182,7 +184,9 @@ entries:
     new: "docs/designs/integrity/docs-spec-rebuild-integrity.md"
     severity: "ng"
   - old: "docs/specs/integrity/backticks-identifier-threshold.md"
-    new: "docs/designs/integrity/backticks-identifier-threshold.md"
+    # 統合先は document-type-responsibilities.md「識別子と散文普通名詞の区別」節
+    # （PR #4064 で統合・廃止済み。Case #4079 で new 側を現行統合先へ更新）。
+    new: "docs/designs/responsibilities/document-type-responsibilities.md"
     severity: "ng"
   - old: "docs/specs/local/runtime-package-boundary.md"
     new: "docs/designs/local/runtime-package-boundary.md"

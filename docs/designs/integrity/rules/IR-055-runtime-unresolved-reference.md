@@ -74,6 +74,31 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integr
 baseline 0 到達後に full audit を fail gate 化できる状態にする（REQ-010-007）。
 3層 guard の実行モデルは REQ-010-005 に従う。
 
+## baseline entries と checker evidence の正規化規則（Case #4079・RU-0286）
+
+baseline entries（`baselines/ng-baseline.json`・`baselines/ir-055-baseline.json`）と
+checker evidence を突合する外部スクリプトを実装する場合は、file パスの正規化規則を
+次のとおり踏襲する（checker 側の実装は `normalizeNgBaselineFilePath`・
+integrity-contracts.md「baseline entry 運用契約」第2点・OU-0008〔Issue #2206〕）。
+
+| 要素 | 正規化規則 |
+|---|---|
+| パス区切り | バックスラッシュ `\` はスラッシュ `/` へ統一する |
+| 先頭カレント表記 | 先頭の `./` は除去する |
+| projection 表記差 | `.opencode/` で始まるパスは `src/common/` へ置換して統一する |
+
+- `.opencode/` と `src/common/` の2表記は同一ファイルの環境別報告である
+  （main 環境は junction projection 実在で `.opencode/...` 表記、worktree 環境は
+  junction 未伝播で `src/common/...` 表記の §7.3 fallback）。bucket key 比較時のみ
+  表記を正規化し、baseline entry の仕様自体（category/check/file/evidence の4組）
+  は変更しない
+- `repo-*`（repo-local skill 参照）と `repo-local`（repo-local 配置区分）の語彙は
+  IR-055 の検出パターン側の概念であり、baseline 正規化のパス置換対象とはしない
+  （repo-local 配置のファイルは本来 IR-055 の走査対象外であり、baseline entry が
+  存在する場合も元表記のまま保持する）
+- 突合スクリプトは bucket key 比較時にのみ本正規化を適用し、baseline JSON の
+  保存値を書き換えない（正規化は比較境界の関心事であり、記録境界の変更ではない）
+
 ## ルール本文と正規表現
 
 IR-055 の正規表現は Decision 移行後の現行命名 `DEC-\d{3}` を検出する。

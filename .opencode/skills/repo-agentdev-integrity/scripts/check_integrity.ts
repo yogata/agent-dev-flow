@@ -3253,7 +3253,7 @@ function checkRetiredFrontmatter(reqDir: string, root: string): CheckResult[] {
 
 // ─── Variant path existence & registry checks (v2:REQ-0108-089~091) ──────────
 
-function checkVariantPathExistence(
+export function checkVariantPathExistence(
   cmdDir: string,
   completionReportsPath: string,
   root: string,
@@ -4873,7 +4873,7 @@ function checkAbolishedSkillReferences(root: string): CheckResult[] {
 
 // ─── REQ range staleness check (INC-0027) ─────────────────────────────────
 
-function checkReqRangeStaleness(root: string): CheckResult[] {
+export function checkReqRangeStaleness(root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const reqDir = path.join(root, "docs", "requirements");
   const reqFiles = listFiles(reqDir).filter(
@@ -6281,7 +6281,7 @@ function checkUpdateNotesInDocs(root: string): CheckResult[] {
 // ─── v2:REQ-0108-206: Summary/index REQ range consistency ────────────────────
 // (Extends checkReqRangeStaleness with specific summary/index file focus)
 
-function checkSummaryReqRangeConsistency(root: string): CheckResult[] {
+export function checkSummaryReqRangeConsistency(root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const reqDir = path.join(root, "docs", "requirements");
   const reqFiles = listFiles(reqDir).filter(
@@ -12057,6 +12057,14 @@ async function main(): Promise<void> {
     ...annotateIrIds(checkInlineCompletionReportsStrict(cmdDir, root), []),
     ...annotateIrIds(checkInlineCompletionBodyInCommands(cmdDir, root), []),
     ...annotateIrIds(checkPostCompletionOutput(cmdDir, root), []),
+    ...annotateIrIds(
+      checkVariantPathExistence(
+        cmdDir,
+        path.join(root, "docs", "commands", "completion-reports.md"),
+        root,
+      ),
+      ["IR-013"],
+    ), // IR-013 (REQ-036-008, v2:REQ-0108-089~091)。results 統合への接続は Case #4079（RU-0286）
     ...annotateIrIds(checkTerminology(cmdDir, root), []),
     ...annotateIrIds(checkLinkIntegrity(root), []),
     ...annotateIrIds(checkDecisionReadmeRetiredReqLink(root), []),
