@@ -2,7 +2,7 @@
 title: 整合性契約
 status: accepted
 created: 2026-08-20
-updated: 2026-11-15
+updated: 2026-11-16
 ---
 <!-- ADF-COVERS(implementation): REQ-010-006 -->
 <!-- ADF-COVERS(implementation): REQ-036-022 -->
@@ -274,7 +274,9 @@ gate 不合格の場合は新規 IR 登録を取り下げ、retired REQ-028-013�
 
 frontmatter `updated` 鮮度債務（req-updated-freshness、req-range-staleness、IR-072）の検出時は、是正を実施単位・タイミングの運用判断に従って扱う。検出時都度の是正チケット扱いを既定とし、REQ 操作を伴わない Case での鮮度違反は自 Case 起因分離証明を要する一括是正候補として check_integrity 補正 commit の標準 contingency に位置づける。鮮度検査の緩和・迂回と updated の乖離恒久化は行わない。
 
-REQ-010-085 が所有する内容変更 PR での frontmatter updated 同時進行（REQ 更新手順の一手順化）は、本節の検出時運用の標準形である。意図的な updated 進行を含む内容変更 PR が merge された後に IR-072 が新規検出される構造に対しては、updated 進行を PR 本体と同一変更セットで行い、merge 後の補正 commit を既定としない。許容幅規則（同日内差分の扱い等）は REQ-010-085 行の実装時検討事項であり、確定結果を本節へ反映する。
+REQ-010-085 が所有する内容変更 PR での frontmatter updated 同時進行（REQ 更新手順の一手順化）は、本節の検出時運用の標準形である。意図的な updated 進行を含む内容変更 PR が merge された後に IR-072 が新規検出される構造に対しては、updated 進行を PR 本体と同一変更セットで行い、merge 後の補正 commit を既定としない。
+
+許容幅規則（同日内差分の扱い等）は導入しないものとして確定した（Issue #4080 の実装時検討に基づく判断記録）。IR-072 は frontmatter updated の日付部分と最終内容変更 commit の author date を日付単位で比較する。同一日内の時刻差はこの比較の対象外であり、日付単位の一致で足りるため、追加の許容幅を要しない。一方、本リポジトリの squash merge では merge commit の author date が merge 時刻となる（PR #4027・#4050・#4051・#4072 の merge commit で author date と committer date が一致する実測による）。このため内容変更 PR で updated を作成日に進めても、merge が日付を跨ぐと IR-072 が不一致を検出する。この跨ぎ検出を許容幅で吸収せず、REQ-010-081 の検出時運用（都度是正）で処理する。是正は frontmatter のみの変更 commit で updated を最終内容変更 commit の日付へ再進行させれば収束する（IR-072 は frontmatter のみの変更 commit を突合対象から除外する）。検出器への日数許容の導入は鮮度検査の緩和に当たるため行わない。
 
 ## 一時移行検査 registry（retired REQ-028-006 から移管）
 
