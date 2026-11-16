@@ -321,7 +321,22 @@
     "stage7_リリース": "未着手"
   },
   "リリース状態": {
-    "状態": "未着手"
+    "状態": "完了",
+    "版番号": "5.2.1",
+    "タグ名": "v5.2.1",
+    "タグ種別": "注釈付きタグ（tag object e8be60ead5ce28623437f407f55125899f9abcd0）",
+    "対象コミット": "3c140b42c9d2527ede5ee82b9e8740536b2bba62",
+    "版番導出根拠": "STEP-11 手続1-2: 基準点再確認（正式 SemVer タグ再列挙・最大版 v5.2.0 から変化なし）→ パッチ+1 で v5.2.1 導出・既存タグ衝突なし（git tag --list v5.2.1 空）を確認",
+    "無関係コミット混入検知": "aa5123e54..3c140b42c の37コミット全件を件名で照合し、すべて整理サイクル5件・要件定義/セット状態記録13件・Definition PR 1件・unit PR squash merge 17件・AUTOGEN補正1件に帰属・混入 0件",
+    "タグ作成": "2026-11-16 作成・push（git ls-remote で識別子一致確認）",
+    "Release対応確認情報": "release_list 読み戻しで全版タグと Release の 1:1 対応を確認（45件・重複なし・既存版は全て公開済みのまま変化なし）",
+    "公開実行形態": "workflow 実行",
+    "承認根拠": {
+      "リリース条件確認": "HITL 質問 ID: Q-RL-20261116-01、回答「はい、進めてよい」（question ツール回答記録 2026-11-16）",
+      "公開承認": "HITL 質問 ID: Q-RL-20261116-02、回答「公開を承認する」（question ツール回答記録 2026-11-16・release_publish の approvalBasis に同一内容を記録）"
+    },
+    "公開後読み戻し": "release_read で draft=false・publishedAt=2026-11-16T07:53:06Z・URL https://github.com/yogata/agent-dev-flow/releases/tag/v5.2.1 を確認済み",
+    "確認日時": "2026-11-16T07:53 JST"
   },
   "要件doc情報": {
     "パス": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
