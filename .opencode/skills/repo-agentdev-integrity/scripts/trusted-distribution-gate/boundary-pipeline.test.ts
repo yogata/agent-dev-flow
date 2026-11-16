@@ -1,4 +1,4 @@
-﻿// Tests for the side-effect-free boundary detector pipeline.
+// Tests for the side-effect-free boundary detector pipeline.
 //
 // The detector must NOT be a closed (REQ|ADR|DEC) list. It must classify
 // arbitrary producer-internal ID families, concrete docs paths (slash,

@@ -68,8 +68,8 @@ bun install && bun run build:engine
 ## 最終検査の実行（用途別入口）
 
 ```bash
-bun run .opencode/plugins/agentdev-textlint-guard/gate.ts --root <project-root>   # 導入先
-bun run src/opencode/plugins/agentdev-textlint-guard/gate.ts --root .             # 本体
+bun .opencode/plugins/agentdev-textlint-guard/gate.ts --root <project-root>   # 導入先
+bun src/opencode/plugins/agentdev-textlint-guard/gate.ts --root .             # 本体
 ```
 
 用途は正規契約から決定的に選択される。`--purpose` で工程側の契約上の用途を指定する（既定は通常最終検査）。LLM が毎回の検査範囲・目的・再利用可否を選択せず、結果の受理と進行判定は plugin 側の共通関数（`lib/runs.ts` の `resolveInspectionPurpose` / `acceptForProgress`）が一元実装する。
