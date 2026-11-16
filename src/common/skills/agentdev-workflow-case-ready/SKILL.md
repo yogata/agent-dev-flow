@@ -48,7 +48,7 @@ case-ready workflow は次の7 STEP で構成する。
 | STEP-3 | Decision 受理評価 | STEP-2 完了 | proposed Decision の評価完了（accepted 遷移実行 / 受理不能で停止 / 評価対象 0 件で継続） | [references/decision-acceptance.md](references/decision-acceptance.md) |
 | STEP-4 | execution contract 確定 | STEP-3 完了 | execution contract を Root Case 本文へ確定済み | [references/execution-contract.md](references/execution-contract.md) |
 | STEP-5 | 実行構造確定 | STEP-4 完了 | Standard / Epic 確定済み。Epic 時は Child Issue / Wave / 依存構造作成済み、構成検証合格 | [references/execution-structure.md](references/execution-structure.md) |
-| STEP-6 | 検証ゲートと ready 遷移 | STEP-5 完了 | 対象要件行の Design 対応 1 件以上・トレーサビリティポリシー有効の確認（missing-design / policy 不正 0 件）、横断依存検査実施済み（警告提示記録または検出不能報告。警告は ready 遷移判定を変更しない）、Root Case を ready へ遷移済み | [references/readiness-and-cleanup.md](references/readiness-and-cleanup.md) |
+| STEP-6 | 検証ゲートと ready 遷移 | STEP-5 完了 | 対象要件行の Design 対応 1 件以上・トレーサビリティポリシー有効の確認（missing-design / policy 不正 0 件）、横断依存検査実施済み（警告提示記録または検出不能報告。警告は ready 遷移判定を変更しない）、QG-2（Acceptance Criteria Coverage）の判定実行済み・判定の結果を工程の記録コメント（または報告 JSON）へ記録済み（観点6 の成果物との整合性の確認を含む）、Root Case を ready へ遷移済み | [references/readiness-and-cleanup.md](references/readiness-and-cleanup.md) |
 | STEP-7 | draft / RU 削除と同期確認 | STEP-6 完了 | draft / RU 削除済み、main ブランチの作業ディレクトリとリモートの同期確認済み | [references/readiness-and-cleanup.md](references/readiness-and-cleanup.md) |
 
 ### STEP 間の依存と分岐
@@ -84,6 +84,7 @@ case-ready workflow は次の7 STEP で構成する。
 - `agentdev-workflow-lifecycle`: work_type 判定、ラベル付与、Standard / Epic 判定の lifecycle 基準
 - `agentdev-workflow-orchestration`: capture 境界の Split Rule、deviation capture 委譲
 - `agentdev-traceability`: coverage / check による対応関係の整合確認、Design 対応・トレーサビリティポリシー有効性のゲート判定
+- `agentdev-quality-gates`: QG-2（Acceptance Criteria Coverage）の判定基準・検査観点（QG-2 reference）の参照
 - Custom Tool `agentdev_gh`: GitHub I/O 境界（issue_read、issue_update、issue_create、pr_read、pr_merge、comment_create。VERIFY は Tool 内部）
 - `agentdev-learning-capture` / `agentdev-intake-pipeline`: deviation capture 委譲（実観測時）
 - `agentdev-git-worktree`: 並列実行安全ステージングプロシージャ（capture 成果物の git 永続化）
@@ -119,6 +120,7 @@ Decision 受理、execution contract と実行構造の確定、lifecycle gate �
 - **realization_actions の投影（Issue Execution Contract REQ「realization_actions の投影」条項）**: draft-data の realization_actions は、Root Case 本文の実現方針（条件付き章。再判断不可の合意済み事項のみを記載し、該当がない場合は章を常設しない）と完了条件の検証方法・合格条件へ投影する。realization_actions の内部属性一式（concern、responsibility 等の構造化一覧）は転記せず、合意済み内容を本文の該当章へ分布させる。case-ready 成功後は case-run が Issue 本文だけで変更責務、変更意図、検証方針を取得できる
 - **本文 verbatim**: Root Case 本文、Issue 本文は Custom Tool `agentdev_gh` の操作引数としてそのまま渡す（文字コード・一時ファイルの実装詳細は Tool 内部）（`POL-gh-io-delegation`）
 - **Issue 本文のファイル経由扱い**: 長文本文は一時ファイル経由で構成し、Markdown 行構造（LF、セクション間空行、インデント）を保持する
+- **QG-2 判定の実行と記録**: 検証ゲート（STEP-6）で QG-2（Acceptance Criteria Coverage）の判定を実行する。判定基準と検査観点は `agentdev-quality-gates` の QG-2 reference が所有する。観点6（数値閾値到達可能性検証）には、その案件が作る・変更する成果物との整合性の確認（完了条件の検証手順に書かれた grep 系のコマンドを、確定済みの成果物に対して事前に実行する検査を含む）を含める。判定の結果は工程の記録コメント（または報告 JSON）へ残し、判定が実行されなかった場合は case-ready を完了として扱わない（観点1〜5・7〜9 の機械化は対象外）
 
 ## See Also
 

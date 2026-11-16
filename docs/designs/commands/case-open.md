@@ -246,7 +246,7 @@ case-open が使用する検査ツール（[integrity-contracts.md](../integrity
 ### 挿入位置（REQ-015-009）
 
 review 挿入位置は「Root Case 本文候補と Definition Package 構成案確定後・最初の GitHub Issue 作成（Root Case 作成）前」である。
-REQ-030 への縮小に伴い、かつて case-open が構成していた execution structure（Epic / Wave / Issue 構成）と完了条件（QG-2 検証）は case-ready へ移管済みであるため、review 対象は case-open が現に構成する2者である。
+REQ-030 への縮小に伴い、かつて case-open が構成していた execution structure（Epic / Wave / Issue 構成）と完了条件（QG-2 検証）の配置は case-ready に確定している（QG-2 の配置の正は v4-quality-gate-model Design と agentdev-quality-gates の QG-2 reference の配置の表。2026-11-17 の利用者判断）。そのため review 対象は case-open が現に構成する2者である。
 
 ### 発動条件判定 Step（REQ-015-001、REQ-015-002、REQ-015-003）
 
