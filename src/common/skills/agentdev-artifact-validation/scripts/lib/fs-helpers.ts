@@ -13,12 +13,6 @@ export function reqNumberFromFilename(filename: string): number | null {
   return m && m[1] ? parseInt(m[1], 10) : null;
 }
 
-/** ファイル名 `ADR-NNNN.md` から番号を取り出す。 */
-export function adrNumberFromFilename(filename: string): number | null {
-  const m = /^ADR-(\d{4})\.md$/.exec(filename);
-  return m && m[1] ? parseInt(m[1], 10) : null;
-}
-
 /** ファイル名 `DEC-NNN.md`（3桁ゼロ埋め）から番号を取り出す。 */
 export function decisionNumberFromFilename(filename: string): number | null {
   const m = /^DEC-(\d{3})\.md$/.exec(filename);

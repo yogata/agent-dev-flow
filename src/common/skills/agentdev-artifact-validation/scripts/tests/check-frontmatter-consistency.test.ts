@@ -55,22 +55,6 @@ Body`;
     expect(result.issues.frontmatterId).toBeNull();
   });
 
-  test("ok when ADR filename matches frontmatter id", () => {
-    // ADR shares the 4-digit format with REQ. Extract the padded number
-    // from the production REQ formatter and apply the ADR prefix.
-    const numPart = formatReqId(1128).slice(4);
-    const filename = `ADR-${numPart}.md`;
-    const content = `---
-id: ADR-${numPart}
-title: "Decision"
----
-
-# Body`;
-    const result = checkSingleFile(filename, content, "adr");
-    expect(result.ok).toBe(true);
-    expect(result.issues.filenameNumber).toBe(1128);
-  });
-
   test("ok when DEC filename matches frontmatter id (3-digit)", () => {
     const id = formatDecisionId(7);
     const filename = `${id}.md`;

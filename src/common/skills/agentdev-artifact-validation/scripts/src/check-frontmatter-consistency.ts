@@ -6,13 +6,13 @@
  *
  * I/O:
  *   入力: argv[2] = 検証対象ディレクトリパス
- *         argv[3] = kind（"req" | "adr" | "decision"、デフォルト: ファイル名から推定）
+ *         argv[3] = kind（"req" | "decision"、デフォルト: ファイル名から推定）
  *   出力: stdout に JSON { ok: boolean, errors: string[], warnings: string[] }
  *   エラー時: ok: false, errors に理由。致命的I/Oエラーは非ゼロ終了コード + stderr
  */
 
-import { listMarkdownFiles, joinPath, readFileContent, reqNumberFromFilename, adrNumberFromFilename, decisionNumberFromFilename } from "../lib/fs-helpers.ts";
-import { parseFrontmatter, extractReqNumber, extractAdrNumber, extractDecisionNumber } from "../lib/frontmatter.ts";
+import { listMarkdownFiles, joinPath, readFileContent, reqNumberFromFilename, decisionNumberFromFilename } from "../lib/fs-helpers.ts";
+import { parseFrontmatter, extractReqNumber, extractDecisionNumber } from "../lib/frontmatter.ts";
 import { emitJson, emitError } from "../lib/result.ts";
 
 export type ConsistencyIssue = {
@@ -26,14 +26,12 @@ export type ConsistencyIssue = {
 export function checkSingleFile(
   filename: string,
   content: string,
-  kind: "req" | "adr" | "decision",
+  kind: "req" | "decision",
 ): { ok: boolean; issues: ConsistencyIssue } {
   const filenameNumber =
     kind === "req"
       ? reqNumberFromFilename(filename)
-      : kind === "adr"
-        ? adrNumberFromFilename(filename)
-        : decisionNumberFromFilename(filename);
+      : decisionNumberFromFilename(filename);
   const fm = parseFrontmatter(content);
   const frontmatterId = fm?.id ?? null;
   let frontmatterNumber: number | null = null;
@@ -41,9 +39,7 @@ export function checkSingleFile(
     frontmatterNumber =
       kind === "req"
         ? extractReqNumber(frontmatterId)
-        : kind === "adr"
-          ? extractAdrNumber(frontmatterId)
-          : extractDecisionNumber(frontmatterId);
+        : extractDecisionNumber(frontmatterId);
   }
 
   const ok =
@@ -64,12 +60,12 @@ export function checkSingleFile(
 
 async function main(): Promise<void> {
   const dir = process.argv[2];
-  const kind = (process.argv[3] as "req" | "adr" | "decision" | undefined) ?? "req";
+  const kind = (process.argv[3] as "req" | "decision" | undefined) ?? "req";
   if (!dir) {
-    emitError("Usage: check-frontmatter-consistency <dir> [req|adr|decision]");
+    emitError("Usage: check-frontmatter-consistency <dir> [req|decision]");
   }
-  if (kind !== "req" && kind !== "adr" && kind !== "decision") {
-    emitError(`kind must be "req", "adr", or "decision", got: ${kind}`);
+  if (kind !== "req" && kind !== "decision") {
+    emitError(`kind must be "req" or "decision", got: ${kind}`);
   }
 
   const files = listMarkdownFiles(dir!);
@@ -77,11 +73,10 @@ async function main(): Promise<void> {
   const warnings: string[] = [];
 
   for (const filename of files) {
-    // REQ/ADR/DEC 以外の .md（README.md 等）はスキップ。
+    // REQ/DEC 以外の .md（README.md 等）はスキップ。
     // REQ の受理は桁数上限なし（各セグメント最小1桁）。
     const isTarget =
       (kind === "req" && /^REQ-\d+\.md$/.test(filename)) ||
-      (kind === "adr" && /^ADR-\d{4}\.md$/.test(filename)) ||
       (kind === "decision" && /^DEC-\d{3}\.md$/.test(filename));
     if (!isTarget) continue;
 
@@ -89,9 +84,9 @@ async function main(): Promise<void> {
     const result = checkSingleFile(filename, content, kind);
     if (!result.ok) {
       const i = result.issues;
-      const prefix = kind === "req" ? "REQ" : kind === "adr" ? "ADR" : "DEC";
+      const prefix = kind === "req" ? "REQ" : "DEC";
       // 期待表示は numbering-policy の最小幅ゼロ埋め（REQ は pad3 最小幅。切詰めなし）。
-      const width = kind === "req" ? 3 : kind === "adr" ? 4 : 3;
+      const width = 3;
       const expected = i.filenameNumber !== null ? `${prefix}-${String(i.filenameNumber).padStart(width, "0")}` : "(no filename number)";
       errors.push(
         `${filename}: frontmatter id "${i.frontmatterId ?? "(missing)"}" does not match expected "${expected}"`,
