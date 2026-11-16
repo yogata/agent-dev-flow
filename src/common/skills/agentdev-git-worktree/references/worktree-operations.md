@@ -215,7 +215,7 @@ worktree 内から `.opencode/skills/agentdev-*` 配下の script を直接実�
 bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts --workflow case-run --root <worktree 絶対パス> --files src/common/skills/agentdev-git-worktree/references/worktree-operations.md --json
 
 # traceability check（--root 必須。--req は対象要件行 ID のカンマ区切り個別指定のみ。.. 範囲構文は非対応）
-bun .opencode/skills/agentdev-traceability/scripts/src/check.ts --root <worktree 絶対パス> --req REQ-{NNNN}-{MMM}
+bun src/common/skills/agentdev-traceability/scripts/src/check.ts --root <worktree 絶対パス> --req REQ-{NNNN}-{MMM}
 
 # textlint final gate（plugins 系 gate。src 側原本の main root 実体から起動し、検査対象 root に worktree を指定。対応引数は --root と --json）
 bun run src/opencode/plugins/agentdev-textlint-guard/gate.ts --root <worktree 絶対パス>
