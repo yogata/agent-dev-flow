@@ -2,7 +2,7 @@
 title: "IR-055: runtime-unresolved-reference（配布物内の導入先未解決参照検出）"
 status: accepted
 created: 2026-08-20
-updated: 2026-10-05
+updated: "2026-11-16"
 detection_method_class: machine-check
 implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
 verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts

@@ -2,7 +2,7 @@
 title: case-close Design
 status: accepted
 created: 2026-06-21
-updated: "2026-11-11"
+updated: "2026-11-17"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-018, REQ-021-019, REQ-021-022, REQ-021-025 -->
@@ -20,6 +20,7 @@ updated: "2026-11-11"
 <!-- ADF-COVERS(design): REQ-032-031, REQ-032-032, REQ-032-033, REQ-032-034, REQ-032-035, REQ-032-036, REQ-032-037, REQ-032-038, REQ-032-039 -->
 <!-- ADF-COVERS(design): REQ-053-045, REQ-053-046（保存済み検証証跡の解析と再実行条件の適用節が close 最終検査実行義務境界の design 実体） -->
 <!-- ADF-COVERS(design): REQ-032-040, REQ-032-041（QG-4 file-level split 標準化と bun 版更新時再検証の実行構成設計） -->
+<!-- ADF-COVERS(design): REQ-030-032 -->
 
 # case-close Design
 
@@ -167,6 +168,13 @@ Epic Issue 本文の `## 完了条件` セクションを読み込み、全完�
 - 再実行の正当理由（変更後検証、環境変更、失敗由来分類、非決定的失敗の再現確認、必須独立検査、証跡欠落）と証跡の必須要素の正は agentdev-quality-gates Design「QG-4 検証証拠の再利用と再実行条件」が所有し、本 Design は再規定しない
 - close の最終検証（full integrity suite、配布物変更を含む case の3検査結果確認、QG-4 checker 実測）は origin/main 取り込み済み・マージ直前の branch HEAD で実行する既存契約を維持し、case-run の保存結果だけによる省略を行わない。verify-only closure の SSoT コメント参照判定も維持する
 - textlint 共通基盤によるファイル単位結果の再利用（同一性条件付きの規則実行省略）は検査基盤内部の実行形態であり、close の最終検査の実行義務の省略を構成しない。close の最終検査は対象全件の列挙・全文取得と現在入力との照合を伴う検査基盤の実行を毎回行い、その内部で同一性が機械検証できた対象の規則実行省略が許容される
+
+#### traceability の門の対象 REQ 行 0 件案件の正規経路と前提の検証順序（REQ-030-032）
+
+traceability の門の、対象 REQ 行が0件の案件の正規の経路と、前提の検証の順序を Design へ反映する。
+
+- 対象 REQ 行が0件の案件の case-close 機械工程における正規の経路は、全体の実行と main の baseline との対照による悪化 0 件の機械証明とする（2026-11-16 の Case #4113 で手で書いた wrapper と同等の役割を正規の実装として提供し、手で書く wrapper を不要にする）。既知の欠落は main の baseline と識別子の集合で完全一致するかぎり不合格の原因にしない。新規の違反を検出する力は維持する（正例・反例の双方で確認する）
+- 機械工程の各 phase で、案件の構成と入力の前提の検証を全試験の起動より先に実行し、前提が満たされない失敗が早い段階で確定する順序にする。実行する検査の総数は減らさない（検査の省略ではなく、失敗を検出する順序の是正）
 
 #### verify-only closure の QG-4 達成判定（SSoT コメント参照）
 

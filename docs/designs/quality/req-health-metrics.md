@@ -2,7 +2,7 @@
 title: REQ 健全性メトリクス
 status: accepted
 created: 2026-08-20
-updated: "2026-11-15"
+updated: "2026-11-17"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-044 -->
 
@@ -108,7 +108,7 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 | REQ-096 | 34 | +0 |  |
 | REQ-036 | 33 | +0 |  |
 | REQ-111 | 33 | +0 |  |
-| REQ-030 | 31 | +0 |  |
+| REQ-030 | 32 | +0 |  |
 | REQ-103 | 31 | +0 |  |
 | REQ-005 | 30 | +0 |  |
 | REQ-108 | 30 | +0 |  |
@@ -122,11 +122,11 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 | REQ-099 | 20 | +0 |  |
 | REQ-101 | 19 | +0 |  |
 | REQ-052 | 18 | +0 |  |
+| REQ-029 | 17 | +0 |  |
 | REQ-041 | 17 | +0 |  |
 | REQ-114 | 17 | +0 |  |
 | REQ-007 | 16 | +0 |  |
 | REQ-014 | 16 | +0 |  |
-| REQ-029 | 16 | +0 |  |
 | REQ-048 | 16 | +0 |  |
 | REQ-050 | 16 | +0 |  |
 | REQ-106 | 16 | +0 |  |
@@ -171,7 +171,7 @@ SPLIT シグナルは `agentdev-req-structure-diagnostics` スキルの推奨ア
 | REQ-113 | 2 | +0 |  |
 | REQ-121 | 1 | +0 |  |
 
-計測日: 2026-11-15。
+計測日: 2026-11-17。
 <!-- AUTOGEN:END -->
 
 要件行数は要件テーブル行のみをカウント（目的、適用範囲セクションの散文は除外）。

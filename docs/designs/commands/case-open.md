@@ -2,7 +2,7 @@
 title: case-open Design
 status: accepted
 created: 2026-06-21
-updated: "2026-11-11"
+updated: "2026-11-17"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-004, REQ-030-005, REQ-030-006, REQ-030-007, REQ-030-008, REQ-030-009, REQ-030-010, REQ-030-011, REQ-030-015 -->
@@ -17,6 +17,7 @@ updated: "2026-11-11"
 <!-- ADF-COVERS(design): REQ-030-019, REQ-030-020, REQ-030-021, REQ-030-024 -->
 <!-- ADF-COVERS(design): REQ-083-002, REQ-083-003 -->
 <!-- ADF-COVERS(design): REQ-029-014, REQ-029-015, REQ-029-016 -->
+<!-- ADF-COVERS(design): REQ-029-017 -->
 
 # case-open Design
 
@@ -107,6 +108,13 @@ script 呼び出しによる Definition 適用の後、設計PR作成の前に�
 - producer 固有のゲート（generate_indexes、check_integrity、traceability-check 等）を必須とする場合、script は当該ゲート実行体の配布先での存在を検査してから起動する。欠落時は fail-closed で報告し、正規の代替経路（証跡化、手動相当手順、対照実行による悪化ゼロ件の機械証明）への切替を報告 JSON に含める。代替経路の履行なしに検査を省略して成功扱いとしない
 - 横断依存検査（inspect_cross_dependencies.ts）の `--root` 等のパス引数は、Windows と Unix 系 shell のパス形式の違い（Git Bash の `/c/...` 形式等）を検出または正規化して受け付ける。正規化不能な形式は検査不能（detection_unavailable）として通過させず、形式エラーとして報告し、形式の違いだけで検出不能とならない
 - 本節の規律は case-ready、case-close の機械工程 script 呼び出しにも同一に適用される（各 Design の既有の同一規律参照を維持する）
+
+#### 対象 REQ 行が0件の案件の正規の入力構成と前提の検証の順序（REQ-029-017）
+
+機械工程の入力構成と前提の検証の順序（全試験の前に案件の構成・入力の検証）を Design へ反映する。
+
+- 対象 REQ 行が0件の案件（Decision のみの作成・変更など）を正当な案件の構成として扱う。機械工程の入力検証に、REQ 行の変更を伴わない案件の正規の入力構成（対象の集合が空であることを明示したうえでの、全体を対象とする検査の mode）を加える。既存の代替経路（REQ-029-014〜016）は救済として維持し、正規の入力構成の追加をもって廃止しない
+- 検査の前提を、高価な全試験の前に確認する。機械工程の各 phase で、案件の構成と入力の前提の検証を全試験の起動より先に実行し、前提が満たされない失敗が早い段階で確定する順序にする。実行する検査の総数は減らさない（検査の省略ではなく、失敗を検出する順序の是正）
 
 ### 検査入力と実行証拠の接続
 
