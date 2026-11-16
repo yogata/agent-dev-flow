@@ -196,3 +196,18 @@
 - **関連**: Case #4117（close 実行・工程記録コメント検証差分）・PR #4120（非接触確認）
 - **タグ**: `#bun-test` `#windows` `#間欠fail` `#case-close`
 
+## 終了判定記録の post-merge 回収は追跡化（commit）ではなく削除で行う
+
+- **問題事象**: 終了判定記録 `.agentdev/close-acceptance/issue-{N}.json` が post-merge の回収（明示パス削除）ではなく恒久 commit として main へ追跡登録された（Case #4117・commit 43fc9b812）。SKILL 契約は同記録を「恒久 commit 対象の契約状態記録ではなく一時保護記録（機械工程が書き出し、post-merge reclamation で回収）」と定める
+- **発生局面**: Root Case #4117 の case-close STEP-6（reclamation）
+- **検知方法**: 再開実行が durable state を照合（`git ls-files .agentdev/close-acceptance/` で追跡検出。#4113 まで同領域は追跡対象外で回収済みの対照）
+- **根本原因**: 回収手順（実在確認→証拠退避→明示パス削除→不存在確認）と IR-073 untracked-residue の解消（追跡化で NG を消す）の混同
+- **自律対応内容**: 証拠退避（git 履歴 43fc9b812 に内容保存済み・完了記録コメント参照・tmp 証跡コピー close-close-acceptance-record-final.json）のうえ `git rm` で削除（commit d2041231c）し不存在を確認した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 回収対象の一時記録の NG 解消は「追跡化」ではなく「削除」で行う。追跡化は一時保護記録の恒久化であり契約違反になる
+- **再発条件**: 機械工程 post-merge runner が deleteFile を提供しない構成（scripts/README.md の機構整理候補）で手動回収を置き換えた場合
+- **予防策候補**: runner への deleteFile 注入（既存の機構整理候補と同一）と、回収前の `git ls-files` による追跡状態確認の工程追加
+- **想定反映先**: src/common/skills/agentdev-workflow-case-close/scripts（runner deleteFile 注入）・scripts/README.md 回収手順
+- **関連**: Case #4117・Case #4084・Case #4113
+- **タグ**: `#case-close` `#reclamation` `#close-acceptance`
