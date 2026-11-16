@@ -68,3 +68,19 @@
 - **想定反映先**: src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts（validateInput・validateTraceabilityReqIds）
 - **関連**: Case #4113・PR #4114・REQ-029-014〜016・REQ-030-028
 - **タグ**: `#機械工程` `#case-open` `#traceability`
+
+## case-ready 受入検査で check_integrity の new unmanaged NG が後続ゲート抑止し対照実行で代替した
+
+- **問題事象**: Root Case #4113 の case-ready 受入検査（acceptance-checks phase・accept_definition_checks.ts）で check_integrity --profile source が exit 1（req-updated-freshness NG・docs/designs/integrity/rules/IR-055-runtime-unresolved-reference.md・frontmatter updated 2026-10-05 vs 内容変更 commit date 2026-11-16）となり、script の後続抑止で overlap・generate_indexes・traceability の3ゲートが未実行になった。NG 対象ファイルは本 PR 差分外であり、PR #4103（b1b4cbddb・2026-11-16）の IR 規則メタデータ是正で内容変更した際に frontmatter updated を変更日へ追随させなかった既存債務の顕在化。baseline 未登録（new unmanaged NG・delta）のため既知債務扱いにならず exit 1 の駆動源になった
+- **発生局面**: Definition 受入（case-ready STEP-1 機械工程・worktree HEAD 0a79bc51 での script 呼び出し）
+- **検知方法**: script 報告 JSON の definition-acceptance-checks step fail と stderr の「1 new unmanaged NG (delta, exit code driver)」、および報告内 NG 詳細の req-updated-freshness 行
+- **根本原因**: PR #4103 が docs/designs/integrity/rules/IR-055-runtime-unresolved-reference.md の本文を変更しながら frontmatter updated を変更日へ進めていなかった（IR-072 違反の新規顕在化）。case-open の対照実行（main HEAD bb89a0a8b）時点では顕在化前であり、HEAD 進行後に NG が現れた。case-open 証跡の IR-027 baseline-known NG は今回の実行では baseline 進行により info 化しており、NG の構成が入れ替わっていた
+- **自律対応内容**: 現行 main HEAD（697de153f）で check_integrity 対照実行を実行し、同一ファイル・同一内容の NG 1件が出ることを機械確認（本変更起因の悪化 0件・REQ-029-014〜016 の正規代替経路）。残り3ゲート（generate_indexes 再生成差分・overlap 突合・traceability check コーパス全体）を手動相当手順で実行し証跡を保存した
+- **ユーザー確認有無**: なし（対照実行による悪化ゼロ件の機械証明で受入判断を正規契約から導出）
+- **Decision/REQ/spec影響**: なし（IR-055-runtime-unresolved-reference.md の freshness 債務は残置。是正は REQ-117 系の docs 整合是正へ接続）
+- **横展開観点**: case-ready 受入検査は merge 前の worktree HEAD で実行されるため、case-open 対照実行時の main HEAD と現在 main HEAD の間で baseline 状態が進行していると NG 構成が入れ替わり得る。受入判断は「script 終了コード」ではなく「本変更起因の新規無管理違反の有無（対照実行）」で確定する
+- **再発条件**: case-open と case-ready の間で main HEAD が進行し、その進行に含まれる docs 内容変更が frontmatter updated を追随させていない場合
+- **予防策候補**: case-open の機械工程に「対照実行時の main HEAD で新規未管理 NG を検出したら baseline 登録または是正を完了させる」手順を追加する。IR-072 対象ファイルの freshness 是正は REQ-117 系で一括是正する
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts（対照実行 step）・docs/designs/integrity/rules/IR-055-runtime-unresolved-reference.md（updated 是正）
+- **関連**: Case #4113・PR #4114・PR #4103・REQ-029-014〜016・docs/designs/integrity/rules/IR-072-req-updated-freshness.md
+- **タグ**: `#ci` `#機械工程` `#case-ready`
