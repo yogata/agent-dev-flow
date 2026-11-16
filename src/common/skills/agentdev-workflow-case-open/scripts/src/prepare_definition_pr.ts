@@ -22,7 +22,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { spawnSync } from "node:child_process";
-import { consumeDefinitionTraceability, isReqRowId, REQ_ROW_ID_LIST_PATTERN, type DeferredObligation } from "../lib/definition-traceability-gate.ts";
+import { consumeDefinitionTraceability, consumeDefinitionTraceabilityWholeScope, isReqRowId, REQ_ROW_ID_LIST_PATTERN, type DeferredObligation } from "../lib/definition-traceability-gate.ts";
 import {
   buildGateEvidence,
   buildKnownGateArgContracts,
@@ -264,9 +264,11 @@ export function validateInput(value: unknown): PrepareDefinitionPrInput {
  * 判定対象 REQ 集合（traceabilityReqIds）の存在・有効性を実行前に検証する（fail-closed）。
  * 書式検証は桁数を固定しない許容書式（traceability checker 契約と同じ REQ-{NNNN}-{MMM}
  * 形式）で行い、producer 固有の追加制約（reqRowIdPattern の設定値）が与えられた場合は
- * 許容書式の範囲内の追加照合として適用する。欠落・空・形式不正・gate 実行範囲
- * （--req 指定）との不整合は、検査や worktree 操作を開始せず MechanicalInputError で
- * 拒否する。空配列への暗黙正規化は行わない。
+ * 許容書式の範囲内の追加照合として適用する。欠落・形式不正・gate 実行範囲（--req 指定）
+ * との不整合は、検査や worktree 操作を開始せず MechanicalInputError で拒否する。
+ * 空配列への暗黙正規化は行わない。空配列の明示（対象 REQ 行 0 件案件の
+ * 正規の入力構成）は受理し、全体を対象とする検査（gate spec の --req 不在）を
+ * 要求する。既存の代替経路の受理挙動は変更しない。
  */
 function validateTraceabilityReqIds(
   value: unknown,
@@ -278,7 +280,11 @@ function validateTraceabilityReqIds(
   }
   const reqIds = value as readonly unknown[];
   if (reqIds.length === 0) {
-    fail("input.traceabilityReqIds must be a non-empty array");
+    const gateReqScope = extractFlagValue(traceabilityGate.args, "--req");
+    if (gateReqScope !== null) {
+      fail(`input.traceabilityReqIds declares an empty target set (zero-target regular mode) but the traceability gate execution is scoped (--req: ${gateReqScope}); the zero-target regular mode requires a whole-scope traceability gate execution (--req absent)`);
+    }
+    return;
   }
   const producerPattern = compileProducerReqRowIdPattern(reqRowIdPattern);
   for (const id of reqIds) {
@@ -745,12 +751,15 @@ export function runPrepareDefinitionPr(
     }
 
     if (input.traceabilityGate) {
+      const zeroTargetRegularMode = (input.traceabilityReqIds ?? []).length === 0;
       const check = runSpec(runner, input.traceabilityGate);
-      const consumption = consumeDefinitionTraceability({
-        exitCode: check.exitCode,
-        stdout: check.stdout,
-        targetReqIds: input.traceabilityReqIds ?? [],
-      });
+      const consumption = zeroTargetRegularMode
+        ? consumeDefinitionTraceabilityWholeScope({ exitCode: check.exitCode, stdout: check.stdout })
+        : consumeDefinitionTraceability({
+          exitCode: check.exitCode,
+          stdout: check.stdout,
+          targetReqIds: input.traceabilityReqIds ?? [],
+        });
       const deferred = consumption.deferredObligations;
       const status = consumption.status;
       deferredTraceabilityObligations = deferred;
@@ -759,6 +768,7 @@ export function runPrepareDefinitionPr(
         status,
         detail: {
           summary: consumption.summary,
+          mode: zeroTargetRegularMode ? "zero-target-whole-scope" : "target-scope",
           reqIds: input.traceabilityReqIds ?? [],
           deferredObligations: deferred,
           ...buildGateEvidence(input.traceabilityGate, check, head),
@@ -788,7 +798,9 @@ export function runPrepareDefinitionPr(
     "",
     "- generate_indexes / check_integrity: 本 script 実行内で成功",
     deferredTraceabilityObligations.length === 0
-      ? "- traceability stage gate: 対象 REQ の Design 対応と構造・policy 検査に合格"
+      ? (input.traceabilityReqIds ?? []).length === 0
+        ? "- traceability stage gate: 対象 REQ 行 0 件の正規の入力構成（対象の集合が空であることの明示 + 全体を対象とする検査）で構造・policy 検査に合格"
+        : "- traceability stage gate: 対象 REQ の Design 対応と構造・policy 検査に合格"
       : `- traceability stage gate: Design 対応と構造・policy 検査に合格。checker の missing-implementation / missing-verification は raw fail のまま case-run / case-close へ deferred: ${deferredTraceabilityObligations.map((obligation) => `${obligation.check} (${obligation.reqIds.join(", ")})`).join("; ")}`,
   ].join("\n");
 

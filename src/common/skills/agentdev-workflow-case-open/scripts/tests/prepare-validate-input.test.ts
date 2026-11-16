@@ -39,6 +39,18 @@ describe("runValidateInputOnly (verification-only entry)", () => {
     expect(report.gateAvailability.missing).toHaveLength(0);
   });
 
+  test("ok: true for the zero-target regular input configuration (explicit empty target set + whole-scope gate)", () => {
+    const fixture = consumerFixture();
+    const zeroTarget: PrepareDefinitionPrInput = {
+      ...fixture,
+      traceabilityReqIds: [],
+      traceabilityGate: mk("traceability-check", [gateScript, "--root", cwd]),
+    };
+    const outcome = runValidateInputOnly(zeroTarget, () => true);
+    expect(outcome.ok).toBe(true);
+    expect((outcome.report as { gateAvailability: { missing: unknown[] } }).gateAvailability.missing).toHaveLength(0);
+  });
+
   test("ok: false and missing gate names when a gate executable is absent", () => {
     const outcome = runValidateInputOnly(consumerFixture(), () => false);
     expect(outcome.ok).toBe(false);

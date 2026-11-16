@@ -87,6 +87,8 @@ function fakeRunner(overrides: {
   previousAcceptanceRecord?: string;
   acceptanceRecordIssueNumber?: number;
   missingPaths?: readonly string[];
+  traceabilityStdout?: string;
+  traceabilityExitCode?: number;
 } = {}): MechanicalRunner & {
   calls: { command: string; args: readonly string[]; cwd: string }[];
   writes: { absolutePath: string; content: string }[];
@@ -146,6 +148,10 @@ function fakeRunner(overrides: {
       }
       if (spec.args.includes("check_autogen_freshness")) {
         result.stdout = JSON.stringify({ compared: 4, changed: 0 });
+      }
+      if (spec.args.includes("traceability-check")) {
+        result.stdout = overrides.traceabilityStdout ?? "";
+        result.exitCode = overrides.traceabilityExitCode ?? 0;
       }
       for (const [gateName, exitCode] of Object.entries(overrides.integrityExitCodes ?? {})) {
         if (spec.args.includes(gateName)) result.exitCode = exitCode;
@@ -1154,6 +1160,286 @@ describe("pre-merge 機械工程の実行（品質ゲート省略なし・報告
       (c) => c.command === "bun" && c.cwd === "<repo>/.worktrees/100-case",
     );
     expect(traceCall).toBeDefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 対象 REQ 行 0 件案件の traceability の門の正規経路（REQ-030-032・TS-002/TS-003）
+// ---------------------------------------------------------------------------
+
+const WHOLE_SCOPE_CHECK_KINDS = [
+  "malformed-declarations",
+  "unknown-roles",
+  "unknown-req-refs",
+  "invalid-artifact-paths",
+  "missing-design",
+  "missing-implementation",
+  "missing-verification",
+  "policy-invalid",
+  "duplicate-inconsistencies",
+  "malformed-links",
+  "dangling-links",
+  "derived-declaration-conflicts",
+] as const;
+
+type WholeScopeCheckOverride = {
+  readonly status: "pass" | "fail";
+  readonly findings: readonly { reqId?: string }[];
+};
+
+/** 全体を対象とする検査（--req 指定なし）の checker 報告。completenessScope は実 checker の全体実行出力と同じ文字列 "all"。 */
+function wholeScopeTraceabilityReport(
+  overrides: Partial<Record<(typeof WHOLE_SCOPE_CHECK_KINDS)[number], WholeScopeCheckOverride>> = {},
+): string {
+  const checks = Object.fromEntries(
+    WHOLE_SCOPE_CHECK_KINDS.map((kind) => [
+      kind,
+      { kind, ...(overrides[kind] ?? { status: "pass", findings: [] }) },
+    ]),
+  );
+  const results = Object.values(checks) as { status: string }[];
+  const failCount = results.filter((result) => result.status === "fail").length;
+  return JSON.stringify({
+    checks,
+    summary: { pass: results.length - failCount, fail: failCount },
+    completenessScope: "all",
+    verificationPolicyUnavailable: false,
+    structuralOnly: true,
+  });
+}
+
+// main baseline の既知欠落（対照基準の識別子集合）。実 corpus の REQ 行IDのリテラルは
+// 書かずプレースホルダで構築する（具体参照排除 RA-003・TS-004）。
+const BASELINE_IMPL_IDS = ["REQ-1000-001", "REQ-1000-002", "REQ-1000-003"];
+const BASELINE_VERIF_IDS = ["REQ-1000-001", "REQ-1000-002", "REQ-1000-003", "REQ-2000-001"];
+
+function knownMissingBaseline(): { missingImplementation: string[]; missingVerification: string[] } {
+  return {
+    missingImplementation: [...BASELINE_IMPL_IDS],
+    missingVerification: [...BASELINE_VERIF_IDS],
+  };
+}
+
+function zeroTargetTraceabilityGate(): GateCommandSpec {
+  return {
+    name: "traceability-check",
+    command: "bun",
+    args: ["./checker.ts", "traceability-check", "--root", "<repo>/.worktrees/100-case"],
+    cwd: "<repo>/.worktrees/100-case",
+    timeoutMs: 60000,
+  };
+}
+
+function zeroTargetInput(overrides: Partial<CloseMechanicalInput> = {}): CloseMechanicalInput {
+  return preMergeInput({
+    traceabilityReqIds: [],
+    traceabilityKnownMissingBaseline: knownMissingBaseline(),
+    traceabilityGate: zeroTargetTraceabilityGate(),
+    ...overrides,
+  });
+}
+
+describe("対象 REQ 行 0 件案件の traceability の門の正規経路（REQ-030-032）", () => {
+  test("正例: 既知の欠落のみ（main baseline と識別子の集合が完全一致）の全体実行で wrapper なしに合格する（TS-002）", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      traceabilityExitCode: 2,
+      traceabilityStdout: wholeScopeTraceabilityReport({
+        "missing-implementation": {
+          status: "fail",
+          findings: BASELINE_IMPL_IDS.map((reqId) => ({ reqId })),
+        },
+        "missing-verification": {
+          status: "fail",
+          findings: BASELINE_VERIF_IDS.map((reqId) => ({ reqId })),
+        },
+      }),
+    });
+    const report = runCloseMechanicalSteps(
+      zeroTargetInput({ acceptanceVerdicts: [soundPass(CID1)] }),
+      runner,
+    );
+    const step = report.result.steps.find((s) => s.name === "traceability-check");
+    expect(step?.status).toBe("pass");
+    expect(step?.detail.mode).toBe("zero-target-baseline-contrast");
+    expect(report.result.exitCategory).toBe("success");
+    expect(isCloseOperationPermitted(report)).toEqual({ permitted: true });
+  });
+
+  test("正例: baseline の部分集合（既知欠落の改善）は新規違反 0 件として不合格にしない", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      traceabilityExitCode: 2,
+      traceabilityStdout: wholeScopeTraceabilityReport({
+        "missing-implementation": {
+          status: "fail",
+          findings: BASELINE_IMPL_IDS.slice(1).map((reqId) => ({ reqId })),
+        },
+        "missing-verification": {
+          status: "fail",
+          findings: BASELINE_VERIF_IDS.slice(1).map((reqId) => ({ reqId })),
+        },
+      }),
+    });
+    const report = runCloseMechanicalSteps(
+      zeroTargetInput({ acceptanceVerdicts: [soundPass(CID1)] }),
+      runner,
+    );
+    expect(report.result.steps.find((s) => s.name === "traceability-check")?.status).toBe("pass");
+    expect(report.result.exitCategory).toBe("success");
+  });
+
+  test("反例: baseline 外の識別子（新規の違反）の注入で不合格になる（TS-002・検出能力の維持）", () => {
+    const injectedId = ["REQ", "3000", "001"].join("-");
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      traceabilityExitCode: 2,
+      traceabilityStdout: wholeScopeTraceabilityReport({
+        "missing-implementation": {
+          status: "fail",
+          findings: BASELINE_IMPL_IDS.map((reqId) => ({ reqId })),
+        },
+        "missing-verification": {
+          status: "fail",
+          findings: [...BASELINE_VERIF_IDS, injectedId].map((reqId) => ({ reqId })),
+        },
+      }),
+    });
+    const report = runCloseMechanicalSteps(
+      zeroTargetInput({ acceptanceVerdicts: [soundPass(CID1)] }),
+      runner,
+    );
+    const step = report.result.steps.find((s) => s.name === "traceability-check");
+    expect(step?.status).toBe("fail");
+    expect(String((step?.detail as { summary?: string }).summary)).toContain(injectedId);
+    expect(report.warnings.join("\n")).toContain(
+      `new traceability violation against the main baseline (missing-verification): ${injectedId}`,
+    );
+    expect(report.result.exitCategory).toBe("failure");
+    expect(decideExitCode(report)).toBe(1);
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
+  });
+
+  test("反例: baseline にない missing-design の出現で不合格になる（baseline は missing 系のみ既知欠落）", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      traceabilityExitCode: 2,
+      traceabilityStdout: wholeScopeTraceabilityReport({
+        "missing-implementation": {
+          status: "fail",
+          findings: BASELINE_IMPL_IDS.map((reqId) => ({ reqId })),
+        },
+        "missing-verification": {
+          status: "fail",
+          findings: BASELINE_VERIF_IDS.map((reqId) => ({ reqId })),
+        },
+        "missing-design": {
+          status: "fail",
+          findings: [{ reqId: ["REQ", "3000", "002"].join("-") }],
+        },
+      }),
+    });
+    const report = runCloseMechanicalSteps(
+      zeroTargetInput({ acceptanceVerdicts: [soundPass(CID1)] }),
+      runner,
+    );
+    expect(report.result.steps.find((s) => s.name === "traceability-check")?.status).toBe("fail");
+    expect(report.warnings.join("\n")).toContain("new traceability violation against the main baseline: missing-design");
+    expect(report.result.exitCategory).toBe("failure");
+  });
+
+  test("反例: 新規の構造違反（dangling-links）の注入で不合格になる", () => {
+    const runner = fakeRunner({
+      issueBody: "- [x] 条件1\n",
+      traceabilityExitCode: 2,
+      traceabilityStdout: wholeScopeTraceabilityReport({
+        "missing-implementation": {
+          status: "fail",
+          findings: BASELINE_IMPL_IDS.map((reqId) => ({ reqId })),
+        },
+        "missing-verification": {
+          status: "fail",
+          findings: BASELINE_VERIF_IDS.map((reqId) => ({ reqId })),
+        },
+        "dangling-links": { status: "fail", findings: [{}] },
+      }),
+    });
+    const report = runCloseMechanicalSteps(
+      zeroTargetInput({ acceptanceVerdicts: [soundPass(CID1)] }),
+      runner,
+    );
+    expect(report.result.steps.find((s) => s.name === "traceability-check")?.status).toBe("fail");
+    expect(report.warnings.join("\n")).toContain("non-deferrable traceability check failed: dangling-links");
+    expect(report.result.exitCategory).toBe("failure");
+  });
+
+  test("前提が欠けた構成（baseline 未提供）は全試験の起動より前に確定する（TS-003・#4113 の全試験後の失敗を起こさない）", () => {
+    const base = zeroTargetInput() as unknown as Record<string, unknown>;
+    const broken = { ...base, traceabilityKnownMissingBaseline: undefined };
+    expect(() => validateInput(broken)).toThrow(/traceabilityKnownMissingBaseline is required/);
+    // 実行経路でも gate 起動前に前提違反で確定する（full-integrity-suite を含む全試験を起動しない）
+    const runner = fakeRunner({ issueBody: "- [x] 条件1\n" });
+    expect(() =>
+      runCloseMechanicalSteps(
+        { ...zeroTargetInput(), traceabilityKnownMissingBaseline: undefined },
+        runner,
+      ),
+    ).toThrow(/traceabilityKnownMissingBaseline is required/);
+    const launchedGates = runner.calls.filter((c) =>
+      ["generate_indexes", "traceability-check", "check_integrity", "check_autogen_freshness", "textlint-final-check"]
+        .some((gateName) => c.args.includes(gateName)),
+    );
+    expect(launchedGates).toHaveLength(0);
+  });
+
+  test("入力検証: 対象 REQ 行 0 件の宣言に --req 付き gate spec を組み合わせた入力を検査起動前に拒否する", () => {
+    const scopedGate: GateCommandSpec = {
+      name: "traceability-check",
+      command: "bun",
+      args: ["./checker.ts", "traceability-check", "--req", ["REQ", "1000", "001"].join("-")],
+      cwd: "<repo>/.worktrees/100-case",
+    };
+    const broken = zeroTargetInput({ traceabilityGate: scopedGate });
+    expect(() => validateInput(broken as unknown as Record<string, unknown>))
+      .toThrow(/whole-scope traceability gate execution/);
+  });
+
+  test("入力検証: baseline の識別子形式不正・重複を検査起動前に拒否する", () => {
+    const base = zeroTargetInput() as unknown as Record<string, unknown>;
+    const malformed = {
+      ...base,
+      traceabilityKnownMissingBaseline: {
+        missingImplementation: ["REQ-1000-"],
+        missingVerification: [],
+      },
+    };
+    expect(() => validateInput(malformed)).toThrow(/missingImplementation must be an array of REQ row ids/);
+    const duplicated = {
+      ...base,
+      traceabilityKnownMissingBaseline: {
+        missingImplementation: ["REQ-1000-001", "REQ-1000-001"],
+        missingVerification: [],
+      },
+    };
+    expect(() => validateInput(duplicated)).toThrow(/duplicate identifiers/);
+  });
+
+  test("入力検証: 非空の traceabilityReqIds 宣言を拒否する（close 門の検査範囲は gate spec で宣言する）", () => {
+    const base = zeroTargetInput() as unknown as Record<string, unknown>;
+    const nonEmpty = { ...base, traceabilityReqIds: [["REQ", "1000", "001"].join("-")] };
+    expect(() => validateInput(nonEmpty)).toThrow(/must be an empty array in close/);
+  });
+
+  test("入力検証: baseline 単独の提供（空配列宣言なし）を拒否する", () => {
+    const base = preMergeInput() as unknown as Record<string, unknown>;
+    const orphanBaseline = { ...base, traceabilityKnownMissingBaseline: knownMissingBaseline() };
+    expect(() => validateInput(orphanBaseline)).toThrow(/only allowed with an empty traceabilityReqIds declaration/);
+  });
+
+  test("入力検証: 正規の対象 REQ 行 0 件宣言（空配列 + baseline + 全体検査 gate）を受領する", () => {
+    const validated = validateInput(zeroTargetInput() as unknown as Record<string, unknown>);
+    expect(validated.traceabilityReqIds).toEqual([]);
+    expect(validated.traceabilityKnownMissingBaseline).toEqual(knownMissingBaseline());
   });
 });
 

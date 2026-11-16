@@ -1,7 +1,7 @@
 // runValidateInputOnly（--validate-input 検証専用経路）の単体検証（REQ-009-053、Case #3862）。
 // 入力検証・gate 引数契約検査・ゲート実行体存在確認のみで ok を返し、副作用を持たない。
 import { describe, expect, test } from "bun:test";
-import { runValidateInputOnly, type CloseMechanicalInput } from "../src/close_mechanical_steps.ts";
+import { runValidateInputOnly, validateInput, type CloseMechanicalInput } from "../src/close_mechanical_steps.ts";
 
 const cwd = process.cwd().replaceAll("\\", "/");
 const gateScript = import.meta.dir + "/../package.json";
@@ -38,6 +38,35 @@ describe("runValidateInputOnly (REQ-009-053 verification-only entry)", () => {
     expect(outcome.ok).toBe(false);
     const report = outcome.report as { gateAvailability: { missing: string[] } };
     expect(report.gateAvailability.missing.length).toBeGreaterThan(0);
+  });
+
+  test("ok: true for the zero-target regular path configuration (REQ-030-032: empty traceabilityReqIds + known-missing baseline + whole-scope gate)", () => {
+    const fixture = consumerFixture();
+    const zeroTarget: CloseMechanicalInput = {
+      ...fixture,
+      traceabilityReqIds: [],
+      traceabilityKnownMissingBaseline: {
+        missingImplementation: ["REQ-1000-001"],
+        missingVerification: ["REQ-1000-001"],
+      },
+      traceabilityGate: mk("traceability-check", [gateScript, "--root", cwd]),
+    };
+    const outcome = runValidateInputOnly(zeroTarget, () => true);
+    expect(outcome.ok).toBe(true);
+    expect((outcome.report as { gateAvailability: { missing: unknown[] } }).gateAvailability.missing).toHaveLength(0);
+  });
+
+  test("rejects the zero-target regular path declaration without the known-missing baseline (precondition before any gate execution)", () => {
+    const fixture = consumerFixture();
+    const broken = {
+      ...fixture,
+      issueUpdatedAt: "2026-11-17T00:00:00Z",
+      issueNumber: 9,
+      contractStateCheck: fixture.contractStateCheck,
+      traceabilityReqIds: [],
+      traceabilityGate: mk("traceability-check", [gateScript, "--root", cwd]),
+    };
+    expect(() => validateInput(broken)).toThrow(/traceabilityKnownMissingBaseline is required/);
   });
 
   test("rejects an invalid gate flag contract before availability checks (fail-closed)", () => {

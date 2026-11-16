@@ -48,10 +48,16 @@ import {
   type CrossObligation,
   type SubjectKind,
 } from "./final-acceptance.ts";
-import { REQ_ROW_ID_LIST_PATTERN } from "../../../agentdev-workflow-case-open/scripts/lib/definition-traceability-gate.ts";
+import {
+  consumeDefinitionTraceabilityAgainstBaseline,
+  isReqRowId,
+  REQ_ROW_ID_LIST_PATTERN,
+  type WholeScopeKnownMissingBaseline,
+} from "../../../agentdev-workflow-case-open/scripts/lib/definition-traceability-gate.ts";
 import {
   buildKnownGateArgContracts,
   evaluateGateAvailability,
+  extractFlagValue,
   fail,
   GATE_ALTERNATIVE_ROUTES,
   MechanicalInputError,
@@ -244,6 +250,17 @@ export interface CloseMechanicalInput {
   generateIndexesGate?: GateCommandSpec;
   autogenDerivedPaths?: readonly string[];
   traceabilityGate?: GateCommandSpec;
+  /**
+   * 対象 REQ 行の明示宣言。空配列は対象 REQ 行 0 件案件の正規の経路
+   * の宣言であり、traceabilityKnownMissingBaseline の提供を必須とする。
+   * 非空配列は受理しない（close 門の検査範囲は traceabilityGate spec の --req で宣言する）。
+   */
+  traceabilityReqIds?: readonly string[];
+  /**
+   * 空配列宣言（対象 REQ 行 0 件案件の正規の経路）で対照基準とする main baseline の
+   * 既知欠落（識別子集合。main での全体実行の実測）。
+   */
+  traceabilityKnownMissingBaseline?: WholeScopeKnownMissingBaseline;
   integrityGates?: readonly GateCommandSpec[];
   integrityMachineAcceptance?: IntegrityMachineAcceptanceRecord;
   textlintGate?: GateCommandSpec;
@@ -369,6 +386,52 @@ export function validateInput(value: unknown): CloseMechanicalInput {
       }
       if (typeof r.terminalOperationCompleted !== "boolean") {
         fail("input.reclamation.closeAcceptanceRecord.terminalOperationCompleted must be a boolean");
+      }
+    }
+  }
+  const reqIdsDeclared = v.traceabilityReqIds !== undefined;
+  if (reqIdsDeclared) {
+    if (!Array.isArray(v.traceabilityReqIds)) {
+      fail("input.traceabilityReqIds must be an array (an empty array declares the zero-target regular path)");
+    }
+    for (const id of v.traceabilityReqIds as readonly unknown[]) {
+      if (typeof id !== "string" || !isReqRowId(id)) {
+        fail(`input.traceabilityReqIds contains an invalid requirement row id: ${String(id)}`);
+      }
+    }
+    if ((v.traceabilityReqIds as readonly unknown[]).length > 0) {
+      fail("input.traceabilityReqIds must be an empty array in close (the close gate scope is declared by the traceabilityGate spec; non-empty declarations are not supported)");
+    }
+    if (v.traceabilityKnownMissingBaseline == null) {
+      fail("input.traceabilityKnownMissingBaseline is required when traceabilityReqIds declares the zero-target regular path (precondition verified before any gate execution)");
+    }
+    const declaredTraceabilityGate = v.traceabilityGate;
+    if (declaredTraceabilityGate != null) {
+      if (typeof declaredTraceabilityGate !== "object" || Array.isArray(declaredTraceabilityGate) ||
+        !Array.isArray((declaredTraceabilityGate as GateCommandSpec).args)) {
+        fail("input.traceabilityGate must contain command (string), args (string[]), cwd (string)");
+      }
+      const gateReqScope = extractFlagValue((declaredTraceabilityGate as GateCommandSpec).args, "--req");
+      if (gateReqScope !== null) {
+        fail(`the zero-target regular path requires a whole-scope traceability gate execution (--req must be absent; got: ${gateReqScope})`);
+      }
+    }
+  }
+  if (v.traceabilityKnownMissingBaseline !== undefined && !reqIdsDeclared) {
+    fail("input.traceabilityKnownMissingBaseline is only allowed with an empty traceabilityReqIds declaration (zero-target regular path)");
+  }
+  if (v.traceabilityKnownMissingBaseline != null) {
+    if (typeof v.traceabilityKnownMissingBaseline !== "object" || Array.isArray(v.traceabilityKnownMissingBaseline)) {
+      fail("input.traceabilityKnownMissingBaseline must be an object");
+    }
+    const baseline = v.traceabilityKnownMissingBaseline as Record<string, unknown>;
+    for (const key of ["missingImplementation", "missingVerification"] as const) {
+      const ids = baseline[key];
+      if (!Array.isArray(ids) || ids.some((id) => typeof id !== "string" || !isReqRowId(id))) {
+        fail(`input.traceabilityKnownMissingBaseline.${key} must be an array of REQ row ids`);
+      }
+      if (new Set(ids as readonly string[]).size !== (ids as readonly string[]).length) {
+        fail(`input.traceabilityKnownMissingBaseline.${key} contains duplicate identifiers`);
       }
     }
   }
@@ -1418,6 +1481,17 @@ export function runCloseMechanicalSteps(
       );
       return assembleReport(input.phase, steps, diff, warnings, proposal);
     }
+    if (input.traceabilityReqIds != null && input.traceabilityReqIds.length === 0) {
+      // 対象 REQ 行 0 件案件の正規の経路の実行前提（baseline の提供と
+      // 全体検査 gate 構成）は、案件の構成と入力の前提の検証として全試験の起動より先に
+      // 確認する（前提が満たされない失敗を早い段階で確定させる順序。検査の省略ではない）。
+      if (input.traceabilityKnownMissingBaseline == null) {
+        fail("input.traceabilityKnownMissingBaseline is required for the zero-target regular path (precondition verified before any gate execution)");
+      }
+      if (extractFlagValue(input.traceabilityGate?.args ?? [], "--req") !== null) {
+        fail("the zero-target regular path requires a whole-scope traceability gate execution (--req must be absent)");
+      }
+    }
     if (input.prNumber < 1) {
       // PR を伴わない完了構成（verify-only closure・docs_chore 特例等の PR なし
       // 完了。prNumber 0 は PR 不在の合意表現）。merge 前提確認は PR を伴う完了
@@ -1618,20 +1692,48 @@ export function runCloseMechanicalSteps(
     }
 
     if (input.traceabilityGate) {
+      const zeroTargetRegularMode = input.traceabilityReqIds != null && input.traceabilityReqIds.length === 0;
+      // 対象 REQ 行 0 件案件の正規の経路の実行前提（baseline の提供）は
+      // gate 起動より先に確認する（前提が満たされない失敗を早い段階で確定させる順序）。
+      const baseline = zeroTargetRegularMode
+        ? input.traceabilityKnownMissingBaseline
+        : undefined;
+      if (zeroTargetRegularMode && baseline == null) {
+        fail("input.traceabilityKnownMissingBaseline is required for the zero-target regular path (precondition verified before traceability gate execution)");
+      }
       const check = runSpec(runner, input.traceabilityGate);
       let summary = "";
-      if (check.exitCode === 0) {
-        try {
-          const parsed = JSON.parse(check.stdout) as { summary?: { pass?: number; fail?: number } };
-          summary = `pass=${parsed.summary?.pass ?? "?"} fail=${parsed.summary?.fail ?? "?"}`;
-        } catch {
-          summary = "report parse failed";
+      let status: StepRecord["status"];
+      if (zeroTargetRegularMode && baseline != null) {
+        const consumption = consumeDefinitionTraceabilityAgainstBaseline({
+          exitCode: check.exitCode,
+          stdout: check.stdout,
+          baseline,
+        });
+        status = consumption.status;
+        summary = consumption.summary;
+        if (consumption.blocking) {
+          warnings.push(`traceability gate failed: ${consumption.reason ?? consumption.summary}`);
         }
+      } else {
+        if (check.exitCode === 0) {
+          try {
+            const parsed = JSON.parse(check.stdout) as { summary?: { pass?: number; fail?: number } };
+            summary = `pass=${parsed.summary?.pass ?? "?"} fail=${parsed.summary?.fail ?? "?"}`;
+          } catch {
+            summary = "report parse failed";
+          }
+        }
+        status = check.exitCode === 0 ? "pass" : "fail";
       }
       steps.push({
         name: "traceability-check",
-        status: check.exitCode === 0 ? "pass" : "fail",
-        detail: { exitCode: check.exitCode, summary },
+        status,
+        detail: {
+          exitCode: check.exitCode,
+          summary,
+          ...(zeroTargetRegularMode ? { mode: "zero-target-baseline-contrast", baseline } : {}),
+        },
       });
     }
 
