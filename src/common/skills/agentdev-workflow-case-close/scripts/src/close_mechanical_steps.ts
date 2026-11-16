@@ -251,7 +251,7 @@ export interface CloseMechanicalInput {
   autogenDerivedPaths?: readonly string[];
   traceabilityGate?: GateCommandSpec;
   /**
-   * 対象 REQ 行の明示宣言。空配列は対象 REQ 行 0 件案件の正規の経路（REQ-030-032）
+   * 対象 REQ 行の明示宣言。空配列は対象 REQ 行 0 件案件の正規の経路
    * の宣言であり、traceabilityKnownMissingBaseline の提供を必須とする。
    * 非空配列は受理しない（close 門の検査範囲は traceabilityGate spec の --req で宣言する）。
    */
@@ -1482,7 +1482,7 @@ export function runCloseMechanicalSteps(
       return assembleReport(input.phase, steps, diff, warnings, proposal);
     }
     if (input.traceabilityReqIds != null && input.traceabilityReqIds.length === 0) {
-      // 対象 REQ 行 0 件案件の正規の経路（REQ-030-032）の実行前提（baseline の提供と
+      // 対象 REQ 行 0 件案件の正規の経路の実行前提（baseline の提供と
       // 全体検査 gate 構成）は、案件の構成と入力の前提の検証として全試験の起動より先に
       // 確認する（前提が満たされない失敗を早い段階で確定させる順序。検査の省略ではない）。
       if (input.traceabilityKnownMissingBaseline == null) {
@@ -1693,7 +1693,7 @@ export function runCloseMechanicalSteps(
 
     if (input.traceabilityGate) {
       const zeroTargetRegularMode = input.traceabilityReqIds != null && input.traceabilityReqIds.length === 0;
-      // 対象 REQ 行 0 件案件の正規の経路（REQ-030-032）の実行前提（baseline の提供）は
+      // 対象 REQ 行 0 件案件の正規の経路の実行前提（baseline の提供）は
       // gate 起動より先に確認する（前提が満たされない失敗を早い段階で確定させる順序）。
       const baseline = zeroTargetRegularMode
         ? input.traceabilityKnownMissingBaseline
