@@ -14,6 +14,7 @@ const CHECK_KINDS = [
   "duplicate-inconsistencies",
   "malformed-links",
   "dangling-links",
+  "derived-declaration-conflicts",
 ] as const;
 
 type CheckKind = typeof CHECK_KINDS[number];
@@ -108,5 +109,42 @@ describe("Definition-stage traceability gate consumption", () => {
     });
 
     expect(consume(raw, [reqId]).status).toBe("fail");
+  });
+
+  test("accepts a valid 12-item checker report including a passing derived-declaration-conflicts check", () => {
+    const raw = report([reqId]);
+
+    const result = consume(raw, [reqId], 0);
+
+    expect(result.status).toBe("pass");
+    expect(result.blocking).toBe(false);
+    expect(result.summary).toBe("pass=12 fail=0");
+    expect(result.deferredObligations).toEqual([]);
+  });
+
+  test("treats a derived-declaration-conflicts failure as a non-deferrable blocking failure", () => {
+    const raw = report([reqId], {
+      "derived-declaration-conflicts": check("derived-declaration-conflicts", [{ reqId }]),
+    });
+
+    const result = consume(raw, [reqId]);
+
+    expect(result.status).toBe("fail");
+    expect(result.blocking).toBe(true);
+    expect(result.reason).toBe("non-deferrable traceability check failed: derived-declaration-conflicts");
+    expect(result.deferredObligations).toEqual([]);
+  });
+
+  test("rejects an unknown extra check kind beyond the 12 known kinds", () => {
+    const raw = report([reqId]);
+    const withUnknownKind = {
+      ...raw,
+      checks: { ...raw.checks, "future-check": { kind: "future-check", status: "pass", findings: [] } },
+    };
+
+    const result = consume(withUnknownKind, [reqId], 0);
+
+    expect(result.status).toBe("fail");
+    expect(result.reason).toBe("traceability checker report is structurally invalid");
   });
 });
