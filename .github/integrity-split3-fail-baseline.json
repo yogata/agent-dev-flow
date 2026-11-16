@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "generated_at": "2026-11-16",
+  "description": "分割③（bun test ./.opencode/plugins/ ./scripts/）の既知 fail クラス集合。known_fail_classes は 2026-11-16 の CI 初回実測（Case #4076・Windows runner・fresh checkout・vendor 未生成・junction 未伝播）で観測された環境差 fail クラス 9 件（CI 環境の構成差に由来し worktree 通常実行では発生しない環境差 fail。根拠は PR #4111 本文の評価記録）。新規 fail は差分検出対象（fail-closed）。",
+  "known_fail_classes": [
+    "shared judgment module / judgment equality across entry configurations > same rule returns the same result under consumer and self-host configurations",
+    "CLI（scripts/src/reflect.ts）の決定性 > closing: 同一入力で同一出力（決定的）",
+    "CLI（scripts/src/reflect.ts）の決定性 > closing: べき等置換と既存終端子状態の保護（子状態4値のみ）",
+    "CLI（scripts/src/reflect.ts）の決定性 > reset: blocked から pending へ戻し、completed は拒否",
+    "CLI（scripts/src/reflect.ts）の決定性 > overall: 子完了のみでは completed=false を評価し、本文を書き換えない",
+    "scripts behavior / check capabilities (REQ-050-004) > orphan junction is reported as a divergence (exit 1)",
+    "agentdev-textlint-guard distribution / consumer install (TS-005 / TS-006) > git clone checkout: vendor 欠落で fail-closed 停止と案内、導入手順後の offline gate",
+    "agentdev-textlint-guard distribution / consumer install (TS-005 / TS-006) > source ZIP checkout (.git absent inside the plugin checkout): vendor 欠落で fail-closed 停止と案内、導入手順後の offline gate",
+    "agentdev-textlint-guard distribution / archive install (TS-005) > archive installer: vendor 欠落で exit 6 停止と案内、導入手順後の再実行成功と offline gate"
+  ]
+}

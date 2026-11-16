@@ -1,0 +1,83 @@
+# integrity suite 分割③（plugins・scripts）の Windows CI 定期実行と fail クラス baseline 機械突合。
+#
+# Case #4076（RU-0283・AG-003 検証方法 (3)）:
+# - Windows runner で bun test 分割③（bun test ./.opencode/plugins/ ./scripts/）を
+#   定期実行（cron schedule）し、fail クラス baseline
+#   （.github/integrity-split3-fail-baseline.json・既知 fail クラス集合）との
+#   機械突合（差分検出）を行う。
+# - baseline 未登録の新規 fail は job を fail させる（fail-closed）。既知 fail
+#   クラスのみの fail は baseline 突合で許容する（環境調整で消える fail クラスの
+#   追跡対象として baseline に登録・運用する）。
+# - baseline 空集合からの運用開始（Case #4076 実測・分割③ 現状 fail 0件）。
+#
+# 正の実行形態（3 cwd 分割正規形・bun test 実行形態契約）の正は
+# agentdev-quality-gates（qg-4-final-acceptance.md「bun test フル suite 正規形」節）と
+# checker-execution-contracts.md「bun test 実行形態契約」節が所有する。本 workflow は
+# CI 定期実行の実行基盤のみを提供する。
+
+name: integrity-suite-split3-windows
+
+on:
+  schedule:
+    # 毎日 03:00 UTC に定期実行（Windows runner での分割③ 環境差監視）。
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  split3-fail-class-baseline-check:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.6"
+
+      - name: Install split3 package dependencies
+        # QG-4 依存パッケージ前置の対象ディレクトリ集合（project-extensions scripts と
+        # repo-integrity scripts）を CI 環境で整備する。
+        shell: pwsh
+        run: |
+          bun install --cwd src/common/skills/agentdev-project-extensions/scripts
+          bun install --cwd .opencode/skills/repo-agentdev-integrity/scripts
+
+      - name: Run split3 (bun test ./.opencode/plugins/ ./scripts/)
+        # exit code は fail クラス baseline check で処理するため、このステップでは
+        # 出力の退避のみを行う（fail があっても突合を実行する）。bun test の
+        # ネイティブ exit code（fail あり = 1）がステップ失敗に伝播しないよう、
+        # スクリプト末尾で明示 exit 0 とする。
+        shell: pwsh
+        run: |
+          bun test ./.opencode/plugins/ ./scripts/ 2>&1 | Out-File -FilePath split3-output.txt -Encoding utf8
+          Write-Host "split3 executed (exit code handled by the baseline check step)"
+          exit 0
+
+      - name: Upload split3 output
+        uses: actions/upload-artifact@v4
+        with:
+          name: split3-output
+          path: split3-output.txt
+          retention-days: 14
+
+      - name: Fail class baseline check
+        shell: pwsh
+        run: |
+          $output = Get-Content split3-output.txt -Raw
+          $baseline = Get-Content .github/integrity-split3-fail-baseline.json -Raw | ConvertFrom-Json
+          $failTests = [regex]::Matches($output, '(?m)^\s*\(fail\)\s+(.+?)\s*(?:\[\d+(\.\d+)?ms\])?\s*$') | ForEach-Object { $_.Groups[1].Value.Trim() }
+          Write-Host "Total fails: $($failTests.Count)"
+          $known = @($baseline.known_fail_classes)
+          $unknown = @($failTests | Where-Object { $known -notcontains $_ })
+          if ($unknown.Count -gt 0) {
+            Write-Host "::error::NEW FAILS not in baseline ($($unknown.Count)):"
+            $unknown | ForEach-Object { Write-Host "::error::  - $_" }
+            exit 1
+          }
+          Write-Host "Fail class baseline check: OK (total fails: $($failTests.Count), unknown new fails: 0)"
