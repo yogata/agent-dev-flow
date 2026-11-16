@@ -40,9 +40,6 @@ jobs:
         with:
           bun-version: "1.3.6"
 
-      - name: Install root dependencies
-        run: bun install
-
       - name: Install split3 package dependencies
         # QG-4 依存パッケージ前置の対象ディレクトリ集合（project-extensions scripts と
         # repo-integrity scripts）を CI 環境で整備する。
