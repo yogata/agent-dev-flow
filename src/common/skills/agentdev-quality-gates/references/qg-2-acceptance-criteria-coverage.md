@@ -1,6 +1,6 @@
 # QG-2: Acceptance Criteria Coverage Gate
 
-case-open で Issue を作成する前に、Issue の完了条件が対象 REQ/Decision/Design の必達要件を網羅しているかを検証する Gate。
+case-ready で ready 遷移に先立って、Issue の完了条件が対象 REQ/Decision/Design の必達要件を網羅しているかを検証する Gate。
 本ファイルは QG-2 の判定基準、検査観点を定義する。
 共通契約は [common-gate-contract.md](common-gate-contract.md) を参照。
 
@@ -25,7 +25,7 @@ case-open で Issue を作成する前に、Issue の完了条件が対象 REQ/D
 
 | コマンド | 配置ステップ | 対象成果物 |
 |---------|-------------|-----------|
-| case-open | STEP-2（Issue 本文生成・execution contract 確定）、STEP-5（Issue 作成: Epic flow / Standard flow） | Issue 本文（完了条件セクション、チェックボックス） |
+| case-ready | STEP-6（検証ゲートと ready 遷移。STEP-5 実行構造確定後の ready 遷移時） | Root Case 本文（完了条件セクション、チェックボックス）・工程の記録コメント（または報告 JSON） |
 
 ## 検査観点
 
@@ -78,12 +78,14 @@ Issue 本文がテンプレート（`issue_desc_*.md`）の【必須】セクシ
 2. 同種の既存成果物から実測値を取得し、閾値の到達可能性を比較検証する
 3. 対象成果物の自然な構造（Markdown セクション構成、ファイル構成等）で閾値が到達可能か判定する
 4. 到達不能、もしくは異常な水準（過剰に大きい、過剰に小さい）の閾値は設定根拠を要求する
+5. その案件が作る・変更する成果物との整合性を確認する。完了条件の検証手順に書かれた grep 系のコマンド（追跡対象での語の件数確認等）は、確定済みの成果物（必須の成果物の判断記録・Design・REQ 等）に対して事前に実行する
+6. 語の0件を要求する完了条件では、要求の範囲（追跡対象全体か、対象の範囲の明示か）と必須の成果物への同じ語の記載の有無を照合する
 
 判定:
 
-- **fail**: 完了条件に数値閾値が含まれるが、同種既存成果物との比較で到達不能、または設定根拠が提示されない。
+- **fail**: 完了条件に数値閾値が含まれるが、同種既存成果物との比較で到達不能、または設定根拠が提示されない。追跡対象全体で語が0件であることを要求しながら、必須の成果物が要求する語を含む場合も不合格とする（検出理由は「必須の成果物が要求する語を含むこと」として表示する）。
 - **warn**: 閾値は到達可能だが根拠が曖昧。設定根拠の明示を推奨。
-- **pass**: 閾値が到達可能、または数値閾値を含まない。
+- **pass**: 閾値が到達可能、または数値閾値を含まない。対象の範囲（.github 配下など）が明示された0件という要求で、成果物に経緯として語を記載する場合は合格とする。
 
 test strategy 策定時の具体的な閾値設定手順は `agentdev-req-analysis` の [test-strategy-numeric-threshold-guide.md](../../agentdev-req-analysis/references/test-strategy-numeric-threshold-guide.md) を参照。
 
@@ -122,7 +124,7 @@ execution contract 確定を支援するため、artifact-specific quality contr
 
 適用範囲:
 
-- 新規 Issue 作成時（case-open STEP-2、STEP-5 で実行）
+- 新規 Issue の完了条件を対象とする検査時（case-ready の QG-2 判定で実行。Root Case 本文は case-open が、Epic 配下の子 Issue 本文は case-ready の実行構造確定が生成する）
 - case-revise による新契約更新時
 - legacy Issue（Execution Contract 必須セクション不存在）には適用しない（presence-based 判定）
 
@@ -170,12 +172,12 @@ QG-2 の検査をサブエージェントに委譲する場合:
 
 - サブエージェントは完了条件候補、必達要件 mapping 候補、網羅性の疑義のみを返す。
 - 親エージェントが pass/warn/fail を確定し、Issue 本文の確定と作成を行う。
-- 具体的な委譲接続点は case-open の各 STEP（STEP-2, STEP-5）を参照。
+- 具体的な委譲接続点は case-ready の検証ゲート（STEP-6）を参照。
 
 ## 責務境界
 
-- QG-2 は**判定のみ**行う。Issue 作成は case-open コマンドの責務。
-- QG-2 fail 時は Issue 作成を停止し、req-define 差し戻しを推奨する（強制差し戻しではない）。
+- QG-2 は**判定のみ**行う。判定の実行と ready 遷移は case-ready コマンドの責務。判定の結果は工程の記録コメント（または報告 JSON）へ残す。
+- QG-2 fail 時は ready 遷移を停止し、req-define 差し戻しを推奨する（強制差し戻しではない）。
 
 ## See Also
 

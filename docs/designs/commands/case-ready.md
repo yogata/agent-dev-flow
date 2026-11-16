@@ -2,7 +2,7 @@
 title: case-ready Design
 status: accepted
 created: 2026-09-14
-updated: "2026-11-11"
+updated: "2026-11-17"
 ---
 
 <!-- ADF-COVERS(design): REQ-021-024 -->
@@ -12,6 +12,7 @@ updated: "2026-11-11"
 <!-- ADF-COVERS(design): REQ-061-003 -->
 <!-- ADF-COVERS(design): REQ-061-010, REQ-061-019, REQ-061-021, REQ-061-038, REQ-061-023, REQ-061-029, REQ-061-030, REQ-061-033, REQ-061-034, REQ-061-035, REQ-061-039, REQ-061-040, REQ-061-047, REQ-061-048, REQ-061-049, REQ-061-050, REQ-061-051, REQ-061-052, REQ-035-012, REQ-035-018 -->
 <!-- ADF-COVERS(design): REQ-061-053（cleanup skippedPaths 報告の永続化漏れ明示設計） -->
+<!-- ADF-COVERS(design): REQ-061-054（QG-2 判定の実行と記録の case-ready 接続設計） -->
 <!-- ADF-COVERS(design): REQ-061-041, REQ-061-042, REQ-017-021, REQ-017-022, REQ-017-023, REQ-017-024, REQ-017-025, REQ-061-043, REQ-061-044, REQ-061-045, REQ-061-046, REQ-030-023 -->
 <!-- ADF-COVERS(implementation): REQ-103-014 -->
 
@@ -94,6 +95,15 @@ case-ready の機械工程（設計PRの忠実性・整合性・品質検査の�
 - canonical 再取得の fetch・ff-only merge が失敗した場合は、ローカル main と origin/main の分岐の有無（ahead/behind の件数とコミット一覧）を検出し、報告 JSON の該当 step detail へ反映する。script は分岐を自動解消せず、解消は agentdev-git-worktree の「Squash merge 後分岐ハンドリング手順」（git-common-procedures.md）に従う（REQ-061-052）。同手順の処理分岐（完全重複・部分重複・独立変更）と case-close STEP-4-3 からの既存参照を変更しない
 - 報告 JSON には検査結果、再生成差分、警告、提案する Issue/PR 本文を含め、モデルは報告 JSON の意味レビューと agentdev_gh による I/O 実行のみを担う
 - workflow skill 参照文面は script 呼び出しと報告 JSON 解釈へ置き換えて短縮する
+
+## QG-2 判定の実行と記録（REQ-061-054）
+
+case-ready は受入検査において QG-2（Acceptance Criteria Coverage）の判定を実行する。判定基準と検査観点の正は agentdev-quality-gates の QG-2 reference（references/qg-2-acceptance-criteria-coverage.md）であり、本 Design は配置・実行・記録の接続を所有する（観点1〜5・7〜9 の機械化は対象外）。
+
+- 配置: QG-2 の配置は case-ready に確定する（v4-quality-gate-model Design の対象遷移「ready 遷移時の execution structure 確定」と一致する。case-open Design の配置の記述も同一の確定に従う）
+- 実行: 検証ゲート（STEP-6）で QG-2 の判定を実行する。観点6（数値閾値到達可能性検証）には、その案件が作る・変更する成果物との整合性の確認（完了条件の検証手順に書かれた grep 系のコマンドを、確定済みの成果物に対して事前に実行する検査を含む）を含める
+- 記録: 判定の結果（pass / warn / fail と検出理由）を工程の記録コメント（または報告 JSON）へ残す。判定が実行されなかった場合は case-ready を完了として扱わない（ready へ遷移させない）
+- 判定の区別（観点6）: 追跡対象全体で語が0件であることを要求しながら必須の成果物が要求する語を含む構成は不合格とする。対象の範囲（.github 配下など）が明示された0件という要求で、成果物に経緯として語を記載する構成は合格とする
 
 ## 受入検査入力と実行証拠の接続
 
