@@ -194,112 +194,112 @@
       "RU-0281": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-001",
-        "実行単位": "#4073（単独 Case・2026-11-16 構成再確定）"
+        "実行単位": "#4073（verify-only (CLOSED・RA-002冪等確認)・CLOSED）"
       },
       "RU-0282": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-003",
-        "実行単位": "#4075（Epic #4071 子・Wave 1・2026-11-16 構成再確定）"
+        "実行単位": "#4074（PR #4095 squash merge・CLOSED）"
       },
       "RU-0283": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-004",
-        "実行単位": "#4076（Epic #4071 子・Wave 2・前提 #4075・2026-11-16 構成再確定）"
+        "実行単位": "#4075（PR #4097 squash merge (Epic #4071 子・Wave 1)・CLOSED）"
       },
       "RU-0284": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-005",
-        "実行単位": "#4077（単独 Case・2026-11-16 構成再確定）"
+        "実行単位": "#4076（PR #4111 squash merge (Epic #4071 子・Wave 2・CI success)・CLOSED）"
       },
       "RU-0285": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-006",
-        "実行単位": "#4078（単独 Case・2026-11-16 構成再確定）"
+        "実行単位": "#4077（PR #4096 squash merge・CLOSED）"
       },
       "RU-0286": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-007",
-        "実行単位": "#4079（単独 Case・2026-11-16 構成再確定）"
+        "実行単位": "#4078（PR #4099 squash merge・CLOSED）"
       },
       "RU-0287": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-008",
-        "実行単位": "#4080（単独 Case・2026-11-16 構成再確定）"
+        "実行単位": "#4079（PR #4103 squash merge・CLOSED）"
       },
       "RU-0288": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-009",
-        "実行単位": "#4081（単独 Case・2026-11-16 構成再確定）"
+        "実行単位": "#4080（PR #4098 squash merge・CLOSED）"
       },
       "RU-0289": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-010",
-        "実行単位": "#4082（単独 Case・2026-11-16 構成再確定）"
+        "実行単位": "#4081（PR #4101 squash merge (orphan commit f5d1bbe05 検証・PR化)・CLOSED）"
       },
       "RU-0290": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-011",
-        "実行単位": "#4083（単独 Case・2026-11-16 構成再確定）"
+        "実行単位": "#4082（verify-only (CLOSED・PR #4072 適用分確認)・CLOSED）"
       },
       "RU-0291": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-012",
-        "実行単位": "#4084（単独 Case・2026-11-16 構成再確定）"
+        "実行単位": "#4083（PR #4104 squash merge・CLOSED）"
       },
       "RU-0292": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-013",
-        "実行単位": "#4085（単独 Case・2026-11-16 構成再確定）"
+        "実行単位": "#4084（PR #4105 squash merge・CLOSED）"
       },
       "RU-0293": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-002",
-        "実行単位": "#4074（単独 Case・2026-11-16 構成再確定）"
+        "実行単位": "#4085（PR #4102 squash merge・CLOSED）"
       },
       "RU-0294": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-014",
-        "実行単位": "#4086（単独 Case・2026-11-16 構成再確定）"
+        "実行単位": "#4086（PR #4106 squash merge・CLOSED）"
       },
       "RU-0295": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-015",
-        "実行単位": "#4087（単独 Case・2026-11-16 構成再確定）"
+        "実行単位": "#4087（PR #4107 squash merge・CLOSED）"
       },
       "RU-0296": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-016",
-        "実行単位": "#4088（単独 Case・2026-11-16 構成再確定）"
+        "実行単位": "#4088（PR #4110 squash merge・CLOSED）"
       },
       "RU-0297": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-017",
-        "実行単位": "#4089（単独 Case・2026-11-16 構成再確定）"
+        "実行単位": "#4089（PR #4109 squash merge・CLOSED）"
       },
       "RU-0298": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-018",
-        "実行単位": "#4090（単独 Case・2026-11-16 構成再確定）"
+        "実行単位": "#4090（verify-only (CLOSED・追試合格)・CLOSED）"
       },
       "RU-0299": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-019",
-        "実行単位": "#4091（単独 Case・2026-11-16 構成再確定）"
+        "実行単位": "#4091（verify-only (CLOSED・crash経路なし確認)・CLOSED）"
       },
       "RU-0300": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-020",
-        "実行単位": "#4092（単独 Case・2026-11-16 構成再確定）"
+        "実行単位": "#4092（verify-only (CLOSED・PR #4072 適用分確認)・CLOSED）"
       },
       "RU-0301": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-021",
-        "実行単位": "#4093（単独 Case・2026-11-16 構成再確定）"
+        "実行単位": "#4093（PR #4112 squash merge・CLOSED）"
       },
       "RU-0302": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-022",
-        "実行単位": "#4094（単独 Case・2026-11-16 構成再確定）"
+        "実行単位": "#4094（PR #4108 squash merge・CLOSED）"
       }
     }
   },
@@ -316,8 +316,8 @@
   "進捗": {
     "整理サイクル": "完了（stage1 inspect-docs 検出13事項 commit cf7ac3729 / stage2 3系統並列 learning promoted13 commit 58de43d2b・intake promoted42 commit 746be8363・inspect promoted3 commit e2a30d283 / stage3 backlog-review RU-0281〜0302 生成22件・docs/knowledge 2件保存・promoted 58件削除 commit a64d6ad07・HITL承認 Q-BR-20261115-01/02 選択肢1〔Hermes監督中継・2026-10-02恒久指示による〕）",
     "stage4_要件定義": "完了（2026-11-15T21:5x JST 単一 req-define 実行・入力 RU-0281〜0302 明示列挙・RU→OU 1:1 22/22 除外なし・壁打ち HITL 1件 Q-RD-20261115-01 選択肢A〔standing order relay〕・要件doc 1451行 auto_ready:true 確定・commit 1f1b6222b push済み・Jev STEP-4 観測 20261115T122103Z-05b8 永続化/STEP-3 は観測書込み失敗の warning 付記）",
-    "stage5_実行": "実行中（2026-11-16 復旧: 構成再確定適用済み・consumer 修復 main 統合済み d7ad5e307。STEP-1 受入機械検査の再実行で traceability gate 合格を確認後、残り実装（未着手単位が多数・既存 PR 5件 OPEN）を再開する）",
-    "stage6_全体完了判定": "未着手",
+    "stage5_実行": "完了（2026-11-16 06:45 JST 受領。修正後実行構造 21実行単位〔Epic #4071 子 #4075/#4076 + standalone 19〕で全 unit case-run→case-close 完了。PR 15件 squash merge（#4095〜#4112 のうち15件）+ verify-only closure 4件（#4073/#4082/#4090/#4092）・blocked 0・failed 0。全 unit 完了条件 [x] 確定・完了記録コメント投稿済み・終了判定記録回収済み（close-acceptance 空）。Epic #4071 CLOSED（2026-11-16T06:25Z・完了条件2項目 [x]・完了記録コメント 6909129198）。main HEAD 40029e94b・open PR 0件・worktree 24 保持。復旧経緯: 委譲セッション2度の障害（モデル不在・gh exit 66）を harness 再起動と再確定構造での再委譲で回復・構成是正（2子Epic化）と consumer 修復（#4100・d7ad5e307）を実施済み。詳細は recovery-inventory.md）",
+    "stage6_全体完了判定": "完遂判定済み（2026-11-16 突合実施。①義務の対応確認: 義務スナップショット22 RU ↔ 要件doc AG-001〜022 ↔ 21実行単位の対応が recovery-inventory.md 対応表で 22/22 突合済み・全 unit Issue CLOSED（#4073〜#4094 全22件…うち21実行単位+Epic）・過不足なし。②検証結果の成立確認: 全 unit の検証証跡成立（full suite 2414 pass/0 fail 等・QG-4 ゲート合格・checker EXIT 0・CI success・verify-only 4件は確認義務の成立証跡あり）。繰延義務 REQ-010-085 は区分B 判断記録（PR #4072 検証欄）どおり blocking に含めず完遂判定確定。③判定: ①②成立により一式全体の完遂と判定）",
     "stage7_リリース": "未着手"
   },
   "リリース状態": {
