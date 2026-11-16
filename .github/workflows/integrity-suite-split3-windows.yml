@@ -71,7 +71,7 @@ jobs:
         run: |
           $output = Get-Content split3-output.txt -Raw
           $baseline = Get-Content .github/integrity-split3-fail-baseline.json -Raw | ConvertFrom-Json
-          $failTests = [regex]::Matches($output, '(?m)^\s*\(fail\)\s+(.+)$') | ForEach-Object { $_.Groups[1].Value.Trim() }
+          $failTests = [regex]::Matches($output, '(?m)^\s*\(fail\)\s+(.+?)\s*(?:\[\d+(\.\d+)?ms\])?\s*$') | ForEach-Object { $_.Groups[1].Value.Trim() }
           Write-Host "Total fails: $($failTests.Count)"
           $known = @($baseline.known_fail_classes)
           $unknown = @($failTests | Where-Object { $known -notcontains $_ })
