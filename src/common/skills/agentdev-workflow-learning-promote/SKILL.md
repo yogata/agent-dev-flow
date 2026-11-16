@@ -48,7 +48,7 @@ learning-promote workflow は次の7 STEP で構成する。
 ### STEP 間の依存と分岐
 
 - **正常経路**: STEP-1 → STEP-2 → STEP-3 → STEP-4（skip 条件該当時は省略）→ STEP-5 → STEP-6 → STEP-7
-- **部分自律確定（STEP-5 内）**: 同一実行内に自律確定可能項目とユーザー判断必要項目が混在する場合、未決項目に依存しない自律確定可能項目を先行確定し、ユーザー判断必要項目のみ HITL 対象とする。自律確定可能項目を HITL 待ちにしない
+- **部分自律確定（STEP-5 内）**: 部分自律確定規律（`agentdev-workflow-lifecycle` SKILL.md「共通報告・Decision・自律確定規約」節〔反復規則の単一正本〕の「promote 系操作の自律確定と HITL 境界」節が正）に従い STEP-5 内で適用する。自律確定可能項目を HITL 待ちにしない
 - **全項目自律確定時（STEP-5 内）**: ユーザー判断必要項目が残らない場合、HITL を発生させず STEP-6 へ進む
 - **evaluation-report 戻しループ（review 反映時）**: STEP-4 の accepted finding 反映で意味内容が変更された場合、STEP-2 → STEP-3 → STEP-4（発動条件判定）の順で再実行し、再 review 発動条件を満たす場合のみ再 review。停止条件（4点）を満たした時点でループを離脱し STEP-5 へ進む
 - **inbox.md 空または不在**: STEP-1 で終了（不在時はエラー終了）。HITL を発生させない
