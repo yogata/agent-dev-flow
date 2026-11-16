@@ -30,6 +30,7 @@ import * as os from "os";
 import * as path from "path";
 import { execFileSync, spawnSync } from "child_process";
 import { createAgentdevGhToolDefinition } from "../../../src/opencode/plugins/agentdev-gh-tool/plugin.ts";
+import { placeMechanicalStepSkillScripts } from "./mechanical-step-skills.ts";
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 const INSTALL_PS1 = path.join(REPO_ROOT, "scripts", "install.ps1");
@@ -99,6 +100,10 @@ function makeConsumerRepo(zipCheckout: boolean, localSource = false): string {
   fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "senpi", "connection-demo"), { recursive: true });
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "common", "commands", "agentdev", "case-run.md"), "# case-run\n");
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "common", "skills", "agentdev-workflow-case-run", "SKILL.md"), "# case-run skill\n");
+  placeMechanicalStepSkillScripts(
+    REPO_ROOT,
+    path.join(root, ".agentdev-plugin", "src", "common", "skills"),
+  );
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "common", "tools", "agentdev-gh", "index.ts"), "// agentdev-gh tool\n");
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode", "plugins", "agentdev-gh-write-guard", "plugin.ts"), "// agentdev-gh-write-guard plugin\n");
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode", "plugins", "agentdev-gh-tool", "plugin.ts"), "// agentdev-gh-tool plugin\n");

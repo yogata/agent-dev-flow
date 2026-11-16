@@ -194,112 +194,112 @@
       "RU-0281": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-001",
-        "実行単位": "未確定"
+        "実行単位": "#4073（単独 Case・2026-11-16 構成再確定）"
       },
       "RU-0282": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
-        "operation_unit": "OU-002",
-        "実行単位": "未確定"
+        "operation_unit": "OU-003",
+        "実行単位": "#4075（Epic #4071 子・Wave 1・2026-11-16 構成再確定）"
       },
       "RU-0283": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
-        "operation_unit": "OU-003",
-        "実行単位": "未確定"
+        "operation_unit": "OU-004",
+        "実行単位": "#4076（Epic #4071 子・Wave 2・前提 #4075・2026-11-16 構成再確定）"
       },
       "RU-0284": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
-        "operation_unit": "OU-004",
-        "実行単位": "未確定"
+        "operation_unit": "OU-005",
+        "実行単位": "#4077（単独 Case・2026-11-16 構成再確定）"
       },
       "RU-0285": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
-        "operation_unit": "OU-005",
-        "実行単位": "未確定"
+        "operation_unit": "OU-006",
+        "実行単位": "#4078（単独 Case・2026-11-16 構成再確定）"
       },
       "RU-0286": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
-        "operation_unit": "OU-006",
-        "実行単位": "未確定"
+        "operation_unit": "OU-007",
+        "実行単位": "#4079（単独 Case・2026-11-16 構成再確定）"
       },
       "RU-0287": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
-        "operation_unit": "OU-007",
-        "実行単位": "未確定"
+        "operation_unit": "OU-008",
+        "実行単位": "#4080（単独 Case・2026-11-16 構成再確定）"
       },
       "RU-0288": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
-        "operation_unit": "OU-008",
-        "実行単位": "未確定"
+        "operation_unit": "OU-009",
+        "実行単位": "#4081（単独 Case・2026-11-16 構成再確定）"
       },
       "RU-0289": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
-        "operation_unit": "OU-009",
-        "実行単位": "未確定"
+        "operation_unit": "OU-010",
+        "実行単位": "#4082（単独 Case・2026-11-16 構成再確定）"
       },
       "RU-0290": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
-        "operation_unit": "OU-010",
-        "実行単位": "未確定"
+        "operation_unit": "OU-011",
+        "実行単位": "#4083（単独 Case・2026-11-16 構成再確定）"
       },
       "RU-0291": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
-        "operation_unit": "OU-011",
-        "実行単位": "未確定"
+        "operation_unit": "OU-012",
+        "実行単位": "#4084（単独 Case・2026-11-16 構成再確定）"
       },
       "RU-0292": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
-        "operation_unit": "OU-012",
-        "実行単位": "未確定"
+        "operation_unit": "OU-013",
+        "実行単位": "#4085（単独 Case・2026-11-16 構成再確定）"
       },
       "RU-0293": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
-        "operation_unit": "OU-013",
-        "実行単位": "未確定"
+        "operation_unit": "OU-002",
+        "実行単位": "#4074（単独 Case・2026-11-16 構成再確定）"
       },
       "RU-0294": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-014",
-        "実行単位": "未確定"
+        "実行単位": "#4086（単独 Case・2026-11-16 構成再確定）"
       },
       "RU-0295": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-015",
-        "実行単位": "未確定"
+        "実行単位": "#4087（単独 Case・2026-11-16 構成再確定）"
       },
       "RU-0296": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-016",
-        "実行単位": "未確定"
+        "実行単位": "#4088（単独 Case・2026-11-16 構成再確定）"
       },
       "RU-0297": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-017",
-        "実行単位": "未確定"
+        "実行単位": "#4089（単独 Case・2026-11-16 構成再確定）"
       },
       "RU-0298": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-018",
-        "実行単位": "未確定"
+        "実行単位": "#4090（単独 Case・2026-11-16 構成再確定）"
       },
       "RU-0299": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-019",
-        "実行単位": "未確定"
+        "実行単位": "#4091（単独 Case・2026-11-16 構成再確定）"
       },
       "RU-0300": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-020",
-        "実行単位": "未確定"
+        "実行単位": "#4092（単独 Case・2026-11-16 構成再確定）"
       },
       "RU-0301": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-021",
-        "実行単位": "未確定"
+        "実行単位": "#4093（単独 Case・2026-11-16 構成再確定）"
       },
       "RU-0302": {
         "要件doc": ".agentdev/drafts/req-draft-backlog-auto-e2e-20261115T191842JST.md",
         "operation_unit": "OU-022",
-        "実行単位": "未確定"
+        "実行単位": "#4094（単独 Case・2026-11-16 構成再確定）"
       }
     }
   },
@@ -316,7 +316,7 @@
   "進捗": {
     "整理サイクル": "完了（stage1 inspect-docs 検出13事項 commit cf7ac3729 / stage2 3系統並列 learning promoted13 commit 58de43d2b・intake promoted42 commit 746be8363・inspect promoted3 commit e2a30d283 / stage3 backlog-review RU-0281〜0302 生成22件・docs/knowledge 2件保存・promoted 58件削除 commit a64d6ad07・HITL承認 Q-BR-20261115-01/02 選択肢1〔Hermes監督中継・2026-10-02恒久指示による〕）",
     "stage4_要件定義": "完了（2026-11-15T21:5x JST 単一 req-define 実行・入力 RU-0281〜0302 明示列挙・RU→OU 1:1 22/22 除外なし・壁打ち HITL 1件 Q-RD-20261115-01 選択肢A〔standing order relay〕・要件doc 1451行 auto_ready:true 確定・commit 1f1b6222b push済み・Jev STEP-4 観測 20261115T122103Z-05b8 永続化/STEP-3 は観測書込み失敗の warning 付記）",
-    "stage5_実行": "未着手",
+    "stage5_実行": "実行中（2026-11-16 復旧: 構成再確定適用済み・consumer 修復 main 統合済み d7ad5e307。STEP-1 受入機械検査の再実行で traceability gate 合格を確認後、残り実装（未着手単位が多数・既存 PR 5件 OPEN）を再開する）",
     "stage6_全体完了判定": "未着手",
     "stage7_リリース": "未着手"
   },
@@ -337,5 +337,11 @@
     "壁打ちHITL回答": {
       "Q-RD-20261115-01": "選択肢A（ADR導入不採用・DEC-009維持）【推奨】standing order relay により受理・provenance draft 記録済み"
     }
+  },
+  "構成再確定": {
+    "日時": "2026-11-16",
+    "内容": "初回 case-ready STEP-5 の22子単一Epic（Epic サイズ上限10超過・fail-closed 違反）を、連結成分（必須依存 #4076→#4075 のみ）に基づき再確定: Epic #4071（子 #4075・#4076・サイズ2≤上限10）+ 20 単独実行単位（Case: 主題・既存 Issue 再利用）",
+    "記録": "GitHub: #4071 タイトル・本文更新＋再確定コメント（commentId 6903808678）・20タイトル同期＋親Epic行除去・読み戻し検証合格。Jev 再確定観測: 20261116T000904Z-fec4（Epic/必須/一貫）・20261116T000915Z-1d98（並列不可）・20261116T000925Z-fffa（重複なし）・新 questionId・全一致",
+    "consumer修復": "tracking Issue #4100・branch fix/issue-4071-traceability-consumer commit d7ad5e307（12種目対応・red/green 証跡・typecheck OK・統合証跡あり）を main へ fast-forward 統合・push 済み（c543c979b→d7ad5e307）"
   }
 }
