@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { traceabilityReport as makeTraceabilityReport } from "./traceability-report-fixture";
+import { traceabilityReport as makeTraceabilityReport, wholeScopeTraceabilityReport as makeWholeScopeReport } from "./traceability-report-fixture";
 
 import {
   applyDefinitionEdit,
@@ -140,9 +140,20 @@ describe("入力検証（品質ゲートの省略禁止・明示パス stage）"
     expect(() => validateInput(broken)).toThrow(/traceabilityReqIds is required/);
   });
 
-  test("判定対象 REQ 集合の空配列を gate 実行前に拒否する", () => {
+  test("対象 REQ 行 0 件の正規の入力構成（空集合の明示 + 全体を対象とする検査の gate spec）を受領する（REQ-029-017）", () => {
+    const zeroTargetGate: GateCommandSpec = {
+      ...gate("traceability-check"),
+      args: ["./checker.ts", "--gate", "traceability-check"],
+    };
+    const accepted = input({ traceabilityReqIds: [], traceabilityGate: zeroTargetGate });
+    const validated = validateInput(accepted as unknown as Record<string, unknown>);
+    expect(validated.traceabilityReqIds).toEqual([]);
+  });
+
+  test("対象 REQ 行 0 件の宣言に --req 付き gate spec（全体検査でない実行）を組み合わせた入力を gate 実行前に拒否する", () => {
     const broken = input({ traceabilityReqIds: [] });
-    expect(() => validateInput(broken as unknown as Record<string, unknown>)).toThrow(/traceabilityReqIds must be a non-empty array/);
+    expect(() => validateInput(broken as unknown as Record<string, unknown>))
+      .toThrow(/zero-target regular mode requires a whole-scope traceability gate execution/);
   });
 
   test("判定対象 REQ 集合と gate 実行範囲（--req）の不整合を gate 実行前に拒否する", () => {
@@ -397,6 +408,64 @@ describe("機械工程の実行（worktree・編集・品質ゲート・明示�
     const report = runPrepareDefinitionPr(input(), runner);
     expect(report.result.steps.find((step) => step.name === "traceability-check")?.status).toBe("fail");
     expect(report.result.exitCategory).toBe("failure");
+  });
+
+  test("対象 REQ 行 0 件の案件構成で機械工程が正規の経路で完走する（TS-001・代替経路への切替と fail-closed 拒否なし）", () => {
+    const backgroundImplId = ["REQ", "117", "001"].join("-");
+    const backgroundVerifIds = [["REQ", "117", "001"].join("-"), ["REQ", "113", "001"].join("-")];
+    const zeroTargetGate: GateCommandSpec = {
+      ...gate("traceability-check"),
+      args: ["./checker.ts", "--gate", "traceability-check"],
+    };
+    const runner = fakeRunner({
+      traceabilityReport: makeWholeScopeReport({
+        "missing-implementation": { status: "fail", findings: [{ reqId: backgroundImplId }] },
+        "missing-verification": { status: "fail", findings: backgroundVerifIds.map((reqId) => ({ reqId })) },
+      }),
+    });
+    const report = runPrepareDefinitionPr(
+      input({ traceabilityReqIds: [], traceabilityGate: zeroTargetGate }),
+      runner,
+    );
+    const step = report.result.steps.find((s) => s.name === "traceability-check");
+    expect(step?.status).toBe("pass");
+    expect(step?.detail.mode).toBe("zero-target-whole-scope");
+    expect(step?.detail.reqIds).toEqual([]);
+    expect((step?.detail.stdout as string).length).toBeGreaterThan(0);
+    expect(report.result.exitCategory).toBe("success");
+    expect(decideExitCode(report)).toBe(0);
+    // 正規の経路であり、代替経路の案内（fail-closed 切替）は発生しない
+    expect(report.warnings.join("\n")).not.toContain("alternative routes");
+    expect(report.warnings.join("\n")).not.toContain("required gate executable is missing");
+    expect(report.proposal.pr_body).toContain("対象 REQ 行 0 件の正規の入力構成");
+  });
+
+  test("対象 REQ 行 0 件の正規経路でも構造検査の fail は不合格になる（検出能力の維持）", () => {
+    const zeroTargetGate: GateCommandSpec = {
+      ...gate("traceability-check"),
+      args: ["./checker.ts", "--gate", "traceability-check"],
+    };
+    const runner = fakeRunner({
+      traceabilityReport: makeWholeScopeReport({
+        "dangling-links": { status: "fail", findings: [{}] },
+      }),
+    });
+    const report = runPrepareDefinitionPr(
+      input({ traceabilityReqIds: [], traceabilityGate: zeroTargetGate }),
+      runner,
+    );
+    expect(report.result.steps.find((s) => s.name === "traceability-check")?.status).toBe("fail");
+    expect(report.result.exitCategory).toBe("failure");
+  });
+
+  test("対象 REQ 行 0 件の宣言の前提不整合は全試験・副作用の起動前に確定する（TS-003・検査の総数の削減なし）", () => {
+    const runner = fakeRunner();
+    // --req 付き gate spec（全体検査でない実行）との前提不整合を入力検証で確定させる
+    const broken = input({ traceabilityReqIds: [] });
+    expect(() => validateInput(broken as unknown as Record<string, unknown>))
+      .toThrow(/zero-target regular mode requires a whole-scope traceability gate execution/);
+    // 入力検証の失敗位置で確定するため、いかなる gate・git 操作も起動しない
+    expect(runner.calls).toHaveLength(0);
   });
 
   test("checks を含まない報告 JSON では終了コードに関わらず停止する（fail-closed）", () => {
