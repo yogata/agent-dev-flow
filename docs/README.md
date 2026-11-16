@@ -185,6 +185,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-060](decisions/DEC-060.md) | ADF本体の GitHub Release 記録と公開承認境界（superseded by DEC-061〔決定(1)のうち公開の実行経路・実行主体に関わる部分と決定(3)（カタログへの追加範囲）は、後継 Decision DEC-061（Release 公開操作のカタログ正規化（承認後の workflow 実行経路））が部分置換する。承認境界（公開は利用者が草稿作成とは別に明確に認めた場合に限る）、release_create の入力契約に公開モードを含めない規則、草稿作成・読み戻しのカタログ限定経路、決定(2)（DEC-059 / DEC-039 系譜の維持）は本 Decision が維持する。〕） |
 | [DEC-061](decisions/DEC-061.md) | Release 公開操作のカタログ正規化（承認後の workflow 実行経路） |
 | [DEC-062](decisions/DEC-062.md) | 要件ID桁数の受理上限撤廃と表示ゼロ埋め・受理検証の分離 |
+| [DEC-063](decisions/DEC-063.md) | 分割③ CI 日次定期実行（cron schedule）の撤去 |
 <!-- AUTOGEN:END -->
 
 ## 設計（Design）
