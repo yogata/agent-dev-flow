@@ -3,7 +3,7 @@
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
 import { mkdirSync, writeFileSync, copyFileSync, renameSync, rmSync, existsSync, readFileSync, readdirSync, cpSync, symlinkSync } from "fs";
 import { basename, dirname, join } from "path";
-import { checkRepoLocalPluginProjectionSymmetry, extractKnownGapNumbers, loadKnownGapReqIds } from "./check_integrity.ts";
+import { checkRepoLocalPluginProjectionSymmetry, checkReqRangeStaleness, checkSummaryReqRangeConsistency, checkVariantPathExistence, extractKnownGapNumbers, loadKnownGapReqIds } from "./check_integrity.ts";
 import { generateDocsReadmeDecisionTable } from "./generate_indexes.ts";
 import { extractKnownGapNumbers as extractKnownGapNumbersAllocator } from "../../../../src/common/skills/agentdev-req-file-manager/scripts/src/alloc-req-number.ts";
 
@@ -482,18 +482,10 @@ function buildInvalidFixture(root: string): void {
   const designsDir = join(root, "docs", "designs");
   mkdirp(designsDir);
 
-  // IR-045 fixture: Design file with undocumented English abstract term
-  writeFileSync(
-    join(designsDir, "doc-quality-fixture.md"),
-    [
-      "# Doc Quality Fixture",
-      "",
-      "This command is a read-only diagnostic.",
-      "",
-    ].join("\n"),
-    "utf-8",
-  );
-
+  // IR-045 は削除済み（REQ-010-003・REQ-036-023・文意品質検査は textlint 共通基盤と
+  // docs 横断診断へ移管、カタログ「IR-045: （削除）」節が正）。使用されない fixture を
+  // 廃止した（Case #4079・RU-0286）。IR-045 識別子は vocabulary-registry.md
+  // 「文意品質検出対象語（IR-045）」の参照として残存する。
   writeFileSync(
     join(designsDir, "README.md"),
     [
@@ -7001,5 +6993,127 @@ describe("IR-074 ir-rule-classification-traceability (REQ-047-011〜013, Issue #
     expect(ng.length).toBe(1);
     expect(ng[0].file ?? "").toContain("IR-998-no-irid-ref.md");
     expect(ng[0].message).toContain("do not reference the rule identifier");
+  });
+});
+
+// ─── IR-013: variant-path-existence 専用 fixture 試験（REQ-036-008, Case #4079） ──
+describe("IR-013 variant-path-existence dedicated fixture tests (REQ-036-008, Case #4079)", () => {
+  it("detects a command referencing a non-existent variant path (違反例)", () => {
+    const root = join(TEMP_ROOT, "ir013-violation");
+    const cmdDir = join(root, "src", "common", "commands", "agentdev");
+    mkdirp(cmdDir);
+    writeFileSync(
+      join(cmdDir, "sample.md"),
+      "See completion-reports/foo/bar.md for details.\n",
+      "utf-8",
+    );
+    const results = checkVariantPathExistence(
+      cmdDir,
+      join(root, "docs", "commands", "completion-reports.md"),
+      root,
+    );
+    const ng = results.filter(
+      (x: { level: string; check: string }) =>
+        x.level === "ng" && x.check === "variant-path-existence",
+    );
+    expect(ng.length).toBe(1);
+    expect(ng[0].message).toContain("'sample'");
+    expect(ng[0].message).toContain("but file does not exist");
+  });
+
+  it("passes when referenced variant paths exist (適合例)", () => {
+    const root = join(TEMP_ROOT, "ir013-ok");
+    const cmdDir = join(root, "src", "common", "commands", "agentdev");
+    const variantDir = join(root, "docs", "commands", "completion-reports", "foo");
+    mkdirp(cmdDir);
+    mkdirp(variantDir);
+    writeFileSync(join(cmdDir, "sample.md"), "See completion-reports/foo/bar.md.\n", "utf-8");
+    writeFileSync(join(variantDir, "bar.md"), "# bar\n", "utf-8");
+    const results = checkVariantPathExistence(
+      cmdDir,
+      join(root, "docs", "commands", "completion-reports.md"),
+      root,
+    );
+    const ng = results.filter((x: { level: string }) => x.level === "ng");
+    expect(ng.length).toBe(0);
+    expect(
+      results.some(
+        (x: { level: string; check: string }) =>
+          x.level === "ok" && x.check === "variant-path-existence",
+      ),
+    ).toBe(true);
+  });
+});
+
+// ─── IR-018: req-range-staleness 専用 fixture 試験（Case #4079） ──────────────
+describe("IR-018 req-range-staleness dedicated fixture tests (Case #4079)", () => {
+  it("detects a stale REQ range statement covering non-existent ids (違反例)", () => {
+    const root = join(TEMP_ROOT, "ir018-violation");
+    const reqDir = join(root, "docs", "requirements");
+    mkdirp(reqDir);
+    writeFileSync(join(reqDir, "REQ-001.md"), "---\nid: REQ-001\n---\n", "utf-8");
+    writeFileSync(join(reqDir, "REQ-002.md"), "---\nid: REQ-002\n---\n", "utf-8");
+    writeFileSync(join(root, "AGENTS.md"), "現行要件は REQ-001〜REQ-009 の範囲である。\n", "utf-8");
+    const results = checkReqRangeStaleness(root);
+    const flagged = results.filter(
+      (x: { level: string; check: string }) =>
+        x.check === "req-range-staleness" && (x.level === "ng" || x.level === "warn"),
+    );
+    expect(flagged.length).toBeGreaterThan(0);
+  });
+
+  it("passes when the range statement matches existing ids (適合例)", () => {
+    const root = join(TEMP_ROOT, "ir018-ok");
+    const reqDir = join(root, "docs", "requirements");
+    mkdirp(reqDir);
+    writeFileSync(join(reqDir, "REQ-001.md"), "---\nid: REQ-001\n---\n", "utf-8");
+    writeFileSync(join(reqDir, "REQ-002.md"), "---\nid: REQ-002\n---\n", "utf-8");
+    writeFileSync(join(root, "AGENTS.md"), "現行要件は REQ-001〜REQ-002 の範囲である。\n", "utf-8");
+    const results = checkReqRangeStaleness(root);
+    const flagged = results.filter(
+      (x: { level: string; check: string }) =>
+        x.check === "req-range-staleness" && (x.level === "ng" || x.level === "warn"),
+    );
+    expect(flagged.length).toBe(0);
+  });
+});
+
+// ─── IR-042: summary-req-range 専用 fixture 試験（Case #4079） ────────────────
+describe("IR-042 summary-req-range dedicated fixture tests (Case #4079)", () => {
+  it("detects a stale hardcoded count in requirements README (違反例)", () => {
+    const root = join(TEMP_ROOT, "ir042-violation");
+    const reqDir = join(root, "docs", "requirements");
+    mkdirp(reqDir);
+    writeFileSync(join(reqDir, "REQ-001.md"), "---\nid: REQ-001\n---\n", "utf-8");
+    writeFileSync(join(reqDir, "REQ-002.md"), "---\nid: REQ-002\n---\n", "utf-8");
+    writeFileSync(join(reqDir, "README.md"), "# 要件\n\n以下3件\n", "utf-8");
+    const results = checkSummaryReqRangeConsistency(root);
+    const warns = results.filter(
+      (x: { level: string; check: string }) =>
+        x.level === "warning" && x.check === "summary-req-range",
+    );
+    expect(warns.length).toBe(1);
+    expect(warns[0].message).toContain("README states 3");
+  });
+
+  it("passes when the stated count matches the actual files (適合例)", () => {
+    const root = join(TEMP_ROOT, "ir042-ok");
+    const reqDir = join(root, "docs", "requirements");
+    mkdirp(reqDir);
+    writeFileSync(join(reqDir, "REQ-001.md"), "---\nid: REQ-001\n---\n", "utf-8");
+    writeFileSync(join(reqDir, "REQ-002.md"), "---\nid: REQ-002\n---\n", "utf-8");
+    writeFileSync(join(reqDir, "README.md"), "# 要件\n\n以下2件\n", "utf-8");
+    const results = checkSummaryReqRangeConsistency(root);
+    const warns = results.filter(
+      (x: { level: string; check: string }) =>
+        x.level === "warning" && x.check === "summary-req-range",
+    );
+    expect(warns.length).toBe(0);
+    expect(
+      results.some(
+        (x: { level: string; check: string }) =>
+          x.level === "ok" && x.check === "summary-req-range",
+      ),
+    ).toBe(true);
   });
 });
