@@ -100,3 +100,35 @@
 - **想定反映先**: src/common/skills/agentdev-git-worktree/references/worktree-operations.md（書込み guard 運用指針節への一時領域記述追補候補）または docs/knowledge/windows-powershell-bulk-io-corruption.md
 - **関連**: Case #4113・DEL-4113-REV1・agentdev-textlint-guard
 - **タグ**: `#guard` `#worktree` `#一時資材`
+
+## case-close の REQUIRED_GATES_PRE_MERGE が REQ 行なし Case で corpus traceability の exit 2 を機械 fail にする
+
+- **問題事象**: Root Case #4113 の case-close 機械工程 pre-merge（close_mechanical_steps.ts）で、REQ 行参照のない Case（maintenance・削除系）では traceabilityGate に lifecycle gate 完全性の正しい実行形態（--req 対象行限定）が構成不能のため --req なし corpus 実行を指定せざるを得ない。corpus 実行は既存 missing 系（missing-implementation 15・missing-verification 17 = main baseline と同一）を検出するのが正規の診断結果（summary pass=10 fail=2）だが、script の step 判定（exitCode === 0 で pass/fail 分類）が check の正規終了コード 2 を機械 fail に分類し、exitCategory failure・isCloseOperationPermitted false（mechanical-failure）で終了操作（issue_close）が抑止された。isCloseAcceptanceReady も exitCategory success を要求するため終了判定記録が accepted にならない
+- **発生局面**: 完了判定（case-close STEP-3 機械工程 pre-merge 1回目・merge 直前 HEAD 6b2de3fb6）
+- **検知方法**: 報告 JSON の traceability-check step fail（exitCode 2・summary 未取得）と exitCategory failure。check を script 外で再実行し stdout JSON（pass=10 fail=2・missing 系 REQ ID 集合）を取得して fail の由来を既出系と確認
+- **根本原因**: lifecycle gate 完全性の判定対象行（--req）と corpus advisory 診断（--req なし）が機械工程の gate 入力構造では区別されず、対象行 0 行の Case では必ず corpus 実行を gate に指定することになる。check の exit 2 は「corpus missing 系の存在」の正常報告であり機械工程の実質失敗ではないが、決定的な step 分類では区別できない
+- **自律対応内容**: GATE_ALTERNATIVE_ROUTES 第3経路（対照実行による悪化ゼロ件の機械証明）を gate ラッパーとして実装し再実行で受理した。ラッパーは check を corpus 全体で実行（観測能力削減なし）し、構造系6項目全 pass かつ missing 系 REQ ID 集合が事前 main baseline（PR 本文記録・main root 実測）と完全一致であることを決定的突合で検証、成立時に exit 0 を返す。判定メタ（対象行 0 行の根拠・突合結果・check 生 exit code）を証跡化し、検証差分には既出 32件として記録した
+- **ユーザー確認有無**: なし（代替経路の履行・観測能力の未削減を機械証明で確定）
+- **Decision/REQ/spec影響**: なし（STEP-3 reference 冒頭の検査不能と代替検証の関係・fail-open 契約の範囲内の処置）
+- **横展開観点**: REQ 変更なしの maintenance / docs_chore Case の case-close では毎回同じ構成不能問題が発生する。isCloseAcceptanceReady / isCloseOperationPermitted は決定的判定のため、意味判断での受理を機械受理に翻訳する gate ラッパー（判定根拠の証跡化を含む）が現行構造での実用解になる。直接実行の advisory 記録（exit 2）を先に取得しておくと受理根拠が強くなる
+- **再発条件**: 完了条件の Issue 本文に REQ 行参照がなく、かつ corpus に未解決の missing 系 REQ 行が存在する Case の case-close
+- **予防策候補**: close_mechanical_steps の入力構成に「traceabilityGate が corpus 実行（--req なし）を指す場合の受理基準（構造系 pass + baseline 一致）」を正規入力として追加する。または check 側に lifecycle-scope モード（対象行 0 行で exit 0）を追加する
+- **想定反映先**: src/common/skills/agentdev-workflow-case-close/scripts/src/close_mechanical_steps.ts（REQUIRED_GATES_PRE_MERGE・traceability step 判定）・src/common/skills/agentdev-traceability/scripts/src/check.ts
+- **関連**: Case #4113・DEL-4113-CLOSE1・REQ-029-014〜016・GATE_ALTERNATIVE_ROUTES
+- **タグ**: `#機械工程` `#case-close` `#traceability`
+
+## check_integrity の IR-073 untracked-residue が機械工程の終了判定記録を検出する
+
+- **問題事象**: Root Case #4113 の post-merge check_integrity（merge 後 main HEAD 4b0f5afd2）で、機械工程が書き出した終了判定記録 .agentdev/close-acceptance/issue-4113.json が IR-073 untracked-residue の NG として検出された（OK 990 / NG 2・既知 NG 1件と併せて NG 2件表示）。契約状態記録・未追跡残存検査（contract-state-residue-check）では approvalEntries に .agentdev/close-acceptance/ が承認一覧対象として存在するため承認済み扱いだが、check_integrity 側の baselines/ng-baseline.json には未登録で承認構造が不一致
+- **発生局面**: 完了判定（case-close STEP-5・Post-merge 最終検証）
+- **検知方法**: check_integrity 報告の UntrackedResidue カテゴリ NG 行（.agentdev/close-acceptance/issue-4113.json）
+- **根本原因**: .agentdev/close-acceptance/ は .gitignore 非対象の一時保護記録領域（機械工程が書き出し・post-merge で回収）であり、恒久的な承認一覧（ng-baseline）への登録対象として想定されていない。回収後は解消するため永続 NG ではないが、pre-merge 機械工程実行後〜reclamation 前に check_integrity を実行する構成では常に1件の既知構造として現れる
+- **自律対応内容**: 一時保護記録である旨を既存契約（Case #4084 記録）で確認し、本 Case 起因の新規 NG 0件として検証差分に記録（ng-baseline への登録は行わない）。reclamation 標準手順（実在確認→証拠退避→明示パス削除→不存在確認）で回収し、回収後の検出解消を対照実行で確認した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: post-merge で check_integrity を実行する case-close では、機械工程の終了判定記録が IR-073 で1件検出される構造が既知として続く。報告の NG 件数を既知件数と突合する際はこの構造を差し引いて対照する
+- **再発条件**: pre-merge 機械工程実行後〜reclamation 前に check_integrity を実行した場合
+- **予防策候補**: close-acceptance 領域の .gitignore 追加、または check_integrity 側の IR-073 除外定義への close-acceptance 登録（provenance 付き）
+- **想定反映先**: .gitignore・.opencode/skills/repo-agentdev-integrity/baselines/（IR-073 除外定義）
+- **関連**: Case #4113・DEL-4113-CLOSE1・Case #4084
+- **タグ**: `#checker実行` `#case-close` `#integrity`
