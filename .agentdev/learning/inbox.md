@@ -36,3 +36,35 @@
 - **想定反映先**: src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts（runMeasurementDateConvergence）
 - **関連**: Issue #4071・PR #4072
 - **タグ**: `#機械工程` `#worktree`
+
+## check_changed_docs --base-ref が worktree HEAD で対象 0 件（TARGET-EMPTY）を返す
+
+- **問題事象**: case-open STEP-4 の targeted docs guard（check_changed_docs.ts --workflow design-save --base-ref origin/main --root worktree）を commit 済み worktree HEAD で実行したところ、git diff origin/main...HEAD に docs 3 ファイルが存在するにもかかわらず「対象ファイルが検出されませんでした（--base-ref 指定）」の zero-targets 警告を返した。--workflow design-save では docs/decisions/ 配下が appliesTo 対象外であることも判明した（design-save の対象は docs/designs/ のみ）。
+- **発生局面**: case-open STEP-4 機械工程（設計PR 作成前の品質ゲート実行・worktree HEAD 0a79bc51・push 前）
+- **検知方法**: guard 報告の「files checked: 0」と zero-targets 警告（対象 0 件を clean 扱いにしない規律で実行前確認）
+- **根本原因**: --base-ref による変更ファイル検出が worktree コンテキストで空になり、加えて workflow 値の対象フィルタ（design-save は docs/designs/ のみ）が本変更（docs/decisions/・docs/README.md）に不適合だった
+- **自律対応内容**: --files による明示指定モード（space 区切りの個別渡し。help の注意に従う）で docs 3 ファイルを渡し、workflow 値を case-run（docs/decisions・docs/README を対象に含む）へ変更して再実行し exit 0（failures 0・warnings 0）を得た
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（正規契約内の実行方法切替。zero-targets を clean 扱いにしない既存規律の適用）
+- **横展開観点**: targeted docs guard を worktree HEAD で実行する場合は --files 明示指定を標準とし、workflow 値は変更対象パスの appliesTo に合う値を選ぶ（design-save ≠ docs/decisions）。実行前に git diff での対象実測を併記すると誤 pass・誤 FAILURE を防げる
+- **再発条件**: --base-ref 付き targeted docs guard を worktree HEAD で実行した場合・docs/decisions 等を design-save workflow 値で検査した場合
+- **予防策候補**: --base-ref の worktree コンテキストでの diff 計算の修正、または guard が TARGET-EMPTY に workflow 値の対象範囲ヒントを出力する改善
+- **想定反映先**: .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts（base-ref 解決と対象フィルタの案内）
+- **関連**: Case #4113・PR #4114
+- **タグ**: `#checker実行` `#worktree` `#targeted-docs-guard`
+
+## prepare_definition_pr の traceabilityReqIds が REQ 行変更なし Case で構成不能になる
+
+- **問題事象**: prepare_definition_pr.ts の入力検証は traceabilityReqIds の非空・有効 REQ 行 ID を必須とする（REQ-030-028）。REQ 行変更を伴わない maintenance Case（Decision 新規作成のみ・Case #4113）では判定対象 REQ 集合が存在せず、script 入力 JSON が構成不能で fail-closed 拒否になることが契約文面とテスト fixture（非空必須の機械検証）から判明した。
+- **発生局面**: case-open STEP-4 機械工程の入力組立
+- **検知方法**: script 入力契約（validateInput・REQUIRED_GATES）と prepare_definition_pr.test.ts の fixture 確認。契約文面から決定的に判明したため実試行による fail 証跡の取得は省略
+- **根本原因**: script 契約が REQ 行変更を伴う Definition 変更を前提に設計されており、REQ 変更なし Case（Decision のみ）での traceability check 対象集合が空しか存在しない
+- **自律対応内容**: REQ-029-014〜016 の正規代替経路（手動相当手順 + 対照実行による悪化ゼロ件の機械証明）へ切替。worktree 作成・Decision 配置・generate_indexes・明示パス commit・check_integrity・traceability check（--req なしコーパス全体・main HEAD と対照し findings 完全一致）・targeted docs guard を手動で実行し証跡を保存した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（REQ-029-016 の代替経路の履行。script 契約の拡張は行わない）
+- **横展開観点**: REQ 変更なしの maintenance / docs_chore Case で設計PRを作る場合、traceabilityReqIds 構成不能を事前に判定して代替経路へ切替する判断点が毎回発生する。対照実行（main HEAD vs worktree HEAD の findings 完全一致）が悪化ゼロ件の機械証明として機能する
+- **再発条件**: REQ 行変更を伴わない Case（Decision のみ・docs_chore 等）で実変更ありと判定された場合
+- **予防策候補**: script 入力検証に「traceabilityReqIds 空 + REQ 行変更なし Case」の正規入力構成（コーパス全体 check モード）を追加する
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts（validateInput・validateTraceabilityReqIds）
+- **関連**: Case #4113・PR #4114・REQ-029-014〜016・REQ-030-028
+- **タグ**: `#機械工程` `#case-open` `#traceability`
