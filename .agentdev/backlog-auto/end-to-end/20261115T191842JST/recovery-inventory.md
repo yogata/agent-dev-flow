@@ -89,6 +89,15 @@
 - 20 単独実行単位のタイトル突合: payload 20 行中 20 行一致・drift 0・全20件 OPEN 継続。#4075・#4076 は `[Epic #4071] Wave-N` 接頭辞を維持（同期対象外の前提どおり）。スナップショット証跡: `.agentdev/tmp/4071-restructure/live-titles-20261116.json`。
 - 結論: 回復後の再実行は「疎通確認 → payload 適用（読み戻し検証込み）」のみに短縮可能。payload の再構成は不要。
 
+## 復旧実行記録 (2026-11-16・harness 再起動後)
+
+harness 再起動（2026-11-16 08:26 頃・監督実施）により agentdev_gh 回復を親セッションで疎通確認（issue_read #4071 ok・本文は payload 前提と一致）し、payload を送信元として委譲2件を再実行した。
+
+- **構成是正委譲 (bg_edb5be09): completed**。#4071 タイトル更新（`Epic: integrity suite の実行環境前提と標準実行形を依存順序どおりに整備する`）・本文更新（実行構成表2行化・構成推論の根拠を 2026-11-16 再確定版へ置換・完了条件第1チェックボックスを2子構成化）・再確定記録コメント（commentId 6903808678）・20単位のタイトル同期（`Case: 主題`）＋親Epic行除去・読み戻し検証合格。Jev 再確定3観測（新 questionId・workflow/evaluationKind 維持・全一致）: 20261116T000904Z-fec4（Epic/必須/一貫）・20261116T000915Z-1d98（並列不可・ペア内重複検出なしにより choice 未生成）・20261116T000925Z-fffa（重複なし・choice 未生成）。逸脱1件（#4071 維持節への指定外編集）は読み戻しで検出し即時修正・残存なし。
+- **consumer 修復委譲 (bg_0a18f919): completed**。追跡Issue #4100 起票（Tracking: 書式・role tracking）。branch `fix/issue-4071-traceability-recovery` ではなく `fix/issue-4071-traceability-consumer` commit d7ad5e307: consumer CHECK_KINDS 11→12・derived-declaration-conflicts を非繰延 blocking へ。回帰テスト6ファイル更新（fixture 12種目化・count pin 修正）＋新規3ケース。red（修正前: structurally invalid で一様失敗）→ green（修正後: 103 pass / 0 fail）・typecheck 両 scripts OK（worktree 内 bun install は worktree-operations 規定の正規手段）・統合証跡（実 checker 12種目 pass=10 fail=2 の受理と繰延義務保持）。
+- **親の統合**: fix branch を main へ fast-forward（c543c979b→d7ad5e307）・push。GitHub スポット検証: #4083（Case: タイトル・親Epic行除去）・#4100（tracking スキーマ完全）合格。set-state を確定版へ更新（実行単位22件を再確定後構成へ記録・構成再確定節追加）＋Jev 観測3件を commit 80339fc83 で push。
+- **STEP-1 受入機械検査の再実行**: 継続セッション（consumer 修復の文脈保持・case-ready skill 併用）で acceptance-checks phase を main 80339fc83 に対して実行中。ゲート結果は #4100 の再評価条件（traceability gate 合格）の反映確認として同 Issue へコメント記録予定。
+
 ## 取得経路
 
 - git worktree list --porcelain と22 worktree の git status --short / git log -1。
