@@ -86,7 +86,7 @@ worktree/ローカルブランチ削除、親Epic 自動クローズ判定、実
 `agentdev-git-worktree` の worktree 削除手順に従う。
 
 - **未コミット変更検出**: `agentdev-git-worktree` skill に従い
-- **remove 前退避ファイル掃除**: `git worktree remove` の実行前に、worktree 内の退避ファイル（`.agentdev/tmp/`〔worktree root 相対〕配下の checker stdout / stderr 分離退避、検査入力 JSON 等の一時ファイル）を列挙し、削除する。列挙・削除手順の詳細は `agentdev-git-worktree` references `worktree-operations.md`「remove 前退避ファイル掃除」節を参照する。削除は明示パス指定とし、ドメイン状態（`.agentdev/` 配下の tmp/ 以外）は削除対象外とする
+- **remove 前退避ファイル掃除**: `git worktree remove` の実行前に、worktree 内の退避ファイル（`.agentdev/tmp/`〔worktree root 相対〕配下の checker stdout / stderr 分離退避、検査入力 JSON 等の一時ファイル）を列挙し、削除する。あわせて、依存整備物（`node_modules`・`vendor/` 等の gitignore 対象で本検証のために作成した整備実体）も掃除対象へ含める（列挙・削除手順の詳細は `agentdev-git-worktree` references `worktree-operations.md`「remove 前退避ファイル掃除」節を参照する）。削除は明示パス指定とし、ドメイン状態（`.agentdev/` 配下の tmp/ 以外）は削除対象外とする
 - **`--force` 不使用の維持**: worktree remove は `--force` を付けずに実行する（現行運用の維持）。退避ファイルの残存により remove が失敗した場合は、残存退避ファイルを確認・掃除してから再試行する
 - **squash merge 済みの場合**: 当該 worktree が隔離されている（専用 worktree + branch で index が独立）場合のみ `git checkout .` で破棄可
 - **共有作業ツリー（main worktree）では `git checkout .` は禁止**（他セッション変更の無差別破壊）
