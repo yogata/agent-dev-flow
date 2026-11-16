@@ -163,7 +163,7 @@ bun test によるフル suite 実行は、次の環境前提を踏まえて実�
        - Git Bash の `rmdir` は junction を空でないディレクトリとして扱い削除を拒否する。補記であり正規手段ではない
        - PowerShell の `Remove-Item` は環境・対象の内容により確認プロンプトが出ることがあり、手順転記では応答待ちの停止要因になる。補記であり正規手段ではない
 
-  - **bun install の --frozen-lockfile 前置（Case #4083・RU-0290）**: worktree 内で `bun install` を実行する場合、lock ファイルを変更しない検証では `--frozen-lockfile` を前置する（bun.lock を検証によって意図せず書き換えない）。lock 変更を伴う実装 Case では `--frozen-lockfile` を前置せず、bun.lock 差分を変更対象として明示する。--frozen-lockfile 規律の正規配置先は本節（worktree 運用手順の管轄）であり、QG-4 は依存解決状態の状態契約を所有する（配置判断の記録は Case #4083 の検証差分を参照）
+  - **bun install の --frozen-lockfile 前置（Case #4083）**: worktree 内で `bun install` を実行する場合、lock ファイルを変更しない検証では `--frozen-lockfile` を前置する（bun.lock を検証によって意図せず書き換えない）。lock 変更を伴う実装 Case では `--frozen-lockfile` を前置せず、bun.lock 差分を変更対象として明示する。--frozen-lockfile 規律の正規配置先は本節（worktree 運用手順の管轄）であり、QG-4 は依存解決状態の状態契約を所有する（配置判断の記録は Case #4083 の検証差分を参照）
   - **bun run --cwd の .bin 解決要件**: `bun run --cwd <dir>` のスクリプト実行は `<dir>` の package 直下 `node_modules/.bin` を解決する。親ディレクトリの `.bin` は解決対象外であるため、実行対象 package の配下に依存整備（対象ディレクトリ集合の両方・前述）が適用済みであることを前置で確認する
   - **tsc PATH 解決失敗時のフォールバック**: `tsc` が PATH から解決できない場合、対象 package 配下の `./node_modules/.bin/tsc --noEmit` 直接起動へフォールバックする（整備済み package 配下で有効。フォールバック実行の旨を環境ラベルへ記録する）
   - **整備後の再実行手順**: 依存整備実施後、依存解決失敗で fail したテスト・型検証を同一 worktree で再実行し、当該 fail が解消したことを確認する。再実行結果には依存整備実施済みの旨を環境ラベル（依存パッケージ状態）へ記録し、整備前の fail と整備後の結果を混在させない
@@ -384,7 +384,7 @@ stash の退避（push）と復元（pop、apply）を往復する前に、以�
 **追跡済みファイル削除禁止**: クリーンアップ操作中は追跡済みファイルを削除してはならない。
 削除対象は未追跡ファイルのみ（実行時作業領域配下の一時ファイル、ビルド成果物等）。
 
-**cleanup 判定の運用規律（Case #4083・RU-0290。実害 Case #4005・#4026 等の学習由来）**:
+**cleanup 判定の運用規律（Case #4083。実害 Case #4005・#4026 等の学習由来）**:
 
 - **コマンド分離**: untracked ファイル削除判定は「内容確認 → 中止判断 → 削除実行」を別 bash コマンドに分離して実行する。1コマンドに確認と削除を連結すると、確認結果の目視判断を飛ばして削除が走るため行わない
 - **所有 run 照合**: 並行 case-auto 環境では `.agentdev/jev-observations/` 等の当日タイムスタンプ物を自 run の一時物と断定せず、観測メタデータ（workflow・subject 等）で所有 run を照合する。自 run 由来でない検出は削除対象から除外し、そのまま残す

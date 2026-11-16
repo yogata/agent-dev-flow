@@ -96,7 +96,7 @@ STEP-4 の機械工程（専用 worktree 作成、Definition branch 作成、REQ
 
 ### STEP-5: 冪等再実行確認
 
-1. 冪等キー（case-open / case-ready Design）で既存成果物を検出する: 既存 Root Case、既存設計PR
+1. 冪等キー（case-open / case-ready Design）で既存成果物を検出する: 既存 Root Case、既存設計PR。検索は複数トークン（topic_slug + 主題語 + 対象 REQ 番号）で実施し、ヒット 0 件時は主題語 + REQ 番号による二段検証で再検索する（`agentdev-issue-management` references `issue-operation-safety.md`「search トークンの選択性指針」節・二段検証〔Case #4093〕参照）
 2. 検出した成果物を再利用し、重複生成しない。Root Case の重複は STEP-2 で、設計PRの重複は STEP-4 で排除する
 3. 不足分だけを処理する: Root Case が存在し設計PRが存在しない場合は STEP-4 の手順で PR のみ作成する。Root Case が存在しない場合は STEP-2 から実行する。両者とも存在する場合は新規生成を行わない
 4. 再利用判定はファイル単位の存在確認で近似しない。同一ファイル内に複数の instruction・複数の Issue 節が混在する成果物（Root Case 本文、Definition Package 等）は、委譲 prompt の instruction 単位、Issue 本文の節単位（【必須】セクション等）で完了度を照合し、未完了の instruction・節のみを処理対象として検出する（ファイル単位の近似照合で部分完了を見逃さない）
