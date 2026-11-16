@@ -148,3 +148,51 @@
 - **想定反映先**: src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts（assembleReport の呼び出し位置・runMeasurementDateConvergence の updated 設定）。本 Case の REQ-029-017（機械工程の入力構成）の case-run 実装時にあわせて評価する
 - **関連**: Case #4117・REQ-029-017・REQ-030-032・REQ-117-011・IR-072
 - **タグ**: `#機械工程` `#case-open` `#traceability`
+## 同一 artifact の対応宣言を複数 sidecar に分散すると traceability checker の duplicate-inconsistencies になる
+
+- **問題事象**: 同一 artifact パス × role の対応宣言を複数 sidecar（case-open と case-close）に分散させると、traceability checker が duplicate-inconsistencies（同一論理関係の矛盾）を検出する
+- **発生局面**: Root Case #4117 の sidecar 追加（commit 3382cca07 の前段試行）
+- **検知方法**: traceability checker の duplicate-inconsistencies 報告
+- **根本原因**: 単一実装を複数 component の sidecar が個別に宣言すると論理関係の重複登録になる
+- **自律対応内容**: case-close sidecar への cross-component 宣言を撤去し、そのファイルを所有する component（case-open）の sidecar に宣言を集約して解消
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 単一実装を共有する変更では、対応宣言は所有 component の sidecar に集約する
+- **再発条件**: 複数 component にまたがる変更で各 sidecar に同一 artifact の宣言を書く場合
+- **予防策候補**: sidecar 追加時の「同一 artifact パス × role の宣言は所有 component の sidecar に 1 件」チェック（checker 側または手順側）
+- **想定反映先**: .opencode/skills/agentdev-traceability（checker）・agentdev-workflow-case-run（手順）
+- **関連**: Case #4117・REQ-029-017・REQ-030-032
+- **タグ**: `#traceability` `#sidecar` `#case-run`
+
+## scripts/self-sync.ps1 は third-party Skill の未配置を ERROR にする（worktree 自動同期の限界）
+
+- **問題事象**: scripts/self-sync.ps1 は third-party Skill（yomiyasu）の未配置を ERROR（exit 7）にする。network 取得を伴うため worktree の自動同期では完走しない
+- **発生局面**: Root Case #4117 の worktree 環境構成（plugins 投影のみを手動で構成）
+- **検知方法**: self-sync.ps1 の exit 7 と third-party 未配置の ERROR 出力
+- **根本原因**: 同期対象に network 取得前提の第三者 Skill が含まれる
+- **自律対応内容**: 本 Case では plugins 投影のみを手動構成し、third-party Skill は対象外として継続
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 第三者 Skill を含む完全投影は network 前提の手順として分離する候補
+- **再発条件**: worktree で self-sync.ps1 を完走前提で実行する場合
+- **予防策候補**: self-sync.ps1 の third-party 取得を分離した network 前提手順化（または --skip-third-party 相当の選択肢）
+- **想定反映先**: scripts/self-sync.ps1
+- **関連**: Case #4117・yomiyasu（third-party Skill）
+- **タグ**: `#self-sync` `#worktree` `#環境構成`
+
+## Windows 環境で textlint-guard-distribution.test.ts の afterAll rmSync が EBUSY で間欠 fail する
+
+- **問題事象**: full-integrity-suite 分割 ③（plugins+scripts）の実行で、scripts/self/release/textlint-guard-distribution.test.ts の afterAll（449 行目 rmSync）が OS 一時ディレクトリの adftl-dist-git-* で EBUSY を出して間欠 fail する（unnamed afterAll fail で「794 tests」と計上されることもある）
+- **発生局面**: Root Case #4117 の case-close pre-merge 機械工程（r2・r3 の gate ③、単独再実行では green）
+- **検知方法**: gate ③ の exit 1 と stderr の EBUSY スタック・replicate 実行（spawnSync パイプ捕捉を模倣）での再現確認
+- **根本原因**: Windows のハンドル競合（テスト終了直後のディレクトリ削除競合）。PR #4120 は当該ファイルに非接触であり事前存在の環境依存欠陥
+- **自律対応内容**: 単独再実行で green（r4 全 11 step pass）であることと PR 非接触を確認し、環境依存の事前存在として機械受理の対象外（failureOrigins 不使用・再実行で立証）として処置
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: Windows での bun test 一括実行は afterAll のテンポラリ削除競合で間欠 fail し得る。fail 時はファイル接触と単独再実行で由来分類（PR 起因か環境起因か）を確定してから扱う
+- **再発条件**: Windows 上で分割 ③ を連続実行しハンドル解放が遅延する場合
+- **予防策候補**: afterAll の rmSync に retry/遅延導入、または一時ディレクトリを OS tmp からテスト実行ディレクトリ配下へ変更
+- **想定反映先**: scripts/self/release/textlint-guard-distribution.test.ts
+- **関連**: Case #4117（close 実行・工程記録コメント検証差分）・PR #4120（非接触確認）
+- **タグ**: `#bun-test` `#windows` `#間欠fail` `#case-close`
+
