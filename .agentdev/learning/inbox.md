@@ -84,3 +84,19 @@
 - **想定反映先**: src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts（対照実行 step）・docs/designs/integrity/rules/IR-055-runtime-unresolved-reference.md（updated 是正）
 - **関連**: Case #4113・PR #4114・PR #4103・REQ-029-014〜016・docs/designs/integrity/rules/IR-072-req-updated-freshness.md
 - **タグ**: `#ci` `#機械工程` `#case-ready`
+
+## 書込み guard がプロジェクト外一時領域（Temp/opencode）への write を fail-closed ブロックする
+
+- **問題事象**: case-revise DEL-4113-REV1 の判断変更記録コメントの投稿前必須項目検証で、コメント本文と検証スクリプトを opencode 標準一時領域（C:\Users\ogatay\AppData\Local\Temp\opencode）へ保存しようとしたところ、agentdev-textlint-guard の書込み guard が「write targets a path outside the project root ... blocked per fail-closed」で write 2 件をともに拒否した。一時資材の保存ができず投稿前検証が実行できない状態になった
+- **発生局面**: 実装（case-revise STEP-5・記録コメント投稿前検証）
+- **検知方法**: write ツール実行の即時エラー応答（guard の fail-closed 拒否メッセージ）
+- **根本原因**: harness 標準の Temp/opencode 一時ディレクトリはプロジェクト root 外であり、書込み guard のプロジェクト root 外 write 拒否（fail-closed）の対象になる。harness 側の「事前承認済み一時領域」という前提とプロジェクト guard の配置契約が一致していない
+- **自律対応内容**: guard の解除・迂回は行わず、プロジェクト内の正規状態外一時領域 .agentdev/tmp/（.gitignore 対象・.agentdev README の約束対象外）へ保存先を切替して検証（validateRecordComment）を完了させた。検証後に今回作成分 2 ファイルを削除して後片付け（既存の他 Case 一時資材には触れない）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（AGENTS.md「書込み guard 運用指針」と docs/knowledge/windows-powershell-bulk-io-corruption.md の既存規律・既存配置契約の範囲内）
+- **横展開観点**: 委譲実行で Temp/opencode へ一時ファイルを書く前に、書込み guard のプロジェクト root 外拒否を想定し .agentdev/tmp/ を第一選択にする（pull --ff-only 前置は不要な一時バッファでも同様）
+- **再発条件**: プロジェクト root 外のパス（Temp/opencode を含む）に write ツールでファイルを作成しようとした場合
+- **予防策候補**: .agentdev/tmp/ を一時資材の標準保存先とする知識の横展開（docs/knowledge/ への追記候補）
+- **想定反映先**: src/common/skills/agentdev-git-worktree/references/worktree-operations.md（書込み guard 運用指針節への一時領域記述追補候補）または docs/knowledge/windows-powershell-bulk-io-corruption.md
+- **関連**: Case #4113・DEL-4113-REV1・agentdev-textlint-guard
+- **タグ**: `#guard` `#worktree` `#一時資材`
