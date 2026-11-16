@@ -8,6 +8,17 @@ case-close の機械工程 script（`scripts/src/close_mechanical_steps.ts`）�
 - 出力: stdout に報告 JSON
 - 終了コード: 通常実行は成功 0、要判断 2、失敗 1。`--validate-input` は合格 0 / 不合格 1
 
+## reclamation（終了判定記録回収）の標準手順
+
+post-merge の `reclamation.closeAcceptanceRecord` 指定時は、CLI runner が deleteFile を提供しないため fail-closed 報告（`mechanical runner does not provide deleteFile; reclamation cannot execute (fail-closed)`）が正である。現行正常系は次の手動回収経路で実施する（Case #4084・RU-0291）:
+
+1. **実在確認**: `ls .agentdev/close-acceptance/` で回収対象の終了判定記録（issue-{N}.json）の実在を確認する
+2. **証拠退避**: 回収対象の内容（accepted・targetRevision 等）を検証記録（完了記録コメント等）へ転記する
+3. **明示パス削除**: 転記後、node fs.unlinkSync で回収対象ファイルを明示パス指定で削除する（wildcard 不使用）
+4. **不存在確認**: 削除後に同パスの不存在を確認する
+
+機構整理候補: main() runner への deleteFile 注入（removeFile と同一の fs 実装）を保持する。removeFile と deleteFile の責務分界と runner 契約への影響範囲を確認したうえで、別作業単位で検討する（本記録は候補の保持まで。Case #4084・RU-0291）。
+
 ## 検証専用経路（--validate-input）
 
 副作用なしで機械工程 script の実行時前提を検証する入口（導入時整合検査〔check モード〕の機械工程前提検証）。
