@@ -132,3 +132,19 @@
 - **想定反映先**: .gitignore・.opencode/skills/repo-agentdev-integrity/baselines/（IR-073 除外定義）
 - **関連**: Case #4113・DEL-4113-CLOSE1・Case #4084
 - **タグ**: `#checker実行` `#case-close` `#integrity`
+
+## prepare_definition_pr の check_integrity fail 時早期 return が提案本文の欠落と計測日収束の不完結を生む
+
+- **問題事象**: Root Case #4117 の case-open STEP-4 機械工程（prepare_definition_pr.ts）で、check_integrity が計測日未同期 3 NG（req-metrics-measurement-example 計測日 AUTOGEN 未同期 1・req-updated-freshness 2〔うち 1 件は main 由来の既出債務の吸収〕）で非ゼロ終了した。script は measurement-convergence step（frontmatter updated 追随 commit 2451fa726）まで実行したが、その後 (1) 収束の generate_indexes 再実行の出力を commit せず未 commit のまま残し、(2) 提案本文（proposal）を生成せず早期 return したため、traceability check と提案本文は script 外の手動相当手順で完結する必要が生じた。さらに measurement-convergence step が frontmatter updated に commit 当日（2026-11-17）を設定したが、IR-072 req-updated-freshness checker の契約は「最終内容変更 commit の author date との一致（frontmatter-only commit は除外）」であるため、内容変更日が 2026-11-16 の対象（IR-055 rules）では NG が解消されず、updated を 2026-11-16 へ訂正する追加 commit（6251ba7aa）が要った
+- **発生局面**: case-open STEP-4 機械工程 1 回目（HEAD af25bd551 → 収束補正後 6251ba7aa）
+- **検知方法**: 報告 JSON の exitCategory failure と check_integrity step fail・proposal 空オブジェクト。check_integrity stdout の NG 3 行と、worktree git status の未 commit 派生物（req-health-metrics.md）
+- **根本原因**: script の制御フローが「check_integrity 非ゼロ = 即座の全体打ち切り」を前提とし、measurement-convergence による補正 commit の後の継続実行（traceability gate・提案本文生成）を持たない。また収束 step の updated 設定値（commit 当日）と checker 契約（内容変更 author date・frontmatter-only commit 除外）の意味が一致していない
+- **自律対応内容**: 既存の幂等再実行手順（報告 JSON と git 状態から適用済み工程を確認し不足分のみ処理）とゲートの読取系実行手順（main root 実体から --root worktree 指定）で残工程を完結した。派生物の明示パス指定補正 commit（77695d5d4）と IR-072 契約に整合した updated 訂正 commit（6251ba7aa）の後、check_integrity を再実行して exit 0・NG 0 件を確認し、traceability check --req を実行して missing-design 0 件・deferred のみを確認した。提案本文は script の proposal テンプレートに基づき実測証跡で再構築した
+- **ユーザー確認有無**: なし（既存 contingency 手順の履行）
+- **Decision/REQ/spec影響**: なし（REQ-030-025/026/027/029・REQ-117-011 の既存契約の範囲で処置）
+- **横展開観点**: REQ 行追加を伴う Definition Package 生成では、req-health-metrics.md の計測日 AUTOGEN 更新が commit 前配置と commit 後検査の間でずれ得る。REQ 追加 Case の case-open では、check_integrity 非ゼロ時に「収束補正後の再実行」を標準の救済として想定し、報告 JSON の proposal 欠落を手動再構築で補う工程を事前に用意する。case-ready / case-close の同型機械工程も同じ制御フロー構造を持つため同様の事象が発生し得る
+- **再発条件**: REQ 行追加等で計測日派生物が更新される Case で、check_integrity が計測日系 NG で非ゼロ終了した場合。および既存債務（内容変更日が frontmatter updated より新しい docs ファイル）を収束 commit が吸収する場合
+- **予防策候補**: (1) prepare_definition_pr.ts の提案本文生成を check_integrity 判定の前または失敗時も含めて実行する（途中結果として proposal を返す）、(2) runMeasurementDateConvergence の updated 設定を「対象ファイルの最終内容変更 commit の author date」へ一致させ、frontmatter-only commit を内容変更として扱わない checker 契約と揃える
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts（assembleReport の呼び出し位置・runMeasurementDateConvergence の updated 設定）。本 Case の REQ-029-017（機械工程の入力構成）の case-run 実装時にあわせて評価する
+- **関連**: Case #4117・REQ-029-017・REQ-030-032・REQ-117-011・IR-072
+- **タグ**: `#機械工程` `#case-open` `#traceability`
