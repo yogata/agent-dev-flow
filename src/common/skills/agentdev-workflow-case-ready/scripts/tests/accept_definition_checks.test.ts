@@ -280,7 +280,7 @@ describe("受入検査 phase（忠実性・整合性・品質検査、overlap �
     };
     const report = runAcceptDefinitionChecks(acceptanceInput({ traceabilityGate }), runner);
     const step = report.result.steps.find((s) => s.name === "traceability-check");
-    expect(step?.detail.summary).toBe("pass=11 fail=0");
+    expect(step?.detail.summary).toBe("pass=12 fail=0");
     expect(step?.status).toBe("pass");
     expect(runner.calls.some((c) => c.args.includes(fourDigitReqId))).toBe(true);
   });
@@ -474,7 +474,7 @@ describe("検査証拠の一括保存と結果消費（標準出力・標準エ�
     const report = runAcceptDefinitionChecks(acceptanceInput({ traceabilityGate }), fakeRunner());
     const step = report.result.steps.find((s) => s.name === "traceability-check");
     expect(step?.detail.stdout).toBe(traceabilityReportFromArgs(traceabilityGate.args));
-    expect(step?.detail.summary).toBe("pass=11 fail=0");
+    expect(step?.detail.summary).toBe("pass=12 fail=0");
     expect(step?.detail.targetRevision).toBe("abc123");
     expect(step?.detail.targetPaths).toEqual(["C:/repo"]);
   });

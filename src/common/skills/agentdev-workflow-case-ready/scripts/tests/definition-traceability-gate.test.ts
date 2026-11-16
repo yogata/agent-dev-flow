@@ -21,6 +21,7 @@ const CHECK_KINDS = [
   "duplicate-inconsistencies",
   "malformed-links",
   "dangling-links",
+  "derived-declaration-conflicts",
 ] as const;
 
 type CheckKind = typeof CHECK_KINDS[number];
@@ -88,7 +89,7 @@ describe("case-ready Definition readiness traceability consumption", () => {
     const result = runAcceptDefinitionChecks(input(), runner(raw));
     const traceabilityStep = result.result.steps.find((step) => step.name === "traceability-check");
 
-    expect(traceabilityStep?.detail.summary).toBe("pass=9 fail=2");
+    expect(traceabilityStep?.detail.summary).toBe("pass=10 fail=2");
     expect(traceabilityStep?.status).toBe("warn");
     expect(traceabilityStep?.detail.exitCode).toBe(2);
     expect(traceabilityStep?.detail.stdout).toBe(JSON.stringify(raw));
@@ -114,5 +115,18 @@ describe("case-ready Definition readiness traceability consumption", () => {
     });
 
     expect(runAcceptDefinitionChecks(input(), runner(raw)).result.exitCategory).toBe("failure");
+  });
+
+  test("keeps derived-declaration-conflicts failures blocking with the checker kind in the reason", () => {
+    const raw = report({
+      "derived-declaration-conflicts": { kind: "derived-declaration-conflicts", status: "fail", findings: [{ reqId: TARGET_REQ_ID }] },
+    });
+
+    const result = runAcceptDefinitionChecks(input(), runner(raw));
+    const traceabilityStep = result.result.steps.find((step) => step.name === "traceability-check");
+
+    expect(result.result.exitCategory).toBe("failure");
+    expect(traceabilityStep?.status).toBe("fail");
+    expect(traceabilityStep?.detail.summary).toBe("non-deferrable traceability check failed: derived-declaration-conflicts");
   });
 });
