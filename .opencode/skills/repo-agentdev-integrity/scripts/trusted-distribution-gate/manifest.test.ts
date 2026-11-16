@@ -130,6 +130,17 @@ describe("manifest / buildSourceManifest", () => {
     expect(() => buildSourceManifest([])).toThrow();
   });
 
+  // 空経路の fail-closed（loadAndClassify の blobs が空で届いた場合）:
+  // runtime エントリのみで必須 bootstrap スクリプトが欠ける候補ツリーは
+  // "missing required bootstrap script" で拒否され、空の source manifest
+  // が黙って成立する経路を残さない。
+  test("rejects when required bootstrap scripts are missing (empty-path guard)", () => {
+    const runtimeOnly: ManifestEntryInput[] = [
+      entry("src/common/skills/agentdev-foo/SKILL.md", "a".repeat(64), 20),
+    ];
+    expect(() => buildSourceManifest(runtimeOnly)).toThrow(/missing required bootstrap script/);
+  });
+
   test("rejects invalid sha256", () => {
     const inputs: ManifestEntryInput[] = [
       entry("src/common/skills/agentdev-foo/SKILL.md", "short", 1),
@@ -160,6 +171,37 @@ describe("manifest / buildLinkManifest", () => {
       const original = runtime.find((r) => r.sha256 === e.sha256);
       expect(original).toBeDefined();
     }
+  });
+
+  // 空経路の fail-closed: bootstrap エントリのみで runtime が空の候補ツリーは
+  // source manifest としては成立するが、link（runtime の .opencode 写像）が
+  // "zero target entries" で拒否され、空の link manifest が黙って成立する
+  // 経路を残さない。
+  test("rejects zero target entries (runtime-empty candidate tree)", () => {
+    expect(() => buildLinkManifest([])).toThrow(/zero target entries/);
+  });
+
+  // repo-local plugin（consumer 配布対象外・独立監査リスト）は consumer 配布
+  // 3投影の監査期待から除外され、source projection の原本監査には残る。
+  test("excludes repo-local plugins from the link expectation", () => {
+    const runtime = [
+      entry("src/common/skills/agentdev-foo/SKILL.md", "a".repeat(64), 10),
+      entry("src/opencode/plugins/agentdev-distribution-boundary-guard/plugin.ts", "b".repeat(64), 20),
+    ];
+    const m = buildLinkManifest(runtime);
+    expect(m.entries.map((e) => e.path)).toEqual([
+      ".opencode/skills/agentdev-foo/SKILL.md",
+    ]);
+    const source = buildSourceManifest([
+      ...runtime,
+      entry("scripts/install.ps1", "d".repeat(64), 40),
+      entry("scripts/consumer/common.ps1", "e".repeat(64), 50),
+      entry("scripts/consumer/install-sync-common.ps1", "0".repeat(64), 55),
+      entry("scripts/consumer/distribution-exclusion.ps1", "1".repeat(64), 56),
+    ]);
+    expect(source.entries.map((e) => e.path)).toContain(
+      "src/opencode/plugins/agentdev-distribution-boundary-guard/plugin.ts",
+    );
   });
 });
 

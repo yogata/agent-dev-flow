@@ -20,11 +20,21 @@ export function extractZip(zipPath: string, dst: string): void {
     // Argument-array invocation: no shell, no string interpolation. The
     // zipPath/dst are passed as literal argv elements via env vars so any
     // quote or metacharacter in them cannot escape the argument boundary.
+    //
+    // Uses the .NET ZipFile API directly under pwsh (PowerShell 7) instead
+    // of the Microsoft.PowerShell.Archive module (Expand-Archive): when this
+    // process tree is launched from pwsh, the inherited PSModulePath makes a
+    // child Windows PowerShell 5.1 load the PS7 Archive module, whose
+    // 3-argument ExtractToDirectory call has no .NET Framework overload —
+    // extraction silently produces an empty tree and archive verification
+    // fails with every entry missing. The 2-argument .NET overload is stable
+    // across runtimes; the destination is always a fresh temp directory.
     const script =
-      `Expand-Archive -LiteralPath $env:TRUST_ZIP -DestinationPath $env:TRUST_DST -Force`;
+      `Add-Type -AssemblyName System.IO.Compression.FileSystem; ` +
+      `[System.IO.Compression.ZipFile]::ExtractToDirectory($env:TRUST_ZIP, $env:TRUST_DST)`;
     execFileSync(
-      "powershell",
-      ["-NoProfile", "-Command", script],
+      "pwsh",
+      ["-NoProfile", "-NonInteractive", "-Command", script],
       {
         env: {
           ...process.env,
@@ -65,14 +75,16 @@ export function compressStage(stageDir: string, zipPath: string): void {
   if (process.platform === "win32") {
     // Argument-array invocation: paths are passed via env vars and read
     // inside PowerShell as $env:*, so metacharacters in stageDir/zipPath
-    // cannot break out of the script string. Compress-Archive -Path
-    // '${stage}\*' would include the dir name as a prefix; we pass the
-    // glob explicitly via env to compress contents only.
+    // cannot break out of the script string. Same .NET-direct rationale as
+    // extractZip: no Microsoft.PowerShell.Archive module dependency. The
+    // `$false` includeBaseDirectory argument stores entries without the
+    // stage-dir prefix (equivalent to the previous `-Path '<stage>\*'`).
     const script =
-      `Compress-Archive -Path (Join-Path $env:TRUST_STAGE '*') -DestinationPath $env:TRUST_ZIP -Force`;
+      `Add-Type -AssemblyName System.IO.Compression.FileSystem; ` +
+      `[System.IO.Compression.ZipFile]::CreateFromDirectory($env:TRUST_STAGE, $env:TRUST_ZIP, [System.IO.Compression.CompressionLevel]::Optimal, $false)`;
     execFileSync(
-      "powershell",
-      ["-NoProfile", "-Command", script],
+      "pwsh",
+      ["-NoProfile", "-NonInteractive", "-Command", script],
       {
         env: {
           ...process.env,

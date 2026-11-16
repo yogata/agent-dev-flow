@@ -13,6 +13,8 @@
 
 ## 起動
 
+Windows では PowerShell 7（pwsh）が必要である。pipeline の archive 圧縮・展開は Microsoft.PowerShell.Archive module（Compress-Archive / Expand-Archive）を使用せず、pwsh から .NET ZipFile API を直接呼び出す（pwsh 起動時に継承された PSModulePath で Windows PowerShell 5.1 子プロセスが PS7 版 Archive module を読み込み、抽出が無音失敗する障害の排除。出典: [archive-zip.ts](archive-zip.ts) 冒頭契約コメント）。
+
 ### 配布依存境界 checker
 
 ```
@@ -27,6 +29,8 @@ bun run check_distribution_boundary.ts [--profile P] [--json]
 ### Stage A trust-root gate
 
 `scripts/self/release/trusted-distribution-gate.ps1` から起動する。PowerShell ランチャーが配列形式の引数で TypeScript CLI（`cli.ts`）を呼び出し、shell 展開なし・一時スクリプトファイルなしで検査を実行する。パラメータの意味（`-BaseOid`、`-CandidateOid`、`-RepoRoot`、`-OutputDir`、`-RepositoryIdentity`、`-DefaultBranch`、`-BootstrapMode`/`-SeedMode`、`-BootstrapReport`）は当該スクリプト冒頭のパラメータ文書を出典とする。検査対象は不変な candidate Git OID であり、candidate コードを実行しない（出典: [trusted-distribution-gate.ps1](../../../../../scripts/self/release/trusted-distribution-gate.ps1) 冒頭文書）。
+
+pipeline 実行の前提（main root・Windows）: 検証は本体リポジトリの main root から行う。`-BaseOid`・`-CandidateOid` には検証対象の commit OID を指定し、`-RepoRoot` には main root の絶対パス、`-OutputDir` には検証用一時出力先の絶対パスを指定する。trust-root 保護パスの列挙は起動した cli.ts の物理位置から決まり（出典: [protected-paths.ts](protected-paths.ts) の trust-root ディレクトリ走査契約）、PowerShell ランチャーはランチャー自身の配置位置から cli.ts を解決する（出典: trusted-distribution-gate.ps1 の cli.ts 解決）。このため trusted-distribution-gate 配下に変更を含む commit の検証は、その変更を含む checkout（merge 後の main root、または当該 commit を checkout して dirty がない検証用作業ツリー）から起動する。作業中 worktree から起動した場合、未 commit の trust-root ファイルが保護期待値に混入して exit 1 で停止する。
 
 ## 失敗時の扱い
 

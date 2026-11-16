@@ -102,6 +102,30 @@ function verifyInDir(input: VerifyInstalledInput, work: string): VerifyInstalled
   const installerPath = path.join(work, "install-from-archive.ps1");
   fs.writeFileSync(installerPath, installerBytes);
 
+  // The installer dot-sources the distribution exclusion canon from its own
+  // directory (consumer/distribution-exclusion.ps1) to resolve repo-local
+  // plugin exclusions. Without the canon placed next to the installer it
+  // stops fail-closed with exit 5 before placing tools/plugins. Place the
+  // BASE-OID canon bytes at the installer's first search path (never trust
+  // the candidate copy).
+  let canonBytes: Uint8Array;
+  try {
+    canonBytes = readBlob(
+      input.adapter,
+      input.baseOid,
+      "base-exclusion-canon",
+      "scripts/consumer/distribution-exclusion.ps1",
+    );
+  } catch (e) {
+    if (e instanceof GitBlobMissingError) {
+      return mismatch(`trusted distribution exclusion canon (scripts/consumer/distribution-exclusion.ps1) missing at base oid ${input.baseOid}`);
+    }
+    throw e;
+  }
+  const canonDir = path.join(work, "consumer");
+  fs.mkdirSync(canonDir, { recursive: true });
+  fs.writeFileSync(path.join(canonDir, "distribution-exclusion.ps1"), canonBytes);
+
   // Target: fresh temp .opencode directory.
   const targetOpencode = path.join(work, "opencode");
   fs.mkdirSync(targetOpencode, { recursive: true });
@@ -141,7 +165,13 @@ function verifyInDir(input: VerifyInstalledInput, work: string): VerifyInstalled
       );
     }
   }
-  if (exitCode !== 0) {
+  // Exit 0 = every file placed. Exit 6 = files placed, then the installer
+  // stopped with the textlint-guard vendor generation guidance: the archive
+  // ships only version pin metadata and the vendor artifacts are generated
+  // by the user at install time (REQ-029-012), so a freshly extracted
+  // archive can never satisfy the vendor completeness check. Placement is
+  // complete in both cases; every other exit is a placement failure.
+  if (exitCode !== 0 && exitCode !== 6) {
     return mismatch(`trusted install-from-archive.ps1 exited ${exitCode} during physical install`);
   }
 

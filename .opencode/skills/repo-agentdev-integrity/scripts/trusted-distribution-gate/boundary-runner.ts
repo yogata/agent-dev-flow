@@ -26,6 +26,7 @@ import {
 } from "./boundary-gate.ts";
 import type { DetectorConfig } from "./boundary-pipeline.ts";
 import { mapRuntimeToLinkPath } from "./manifest.ts";
+import { isBoundaryScanTarget, isConsumerProjectionScanTarget } from "./boundary-scan-scope.ts";
 
 const PROJECTIONS: readonly Projection[] = [
   "source",
@@ -48,6 +49,10 @@ function buildProjectionFiles(
   if (projection === "source") {
     for (const b of input.blobs) {
       if (b.subset !== "runtime" && b.subset !== "bootstrap") continue;
+      // 検査対象の除外領域 (Design 検査対象の除外領域): 共通原本側
+      // tests/ 配下と tools/<name>/local/ 配下は配布テキスト成果物の
+      // 検査対象外。manifest には含まれたまま (scan target only)。
+      if (!isBoundaryScanTarget(b.entry.path)) continue;
       if (b.text !== null) out.push({ filePath: b.entry.path, projection, text: b.text });
     }
     return out;
@@ -56,6 +61,7 @@ function buildProjectionFiles(
   if (projection === "archive") {
     for (const b of input.blobs) {
       if (b.subset !== "runtime" && b.subset !== "archive-extra") continue;
+      if (!isBoundaryScanTarget(b.entry.path)) continue;
       if (b.text !== null) out.push({ filePath: b.entry.path, projection, text: b.text });
     }
     return out;
@@ -63,6 +69,12 @@ function buildProjectionFiles(
 
   for (const b of input.blobs) {
     if (b.subset !== "runtime") continue;
+    // Exclusion is decided on the candidate source path (before the
+    // .opencode/** link mapping) so it holds identically in the link and
+    // archive-installed projections. Repo-local plugin originals are
+    // consumer-undistributable and therefore absent from these projections.
+    if (!isBoundaryScanTarget(b.entry.path)) continue;
+    if (!isConsumerProjectionScanTarget(b.entry.path)) continue;
     if (b.text !== null) {
       const mapped = mapRuntimeToLinkPath(b.entry.path);
       out.push({ filePath: mapped, projection, text: b.text });
