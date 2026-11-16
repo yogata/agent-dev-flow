@@ -1,4 +1,4 @@
-﻿// Tests for the archive builder.
+// Tests for the archive builder.
 //
 // Stage A trust-root archive builder:
 //   - ZIP entries come ONLY from candidate Git blobs (never working tree).

@@ -82,7 +82,7 @@ Step 3-2（既存REQ）および Step 10-2（生成ドラフト）で REQ 健全
  - 複数成果物種別の混在（command + skill + template 等）
  - 複数 command family の混在
  - 複数 lifecycle 段階の混在
-3. **成果物種別数**: req-impact-map Design の「影響する Artifact」列、または要件本文の対象成果物記述から集計する。
+3. **成果物種別数**: req-impact-map.md（docs/designs/responsibilities/ 配下・IR frontmatter の AUTOGEN 導出対応表）の対応記録、または要件本文の対象成果物記述から集計する。
 新規 CREATE のドラフトで影響マップに未載の場合は要件本文から推定する。
 
 ### シグナル算出
