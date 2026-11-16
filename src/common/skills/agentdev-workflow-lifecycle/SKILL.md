@@ -155,7 +155,7 @@ promote 系コマンド（intake-promote・learning-promote・inspect-promote）
 
 docs/** の日本語文章を変更する場合、編集前に yomiyasu を読み込み、内容変更が揃った後に変更文章と周辺文脈を推敲し、同梱 lint を実行して指摘を確認してから提出する。各 edit ごと・既存文書全体の一括推敲は不要。
 
-lint の実行経路: `.opencode/skills/yomiyasu/scripts/yomiyasu_lint.py` を、環境で利用可能な Python コマンド（python3 に固定しない）で実行する。標準入力・パイプ・リダイレクト経由の本文渡しは使わず、検査専用本文ファイルを非永続領域（リポジトリ外の一時ディレクトリ等）に新規作成して lint のファイル引数実行を行い、検査後に当該ファイルを削除する。パイプ・リダイレクト経由の本文渡しが Windows 環境の文字コード再符号化により本文を破損し得る事象の詳細と標準回避手段は、docs/knowledge/windows-powershell-bulk-io-corruption.md を参照する（必要なときだけ参照する条件付き参照）。
+lint の実行経路: `.opencode/skills/yomiyasu/scripts/yomiyasu_lint.py` を、環境で利用可能な Python コマンド（python3 に固定しない）で実行する。標準入力・パイプ・リダイレクト経由の本文渡しは使わず、検査専用本文ファイルを project root 内の gitignore 対象領域（`.agentdev/tmp/` 等・検査後削除）へ新規作成して lint のファイル引数実行を行い、検査後に当該ファイルを削除する。パイプ・リダイレクト経由の本文渡しが Windows 環境の文字コード再符号化により本文を破損し得る事象の詳細と標準回避手段は、docs/knowledge/windows-powershell-bulk-io-corruption.md を参照する（必要なときだけ参照する条件付き参照）。
 
 GitHub 文章（Issue/PR タイトル・本文、説明・レビュー・完了コメント。委譲先能力スキル〔agentdev-issue-management、agentdev-workflow-templates、agentdev-epic-tracker、agentdev-quality-gates、agentdev-case-run-execution-adapter〕経由の書込みを含む）は agentdev_gh へ渡す前に推敲する。本文は lint・指摘確認後、タイトルは本文向け文長・箇条書き比率を合否条件にしない。書込み後 VERIFY は維持する。
 
