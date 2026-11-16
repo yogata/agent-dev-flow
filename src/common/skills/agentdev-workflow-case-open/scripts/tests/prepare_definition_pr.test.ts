@@ -738,8 +738,11 @@ describe("runMeasurementDateConvergence（補正適用と差分検査 fail-close
   // 報告される。計測日ドリフト検出はこの実出力詳細行（index-generation-consistency 行と
   // 計測日）を捕捉する。category 見出し・ルーティング表のキャメル表記を含まない入力で
   // 検証し、詳細行の表記だけで trigger が成立することを機械突合で固定する。
-  const measurementDriftNgLine = "- **[NG]** index-generation-consistency: req-metrics-measurement-example AUTOGEN block out of sync. first mismatch at line 84 (current=計測日: 2026-11-07。, expected=計測日: 2026-11-08。). Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002) [IR-061] (docs/designs/quality/req-health-metrics.md:174) → route: intake";
-  const catalogDriftNgLine = "- **[NG]** index-generation-consistency: catalog pre-045 AUTOGEN block out of sync. first mismatch at line 1 (current=| REQ-001 | 例 |, expected=| REQ-002 | 例 |). Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002) [IR-061] (docs/designs/integrity/integrity-rule-catalog.md:24) → route: intake";
+  // 報告詳細行の末尾パス（対象文書の具体パス）は trigger 判定の対象外であるため、
+  // エンジン配布ファイルの docs/ 具体パス排除契約（RA-003・TS-004）に従い
+  // プレースホルダへ置換して実出力構造を再現する。
+  const measurementDriftNgLine = "- **[NG]** index-generation-consistency: req-metrics-measurement-example AUTOGEN block out of sync. first mismatch at line 84 (current=計測日: 2026-11-07。, expected=計測日: 2026-11-08。). Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002) [IR-061] (<checker-report-target-doc>:174) → route: intake";
+  const catalogDriftNgLine = "- **[NG]** index-generation-consistency: catalog pre-045 AUTOGEN block out of sync. first mismatch at line 1 (current=| REQ-001 | 例 |, expected=| REQ-002 | 例 |). Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002) [IR-061] (<checker-report-target-catalog>:24) → route: intake";
 
   test("checker 実出力詳細行（ケバブ表記 index-generation-consistency）の計測日ドリフトを捕捉して収束 step を生成する", () => {
     const runner = convergenceRunner({});
