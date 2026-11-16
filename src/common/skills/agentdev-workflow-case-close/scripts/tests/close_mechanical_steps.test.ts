@@ -445,14 +445,6 @@ function completeMachineAcceptanceRecord(
     suiteRunRecords: [
       {
         split: "分割①",
-        command: "bun test ./src/",
-        cwd: "<repo>",
-        testCountSummary: "Ran 2909 tests across 96 files",
-        exitCode: 0,
-        scope: "./src/",
-      },
-      {
-        split: "分割②",
         command: "bun test ./.opencode/skills/repo-agentdev-integrity/scripts/",
         cwd: "<repo>",
         testCountSummary: "Ran 592 tests across 12 files",
@@ -460,12 +452,20 @@ function completeMachineAcceptanceRecord(
         scope: "./.opencode/skills/repo-agentdev-integrity/scripts/",
       },
       {
+        split: "分割②",
+        command: "bun test ./src/",
+        cwd: "<repo>",
+        testCountSummary: "Ran 2909 tests across 96 files",
+        exitCode: 0,
+        scope: "./src/",
+      },
+      {
         split: "分割③",
-        command: "bun test ./.opencode/plugins/ ./scripts/",
+        command: "bun test ./.opencode/plugins/",
         cwd: "<repo>",
         testCountSummary: "Ran 348 tests across 20 files",
         exitCode: 0,
-        scope: "./.opencode/plugins/ ./scripts/",
+        scope: "./.opencode/plugins/",
       },
     ],
     environmentLabel: {
