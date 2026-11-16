@@ -6,7 +6,7 @@ context:
   - id: backticks-threshold
     when: backticks 識別子判定閾値参照時
     paths:
-      - "docs/designs/integrity/backticks-identifier-threshold.md"
+      - "docs/designs/responsibilities/document-type-responsibilities.md"
     purpose: backticks 必須と任意の機械判定閾値の確認
   - id: artifact-contracts
     when: アーティファクト間契約参照時

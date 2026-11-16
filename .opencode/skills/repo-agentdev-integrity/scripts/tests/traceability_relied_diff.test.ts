@@ -300,8 +300,10 @@ describe("relied-diff 取得失敗の構造化報告と変更起点の保持", (
       "docs/designs/workflows/v51-phase-transition-and-coexistence-model.md",
       "utf-8",
     );
-    expect(v51).toContain("impact 拡張（差分候補）");
     expect(v51).toContain("relied-diff");
+    const traceabilityDesign = readFileSync("docs/designs/skills/agentdev-traceability.md", "utf-8");
+    expect(traceabilityDesign).toContain("impact 拡張（差分候補）");
+    expect(traceabilityDesign).toContain("relied-diff");
   });
 });
 
