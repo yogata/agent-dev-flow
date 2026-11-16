@@ -50,11 +50,21 @@ jobs:
 
       - name: Run split3 (bun test ./.opencode/plugins/ ./scripts/)
         # exit code は fail クラス baseline check で処理するため、このステップでは
-        # 出力の退避のみを行う（fail があっても突合を実行する）。
+        # 出力の退避のみを行う（fail があっても突合を実行する）。bun test の
+        # ネイティブ exit code（fail あり = 1）がステップ失敗に伝播しないよう、
+        # スクリプト末尾で明示 exit 0 とする。
         shell: pwsh
         run: |
           bun test ./.opencode/plugins/ ./scripts/ 2>&1 | Out-File -FilePath split3-output.txt -Encoding utf8
           Write-Host "split3 executed (exit code handled by the baseline check step)"
+          exit 0
+
+      - name: Upload split3 output
+        uses: actions/upload-artifact@v4
+        with:
+          name: split3-output
+          path: split3-output.txt
+          retention-days: 14
 
       - name: Fail class baseline check
         shell: pwsh
