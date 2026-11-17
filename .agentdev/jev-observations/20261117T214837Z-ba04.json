@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261117T214837Z-ba04",
+  "workflow": "req-define",
+  "evaluationKind": "req-matching-and-classification",
+  "subject": "実験前提移行一括整理(Epic #4126完了済み)の未達5項目解消完了作業のREQ操作帰属とdocs/designs修正の分類",
+  "sourceRevision": "f670c9824",
+  "durationMs": 1201,
+  "inputTokens": 2422,
+  "inputs": {
+    "requestDigest": "6defb6ffe56669fdaef179a27ecc324029dd0591e322e0176ca4a3f42a3fe2a7",
+    "references": [
+      {
+        "digest": "ecf2a8328c5bd1f3099dd4360fc40dacb162abf47e410839ee16e2e1e57317c6",
+        "label": "REQ-010 (docs-check・baseline撤廃既定)",
+        "path": "docs/requirements/REQ-010.md"
+      },
+      {
+        "digest": "1cd1d03c961ff1cbe08aaeeeb405cccba43bef409de655ce804c4847870e70b8",
+        "label": "REQ-109 (v5移行と互換性の境界)",
+        "path": "docs/requirements/REQ-109.md"
+      },
+      {
+        "digest": "71a9e29c64fbad1aae55fd5906ae369425887ad0a891e30f873675ac2c9c759c",
+        "label": "REQ-117 (docs整合・区分外行解消)",
+        "path": "docs/requirements/REQ-117.md"
+      },
+      {
+        "digest": "02650b14a484ec8b01eec2cb58a2af419c3e448718ab72084d9b316f60bdcf27",
+        "label": "REQ-090 (Jev観測の永続契約)",
+        "path": "docs/requirements/REQ-090.md"
+      }
+    ],
+    "snapshot": "未達5項目: (1) jev-observations JSON 5件残存(指定状態は .gitkeep のみ), (2) vocabulary-registry.md に撤廃済みIR-055 baseline手順・削除済みIR-065/066・data参照, (3) check_extensions.ts の ng-baseline 読込・免除・--update-ng-baseline 残存, (4) traceability check exit 2(missing-impl 21行/missing-verif 18行・6行はDesign削除起因・REQ-117系は13行), (5) 削除済みパス参照コメント。docs/designs 修正候補4件は撤廃済み機構への旧参照修正。"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-existing-req-matching",
+      "questionForm": "choice",
+      "value": "REQ操作なし",
+      "probabilityDistribution": {
+        "CREATE": 0,
+        "APPEND": 0,
+        "UPDATE": 0.25,
+        "REQ操作なし": 0.74,
+        "保留": 0.01
+      }
+    },
+    {
+      "questionId": "q2-matching-confidence",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.28,
+        "false": 0.72
+      }
+    },
+    {
+      "questionId": "q3-design-vs-realization",
+      "questionForm": "choice",
+      "value": "Design保存対象(artifact: design)",
+      "probabilityDistribution": {
+        "REQ行として新規保存": 0,
+        "Design保存対象(artifact: design)": 1,
+        "実現面のみ(realization)": 0,
+        "保留": 0
+      }
+    },
+    {
+      "questionId": "q4-separation-need",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.2,
+        "false": 0.8
+      }
+    }
+  ],
+  "confidence": 0.68,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-existing-req-matching",
+        "value": "REQ操作なし"
+      },
+      {
+        "questionId": "q2-matching-confidence",
+        "value": false
+      },
+      {
+        "questionId": "q3-design-vs-realization",
+        "value": "Design保存対象(artifact: design)"
+      },
+      {
+        "questionId": "q4-separation-need",
+        "value": false
+      }
+    ]
+  }
+}
