@@ -17,6 +17,8 @@
 .agentdev/graph/
 .agentdev/tmp/
 .agentdev/cache/
+# 機械工程の終了判定記録（一時保護記録・post-merge reclamation で回収。恒久 commit 対象外）
+.agentdev/close-acceptance/
 docs/reports/local/
 AGENTS.md
 outputs/

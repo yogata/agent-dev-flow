@@ -95,10 +95,10 @@ links:
     src/common/skills/agentdev-traceability/scripts/lib/inventory.ts:
       - docs/designs/skills/agentdev-traceability.md
     src/common/skills/agentdev-traceability/scripts/lib/links.ts:
-      - docs/designs/foundations/v4-traceability-model.md
+      - docs/designs/foundations/traceability-model.md
       - docs/designs/skills/agentdev-traceability.md
     src/common/skills/agentdev-traceability/scripts/lib/reuse.ts:
-      - docs/designs/foundations/v4-traceability-model.md
+      - docs/designs/foundations/traceability-model.md
 verification:
   src/common/skills/agentdev-traceability/scripts/src/check.ts:
     - REQ-012-058

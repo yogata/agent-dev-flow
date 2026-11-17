@@ -68,4 +68,4 @@ verification:
 links:
   upstream:
     src/common/skills/agentdev-workflow-phase-tasks-create/SKILL.md:
-    - docs/designs/workflows/v51-phase-driven-collaboration-model.md
+    - docs/designs/workflows/phase-driven-collaboration-model.md

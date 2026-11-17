@@ -13,5 +13,3 @@ verification:
     - REQ-111-013
   .agentdev/README.md:
     - REQ-111-013
-  docs/designs/foundations/references/v4-v5-crosswalk.md:
-    - REQ-111-013

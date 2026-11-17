@@ -20,7 +20,7 @@
 # Case #3996: case-run SKILL.md の根拠参照7行8出現（基準6bedd394a）を個別照合。
 # L17 DEC-{N}: DEC-010「決定」責務3層分化。本文に3層の所有責務を明記。
 # L52 DEC-{N}: DEC-011「決定」安定STEP識別子・永続情報による再開。
-#   隣接していた仮Designパスも実ファイル v4-durable-state-and-recovery.md と照合し、
+#   隣接していた仮Designパスも実ファイル durable-state-and-recovery.md と照合し、
 #   配布本文は同じ再開契約を説明する。See Also のDesign概念名参照は維持。
 # L88 REQ-{NNNN}-{NNN}: REQ-002-017。他Skillの内部構造へ直接依存しない契約を本文に明記。
 # L101 IR-{NNN}: IR-056-project-extensions-integrity「検査項目」。
@@ -461,7 +461,7 @@ links:
       - docs/decisions/DEC-011.md
       - docs/requirements/REQ-002.md
       - docs/requirements/REQ-101.md
-      - docs/designs/foundations/v4-durable-state-and-recovery.md
+      - docs/designs/foundations/durable-state-and-recovery.md
       - docs/designs/integrity/rules/IR-056-project-extensions-integrity.md
     src/common/skills/agentdev-phase-theme-collaboration/scripts/README.md:
       - docs/requirements/REQ-060.md
@@ -479,10 +479,10 @@ links:
       - docs/requirements/REQ-015.md
       - docs/requirements/REQ-031.md
     src/common/skills/agentdev-workflow-case-close/references/docs-and-design-promotion.md:
-      - docs/designs/foundations/v4-responsibility-boundaries.md
+      - docs/designs/foundations/responsibility-boundaries.md
       - docs/requirements/REQ-096.md
     src/common/skills/agentdev-workflow-case-close/references/issue-resolution-and-qg4.md:
-      - docs/designs/foundations/v4-responsibility-boundaries.md
+      - docs/designs/foundations/responsibility-boundaries.md
       - docs/designs/integrity/rules/IR-055-runtime-unresolved-reference.md
       - docs/requirements/REQ-031.md
       - docs/requirements/REQ-096.md
@@ -501,23 +501,23 @@ links:
       - docs/decisions/DEC-011.md
       - docs/requirements/REQ-030.md
     src/common/skills/agentdev-workflow-case-ready/references/decision-acceptance.md:
-      - docs/designs/foundations/v4-responsibility-boundaries.md
+      - docs/designs/foundations/responsibility-boundaries.md
       - docs/requirements/REQ-061.md
       - docs/requirements/REQ-096.md
     src/common/skills/agentdev-workflow-case-ready/references/definition-acceptance.md:
-      - docs/designs/foundations/v4-responsibility-boundaries.md
+      - docs/designs/foundations/responsibility-boundaries.md
       - docs/requirements/REQ-061.md
       - docs/requirements/REQ-096.md
     src/common/skills/agentdev-workflow-case-ready/references/execution-structure.md:
       - docs/decisions/DEC-040.md
-      - docs/designs/foundations/v4-responsibility-boundaries.md
+      - docs/designs/foundations/responsibility-boundaries.md
       - docs/requirements/REQ-061.md
       - docs/requirements/REQ-090.md
       - docs/requirements/REQ-096.md
     src/common/skills/agentdev-workflow-case-ready/SKILL.md:
       - docs/decisions/DEC-010.md
       - docs/decisions/DEC-011.md
-      - docs/designs/foundations/v4-responsibility-boundaries.md
+      - docs/designs/foundations/responsibility-boundaries.md
       - docs/requirements/REQ-061.md
       - docs/requirements/REQ-096.md
     src/common/skills/agentdev-workflow-case-revise/references/definition-revision.md:

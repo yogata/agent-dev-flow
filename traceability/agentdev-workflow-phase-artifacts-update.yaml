@@ -135,4 +135,4 @@ verification:
 links:
   upstream:
     src/common/skills/agentdev-workflow-phase-artifacts-update/SKILL.md:
-    - docs/designs/workflows/v51-phase-driven-collaboration-model.md
+    - docs/designs/workflows/phase-driven-collaboration-model.md

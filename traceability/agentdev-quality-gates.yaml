@@ -58,7 +58,7 @@ implementation:
   docs/knowledge/qg4-baseline-detached-worktree-reproduction.md:
     - REQ-007-013
 verification:
-  docs/designs/quality/v4-quality-gate-model.md:
+  docs/designs/quality/quality-gate-model.md:
     - REQ-103-018
     - REQ-103-019
     - REQ-103-024

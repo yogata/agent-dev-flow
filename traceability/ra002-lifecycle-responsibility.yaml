@@ -5,6 +5,6 @@ verification:
     - REQ-103-015
     - REQ-103-022
     - REQ-103-023
-  docs/designs/workflows/v4-standard-lifecycle.md:
+  docs/designs/workflows/standard-lifecycle.md:
     - REQ-103-014
     - REQ-103-015

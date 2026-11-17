@@ -31,10 +31,10 @@ verification:
 links:
   upstream:
     .agentdev/phase/README.md:
-      - docs/designs/workflows/v51-phase-driven-collaboration-model.md
+      - docs/designs/workflows/phase-driven-collaboration-model.md
     .agentdev/phase/identity.yaml:
-      - docs/designs/workflows/v51-phase-driven-collaboration-model.md
+      - docs/designs/workflows/phase-driven-collaboration-model.md
     .agentdev/phase/themes.md:
-      - docs/designs/workflows/v51-phase-driven-collaboration-model.md
+      - docs/designs/workflows/phase-driven-collaboration-model.md
     .agentdev/phase/pending.md:
-      - docs/designs/workflows/v51-phase-driven-collaboration-model.md
+      - docs/designs/workflows/phase-driven-collaboration-model.md
