@@ -113,7 +113,7 @@ context 管理:
 - 発動条件は環境制約（恒常的な書込み不能）に限定する。一時障害は既存の再試行・回復経路（子 task 中断回復パス、infra-transient 停止分類、委譲起動不能時の扱い）で扱い、フォールバックを発動しない
 - フォールバック発動時は委譲記録に発動理由（環境制約の内容）と親実施の事実を記録する
 - この許容は agentdev_gh 等の Custom Tool 境界と git 操作ガードレールを置き換えるものではない
-- 契約水準の正は REQ-003-031 および [workflows/v4-delegation-contracts.md](../workflows/v4-delegation-contracts.md)「環境制約時の親オーケストレータ直接書込みフォールバック（REQ-003-031）」節であり、本節はその case-auto 実現面の明記である
+- 契約水準の正は REQ-003-031 および [workflows/delegation-contracts.md](../workflows/delegation-contracts.md)「環境制約時の親オーケストレータ直接書込みフォールバック（REQ-003-031）」節であり、本節はその case-auto 実現面の明記である
 
 ## 所有関係と委譲
 
