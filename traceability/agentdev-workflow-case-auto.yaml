@@ -41,6 +41,7 @@ implementation:
     - REQ-111-017
     - REQ-111-018
     - REQ-111-035
+    - REQ-003-031
   src/common/skills/agentdev-workflow-case-auto/scripts/src/records-report.ts:
     - REQ-034-021
     - REQ-101-008
@@ -104,6 +105,8 @@ verification:
     - REQ-101-012
   src/common/skills/agentdev-workflow-case-auto/scripts/tests/stage-dispatch-single-flight.test.ts:
     - REQ-034-047
+  src/common/skills/agentdev-workflow-case-auto/scripts/tests/environment-constraint-fallback-pin.test.ts:
+    - REQ-003-031
   src/common/skills/agentdev-workflow-case-auto/scripts/tests/wave-gate.test.ts:
     - REQ-032-038
   src/common/skills/agentdev-workflow-case-auto/scripts/tests/slot_queue.test.ts:
