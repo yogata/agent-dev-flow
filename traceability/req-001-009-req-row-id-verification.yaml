@@ -1,0 +1,8 @@
+component: req-001-009-req-row-id-verification
+# REQ-001-009(要件内の個別要件行が親識別子+連番形式で一意に識別できること)の
+# verification 対応。REQ 行存在検査 checker が REQ 参照(ID 形式・実在・一意性)を
+# 機械検査し、一意識別形式の運用を恒常担保する。
+# 実体確認は Case #4143・DEL-4143-1 で実施(2026-11-18)。
+verification:
+  src/common/skills/agentdev-artifact-validation/scripts/src/check-req-row-existence.ts:
+    - REQ-001-009

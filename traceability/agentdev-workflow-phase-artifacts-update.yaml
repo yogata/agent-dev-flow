@@ -42,6 +42,7 @@ implementation:
   - REQ-111-030
   - REQ-111-031
   - REQ-111-032
+  - REQ-117-008
   src/common/commands/agentdev/phase-artifacts-update.md:
   - REQ-110-007
   - REQ-110-008
