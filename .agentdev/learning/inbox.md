@@ -243,3 +243,67 @@
 - **想定反映先**: src/common/skills/agentdev-workflow-case-open/scripts/README.md（「検査入力 JSON」節）
 - **関連**: Case #4123・PR #4124
 - **タグ**: `#機械工程` `#checker実行`
+
+## 検証用ラッパースクリプトの相対上層解決ミスがメイン側の誤パスへ一時退避ファイルを書き出す
+
+- **問題事象**: case-run の検証用ラッパースクリプト（node -e spawnSync）が `path.resolve(dirname, "..", "..", "..")` による REPO_ROOT 解決を worktree 内スクリプトに対して用いたため、メイン側 `.worktrees/.agentdev/tmp/evidence` へ一時退避ファイル 8件を誤作成した。実行直後の退避ファイル不存在確認で検知し、誤作成物のリスティング取得（本実行由来であることの確認）後に明示パス削除で回収した。REPO_ROOT 解決を `".."` 2つへ修正して再実行した。
+- **発生局面**: Case #4123 の case-run 検証（bun test 正規形・stdout/stderr 分離退避用ラッパー実行）
+- **検知方法**: 実行直後の退避ファイル不存在確認（想定パスに退避が存在しないことの確認）
+- **根本原因**: worktree 配下のスクリプトに対する相対上層解決は worktree root ではなくメイン root 側の親を辿る。worktree 構造での「repo root」はブランチ構成と異なり上層ディレクトリの固定数では決まらない
+- **自律対応内容**: 誤作成物のリスティング取得と明示パス削除で回収後、`git rev-parse --show-toplevel` による top-level 判定を前置した解決へ修正して再実行
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（検証スクリプト側の回復。正規契約の変更なし）
+- **横展開観点**: worktree 配下の検証スクリプトで相対上層解決を行う場合は `git rev-parse --show-toplevel` による top-level 判定を前置すべき。後片付け義務の履行には退避先の実在確認（書出しと確認の同一パス化）が要る
+- **再発条件**: worktree 内スクリプトで `dirname` からの相対上層解決により repo root を導出した場合
+- **予防策候補**: 検証用ラッパーの雛形（共通化された生成経路があればその雛形）へ top-level 判定の前置を組み込む
+- **想定反映先**: case-close・case-run の検証用ラッパースクリプト作成手順（references）
+- **関連**: Case #4123・PR #4125
+- **タグ**: `#bun-test` `#worktree` `#証跡退避`
+
+## bun test の複数 filter で no-match filter が静かに無視され worktree での分割実行が合格し得る
+
+- **問題事象**: worktree で bun test 分割③（`bun test ./.opencode/plugins/ ./scripts/`）を実行した場合、`.opencode/plugins` は junction 未伝播で実在しないため filter に no-match となるが、他 filter（`./scripts/`）に match があれば bun test は終了コード 0 で実行を完了する。件数突合（409 tests across 23 files）は scripts 分割のみを計上しており、plugins 分割の未実行が静かに隠れ得る。
+- **発生局面**: Case #4123 の case-run・case-close 検証（bun test 正規形 3 cwd 分割・worktree 実行）
+- **検知方法**: 件数突合と実行対象ディレクトリの実在事前確認（Test-Path）の併用
+- **根本原因**: bun test は複数 filter の一部に no-match があっても他 filter に match があれば終了コード 0 で実行する（no-match filter を静かに無視する）。worktree の junction 未伝播は filter 対象の欠落を生み、その欠落が fail として表面化しない
+- **自律対応内容**: 分割対象ディレクトリの実在事前確認（Test-Path）と、未伝播時の実体パス補完実行（`bun test ./src/opencode/plugins/` で 384 tests を補完実行）を検証手順へ組み込んだ。未実行対象を実行済みとして扱わない記録（検査範囲の環境差明記）を検証差分へ記録した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（検証手順の運用知見。bun test 実行形態契約の検査範囲記録と整合）
+- **横展開観点**: bun test 分割実行では件数突合に加え、分割対象ディレクトリの実在事前確認と未伝播時の実体パス補完実行を検証手順へ組み込むべき（実施範囲判別の学び）。no-match 静的無視は「0 件実行の成功扱い」に直結するため検査範囲記録の環境差明記と併用する
+- **再発条件**: worktree 等の junction 未伝播環境で bun test 複数 filter を実行した場合・新規配置領域を分割対象に追加した場合
+- **予防策候補**: bun test 正規形手順（qg-4-final-acceptance.md）の worktree 分割③ 環境差注記への実在事前確認と補完実行の明記（既存記述は代替検証手順の運用を案内する形のため、実在確認ステップの前置化を検討）
+- **想定反映先**: src/common/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md（worktree 環境差注記）
+- **関連**: Case #4123・PR #4125
+- **タグ**: `#bun-test` `#worktree` `#検証手順`
+
+## bun test 分割の並行実行で実測時間比較系と timeout 帯系のテストが非決定的 fail する
+
+- **問題事象**: case-close の最終検証で bun test 4分割を並行実行（node child_process spawn による同時起動）したところ、7件の fail（分割① check_integrity 関連 3件〔5.0〜5.5秒の timeout 帯系〕、分割② TS-009 実測時間比較系 2件・unnamed 2件）を観測した。同一環境での単独逐次再実行では全分割 fail 0件・case-run 実績と同件数（5891 tests across 261 files）を確認し、fail は並行実行の相互作用による非決定的失敗と由来分類した。
+- **発生局面**: Case #4123 の case-close 最終検証（bun test 正規形・初回並行実行 → 逐次再実行で解消確認）
+- **検知方法**: full integrity suite 実行の fail 検出と非決定的失敗の再現確認手順（単独逐次再実行）
+- **根本原因**: TS-009 実測時間比較系テストは CPU 負荷に依存する実測時間の比較で合否を判定するため、並行実行による CPU 競合で比較が破綻する。check_integrity timeout 帯系テストも並行負荷下で閾値超過し得る。逐次実行では相互作用が発生しない
+- **自律対応内容**: 逐次再実行（4分割直列・timeout 600秒明示）で全分割 fail 0件・件数突合一致を確認し、正規形実行記録は逐次実行を採用。並行実行の 7 fail は環境依存と由来分類して検証差分へ記録した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（検証実行形態の運用知見。機械受理基準の記録様式は変更しない）
+- **横展開観点**: bun test 正規形の実行は実測時間比較系テストを含むため逐次実行を標準とすべき。並行実行による fail は非決定的失敗の再現確認（単独再実行）で由来分類する手順が消費コストを生む。実測時間比較系テストの負荷依存性は suite 実行環境のラベル（並行/逐次）を検証記録に含める根拠になる
+- **再発条件**: bun test 分割（または単一 suite）を並行実行した場合・実測時間比較系テストを CPU 負荷のある環境で実行した場合
+- **予防策候補**: bun test 正規形手順（qg-4-final-acceptance.md）への「分割実行は逐次を標準、並行実行時は非決定的 fail の再現確認を前提に記録する」注記の追加。実測時間比較系テストへの環境ラベル前置（負荷状態の記録）の検討
+- **想定反映先**: src/common/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md（bun test 正規形・実行形態契約）
+- **関連**: Case #4123・PR #4125
+- **タグ**: `#bun-test` `#検証手順` `#非決定的失敗`
+
+## case-close で post-merge cleanup を issue_close 前に実行すると freshness 順序契約の pre-merge 冪等再実行の前提が欠落する
+
+- **問題事象**: case-close STEP-5-2 の freshness 順序契約（Issue 書込み完了 → fresh revision で機械工程冪等再実行して終了判定記録再生成 → 直後に issue_close）の「機械工程」は pre-merge phase である（終了判定記録の書出しは pre-merge 分岐のみ）が、post-merge 機械工程（cleanup 付き）を issue_close の前に実行して worktree とローカルブランチを削除したため、pre-merge 冪等再実行の前提（worktree 存在・branch 存在・依存解決済み gate 実行体）が欠落した。worktree/branch の再作成（git branch + worktree add）と bun install ×3 + textlint-guard build:engine の再実行により依存整備をやり直してから pre-merge 再実行・issue_close・post-merge cleanup 再実行（remove 前掃除の再実行を含む）に至った。
+- **発生局面**: Case #4123 の case-close STEP-5-2（freshness 順序・終了判定記録再生成）
+- **検知方法**: post-merge 報告 JSON の diff.closeAcceptanceRecord が undefined（post-merge 分岐では終了判定記録を書出さない）であることの確認と freshness 順序契約との突合
+- **根本原因**: 終了判定記録（.agentdev/close-acceptance/）の provisional/final 書出しは close_mechanical_steps.ts の pre-merge 分岐にのみ実装されている。issue_close 直前に必要なのは「終了判定記録の targetRevision を fresh revision に一致させる」pre-merge 再実行であり、worktree/branch 削除（post-merge cleanup）は issue_close の後の STEP-6 が正の順序である
+- **自律対応内容**: durable state 再構成（resume protocol 相当）として branch 復元（git branch {branch} cecfc2d7c）→ worktree add → 依存整備（bun install ×3、textlint-guard bun install && bun run build:engine）→ pre-merge 機械工程冪等再実行（fresh issueUpdatedAt で全 gate pass・終了判定記録 targetRevision 2026-11-17T05:37:55Z で accepted 書出し）→ issue_close → post-merge cleanup 再実行の順序で完了。検証義務の省略は行わなかった（同一 HEAD での gate 再履行）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（workflow 実行順序の運用知見。検証義務・契約の変更なし）
+- **横展開観点**: case-close の正しい実行順序は「Issue 書込み完了（checkbox 確定・完了記録・本文更新・対応記録）→ fresh issue_read → pre-merge 機械工程冪等再実行〔fresh revision で終了判定記録再生成〕→ issue_close → post-merge cleanup（remove 前掃除 → worktree/branch 削除）→ reclamation 手動回収」。post-merge cleanup を issue_close 前に置くと pre-merge 再実行の gate 実行体前提が失われる
+- **再発条件**: case-close で post-merge cleanup を issue_close の前に実行した場合・freshness 再実行が必要な Case で worktree を事前に削除した場合
+- **予防策候補**: case-close SKILL.md・cleanup-and-capture.md の STEP-5-2-4 手順へ「機械工程冪等再実行は pre-merge phase であること（post-merge cleanup は issue_close 後）」の明示追記。post-merge 報告 JSON に close-acceptance-record step が存在しないことの注意書き
+- **想定反映先**: src/common/skills/agentdev-workflow-case-close/SKILL.md（STEP-5-2 の freshness 順序節）・references/cleanup-and-capture.md（STEP-5-2-4）
+- **関連**: Case #4123・Case #4084・PR #4125
+- **タグ**: `#case-close` `#機械工程` `#freshness順序`
