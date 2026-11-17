@@ -14,7 +14,7 @@ updated: "2026-11-13"
 
 ## 目的
 
-標準配布スキル `agentdev-traceability` は、ADF v4 Traceability モデル（foundations/v4-traceability-model.md。v5 追跡語義を含む）に基づき、要件と成果物の明示的な対応関係について coverage、impact、check の3能力を提供する。
+標準配布スキル `agentdev-traceability` は、ADF v4 Traceability モデル（foundations/traceability-model.md。v5 追跡語義を含む）に基づき、要件と成果物の明示的な対応関係について coverage、impact、check の3能力を提供する。
 標準関係は covers 対応関係に加え、プロジェクトの採用した工程に基づく隣接工程間の対応関係を有界な標準関係として含む（REQ-012-027、REQ-107-001）。
 正規成果物を直接走査し、対応関係をその場で解決する（REQ-012、DEC-037。直接走査は旧 DEC-017 決定2 の維持として DEC-037 配下で搬送され、前身機能の廃止と移行の経緯は旧 DEC-017 が記録する）。
 
@@ -25,9 +25,9 @@ updated: "2026-11-13"
 
 ## 対応関係データの取得と正規化
 
-- 本 skill が解決する標準関係の語義は、covers 対応関係と採用された隣接工程間対応である（v4-traceability-model Design「標準関係の構造（v5 語義）」節）。covers 対応関係は本節の sidecar・inline declaration から解決する。採用された隣接工程間対応の宣言と保存は採用規約機構（v5-adopted-conventions Design）が所有し、機械解決の実装面は後続の実装 Design が所有するため、本 skill の現行解決対象は covers 対応関係である
+- 本 skill が解決する標準関係の語義は、covers 対応関係と採用された隣接工程間対応である（traceability-model Design「標準関係の構造（v5 語義）」節）。covers 対応関係は本節の sidecar・inline declaration から解決する。採用された隣接工程間対応の宣言と保存は採用規約機構（adopted-conventions Design）が所有し、機械解決の実装面は後続の実装 Design が所有するため、本 skill の現行解決対象は covers 対応関係である
 - 対応関係データの正規情報源は、リポジトリ top-level `traceability/` 配下の component / package 単位 sidecar（`traceability/<component-slug>.yaml`）と検証スコープポリシー（`traceability/policy.yaml`）、および producer-only artifact に許容された inline declaration とする
-- sidecar と policy.yaml のスキーマは ADF v4 Traceability モデル（foundations/v4-traceability-model.md）が所有する。本 skill は sidecar を読み込み、component、artifact パス、role、要件行 ID の組を論理的な対応関係へ正規化する。本 skill は ADF 自身の個別 REQ と個別成果物との対応データを保持しない
+- sidecar と policy.yaml のスキーマは ADF v4 Traceability モデル（foundations/traceability-model.md）が所有する。本 skill は sidecar を読み込み、component、artifact パス、role、要件行 ID の組を論理的な対応関係へ正規化する。本 skill は ADF 自身の個別 REQ と個別成果物との対応データを保持しない
 - inline declaration は `ADF-COVERS(<role>): <REQ-ID>{, <REQ-ID>}*` 形式（role は decision / design / implementation / verification、REQ-ID は `REQ-{NNNN}-{MMM}` 形式の要件行ID）とし、producer-only artifact の各ファイル種別のコメント記法（Markdown は HTML コメント、TypeScript は `//` 等）の内部に1行で記述する。マーカー文字列 `ADF-COVERS(...)` 自体はファイル種別に依存しない。consumer distribution closure（src/opencode/**）に含まれる成果物では使用しない
 - sidecar と inline declaration は同一の論理的な対応関係へ正規化され、coverage、impact、check から同一に扱われる。同一論理関係の不整合な重複は check が検出する
 - 解析は行単位のパターン照合で行い、意味推定を行わない。存在しない要件IDへの参照は check が検出する
@@ -112,7 +112,7 @@ Decision 対応の欠落は不合格としない。
 正規成果物を、宣言済みの対応関係と独立に確認（棚卸し）できる（REQ-107-003）。棚卸しは coverage・check の宣言解析を入力にせず、正規成果物の直接走査（README 索引、正規成果物の直接読取、`rg` 等の探索）で行う。
 
 - 宣言外の実在成果物・追跡候補は、発見候補（advisory・fail-open）として扱う。発見候補を対応関係の欠落と誤判定しない
-- 宣言されていない成果物の不在は正である。採用されていない参照例の工程・成果物を判定基準に含めない点は、v5-adopted-conventions Design「未採用参照例を欠落と誤判定しない判定規則」節に従う
+- 宣言されていない成果物の不在は正である。採用されていない参照例の工程・成果物を判定基準に含めない点は、adopted-conventions Design「未採用参照例を欠落と誤判定しない判定規則」節に従う
 - 棚卸しの結果は候補提供であり、対応関係の作成・修正の最終判断は各工程（case-open、case-run、Design 確定工程）が所有する
 
 ## advisory 能力と品質ゲートとしての check の境界
@@ -140,7 +140,7 @@ Decision 対応の欠落は不合格としない。
 
 ## v4 責務分類
 
-ADF v4 の責務分類（正典: DEC-048、foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節）における本 Design の 3 区分（意味判断担当〔閉じた意味評価・開いた推論を所有〕/ 決定的処理委譲先 / 知識提供）。語彙の原本は foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節であり、本節はその確定値を記録する。
+ADF v4 の責務分類（正典: DEC-048、foundations/responsibility-boundaries Design「v4 責務分類語彙の後継」節）における本 Design の 3 区分（意味判断担当〔閉じた意味評価・開いた推論を所有〕/ 決定的処理委譲先 / 知識提供）。語彙の原本は foundations/responsibility-boundaries Design「v4 責務分類語彙の後継」節であり、本節はその確定値を記録する。
 
 - **意味判断担当**: 0 件（対応解釈は知識提供）
 - **決定的処理委譲先**: traceability extraction / evidence aggregation / validation → scripts/src/check.ts・coverage.ts・impact.ts + lib

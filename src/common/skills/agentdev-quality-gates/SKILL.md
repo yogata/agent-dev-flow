@@ -55,7 +55,7 @@ QG-3 は乖離の分類と推奨アクションの提示までを責務とし、
 
 ## 自動ループバック禁止
 
-QG-3/ QG-4 の fail 判定時、エージェントは失敗原因の分類と推奨アクションを提示する（ADF 判断契約の失敗原因分類と品質ゲート所有境界条項）。Gate 自身は差し戻し・修正を実行せず、修正の実行は正規所有工程（case-run 修正ループ、case-revise 等）へ任せる。人間判断へ移行するのは引き上げ条件（人間判断移行条項、`<foundations/v4-responsibility-boundaries>` Design「人間判断への引き上げ条件」節）に該当する場合のみ。
+QG-3/ QG-4 の fail 判定時、エージェントは失敗原因の分類と推奨アクションを提示する（ADF 判断契約の失敗原因分類と品質ゲート所有境界条項）。Gate 自身は差し戻し・修正を実行せず、修正の実行は正規所有工程（case-run 修正ループ、case-revise 等）へ任せる。人間判断へ移行するのは引き上げ条件（人間判断移行条項、`<foundations/responsibility-boundaries>` Design「人間判断への引き上げ条件」節）に該当する場合のみ。
 
 ## bun test フル suite 正規形の所有
 
@@ -71,7 +71,7 @@ QG-3/ QG-4 の fail 判定時、エージェントは失敗原因の分類と推
 ## See Also
 
 - [common-gate-contract.md](references/common-gate-contract.md)（全 Gate 共通契約。pass/warn/fail/partial、evidence-first、結果フォーマット）
-- ADF v4 Quality / Verification / Evidence / Gate モデル Design（v4-quality-gate-model。QG-1〜QG-4 の Design 定義〔再導出結果表の Verification Obligation〕、機械化境界、実装マッピング、skill extension 経由）
+- ADF v4 Quality / Verification / Evidence / Gate モデル Design（quality-gate-model。QG-1〜QG-4 の Design 定義〔再導出結果表の Verification Obligation〕、機械化境界、実装マッピング、skill extension 経由）
 - **agentdev-req-analysis**: 要件分析手法、チェックボックス品質基準（QG-1 の基準）
 - **agentdev-workflow-lifecycle**: work_type 判定、フェーズ定義
 - **agentdev-workflow-routing**: レビュー NG 対応手順（QG-3 結果の消費先）

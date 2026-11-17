@@ -91,7 +91,7 @@ CI typecheck job での `git diff --exit-code` 検証は検討候補として記
 - **重要変更の識別と報告**: 実行担当サブエージェントは、実装・検証中に既存の正規成果物や既存前提への重要変更、外部仕様・互換性・データ・セキュリティへの重要な影響、進行中の別作業への重大な影響、当初想定からの重大な変更を、判明した時点でその内容と影響とともに取りまとめへ報告する。識別は変更の意味と影響に基づく判断であり、変更ファイル数やキーワードだけの機械判定に置き換えない。報告対象には、その時点で未反映の重要変更と、判明時点ですでに反映済みの内容（反映済みである事実を区別して説明する）の双方を含める。委譲された裁量の範囲内の重要変更は、報告後に追加承認なしで実行を継続する。利用者に留保された判断が必要な場合は、result 契約の `blocked` として判断事項を報告する。既存の合意内容との照合、差分・影響評価、必要な更新・再検証を通知で代替しない
 - **委譲要求と実着手の区別**: 委譲起動（委譲要求）は実着手と同一視されない。実装着手の事実を報告するのは実行担当の責務であり、取りまとめの着手記録はその報告を契機に行われる
 - **工程終了を待たない途中報告**: 工程終了（result 確定）を待たず、確定した停止・判断待ち・判断変更影響を報告できる。途中報告は取りまとめが受領時点で対応する記録契機の反映（停止等）に使われる。途中報告は result 契約（4状態）の最終確定値を代替せず、result は確定時に必ず返却する
-- **検証用一時資材の作成報告**: 委譲内で検証用remote、clone、bare repository、退避ログ、補助スクリプト、専用server・process等の検証用一時資材を作成する場合、許可された範囲（既存の配置規則と権限に従う標準的な一時領域への作業専用領域、リポジトリ内の作業領域、許可された外部環境）で作成・利用し、利用終了時に安全条件（当該作業が作成した専用資材であることの確認、回収対象範囲の特定、正式な成果物・必要な証拠・他の作業や利用者が管理する資材の保護、既存の副作用・承認境界への適合）が成立する範囲で回収する。継続利用する資材は引継ぎ事項として報告する。後片付けの実施結果、確認根拠、未処理事項（未回収・確認不能・引継ぎ）を既存の報告経路で委譲元の実行処理へ報告する。必要な副作用が許可範囲を超える場合は既存の停止・判断経路を利用し、許可範囲を独断で拡張しない（様式の正は v4-delegation-contracts Design「検証用一時資材の作成・報告義務」節、安全条件と配置規則の詳細は検証に伴う一時資材の取扱いと後片付け責任 Design「一時資材の配置・利用・回収」節）
+- **検証用一時資材の作成報告**: 委譲内で検証用remote、clone、bare repository、退避ログ、補助スクリプト、専用server・process等の検証用一時資材を作成する場合、許可された範囲（既存の配置規則と権限に従う標準的な一時領域への作業専用領域、リポジトリ内の作業領域、許可された外部環境）で作成・利用し、利用終了時に安全条件（当該作業が作成した専用資材であることの確認、回収対象範囲の特定、正式な成果物・必要な証拠・他の作業や利用者が管理する資材の保護、既存の副作用・承認境界への適合）が成立する範囲で回収する。継続利用する資材は引継ぎ事項として報告する。後片付けの実施結果、確認根拠、未処理事項（未回収・確認不能・引継ぎ）を既存の報告経路で委譲元の実行処理へ報告する。必要な副作用が許可範囲を超える場合は既存の停止・判断経路を利用し、許可範囲を独断で拡張しない（様式の正は delegation-contracts Design「検証用一時資材の作成・報告義務」節、安全条件と配置規則の詳細は検証に伴う一時資材の取扱いと後片付け責任 Design「一時資材の配置・利用・回収」節）
 - **result 契約との独立性**: 本報告契約は result 4状態（completed-pr / blocked / failed / delegation-unavailable）の追加・変更を行わない。報告は result の生成・受領に付随する情報であり、result 契約（最小契約）は維持する
 
 物理削除を伴う docs-chore 系の委譲では、削除対象に対する extensions、templates 等の実行時設定からの参照を追随確認する。削除対象の参照先を事前確認し、残存参照を検出した場合は委譲スコープ内で解消する。解消に別 OU の対象範囲拡大・新規の意思決定が必要な場合は blocked として報告する（原本は `<workflows/references/execution-unit-construction>` Design「docs-chore OUの削除起因参照追随」節。根拠事例: E6-2〔Epic #2984 コメント記録〕、Case #2979）。
@@ -206,14 +206,14 @@ AgentDevFlow の永続状態は既存の draft/ Issue/ PR/ REQ/ Decision/ Design
 
 ### 委譲コンテキストと Input Resolution
 
-委譲起動時に case-run から引き渡される worktree root、ブランチ名、Issue 番号、実行 command 指定は、永続状態の優先順位（`<foundations/v4-durable-state-and-recovery>` Design）に従い、case-run `execute` STEP の入力解決（Input Resolution）で解決された入力である。
+委譲起動時に case-run から引き渡される worktree root、ブランチ名、Issue 番号、実行 command 指定は、永続状態の優先順位（`<foundations/durable-state-and-recovery>` Design）に従い、case-run `execute` STEP の入力解決（Input Resolution）で解決された入力である。
 実行担当サブエージェントは委譲内で Issue 本文、REQ/Decision/Design を SSoT 再構成（最上位優先）で再取得・再検証し、自然言語の前STEP result のみに依存しない。
 
 ### 委譲内シーケンスと result 接合
 
 実行担当サブエージェントの責務（Issue 読込、context 再確認、実装・検証・PR 作成、blocker 処理、result 返却）は adapter 委譲内の内部シーケンスであり、case-run 側からは result 4状態（`completed-pr` / `blocked` / `failed` / `delegation-unavailable`）のみで観測される。
 内部シーケンスの STEP 遷移を case-run workflow の STEP model へ投影せず、PR URL（成功時）または Issue コメント（blocked/failed時）を SSoT として扱う。
-STEP reference 8 要素は `<foundations/v4-durable-state-and-recovery>` Design 参照。
+STEP reference 8 要素は `<foundations/durable-state-and-recovery>` Design 参照。
 
 ## 委譲抽象IF
 
@@ -264,12 +264,12 @@ STEP reference 8 要素は `<foundations/v4-durable-state-and-recovery>` Design 
 | accepted finding 反映 | caller 統合共通契約・accepted finding 反映条項 | accepted finding の実装方針への反映は adapter 委譲内の実行担当サブエージェント責務 |
 | 再 review 条件 | caller 統合共通契約・再 review 条件条項 | 意味内容変更時のみ再発動可能、同一 finding 再起票禁止（正は adversarial-review Design） |
 | 呼出失敗時の扱い | caller 統合共通契約・呼出失敗時条項 | silent skip 禁止、従来フロー維持（正は adversarial-review Design） |
-| 副作用境界 | caller 統合共通契約・副作用禁止条項 | `semantic_review`（書き込み禁止型）、新規 artifact 非生成（正は adversarial-review Design、v4-delegation-contracts Design） |
+| 副作用境界 | caller 統合共通契約・副作用禁止条項 | `semantic_review`（書き込み禁止型）、新規 artifact 非生成（正は adversarial-review Design、delegation-contracts Design） |
 
 ## See Also
 
 - **agentdev-workflow-orchestration**: サブエージェントプロトコル、capture 境界
 - **agentdev-workflow-templates**: PR 本文、コメント SSoT のテンプレート構造
-- **Design `v4-delegation-contracts.md`**: 委譲契約横断 Design、case 実行責務の 4 用語
+- **Design `delegation-contracts.md`**: 委譲契約横断 Design、case 実行責務の 4 用語
 - **Design `responsibility-boundary-purification.md`**: case 実行責務の 4 用語と所有者 SSoT
 - **references/harness-delegation.md**: 委譲起動、category 設計、異常終了回復の具象実装ノート

@@ -53,7 +53,7 @@ REQ、Decision、Design 固有の内容判断を行わず、決定的検証の�
 
 - artifact-contracts.md「Script 所有権と委譲契約」
 - artifact-responsibilities.md「操作 skill 正規所有者台帳」
-- v4-lifecycle-state-machine.md（保存内部責務からの共通検証 script 呼出契約）
+- lifecycle-state-machine.md（保存内部責務からの共通検証 script 呼出契約）
 
 ## 現在の動作
 
@@ -99,7 +99,7 @@ REQ 固有 script は `agentdev-req-file-manager`、Decision 固有 script は `
 
 ## v4 責務分類
 
-ADF v4 の責務分類（正典: DEC-048、foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節）における本 Design の 3 区分（意味判断担当〔閉じた意味評価・開いた推論を所有〕/ 決定的処理委譲先 / 知識提供）。語彙の原本は foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節であり、本節はその確定値を記録する。
+ADF v4 の責務分類（正典: DEC-048、foundations/responsibility-boundaries Design「v4 責務分類語彙の後継」節）における本 Design の 3 区分（意味判断担当〔閉じた意味評価・開いた推論を所有〕/ 決定的処理委譲先 / 知識提供）。語彙の原本は foundations/responsibility-boundaries Design「v4 責務分類語彙の後継」節であり、本節はその確定値を記録する。
 
 - **意味判断担当**: 0 件
 - **決定的処理委譲先**: validation → scripts/src/check-change-impact.ts・check-entry-existence.ts・check-frontmatter-consistency.ts・check-req-row-existence.ts（第4共通検証: 書込み時引用識別子実在検証）

@@ -7,7 +7,7 @@ description: "Updates the parent Epic execution table and reflects coordination 
 
 親Epic Issueの実行構成表（`| Wave | Issue | 前提 | 状態 |`、子状態4値 `pending`/ `completed`/ `blocked`/ `failed`）を更新し、Case Issue 工程記録の取りまとめによる記録契機別の状態反映を per-Epic の単一書き手排他制御の下で Epic Issue 本文へ書き込む知識ベースである。
 Epic 本文への書き込みは実行構成の状態反映と全体条件評価の更新に限定される。停止理由・再開条件・判断変更・検証証拠を Epic 本文の隠しブロック等の第二の恒常的状態台帳へ複製しない（記録コメントが正）。
-`ready`/ `running` は runtime 実行状態であり、実行構成表（永続状態）には書き込まれない（v4-lifecycle-state-machine Design「二層状態モデル」参照）。実行構成は Epic 本文に一つだけ存在し、Wave 状態・状態別件数を本文へ保存しない。表示用の進行状態4値は廃止されており、進行状況は正規状態と開始・終了日時で表現する（workflows/issue-lifecycle-records Design による）。
+`ready`/ `running` は runtime 実行状態であり、実行構成表（永続状態）には書き込まれない（lifecycle-state-machine Design「二層状態モデル」参照）。実行構成は Epic 本文に一つだけ存在し、Wave 状態・状態別件数を本文へ保存しない。表示用の進行状態4値は廃止されており、進行状況は正規状態と開始・終了日時で表現する（workflows/issue-lifecycle-records Design による）。
 
 - **参照元**: `case-close`（completed/ blocked/ failed 更新、closing 書き込み）。`case-auto` 等の進行スキル（記録契機に応じた取りまとめ反映の書き込み）。`case-run` は Epic Issue 本文を読み取るのみで書き込まない
 - **`⏭スキップ` は採用しない**。前提未達の Issue は `pending` のまま選択対象外となる。Wave status は保存せず、Wave 内 Issue 状態から導出する
@@ -35,7 +35,7 @@ Epic 本文への書き込みは実行構成の状態反映と全体条件評価
 
 ## 子状態値定義
 
-子Issue 実行状態 enum（v4-lifecycle-state-machine Design「二層状態モデル」「階層合成」参照）:
+子Issue 実行状態 enum（lifecycle-state-machine Design「二層状態モデル」「階層合成」参照）:
 
 | 値 | 意味 | 設定主体 | 終端状態 |
 |---|---|---|---|

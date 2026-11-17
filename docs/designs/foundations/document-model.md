@@ -96,7 +96,7 @@ REQは成立すべき成果・制約・安定した外部契約のみを所有�
 Designへ独立した新要求を追加しない（手段の独自要件化の禁止）。
 
 
-本節および「具体名を含む公開契約のREQ適格と手段分離の補強」節の分類規則（文書分類モデル8原則）の正規所有は本 Design（document-model.md）である。上位の恒久契約は REQ-001-067（設計詳細の分離）・REQ-001-068（安定契約の例外）・REQ-056（Knowledge の非規範限定）が保持し、両節はこれらの要件行を具体化する分類規則として本 Design が所有する（REQ 行の新設は行わない）。document-type-responsibilities.md・v4-operating-model.md・command Design（req-define）の関連記述は各自の適用文脈での展開であり、配布 skill references 側の相当記述は投影である。
+本節および「具体名を含む公開契約のREQ適格と手段分離の補強」節の分類規則（文書分類モデル8原則）の正規所有は本 Design（document-model.md）である。上位の恒久契約は REQ-001-067（設計詳細の分離）・REQ-001-068（安定契約の例外）・REQ-056（Knowledge の非規範限定）が保持し、両節はこれらの要件行を具体化する分類規則として本 Design が所有する（REQ 行の新設は行わない）。document-type-responsibilities.md・operating-model.md・command Design（req-define）の関連記述は各自の適用文脈での展開であり、配布 skill references 側の相当記述は投影である。
 
 ### Design 分離基準
 
@@ -345,7 +345,7 @@ consumer 境界は producer、direct consumer、orchestration pre-reader、inval
 3. Design
 4. guides
 
-v3 → v4 移行期間中は、accepted の v4 モデル定義 Design と未置換の v3 accepted Design の衝突について、当該 v3 Design の処遇実行段階まで v3 を正とする扱いとした（v3-v4-crosswalk.md 処遇実行原則）。処遇記録 crosswalk-inventory.md の全行 executed と実際の処遇状態の確認をもって移行は完了しており、この規則は現行規範ではなく歴史的説明として保持する（REQ-103-020）。
+v3 → v4 移行の処遇規則（処遇実行段階による権威移行）は移行完了済みであり、現行規範ではなく過去の移行記録として Git 履歴で担保する（REQ-103-020）。
 
 ## 設定規則
 
@@ -600,9 +600,9 @@ agent-dev-flow リポジトリの docs/designs/ 直下の基盤Designは、既�
 
 | ディレクトリ | 責務 | 配置対象Design |
 |---|---|---|
-| foundations/ | 基盤モデル、システム構成、文書フォーマット、設計原則 | numbering-policy.md, system.md, document-model.md, decision-lifecycle.md, patterns.md, design-principles.md, project-extensions.md, harness-separation-model.md, v4-operating-model.md, v4-runtime-execution-model.md, v3-v4-crosswalk.md |
+| foundations/ | 基盤モデル、システム構成、文書フォーマット、設計原則 | numbering-policy.md, system.md, document-model.md, decision-lifecycle.md, patterns.md, design-principles.md, project-extensions.md, harness-separation-model.md, operating-model.md, runtime-execution-model.md |
 | responsibilities/ | 文書種別責務、成果物責任、アーティファクト契約、REQ影響マップ | document-type-responsibilities.md, artifact-responsibilities.md, artifact-contracts.md, req-impact-map.md |
-| quality/ | 品質仕様、品質ゲート、健全性メトリクス（REQ/Design 双方向） | quality-specs.md, v4-quality-gate-model.md, req-health-metrics.md, design-health-metrics.md, textlint-quality-runtime.md |
+| quality/ | 品質仕様、品質ゲート、健全性メトリクス（REQ/Design 双方向） | quality-specs.md, quality-gate-model.md, req-health-metrics.md, design-health-metrics.md, textlint-quality-runtime.md |
 | integrity/ | 整合性契約、整合性ルールカタログ、ルール所有権、配布物整合性 | integrity-contracts.md, integrity-rule-catalog.md, rule-ownership.md, docs-spec-rebuild-integrity.md, checker-execution-contracts.md |
 | local/ | ローカル版 Design 群（実行時パッケージ境界、link mode、Case ファイル） | runtime-package-boundary.md, local-case-file.md, install-script-usability.md, third-party-skill-management.md |
 | authoring/ | コマンドファイル執筆規約 | command-file-format.md, vocabulary-registry.md |

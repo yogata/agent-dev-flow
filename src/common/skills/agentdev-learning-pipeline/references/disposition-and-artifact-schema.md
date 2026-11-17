@@ -43,7 +43,7 @@ living pool は終端保管ではなく、次回 `/agentdev/learning-promote` �
 
 ## 継続コラボレーションループと三方対応表
 
-本処分区分は継続コラボレーションループ（`<workflows/v4-collaboration-loop>` Design）の Learning 段で参照される。
+本処分区分は継続コラボレーションループ（`<workflows/collaboration-loop>` Design）の Learning 段で参照される。
 Learning 評価結果の 7 系統・処分区分・8 寿命を次の三方対応表で対応づける。
 
 **二層注記**: 7 系統はループ全体の集計ビュー（最終振り分け先）であり、処分区分は learning-promote の局所判定である。ループ Design の .agentdev/ 整合表は durable state 5 分類 × 8 寿命の repo 内正規状態側の整合表であり、本表は振り分け処分区分側を担う（役割分担）。

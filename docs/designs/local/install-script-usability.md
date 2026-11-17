@@ -275,4 +275,4 @@ PowerShell の comment-based help 仕様は、スクリプトヘルプが「ス�
 
 導入スクリプト（install/self-sync）が扱う配備形態（junction・copy・投影構造）は v4 の Harness/Backend adapter 境界（ADF v4 実装責務境界 Design・DEC-036）の配備層に属する。スクリプトの使いやすさ契約（本 Design 既有）は不変である。
 
-定義の所有は v4-responsibility-boundaries へ参照する。既存節は不変とする。
+定義の所有は responsibility-boundaries へ参照する。既存節は不変とする。

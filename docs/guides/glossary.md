@@ -65,7 +65,7 @@ AgentDevFlow で使う用語の定義。
 | 用語 | 定義 |
 |------|------|
 | work_type | Issue の作業分類（bugfix / feature / maintenance / docs_chore）。参考情報であり、工程分岐は入力状態と `artifact_actions` を case-ready に渡して判定する |
-| 実装分類（Implementation Pattern） | コマンド内部構造の分類軸（wall-session=対話セッション型 / file-pipeline=ファイル変換パイプライン型 / manager-orchestrator=状態機械統制型 / capture-only=データ収集型 / read-only-diagnostic=検査対象を直接修正しない診断型）。work_type とは別概念（v4-lifecycle-state-machine.md） |
+| 実装分類（Implementation Pattern） | コマンド内部構造の分類軸（wall-session=対話セッション型 / file-pipeline=ファイル変換パイプライン型 / manager-orchestrator=状態機械統制型 / capture-only=データ収集型 / read-only-diagnostic=検査対象を直接修正しない診断型）。work_type とは別概念（lifecycle-state-machine.md） |
 | SSoT（Single Source of Truth / 唯一の情報源） | 各フェーズでの信頼できる唯一の情報源 |
 | HITL（Human-in-the-loop / 人の判断を挟む） | ユーザーの確認を挟む判断ポイント |
 | マクロフェーズ | 壁打ち、構造的実行、レビュー完了の3段階 |
@@ -76,7 +76,7 @@ AgentDevFlow で使う用語の定義。
 
 | 用語 | 定義 |
 |------|------|
-| Epic | 複数 execution unit の協調管理が必要な変更。Epic Issue 本文の実行構成表が依存と実行構成の SSoT となる（v4-standard-lifecycle.md、REQ-035） |
+| Epic | 複数 execution unit の協調管理が必要な変更。Epic Issue 本文の実行構成表が依存と実行構成の SSoT となる（standard-lifecycle.md、REQ-035） |
 | Wave | 意味的な依存関係のまとまり。並列実行の共有上限は Wave や親子 Issue の個数から独立した実行制御とする（DEC-055） |
 | Epic 自動クローズ | 全子 Issue 完了時に親 Epic を自動的にクローズする仕組み |
 | 実行構成表 | Epic 本文内の実行構成の一表（`| Wave | Issue | 前提 | 状態 |`）。子状態は pending/completed/blocked/failed の4値のみ。⏭スキップは採用せず、前提未達の Issue は pending のまま選択対象外である（REQ-035-004） |
@@ -119,4 +119,4 @@ GitHub Issue/PR を使わない個人利用環境向けの AgentDevFlow 利用�
 | `src/common/tools/agentdev-gh/local/` | ローカル版 Custom Tool `agentdev_gh` の Local 実装の原本。AgentDevFlow 本体リポジトリの共通原本領域に配置され、`runner-local.ts` とローカルIssue操作用定義（`case-schema/`）を保持する。通常版の同期・インストールの配布対象から除外する（REQ-009-016） |
 | link mode | ローカル版導入方式。`.opencode/` 配下を src 配下へ接続し、原本をそのまま利用する。`agentdev-gh` だけを `src/common/tools/agentdev-gh/local/` から差し替える |
 | link target 確認 | ローカル版 link 設定前に `.opencode/` 配下の各パスが意図した link target へ解決されることを確認する安全機構。意図しない link target へ解決される場合は link 設定を停止する |
-| Local backend | ローカル版 OpenCode のバックエンド区分。GitHub backend（GitHub Issue/PR を使う通常運用）との差分として Design `v4-lifecycle-state-machine.md` で定義される。SSoT は GitHub Issue/PR ではなくローカルIssue（`.agentdev/issues/issue-{NNNN}.md`）となる |
+| Local backend | ローカル版 OpenCode のバックエンド区分。GitHub backend（GitHub Issue/PR を使う通常運用）との差分として Design `lifecycle-state-machine.md` で定義される。SSoT は GitHub Issue/PR ではなくローカルIssue（`.agentdev/issues/issue-{NNNN}.md`）となる |

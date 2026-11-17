@@ -76,7 +76,7 @@
 - **design 対応事前確認**: 変更対象のうち既存 REQ 行の意味変更を含む場合、`agentdev-traceability` の coverage --req により当該行の design 対応有無を事前確認する。design 対応が欠落する意味変更行を検出した場合は、当該行の design 対応を `artifact_actions`（`artifact: design`）へ組込む。本確認は STEP-6 の生成手順（draft-generation.md の design 対応事前確認）へ引き継がれる前段の確認であり、後段の case-ready lifecycle gate completeness（fail-closed）での停止を予防する位置づけである（正規所有は case-open Design「意味変更行の design 対応事前確認」節）
 - **文書分類妥当性検証**: REQ 要件行に Design 分離基準違反残留がないか検出する。検出時は Design 保存対象へ移送する（安定契約例外は対象外）。具体名・パス・値の存在だけでは内部詳細と判定せず、公開入口、対応対象、安全境界、安定外部契約に該当する記述は具体名を含めた要約として REQ に残す。成果を保証する記述と既定の手段を記す記述が同一行に混在する場合、成果・制約のみを REQ に残し、具体コマンド、検索引数の使用手順、実行方法を既存 Design または配布参照文書へ分離する。分離先として Knowledge 文書を選択しない（Knowledge は規範の所有先ではなく、非規範的な環境知識・作業知識・観測の記録の配置先である）
 - **Decision要否確認ゲート**: Decision候補・既存REQ/Decision/Design との衝突候補・責務境界変更を含む場合、`agentdev-architecture-advisory` へ委譲する。出力は4ラベル構造（確定事項/推定事項/ユーザー確認事項/ブロッカー）。soft-contract（Decision）。ブロッカーまたは未決事項残存時は壁打ち（STEP-2）へ差し戻す
-- **実行主体分類表**: 委譲契約を定義する場合、各委譲について実行主体分類表（adapter skill / command / subagent / harness）を必須とする（詳細は v4-delegation-contracts Design（extension 経由）参照。委譲を含まない要件では省略可）
+- **実行主体分類表**: 委譲契約を定義する場合、各委譲について実行主体分類表（adapter skill / command / subagent / harness）を必須とする（詳細は delegation-contracts Design（extension 経由）参照。委譲を含まない要件では省略可）
 - **変更誘発境界リスク分析**: `agentdev-req-analysis` の「変更誘発境界リスク分析」観点に従い、変更差分から dependency boundary、client/server boundary、execution boundary、build/runtime boundary、environment propagation boundary の 5観点境界について case-specific risk を導出する。project 固有のリスク導出規則を参照する場合、docs/knowledge/ を正規知識領域とし、利用可能なハーネスの探索能力を通じて関連知識を検索する（Project Knowledge の所有と workflow 利用の要件が正規所有する利用契約に従う）。知識が不在の場合は ADF core の一般規則のみで 5観点境界分析を実行する（分析を省略しない）。導出した case-specific risk は検証契約へ投影する。変換経路は change → risk → verification obligation → test strategy とし、投影先は test strategy、投影完全性の検査は QG-1（リスク→test strategy 投影完全性検査）が担う
 - **test strategy 定義**: 各合意項目（AG-*）の検証方法を test strategy として定義する。3要素構造（`verification` / `pass_criteria` / `on_failure`）を必須とし、`on_failure` を持たない検証項目は含めない。項目識別子は `TS-NNN`、`on_failure` アクション種別は `fix-and-reverify` / `record-in-findings` の2値。シリアライズ形式の詳細は req-define command Design（extension 経由）の draft-data test_strategy フィールドスキーマ参照。導出済み case-specific risk から検証義務（verification obligation）を導き、test strategy 項目へ投影する（change → risk → verification obligation → test strategy）。選択した検証手段の質は `agentdev-req-analysis` の「検証手段の質基準」観点（production-equivalent verification、正本は analysis-viewpoints reference）に従い判定する。完了時点の証跡契約を正規所有する要件群が正規所有するため、本工程では複製せず参照に留める
 - **検索系検証の網羅範囲・修正対象列挙一致確認**: test strategy 項目に検索系検証（rg 等）を定義する際、検証コマンドの網羅範囲（対象パス・パターン）と修正対象列挙（変更対象ファイル集合）の一致を確認する。See Also 等の参照行は修正対象ではないため、網羅範囲から除外するか、検索に含める場合は参照行を検出対象外とする扱いを明示する。本確認は既存の test strategy 定義義務（3要素構造、case-specific risk 投影、検証手段の質基準適用）への追加であり、既存手順を置換するものではない
@@ -174,9 +174,9 @@
 共通契約:
 
 - 利用可否は `CLOUDFLARE_ACCOUNT_ID` と `CLOUDFLARE_API_TOKEN` の設定有無で決まる（デフォルト有効、feature flag や opt-in 手続きは不要）。未設定時は API を呼び出さず構造化失敗（not_configured）を返し、観測を生成しない
-- 評価器障害（not_configured、timeout、429、5xx、network error、response validation error 等）で評価が成立しない場合、LLM 推論へ fallback して判定を継続せず、当該判定を未確定として扱い、当該判定に依存する後続の副作用および状態遷移を開始しない。判定未確定を不合格または非該当へ変換せず、依存しない独立処理を一律に停止せず、評価器障害だけを理由に人間判断へ移行しない。判定未確定の停止（停止条件と再開条件を含む）を報告し、状態記録は証跡として残す。契約の正は v4-responsibility-boundaries Design「閉じた意味評価の障害時契約」節（runtime 面の適用は v4-runtime-execution-model Design「判定未確定時の依存後続抑止」節）
+- 評価器障害（not_configured、timeout、429、5xx、network error、response validation error 等）で評価が成立しない場合、LLM 推論へ fallback して判定を継続せず、当該判定を未確定として扱い、当該判定に依存する後続の副作用および状態遷移を開始しない。判定未確定を不合格または非該当へ変換せず、依存しない独立処理を一律に停止せず、評価器障害だけを理由に人間判断へ移行しない。判定未確定の停止（停止条件と再開条件を含む）を報告し、状態記録は証跡として残す。契約の正は responsibility-boundaries Design「閉じた意味評価の障害時契約」節（runtime 面の適用は runtime-execution-model Design「判定未確定時の依存後続抑止」節）
 - Jev API 失敗時は自動再試行せず、失敗観測に失敗分類と最小 diagnostic が記録される。正規状態を破損しない
-- 評価器復旧後は、正規の再実行・再開経路で評価を再実行する。再開前に入力・規則・成果物・証拠への変更影響を確認し、影響する古い判定を再利用せず、成功済み副作用を重複実行せず、影響しない証拠は再利用する。修復・再試行・設定等の運用介入を判定方式の代替または新規規範の確定と混同しない。再開契約の正は v4-durable-state-and-recovery Design「評価器復旧後の評価再開契約」節
+- 評価器復旧後は、正規の再実行・再開経路で評価を再実行する。再開前に入力・規則・成果物・証拠への変更影響を確認し、影響する古い判定を再利用せず、成功済み副作用を重複実行せず、影響しない証拠は再利用する。修復・再試行・設定等の運用介入を判定方式の代替または新規規範の確定と混同しない。再開契約の正は durable-state-and-recovery Design「評価器復旧後の評価再開契約」節
 - 観測は 1 semantic evaluation = 1 observation（1 JSON）で `.agentdev/jev-observations/` に保存する。confidence は evaluation 単位の一次事実であり、provider が返した場合のみ保存する。質問単位への複製・確率分布からの代替生成を行わない。観測書込み失敗時は本 Workflow の success を維持し、完了報告に識別可能な warning を明示する。rollback・再実行・擬似再生成を行わない
 - 再構成可能な判断入力は判断入力全文を保存せず、評価リクエストの digest と参照で保持する。再構成不能な入力のみ最小 snapshot を渡す
 - 条件付き評価の発動制御（Jev 先行評価の実運用組込み要件より）: 親となる判断の結果によって後続判断の必要性が決まる場合、親判断の最終確定結果が発動条件を満たした場合だけ後続の意味評価を生成する。Jev による親判断の先行評価結果のみをもって後続評価を発動しない。発動条件が成立しない場合は後続質問自体を生成せず、後続の意味評価に対応する観測記録（非該当等を表すためだけのものを含む）も生成しない
@@ -213,7 +213,7 @@ choice 形式質問を構成する際は、次の規約に従う。
 
 deterministic 境界の適用判定（Jev 先行評価の実運用組込み要件より）:
 
-境界判定基準「モデル推論なしで一意に導出できること」を各判断単位に適用した結果を次に記録する。対象外とした部分の導出結果は後続の semantic evaluation の state として利用し、deterministic に確定した結果を Jev で再判定させない。評価後に判明した deterministic な確定は差異理由 deterministic_override として処理する。境界判定が確定できない部分は、閉じた意味評価の閉包条件（閉じた意味評価の閉包条件を所有する ADF 判断アーキテクチャ要件。判別基準の正典は `<foundations/v4-responsibility-boundaries>` Design「閉じた意味評価の閉包条件」節が集約所有する）によって判定し、「決定的処理として確定できない」という理由のみで評価対象に分類しない。
+境界判定基準「モデル推論なしで一意に導出できること」を各判断単位に適用した結果を次に記録する。対象外とした部分の導出結果は後続の semantic evaluation の state として利用し、deterministic に確定した結果を Jev で再判定させない。評価後に判明した deterministic な確定は差異理由 deterministic_override として処理する。境界判定が確定できない部分は、閉じた意味評価の閉包条件（閉じた意味評価の閉包条件を所有する ADF 判断アーキテクチャ要件。判別基準の正典は `<foundations/responsibility-boundaries>` Design「閉じた意味評価の閉包条件」節が集約所有する）によって判定し、「決定的処理として確定できない」という理由のみで評価対象に分類しない。
 
 | 判断単位 | 対象外とした部分 | 根拠 |
 |---|---|---|
@@ -228,7 +228,7 @@ deterministic 境界の適用判定（Jev 先行評価の実運用組込み要�
 
 ## 閉じた意味評価の全件監査結果（Jev 先行評価の実運用組込み要件の全件監査規定）
 
-導入時に割当てられた本 Workflow の判断単位（2件）と適用不採用判断（1件）を存続を前提とせず全件監査し、各判断に「維持」「決定的処理への移行」「条件付き化」「統合」「削除」「T1（正規判断主体の再設計）への持ち越し」のいずれかの処置を確定した。閉じた意味評価の閉包条件（閉じた意味評価の閉包条件を所有する ADF 判断アーキテクチャ要件。判別基準の正典は `<foundations/v4-responsibility-boundaries>` Design「閉じた意味評価の閉包条件」節）の6条件を各判断単位に適用した。現行の質問数・質問構造の維持を監査の制約としない。
+導入時に割当てられた本 Workflow の判断単位（2件）と適用不採用判断（1件）を存続を前提とせず全件監査し、各判断に「維持」「決定的処理への移行」「条件付き化」「統合」「削除」「T1（正規判断主体の再設計）への持ち越し」のいずれかの処置を確定した。閉じた意味評価の閉包条件（閉じた意味評価の閉包条件を所有する ADF 判断アーキテクチャ要件。判別基準の正典は `<foundations/responsibility-boundaries>` Design「閉じた意味評価の閉包条件」節）の6条件を各判断単位に適用した。現行の質問数・質問構造の維持を監査の制約としない。
 
 | 判断単位 | 閉包条件適用結果 | 処置 | 根拠 |
 |---|---|---|---|

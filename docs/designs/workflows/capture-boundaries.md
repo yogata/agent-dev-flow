@@ -115,7 +115,7 @@ Skill は候補生成と file 書き込みまでを担い、commit 実行は委�
 
 ### Epic Issue 単一書き手制約
 
-Epic Issue 本文（実行構成表）の書き込みは per-Epic の単一書き手として排他制御される（REQ-035-001、`docs/designs/foundations/v4-runtime-execution-model.md`「直列化単位表」参照）。書き込みを実施するのは case-close(#epic) と case-auto stage 3 の統合処理（case-close 相当）であり、同一の排他制御の下で実行する。
+Epic Issue 本文（実行構成表）の書き込みは per-Epic の単一書き手として排他制御される（REQ-035-001、`docs/designs/foundations/runtime-execution-model.md`「直列化単位表」参照）。書き込みを実施するのは case-close(#epic) と case-auto stage 3 の統合処理（case-close 相当）であり、同一の排他制御の下で実行する。
 
 - `case-run` は Epic Issue 本文を読み取るのみで書き込まない
 - 複数 execution_unit 並列実行時も per-Epic-Issue-body の単一書き手が維持される
@@ -155,14 +155,14 @@ req-define の明示入力としてルーティングする（backlog-review 経
 
 ## v4 継続コラボレーションループへの接続
 
-本 Design が定義する intake / learning 境界は、v4 継続コラボレーションループ（v4-collaboration-loop Design）における Observe から Intake・Learning への流入境界として位置づく。capture 成果物の配置とライフサイクルの整合は v4-collaboration-loop Design「.agentdev/ 状態領域の整合」節が、状態遷移は v4-lifecycle-state-machine Design が所有する。
-v3 backlog-artifact-lifecycle Design の検出事項プロトコル（検出事項の保存・分類・昇格の入力契約）は本 Design が引き継ぐ（redefine 先）。節内容の帰属の記録は v4-collaboration-loop Design「v3 backlog-artifact-lifecycle Design からの吸収」節が所有する。
+本 Design が定義する intake / learning 境界は、v4 継続コラボレーションループ（collaboration-loop Design）における Observe から Intake・Learning への流入境界として位置づく。capture 成果物の配置とライフサイクルの整合は collaboration-loop Design「.agentdev/ 状態領域の整合」節が、状態遷移は lifecycle-state-machine Design が所有する。
+v3 backlog-artifact-lifecycle Design の検出事項プロトコル（検出事項の保存・分類・昇格の入力契約）は本 Design が引き継ぐ（redefine 先）。節内容の帰属の記録は collaboration-loop Design「v3 backlog-artifact-lifecycle Design からの吸収」節が所有する。
 
 ## See Also
 
-- [v4-lifecycle-state-machine.md](v4-lifecycle-state-machine.md)（ワークフロー全体契約）
-- [../foundations/v4-runtime-execution-model.md](../foundations/v4-runtime-execution-model.md)（Epic Issue 本文の単一書き手〔直列化単位表〕）
-- [v4-collaboration-loop.md](v4-collaboration-loop.md)（継続コラボレーションループ: ループ各段責務、採用済み成果物の .agentdev/ 状態領域の整合、v3 backlog-artifact-lifecycle Design からの吸収記録）
+- [lifecycle-state-machine.md](lifecycle-state-machine.md)（ワークフロー全体契約）
+- [../foundations/runtime-execution-model.md](../foundations/runtime-execution-model.md)（Epic Issue 本文の単一書き手〔直列化単位表〕）
+- [collaboration-loop.md](collaboration-loop.md)（継続コラボレーションループ: ループ各段責務、採用済み成果物の .agentdev/ 状態領域の整合、v3 backlog-artifact-lifecycle Design からの吸収記録）
 - [../responsibilities/artifact-contracts.md](../responsibilities/artifact-contracts.md)（Command→Skill 依存方向、`Capture結果` 小節の共通意味契約）
 - 各 command Design（`docs/designs/commands/`）
 - `agentdev-workflow-orchestration` skill（capture 境界の詳細）

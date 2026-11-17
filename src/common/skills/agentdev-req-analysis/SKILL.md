@@ -15,7 +15,7 @@ description: Provides requirement analysis methods with quality criteria and Dec
 
 ## 入力
 
-- RU（採用済み成果物）、セッションコンテキスト、明示入力ファイル。エラー・ログ・障害情報、外部課題、finding も入力種別として扱う（`v4-standard-lifecycle` Design「req-define の入力意味と要件化責務」節）
+- RU（採用済み成果物）、セッションコンテキスト、明示入力ファイル。エラー・ログ・障害情報、外部課題、finding も入力種別として扱う（`standard-lifecycle` Design「req-define の入力意味と要件化責務」節）
 
 ## 出力
 
@@ -93,11 +93,11 @@ description: Provides requirement analysis methods with quality criteria and Dec
 
 ### 呼出元 STEP と Input Resolution
 
-呼出元 STEP は本スキルへの入力（RU、セッションコンテキスト、明示入力ファイル）を Input Resolution（`<foundations/v4-durable-state-and-recovery>` Design）に従って解決する。
+呼出元 STEP は本スキルへの入力（RU、セッションコンテキスト、明示入力ファイル）を Input Resolution（`<foundations/durable-state-and-recovery>` Design）に従って解決する。
 優先順位: (1) SSoT 再構成（docs/ 配下の永続文書）、(2) identifier 保持（RU-ID、REQ-ID、Issue番号）、(3) 最小 scalar、(4) runtime artifact（要件doc draft、検出事項等、一時成果物のライフサイクル契約）。
 
 本スキルの出力（要件doc候補、壁打ち出力）は runtime artifact に分類され、呼出元 STEP の result evidence および次 STEP の Input Resolution 入力として扱われる。
-STEP reference 8 要素は `<foundations/v4-durable-state-and-recovery>` Design 参照。
+STEP reference 8 要素は `<foundations/durable-state-and-recovery>` Design 参照。
 
 ## See Also
 

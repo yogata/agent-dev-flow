@@ -9,7 +9,7 @@ updated: "2026-10-07"
 
 # execution_unit 構成アルゴリズム参照
 
-> **位置づけ**: 本資料は `docs/designs/workflows/v4-standard-lifecycle.md`（語彙定義）および `docs/designs/commands/case-ready.md`（運用主体）から参照される実装アルゴリズム詳細である。
+> **位置づけ**: 本資料は `docs/designs/workflows/standard-lifecycle.md`（語彙定義）および `docs/designs/commands/case-ready.md`（運用主体）から参照される実装アルゴリズム詳細である。
 > 現行契約（依存強度3レベル定義、Epic あたり子 Issue 数上限、単独根 Standard flow 等）の宣言は参照先 Design を正とし、本資料はその機械的判定手順を示す。
 
 ## 目的
@@ -86,5 +86,5 @@ REQ/Design で固定するのは不変の方針（依存強度3レベル定義�
 
 ## See Also
 
-- [../v4-standard-lifecycle.md](../v4-standard-lifecycle.md)（語彙定義: work_type / scale / Epic / Wave の v4 意味モデル）
+- [../standard-lifecycle.md](../standard-lifecycle.md)（語彙定義: work_type / scale / Epic / Wave の v4 意味モデル）
 - `docs/designs/commands/case-ready.md`（適用主体 command Design。Epic/Wave 構成判断の正規所有者は case-ready。REQ-061-007）

@@ -35,7 +35,7 @@ case-open command は公開 interface（入出力契約・ガードレール）�
 ## 制御平面（STEP 一覧）
 
 case-open workflow は次の6 STEP で構成する。
-各 STEP は再開ポイント（resume point）を持つ（STEP resume point と会話記憶非依存の Decision、`<foundations/v4-durable-state-and-recovery>` Design）。
+各 STEP は再開ポイント（resume point）を持つ（STEP resume point と会話記憶非依存の Decision、`<foundations/durable-state-and-recovery>` Design）。
 会話コンテキストに依存せず、永続状態（draft-data、Root Case Issue、設計PR）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -104,12 +104,12 @@ case-open は、上流工程（req-define）で確定した対象要件を実行
 - **実行識別情報の非記録（Issue 本文）**: Issue 本文には実行識別情報セクションを設けない（agentdev-workflow-templates Design「実行識別情報・検証差分のテンプレートセクション形式」節）。Case・実行単位・前工程確定事項は Definition Package・設計PR・canonical 成果物関係から相関でき、本文へ一覧化しない。実行識別情報セクションは PR テンプレートのみが持つ
 - **Root Case タイトル**: Root Case の起票時のタイトル書式は `<workflows/issue-title-policy>` Design（Issue タイトル記述規則）を参照する（Root Case は Case 接頭辞書式。合意済みの対象・目的から主題を生成する）。本スキルは書式を複製しない
 - **本文 verbatim**: Root Case 本文、PR 本文は Custom Tool `agentdev_gh` の操作引数としてそのまま渡す（文字コード・一時ファイルの実装詳細は Tool 内部）（`POL-gh-io-delegation`）
-- **検証用一時資材の作成・回収義務**: Root Case 確立に伴い検証用remote、clone、bare repository、退避ログ、補助スクリプト、専用server・process等の検証用一時資材を作成する場合、既存の配置規則と権限に従う標準的な一時領域・リポジトリ内の作業領域（`.agentdev/tmp/` 等の配置分類）・許可された外部環境で作成・利用し、利用終了時に安全条件（当該作業が作成した専用資材であることの確認、回収対象範囲の特定、正式な成果物・必要な証拠・他の作業や利用者が管理する資材の保護、既存の副作用・承認境界への適合）が成立する範囲で回収する。安全条件と配置規則の詳細は検証に伴う一時資材の取扱いと後片付け責任 Design が所有する（対応関係は repository top-level `traceability/` 配下 sidecar を参照）。作成を委譲する場合は委譲契約へ一時資材の作成・利用・回収義務を含める（v4-delegation-contracts Design「検証用一時資材の作成・報告義務」節）。後片付けの実施結果、確認根拠、未処理事項（未回収・確認不能・引継ぎ）を既存の作業記録経路へ返す
+- **検証用一時資材の作成・回収義務**: Root Case 確立に伴い検証用remote、clone、bare repository、退避ログ、補助スクリプト、専用server・process等の検証用一時資材を作成する場合、既存の配置規則と権限に従う標準的な一時領域・リポジトリ内の作業領域（`.agentdev/tmp/` 等の配置分類）・許可された外部環境で作成・利用し、利用終了時に安全条件（当該作業が作成した専用資材であることの確認、回収対象範囲の特定、正式な成果物・必要な証拠・他の作業や利用者が管理する資材の保護、既存の副作用・承認境界への適合）が成立する範囲で回収する。安全条件と配置規則の詳細は検証に伴う一時資材の取扱いと後片付け責任 Design が所有する（対応関係は repository top-level `traceability/` 配下 sidecar を参照）。作成を委譲する場合は委譲契約へ一時資材の作成・利用・回収義務を含める（delegation-contracts Design「検証用一時資材の作成・報告義務」節）。後片付けの実施結果、確認根拠、未処理事項（未回収・確認不能・引継ぎ）を既存の作業記録経路へ返す
 
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
+- **`<foundations/durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **case-open / case-ready Design**: Definition Package 構成、設計PR lifecycle、冪等キー
 - **Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則の Decision**: 責務3層分化の採用記録（docs/decisions/ 配下）
 - **STEP resume point と会話記憶非依存の Decision**: STEP resume point 採用の記録（docs/decisions/ 配下）

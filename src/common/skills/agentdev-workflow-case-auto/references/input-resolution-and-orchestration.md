@@ -115,7 +115,7 @@ STEP-8（停止時報告）・STEP-8（完了報告）での所要時間算出�
 
 1. SSoT 再構成: 各工程の durable state（REQ/Decision/Design ファイル、Issue/PR、Epic Issue 本文）
 2. identifier 保持: Issue番号、PR番号、OU ID、draft パス、RU パス
-3. 最小 scalar: L1 工程別タイムスタンプ、stage 3 共有 active Issue task 枠（上限 5、起動間隔10秒。v4-runtime-execution-model Design「runtime 制御ループ」節〔起動間隔・並列数制御〕）
+3. 最小 scalar: L1 工程別タイムスタンプ、stage 3 共有 active Issue task 枠（上限 5、起動間隔10秒。runtime-execution-model Design「runtime 制御ループ」節〔起動間隔・並列数制御〕）
 4. runtime artifact: なし（委譲工程内部の過程は親コンテキストに累積しない、command 不変条件）
 
 ### Preconditions
@@ -161,7 +161,7 @@ stage 1（case-open）の収束条件には、全対象確立後の横断依存�
 横断依存検査の単独起動（case-open STEP-5）と case-auto 側の横断評価は二重実行とせず、case-auto 側評価は全対象確立を前提とした population 補完の位置づけである。
 
 並列実行は必須であり、実行環境由来の障害（background task の消失、親 run の中断、provider failure 等）を理由とする同期逐次実行（順次フォールバック）への切替を行わない。並列起動が当該 stage の起動可能対象集合に対して1件も成立しない場合は、直列化で完了を装わず停止理由「並列起動不能」（原因の断定を含まない）と再開可能性を報告して停止する（case-auto Design「runtime 制御契約」節、command 不変条件）。
-並列起動時は委譲起動ごとに10秒の起動間隔を置き、同一Tool一括ブロックでの複数起動発行は行わない（v4-runtime-execution-model Design「runtime 制御ループ」節〔起動間隔・並列数制御〕）。起動間隔は stage 3（case-run インライン実行の実装実行委譲）に限らず stage 1（case-open / case-revise 委譲）・stage 2（case-ready 委譲）・stage 4（case-close 委譲）の並列委譲起動にも同一に適用する。
+並列起動時は委譲起動ごとに10秒の起動間隔を置き、同一Tool一括ブロックでの複数起動発行は行わない（runtime-execution-model Design「runtime 制御ループ」節〔起動間隔・並列数制御〕）。起動間隔は stage 3（case-run インライン実行の実装実行委譲）に限らず stage 1（case-open / case-revise 委譲）・stage 2（case-ready 委譲）・stage 4（case-close 委譲）の並列委譲起動にも同一に適用する。
 bg task 破棄検知時の3状態回復は `agentdev-workflow-orchestration` 参照。
 
 #### stage 2・stage 4 の並列委譲起動と委譲指示の構築（case-ready・case-close）
@@ -175,7 +175,7 @@ stage 2（case-ready）・stage 4（case-close）の委譲起動は、起動時�
 
 #### stage 3 runtime 制御契約（共有 active Issue task 枠）
 
-stage 3 の実行制御は case-auto が単一所有し、次の runtime 制御契約に従う（詳細は case-auto Design「runtime 制御契約」節と v4-runtime-execution-model Design「runtime 制御ループ」節）:
+stage 3 の実行制御は case-auto が単一所有し、次の runtime 制御契約に従う（詳細は case-auto Design「runtime 制御契約」節と runtime-execution-model Design「runtime 制御ループ」節）:
 
 1. **共有 active 枠**: 1 active task は 1 Issue への実装実行委譲であり、Epic・Wave・Standard Issue を横断して active Issue task 数が上限（5）を超えない。Epic・Wave・Standard Issue・case-run 呼出しごとの独立実行枠を設けない
 2. **空き枠補充**: active Issue task 数が上限未満の場合、各 Epic の依存充足済みの子 Issue（Wave の前後を前提としない）と Standard Issue から開始条件を満たす Issue を横断して候補として認識し、実行上の安全条件を満たす候補がある限り補充する（横断補充は best-effort でなく必須）。最初に起動した全 task の完了を待つ固定 batch 方式を取らず、起動は実行進行中に継続する

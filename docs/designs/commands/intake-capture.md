@@ -57,7 +57,7 @@ updated: "2026-10-05"
 ## 参照する横断 Design
 
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Split Rule（作業知見のみは除外））
-- [workflows/v4-collaboration-loop.md](../workflows/v4-collaboration-loop.md)（Intake 段の責務、.agentdev/ 状態領域の整合）
+- [workflows/collaboration-loop.md](../workflows/collaboration-loop.md)（Intake 段の責務、.agentdev/ 状態領域の整合）
 
 ## 対象外
 

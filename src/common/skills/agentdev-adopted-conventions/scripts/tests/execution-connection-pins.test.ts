@@ -1,6 +1,6 @@
 // 採用した工程構成に基づく単独工程・一気通貫実行・中断再開の実行接続の構造照合。
 //
-// v51 Design（docs/designs/workflows/v51-phase-transition-and-coexistence-model.md）
+// v51 Design（docs/designs/workflows/phase-transition-and-coexistence-model.md）
 // 「有限作業と実装接続」節が実行接続の design 宣言の正であり、その実現面として
 // case-auto workflow 実装本体（v5 有限実行モード節のモード契約）、case-run workflow
 // 実装本体（単独工程からの実装・検証接続節）、req-define command（要件確定のみの
@@ -88,7 +88,7 @@ const modeContractSection = sectionBetween(caseAutoSkill, "### モード契約")
 const caseRunSkill = readSkill("agentdev-workflow-case-run/SKILL.md");
 const reqDefineCommand = readCommand("req-define.md");
 const caseAutoCommand = readCommand("case-auto.md");
-const v51Design = readDoc("docs/designs/workflows/v51-phase-transition-and-coexistence-model.md");
+const v51Design = readDoc("docs/designs/workflows/phase-transition-and-coexistence-model.md");
 const v51ConnectionSection = sectionBetween(v51Design, "## 有限作業と実装接続");
 
 describe("単独工程の独立完了の実行接続（case-auto workflow 実装本体）", () => {

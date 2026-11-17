@@ -61,7 +61,7 @@ updated: "2026-10-05"
 ## 参照する横断 Design
 
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 境界）
-- [workflows/v4-collaboration-loop.md](../workflows/v4-collaboration-loop.md)（ループ統合。バックログドラフトプロトコル〔draft → approved → issued〕は本 Design が全量移管の受け先である〔帰属の記録は同 Design 吸収節〕）
+- [workflows/collaboration-loop.md](../workflows/collaboration-loop.md)（ループ統合。バックログドラフトプロトコル〔draft → approved → issued〕は本 Design が全量移管の受け先である〔帰属の記録は同 Design 吸収節〕）
 
 ## 対象外
 

@@ -140,7 +140,7 @@ describe("findDesignFrontmatterViolations", () => {
     expect(violations[0].kind).toBe("missing-frontmatter");
   });
 
-  test("必須キー欠落を検出する（違反例: 再現例 - v4-collaboration-loop 形状の updated 欠落）", () => {
+  test("必須キー欠落を検出する（違反例: 再現例 - collaboration-loop 形状の updated 欠落）", () => {
     const doc = `---
 id: sample
 title: 欠落
@@ -266,8 +266,8 @@ describe("isExcludedDesignFile", () => {
     expect(isExcludedDesignFile("integrity/README.md")).toBe(true);
   });
 
-  test("references/ 配下は対象外（crosswalk-inventory.md の対象範囲判定）", () => {
-    expect(isExcludedDesignFile("foundations/references/crosswalk-inventory.md")).toBe(true);
+  test("references/ 配下は対象外（concrete-abstraction.md の対象範囲判定）", () => {
+    expect(isExcludedDesignFile("foundations/references/concrete-abstraction.md")).toBe(true);
     expect(isExcludedDesignFile("workflows/references/execution-unit-construction.md")).toBe(true);
   });
 
@@ -281,7 +281,7 @@ describe("isExcludedDesignFile", () => {
   });
 
   test("通常の Design ファイルは検査対象", () => {
-    expect(isExcludedDesignFile("workflows/v4-collaboration-loop.md")).toBe(false);
+    expect(isExcludedDesignFile("workflows/collaboration-loop.md")).toBe(false);
     expect(isExcludedDesignFile("integrity/integrity-contracts.md")).toBe(false);
   });
 });
@@ -331,8 +331,8 @@ created: 2026-08-20
  updated: 2026-09-14
 ---
 `);
-    writeDesignDoc(root, "workflows/v4-collaboration-loop.md", `---
-id: v4-collaboration-loop
+    writeDesignDoc(root, "workflows/collaboration-loop.md", `---
+id: collaboration-loop
 title: ADF v4 継続コラボレーションループ
 created: 2026-09-20
 status: accepted
@@ -345,7 +345,7 @@ status: accepted
       byFile.set(f.file, (byFile.get(f.file) ?? 0) + 1);
     }
     expect(byFile.get("docs/designs/integrity/integrity-contracts.md")).toBe(2);
-    expect(byFile.get("docs/designs/workflows/v4-collaboration-loop.md")).toBe(1);
+    expect(byFile.get("docs/designs/workflows/collaboration-loop.md")).toBe(1);
   });
 
   test("README.md と references/ 配下の frontmatter なしファイルは検出しない（許容例: 対象範囲判定）", () => {
@@ -353,7 +353,7 @@ status: accepted
     writeDesignDoc(root, "README.md", "# Design インデックス\n");
     writeDesignDoc(
       root,
-      "foundations/references/crosswalk-inventory.md",
+      "foundations/references/concrete-abstraction.md",
       "# frontmatter なし references 文書\n",
     );
     writeDesignDoc(root, "foundations/system.md", VALID_FRONTMATTER_DOC);

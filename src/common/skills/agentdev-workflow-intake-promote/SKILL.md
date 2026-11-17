@@ -10,7 +10,7 @@ intake-promote command の workflow 実装本体である。
 classification → review → HITL → persistence → destructive handling の各段階を独立 resume point として構成する。
 
 intake-promote command は公開 interface（入出力契約・ガードレール・分類値契約）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（責務3層分化と1:N分割原則、intake pipeline 要件〔蓄積・capture 整理・分類確定・配置先限定〕）。
-各 item の分類確定は、横断契約Designの HITL 判断確定原則に基づき、取得可能な根拠から正規契約からの導出または委譲された裁量の範囲で確定できる item を自律確定し、人間判断への引き上げ条件（intake 分類確定契約。`<foundations/v4-responsibility-boundaries>` Design「人間判断への引き上げ条件」節）に該当する item のみを HITL 対象とする（後述「自律確定とHITL境界」）。
+各 item の分類確定は、横断契約Designの HITL 判断確定原則に基づき、取得可能な根拠から正規契約からの導出または委譲された裁量の範囲で確定できる item を自律確定し、人間判断への引き上げ条件（intake 分類確定契約。`<foundations/responsibility-boundaries>` Design「人間判断への引き上げ条件」節）に該当する item のみを HITL 対象とする（後述「自律確定とHITL境界」）。
 
 ## 入力
 
@@ -33,7 +33,7 @@ intake-promote command は公開 interface（入出力契約・ガードレー�
 ## 制御平面（STEP 一覧）
 
 intake-promote workflow は次の6 STEP で構成する。
-各 STEP は再開ポイント（resume point）を持ち（STEP resume point と会話記憶非依存、`docs/designs/<foundations/v4-durable-state-and-recovery>.md`）、classification / review / HITL / persistence / destructive handling の5段階がそれぞれ独立した再開ポイントである。
+各 STEP は再開ポイント（resume point）を持ち（STEP resume point と会話記憶非依存、`docs/designs/<foundations/durable-state-and-recovery>.md`）、classification / review / HITL / persistence / destructive handling の5段階がそれぞれ独立した再開ポイントである。
 会話コンテキストに依存せず、永続状態（inbox / promoted の実ファイル状態、分類確定状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -71,7 +71,7 @@ intake-promote workflow は次の6 STEP で構成する。
 ## 再開プロトコル（永続状態による再開）
 
 会話コンテキストを権威情報源とせず、永続状態から current STEP を再構成する（STEP resume point と会話記憶非依存）。
-優先順位は `<foundations/v4-durable-state-and-recovery>` Design に従う。
+優先順位は `<foundations/durable-state-and-recovery>` Design に従う。
 
 1. SSoT 再構成: `.agentdev/intake/inbox/` と `.agentdev/intake/promoted/` の実ファイル状態
 2. identifier 保持: item ファイルパス、採用済み成果物パス
@@ -115,10 +115,10 @@ HITL（STEP-3）の承認状態は単独では永続状態に記録されない�
 
 ## See Also
 
-- **`<foundations/v4-responsibility-boundaries>` Design**: HITL 判断確定原則（人間判断への引き上げ条件）の集約所有者
+- **`<foundations/responsibility-boundaries>` Design**: HITL 判断確定原則（人間判断への引き上げ条件）の集約所有者
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
-- **`<foundations/v4-durable-state-and-recovery>` Design**: 永続状態の優先順位、current STEP 再構成
+- **`<foundations/durable-state-and-recovery>` Design**: STEP reference 構造、resume point
+- **`<foundations/durable-state-and-recovery>` Design**: 永続状態の優先順位、current STEP 再構成
 - **責務3層分化と1:N分割原則**: Command は公開入口、Workflow Skill は工程の実装、Capability Skill は共通能力を所有する。Workflow Skill の分割は制御構造の実質差異に基づき評価し、操作の違いだけでは分割しない
 - **STEP resume point と会話記憶非依存**: 安定した STEP 識別子と永続情報から再開点を再構成する。再開点を決める契約と、実行基盤による現在 STEP の選択処理を区別する。
 - **intake-promote command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

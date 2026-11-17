@@ -89,7 +89,7 @@ agentdev-traceability の coverage, impact, check を一般文書探索、構造
 ## 参照する横断 Design
 
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 境界）
-- [workflows/v4-collaboration-loop.md](../workflows/v4-collaboration-loop.md)（継続コラボレーションループ: ループ各段責務、RU 生成・合流、採用済み成果物の .agentdev/ 状態領域の整合、v3 backlog-artifact-lifecycle Design からの吸収記録）
+- [workflows/collaboration-loop.md](../workflows/collaboration-loop.md)（継続コラボレーションループ: ループ各段責務、RU 生成・合流、採用済み成果物の .agentdev/ 状態領域の整合、v3 backlog-artifact-lifecycle Design からの吸収記録）
 
 ## 対象外
 
@@ -239,6 +239,6 @@ unresolved な本質的争点またはユーザー判断事項が残る場合、
 
 ### 正規所有者マトリックス参照
 
-本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、v4-delegation-contracts Design「adversarial-review との委譲契約接続」節、agentdev-backlog-integration Design「adversarial-review 候補判断と内部挿入」節との間で意味の重複、矛盾を生じない。
+本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、agentdev-backlog-integration Design「adversarial-review 候補判断と内部挿入」節との間で意味の重複、矛盾を生じない。
 backlog-review command 固有の挿入境界（発動条件、挿入構造、順序、矛盾取扱い）のみを本節が所有し、候補判断基準、内部手続きの詳細は agentdev-backlog-integration Design を正とする。
 

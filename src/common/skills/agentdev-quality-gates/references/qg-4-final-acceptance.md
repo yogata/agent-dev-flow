@@ -6,20 +6,20 @@ case-close で PR マージ前に、最終受け入れ状態を確認する Gate
 
 ## v4 Quality モデルへの接続
 
-本 Gate は ADF v4 Quality モデル（v4-quality-gate-model Design）の lifecycle 級 semantic Gate 群として再導出された QG-4（Final Acceptance）である。
+本 Gate は ADF v4 Quality モデル（quality-gate-model Design）の lifecycle 級 semantic Gate 群として再導出された QG-4（Final Acceptance）である。
 本ファイルの 3 層は同 Design「再導出結果（lifecycle 級 semantic Gate 群）」表の QG-4 行と次のように対応する。
 
 | 層 | 対応内容 |
 |---|---|
-| Verification Obligation | test strategy 3 要素完全性・リスクから test strategy への投影完全性・正規契約から導出した検証義務の履行確認（検証義務がリポジトリ全体の試験を要求する対象では full integrity suite 受入れ。試験範囲の選択は case-close 実行契約 REQ の最終検証の検証義務に基づく試験範囲選択要件行が所有）・traceability check 前提手順・verify-only 証拠ソース・正規契約からの検証義務導出（判断方法 3 分類・確定権限区分の適用）と完了判定の双方向忠実性・not applicable 根拠確認・完了条件単位の最終評価（証拠の意味対応、全称・不存在条件の反例探索、非循環証拠、反例の対象外化禁止、検証方法弱化禁止、必須未達存在時の close 拒否、親横断義務の Epic/Root 最終終了時評価）（v4-quality-gate-model Design「QG-2 / QG-4 の受け入れ義務保存拡張」節） |
+| Verification Obligation | test strategy 3 要素完全性・リスクから test strategy への投影完全性・正規契約から導出した検証義務の履行確認（検証義務がリポジトリ全体の試験を要求する対象では full integrity suite 受入れ。試験範囲の選択は case-close 実行契約 REQ の最終検証の検証義務に基づく試験範囲選択要件行が所有）・traceability check 前提手順・verify-only 証拠ソース・正規契約からの検証義務導出（判断方法 3 分類・確定権限区分の適用）と完了判定の双方向忠実性・not applicable 根拠確認・完了条件単位の最終評価（証拠の意味対応、全称・不存在条件の反例探索、非循環証拠、反例の対象外化禁止、検証方法弱化禁止、必須未達存在時の close 拒否、親横断義務の Epic/Root 最終終了時評価）（quality-gate-model Design「QG-2 / QG-4 の受け入れ義務保存拡張」節） |
 | Verifier | deterministic + semantic |
 | Evidence | QG-4 結果コメント・suite 実行ログ・SSoT コメント（機械的証拠） |
 
 - 対象遷移（v4 lifecycle deterministic gate predicate 接続点）: closing 前（子 Issue・Epic・Root Case の close 前）
-- 判定値と Gate predicate の写像: `pass`/ `warn` のみ close 可。QG-4 は `partial` を不可として扱い、再判定は当該 close 内で完了させる。写像の正規定義は v4-quality-gate-model Design「判定値と遷移接続」節と [common-gate-contract.md](common-gate-contract.md)「5 概念への写像」を参照する
-- 証拠分類の直交: 上表 Evidence の証拠分類（機械的）は Evidence の属性であり、Verifier 分類（deterministic/ semantic）とは直交する。正規定義は v4-quality-gate-model Design「証拠種別と Verifier 分類の直交」節を参照する
+- 判定値と Gate predicate の写像: `pass`/ `warn` のみ close 可。QG-4 は `partial` を不可として扱い、再判定は当該 close 内で完了させる。写像の正規定義は quality-gate-model Design「判定値と遷移接続」節と [common-gate-contract.md](common-gate-contract.md)「5 概念への写像」を参照する
+- 証拠分類の直交: 上表 Evidence の証拠分類（機械的）は Evidence の属性であり、Verifier 分類（deterministic/ semantic）とは直交する。正規定義は quality-gate-model Design「証拠種別と Verifier 分類の直交」節を参照する
 - v3 からの処遇: 保持（verify-only closure 証拠ソースと full suite 受入れ基準を維持。同 Design「QG-1〜QG-4 個別処遇対応表」の QG-4 行）
-- 責務分界: Gate の意味契約の正は v4-quality-gate-model Design が所有し、full integrity suite 受入れ基準・bun test 正規形・機械受理基準の正規形は本スキル Design（本ファイルおよび references）が原本として保持する（二重管理を行わない）
+- 責務分界: Gate の意味契約の正は quality-gate-model Design が所有し、full integrity suite 受入れ基準・bun test 正規形・機械受理基準の正規形は本スキル Design（本ファイルおよび references）が原本として保持する（二重管理を行わない）
 
 ## 目次
 
@@ -92,7 +92,7 @@ PR の CI が全て通過しているか。
 - 関連ドキュメント整合性確認
 - README 索引整合性確認
 
-- **warn**: 不足項目がある。不足の原因を分類する（失敗原因分類条項）。証拠不足は証拠再取得、実装不具合・上流成果物の不備は正規所有工程〔case-run 差し戻し、case-close STEP-3 docs 検証・確定〕への処置、人間判断への引き上げ条件（人間判断移行条項、`<foundations/v4-responsibility-boundaries>` Design「人間判断への引き上げ条件」節）に該当する場合のみユーザー判断へ（case-close 不変条件・最終工程の判断権限条項）。
+- **warn**: 不足項目がある。不足の原因を分類する（失敗原因分類条項）。証拠不足は証拠再取得、実装不具合・上流成果物の不備は正規所有工程〔case-run 差し戻し、case-close STEP-3 docs 検証・確定〕への処置、人間判断への引き上げ条件（人間判断移行条項、`<foundations/responsibility-boundaries>` Design「人間判断への引き上げ条件」節）に該当する場合のみユーザー判断へ（case-close 不変条件・最終工程の判断権限条項）。
 - **pass**: 全て確認済み、または機能追加以外で docs 影響なし。
 
 ### 4. 文書分類ポリシー適合
@@ -226,7 +226,7 @@ case-close は完了条件を主評価値（識別子）で最終評価する。
 ### 11. 正規契約からの検証義務導出と完了判定の双方向忠実性
 
 完了条件単位の達成判定は、正規契約（REQ、Decision、Design、Issue 本文の実行契約）から導出した検証義務に基づいて行う。
-case-run が提示した検査対象、期待結果、除外条件、合格申告をそのまま最終基準として利用せず、実装結果から検証基準を逆算しない（v4-quality-gate-model Design「QG-2 / QG-4 の受け入れ義務保存拡張」節の実行時詳細）。
+case-run が提示した検査対象、期待結果、除外条件、合格申告をそのまま最終基準として利用せず、実装結果から検証基準を逆算しない（quality-gate-model Design「QG-2 / QG-4 の受け入れ義務保存拡張」節の実行時詳細）。
 
 #### 検証義務の導出手順
 
@@ -258,7 +258,7 @@ case-run が提示した検査対象、期待結果、除外条件、合格申�
 
 ### 12. 完了条件単位の最終評価と非循環証拠
 
-完了条件単位の評価区分（観点 11 で導出した検証義務に基づく pass / fail / blocked / not applicable）の適用、証拠の意味対応、全称・不存在条件の反例探索、非循環証拠、反例の対象外化禁止、検証方法弱化禁止、必須未達存在時の close 拒否、親横断義務の Epic/Root 最終終了時評価を検査する（v4-quality-gate-model Design「QG-2 / QG-4 の受け入れ義務保存拡張」節の実行時詳細。完了条件単位の評価区分と Gate 判定値の写像境界は common-gate-contract「完了条件単位の評価区分と Gate 判定値の写像境界」節）。
+完了条件単位の評価区分（観点 11 で導出した検証義務に基づく pass / fail / blocked / not applicable）の適用、証拠の意味対応、全称・不存在条件の反例探索、非循環証拠、反例の対象外化禁止、検証方法弱化禁止、必須未達存在時の close 拒否、親横断義務の Epic/Root 最終終了時評価を検査する（quality-gate-model Design「QG-2 / QG-4 の受け入れ義務保存拡張」節の実行時詳細。完了条件単位の評価区分と Gate 判定値の写像境界は common-gate-contract「完了条件単位の評価区分と Gate 判定値の写像境界」節）。
 
 #### 検査手順
 

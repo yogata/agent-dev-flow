@@ -1,6 +1,6 @@
 // top-level traceability/ 配下 component / package 単位 sidecar の読み込みと
 // 論理対応関係への正規化（agentdev-traceability Design
-// 「対応関係データの取得と正規化」、v4-traceability-model Design
+// 「対応関係データの取得と正規化」、traceability-model Design
 // （sidecar 保存方式の承継正本）の実装側）。
 //
 // - sidecar の最小データは component 識別子、artifact のリポジトリ相対パス、
@@ -106,7 +106,7 @@ function parseSidecarObject(file: string, value: Record<string, unknown>): Sidec
     issues.push({
       reason: "invalid-schema",
       file,
-      detail: "トップレベルキー component は必須の非空文字列（v4-traceability-model Design の sidecar schema）",
+      detail: "トップレベルキー component は必須の非空文字列（traceability-model Design の sidecar schema）",
     });
   }
   const linksResult = parseSidecarLinks(file, value["links"]);

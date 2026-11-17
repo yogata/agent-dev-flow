@@ -11,7 +11,7 @@ updated: "2026-11-10"
 
 # ローカルIssue共通スキーマ
 
-本 Design の状態記述は ADF v4 ライフサイクル状態機械（workflows/v4-lifecycle-state-machine.md）の backend 抽象・物理写像が一般化契約として被覆する。
+本 Design の状態記述は ADF v4 ライフサイクル状態機械（workflows/lifecycle-state-machine.md）の backend 抽象・物理写像が一般化契約として被覆する。
 
 > **Scope**: 本 Design は agent-dev-flow リポジトリのリポジトリ内部設計文書である（REQ-001）。
 > ローカル版 OpenCode 導入先リポジトリで運用されるローカルIssueの共通スキーマ、role 条件付きスキーマ、採番、見出しを定義する。
@@ -208,7 +208,7 @@ runner-local 固有の前提と差分（REQ-011-006）: ローカル版の Tool 
 
 Local backend adapter（同一操作契約の GitHub/Local 差し替え・REQ-011-006/007/024）は v4 の Harness/Backend adapter 境界（ADF v4 実装責務境界 Design・DEC-036）における Backend 側の実例である。
 
-定義の所有は v4-responsibility-boundaries にあり、本節は参照にとどめる。既存節は不変とする。
+定義の所有は responsibility-boundaries にあり、本節は参照にとどめる。既存節は不変とする。
 
 ## 関連項目
 

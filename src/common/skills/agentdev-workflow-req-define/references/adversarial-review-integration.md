@@ -33,7 +33,7 @@ req-define 固有の手続を次に示す。共通実行手続（発動条件判
 adversarial-review は構造・変更前提検査、組立、差分・完結性検査の後に行う意味レビューである。機械検査の成功で意味レビューを代替せず、指摘を反映した場合は影響する依存判断を再評価する。
 
 - **発動条件判定（req-define 固有条件）**: default-on で発動する。req-define 固有の skip 条件（Scale=L0 で Decision判断対象なし、意味的決定なし）該当時は省略して従来フロー（review を挿入せず STEP-9 へ進む）を継続できる。skip する場合は正本「非発動時の判定理由記録と代替自己反証」の記録義務に従う
-- **review 呼出（req-define 固有対象と戻り先）**: 発動条件判定で発動と判定された場合、要件候補（draft-data、`agreed_items`、`artifact_actions`、Decision判断結果、Scale判断結果）を対象に adversarial-review を呼び出す。委譲契約は v4-delegation-contracts Design（extension 経由）「adversarial-review との委譲契約接続」節に従う
+- **review 呼出（req-define 固有対象と戻り先）**: 発動条件判定で発動と判定された場合、要件候補（draft-data、`agreed_items`、`artifact_actions`、Decision判断結果、Scale判断結果）を対象に adversarial-review を呼び出す。委譲契約は delegation-contracts Design（extension 経由）「adversarial-review との委譲契約接続」節に従う
   - Decision finding は STEP-5（Decision判断）へ戻し再評価する。要件展開に関わる finding は該当 STEP へ戻す。accepted finding の反映は呼出元の責務である（正本「結果反映」を参照）
   - 未解決のユーザー判断事項が残る場合、STEP-9（ドラフト保存）へ進まない。工程委譲起源であるため既存 status に unresolved 判断事項を付加する
   - 呼出失敗時は silent skip を禁止し、従来フローを維持する（記録経路と禁止事項の詳細は正本「従来フロー（review 非発動時）」を参照）

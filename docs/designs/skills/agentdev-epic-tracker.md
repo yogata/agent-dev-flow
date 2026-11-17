@@ -28,7 +28,7 @@ updated: 2026-10-04
 
 ## 参照する references
 
-- なし（SKILL.md 本文に集約、`agentdev-workflow-lifecycle`、`docs/designs/commands/case-close.md`（Epic Wave クローズ・Epic 実行構成表の子状態更新）、`docs/designs/foundations/v4-runtime-execution-model.md`（per-Epic 単一書き手）参照）
+- なし（SKILL.md 本文に集約、`agentdev-workflow-lifecycle`、`docs/designs/commands/case-close.md`（Epic Wave クローズ・Epic 実行構成表の子状態更新）、`docs/designs/foundations/runtime-execution-model.md`（per-Epic 単一書き手）参照）
 
 ## 現在の動作
 
@@ -53,7 +53,7 @@ updated: 2026-10-04
 
 - [agentdev-issue-management.md](agentdev-issue-management.md)
 - [agentdev-workflow-lifecycle.md](agentdev-workflow-lifecycle.md)
-- [../foundations/v4-runtime-execution-model.md](../foundations/v4-runtime-execution-model.md)（Epic Issue 本文の単一書き手〔直列化単位表〕）
+- [../foundations/runtime-execution-model.md](../foundations/runtime-execution-model.md)（Epic Issue 本文の単一書き手〔直列化単位表〕）
 - [commands/case-close.md](../commands/case-close.md)
 - REQ-006（Case実行オーケストレーション / Epic、Wave）
 - v2:ADR-0125（Epic Issue 本文単一書き手）
@@ -61,7 +61,7 @@ updated: 2026-10-04
 
 ## v4 責務分類
 
-ADF v4 の責務分類（正典: DEC-048、foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節）における本 Design の 3 区分（意味判断担当〔閉じた意味評価・開いた推論を所有〕/ 決定的処理委譲先 / 知識提供）。語彙の原本は foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節であり、本節はその確定値を記録する。
+ADF v4 の責務分類（正典: DEC-048、foundations/responsibility-boundaries Design「v4 責務分類語彙の後継」節）における本 Design の 3 区分（意味判断担当〔閉じた意味評価・開いた推論を所有〕/ 決定的処理委譲先 / 知識提供）。語彙の原本は foundations/responsibility-boundaries Design「v4 責務分類語彙の後継」節であり、本節はその確定値を記録する。
 
 - **意味判断担当**: 0 件
 - **決定的処理委譲先**: API I/O → Custom Tool agentdev_gh

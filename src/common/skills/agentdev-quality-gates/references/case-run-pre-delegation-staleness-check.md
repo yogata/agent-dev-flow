@@ -6,7 +6,7 @@ staleness check は実装開始前の入力妥当性検査であり、QG-3 本�
 
 ## v4 Quality モデルへの接続
 
-本検査は ADF v4 Quality モデル（v4-quality-gate-model Design）「工程内 deterministic gate 群（QG 番号を付与しない）」に属する工程内 deterministic 検査であり、lifecycle 級 semantic Gate（QG-1〜QG-4）とは区別され、QG 番号は付与されない。
+本検査は ADF v4 Quality モデル（quality-gate-model Design）「工程内 deterministic gate 群（QG 番号を付与しない）」に属する工程内 deterministic 検査であり、lifecycle 級 semantic Gate（QG-1〜QG-4）とは区別され、QG 番号は付与されない。
 該当行は targeted docs guard / AUTOGEN 鮮度検出 gate（各保存・完了工程。変更ファイル限定検査と AUTOGEN 再生成鮮度）であり、本検査の参照鮮度検査（Issue 本文参照の現行リポジトリとの整合確認）は同クラスの陳腐化検出に位置づく。
 Gate を checker / test / Skill の別名として増殖させない原則は同 Design「工程内 deterministic gate 群」節を参照する。
 

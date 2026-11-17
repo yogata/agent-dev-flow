@@ -80,7 +80,7 @@ case-run、case-auto の実行結果契約は次の4状態を区別する。
 - `delegation-unavailable`: 実行インフラ起動不能
 
 `failed` と `delegation-unavailable` は異なる回復アクションを要する独立の結果状態として扱う。
-結果状態の遷移機械、委譲契約、ラベル構造の詳細は `docs/designs/workflows/v4-delegation-contracts.md` を正規所有者とし、本 Design は境界宣言へ縮約する。
+結果状態の遷移機械、委譲契約、ラベル構造の詳細は `docs/designs/workflows/delegation-contracts.md` を正規所有者とし、本 Design は境界宣言へ縮約する。
 
 ## case-auto の orchestration stage と bg task 管理
 
@@ -110,7 +110,7 @@ OpenCode を first-class reference harness と位置づける。他 harness へ�
 
 tools/（agentdev-gh・agentdev-third-party）と plugins/（tool 登録配線・guard 3 本）はこの境界の OpenCode 側実装例である（engine 部は共通原本へ、登録・配線は src/opencode/ 側へ配置する）。いずれも配布物の harness 非依存原則（本 Design 既有）に従い、Senpi 側の接続も同一原則に従う。
 
-定義の所有は v4-responsibility-boundaries と DEC-036 にあり、本節は参照にとどまる。既存節は不変とする。
+定義の所有は responsibility-boundaries と DEC-036 にあり、本節は参照にとどまる。既存節は不変とする。
 
 ## 適用基準
 
@@ -150,5 +150,5 @@ AgentDevFlow 配布command / Workflow Skill / Design は ToDo を必須機構と
 - v2:ADR-0136（配布物の harness 実行制御分離）: 吸収元。決定本質は charter 決定2 に先駆的適用として含まれる。
 - v2:REQ-0162（配布物の harness 実行制御分離）: 吸収元。原則の SSoT と各要件行（4状態結果契約、配布 docs 制約、ADF 可観測タイムスタンプ境界、ID 除去、パス除去）を本 Design および REQ-002 へ統合した。
 - v2:ADR-0114（case-run 実行責務の外部実行バックエンド委譲）: 吸収元。harness 選定領域に降格された実行制御側の知見を取り込み、result 4状態契約の前身である委譲モデルを本 Design の前段として位置づける。
-- `docs/designs/workflows/v4-delegation-contracts.md`: 委譲契約詳細（delegation envelope、委譲種別、adversarial-review 接続）の正規所有者。result 4 状態は v4-lifecycle-state-machine、authority・副作用は v4-runtime-execution-model が正である。
+- `docs/designs/workflows/delegation-contracts.md`: 委譲契約詳細（delegation envelope、委譲種別、adversarial-review 接続）の正規所有者。result 4 状態は lifecycle-state-machine、authority・副作用は runtime-execution-model が正である。
 - `docs/designs/responsibilities/responsibility-boundary-purification.md`: 工程別（case-auto、case-run、execution adapter、Project Extensions、タイムスタンプ）の所有/非所有リスト詳細。

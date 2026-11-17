@@ -19,7 +19,7 @@ capture → inbox.md → promote（内部分析フェーズ + 昇華判定フェ
 
 ## 継続コラボレーションループにおける位置づけ
 
-本 pipeline は継続コラボレーションループ（`<workflows/v4-collaboration-loop>` Design）の Learning 段の知識ベースである。
+本 pipeline は継続コラボレーションループ（`<workflows/collaboration-loop>` Design）の Learning 段の知識ベースである。
 Learning 評価結果は 7 系統へ振り分けられる。7 系統はループ全体の集計ビュー（最終振り分け先）であり、本 skill が定義する処分区分（learning-promote の局所判定）とは別の軸である。
 7 系統・処分区分・8 寿命の三方対応表は本 skill の処分区分スキーマ参照ファイルが所有する（正）。
 昇華経路（`promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/case-auto`（内部 lifecycle）。docs/knowledge/ 直接保存分は RU を経ない）はループの Backlog → req-define 段に接続する。

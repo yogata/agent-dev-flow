@@ -36,7 +36,7 @@ case-close command は公開 interface（入出力契約・ガードレール）
 
 case-close workflow は次の STEP で構成する。
 Epic Wave クローズは STEP-1 のルーティングで分岐し、E1〜E6 として並列記述する。
-各 STEP は再開ポイント（resume point）を持つ（STEP resume point と会話記憶非依存の Decision、`docs/designs/<foundations/v4-durable-state-and-recovery>.md`）。
+各 STEP は再開ポイント（resume point）を持つ（STEP resume point と会話記憶非依存の Decision、`docs/designs/<foundations/durable-state-and-recovery>.md`）。
 会話コンテキストに依存せず、永続状態（GitHub Issue/PR、`.agentdev/`、commit hash、Design status）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -130,7 +130,7 @@ case-run 側の事前検査とは独立に実施する。検証手段との対�
 - **検証対応の3完全性ゲート（完了阻止面）**: 対象要件行の Design 対応、implementation 対応、および policy が required と判定する要件行の verification 対応のいずれかに欠落が残る場合、当該 Case を完了として扱わない。導出は `agentdev-traceability` の check（`--req` で対象要件行に限定）で機械的に行い、`missing-design` / `missing-implementation` / `missing-verification` の findings を該当行の完了阻止条件として扱う。check が正常に完全性を判定できなかった場合（check 実行不能、検査対象の取得不能等）の検査不能時の処置は、本節冒頭の統合文（検査不能と代替検証の関係）に従う
 - **policy optional 行の保護**: verification 対応の完全性判定は、project-level verification policy が required と判定する要件行のみを計上する。policy の正規情報源は `traceability/policy.yaml`（既定 required、optional な要件行のみ明示、未指定の要件行は required）であり、policy が optional と明示した要件行の verification 対応欠落は完全性違反に含めない
 - **worktree root 起点の完全性判定時の取扱い**: traceability check を worktree root 起点で実行して検出対象の完全性が確定できない場合、main 側 root で check を再実行し、トレーサビリティポリシー登録 commit の時系列（ブランチ分岐の前後）を確認してから完了阻止を判断する。durable state 上で解消済みの対象行を本変更起因の失敗と誤判定しない。再実行は読取系 check の実行のみで行う
-- QG-4 の対応完全性検査は有効である。対応完全性は2層で解釈する（正本: v4-traceability-model Design「completeness の 2 層」節）。lifecycle gate 完全性は対象要件行に scope を限定して判定し、3完全性ゲートの欠落（Design 対応・implementation 対応・required 行 verification 対応）と対象要件行に限定した check（`--req`）の未解決不合格を完了阻止条件とする（fail-closed）。全現行要件行を対象とする corpus 完全性の計数（missing 系の件数）は到達目標状態の診断指標として数値追跡し、lifecycle gate の判定と完了条件には使用しない（advisory・fail-open）。verification 対応の完全性判定は policy が required と判定する要件行のみを計上する
+- QG-4 の対応完全性検査は有効である。対応完全性は2層で解釈する（正本: traceability-model Design「completeness の 2 層」節）。lifecycle gate 完全性は対象要件行に scope を限定して判定し、3完全性ゲートの欠落（Design 対応・implementation 対応・required 行 verification 対応）と対象要件行に限定した check（`--req`）の未解決不合格を完了阻止条件とする（fail-closed）。全現行要件行を対象とする corpus 完全性の計数（missing 系の件数）は到達目標状態の診断指標として数値追跡し、lifecycle gate の判定と完了条件には使用しない（advisory・fail-open）。verification 対応の完全性判定は policy が required と判定する要件行のみを計上する
 
 ## 重要変更の通知と結果説明（完了報告接続）
 
@@ -152,7 +152,7 @@ case-close は、完了判定（STEP-2 QG-4）と完了記録（記録コメン�
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
+- **`<foundations/durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則の Decision**: 責務3層分化の採用記録（docs/decisions/ 配下）
 - **STEP resume point と会話記憶非依存の Decision**: STEP resume point 採用の記録（docs/decisions/ 配下）
 - **case-close command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

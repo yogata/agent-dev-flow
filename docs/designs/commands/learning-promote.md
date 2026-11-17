@@ -109,11 +109,11 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
 ## 参照する横断 Design
 
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 境界）
-- [workflows/v4-collaboration-loop.md](../workflows/v4-collaboration-loop.md)（Learning 段の責務、7 系統振り分け、採用済み成果物の .agentdev/ 状態領域の整合）
+- [workflows/collaboration-loop.md](../workflows/collaboration-loop.md)（Learning 段の責務、7 系統振り分け、採用済み成果物の .agentdev/ 状態領域の整合）
 
 ## 自律確定の判定位置とHITLフォールバック（新規セクション）
 
-本節は learning-promote における自律確定の判定位置とHITLフォールバックの実行詳細を所有する。判断確定の境界は REQ-096（ADF判断アーキテクチャ）の共通原則に従い、詳細判定表は v4-responsibility-boundaries Design（ADF判断アーキテクチャ詳細基準節）が集約所有する（本 Design と Workflow Skill は同一内容を重複保持しない）。
+本節は learning-promote における自律確定の判定位置とHITLフォールバックの実行詳細を所有する。判断確定の境界は REQ-096（ADF判断アーキテクチャ）の共通原則に従い、詳細判定表は responsibility-boundaries Design（ADF判断アーキテクチャ詳細基準節）が集約所有する（本 Design と Workflow Skill は同一内容を重複保持しない）。
 
 ### 8軸評価・廃棄判定・昇華可能性・既存対策確認後の自律確定判定の挿入位置
 
