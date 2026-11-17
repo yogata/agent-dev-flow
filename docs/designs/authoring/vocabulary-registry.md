@@ -73,8 +73,8 @@ IR-044（REQ/Design 境界違反検出）の候補語対照表は `docs/designs/
 
 ## 語彙直交性との接続（v4 概念語彙）
 
-v4 概念語彙（work_type、scale、Epic、Wave）の正規定義は `docs/designs/workflows/standard-lifecycle.md`「work_type / scale / Epic / Wave の v4 意味モデル」節が正であり、本 Design は定義を複製しない。
-実体対照表（repo-local）には「v4 概念語彙（意味参照）」セクションを設け、各概念語彙から standard-lifecycle L13-21 への意味参照リンク行（work_type、scale、Epic、Wave の 4 行）を所有する。
+v4 概念語彙（work_type、scale、Epic、Wave）の正規定義は `docs/designs/workflows/standard-lifecycle.md`「work_type / scale / Epic / Wave の意味モデル」節が正であり、本 Design は定義を複製しない。
+実体対照表（repo-local）には「v4 概念語彙（意味参照）」セクションを設け、各概念語彙から standard-lifecycle 当該節への意味参照リンク行（work_type、scale、Epic、Wave の 4 行）を所有する。
 旧語彙→新語彙の対照行は改名でないため作成しない（語彙直交性は概念再定義であり語の改名ではない、消費する検出規則が存在しない）。
 
 ## 旧語彙除去の検証経路（REQ-103-022）
