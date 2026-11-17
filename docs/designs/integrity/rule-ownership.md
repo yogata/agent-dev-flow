@@ -2,7 +2,7 @@
 title: ルール所有権マトリックス
 status: accepted
 created: 2026-08-20
-updated: "2026-11-15"
+updated: "2026-11-17"
 ---
 
 <!-- ADF-COVERS(design): REQ-047-013 -->
