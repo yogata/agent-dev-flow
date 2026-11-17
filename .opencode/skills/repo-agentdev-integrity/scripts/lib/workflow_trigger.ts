@@ -41,15 +41,15 @@
 //
 // A. check_workflow_preventive.ts check 3（workflow-soft-guard）:
 //    AG-008 予防検査 7 項目の command 単位構造段階。strict 判定で同 checker の
-//    exit code を直接駆動し、baseline 適用を持たない。段階統合すると AG-008 の
-//    検査網羅と exit code 契約が変わるため残す。
+//    exit code を直接駆動する。段階統合すると AG-008 の検査網羅と exit code 契約が
+//    変わるため残す。
 // B. lint_skills.ts AG-005「workflow trigger item」:
-//    skill 記述基準 linter 段階。lint-skills-baseline.json による delta-aware
-//    grandfathering（baseline-known の info 降格）を伴う別の判定段階であり、
-//    段階統合は baseline 契約の変更を意味するため残す。
+//    skill 記述基準 linter 段階（lint-skills baseline による grandfathering は
+//    baseline 運用の撤廃に伴い除去済み）。段階統合は判定段階の意味変更を意味する
+//    ため残す。
 //
 // 両段階は同一の不変式（検出語・対象集合・description 抽出）を本モジュール経由で
-// 検査し、差分は検査段階（実行タイミング・severity モデル・baseline 適用）のみである。
+// 検査し、差分は検査段階（実行タイミング・severity モデル）のみである。
 // 大規模検査器（check_integrity）は本不変式を所有しない（専用検査器の責務）。
 //
 // 名簿と実態の一致は lib/workflow_trigger.test.ts が機械検証する。

@@ -138,10 +138,10 @@ LLM 推論で実行していた決定的処理をスクリプトへ委譲する�
 
 ```bash
 # bun 経由で直接実行（REQ: LLM は bash 経由で呼び出し）
-bun src/common/skills/agentdev-design-file-manager/scripts/src/search-target-area.ts "target_area文字列" docs/designs/{domain}/<existing-design>.md
+bun src/common/skills/agentdev-design-file-manager/scripts/src/search-target-area.ts "target_area文字列" `docs/designs/`{domain}/<existing-design>.md
 
 # stdin JSON 入力
-echo '{"target_area":"パターン","files":["docs/designs/{domain}/<existing-design>.md"]}' | bun src/common/skills/agentdev-design-file-manager/scripts/src/search-target-area.ts
+echo '{"target_area":"パターン","files":["`docs/designs/`{domain}/<existing-design>.md"]}' | bun src/common/skills/agentdev-design-file-manager/scripts/src/search-target-area.ts
 
 # テスト実行
 cd src/common/skills/agentdev-design-file-manager/scripts && bun test
@@ -203,4 +203,4 @@ SKILL.md 本文から遅延読み込みされる詳細資料である。
 | ファイル | 内容 |
 |----------|------|
 | [references/target-area-matching.md](references/target-area-matching.md) | target_area マッチング規則、見出し階層解釈、複数マッチ時の挙動、未検出時の挙動、機械置換手順の3段階適用と参照検査観点（参照実在確認、変動値分離）、後方互換（target_area 未指定） |
-| [references/design-lifecycle-application.md](references/design-lifecycle-application.md) | Design lifecycle（draft/accepted）適用、CREATE/APPEND/UPDATE ごとの status 扱い、Design 一覧表（`docs/designs/README.md` 相当）登録 |
+| [references/design-lifecycle-application.md](references/design-lifecycle-application.md) | Design lifecycle（draft/accepted）適用、CREATE/APPEND/UPDATE ごとの status 扱い、Design 一覧表（docs 配下の Design README 相当）登録 |

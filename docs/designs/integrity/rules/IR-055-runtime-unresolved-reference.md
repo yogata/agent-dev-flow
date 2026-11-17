@@ -2,7 +2,7 @@
 title: "IR-055: runtime-unresolved-reference（配布物内の導入先未解決参照検出）"
 status: accepted
 created: 2026-08-20
-updated: "2026-11-16"
+updated: "2026-11-18"
 detection_method_class: machine-check
 implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
 verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts
@@ -24,7 +24,7 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integr
 | false_positive_risk | 中。code block 内部、template placeholder（`{xxx}`）、vocabulary-registry.md 等の正当使用例外パスは exemption 対象とする。`integrity-rule-catalog.md` 自身のルール記述も exemption 対象とする。exemption 設計を誤ると true positive が誤って免除される |
 | regression_test | check_integrity.test.ts。各検出パターン（REQ-NNNN、REQ-NNNN-NNN、DEC-NNN、residual ADR-NNNN、`src/opencode/`、`docs/designs/`、`docs/guides/`、`/repo/*`、`repo-*`、本体 docs URL、line number 付き参照）を含む fixture で検出されること、exemption 対象が報告されないことを検証する |
 | finding_route | intake（既知違反の段階解消は別途処理） |
-| triage_action | 新規検出時は baseline に追加し、delta guard で新規増加を fail 対象とする。既存違反の段階解消は docs-check report / intake / backlog 経由で処理する。baseline 0 到達後に full audit を fail gate 化する（REQ-010-007）。warning 総数 ratchet（full-audit 契約の絶対数検知。実行時観測の warning 総数が baseline の warning_total_cap を超える場合は fail。cap は純減方向のみ更新可能。増加は --raise-warning-cap 明示フラグ経由のみ許可。詳細は integrity-contracts.md「IR-055 warning 総数 ratchet」節）を適用する |
+| triage_action | 新規検出時は対象ファイル側の直接修正で解消する（baseline による免除管理は撤廃済み。REQ-010-074/079）。既存違反の段階解消は docs-check report / intake / backlog 経由で処理する |
 | last_verified | 2026-09-27 |
 
 ## IR-055 検出パターンと severity（REQ-029-003）
@@ -60,44 +60,9 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integr
 | `v2:ADR-\d{4}` 履歴参照 | AG-010 履歴参照保護。`v2:` prefix ありは検出対象外 |
 | `vocabulary-registry.md` / `integrity-rule-catalog.md` / `rules/IR-055-*.md` 自身 | 検出ルール自体の記述、正規語彙の対照表は正当使用 |
 
-## 段階導入運用（REQ-010-007）
+## 検出違反の現行運用（baseline 撤廃後）
 
-本ルールは段階導入で運用する。
-既存違反が多数存在するため、full audit を即 fail gate 化せず、baseline 既知違反と新規違反を区別する（REQ-010-007）。
-
-| 層 | 動作 | baseline 0 到達前 | baseline 0 到達後 |
-|----|------|-------------------|-------------------|
-| full audit | 全ルール実行 | 報告のみ（fail なし） | fail gate 化 |
-| delta guard | 変更関連ルール実行 | 新規増加は fail | 新規増加は fail |
-| impact guard | 影響範囲ルール実行 | 新規増加は fail | 新規増加は fail |
-
-baseline 0 到達後に full audit を fail gate 化できる状態にする（REQ-010-007）。
-3層 guard の実行モデルは REQ-010-005 に従う。
-
-## baseline entries と checker evidence の正規化規則（Case #4079・RU-0286）
-
-baseline entries（`baselines/ng-baseline.json`・`baselines/ir-055-baseline.json`）と
-checker evidence を突合する外部スクリプトを実装する場合は、file パスの正規化規則を
-次のとおり踏襲する（checker 側の実装は `normalizeNgBaselineFilePath`・
-integrity-contracts.md「baseline entry 運用契約」第2点・OU-0008〔Issue #2206〕）。
-
-| 要素 | 正規化規則 |
-|---|---|
-| パス区切り | バックスラッシュ `\` はスラッシュ `/` へ統一する |
-| 先頭カレント表記 | 先頭の `./` は除去する |
-| projection 表記差 | `.opencode/` で始まるパスは `src/common/` へ置換して統一する |
-
-- `.opencode/` と `src/common/` の2表記は同一ファイルの環境別報告である
-  （main 環境は junction projection 実在で `.opencode/...` 表記、worktree 環境は
-  junction 未伝播で `src/common/...` 表記の §7.3 fallback）。bucket key 比較時のみ
-  表記を正規化し、baseline entry の仕様自体（category/check/file/evidence の4組）
-  は変更しない
-- `repo-*`（repo-local skill 参照）と `repo-local`（repo-local 配置区分）の語彙は
-  IR-055 の検出パターン側の概念であり、baseline 正規化のパス置換対象とはしない
-  （repo-local 配置のファイルは本来 IR-055 の走査対象外であり、baseline entry が
-  存在する場合も元表記のまま保持する）
-- 突合スクリプトは bucket key 比較時にのみ本正規化を適用し、baseline JSON の
-  保存値を書き換えない（正規化は比較境界の関心事であり、記録境界の変更ではない）
+baseline による既知/新規の区別（段階導入運用 REQ-010-007）と baseline entries の正規化規則は撤廃済みである（REQ-010-074/079、Epic #4126 Phase 4）。検出違反は全件を厳格度どおりに報告し（strict → ng、heuristic → warning）、免除せず対象ファイル側の直接修正で即時解消する。`repo-*`（repo-local skill 参照）と `repo-local`（repo-local 配置区分）の語彙は検出パターン側の概念であり、変更しない。
 
 ## ルール本文と正規表現
 

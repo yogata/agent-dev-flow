@@ -3,10 +3,9 @@
 //
 // Split out of check_distribution_boundary.ts so the orchestrator stays
 // under the 250 pure-LOC ceiling. Preserves the documented CLI contract:
-//   bun run check_distribution_boundary.ts [--profile P] [--json]
-//     [--save-baseline <path> | --delta <path>] [--exemptions <path>]
-//     [repoRoot]
-//   exit codes: 0 ok, 1 violation, 2 error.
+//   bun run check_distribution_boundary.ts [--profile P] [--json] [repoRoot]
+//   exit codes: 0 ok, 1 violation, 2 error. baseline / exemption 運用は撤廃済みで
+//   あり、検出違反は免除せず対象側の直接修正で解消する。
 //
 // Profile values map to lib Projection (source/link/archive/archive-installed
 // per docs/designs/integrity/distribution-boundary.md "projection の分離").
@@ -15,13 +14,6 @@
 
 import type { BoundaryFailure, BoundaryReport } from "./lib/distribution-boundary-types.ts";
 import type { Projection } from "./lib/distribution-boundary.ts";
-import {
-  buildBaseline,
-  computeDelta,
-  loadBaseline,
-  saveBaseline,
-} from "./lib/distribution-boundary-baseline.ts";
-import { applyExemptions, loadExemptions } from "./lib/distribution-boundary-exemptions.ts";
 import { checkDistributionRules } from "./lib/distribution-boundary-rules.ts";
 import { checkDistributionBoundary } from "./check_distribution_boundary.ts";
 
@@ -42,19 +34,12 @@ function normalizeProfileToProjection(profile: string): Projection | null {
   }
 }
 
-function countCategory(failures: readonly BoundaryFailure[], cat: BoundaryFailure["category"]): number {
-  return failures.filter((f) => f.category === cat).length;
-}
-
 export function runCli(): void {
   const args = process.argv.slice(2);
   // Strip `--flag value` pairs before computing positional args so that a
   // profile value like "archive-installed" is not mistaken for a path.
   const STRIP_VALUE_FLAGS = new Set([
     "--profile",
-    "--save-baseline",
-    "--delta",
-    "--exemptions",
   ]);
   const positional: string[] = [];
   for (let i = 0; i < args.length; i++) {
@@ -84,98 +69,15 @@ export function runCli(): void {
     process.exit(2);
   }
 
-  const saveBaselineIdx = args.indexOf("--save-baseline");
-  const deltaBaselineIdx = args.indexOf("--delta");
-  const exemptionsIdx = args.indexOf("--exemptions");
-  const baselinePath = saveBaselineIdx >= 0
-    ? args[saveBaselineIdx + 1]
-    : deltaBaselineIdx >= 0
-      ? args[deltaBaselineIdx + 1]
-      : null;
-  const exemptionsPath = exemptionsIdx >= 0 ? args[exemptionsIdx + 1] : null;
-
-  const rawReport = checkDistributionBoundary(repoRoot, projection);
-  const warnings = rawReport.warnings ?? [];
+  const report = checkDistributionBoundary(repoRoot, projection);
+  const warnings = report.warnings ?? [];
   if (warnings.length > 0) {
     for (const w of warnings) {
       process.stderr.write(`warning: ${w}\n`);
     }
   }
-  const exemptions = exemptionsPath ? loadExemptions(exemptionsPath) : null;
-  const exemptionResult = applyExemptions(rawReport.failures, exemptions, repoRoot);
-  const report: BoundaryReport = {
-    ok: exemptionResult.remaining.length === 0,
-    failures: exemptionResult.remaining,
-    stats: {
-      scanned_files: rawReport.stats.scanned_files,
-      concrete_id_hits: countCategory(exemptionResult.remaining, "concrete-id"),
-      concrete_path_hits: countCategory(exemptionResult.remaining, "concrete-path"),
-      fixed_url_hits: countCategory(exemptionResult.remaining, "fixed-url"),
-      producer_metadata_hits: rawReport.stats.producer_metadata_hits,
-    },
-    warnings,
-  };
 
-  if (saveBaselineIdx >= 0 && baselinePath) {
-    const baseline = buildBaseline(
-      rawReport,
-      repoRoot,
-      "IR-059 distribution reference boundary known-violations baseline",
-    );
-    saveBaseline(baseline, baselinePath);
-    if (json) {
-      process.stdout.write(
-        JSON.stringify({ saved: baselinePath, entries: baseline.entries.length }, null, 2) + "\n",
-      );
-    } else {
-      process.stdout.write(`baseline saved: ${baselinePath}\n`);
-      process.stdout.write(`entries: ${baseline.entries.length}\n`);
-    }
-    process.exit(0);
-  }
-
-  if (deltaBaselineIdx >= 0 && baselinePath) {
-    const baseline = loadBaseline(baselinePath);
-    if (baseline === null) {
-      process.stderr.write(`error: cannot load baseline at ${baselinePath}\n`);
-      process.exit(2);
-    }
-    const delta = computeDelta(report, baseline, repoRoot);
-    if (json) {
-      const payload = { ...delta, exempted_count: exemptionResult.exempted.length };
-      process.stdout.write(JSON.stringify(payload, null, 2) + "\n");
-    } else {
-      process.stdout.write(`check_distribution_boundary.ts - delta guard\n`);
-      process.stdout.write(`=============================================================\n`);
-      process.stdout.write(`profile: ${profile}\n`);
-      process.stdout.write(`repoRoot: ${repoRoot}\n`);
-      process.stdout.write(`baseline: ${baselinePath}\n`);
-      if (exemptionsPath) {
-        process.stdout.write(
-          `exemptions: ${exemptionsPath} (${exemptionResult.exempted.length} exempted)\n`,
-        );
-      }
-      process.stdout.write(`ok: ${delta.ok}\n`);
-      process.stdout.write(`stats: ${JSON.stringify(delta.stats, null, 2)}\n`);
-      process.stdout.write(`new failures (${delta.new_failures.length}):\n`);
-      for (const f of delta.new_failures) {
-        process.stdout.write(
-          `  [${f.category}] ${f.file}:${f.line} matched=${f.matched}\n    snippet: ${f.snippet}\n`,
-        );
-      }
-      if (delta.resolved.length > 0) {
-        process.stdout.write(`resolved (${delta.resolved.length}):\n`);
-        for (const r of delta.resolved) {
-          process.stdout.write(
-            `  [${r.category}] ${r.file} matched=${r.matched} (${r.baseline_count} -> ${r.current_count})\n`,
-          );
-        }
-      }
-    }
-    process.exit(delta.ok ? 0 : 1);
-  }
-
-  // IR-046/047/048 観点を正規実行経路へ統合（AC-04/05: detector 到達可能性）。
+  // IR-059/IR-047/IR-048 観点を正規実行経路へ統合（AC-04/05: detector 到達可能性）。
   // data/distribution-targets.yaml は正本定義（REQ-047-009）: 欠損・不正時は
   // fail-closed で検査を実行せず停止する（exit 2）。
   let rulesResult;
@@ -212,7 +114,7 @@ export function runCli(): void {
       );
     }
     process.stdout.write(
-      `\nrules findings (IR-046/047/048, scanned=${rulesResult.stats.scanned_files}):\n`,
+      `\nrules findings (IR-047/048, scanned=${rulesResult.stats.scanned_files}):\n`,
     );
     for (const f of rulesResult.findings) {
       process.stdout.write(

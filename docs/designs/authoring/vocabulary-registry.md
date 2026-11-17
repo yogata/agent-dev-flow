@@ -2,7 +2,7 @@
 title: 語彙レジストリ
 status: accepted
 created: 2026-08-20
-updated: 2026-10-14
+updated: "2026-11-18"
 ---
 
 <!-- ADF-COVERS(design): REQ-094-008, REQ-094-012 -->
@@ -82,7 +82,7 @@ v4 概念語彙（work_type、scale、Epic、Wave）の正規定義は `docs/des
 旧語彙（廃止済み command、旧 lifecycle 名、旧成果物名）の現行規範としての使用は、語彙・投影領域で 0 件であることを検証対象とする。対象領域は src/opencode、src/senpi、.opencode 投影を含む。検証経路は次のとおりであり、本 Design は配置基準と連携契約として所有する。
 
 - 網羅範囲: docs、src、.opencode、traceability sidecars、`.agentdev/extensions/skills` 配下の yaml と一致させる。歴史的説明（retired、superseded、historical 本文、docs/reports）は検出対象外とする
-- 機械検出: 主検出器は `check_integrity.ts` の IR-065（廃止語彙）と IR-066（旧パス・削除済み名称）である。運用データ（existence_probe、exemption、否定文脈語）は `data/obsolete-vocabulary-map.yaml` が所有する。検出シグナルの正は check_integrity 側が所有する（「配置と連携」節のとおり）
+- 機械検出: 旧 IR-065（廃止語彙）・IR-066（旧パス・削除済み名称）に対応する検査と `data/obsolete-vocabulary-map.yaml` は Epic #4126 Phase 4 で削除済みである。本表の対照運用は語彙整備の正規対照として維持し、旧語彙の出現は IR-055 の runtime-unresolved-reference 検出と手動補完（下記）で扱う
 - 手動補完: 実体対照表の「検出パターン縮小」で機械検出対象から除外された旧語彙群は、検出対象から外れた事実そのもので旧語彙の状態は変わらない。現行規範としての再出現を網羅範囲の全文検索で確認し、再出現時は検出パターンを復活させる
 - 参照突合: 検出された語彙について正規所有者（現行語彙・現行パス・現行所有者）と参照元の双方向突合を行う。廃止済み所有先を指す参照（See Also 等を含む）は検出対象である。参照先の更新または参照の除去を反映対象とする
 - 索引追随: 反映後は `generate_indexes.ts` で AUTOGEN ブロックを再生成し、再生成差分 0 件を合格条件とする（index-auto-generation.md 契約）。検証経路の詳細は index-auto-generation.md「旧語彙・語彙追随変更時の AUTOGEN 再生成」節を参照する

@@ -262,7 +262,7 @@ export interface IntegrityGateResult {
  * 契約状態記録・未追跡残存検査の入力契約。
  * 正規契約から導出した状態記録パスの範囲導出は意味判断としてモデルが担当し、
  * 本 script は与えられた範囲の commit 済み検証と、リポジトリ全体の未追跡残存の
- * 承認一覧突合を決定的に実行する。承認一覧は既存の ng-baseline 系承認一覧機構
+ * 承認一覧突合を決定的に実行する。承認一覧は撤廃済みの承認一覧機構（ng-baseline）。撤廃後は承認一覧は空を正規入力とし
  * （category/check/file/evidence/count/provenance/reason の恒久承認記録）と同一の
  * 物理実体から、当該実行の対象エントリが渡される。script が承認を自動追加することはない。
  */

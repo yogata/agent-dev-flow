@@ -215,22 +215,11 @@ detector 不在、部分実装、test 不在、到達不能、finding 未接続�
 - `foundations/numbering-policy.md`: 欠番管理、識別子再利用禁止
 - `foundations/document-model.md`: IR frontmatter フィールド定義
 
-## finding-baseline 分類（retired REQ-028-009/010 から移管、TS-014）
+## baseline 分類・免除機構の撤廃（REQ-010-074/079、Epic #4126 Phase 4）
 
-`baseline_status` を IR スキーマから分離し、finding 側の状態として定義する。
-IR は finding-baseline 分類を持たず、finding が生成される時に finding 側で new/known/resolved を判定する。
-
-| finding-baseline 状態 | 内容 |
-|---|---|
-| `new` | 現行の baseline 集合に含まれない新規検出事項。厳密な取扱い（strict なら NG、heuristic なら warning）を適用する |
-| `known` | baseline 集合に記録済みの検出事項。`info`（observation）へ降格し、PR review で情報参照扱いとする |
-| `resolved` | 実修復により現行の finding/baseline 集合から除去された検出事項。baseline 更新で除去される |
-
-baseline 集合の管理は検出器（`check_integrity.ts`、`check_extensions.ts`）が行う。
-各 checker は baseline ファイル（`baselines/ng-baseline.json`、`baselines/ir-055-baseline.json` 等）を持ち、新規検出事項と既知事項を区別する（REQ-010-007）。
-IR 側で baseline を事前登録せず、finding が発生した時点で baseline 比較を行う。
-
-tombstone 群（IR-011 型 file-backed）の `baseline_status: superseded` 表現は AG-008 により物理削除で解消し、file-backed 上の baseline 属性は持たない（retired REQ-028-010）。
+baseline による既知/新規分類（旧 finding-baseline 分類）、恒久免除レジストリ（baselines/exemptions.json）、NG baseline・IR-055 baseline による免除管理・delta 運用は撤廃済みである。
+検出違反は全件を新規扱いで報告し、免除せず対象ファイル側の直接修正で即時解消する（REQ-010-079、REQ-010-082、REQ-010-084）。
+IR-055・IR-059 の検出器自体は存続する（baseline 運用のみ撤廃。IR-073 と同一の扱い）。
 
 ## 新規 IR 登録 gate（retired REQ-028-012 から移管、TS-020）
 
@@ -296,14 +285,9 @@ REQ-010-085 が所有する内容変更 PR での frontmatter updated 同時進�
 昇格時は新規 IR 登録 gate（前述）を適用する。
 retired REQ-028-006 の詳細運用は別途 Definition 保存（case-ready / case-revise の Design 保存内部責務）工程で確定する。
 
-### IR-057 適用（REQ-028-006 移行判断、Phase 3 §7.2 判定）
+### 旧 obsolete-spec-path ルール（削除済み）
 
-IR-057（obsolete-spec-path-after-domain-split、Phase 2 KEEP 確定）は Phase 3 §7.2 判定に基づき現状維持（恒久 IR）とする。
-`docs/designs/` ドメイン再編が未完了であり、obsolete-path 参照の新規発生リスクが継続するため。
-別種検査への移行条件は次の2条件が両立した場合、Phase 6（OU-007）全体検証で再評価する。
-
-1. `docs/designs/` ドメイン再編が完了し、obsolete-spec-path 構造が安定する
-2. obsolete-path 参照の新規発生が一定期間（目安: 移行判断時点から2四半期以上）発生しない
+旧 obsolete-spec-path ルール（obsolete-spec-path-after-domain-split）は Epic #4126 Phase 4（OU-004）で削除された。一時移行検査 registry の Phase 3 §7.2 判定（現状維持＝恒久 IR 扱い）は撤廃後の実態に従うものではない。
 
 ## IR-050 / IR-051 適用条件（REQ-010-006/007）
 
@@ -339,172 +323,22 @@ PR #2152（merge 4bf264b7）で実装された検出拡張4点を本節の正規
 
 実装は main 入り済みであり、本節は文面の追従として機能する。
 
-## RuntimeReference baseline 運用手順（REQ-010-007）
+## IR-055 検出責務境界と現行運用（REQ-010-007/079）
 
-IR-055（runtime-unresolved-reference）は段階導入（REQ-010-007）のため、baseline 既知違反と新規違反を区別する。
-baseline は `.opencode/skills/repo-agentdev-integrity/baselines/ir-055-baseline.json` に格納する。
-
-| 項目 | 定義 |
-|------|------|
-| 更新タイミング | delta guard / impact guard で「new violation」と報告された場合。ただし根因調査の結果、当該違反が正当な実装修復の結果ではなく baseline 陳腐化（周辺文書の改修や対象外領域の再編等）に起因すると判断された場合に限り baseline を更新する |
-| 更新対象範囲 | IR-055 baseline のみ。他ルール（IR-001〜IR-054, IR-056, IR-057）は baseline 運用を行わず、新規違反は即座に修正する |
-| 実行者 | agent-dev-flow リポジトリの maintainer。PR を経由して更新する |
-| 根因特定手順 | (1) 報告された new violation の evidence を確認する。(2) 当該箇所が本来除去されるべき違反か、baseline に記録された既知違反の周辺改修による見え方の変化かを分類する。(3) 前者の場合は違反を修正し baseline は更新しない。後者の場合は baseline 更新を正当化する根因（baseline 再計算で当該 bucket の count が増加する理由）を PR 本文に記載する |
-| 更新実行手順 | `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts --update-ir055-baseline` を実行し、生成された baseline ファイルを commit する。更新後は `--json` 実行で new violation が 0 件になることを確認する |
-| 更新非対象 | strict 違反（REQ-NNNN、ADR-NNNN、`src/opencode/`、`/repo/*`、`repo-*`）の新規発生は baseline 更新で解消せず、必ず実装修復を行う。baseline 更新が許容されるのは heuristic 違反（`docs/designs/`、`docs/guides/`、本体 GitHub URL、行番号付き参照）の bucket 再計算のみ |
-
-### IR-055 検出責務境界
-
-- IR-055（runtime-unresolved-reference）の検出対象は参照解決不可能な未解決参照である。配布物内の concrete REQ 行 ID
-  （3桁行参照 `REQ-NNN-NNN` を含む）の残存検出は IR-059（distribution-reference-boundary）が所有し、IR-055 は
-  3桁行参照を検出対象外とする。検出器の正規パターン定義と baseline は本境界に従う。
-
-### ir-055-baseline entry schema
-
-- ir-055-baseline.json の entry schema: 各 entry は `classification: baseline`（再生成時に機械的に付与・保持される。
-  strict entry には付与しない）と `reason`（既知残存の根拠）を持つ。baseline 再生成は既存 entry の classification・reason
-  を保持する。
-
-### baseline 再生成分実行契約
-
-- **移設を伴う変更**: 文書の移設・改名・参照構造変更を伴う PR では、baseline 再生成（再計算）を標準手順として PR 内で実行する。移設完了と baseline 不整合の残存を分離して報告する
-- **並列 Wave 実行時**: 並列 Wave で同一 baseline への更新競合が生じ得る場合、再生成スコープは Wave 境界（各 Wave の取り込み完了時点）または最終 merge 後（Epic 全体の取り込み後）のいずれかとし、PR 間で同一 bucket の二重更新を発生させない
-- **保存工程での要否判定**: docs/designs 配下への新規参照追加・参照変更を伴う保存工程では、変更後に IR-055 の new violation を確認し、正当な実装修復由来でない場合に再生成要否を判定する
-- **ratchet 性の維持**: baseline は純減を健全とする ratchet であり、再生成により既知違反の隠蔽と検出対象の縮小を行わない。再生成の根拠は PR 本文に記録する
-
-### IR-055 warning 総数 ratchet（full-audit 契約）
-
-full-audit 実行時（docs-check 全量検査）、実行時に観測される IR-055 warning の総数が baseline の `warning_total_cap` を超える場合は fail する。
-計上対象の定義は「exemptions 適用後・applyNgBaseline による demote 前の全カテゴリ warning level findings 総数（baseline-known と新規の区別なし）」であり、runtime 契約として固定する（Case #3166）。
-初回 cap は本定義による実測 50 で確定した（Case #3166 の全変更適用後の demote 前総数と一致）。
-cap は純減方向のみ更新可能とし、増加は `--raise-warning-cap` 明示フラグ（実行ログへの明記を伴う）経由の更新のみ許可する（正統な新規残存の受入れ手順として機能させる）。
-これにより `--update-ir055-baseline` による heuristic 違反の自動取り込み（意図的残存分類）で警告総数が静かに増加する構造を封じ、棚卸し周期の機械化（絶対数検知）を実現する。cap の比較対象は demote 前の総数のため、baseline 再生成で警告が取り込まれても総数増加が検知される。
-
-### 恒久免除レジストリ（baselines/exemptions.json）の運用
-
-IR-055 warning のうち意味検証済みの正当な warning（例: accepted-adr-only-citation 等の正当引用）は、恒久免除レジストリ `baselines/exemptions.json` へ登録することで、baseline（未解決債務）とは区別して恒久免除表示にする。
-
-- entry は `rule_id`・accepted な `rationale_ref`・`review_status` を必須とする（schema version 2）。`rationale_ref` の契約は rule 別に定義する（IR-059 は従来どおり docs/adr/**〔将来復活時〕、一般化分は現存する正当性根拠パス〔該当 Decision・Design〕を許容）
-- loader はスキーマ違反の entry を fail として扱う
-- 免除された warning は恒久免除表示となり、baseline（未解決債務）の count に含めない。これにより「正当は免除・不正は純減」の分離を機械保証し、baseline は債務追跡に専念させる
-- 免除対象警告が ng-baseline.json の bucket を持つ場合は同時に prune し、恒久免除と baseline-known demote の二重適用を生じさせない
-- entry match 条件: `rule_id` は check 名と一致させ、`file`・`evidence` を指定した場合は観測された warning の file/evidence との同一性一致を必須とする。`file`・`evidence` が null の entry は当該 check 名に一致する警告の全体免除を意味する
-- 適用順序の構造保証: exemptions 適用は ng-baseline 適用（applyNgBaseline による demote）より前に実行される。免除された warning は info 化のうえ ng-baseline 対象外となるため、恒久免除と baseline-known demote の二重計上は構造的に発生しない（Case #3166 で runtime 契約として確定）
-
-## NG baseline 運用手順（全カテゴリ strict pass、v2:REQ-0161-005 統合）
-
-`check_integrity.ts` と `check_extensions.ts` は、既知の NG 集合を NG baseline として `.opencode/skills/repo-agentdev-integrity/baselines/ng-baseline.json` へ格納する。
-各実行は「当該変更起因の新規 NG が 0 件であること」を以て strict pass（exit 0）と判定する。
-既知 NG が残存する状態でも strict pass が到達可能な構造を提供する（v2:REQ-0161-005）。
-
-baseline は `category` / `check` / `file` / `evidence` の4組を bucket key とする集計値（`count`）を持つ。
-実行結果は同 bucket key で集計し、各 bucket について現在の count が baseline count 以下であれば当該 NG を `info`（observation）へ降格する。
-現在の count が baseline count を超える bucket に属する NG は新規 NG として `ng` / `warning` レベルを維持し、exit code を非ゼロにする。
-
-| 項目 | 定義 |
-|------|------|
-| 適用対象 | `check_integrity.ts` と `check_extensions.ts` の出力全カテゴリ（ADR、Canonical、CanonicalConflict、Inventory、LinkIntegrity、RuntimeReference 等）。`level` が `ng` または `warning` の結果を対象とする |
-| baseline 形式 | `version`, `rule_id: "NG-BASELINE"`, `generated_at`, `entries[]`（各 entry は `category` / `check` / `file`（null 許容）/ `evidence`（null 許容）/ `count` / `provenance`（由来ラベル）/ `reason`（承認理由）を持つ）|
-| bucket key | `${category}\t${check}\t${file||""}\t${evidence||""}` の4組。同一 bucket 内の複数結果は `count` で集計する |
-| pass 判定 | 全 bucket で現在 count ≤ baseline count を満たす場合に strict pass（exit 0）。1 bucket でも超過があれば非 pass（exit 非ゼロ）|
-| 報告形式 | baseline 既知 NG（`info` 降格件数）、承認済み追加分（由来ラベル付き baseline 追加件数）、新規かつ未管理の NG（非 pass 起因件数）の3分類を件数で区別して示す。新規 NG 件数だけを報告する形式は採らず、既知 NG を `info` へ降格した件数を識別可能にする |
-| 降格動作 | baseline 既知の bucket では、現在 count が baseline count 以下の範囲の NG を `info`（observation）へ降格し、`[baseline-known]` prefix を付与する。降格済み NG は PR review で情報参照扱いとする |
-| 更新タイミング | 周辺文書の改修、ファイル削除、対象外領域の再編等により既知 NG の見え方が変化した場合。新規の strict 違反は baseline 更新ではなく実装修復を必須とする（NG 隠蔽禁止、後述「NG 隠蔽（禁止）」参照）|
-| 更新実行者 | agent-dev-flow リポジトリの maintainer。PR を経由して更新する |
-| 更新実行手順 | `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts --update-ng-baseline`（`check_extensions.ts` も同様）は現行 NG 全体を無条件に再生成して取り込まない。承認済み差分に由来ラベル（`provenance`）と理由（`reason`）を付与して baseline entry へ追加する。追加対象でない既存未管理 NG は baseline へ取り込まず実修復対象として残す。更新後は `--json` 実行で新規 NG が 0 件になることを確認する |
-| 更新非対象 | 当該変更に直接起因する新規 NG。これらは baseline 更新で隠蔽せず、必ず実装修復を行う。既存未管理 NG は baseline 更新だけで解決済み扱いとせず、修復候補として追跡可能な状態を維持する |
-
-### stderr 集計サマリとレポート本文の件数対応（集計定義）
-
-stderr の `NG baseline applied` 行が報告する 3 計数（baseline-known、approved additions、new unmanaged NG）と、レポート本文のサマリ表（OK / NG / Warning / Info）は、同じ結果集合の異なる集計視点である。両者を突合する際の件数の数え方は次のとおり定める。
-
-- **new unmanaged NG（stderr）**: baseline 適用後に `ng` / `warning` レベルのまま残った finding の合計（entry 単位）。`warning` レベルの新規 finding も含む合算値であり、NG レベルのみの件数ではない
-- **レポート本文のサマリ表**: レベル別（NG / Warning / Info）に分けて計上する。NG は `ng` レベルかつ finding_level が observation 以外の件数、Warning は `warning` レベルかつ finding_level が observation 以外の件数である。参考情報扱い（observation）の finding はサマリ表の NG / Warning いずれにも計上しない
-- **突合の成立条件**: stderr の new unmanaged NG ≥ レポート本文サマリの NG + Warning の合計。主な差分経路は、新規 `warning` レベル finding が stderr 表記では「NG」に含まれることである（サマリ表では Warning 行へ分離計上される）
-- **部分降格の不在**: baseline 超過 bucket は部分降格しない。超過 bucket に属する finding は baseline 計上分を含む全件が `ng` / `warning` レベルを維持する
-- **突合手順（乖離再現条件）**: new unmanaged NG が 1 件以上の実行で、stderr の new unmanaged NG とレポート本文サマリの NG + Warning の和、さらに `--json` 出力の `results` による `level` 別・`finding_level` 別内訳を突き合わせる。乖離が観測された場合は `--json` の results で内訳を機械的に再構成して由来を分類する。new unmanaged NG が 0 件の実行では乖離表示は発生しない
-
-この集計定義は、stderr サマリの件数とレポート本文の明細行数の乖離（例: 報告 8 件に対し本文 NG 行 7 行）の読み替え基準である。stderr の表記を「NG レベルのみの件数」と解釈して突合した場合に生じる見かけ上の乖離は、本節の集計定義に基づいて分類する。
-
-RuntimeReference baseline（IR-055、前節）は heuristic 違反の段階導入を目的とし、本 NG baseline は strict 違反（`ng` / `warning`）の既知集合を管理して「既知違反の解消」により strict pass を到達可能にすることを目的とする。
-両 baseline は独立に運用し、相互に影響しない。
-NG baseline は v2:REQ-0161-005（旧 `docs/requirements/v2:REQ-0161.md`、現 `docs/requirements/retired/v2:REQ-0161.md`）から Design 統合された恒久契約である。
-
-整合性契約の補完:
-
-- 参照パス導入の列挙化（許容参照パスを明示的に列挙する）
-- NG baseline 運用手順節へ衝突時 semantic（max 採用）を明文化する
-- baseline の環境別表記統合と導入運用（環境差異の統合記録）
-
-### baseline entry 運用契約（機械生成・パス bucket key・生成環境・報告分類）
-
-NG baseline entry の運用は次の契約に従う。
-
-1. entry 追加は機械生成を必須とし、手書きによる追加を行わない。`--update-ng-baseline --ng-baseline-additions` が manifest 入力から provenance・reason を付与して生成する。手書き追加は NG 隠蔽（禁止）と同様に扱う
-2. パス bucket key は環境依存差を含む。worktree と main でパス表記が変化する場合、正規化（相対パス基準への統一）または unmatched additions / unmanaged delta 対警告により検知可能にする。bucket key 仕様自体（category/check/file/evidence の4組）は維持する
-3. baseline の生成環境を前提として明示する。worktree 環境で生成した baseline は main 環境（junction 実在環境）で新規未管理 NG が 0 件であることを確認してから確定する
-4. 由来ラベル（legacy、superseded、AUTOGEN、実欠陥等）と報告分類（baseline-known 降格、approved additions、新規未管理）の対応を明確に保つ。承認済み entry の解消（実装修復完了）後は当該 entry を除去する（ratchet の純減）
-
-check_extensions の NG baseline 運用は共用 ng-baseline（additions manifest 必須）を正とする。分離 baseline（check-extensions-baseline.json）は作成せず、実装を共用 baseline 運用に整合させる（SPEC を正とする確定: ru-batch-20260903）。
-
-既知残存違反の処置は次の統一選択基準で行う: (a) 意図的残存（検出器語彙・パターン定義内言及）は baseline 登録し根拠を注記する、(b) 実不備は個別修正する、(c) 検出器の誤検出は検出器調整で解消する。処置は baseline 登録・修正・調整のいずれかに分類記録され、未分類残存を許さない。
-
-baseline provenance 運用規約:
-
-- merge 側（case-close）での baseline 登録は provenance（由来 Issue/PR・登録根拠・登録日）を必ず伴わせる（REQ-010-079）
-- cap 更新（増分反映）と全量再生成を使い分け、全量再生成時に approved provenance が喪失しないことを確認する
-- frontmatter ドリフト検出分の baseline 未登録を残さない
-- 参照是正系の ACT（旧参照の現行化等）は、当該変更が既知違反の解消・新規発生のいずれに当たるかを確認し、baseline 要否（登録・解除）を判定してから完了する
-
-### 宣言的データ YAML と detector の契約（REQ-028-015/016 移管受入れ）
-
-REQ-028 の RETIRE に伴い、次の恒常契約の移管を受入れる（詳細な実行規則は checker-execution-contracts Design が所有する）。
-
-- 検出用の宣言的データ YAML は Design が正となるスキーマを持ち、YAML は検出用ビューとして扱うこと
-- detector 実装は IR 識別子に基づく命名規約を持ち、IR から detector 実装への機械的逆引きが可能であること
-
-### NG baseline エントリの現行維持
-
-本節は当該セクションの既存サブセクション（baseline entry 運用契約、宣言的データ YAML と detector の契約）を変更せず、それらと並ぶ運用節として追加する。
-
-- ng-baseline.json のエントリは、src 側で解消済みの表記に由来するエントリを削除して維持する。削除後は
-  `check_integrity` を再実行し、demote（warning 抑制）が解除されて新規違反として検出されないことを検証する。
-- 起源 source path が存在しないエントリ（third-party Skill 配置先への移設等により不在となったパス）は削除する。
-  third-party Skill 配置先（`.opencode/skills/` 配下の管理外 Skill）は baseline 走査対象外とする。
-
-### baseline 未整備環境での対照実行による合格判定
-
-NG baseline 保持型 checker を baseline 未整備環境で実行した場合は、次の対照実行手順により合格判定できる。baseline 未整備環境の判定基準は、検出事項が NG baseline に未登録であること、または NG baseline ファイル自体が不在であることとする。
-
-1. 対照実行: 同一 detector・同一引数を、remediation 開始前の baseline commit（main HEAD、PR 変更未適用）と変更 HEAD（worktree）で同一環境にて再実行する
-2. 同一 signature 確認: 両実行の検出事項について signature（同一 detector が同一検出対象へ産出する検出識別子。具体定義は各 detector の検出契約が所有する）単位の一致を確認する
-3. delta 0 実証: 変更 HEAD の検出事項が baseline commit 側検出事項の部分集合であること（新規違反 delta 0）を実証する
-4. 判定: baseline policy（baseline 超過分のみ gate 失敗）に準拠し、新規違反 delta 0 を実証した場合は合格扱いとする
-
-判定根拠の記録形式:
-
-- 対照実行の実施記録（detector、引数、両 HEAD の識別子）
-- 同一 signature 確認結果と delta 0 実証の証跡
-- 実行環境ラベル（checker 実行契約の環境ラベル契約に従う。両実行が同一環境であることの根拠）
-- baseline policy 準拠の判定根拠
-
-制約:
-
-- delta 0 実証は同一環境での再実行に基づく。異なる環境間の結果比較で代替しない。環境ラベル（worktree/main、junction 伝播状態、依存パッケージ状態）が一致しない実行間の比較は delta 0 の証拠として採用しない
-- 対照実行の main HEAD 側実行は detached worktree を使う（stash 往復リスク回避の既存規約。worktree 汎用手順の baseline 比較手順に従う）
-- 本判定は baseline 未整備環境に限定する。baseline 整備済み環境では通常の baseline 比較を用い、本手順を適用しない
-- baseline ファイルの整備自体（IR-059 baseline 整備）は別課題であり、checker 実装の変更も対象外である。本手順はその代替を恒久化するものではない
+IR-055（runtime-unresolved-reference）の検出器は存続し、検出した違反は全件を厳格度どおりに報告する（strict は NG、heuristic は warning）。
+baseline による既知/新規の区別・`warning_total_cap` ratchet・恒久免除レジストリ・NG baseline による免除管理は撤廃済みである。
+検出違反は免除せず、対象ファイル側の直接修正で即時解消する。検出器の正規パターン定義は docs/designs/integrity/rules/IR-055-runtime-unresolved-reference.md が所有する。
 
 ## docs-check delta 検出における除外設定方針（REQ-010-007, REQ-010-009 準拠）
 
-docs-check は baseline 運用（IR-055）と path exemption（`IR055_EXEMPT_PATH_PATTERNS`）の二系統で検出対象を絞る。
+docs-check は path exemption（`IR055_EXEMPT_PATH_PATTERNS`）で検出対象を絞る（baseline 運用は撤廃済み）。
 両者とも「正当な除外」と「NG 隠蔽」を区別して運用する（REQ-010-007）。
 
 ### 正当な除外（legitimate exclusions）
 
 | 除外種別 | 対象 | 根拠 |
 |----------|------|------|
-| ルール自己参照 | `vocabulary-registry.md`、`integrity-rule-catalog.md`、`integrity-contracts.md`、`rules/IR-*.md`（全IRルールファイル、REQ-010-009）、`baselines/ir-055-baseline.json` | 検出ルール自体の記述、正規語彙の対照表はルールを説明するためにパターンを列挙する。これを検出するとルール自身が NG となるため自己参照除外とする。個別 IR ルールファイル（`rules/IR-*.md`）は検出ルールの説明文であり、例示用 ID、廃止 skill 例、廃止 ADR 番号帯例示は自己参照的な説明資料であるため、全検出関数（broken-reference, abolished-skill-references, obsolete-spec-path 等）の検出スコープから除外する（REQ-010-009） |
+| ルール自己参照 | `vocabulary-registry.md`、`integrity-rule-catalog.md`、`integrity-contracts.md`、`rules/IR-*.md`（全IRルールファイル、REQ-010-009） | 検出ルール自体の記述、正規語彙の対照表はルールを説明するためにパターンを列挙する。これを検出するとルール自身が NG となるため自己参照除外とする。個別 IR ルールファイル（`rules/IR-*.md`）は検出ルールの説明文であり、例示用 ID、廃止 skill 例、廃止 ADR 番号帯例示は自己参照的な説明資料であるため、全検出関数（broken-reference, abolished-skill-references, obsolete-spec-path 等）の検出スコープから除外する（REQ-010-009） |
 | コードブロック内部 | ` ``` ` で囲まれた範囲 | 例示、パターン説明は検出対象外（integrity-rule-catalog.md「対象ファイル設計」準拠） |
 | template placeholder | `{xxx}` 形式のプレースホルダーを含む行 | プレースホルダーは実参照ではない |
 
@@ -512,8 +346,7 @@ docs-check は baseline 運用（IR-055）と path exemption（`IR055_EXEMPT_PAT
 
 | 隠蔽種別 | 例 | 対処 |
 |----------|----|------|
-| baseline 過大計上 | 実修復されていない違反を baseline count に含め報告を抑止する | 許容しない。baseline 更新は前節「RuntimeReference baseline 運用手順」の根因特定を経た場合のみ認める |
-| 広域 exemption | 対象を絞らない glob（`docs/**` 等）で検出を回避する | 許容しない。exemption は対象ファイル単位、かつ根拠文書化を必須とする |
+| 広域 exemption || 広域 exemption | 対象を絞らない glob（`docs/**` 等）で検出を回避する | 許容しない。exemption は対象ファイル単位、かつ根拠文書化を必須とする |
 | 検出無効化 | check_integrity.ts の検出関数をコメントアウト、条件付きで回避 | 許容しない。検出の廃止は catalog↔実装双方向同期運用（REQ-010-003）に従い IR エントリの物理削除（AG-008、retired REQ-028-008）を行う |
 
 ### 除外設定の文書化要件
@@ -551,8 +384,8 @@ IR-053（gh 直接記述検出）の正規検出条件と既知許容を本節�
 本許容は、検出語彙の引用・記録領域を領域ベースの構造的除外として宣言・管理し、個別出現箇所の許容条件列挙で代替しない area-based 除外宣言方式の原則と次の点で整合する。
 
 - 本許容の正当性の所在は引用・記録領域（領域スコープ）ではなく、否定述語が同一文中に後続するという文ローカルの構造条件である。このためファイル単位・領域単位の除外は採らず、当該領域内の真の violation を隠蔽しない
-- 個別出現箇所の許容（ng-baseline / exemptions への当該 warning 登録）も行わない（正の検出器仕様を迂回しない）。許容条件は検出器仕様として本節が宣言・管理し、baseline・exemptions は未登録のまま維持する
-- 既存の例外経路（読取系 contingency のファイル単位例外、恒久免除レジストリ、コードブロック除外）は本許容と独立に維持し、相互に置換しない
+- 個別出現箇所の許容（baseline / exemptions への当該 warning 登録）も行わない（正の検出器仕様を迂回しない。両機構は撤廃済み）。許容条件は検出器仕様として本節が宣言・管理する
+- 既存の例外経路（読取系 contingency のファイル単位例外、コードブロック除外）は本許容と独立に維持し、相互に置換しない
 
 ## catalog ↔ 実装双方向同期運用（REQ-010-003/004）
 
@@ -666,9 +499,9 @@ junction は作成しない。
 
 ### 検出力回帰マトリクス（§7.7.1）
 
-profile 分離によって検出力が低下していないことを保証するため、意図的 violation を各 profile へ投入し、期待する NG が必ず発生することを baseline 更新前に照合する。
-このマトリクスは baseline 更新前の必須ゲートであり、いずれかのセルで期待 NG が発生しなければ baseline を更新せず WP-3 を完了扱いにしない。
+profile 分離によって検出力が低下していないことを保証するため、意図的 violation を各 profile へ投入し、期待する NG が必ず発生することを照合する。
+このマトリクスは必須ゲートであり、いずれかのセルで期待 NG が発生しない場合は検出器の変更を完了扱いにしない。
 
 ## IR-020 移管に伴う追記（2026-11-15）
 
-IR-020（基準既知（baseline-known）と新規 finding の区別）は本 Design へ移管して廃止した（Epic #4054、RU-0278）。IR-020 が担っていた「baseline 既知と新規 finding の区別」は、「finding-baseline 分類」節（new/known/resolved 判定）と「RuntimeReference baseline 運用手順」「NG baseline 運用手順」各節（baseline 集合管理と新規検出事項の区別、REQ-010-007）が現行で正規所有する。IR-020 は独立の機械検出を持たず、検出器名義は IR-055（checkRuntimeUnresolvedReference）と共用であったため、本移管に伴う検出器変更はない（annotateIrIds の IR-020 名義除去は検出挙動不変の参照整理である）。IR-020 本文が基準集合として参照していた旧パス記述は移管対象から除外した。現行の基準集合は ng-baseline.json と ir-055-baseline.json が担い、更新タイミング・根因特定手順・報告分類は本 Design の各節が定義する。
+IR-020（基準既知（baseline-known）と新規 finding の区別）は本 Design へ移管して廃止した（Epic #4054、RU-0278）。のちに baseline 機構自体が撤廃された（Epic #4126 Phase 4、REQ-010-074/079）。IR-020 が担っていた「baseline 既知と新規 finding の区別」は、移管先節の撤廃に伴い現行では管理対象外である（検出違反は全件を新規扱いで直接修正する）。IR-020 は独立の機械検出を持たず、検出器名義は IR-055（checkRuntimeUnresolvedReference）と共用であったため、本移管に伴う検出器変更はない（annotateIrIds の IR-020 名義除去は検出挙動不変の参照整理である）。IR-020 本文が基準集合として参照していた旧パス記述は移管対象から除外した。現行の基準集合は ng-baseline.json と ir-055-baseline.json が担い、更新タイミング・根因特定手順・報告分類は本 Design の各節が定義する。

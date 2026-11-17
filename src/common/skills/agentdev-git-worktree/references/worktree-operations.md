@@ -177,7 +177,7 @@ bun test によるフル suite 実行は、次の環境前提を踏まえて実�
     - **junction 作成を選択する**: (a) 依存定義の変更がなく、main 側の整備済み依存と同一の状態で足りる一時的な検証。(b) 検証後に worktree へ `node_modules` 実体を残したくない場合（junction エントリ削除のみでクリーンアップが完結し、gitignore 対象の実体が worktree に残留しない）。(c) `bun install` による復元時間を要しない速い前置が有利な場合
     - **共通制約**: いずれの手段でも、選択根拠と依存パッケージ状態を環境ラベルとして検証記録に残す。整備手段の切替（junction → bun install 等）を行った場合は切替後の結果を正とし、切替前の結果を再利用しない
   - **package rename 時の bun.lock 確認**: package rename を伴う変更で `bun install` を実行した場合は、bun.lock の root workspace name が新パッケージ名へ追従していることを確認する（確認手順は runtime-package-boundary Design「本体リポジトリ sync」節参照）
-- worktree の `.opencode/` 配下では commands と skills の junction のみが伝播し、plugins および repo-local 実体は worktree 側に存在しない（無言欠落）。junction を前提とする構造系テストは source パス（SoT パス）へ切り替えるか、main root 実体から `--root <worktree root>` を指定した読取専用実行で補完する。QG-4「3 cwd 分割実行」の分割③（plugins）の環境差と補完時の記録要件は `agentdev-quality-gates` references `qg-4-final-acceptance.md`「worktree での分割③ 対象欠落の環境差」を参照する
+- worktree の `.opencode/` 配下では commands と skills の junction のみが伝播し、plugins およびリポジトリローカル実体は worktree 側に存在しない（無言欠落）。junction を前提とする構造系テストは source パス（SoT パス）へ切り替えるか、main root 実体から `--root <worktree root>` を指定した読取専用実行で補完する。QG-4「3 cwd 分割実行」の分割③（plugins）の環境差と補完時の記録要件は `agentdev-quality-gates` references `qg-4-final-acceptance.md`「worktree での分割③ 対象欠落の環境差」を参照する
 - worktree の構造上の理由でテストスイートが実行できない場合は、メインリポジトリからの読取専用実行でエビデンスを採取できる。この場合は実行環境（worktree または main、junction 伝播状態、依存パッケージ状態）を環境ラベルとして検証記録に明記し、fail 全件の由来分類（既知欠陥・環境依存・当該変更起因）を行う
 - **旧 baseline と並行 main merge 追随差の注意**: worktree 作成元の分岐点 baseline 以降に origin/main へ他 Case の merge が入った場合、baseline 系 durable state（baseline commit、baseline 期待値・許容リスト等）は現行 main より古い状態で検証が行われる。この追随差により、当該変更と無関係なテストが baseline の陳腐化で疑似 fail することがある。検証開始前に `git fetch origin` 後の main 鮮度確認（本リポジトリ「main の鮮度確認」参照）で追随差の有無を確認し、追随差下の疑似 fail については `agentdev-quality-gates` QG-4「fail 由来分類」節の baseline 追随差3点対照手順（単独再実行・分岐点 main root 再現・現行 baseline 差し替え再実行（検証後に旧状態へ復元））で由来分類する。疑似 fail を当該変更起因と誤分類しないこと
 
@@ -279,7 +279,7 @@ guard が書込みをブロックした場合、ブロックの解除・迂回�
 
 ### コマンドリテラル誤検出の事例と標準検証構成
 
-- **誤検出事例**: 読取のみを意図したコマンドの文字列リテラルが、WRITE 系 guard の判定に抵触して誤検出された事例がある（例: `gh pr view` 等の READ 系コマンドを確認する検証コードや出力処理において、`rule=gh pr WRITE` 等のコマンド文字列を対象とする WRITE 系 guard の判定パターンに、コマンド文字列自体が一致してブロック対象と誤判定された）
+- **誤検出事例**: 読取のみを意図したコマンドの文字列リテラルが、WRITE 系 guard の判定に抵触して誤検出された事例がある（例: gh CLI の READ 系コマンド呼び出し文字列を確認する検証コードや出力処理において、`rule=` + WRITE 系コマンド名 等のコマンド文字列を対象とする WRITE 系 guard の判定パターンに、コマンド文字列自体が一致してブロック対象と誤判定された）
 - **標準検証構成**: コマンド実行結果の検証は、出力の自然言語解釈に依存する構成ではなく、コマンド出力から regex で対象値を抽出し、期待する定数との比較で判定する構成（regex 抽出＋定数比較）を標準とする。機械比較により判定を決定化し、guard 誤検出や曖昧判定が発生した場合も判定根拠の再現を可能にする
 - **誤検出時の扱い**: guard の判定にコマンドリテラルが誤検出した場合も、guard の解除・迂回は行わない（fail-closed の維持）。検証対象の値そのものは本項の標準検証構成（regex 抽出＋定数比較）で取得し、guard 判定の入力と検証対象の分離で対処する
 

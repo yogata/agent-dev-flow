@@ -353,7 +353,7 @@ PR #1177 で候補語対照表に追加された 4 種（`baseline`, `provider`,
 
 exemption: code block 内部、template placeholder（`{xxx}`）、`vocabulary-registry.md` / `integrity-rule-catalog.md` / `rules/IR-055-*` 自身は正当使用として検出対象外とする（Design IR-055「exemption」参照）。
 
-段階導入（REQ-0108-264）: baseline 既知違反は `info`（報告のみ、fail なし）。新規違反は strict→`ng`、heuristic→`warning`（delta guard / impact guard で fail）。baseline ファイル（`.opencode/skills/repo-agentdev-integrity/baselines/ir-055-baseline.json`）は `--update-ir055-baseline` で再生成する。baseline 0 到達後に full audit を fail gate 化する。
+baseline による既知/新規の区別（段階導入運用）は撤廃済みである（REQ-010-074/079、Epic #4126 Phase 4）。検出違反は全件を厳格度どおりに報告し（strict→ng、heuristic→warning）、免除せず対象側の直接修正で即時解消する。
 
 前置確認運用（REQ-057-024）: 配布物 Markdown を変更する変更は、マージの前置確認で IR-055 既知 delta の鮮度を確認し、鮮度を欠く場合は baseline の再生成（`--update-ir055-baseline`）または該当表現の解消のいずれかを行うこと。
 

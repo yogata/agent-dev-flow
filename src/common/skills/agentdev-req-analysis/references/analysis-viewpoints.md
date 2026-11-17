@@ -131,7 +131,7 @@ QG-1 の観点 6（REQ/Design 配置判定）がこれを担保する。
 **Design 候補の分離経路**: req-define は Design 等に配置すべきと判定した要件行候補を REQ 要件行に残留させず、ドラフト内の `## Design候補` 補助セクションと `draft-meta.spec-candidates`（SC-ID、content、intended_spec、classification、source）に分離する。
 各 Design 候補には想定配置先 Design（既存 Design ファイル名または新規 Design 候補）と分離根拠（Design分離基準の該当種別）を記録する。
 この分離経路により、Design 相当行が REQ ファイルへ混入することを構造的に防止する。
-Definition 保存内部責務は REQ ファイル保存時に Design候補セクションを除去し、内容は Design 保存（case-ready / case-revise の Capability Skill 委譲）が `docs/designs/<**/*>.md` へ保存する。
+Definition 保存内部責務は REQ ファイル保存時に Design候補セクションを除去し、内容は Design 保存（case-ready / case-revise の Capability Skill 委譲）が docs 配下の Design 文書へ保存する。
 
 ## 用語定義
 

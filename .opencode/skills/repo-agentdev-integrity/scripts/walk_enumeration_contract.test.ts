@@ -25,7 +25,6 @@ import { listFilesRecursive, listYamlFilesRecursive, listMarkdownFiles } from ".
 import { listFilesRecursive as listFilesRecursivePreventive } from "./check_workflow_preventive.ts";
 import { listMarkdownRecursive as listMarkdownRecursiveExecutor } from "./check_executor_notation.ts";
 import { listMarkdownRecursive as listMarkdownRecursiveDelegation } from "./check_delegation_contract_residual.ts";
-import { listMarkdownRecursive as listMarkdownRecursiveRetired } from "./check_retired_artifact_residual.ts";
 import { walkMarkdown, collectMarkdownTree, walkAllFiles } from "./check_integrity.ts";
 import { discoverTestFiles } from "./check_test_impact.ts";
 import { collectReferenceMarkdownFiles } from "./lint_skills.ts";
@@ -197,7 +196,7 @@ describe("再帰列挙契約: 対象ファイル集合と拡張子フィルタ�
     ]);
   });
 
-  test("check_delegation/retired listMarkdownRecursive: スキップなしで全 .md", () => {
+  test("check_delegation listMarkdownRecursive: スキップなしで全 .md", () => {
     const root = buildFixture();
     const expected = [
       ".git/gm.md",
@@ -210,7 +209,6 @@ describe("再帰列挙契約: 対象ファイル集合と拡張子フィルタ�
       "sub/x.md",
     ];
     expect(sorted(rel(root, listMarkdownRecursiveDelegation(root)))).toEqual(expected);
-    expect(sorted(rel(root, listMarkdownRecursiveRetired(root)))).toEqual(expected);
   });
 
   test("check_integrity walkMarkdown / collectMarkdownTree / walkAllFiles", () => {
@@ -264,7 +262,6 @@ describe("再帰列挙契約: 欠落ディレクトリとリンク追跡", () =>
     expect(listFilesRecursivePreventive(missing)).toEqual([]);
     expect(listMarkdownRecursiveExecutor(missing)).toEqual([]);
     expect(listMarkdownRecursiveDelegation(missing)).toEqual([]);
-    expect(listMarkdownRecursiveRetired(missing)).toEqual([]);
     const mdAcc: string[] = [];
     walkMarkdown(missing, mdAcc);
     expect(mdAcc).toEqual([]);

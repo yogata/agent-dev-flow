@@ -230,36 +230,3 @@ export function normalizeFileForBaseline(file: string, repoRoot: string): string
   }
   return norm;
 }
-
-export interface SignatureCount {
-  file: string;
-  category: FailureCategory;
-  matched: string;
-  count: number;
-}
-
-/**
- * Build a (file, category, matched) -> count map keyed on a NUL-joined
- * signature. Used by baseline construction and delta computation.
- */
-export function countBySignature(
-  failures: ReadonlyArray<{
-    file: string;
-    category: FailureCategory;
-    matched: string;
-  }>,
-  repoRoot: string,
-): Map<string, SignatureCount> {
-  const map = new Map<string, SignatureCount>();
-  for (const f of failures) {
-    const file = normalizeFileForBaseline(f.file, repoRoot);
-    const key = `${file}\u0000${f.category}\u0000${f.matched}`;
-    const existing = map.get(key);
-    if (existing) {
-      existing.count += 1;
-    } else {
-      map.set(key, { file, category: f.category, matched: f.matched, count: 1 });
-    }
-  }
-  return map;
-}

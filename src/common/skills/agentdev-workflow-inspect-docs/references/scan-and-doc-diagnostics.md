@@ -27,7 +27,7 @@
 
 ### STEP-1-1: スキャン対象の収集
 
-`docs/requirements/`、`docs/decisions/`、`docs/designs/`、`docs/guides/`、`README.md`、`.opencode/` を収集する。
+docs 配下の requirements / decisions / designs / guides 文書群、README.md、`.opencode/` を収集する。
 
 ### STEP-2-0: 候補整理の前置
 
@@ -53,8 +53,8 @@ STEP-2 の意味診断（STEP-2-2〜2-10）を、範囲が重複しない診断�
 | 診断担当 | 対象工程 | 対象範囲 |
 |---|---|---|
 | REQ 体系担当 | STEP-2-2、2-3、2-4、2-9、2-10 | `docs/requirements/`（REQ 参照 ID 整合性、第一参照導線、現行/廃止/世代境界、6観点 structure review、文書分類一貫性） |
-| Design 担当 | STEP-2-5 | `docs/designs/`（Design 意味診断） |
-| Decision/guides/README 担当 | STEP-2-6、2-7、2-8 | `docs/decisions/`、`docs/guides/`、`README.md`（Decision 意味診断、guides 意味診断、README 索引診断） |
+| Design 担当 | STEP-2-5 | docs 配下の Design 文書群（Design 意味診断） |
+| Decision/guides/README 担当 | STEP-2-6、2-7、2-8 | docs 配下の decisions / guides 文書群、README.md（Decision 意味診断、guides 意味診断、README 索引診断） |
 
 - 担当間で同一の対象工程、同一の診断観点を重複して割り当てない
 - 担当の対象範囲が大きく完了できない見込みの場合は、完了できる単位（判定対象のファイル群、観点の部分集合）へ切り分ける。切り分けは担当の内部分割であり、担当間の範囲重複を生まない。6観点の網羅確認は親の fan-in 手順で行うため、担当の切り分けは網羅性を損なわない

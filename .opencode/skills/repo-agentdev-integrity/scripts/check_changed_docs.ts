@@ -36,11 +36,6 @@ import {
   type FindingCategory,
   findRepoRoot,
 } from "./cli_utils.ts";
-import {
-  isFileLevelHistoryExempt,
-  hasLineLevelHistoryMarker,
-  isIr057PathExempt,
-} from "./ir057_history_exemption.ts";
 
 const path = require("path") as typeof import("path");
 const fs = require("fs") as typeof import("fs");
@@ -257,8 +252,6 @@ function profileFor(workflow: Workflow): WorkflowProfile {
         "docmap-update-required",
         "decision-crossref-update-required",
         "design-readme-update-required",
-        "obsolete-design-path",
-        "legacy-local-generation-vocab",
         "doc-type-responsibility",
       ],
     };
@@ -274,8 +267,6 @@ function profileFor(workflow: Workflow): WorkflowProfile {
         "design-readme-status-sync",
         "design-domain-classification",
         "docmap-update-required",
-        "obsolete-design-path",
-        "legacy-local-generation-vocab",
         "design-responsibility-classification",
       ],
     };
@@ -297,8 +288,6 @@ function profileFor(workflow: Workflow): WorkflowProfile {
         rel === "docs/README.md",
       coupledFor: (rel) => defaultCoupling(rel),
       rules: [
-        "obsolete-design-path",
-        "legacy-local-generation-vocab",
         "doc-type-responsibility",
         "docmap-update-required",
         "design-readme-update-required",
@@ -312,8 +301,6 @@ function profileFor(workflow: Workflow): WorkflowProfile {
       appliesTo: (_rel) => true,
       coupledFor: (rel) => defaultCoupling(rel),
       rules: [
-        "obsolete-design-path",
-        "legacy-local-generation-vocab",
         "design-status-transition-sync",
         "issue-pr-declared-files-match",
         "full-docs-check-recommendation",
@@ -383,111 +370,6 @@ function readText(filePath: string): string | null {
   } catch {
     return null;
   }
-}
-
-function loadObsoleteTerms(root: string): {
-  oldPaths: string[];
-  vocab: string[];
-} {
-  const mapPath = path.join(root, ".opencode", "skills", "repo-agentdev-integrity", "data", "obsolete-path-map.yaml");
-  const content = readText(mapPath);
-  if (!content) return { oldPaths: [], vocab: [] };
-  const oldPaths: string[] = [];
-  const vocab: string[] = [];
-  let section = "";
-  for (const raw of content.split("\n")) {
-    const line = raw.replace(/\r$/, "");
-    if (/^entries:/.test(line)) {
-      section = "entries";
-      continue;
-    }
-    if (/^legacy_local_generation_vocabulary:/.test(line)) {
-      section = "vocab";
-      continue;
-    }
-    if (/^[a-z]/.test(line)) {
-      section = "";
-      continue;
-    }
-    if (section === "entries") {
-      const m = line.match(/^\s*-\s*old:\s*"([^"]+)"/);
-      if (m) oldPaths.push(m[1]);
-    }
-    if (section === "vocab") {
-      const m = line.match(/^\s*-\s*term:\s*"([^"]+)"/);
-      if (m) vocab.push(m[1]);
-    }
-  }
-  return { oldPaths, vocab };
-}
-
-function checkObsoleteDesignPath(
-  root: string,
-  files: string[],
-  oldPaths: string[],
-): Failure[] {
-  const failures: Failure[] = [];
-  for (const f of files) {
-    const rel = path.relative(root, f).replace(/\\/g, "/");
-    // docs/reports/ は監査・評価・観測記録（Report）であり、旧パスの履歴記述を正規内容として持つ。
-    // Design 現行成果物の検査対象外とする（Report 分離、専用例外登録は不要）。
-    if (rel.startsWith("docs/reports/")) continue;
-    if (isIr057PathExempt(rel)) continue;
-    const content = readText(f);
-    if (!content) continue;
-    if (isFileLevelHistoryExempt(rel, content)) continue;
-    const lines = content.split("\n");
-    for (const old of oldPaths) {
-      for (let i = 0; i < lines.length; i++) {
-        if (!lines[i].includes(old)) continue;
-        if (isInsideCodeBlock(lines, i)) continue;
-        if (hasLineLevelHistoryMarker(lines[i])) continue;
-        failures.push({
-          rule_id: "IR-057",
-          severity: "strict",
-          file: rel,
-          line: i + 1,
-          message: `Old design direct path reference '${old}' detected`,
-          expected: `use current path (see .opencode/skills/repo-agentdev-integrity/data/obsolete-path-map.yaml)`,
-        });
-      }
-    }
-  }
-  return failures;
-}
-
-function checkLegacyVocab(
-  root: string,
-  files: string[],
-  vocab: string[],
-): Failure[] {
-  const failures: Failure[] = [];
-  for (const f of files) {
-    const rel = path.relative(root, f).replace(/\\/g, "/");
-    // docs/reports/ は Report 領域のため旧語彙の履歴記述を正規内容として持つ（checkObsoleteDesignPath と同一理由で対象外）。
-    if (rel.startsWith("docs/reports/")) continue;
-    if (isIr057PathExempt(rel)) continue;
-    const content = readText(f);
-    if (!content) continue;
-    if (isFileLevelHistoryExempt(rel, content)) continue;
-    const lines = content.split("\n");
-    for (const term of vocab) {
-      for (let i = 0; i < lines.length; i++) {
-        if (!lines[i].includes(term)) continue;
-        if (isInsideCodeBlock(lines, i)) continue;
-        if (hasLineLevelHistoryMarker(lines[i])) continue;
-        failures.push({
-          rule_id: "IR-057",
-          severity: "strict",
-          file: rel,
-          line: i + 1,
-          message: `Legacy local generation vocabulary '${term}' detected (link mode unified, v2:ADR-0131)`,
-          expected: "remove legacy vocabulary; use link mode terminology (v2:ADR-0131)",
-        });
-      }
-    }
-  }
-  return failures;
 }
 
 function isInsideCodeBlock(lines: string[], idx: number): boolean {
@@ -795,7 +677,6 @@ function runWorkflowChecks(
   profile: WorkflowProfile,
   changedFiles: string[],
   coupledFiles: string[],
-  obsolete: { oldPaths: string[]; vocab: string[] },
   declaredFiles: string[],
   changeDescriptors: ChangeDescriptor[],
 ): {
@@ -815,12 +696,6 @@ function runWorkflowChecks(
   // 「対象ファイルが検出されなかった」旨のメッセージを main() で生成する。
   const allTargets = [...changedFiles, ...coupledFiles];
 
-  if (profile.rules.includes("obsolete-design-path")) {
-    failures.push(...checkObsoleteDesignPath(root, allTargets, obsolete.oldPaths));
-  }
-  if (profile.rules.includes("legacy-local-generation-vocab")) {
-    failures.push(...checkLegacyVocab(root, allTargets, obsolete.vocab));
-  }
   if (profile.name === "req-save") {
     failures.push(...checkReqFrontmatter(changedFiles));
   }
@@ -997,8 +872,6 @@ function main(): void {
   });
   const coupledFiles = resolveCoupledFiles(root, profile, applicable);
 
-  const obsolete = loadObsoleteTerms(root);
-
   const changeDescriptors = computeChangeDescriptors(
     root,
     applicable,
@@ -1010,7 +883,6 @@ function main(): void {
     profile,
     applicable,
     coupledFiles,
-    obsolete,
     parsed.declaredFiles,
     changeDescriptors,
   );
