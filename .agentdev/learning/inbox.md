@@ -227,3 +227,19 @@
 - **想定反映先**: なし（opencode 本体の挙動のため）
 - **関連**: Case #4117・Case #4118・2026-11-17 の完了報告
 - **タグ**: `#実行基盤` `#opencode` `#委譲`
+
+## 横断依存検査エンジンの入力 JSON を README 概要のみで組立てて TypeError で fail する
+
+- **問題事象**: case-open STEP-5 の横断依存検査（inspect_cross_dependencies.ts）の検査入力 JSON を初めて組立てた際、README の「検査入力 JSON」節の構造概要のみを根拠に `case_id`・`target_artifacts`・`target_req_rows` というフィールド名で入力を組み、実際の契約（lib の CaseDeclaration: `case_ref`・`epic_ref`・`artifact_paths`・`target_rows`、`current_case.is_epic_intake`、トップレベル `mode`）と不一致で 2 回の fail（`mode must be "case-open" or "case-ready"`、`TypeError: decl.artifact_paths is not an object`）を返した。
+- **発生局面**: case-open STEP-5 横断依存検査（エンジン入力 JSON 組立・初回実行）
+- **検知方法**: CLI の入力契約 fail（stderr error 行）と engine の TypeError（stderr スタック）
+- **根本原因**: scripts/README.md の検査入力 JSON 説明が置き場所・方針・kind 一覧の概要のみで、必須フィールド名（CaseDeclaration / CrossDependencyInspectionInput の interface 定義）を記載していないため、型定義ファイルを読まずに README から推測して組立てた
+- **自律対応内容**: cross_dependency_types.ts の CaseDeclaration / CrossDependencyInspectionInput / SharedAreaDefinition を実読し、正しいフィールド名で入力 JSON を再組立てし、実行を完遂（population_count 1・condition_a 0 件・detection_unavailable 0 件・警告なし）
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（呼出側の入力組立ミスの即時回復。エンジン本体は入力契約通りに fail しており、検出条件の変更なし）
+- **横展開観点**: 機械検査エンジンの入力 JSON を初めて組立てる場合は README 概要ではなく lib の型定義（interface 定義）を一次情報として読むのが安全。--validate-input 相当の検証専用経路を持たないエンジンでは、入力契約ミスが実行時 TypeError で露見する
+- **再発条件**: inspect_cross_dependencies.ts の検査入力 JSON を README のみを根拠に組立てた場合・shared_areas の kind 契約を他文書から推測した場合
+- **予防策候補**: scripts/README.md の「検査入力 JSON」節へ CaseDeclaration / CrossDependencyInspectionInput / SharedAreaDefinition の必須フィールド名一覧（または型定義ファイルへの明示参照）を追記する
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/scripts/README.md（「検査入力 JSON」節）
+- **関連**: Case #4123・PR #4124
+- **タグ**: `#機械工程` `#checker実行`
