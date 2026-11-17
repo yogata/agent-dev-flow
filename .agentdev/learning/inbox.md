@@ -5,6 +5,22 @@
 
 ---
 
+## case-open の yomiyasu 適用記録が PR 上への投稿漏れとなり case-ready 受入前置確認で検出される
+
+- **問題事象**: case-open STEP-4 完了条件に「PR 作成直後に yomiyasu 適用記録（対象・実施結果・保持した指摘理由の最小限記録）を PR 本文（検証欄等）または PR コメントへ記録する」が存在したが、実行時には learning inbox への個別記録のみを行い PR 上への記録投稿が漏れていた
+- **発生局面**: 実装（case-ready STEP-1 受入前置確認。Root Case #4126・PR #4127）
+- **検知方法**: case-ready の project extension acceptance_gates 前置確認（「PR の差分に docs/** の日本語文章変更を含む場合、当該変更文章への yomiyasu 適用記録が PR 上に存在すること。不足時はマージを行わず」）。PR 本文・コメント一覧に記録が存在しないことを comment_list 実測で検出
+- **根本原因**: case-open 側で適用事実の永続記録（learning inbox・修正 commit 55df9dc89）は行われたが、STEP-4 完了条件の「PR 上への記録存在」検証が完了判定に組み込まれていなかった
+- **自律対応内容**: case-open 時の適用事実を learning inbox 記録（commit 46b875c56）と修正 commit 55df9dc89 から確認し、PR へ最小限の yomiyasu 適用記録コメントを1件投稿（comment_create、commentId 6952760380）して前置確認を成立させた後、merge を実行した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存の記録様式〔agentdev-workflow-lifecycle「文章品質・書込み規約」節〕の適用。記録のためだけの再帰的コメント投稿は1件に限定）
+- **横展開観点**: 受入側 acceptance_gates が前工程の記録漏れを fail-closed で検出する構造は機能した。記録の本体（適用事実）と記録の提出先（PR 上）が分離していると提出漏れが起きる。工程完了判定には「記録の投稿先に存在する」ことの実測（comment_list・PR 本文検索）を含める
+- **再発条件**: case-open が learning inbox への記録のみで工程を完了扱いにした場合
+- **予防策候補**: case-open STEP-4 の完了判定に「PR 上への記録存在」の機械確認（comment_list と PR 本文への記録検索）を組み込む
+- **想定反映先**: src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md「PR 作成」節 5番（yomiyasu 適用記録）
+- **関連**: Issue #4126・PR #4127
+- **タグ**: `#文章品質` `#工程契約`
+
 ## prepare_definition_pr.ts 冪等再実行時 nothing-to-commit で後続ゲートが実行されない
 
 - **問題事象**: 設計PR 機械工程の複数回再実行（IR-067 phantom 解消・計測日収束の反復修正）の最終段で、worktree が clean（全編集 commit 済み）の状態で script を再実行すると stage-and-commit step が nothing-to-commit で exitCode 1 となり、check_integrity と traceability check が実行されない

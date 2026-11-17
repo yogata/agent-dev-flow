@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261117T155148Z-2795",
+  "workflow": "case-ready",
+  "evaluationKind": "structure-decision",
+  "subject": "Root Case #4126 の実行構造判断（Wave 構成判断）",
+  "sourceRevision": "ff8e185538f008c6a83dc258c5290582d0720d31",
+  "durationMs": 665,
+  "inputTokens": 1420,
+  "inputs": {
+    "requestDigest": "643b8c8c5aeae614871cac638f7272bdb055e722aa0e1a2f613d5dcd772f3c98"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-parallelizable",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.94,
+        "false": 0.06000000000000005
+      }
+    },
+    {
+      "questionId": "q2-duplicate-handling",
+      "questionForm": "choice",
+      "value": "重複許容",
+      "probabilityDistribution": {
+        "変更対象分割": 0.16,
+        "重複許容": 0.84
+      }
+    }
+  ],
+  "confidence": 0.68,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-parallelizable",
+        "value": true
+      },
+      {
+        "questionId": "q2-duplicate-handling",
+        "value": "重複許容"
+      }
+    ]
+  }
+}
