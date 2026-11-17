@@ -8,6 +8,7 @@ updated: 2026-11-18
 <!-- ADF-COVERS(implementation): REQ-003-013, REQ-007-006, REQ-007-007, REQ-007-008, REQ-007-009, REQ-054-003 -->
 <!-- ADF-COVERS(design): REQ-061-042, REQ-017-021, REQ-017-022, REQ-032-031, REQ-032-032, REQ-032-033, REQ-032-034, REQ-032-035, REQ-032-036, REQ-032-037, REQ-032-038, REQ-096-032, REQ-096-033, REQ-096-034, REQ-101-017, REQ-101-018, REQ-101-019 -->
 <!-- ADF-COVERS(design): REQ-103-018, REQ-103-019, REQ-103-029, REQ-103-031（REQ-103 の統制必要性・新規統制抑制・有限完了・最終検証判定の設計対応面） -->
+<!-- ADF-COVERS(design): REQ-109-005（移行成功の確定境界が本 Design の Gate 状態遷移 predicate 契約に従う設計対応面。削除 Design v4-migration-and-release からの移管〔RA-010、Issue #4132〕） -->
 <!-- ADF-COVERS(implementation): REQ-103-018, REQ-103-019（統制種別必要性節と前置規律・検証体制の実装対応。統制の必要性説明の正規節を本 Design が所有する） -->
 
 # ADF Quality / Verification / Evidence / Gate モデル

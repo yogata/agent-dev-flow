@@ -10,6 +10,7 @@ updated: "2026-11-18"
 <!-- ADF-COVERS(design): REQ-106-001, REQ-106-002, REQ-106-003, REQ-106-004, REQ-106-005, REQ-106-006, REQ-106-007, REQ-106-008, REQ-106-009, REQ-107-001, REQ-107-002, REQ-107-003, REQ-107-004, REQ-107-005, REQ-107-006, REQ-107-007, REQ-107-008 -->
 <!-- ADF-COVERS(design): REQ-021-031, REQ-021-032（corpus completeness の optional 明示方針と policy optional 区分機構の設計対応） -->
 <!-- ADF-COVERS(design): REQ-012-060, REQ-012-061 -->
+<!-- ADF-COVERS(design): REQ-109-003（移行後の対応関係維持確認が本 Design「標準関係の構造」節の covers・採用された隣接工程間対応で継続する設計対応面。削除 Design v4-migration-and-release からの移管〔RA-010、Issue #4132〕） -->
 <!-- ADF-COVERS(implementation): REQ-106-001, REQ-106-002, REQ-106-003, REQ-106-004, REQ-106-005, REQ-106-006, REQ-106-007, REQ-106-008, REQ-106-009, REQ-107-001, REQ-107-002, REQ-107-003, REQ-107-004, REQ-107-005, REQ-107-006, REQ-107-007, REQ-107-008（v5 変更影響・追跡品質検証の語義は本 Design 本文の v5 語義更新節が所有し、REQ-106 の差分影響評価の構成実体は agentdev-traceability Design の impact 拡張節が、その利用側接続は case-revise Design が所有する） -->
 
 # ADF Traceability モデル（Change / Evidence 中心）

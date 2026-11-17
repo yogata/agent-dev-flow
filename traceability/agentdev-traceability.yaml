@@ -60,6 +60,7 @@ implementation:
     - REQ-021-032
   src/common/skills/agentdev-traceability/scripts/src/check.ts:
     - REQ-021-030
+    - REQ-109-003
   src/common/skills/agentdev-traceability/scripts/src/coverage.ts:
     - REQ-021-030
   src/common/skills/agentdev-traceability/scripts/src/derivations.ts:
