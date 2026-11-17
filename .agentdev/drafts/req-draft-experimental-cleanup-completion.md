@@ -65,8 +65,8 @@ artifact_actions:
       （3）false_positive_risk（26行）末尾: 旧「検出時は gitignore 追加または承認一覧登録を人間の運用判断で処置する）」→ 新「検出時は gitignore 追加または commit を人間の運用判断で処置する）」
       （4）regression_test（27行）: 旧「・承認例（ng-baseline.json 承認一覧登録分は `[baseline-known provenance=...]` 付き info として承認記録報告し NG にしない。未承認残存は NG のまま終了コードを駆動）・案内例（検出報告に gitignore 追加提案と承認一覧登録手順の案内を含む）」→ 新「・案内例（検出報告に gitignore 追加提案を含む）」（テスト実体は案内例で免除しないことを検証済み）
       （5）triage_action（29行）: 旧「恒久的な許容であれば provenance 付きで.gitignore 宣言へ人間の運用判断で明示登録する。それ以外は commit して git 管理状態へ置く。本検査が承認を自動追加することはない」→ 新「恒久的な許容であれば `.gitignore` 宣言へ人間の運用判断で明示登録する。それ以外は commit して git 管理状態へ置く」
-      （6）検査項目表（36〜40行）: 行2（承認一覧登録分は NG にしないこと）と行3（承認を自動追加しないこと）を削除し、行5（案内）を「検出報告に gitignore 追加の提案を含めること」へ改め、残る行（未追跡残存なし・info スキップ・案内）で1から再番号する。
-      （7）exemption 表（47行）: 「| .gitignore 宣言登録パス | provenance 付き恒久承認記録。承認済み検出は承認記録として報告にとどめる |」行を削除する（46行の gitignore 対象パス行と重複）。
+      （6）検査項目表（36〜40行・5行→5行の等行数更新）: 行1の「承認一覧対象外に」を除去し、行2を「検出は全件を NG として報告し、免除・降格を行わないこと」へ、行3を「許容の追加（`.gitignore` への追加）は人間の運用判断による明示判断であり、検査実行が許容を自動追加しないこと」へ、行5を「検出報告に gitignore 追加の提案を含めること」へ改める（行4は不変）。行削除・再番号に代わる等行数の現行要件への更新であり、いずれの行も検出器・テスト（check_integrity.test.ts 5160〜5212行）の現行動作に対応する。〔組立検査済み〕
+      （7）exemption 表（47行・1行→1行の等行数更新）: 「| .gitignore 宣言登録パス | provenance 付き恒久承認記録。承認済み検出は承認記録として報告にとどめる |」を「| 検査基盤由来パス（`.agentdev/integrity/reports/` 等） | gitignore 宣言済みのため検出対象外 |」へ改める（false_positive_risk 記載の実在免除の明記。46行の gitignore 対象パス行との重複解消）。〔組立検査済み〕
   - id: ACT-DESIGN-003
     artifact: design
     operation: update
@@ -94,9 +94,11 @@ artifact_actions:
     source_items: [AG-002]
     content: |
       撤廃済み baseline delta 運用の記述解消。
-      （1）128〜130行: 旧「突合は base 既知違反（baseline 既知 delta）と変更起因の新規違反を分離して行う。
+      （1）128〜130行（3行→3行の等行数更新）: 旧「突合は base 既知違反（baseline 既知 delta）と変更起因の新規違反を分離して行う。
       新規違反は全件分類して修正し、再検証で新規違反 0 件を確認してから commit する（fix-and-reverify）。
-      baseline 既知違反の無断削除・隠蔽を行わない。baseline エントリの除去は対応する残存箇所の実際の解消とセットでのみ行う。」→ 新「突合は検出違反を全件新規扱いで行い、全件を修正し、再検証で違反 0 件を確認してから commit する（fix-and-reverify。baseline による既知違反の区別・免除は撤廃済み、REQ-010-074/079）。違反の無断削除・隠蔽を行わない。」〔組立検査済み〕
+      baseline 既知違反の無断削除・隠蔽を行わない。baseline エントリの除去は対応する残存箇所の実際の解消とセットでのみ行う。」→ 新「突合は検出違反を全件新規扱いで行う（baseline による既知違反の区別・免除は撤廃済み、REQ-010-074/079）。
+      全件を修正し、再検証で違反 0 件を確認してから commit する（fix-and-reverify）。
+      違反の無断削除・隠蔽を行わない。」〔組立検査済み〕
       （2）166行: 旧「base 既知違反（baseline 既知 delta）と変更起因の新規違反を分離して新規違反 0 件を確認する（fix-and-reverify）。」→ 新「検出違反を全件新規扱いで違反 0 件を確認する（fix-and-reverify。baseline 既知違反の区別は撤廃済み）。」
       （3）169行: 旧「baseline 既知違反の無断削除・隠蔽を行わない（「配布物変更時の commit 前3検査工程」と同一の扱い）。」→ 新「違反の無断削除・隠蔽を行わない（「配布物変更時の commit 前3検査工程」と同一の扱い）。」
   - id: ACT-DESIGN-006
@@ -305,8 +307,24 @@ assembly_evidence:
     checker: { name: assemble-draft-section, version: 0.2.0, settings: { heading_match: exact-after-normalization, old_text_count_check: true } }
     result_affecting_references: { heading_match_rule: "search-target-area.ts compatible", scan_scope: "target section only" }
     checks_summary: { pre: { count: 3, all_ok: true }, post: { count: 3, all_ok: true } }
-    diff_compact: { changed_lines_count: 3, added: 1, removed: 3 }
-    executed_at: "2026-11-17T22:07:05.000Z"
+    diff_compact: { changed_lines_count: 3, added: 3, removed: 3 }
+    executed_at: "2026-11-17T22:38:00.000Z"
+  - target_file: docs/designs/integrity/rules/IR-073-untracked-residue.md
+    check_scope: { heading: "## 検査項目", start_line: 32 }
+    execution_conditions: { operation: replace, expected_old_count: 1 }
+    checker: { name: assemble-draft-section, version: 0.2.0, settings: { heading_match: exact-after-normalization, old_text_count_check: true } }
+    result_affecting_references: { heading_match_rule: "search-target-area.ts compatible", scan_scope: "target section only" }
+    checks_summary: { pre: { count: 3, all_ok: true }, post: { count: 3, all_ok: true } }
+    diff_compact: { changed_lines_count: 5, added: 5, removed: 5 }
+    executed_at: "2026-11-17T22:38:00.000Z"
+  - target_file: docs/designs/integrity/rules/IR-073-untracked-residue.md
+    check_scope: { heading: "## exemption（許容条件）", start_line: 42 }
+    execution_conditions: { operation: replace, expected_old_count: 1 }
+    checker: { name: assemble-draft-section, version: 0.2.0, settings: { heading_match: exact-after-normalization, old_text_count_check: true } }
+    result_affecting_references: { heading_match_rule: "search-target-area.ts compatible", scan_scope: "target section only" }
+    checks_summary: { pre: { count: 3, all_ok: true }, post: { count: 3, all_ok: true } }
+    diff_compact: { changed_lines_count: 1, added: 1, removed: 1 }
+    executed_at: "2026-11-17T22:38:00.000Z"
   - target_file: docs/designs/commands/case-close.md
     check_scope: { heading: "### 最終検証の実行（検証義務に基づく試験範囲選択）と tmp 残存確認", start_line: 159 }
     execution_conditions: { operation: replace, expected_old_count: 1 }
