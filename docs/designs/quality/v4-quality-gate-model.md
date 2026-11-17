@@ -49,7 +49,7 @@ Quality Policy / Verification Obligation / Verifier / Evidence / Gate の定義�
 | QG-1（Definition Integrity） | Definition 保存完了時（draft 保存・設計PR化前） | Definition（要件doc・Definition Package）が構造完全性・frontmatter 妥当性・未確定内容抑止を満たす | semantic（機械的検査を部分的に内包） | 検査ログ・draft 検証記録（機械的証拠・推論証拠） | pass / warn で継続可 |
 | QG-2（Acceptance Coverage） | ready 遷移時の execution structure 確定（Epic・子 Issue 構成） | 完了条件・acceptance criteria が対象要件行を網羅し参照整合が取れている | semantic | Issue 本文・チェックボックス投影・構成対応表（構造的証拠） | pass / warn で継続可 |
 | QG-3（Implementation Deviation） | running への PR 化前 | 実装差分が Issue scope を逸脱していない（no-deviation / impl-bug / spec-bug / scope-creep の分類） | semantic（機械的検査を部分的に内包） | PR 本文・乖離分類記録・検査ログ（機械的証拠・推論証拠） | fail は PR 化不可 |
-| QG-4（Final Acceptance） | closing 前（子 Issue・Epic・Root Case の close 前） | test strategy 3 要素完全性・リスクから test strategy への投影完全性・full integrity suite 受入れ・traceability check 前提手順・verify-only 証拠ソース | deterministic + semantic | QG-4 結果コメント・suite 実行ログ・SSoT コメント（機械的証拠） | pass / warn のみ close 可 |
+| QG-4（Final Acceptance） | closing 前（子 Issue・Epic・Root Case の close 前） | test strategy 3 要素完全性・リスクから test strategy への投影完全性・正規契約から導出した検証義務の履行確認（検証義務がリポジトリ全体の試験を要求する対象では full integrity suite 受入れ。試験範囲の選択は REQ-032-047 が所有）・traceability check 前提手順・verify-only 証拠ソース | deterministic + semantic | QG-4 結果コメント・suite 実行ログ・SSoT コメント（機械的証拠） | pass / warn のみ close 可 |
 
 ### QG-1〜QG-4 個別処遇対応表
 

@@ -146,12 +146,15 @@ maintenance case を含む）では、変更が存在しないため commit 前3
    checker コマンドの実行経路と stdout 退避形式は checker 実行契約
    （安定実行経路: モジュール import 経由、spawnSync による status/stdout 分離取得、
    fs.writeFileSync の UTF-8 明示書き出し）に従う
-3. integrity suite の実行: full integrity suite（bun test 全件）を実行し、
+3. 必要な検証の実行: 正規契約（execution contract の test strategy 等）から導出した検証義務に基づく
+   必要な検証を実行する。検証義務がリポジトリ全体の試験を要求する場合、または試験範囲を安全に
+   限定できない場合は full integrity suite（bun test 全件）を実行し、
    「Ran N tests across M files」の N/M 件数突合と直前実績との件数急減なし確認を行う
-   （case-close STEP-3 の合格基準と同水準）
+   （case-close 最終検証の合格基準と同水準）。変更が存在しないことのみを理由に必要な検証を省略しない
 4. SSoT コメントへの記録: 実行コマンド列（実行 cwd、実行形態を含み、そのまま再実行手順として
-   機能する形式）と結果（3検査の new_delta 0・新規違反 0 件、integrity suite の pass/fail 件数）
-   を Issue コメントに記録する。verify-only closure では PR が存在しないため
+   機能する形式）と結果（3検査の new_delta 0・新規違反 0 件、実行した検証の pass/fail 件数）、
+   および実行する検証と実行しない検証の範囲とその根拠を Issue コメントに記録する。
+   verify-only closure では PR が存在しないため
    PR 本文を記録先に使わない
 5. チャネル分離: SSoT コメントは検証証跡チャネルであり、capture（intake/learning 候補）
    チャネルではない。REQ-031-014 の capture 引き継ぎ経路（PR 本文限定）は変更しない。
