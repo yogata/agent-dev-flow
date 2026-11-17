@@ -2,7 +2,7 @@
 title: ADF全体簡素化計画の見送り記録
 status: accepted
 created: 2026-11-13
-updated: 2026-11-18
+updated: 2026-11-17
 ---
 
 # ADF全体簡素化計画の見送り記録
