@@ -504,4 +504,4 @@ profile 分離によって検出力が低下していないことを保証する
 
 ## IR-020 移管に伴う追記（2026-11-15）
 
-IR-020（基準既知（baseline-known）と新規 finding の区別）は本 Design へ移管して廃止した（Epic #4054、RU-0278）。のちに baseline 機構自体が撤廃された（Epic #4126 Phase 4、REQ-010-074/079）。IR-020 が担っていた「baseline 既知と新規 finding の区別」は、移管先節の撤廃に伴い現行では管理対象外である（検出違反は全件を新規扱いで直接修正する）。IR-020 は独立の機械検出を持たず、検出器名義は IR-055（checkRuntimeUnresolvedReference）と共用であったため、本移管に伴う検出器変更はない（annotateIrIds の IR-020 名義除去は検出挙動不変の参照整理である）。IR-020 本文が基準集合として参照していた旧パス記述は移管対象から除外した。現行の基準集合は ng-baseline.json と ir-055-baseline.json が担い、更新タイミング・根因特定手順・報告分類は本 Design の各節が定義する。
+IR-020（基準既知（baseline-known）と新規 finding の区別）は本 Design へ移管して廃止した（Epic #4054、RU-0278）。のちに baseline 機構自体が撤廃された（Epic #4126 Phase 4、REQ-010-074/079）。IR-020 が担っていた「baseline 既知と新規 finding の区別」は、移管先節の撤廃に伴い現行では管理対象外である（検出違反は全件を新規扱いで直接修正する）。IR-020 は独立の機械検出を持たず、検出器名義は IR-055（checkRuntimeUnresolvedReference）と共用であったため、本移管に伴う検出器変更はない（annotateIrIds の IR-020 名義除去は検出挙動不変の参照整理である）。IR-020 本文が基準集合として参照していた旧パス記述は移管対象から除外した。旧基準集合（ng-baseline.json・ir-055-baseline.json）は baseline 機構の撤廃（REQ-010-074/079、Epic #4126 Phase 4）に伴い削除済みであり、現行に基準集合は存在しない。検出違反は全件を新規扱いで直接修正する。

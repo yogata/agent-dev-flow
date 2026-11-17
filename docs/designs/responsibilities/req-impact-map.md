@@ -127,11 +127,11 @@ IR-023（Integrity artifact validator drift）は prose-only 規則であり、�
 
 ### IR-020 削除に伴う交叉参照再配置
 
-IR-020（基準既知（baseline-known）と新規 finding の区別）は独立の機械検出を持たず、検出器名義は IR-055（checkRuntimeUnresolvedReference）と共用であった。baseline 運用契約の正規所有者は integrity-contracts.md（「finding-baseline 分類」「RuntimeReference baseline 運用手順」「NG baseline 運用手順」各節）である。各条項を integrity-contracts.md へ移管し、規則文書を物理削除した。check_integrity.ts annotateIrIds の IR-020 名義は検出挙動不変の参照整理として除去し、IR-055 共用名義は維持した。
+IR-020（基準既知（baseline-known）と新規 finding の区別）は独立の機械検出を持たず、検出器名義は IR-055（checkRuntimeUnresolvedReference）と共用であった。baseline 運用契約は Epic #4126 Phase 4（REQ-010-074/079）で撤廃され、その経緯と現行運用は integrity-contracts.md「baseline 分類・免除機構の撤廃」節と「IR-020 移管に伴う追記」節が所有する。規則文書は物理削除した。check_integrity.ts annotateIrIds の IR-020 名義は検出挙動不変の参照整理として除去し、IR-055 共用名義は維持した。
 
 | 旧交叉参照 | 旧タイトル | 再配置元 | 再配置日 | 後継 |
 |---|---|---|---|---|
-| `IR-020` | 基準既知（baseline-known）と新規 finding の区別 | integrity-rule-catalog.md ルールインデックス AUTOGEN（`catalog-ir-entries-pre-045`）・影響マトリクス REQ-010 行 AUTOGEN・rule-ownership.md IR 別関連マッピング AUTOGEN・check_integrity.ts annotateIrIds の IR-020 名義 | 2026-11-15 | integrity-contracts.md「finding-baseline 分類」「RuntimeReference baseline 運用手順」「NG baseline 運用手順」各節 |
+| `IR-020` | 基準既知（baseline-known）と新規 finding の区別 | integrity-rule-catalog.md ルールインデックス AUTOGEN（`catalog-ir-entries-pre-045`）・影響マトリクス REQ-010 行 AUTOGEN・rule-ownership.md IR 別関連マッピング AUTOGEN・check_integrity.ts annotateIrIds の IR-020 名義 | 2026-11-15 | integrity-contracts.md「baseline 分類・免除機構の撤廃」節・「IR-020 移管に伴う追記」節 |
 
 ### IR-009/014/021/046/054/057/065/066 削除に伴う交叉参照再配置
 

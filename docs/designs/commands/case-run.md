@@ -125,9 +125,9 @@ Workflow Skill は常に単一 Issue 実行（single workflow）として動作�
 1. 配布依存境界検査（check_distribution_boundary.ts）
 2. IR-055 検査（runtime-unresolved-reference）
 3. traceability 検査（宣言整合）
-突合は base 既知違反（baseline 既知 delta）と変更起因の新規違反を分離して行う。
-新規違反は全件分類して修正し、再検証で新規違反 0 件を確認してから commit する（fix-and-reverify）。
-baseline 既知違反の無断削除・隠蔽を行わない。baseline エントリの除去は対応する残存箇所の実際の解消とセットでのみ行う。
+突合は検出違反を全件新規扱いで行う（baseline による既知違反の区別・免除は撤廃済み、REQ-010-074/079）。
+全件を修正し、再検証で違反 0 件を確認してから commit する（fix-and-reverify）。
+違反の無断削除・隠蔽を行わない。
 
 #### verify-only closure の検証実行と SSoT コメント記録工程
 
@@ -163,10 +163,10 @@ maintenance case を含む）では、変更が存在しないため commit 前3
 #### docs 変更を含む case での commit 前 full check_integrity 工程
 
 PR 対象ファイルに docs/** 変更を含む case では、commit 前に check_integrity を full 実行し、
-base 既知違反（baseline 既知 delta）と変更起因の新規違反を分離して新規違反 0 件を確認する（fix-and-reverify）。
+検出違反を全件新規扱いで違反 0 件を確認する（fix-and-reverify。baseline 既知違反の区別は撤廃済み）。
 これにより integrity 由来の違反（reference-path-existence 等）の検出を case-run に前段化し、
 case-close 最終 gate（QG-4）での初検出・blocked を防ぐ。
-baseline 既知違反の無断削除・隠蔽を行わない（「配布物変更時の commit 前3検査工程」と同一の扱い）。
+違反の無断削除・隠蔽を行わない（「配布物変更時の commit 前3検査工程」と同一の扱い）。
 targeted docs guard（PR 単位の targeted 検査）は維持する。
 
 ### Epic Wave 実行モードの廃止（Wave 実行制御の case-auto 移転）
