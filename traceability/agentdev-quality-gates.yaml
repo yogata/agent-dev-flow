@@ -33,7 +33,6 @@ implementation:
     - REQ-007-016
     - REQ-018-005
     - REQ-021-027
-    - REQ-032-030
     - REQ-032-031
     - REQ-032-032
     - REQ-032-033
@@ -67,7 +66,6 @@ verification:
   docs/knowledge/qg4-baseline-detached-worktree-reproduction.md:
     - REQ-007-013
   src/common/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md:
-    - REQ-032-030
     - REQ-032-048
     - REQ-060-007
   src/common/skills/agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md:

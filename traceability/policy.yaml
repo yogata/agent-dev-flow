@@ -302,8 +302,6 @@ verification:
   - REQ-010-062
   - REQ-010-064
   - REQ-010-065
-  - REQ-010-066
-  - REQ-010-067
   - REQ-010-069
   - REQ-010-070
   - REQ-010-071
@@ -313,7 +311,6 @@ verification:
   - REQ-010-075
   - REQ-010-076
   - REQ-010-077
-  - REQ-010-080
   - REQ-010-081
   - REQ-010-082
   - REQ-011-001
@@ -922,8 +919,6 @@ verification:
   - REQ-120-001
   - REQ-120-002
   - REQ-120-003
-  # REQ-121-001 は Case #4049（C-ω・2026-11-13）で REQ 行作成と同一の Definition 変更として登録（区分C: 恒常 checker を所有しない配布物文面の契約行、検証は Case 実行時の対比突合〔TS-001〕で補完）。
-  - REQ-121-001
 
 design:
   default: required
@@ -1246,8 +1241,6 @@ design:
   - REQ-010-063
   - REQ-010-064
   - REQ-010-065
-  - REQ-010-066
-  - REQ-010-067
   - REQ-010-069
   - REQ-010-072
   - REQ-010-073
@@ -1619,7 +1612,6 @@ implementation:
   - REQ-008-060
   - REQ-009-050
   - REQ-010-065
-  - REQ-010-067
   - REQ-010-069
   - REQ-017-018
   - REQ-021-012

@@ -2,7 +2,7 @@
 title: "IR-066: legacy-path-removed-name"
 status: accepted
 created: 2026-08-22
-updated: 2026-10-05
+updated: 2026-11-17
 detection_method_class: machine-check
 implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
 verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts
@@ -18,7 +18,7 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integr
 | category | obsolete-structure |
 | detection_method | `check_integrity.ts` による行単位走査。検出パターンはスクリプト内 `IR066_VOCAB_PATTERNS` 定数、許容条件の運用データは `data/obsolete-vocabulary-map.yaml` が宣言する。IR-065 と同一の走査・許容基盤を共有する。docs/designs 本文における旧パス現在形宣言検出: docs/designs/**/*.md の本文で `src/opencode/commands/` または `src/opencode/skills/` を原本・正規位置・検査対象として現在形で列挙する行を検出する（免除: code span 内の語彙言及、`src/opencode/plugins/` 等ホスト接続領域の現存パス言及、歴史言及〔v2: プレフィックス・旧構造の説明・Decision/Design の supersede 注記内〕、IR-055 の検出パターン語彙としての言及） |
 | affected_artifacts | [docs/designs/**, docs/requirements/*.md, docs/decisions/*.md, docs/guides/*.md, src/common/**, .opencode/commands/**, .agentdev/extensions/**]（詳細は yaml scope） |
-| related_req | [REQ-010-067, REQ-010-068, REQ-010-080] |
+| related_req | [REQ-010-068] |
 | related_design | [../integrity-rule-catalog.md, data/obsolete-vocabulary-map.yaml] |
 | gate_level | full-audit |
 | false_positive_risk | 低〜中。IR-065 と同一の許容条件（履歴マーカー、superseded Decision、否定文脈、existence_probe、exemption_files）を適用する。廃止スキル名の検出は REQ-0108-262（検出パターン縮小）で除外された語彙のうち Wave 1 監査が fail 実在を確認した語彙に限定する。追加採用語彙（inspect-extensions 等 3 種）は v1〜v4 再走査で現行参照残存 0 件を確認した上で採用しており、DEC-006（inspect-extensions 廃止の移行記録）は exemption_files に登録する |
