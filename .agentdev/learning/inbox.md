@@ -117,3 +117,19 @@
 - **想定反映先**: agentdev-traceability（check・宣言追加手順）・traceability-model Design（単一情報源契約節）
 - **関連**: Issue #4126・#4132・PR #4137
 - **タグ**: #トレーサビリティ #宣言追加\n
+
+## DefinitionEdit の行構造事前確認は行削除・縮約を含む合意済み編集を表現できず req-define 側の組立検査への前置が必要
+
+- **問題事象**: case-open STEP-4 の機械工程入力（DefinitionEdit）の行構造事前確認（newText は oldText の行区切りを保全し行の追加のみ許可）に対し、行削除（テーブル行の削除・1行削除）と縮約（3行→1行）を含む合意済み artifact_actions 3編集（ACT-DESIGN-002(6)(7)・ACT-DESIGN-005(1)）が fail-closed 拒否され、STEP-4 全体が停止した
+- **発生局面**: 設計（case-open STEP-4 機械工程・Root Case #4138・初回実行）
+- **検知方法**: prepare_definition_pr.ts --validate-input の行構造事前確認 error 行（newText must preserve the line separation of oldText and may only add lines: oldText: 7 lines, newText: 5 lines）と終了コード 1（機械実証）
+- **根本原因**: req-define 側の組立検査（assemble-draft-section）はテキスト置換の整合のみを検証し、case-open 側 DefinitionEdit 契約の表現能力（等行数または行追加のみ）を前提としていなかった。行削除を含む合意編集が draft に残存したまま case-open へ引き渡された
+- **自律対応内容**: 停止報告で fail-closed 契約に従い PR を作成せず停止（部分適用への分解は「1回の呼び出し」「新しい適用経路を設けない」契約に反するため実施せず）。親オーケストレータが要件の意味を変えずに3編集を等行数形式へ再構成する draft 更新（af432b42a）を行い、STEP-4 を再実行して全16編集の validate-input pass と verbatim 包含突合 PASS（16編集すべて新文逐語包含・旧文残存 0 件）を確認した
+- **ユーザー確認有無**: あり（再開指示〔3編集の等行数再構成・commit af432b42a〕を親オーケストレータが実施）
+- **Decision/REQ/spec影響**: なし（DefinitionEdit 契約の行構造事前確認の現行動作は正しい。合意編集側の表現形態の問題）
+- **横展開観点**: 合意済み編集の意味的整合だけでなく、下流適用機構の表現能力を組立時に検証する前置がないと、case-open STEP-4 で初めて発見され工程全体が止まる。組立検査に「DefinitionEdit 等行数または行追加の表現可能性」を前置すると fail を上流で検出できる
+- **再発条件**: 行削除・縮約（複数行の統合）を含む artifact_actions を req-define で合意した場合
+- **予防策候補**: req-define の組立検査（assemble-draft-section）に newText の行数下限検証（DefinitionEdit 契約と同一規則）を前置する
+- **想定反映先**: req-define の組立検査手順（assemble-draft-section）・src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts（validateEditLineStructure の契約参照）
+- **関連**: Issue #4138・PR #4139
+- **タグ**: `#機械工程` `#組立`
