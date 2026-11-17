@@ -223,7 +223,7 @@ self-hosting リポジトリでは履歴メタデータとして通常の case w
 
 ### Purpose
 
-verify-only closure（PR も carrier commit も存在しない Issue 完了。検証のみで完了する maintenance case を含む）では、変更が存在しないため commit 前3検査の発火条件（配布物変更を含む case）が成立しない。この場合でも検証完了の恒久証跡を残すため、3検査と integrity suite を通常 case と同水準で実行し、その実行証跡を SSoT コメント（Issue コメント）へ記録する。正規原本は case-run command Design「verify-only closure の検証実行と SSoT コメント記録工程」節であり、本工程はその実行時手順である。
+verify-only closure（PR も carrier commit も存在しない Issue 完了。検証のみで完了する maintenance case を含む）では、変更が存在しないため commit 前3検査の発火条件（配布物変更を含む case）が成立しない。この場合でも検証完了の恒久証跡を残すため、3検査と、正規契約（execution contract の test strategy 等）から導出した検証義務に基づく必要な検証を通常 case と同等の水準で実行し、その実行証跡を SSoT コメント（Issue コメント）へ記録する。変更が存在しないことのみを理由に必要な検証を省略せず、検証完了のために carrier commit を作成しない。正規原本は case-run command Design「verify-only closure の検証実行と SSoT コメント記録工程」節であり、本工程はその実行時手順である。
 
 ### Preconditions
 
@@ -233,26 +233,59 @@ verify-only closure（PR も carrier commit も存在しない Issue 完了。�
 
 1. **verify-only closure の判定**: execution contract で検証のみと事前確定された case、または実行の結果変更不要が確定した case のいずれかを正規の判定点とする。判定根拠を Issue コメント（SSoT コメント）に残す
 2. **3検査の実行**: 配布依存境界検査（check_distribution_boundary.ts）、runtime-unresolved-reference 検査（check_extensions.ts 経由の integrity 検査）、traceability 検査（宣言整合）を通常 case と同一の手順・同一の水準（base 既知違反と新規違反の分離突合、新規違反 0 件確認、件数突合）で実行する。checker コマンドの実行経路と stdout 退避形式は STEP-S5「checker コマンドの実行経路（安定実行経路）」「checker コマンドの stdout 退避形式」（delegation-and-result.md）と同一契約に従う
-3. **integrity suite の実行**: full integrity suite（bun test 全件）を実行し、「Ran N tests across M files」の N/M 件数突合と直前実績との件数急減なし確認を行う（case-close STEP-3 の合格基準と同水準）
-4. **SSoT コメントへの記録**: 実行コマンド列（実行 cwd、実行形態を含み、そのまま再実行手順として機能する形式）と結果（3検査の new_delta 0・新規違反 0 件、integrity suite の pass/fail 件数）に加え、検証証跡の必須要素（標準出力・標準エラーの退避先、終了コード、実行した正規ランナーの版、検査範囲、環境ラベル3要素）を Issue コメント（Custom Tool `agentdev_gh` の comment_create）へ記録する。証跡の必須要素と再実行条件の正は `agentdev-quality-gates` スキル Design「QG-4 検証証拠の再利用と再実行条件」節が所有し、本工程は SSoT コメント経由の記録経路を扱う。非ゼロ終了・timeout 打ち切り・切断した検証結果は成功へ変換せず、検証コマンド自体の終了コードを記録する。verify-only closure では PR が存在しないため PR 本文を記録先に使わない
+3. **必要な検証の実行**: 正規契約（execution contract の test strategy 等）から導出した検証義務に基づく必要な検証を実行する。検証義務がリポジトリ全体の試験を要求する場合、または試験範囲を安全に限定できない場合は full integrity suite（bun test 全件）を実行し、「Ran N tests across M files」の N/M 件数突合と直前実績との件数急減なし確認を行う（case-close 最終検証の合格基準と同水準）。試験範囲を選択する場合は、テスト影響範囲検出 gate と変更誘発境界リスク分析の既存機構の適用拡大として影響範囲を判定し、変更が存在しないことのみを理由に必要な検証を省略しない。判定できない場合はリポジトリ全体の試験へフォールバックする
+4. **SSoT コメントへの記録**: 実行コマンド列（実行 cwd、実行形態を含み、そのまま再実行手順として機能する形式）と結果（3検査の new_delta 0・新規違反 0 件、実行した検証の pass/fail 件数。検証義務がリポジトリ全体の試験を要求する場合は integrity suite 全件の結果）、および実行する検証と実行しない検証の範囲とその根拠に加え、検証証跡の必須要素（標準出力・標準エラーの退避先、終了コード、実行した正規ランナーの版、検査範囲、環境ラベル3要素）を Issue コメント（Custom Tool `agentdev_gh` の comment_create）へ記録する。証跡の必須要素と再実行条件の正は `agentdev-quality-gates` スキル Design「QG-4 検証証拠の再利用と再実行条件」節が所有し、本工程は SSoT コメント経由の記録経路を扱う。非ゼロ終了・timeout 打ち切り・切断した検証結果は成功へ変換せず、検証コマンド自体の終了コードを記録する。verify-only closure では PR が存在しないため PR 本文を記録先に使わない
 5. **carrier commit 不作成**: 検証完了のために carrier commit を作成しない（case 2769 で確立した作業仮定の継承。「検証完了のために carrier commit を作成する」代替案は Design 節で却下済み）
 6. **チャネル分離**: SSoT コメントは検証証跡チャネルであり、capture（intake/learning 候補）チャネルではない。capture 引き継ぎの PR 本文限定原則（既存契約）は変更しない。検証中に発見した本筋外の検出事項は既存の intake 起票経路で扱う
 
 ### Result
 
-- 検証完了（3検査と integrity suite の実行結果確認済み）、SSoT コメント記録済み
+- 検証完了（3検査と実行した必要な検証の結果確認済み）、SSoT コメント記録済み（実施・省略の範囲と根拠を含む）
 
 ### Evidence
 
-- SSoT コメント（Issue コメント）: 判定根拠、実行コマンド列、検証結果、検証証跡の必須要素（退避先、終了コード、版、検査範囲、環境ラベル3要素）
+- SSoT コメント（Issue コメント）: 判定根拠、実行コマンド列、検証結果、実行する検証と実行しない検証の範囲およびその根拠、検証証跡の必須要素（退避先、終了コード、版、検査範囲、環境ラベル3要素）
 
 ### Completion Verification
 
-- SSoT コメントに判定根拠、再実行可能な実行コマンド列（実行 cwd・実行形態を含む）、検証結果、検証証跡の必須要素（標準出力・標準エラーの退避先、終了コード、版、検査範囲、環境ラベル3要素）が記録されていること
+- SSoT コメントに判定根拠、再実行可能な実行コマンド列（実行 cwd・実行形態を含む）、検証結果、実行する検証と実行しない検証の範囲およびその根拠、検証証跡の必須要素（標準出力・標準エラーの退避先、終了コード、版、検査範囲、環境ラベル3要素）が記録されていること。必要な検証が未実施の場合は完了としない
 
 ### Resume-Idempotency
 
-- 3検査と integrity suite は読取検査であり再実行可能。SSoT コメントの記録有無で本工程の完了を判定し、記録済みの場合は重複記録しない
+- 3検査と必要な検証は読取検査であり再実行可能。SSoT コメントの記録有無で本工程の完了を判定し、記録済みの場合は重複記録しない
+
+## 試験影響範囲判定と実行試験範囲の特定（検証義務ベースの試験範囲選択）
+
+### Purpose
+
+case-run 委譲内の実行担当サブエージェントが、当該 Case の検証義務から必要な試験・検査の範囲を判定する。試験影響範囲の判定は、テスト影響範囲検出 gate と変更誘発境界リスク分析の既存機構の適用拡大として行い、新しい品質ゲート・恒久台帳を追加しない。変更ファイルに直接対応する試験に加え、影響を受ける関連機能および共通基盤の試験を評価対象に含める。コード変更・依存関係に連動した実行試験範囲の特定と、判定できない場合の境界（リポジトリ全体の試験へのフォールバック）を機能させる。正規原本は case-run command Design（検証義務に基づく試験範囲選択の該当節）であり、本節はその実行時手順である。
+
+### Preconditions
+
+- STEP-S4 委譲内で実装が完了し、test strategy 項目の検証実行（test-fix ループ）または verify-only closure の必要な検証実行に着手する時点であること
+
+### Procedure
+
+1. **検証義務の導出**: 正規契約（execution contract の test strategy、Issue 本文の完了条件の検証方法、REQ/Decision/Design の検証義務）から、当該 Case が満たすべき検証義務を導出する。判断方法の区分は正規の判断アーキテクチャに従い、検証義務の導出は確定済み検査観点・検証方法からの照合である
+2. **影響範囲の判定**: 変更ファイルに直接対応する試験に加え、テスト影響範囲検出 gate（Design 変更に連動するテストの陳腐化検出）と変更誘発境界リスク分析（dependency boundary、client/server boundary、execution boundary、build/runtime boundary、environment propagation boundary の5観点境界から change-induced risk を導出）の既存機構を適用し、影響を受ける関連機能および共通基盤の試験を評価対象に含める。判定に使用できる既存機構（`check_test_impact.ts` 等）の実行結果を判定根拠として記録する
+3. **範囲の決定**: 判定結果から、リポジトリ全体の試験を実行するか、試験範囲を選択するかを決定する。試験範囲を安全に限定する根拠が不足する場合、および利用者または正規契約がリポジトリ全体の試験を明示要求する場合は、リポジトリ全体の試験を正規の方法（full integrity suite 正規形）で実行する。影響範囲の判定ができない場合はリポジトリ全体の試験へフォールバックする。execution contract または test strategy で確定・合意済みの検証方法を、試験範囲選択の判断だけでは縮小しない（検証方法弱化禁止の維持）
+4. **記録**: 範囲の決定内容（選択根拠・除外根拠・実行対象・影響範囲判定に使用した既存機構と判定方法）を、試験範囲を選択した case では PR 本文の検証差分セクションへ、verify-only closure では SSoT コメントへ記録する。記録は case-close の検証義務ベース最終検証（verification-scope-selection step）と QG-4 完了条件照合の入力となる
+
+### Result
+
+- 決定した実行試験範囲（full-repository または selected）とその根拠、影響範囲判定の記録
+
+### Evidence
+
+- PR 本文検証差分セクションまたは SSoT コメント: 選択根拠・除外根拠・実行対象・影響範囲判定に使用した既存機構と判定方法、フォールバック適用の有無
+
+### Completion Verification
+
+- 実行試験範囲の決定とその根拠が記録されていること。判定できない場合のフォールバック（リポジトリ全体の試験）が適用される場合、full integrity suite が実行されていること。既存機構の適用拡大であり、新しい品質ゲート・恒久台帳を構成していないこと
+
+### Resume-Idempotency
+
+- 影響範囲判定は読取検査であり再実行可能。同一の変更状態に対して同一の判定根拠から同一の範囲決定を返す
 
 ## STEP-S6: worktree クリーンアップ確認・完了報告
 

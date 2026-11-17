@@ -150,7 +150,7 @@ describe("SKILL.md の一気通貫実行 pin", () => {
     expect(SKILL).toContain("| STEP-9 | stage 5: 実行接続 |");
     expect(SKILL).toContain("| STEP-10 | stage 6: 全体完了判定 |");
     expect(SKILL).toContain("| STEP-11 | stage 7: リリース |");
-    expect(SKILL).toContain("タグ作成、Release 草稿作成・読み戻し確認、承認時の Release 公開（release_publish）、リリース状態記録（公開実行形態を含む）/ 完遂済み・リリース保留");
+    expect(SKILL).toContain("リリース対象コミットでのリポジトリ全体の試験の実行・受理証拠確認（正式版タグ作成前。fail-closed）、タグ作成、Release 草稿作成・読み戻し確認、承認時の Release 公開（release_publish）、リリース状態記録（公開実行形態を含む）/ 完遂済み・リリース保留");
   });
 
   test("依存と分岐に正常経路（一気通貫）、基準点確定不能経路、一式分割経路、実行停止経路、完遂不成立経路、リリース保留経路、公開途中失敗経路が定義されている", () => {
@@ -161,7 +161,7 @@ describe("SKILL.md の一気通貫実行 pin", () => {
     expect(SKILL).toContain("**実行停止経路**");
     expect(SKILL).toContain("停止報告には case-auto 単独の再開入口と一式再開経路（backlog-auto 再実行）を併記");
     expect(SKILL).toContain("**完遂不成立経路**");
-    expect(SKILL).toContain("**リリース保留経路**");
+    expect(SKILL).toContain("**リリース保留経路**: STEP-11 でリリース条件・公開権限が不成立、またはリリース前全試験確認で全試験未実施・対象コミット不一致・不合格・証拠不足・実行不能が検出された場合 → タグ・リリースを作成せず「完遂済み・リリース保留（理由記録）」として STEP-6 へ（報告）");
     expect(SKILL).toContain("**公開途中失敗経路**");
   });
 
@@ -261,12 +261,15 @@ describe("end-to-end-execution reference の手順 pin", () => {
     expect(END_TO_END).toContain("突合の正は set-state の義務スナップショットと対応表であり、RU・要件doc が削除済みでも突合は set-state から復元して実行する");
   });
 
-  test("リリース手順シーケンスが再確認・版番導出・差分突合・タグ作成・Release 記録・結果記録の順で手順化されている", () => {
+  test("リリース手順シーケンスが再確認・版番導出・差分突合・リリース前全試験確認・タグ作成・Release 記録・結果記録の順で手順化されている", () => {
     expect(END_TO_END).toContain("1. 基準点再確認: リリース時点で正式 SemVer タグを再確認する。開始時基準より新しい正式タグが存在する場合は、その最大版から版番号を導出し直す。既存タグとの衝突、タグの移動、二重採番は行わない");
     expect(END_TO_END).toContain("2. 版番導出: 最後の正式リリースからパッチ番号を1つだけ進めた版を確定する（major/minor への自動振り分け、同一実行での二つの版番号の消費を行わない）。導出版と同一のタグが既に存在する場合は衝突として報告し、版番号を再消費せず停止する");
     expect(END_TO_END).toContain("3. 対象コミット確定と無関係コミット混入検知: リリース対象コミット（一式の全マージ完遂時点の main HEAD）を確定する。開始コミット..対象コミットの差分と、set-state の対応表から導出する一式分の実変更（一式の実行単位が生んだマージ済み変更）を突合し、一式に帰属しない無関係コミットの混入を検出した場合は報告して利用者判断を求める（タグ付与の可否は利用者判断）");
-    expect(END_TO_END).toContain("4. タグ作成: リリース対象コミットに導出版のタグを作成する。タグ作成済みを検出した場合は作成を省略し、タグの移動・再作成を行わない");
-    expect(END_TO_END).toContain("5. 追加公開物（Release 記録）:");
+    expect(END_TO_END).toContain("4. リリース前全試験確認: リリース対象として確定したコミット自体（一式の全マージ完遂時点の main HEAD 確定後）について、リポジトリ全体の試験を正規の方法（full integrity suite 正規形）で実行し、既存の受理基準を満たした証拠を、新しい正式版タグの作成より前に確認する");
+    expect(END_TO_END).toContain("squash merge 前の branch HEAD で実行した close 時点の証拠は、リリース対象コミットの全試験の証拠として単独では採用しない");
+    expect(END_TO_END).toContain("リリース対象とは異なる案件分岐の試験結果だけを、リリース対象コミットの全試験の証拠として扱わない。同一対象コミット・同一検証条件で既存の受理基準を満たした有効な証拠が存在する場合は再利用できる。タグ作成までの間に対象コミットまたは検証条件が変わり証拠の有効性が失われた場合は、必要な再検証を行う。全試験未実施、対象コミット不一致、不合格・証拠不足、実行不能の場合はタグ作成を行わず「完遂済み・リリース保留（理由記録）」として報告する");
+    expect(END_TO_END).toContain("5. タグ作成: リリース対象コミットに導出版のタグを作成する。タグ作成済みを検出した場合は作成を省略し、タグの移動・再作成を行わない");
+    expect(END_TO_END).toContain("6. 追加公開物（Release 記録）:");
     expect(END_TO_END).toContain("次の Release 記録手順を Custom Tool 操作カタログ（release_create、release_list、release_read、release_publish）経由で実行する");
     expect(END_TO_END).toContain("公開（draft の解除）は公開権限の確認で利用者が草稿作成とは別に明確に承認した場合に限り release_publish（承認根拠必須）で実行する");
     expect(END_TO_END).toContain("1. 版タグ列挙: 対象プロジェクトの版タグ（正式 SemVer タグと RC タグ）を列挙する。非 SemVer のベースラインタグは対応対象から除外する");
@@ -275,11 +278,16 @@ describe("end-to-end-execution reference の手順 pin", () => {
     expect(END_TO_END).toContain("4. 草稿作成: 対応のない版タグへ release_create で草稿を作成する。RC 版タグは prerelease: true で作成する。Release タイトルは版タグ名とする。作成に失敗した場合はタグを移動・再作成せず、Release が欠けているため工程を完了できない旨を報告して停止する");
     expect(END_TO_END).toContain("5. 読み戻し確認: release_list（必要に応じて release_read）で全版タグと Release の 1:1 対応を再読取して確認するまで、Release 記録工程を完了としない。同一タグ名の Release が2件検出された場合は削除せずに読み戻し結果を報告して停止する");
     expect(END_TO_END).toContain("6. 承認時公開: 公開権限の確認で利用者が公開を明示承認した場合、release_publish（承認根拠〔承認した HITL 質問 ID・回答の記録参照〕付き）で対象版タグの Release を公開（draft の解除）し、読み戻しで draft=false・published_at が確認された場合のみ公開完了とする。already-published（draft=false）を検出した場合は重複実行せず記録完了扱いとする。未承認の場合は公開を実行せず、Release 草稿が draft 状態のまま保持されていることを確認する");
-    expect(END_TO_END).toContain("6. 結果記録: set-state のリリース状態を完了へ更新し（版番号、タグ名、対象コミット、Release 対応の確認情報、公開実行形態を含める）、結果を報告する。公開実行形態は workflow 実行（承認根拠の参照を含む）／代行／利用者手動の3区分で区別して記録する。未承認であるのに公開済み（draft=false）を検出した場合は不整合として完了とせず報告する");
+    expect(END_TO_END).toContain("7. 結果記録: set-state のリリース状態を完了へ更新し（版番号、タグ名、対象コミット、リリース前全試験の実行・受理証拠の確認情報、Release 対応の確認情報、公開実行形態を含める）、結果を報告する。公開実行形態は workflow 実行（承認根拠の参照を含む）／代行／利用者手動の3区分で区別して記録する。未承認であるのに公開済み（draft=false）を検出した場合は不整合として完了とせず報告する");
   });
 
   test("公開完了検証が set-state の公開実行形態記録を判定鍵とする条件化で手順化されている", () => {
     expect(END_TO_END).toContain("公開完了検証は set-state の公開実行形態記録を判定鍵とする条件化である。公開実行形態が未記録（未承認）の場合: 公開操作（draft の解除）が実行されておらず、Release 草稿は draft 状態のまま保持されていること。公開実行形態が workflow 実行の場合: 対象 Release の読み戻しで draft=false・published_at が確認され、set-state に承認根拠の参照が記録されていること。公開実行形態が代行・利用者手動の場合: set-state の記録と Release の実状態（draft 状態）が一致していること。未承認であるのに公開済み（draft=false）を検出した場合は不整合として完了とせず報告する");
+  });
+
+  test("リリース前全試験確認がタグ作成前の fail-closed 拒否経路と証拠有効性の再検証条件を完了検証として手順化されている", () => {
+    expect(END_TO_END).toContain("リリース前全試験確認がタグ作成より前に完了していること。全試験未実施、対象コミット不一致、不合格・証拠不足、close 時点証拠の単独採用、異なる案件分岐の試験結果のみでの証拠採用の場合にタグ作成が行われていないこと。証拠の有効性が失われた場合に旧証拠を無条件に再利用せず必要な再検証が行われていること");
+    expect(END_TO_END).toContain("リリース前全試験確認の再開時は、同一対象コミット・同一検証条件で有効な受理証拠が存在する場合はその証拠を再利用し、対象コミットまたは検証条件が変わって証拠の有効性が失われた場合は全試験を再実行する");
   });
 
   test("公開権限確認の HITL 選択肢文言が実行能力と一致する一元定義を宣言している", () => {
@@ -295,9 +303,10 @@ describe("end-to-end-execution reference の手順 pin", () => {
     expect(END_TO_END).toContain("公開方式・権限・必要な環境が不足する場合は、対象と理由を報告し、リリース完了としない");
   });
 
-  test("異常系の取扱い表が対象なし・実変更なし・初期状態・到達不能・公開不能・Release 草稿失敗・Release 重複・タグ push 失敗の各ケースを定義している", () => {
+  test("異常系の取扱い表が対象なし・実変更なし・全試験確認不成立・初期状態・到達不能・公開不能・Release 草稿失敗・Release 重複・タグ push 失敗の各ケースを定義している", () => {
     expect(END_TO_END).toContain("| RU 0 件 | stage 4〜7 を開始せず、一式不在の旨を報告する。リリースは作成しない |");
     expect(END_TO_END).toContain("| リリース対象となる実変更なし | 完遂判定の結果、一式に対応する実変更（マージ済み変更）が存在しない場合はリリースを作成せず報告する |");
+    expect(END_TO_END).toContain("| リリース前全試験確認の不成立（全試験未実施・対象コミット不一致・不合格・証拠不足・実行不能・close 時点証拠のみ） | タグ・リリースを作成せず「完遂済み・リリース保留（理由記録）」として扱う。同一対象コミット・同一検証条件で有効な証拠の再利用は許容し、無効な証拠の再利用は行わず必要な再検証を行う |");
     expect(END_TO_END).toContain("| 正式なバージョン基準なし（初期状態） |");
     expect(END_TO_END).toContain("| 到達可能な正式タグ 0 件 |");
     expect(END_TO_END).toContain("| 公開方式・権限・環境の不足 | 対象と理由を報告し、リリース完了としない。完遂済み・リリース保留（理由記録）として扱う |");

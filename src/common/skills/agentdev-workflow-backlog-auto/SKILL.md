@@ -49,7 +49,7 @@ STEP 番号は既存 STEP（STEP-1〜6）の契約を維持したままの追加
 | STEP-8 | stage 4: 要件定義接続 | set-state 初期化済み | 単一要件doc 確定（単一 req-define 実行、入力は一式 RU の明示列挙） | [references/end-to-end-execution.md](references/end-to-end-execution.md) |
 | STEP-9 | stage 5: 実行接続 | 要件doc 確定 | 単一 case-auto 実行の完了または停止（要件doc 明示指定） | [references/end-to-end-execution.md](references/end-to-end-execution.md) |
 | STEP-10 | stage 6: 全体完了判定 | case-auto 完了、または再開時に set-state 上で実行済みと確定 | 完遂 / 未完遂判定（義務スナップショットと対応表による突合） | [references/end-to-end-execution.md](references/end-to-end-execution.md) |
-| STEP-11 | stage 7: リリース | 完遂、リリース条件・公開権限の成立 | タグ作成、Release 草稿作成・読み戻し確認、承認時の Release 公開（release_publish）、リリース状態記録（公開実行形態を含む）/ 完遂済み・リリース保留 | [references/end-to-end-execution.md](references/end-to-end-execution.md) |
+| STEP-11 | stage 7: リリース | 完遂、リリース条件・公開権限の成立 | リリース対象コミットでのリポジトリ全体の試験の実行・受理証拠確認（正式版タグ作成前。fail-closed）、タグ作成、Release 草稿作成・読み戻し確認、承認時の Release 公開（release_publish）、リリース状態記録（公開実行形態を含む）/ 完遂済み・リリース保留 | [references/end-to-end-execution.md](references/end-to-end-execution.md) |
 
 ### STEP 間の依存と分岐
 
@@ -62,7 +62,7 @@ STEP 番号は既存 STEP（STEP-1〜6）の契約を維持したままの追加
 - **要件定義停止経路**: STEP-8 で req-define が blocked / failed → STEP-9 以降を開始せず STEP-6（停止報告、set-state に進捗記録）
 - **実行停止経路**: STEP-9 で case-auto が blocked / failed → STEP-10 以降を開始せず STEP-6（停止報告、set-state に進捗記録、停止報告には case-auto 単独の再開入口と一式再開経路（backlog-auto 再実行）を併記）
 - **完遂不成立経路**: STEP-10 で義務・検証結果の突合が成立しない → 完遂とせず STEP-6（全体完遂不成立の報告。不足内容と再開経路を含める）
-- **リリース保留経路**: STEP-11 でリリース条件・公開権限が不成立 → タグ・リリースを作成せず「完遂済み・リリース保留（理由記録）」として STEP-6 へ（報告）。backlog-auto 再実行はリリース段階から再開する
+- **リリース保留経路**: STEP-11 でリリース条件・公開権限が不成立、またはリリース前全試験確認で全試験未実施・対象コミット不一致・不合格・証拠不足・実行不能が検出された場合 → タグ・リリースを作成せず「完遂済み・リリース保留（理由記録）」として STEP-6 へ（報告）。backlog-auto 再実行はリリース段階から再開する
 - **公開途中失敗経路**: STEP-11 の公開途中で失敗・中断 → 既存結果を読み戻し、読み戻し再開可能な状態で報告する（タグの移動・再作成、第二のパッチ番号の消費は行わない）
 - **系統内再開**: STEP-3 の各系統は子ワークフローの既存再開契約（STEP model、永続状態）で系統内の再開点から再開する
 - **一式再開**: STEP-7〜11 の中断時は set-state から同じ一式の対象と進捗を復元し、未完了部分から再開する

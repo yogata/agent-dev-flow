@@ -192,6 +192,10 @@ export function buildInputFixtures(gatePath: string, missingGatePath: string): R
     issueUpdatedAt: "2026-11-11T00:00:00.000Z",
     issueNumber: 4014,
     contractStateCheck: { contractStatePaths: ["docs/char-target.md"], approvalEntries: ["- 特性化用の契約状態行"] },
+    verificationScope: {
+      scopeKind: "full-repository",
+      selectionBasis: "特性化 fixture（検証義務がリポジトリ全体の試験を要求する対象の代表入力）",
+    },
   });
 
   const closeMissing = writeInputFixture("close-missing-gate.json", {
@@ -208,6 +212,10 @@ export function buildInputFixtures(gatePath: string, missingGatePath: string): R
     issueUpdatedAt: "2026-11-11T00:00:00.000Z",
     issueNumber: 4014,
     contractStateCheck: { contractStatePaths: ["docs/char-target.md"], approvalEntries: ["- 特性化用の契約状態行"] },
+    verificationScope: {
+      scopeKind: "full-repository",
+      selectionBasis: "特性化 fixture（検証義務がリポジトリ全体の試験を要求する対象の代表入力）",
+    },
   });
 
   const closeBadPhase = writeInputFixture("close-bad-phase.json", {

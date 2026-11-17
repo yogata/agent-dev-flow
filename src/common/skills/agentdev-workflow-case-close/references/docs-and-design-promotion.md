@@ -114,14 +114,14 @@ case-close を worktree 環境で実行する場合、各 checker の実行前�
 2. junction 系 skill scripts および plugins 系 gate を用いる検査は、`agentdev-git-worktree` references（worktree 構造的制約）「main root 実体 + --root 指定による読取系 checker 実行手順」節の汎用手順に従い、main root 実体から `--root <worktree root>` 指定（必要に応じ `--files` 併用）で実行する
 3. 検査対象が 0 件に解決された実行を clean 扱いや暗黙の検査省略として採用しない。checker 側の zero-targets 事前警告を含む出力を確認してから結果を採用し、0 件解決時は上記の無効分類として記録する
 
-#### full integrity suite 実行（bun test 実行形態契約）
+#### 最終検証の実行（検証義務に基づく試験範囲選択）
 
-QG-4 の full integrity suite 合格基準により検証スイート全体（bun test 全件）を実行する場合、bun test 実行形態契約に従う。
-3 cwd 分割実行、依存パッケージ前置、環境ラベルを含む正規形契約の本体は `agentdev-quality-gates/references/qg-4-final-acceptance.md` を参照。
+STEP-3 の最終検証は、当該 Case の変更内容、依存関係、リスク、受け入れ条件および正規契約から導出される検証義務から、必要な試験・検査の範囲を決定して実行する（検証義務ベースの試験範囲選択）。変更ファイルに直接対応する試験に加え、影響を受ける関連機能および共通基盤の試験を評価対象に含める。試験範囲を安全に限定する根拠が不足する場合、および利用者または正規契約がリポジトリ全体の試験を明示要求する場合は、リポジトリ全体の試験を正規の方法で実行する。試験範囲の選択は、テスト影響範囲検出 gate と変更誘発境界リスク分析の既存機構の適用拡大として行い、新しい品質ゲート・恒久台帳を追加しない。execution contract または test strategy で確定・合意済みの検証方法を選択の判断だけでは縮小しない（検証方法弱化禁止の維持）。試験範囲の選択根拠および除外根拠の記録は完了条件照合の対象とし、判定結果の記録は QG-4 で照合する。
+検証義務がリポジトリ全体の試験を要求する対象では、full integrity suite（bun test 全件）の実行と機械受理を現行どおり必須とする。検証義務がリポジトリ全体の試験を要求する場合、または試験範囲を安全に限定できない場合の bun test 実行形態は、bun test 実行形態契約（3 cwd 分割実行、依存パッケージ前置、環境ラベルを含む正規形）に従う。正規形契約の本体は `agentdev-quality-gates/references/qg-4-final-acceptance.md` を参照。
 
-**full suite 実行の省略禁止**: STEP-3 では full integrity suite（bun test 全件）実行を省略しない。対象 Case が宣言的データ・config（extension yaml、plugin 追加対象設定、判断境界文言、配布物文言）を期待値に持つテストへ影響する変更を含む場合を含め、検証スイート全体の実行を個別 checker の部分実行で代替しない。
+**選択された検証範囲の実行義務の省略禁止**: STEP-3 では、検証義務がリポジトリ全体の試験を要求する対象では full integrity suite（bun test 全件）実行を省略しない。対象 Case が宣言的データ・config（extension yaml、plugin 追加対象設定、判断境界文言、配布物文言）を期待値に持つテストへ影響する変更を含む場合を含め、検証スイート全体の実行を個別 checker の部分実行で代替しない。試験範囲を選択した case では、選択した検証範囲の実行義務を省略せず、実行対象・結果・除外根拠の記録（変更対象と関連試験の対応づけを含む）を揃え、関連試験の欠落または根拠のない除外を残さない。無条件除外や 0 件実行の成功扱いは発生させない。機械工程 script（close_mechanical_steps.ts）の verification-scope-selection step が full-repository 宣言と selected 宣言の検査を担う。
 
-**実行結果の解析と保存証跡の関係**: 実行済み full suite・checker の件数、失敗明細、サマリーの表示変更は、保存済み証跡（退避ファイル、PR 本文検証差分セクション、SSoT コメント）の読み戻しで行う。同一情報の取得だけを目的とした full suite や checker の再実行をしない。再実行の正当理由（変更後検証、環境変更、失敗由来分類、非決定的失敗の再現確認、必須独立検査、証跡欠落）と証跡の必須要素（標準出力、標準エラー、終了コード、版、検査範囲、実行環境）の正は `agentdev-quality-gates` スキル Design「QG-4 検証証拠の再利用と再実行条件」節が所有し、本 reference は再規定しない。close の最終検証（full integrity suite、配布物変更を含む case の3検査結果確認、QG-4 checker 実測）を origin/main 取り込み済み・マージ直前の branch HEAD で実行する既存契約は維持し、case-run の保存結果だけによる省略を行わない。保存出力の欠落、切断、タイムアウト、検査範囲欠落を完全な合格証拠として扱わない。
+**実行結果の解析と保存証跡の関係**: 実行済み full suite・checker の件数、失敗明細、サマリーの表示変更は、保存済み証跡（退避ファイル、PR 本文検証差分セクション、SSoT コメント）の読み戻しで行う。同一情報の取得だけを目的とした full suite や checker の再実行をしない。再実行の正当理由（変更後検証、環境変更、失敗由来分類、非決定的失敗の再現確認、必須独立検査、証跡欠落）と証跡の必須要素（標準出力、標準エラー、終了コード、版、検査範囲、実行環境）の正は `agentdev-quality-gates` スキル Design「QG-4 検証証拠の再利用と再実行条件」節が所有し、本 reference は再規定しない。close の最終検証（検証義務に基づき選択された必要な試験・検査、配布物変更を含む case の3検査結果確認、QG-4 checker 実測）を origin/main 取り込み済み・マージ直前の branch HEAD で実行する既存契約は維持し、case-run の保存結果だけによる省略を行わない。省略を行わない対象は選択された必要検証範囲の実行義務であり、検証義務がリポジトリ全体の試験を要求する case ではリポジトリ全体の試験の実行義務である。保存出力の欠落、切断、タイムアウト、検査範囲欠落を完全な合格証拠として扱わない。
 
 - **実行コマンド**: `bun test ./.opencode/skills/<integrity-detector-skill>/scripts/`。`./` prefix 付きで対象ディレクトリを明示指定する（必須ステップ）
 - **timeout 明示指定**: bun test フル suite 全体実行を含む検証の実行指示は、実行 timeout を明示指定する。全体実行の実測所要時間は既定 timeout を超え得るため、**300〜600 秒の指定を標準**とする。timeout 未指定（既定値での打ち切り）で全体実行を打ち切った結果を fail 証跡として扱わない
@@ -200,12 +200,14 @@ Design status 昇格タイミング（draft → accepted）の詳細、frontmatt
 
 - targeted docs guard、check_extensions.ts、check_distribution_boundary.ts、check_autogen_freshness.ts の各 JSON 結果（check_autogen_freshness は green または再生成後 green）、Design 状態評価（棚卸し制）の列挙結果・統合結果・全件評価結果（処理パターン a/b/c、0 件確認の有無）
 - full integrity suite 実行時: 「Ran N tests across M files」の N/M 件数突合結果、実行 cwd と起動コマンド形式
+- 試験範囲を選択した case: 選択した検証範囲の実行対象・結果・除外根拠の記録（変更対象と関連試験の対応づけを含む）と試験影響範囲判定の記録（既存機構の適用拡大と判定方法、フォールバック適用の有無）
 
 ## Completion Verification
 
 - targeted docs guard の `failures` に strict severity を含まないこと。check_extensions.ts の違反がないこと。配布依存境界 最終 gate が合格（または違反時はマージ停止）であること
 - squash merge を伴う境界 close 時、AUTOGEN 鮮度 gate が green（または drift 検出時の再生成後 green）であること
 - full integrity suite 実行時: N/M 件数突合にて直前実績と比較して件数の急減がないことを確認済みであること
+- 検証義務がリポジトリ全体の試験を要求する対象では full integrity suite の起動・機械受理が成立していること。試験範囲を選択した case では選択範囲の実行義務が省略されておらず、実行対象・結果・除外根拠の記録が揃い、根拠のない除外・関連試験の欠落・0 件実行の成功扱いがないこと
 
 ## Resume-Idempotency
 
