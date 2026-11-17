@@ -101,3 +101,19 @@
 - **関連**: Issue #4126・#4130・PR #4134・PR #4127
 - **タグ**: `#worktree` `#checker実行`
 
+
+## artifact × role の対応宣言は同一論理関係の単一情報源契約に従い inline 側へ追記する（inline と sidecar の混在は duplicate-inconsistencies で機械検出される）
+
+- **問題事象**: 既存 inline 宣言を持つ Design へ design 宣言を sidecar に新規追加すると、traceability check が duplicate-inconsistencies（inline と sidecar の宣言矛盾）として検出する
+- **発生局面**: 実装（Epic #4126 Wave-2 子 Issue #4132 OU-005 Phase 5・missing-design 13行の design 対応移管。PR #4137）
+- **検知方法**: traceability check の duplicate-inconsistencies（機械検出。本 PR で実検出あり）
+- **根本原因**: artifact × role の対応宣言の情報源判断（inline と sidecar の単一情報源契約）が対応宣言追加手順に機械的に組込まれていなかった
+- **自律対応内容**: 既存 inline 宣言を持つ Design（operating-model.md・traceability-model.md・quality-gate-model.md）への design 宣言追加は inline 側へ追記する形へ修正し、新規 sidecar（ra010-traceability-modernization.yaml）は inline 宣言を持たない対象のみへ配置。実装後の traceability check で duplicate-inconsistencies 0件を機械検証
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（既存の単一情報源契約の適用）
+- **横展開観点**: 対応宣言の追加は「当該 artifact に inline 宣言が既存するか」を前置確認し、inline 既存なら inline 側追記・inline 未存在なら sidecar 追加が正規経路。情報源混在は機械検出されるが事前判断で防げる
+- **再発条件**: 対応宣言（design/implementation/verification）の追加を inline と sidecar のどちらへ行うか判断する場合
+- **予防策候補**: 対応宣言追加手順に「inline 宣言既存確認の前置」を組み込む
+- **想定反映先**: agentdev-traceability（check・宣言追加手順）・traceability-model Design（単一情報源契約節）
+- **関連**: Issue #4126・#4132・PR #4137
+- **タグ**: #トレーサビリティ #宣言追加\n
