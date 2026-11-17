@@ -52,3 +52,52 @@
 - **想定反映先**: case-open STEP-4 の DefinitionEdit 組立手順・src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts（validateEditLineStructure）
 - **関連**: Issue #4126・PR #4127
 - **タグ**: `#機械工程` `#組立`
+
+## 大規模 checker 手術では削除対象スクリプトを import / copyFileSync / fixture から逆方向 grep で先に列挙してから削除する
+
+- **問題事象**: 削除対象 checker・スクリプトの一括削除後に、テスト側の copyFileSync（削除済みファイル参照）・fixture YAML copy が残存し、テスト実行で失敗を生む。sed 的な一括削除では削除対象の依存方向（誰が import しているか・誰が copy しているか）が追跡されない
+- **発生局面**: 実装（Epic #4126 Wave-1 子 Issue #4131 OU-004 Phase 4・integrity checker 群の簡素化。PR #4136）
+- **検知方法**: bun test 全件実行（3分割正規形）での削除済みファイル参照 fail。walk_enumeration_contract.test.ts から check_retired_artifact_residual 参照が残存
+- **根本原因**: 削除対象スクリプトの依存方向（import・copyFileSync・fixture 参照）の列挙を削除前に実施していなかった
+- **自律対応内容**: 削除対象を import / copyFileSync / fixture から逆方向 grep で列挙し直し、残余参照を同一 PR 内で除去（walk_enumeration_contract.test.ts から check_retired_artifact_residual 参照除去）して再実行で全件 pass を確認
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 大規模削除では「削除対象を消す」より「参照側から削除対象を見つける」が効率的。bun test 全件 PASS は残余参照の発見手段として実効的だが、事前の逆方向列挙で fail を0件化できる
+- **再発条件**: checker・スクリプト・fixture を跨ぐ依存を持つファイルの大規模削除を実行した場合
+- **予防策候補**: 削除対象ファイル名を引数に import/copyFileSync/fixture 参照を一括 grep する前置手順を case-run の削除系委譲契約へ追加
+- **想定反映先**: case-run 委譲契約（削除系変更の前置手順）
+- **関連**: Issue #4126・#4131・PR #4136
+- **タグ**: `#削除系変更` `#bun test`
+
+## bun test の describe 構造の cuts は行レベルの深さ追跡で閉じを検証する
+
+- **問題事象**: describe ブロックの削除（機械手術）で閉じ括弧の対応が崩れ、Unexpected end of file を2回発生させた。行レベルの文字列置換ではネストした describe の深さが追跡されない
+- **発生局面**: 実装（Epic #4126 Wave-1 子 Issue #4131 OU-004 Phase 4・回帰テストと checker テストの describe cuts。PR #4136）
+- **検知方法**: bun test 実行時の Unexpected end of file（構文エラー）
+- **根本原因**: describe ブロック削除を開始行と終了行の文字列突合だけで実施し、ネスト深さの追跡がなかった
+- **自律対応内容**: 行レベルの深さ追跡で describe の閉じを検証する手順へ切替し、cuts 後の構文確認を bun test で実施
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: テストファイルの機械手術（describe 統合・削除）では、構文エラーがテスト実行まで顕在化しない。cuts 直後に syntax-only で閉じ検証するのが低コスト
+- **再発条件**: describe 構造の機械的な cuts・統合を複数箇所へ適用した場合
+- **予防策候補**: describe cuts の前置に開始行・終了行の深さ一致検証を組み込む
+- **想定反映先**: case-run 委譲契約（テストファイル手術の前置手順）
+- **関連**: Issue #4126・#4131・PR #4136
+- **タグ**: `#bun test` `#機械工程`
+
+## worktree 内では .opencode junction 未伝播により traceability checker を相対パス起動できず、main root 実体から --root 指定で実行する（既出記録あり・本 entry は重複統合対象）
+
+- **問題事象**: worktree 内の .opencode/ には agentdev-* junction が伝播しないため、agentdev-traceability checker を worktree 内の相対パスで起動できない。また node ランナーでは Bun.YAML が未定義のため sidecar 解析が擬似 findings（malformed-declarations 全件）を出す
+- **発生局面**: 実装と case-close 検証（Epic #4126 Wave-1 子 Issue #4130 OU-003 Phase 3 と Wave-1 境界クローズ。PR #4134）
+- **検知方法**: worktree 実行での scan 対象欠落（擬似 findings）。既出: PR #4127 テスト結果セクションに同一実行形態の記録あり
+- **根本原因**: worktree 構造的制約（agentdev-git-worktree references）と checker 実行ランナー（bun 必須）の前提が checker 実行手順に機械的に組込まれていない
+- **自律対応内容**: main root 実体から `--root <worktree root>`（Windows 形式絶対パス・forward slash 記法）を指定する実行形態（PR #4127 と同一）を採用。ランナーは bun で統一
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし（worktree 構造的制約の既存契約の適用）
+- **横展開観点**: junction 未伝播環境での checker 実行は main root 実体＋--root 指定が正規形。ランナーの言語実装依存（Bun.YAML）も checker 実行の前置確認対象（node で起動すると擬似 findings で誤判定する）
+- **再発条件**: worktree 環境で junction 系 checker を起動した場合、または bun 以外のランナーで Bun.YAML 依存 checker を起動した場合
+- **予防策候補**: checker 実行契約にランナー前置確認（bun 統一・Bun.YAML 依存明記）を追記する
+- **想定反映先**: checker-execution-contracts Design（安定実行経路節）・agentdev-git-worktree references（worktree 構造的制約）
+- **関連**: Issue #4126・#4130・PR #4134・PR #4127
+- **タグ**: `#worktree` `#checker実行`
+
