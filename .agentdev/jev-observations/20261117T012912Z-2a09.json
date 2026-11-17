@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261117T012912Z-2a09",
+  "workflow": "req-define",
+  "evaluationKind": "requirement-development-classification",
+  "subject": "RU-20261117-01 の要件展開（最終分類・Design 分離）の確定",
+  "sourceRevision": "692d6e5a5ff0923c01232f539c8e915b87dac579",
+  "durationMs": 763,
+  "inputTokens": 3007,
+  "inputs": {
+    "requestDigest": "4048de5ddef6d3d40fad10c31a99f5b15695acd334607eb821d5ac78aa439abd",
+    "references": [
+      {
+        "digest": "3e5612f77458c259d1cdb8b8f5e26bb92d94336d1cf87b02fe5f54736b74e76c",
+        "label": "RU-20261117-01",
+        "path": ".agentdev/backlog/req-units/RU-20261117-01.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-normal-case-req",
+      "questionForm": "choice",
+      "value": "REQ行（REQ-032 の要件行として保存）",
+      "probabilityDistribution": {
+        "REQ行（REQ-032 の要件行として保存）": 0.8,
+        "Design行（既存 Design のみ更新）": 0,
+        "両方（成果定義は REQ行、手続詳細は Design行）": 0.2,
+        "実現面のみ（realization_actions）": 0
+      }
+    },
+    {
+      "questionId": "q2-qg4-obligation",
+      "questionForm": "choice",
+      "value": "Design行（v4-quality-gate-model Design のみ更新）",
+      "probabilityDistribution": {
+        "REQ行（REQ-032 の要件行として保存）": 0.09,
+        "Design行（v4-quality-gate-model Design のみ更新）": 0.73,
+        "両方（QG-4の責務成果は REQ行、Obligation 表現は Design）": 0.18,
+        "実現面のみ": 0
+      }
+    },
+    {
+      "questionId": "q3-verify-only-req",
+      "questionForm": "choice",
+      "value": "REQ行（REQ-031-028 の更新として保存）",
+      "probabilityDistribution": {
+        "REQ行（REQ-031-028 の更新として保存）": 0.98,
+        "Design行（case-run Design のみ更新）": 0,
+        "両方": 0.02,
+        "実現面のみ": 0
+      }
+    },
+    {
+      "questionId": "q4-release-req",
+      "questionForm": "choice",
+      "value": "REQ行（REQ-114 の要件行として保存）",
+      "probabilityDistribution": {
+        "REQ行（REQ-114 の要件行として保存）": 0.66,
+        "Design行（backlog-auto 関連 Design のみ更新）": 0,
+        "両方（保証要件は REQ行、手順詳細は Design・実現面）": 0.34,
+        "実現面のみ": 0
+      }
+    },
+    {
+      "questionId": "q5-execution-detail",
+      "questionForm": "choice",
+      "value": "Design行（既存 Design・skill 正本のみ更新）",
+      "probabilityDistribution": {
+        "REQ行（要件行に手続詳細も記載）": 0,
+        "Design行（既存 Design・skill 正本のみ更新）": 0.98,
+        "実現面のみ（realization_actions）": 0.02
+      }
+    },
+    {
+      "questionId": "q6-separation",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.91,
+        "false": 0.08999999999999997
+      }
+    }
+  ],
+  "confidence": 0.73,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-normal-case-req",
+        "value": "REQ行（REQ-032 の要件行として保存）"
+      },
+      {
+        "questionId": "q2-qg4-obligation",
+        "value": "両方（成果定義は REQ行、Obligation 表現は Design）",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q3-verify-only-req",
+        "value": "REQ行（REQ-031-028 の更新として保存）"
+      },
+      {
+        "questionId": "q4-release-req",
+        "value": "両方（保証要件は REQ行、手順詳細は Design・実現面）",
+        "differenceReason": "semantic_disagreement"
+      },
+      {
+        "questionId": "q5-execution-detail",
+        "value": "Design行（既存 Design・skill 正本のみ更新）"
+      },
+      {
+        "questionId": "q6-separation",
+        "value": true
+      }
+    ]
+  }
+}
