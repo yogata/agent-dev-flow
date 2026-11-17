@@ -126,7 +126,7 @@ user-decision-required（adversarial-review 由来）は停止伝播に付随す
 case-auto は受領した decision_context をまず STEP-6（bounded parent decision resolution）へ入力し、STEP-6 で上位合意矛盾・新規ユーザー判断事項の2分類に帰着した場合に限り、当該 execution_unit の自走を停止してユーザー判断を待機する。
 停止伝播契約の詳細は case-auto command Design（project extension 経由参照）「停止伝播契約」節を正とする。
 
-- **受領**: case-run 起源は result `blocked` + user-decision-required 分類、工程委譲起源は既存 status + `parent_decision_required`（v4-lifecycle-state-machine Design「adversarial-review 由来の停止信号」節、v4-delegation-contracts Design「review 経路での parent_decision_required / decision_context 適用」節）。user-decision-required は case-run result enum の第5状態ではなく、既存結果に付随する報告分類であり、停止理由分類（10分類）一覧の値ではない
+- **受領**: case-run 起源は result `blocked` + user-decision-required 分類、工程委譲起源は既存 status + `parent_decision_required`（lifecycle-state-machine Design「adversarial-review 由来の停止信号」節、delegation-contracts Design「review 経路での parent_decision_required / decision_context 適用」節）。user-decision-required は case-run result enum の第5状態ではなく、既存結果に付随する報告分類であり、停止理由分類（10分類）一覧の値ではない
 - **bounded parent decision resolution 先行**: 受領した decision_context を STEP-6 へ先に入力する。正規契約から導出可能なもの・委譲された裁量の範囲内のものは回答して当該下位の再開点（resume point）から再開し、自走停止に進まない
 - **自走停止**: STEP-6 で上位合意矛盾・新規ユーザー判断事項に分類された場合のみ、当該 execution_unit のみ停止。他 ready 対象は継続（部分停止、STEP-3 Wave 反復制御）
 - **ユーザー提示**: decision_context をユーザーへ提示し判断を待機
@@ -178,7 +178,7 @@ user-decision-required は STEP-4 の HITL 境界停止条件の分類（10分�
 
 case-auto は下位 command から受領した decision_context を限定的に自律解決する。
 default-on + skip policy と case-auto の自走性を両立し、ユーザー停止を本質的な場面へ集約する。
-解決範囲、作業仮定の明示要件、停止理由分類の詳細は case-auto command Design（project extension 経由参照）「bounded parent decision resolution」節、v4-delegation-contracts Design「case-auto による decision_context の限定的親判断解決」節、v4-lifecycle-state-machine Designが正である。
+解決範囲、作業仮定の明示要件、停止理由分類の詳細は case-auto command Design（project extension 経由参照）「bounded parent decision resolution」節、delegation-contracts Design「case-auto による decision_context の限定的親判断解決」節、lifecycle-state-machine Designが正である。
 
 | 分類 | 条件 | アクション |
 |---|---|---|

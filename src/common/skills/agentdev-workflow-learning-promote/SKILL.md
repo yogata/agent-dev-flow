@@ -33,7 +33,7 @@ learning-promote command は公開 interface（入出力契約・ガードレー
 ## 制御平面（STEP 一覧）
 
 learning-promote workflow は次の7 STEP で構成する。
-各 STEP は再開ポイント（resume point）を持ち（STEP resume point と会話記憶非依存、`docs/designs/<foundations/v4-durable-state-and-recovery>.md`）、会話コンテキストに依存せず、永続状態（inbox.md / deferred.md / evaluation-report.md / promoted/ の実ファイル状態、分類確定状態）から再開点を再構成する。
+各 STEP は再開ポイント（resume point）を持ち（STEP resume point と会話記憶非依存、`docs/designs/<foundations/durable-state-and-recovery>.md`）、会話コンテキストに依存せず、永続状態（inbox.md / deferred.md / evaluation-report.md / promoted/ の実ファイル状態、分類確定状態）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
 |---|---|---|---|---|
@@ -57,7 +57,7 @@ learning-promote workflow は次の7 STEP で構成する。
 ## 再開プロトコル（永続状態による再開）
 
 会話コンテキストを権威情報源とせず、永続状態から current STEP を再構成する（STEP resume point と会話記憶非依存）。
-優先順位は `<foundations/v4-durable-state-and-recovery>` Design に従う。
+優先順位は `<foundations/durable-state-and-recovery>` Design に従う。
 
 1. SSoT 再構成: `.agentdev/learning/` 配下の inbox.md、deferred.md、evaluation-report.md、promoted/ の実ファイル状態
 2. identifier 保持: エントリ区切り（`---`）、問題クラス、採用済み成果物パス
@@ -81,7 +81,7 @@ HITL（STEP-5）の承認状態は単独では永続状態に記録されない�
 
 ## 継続コラボレーションループにおける位置づけ
 
-本 workflow は継続コラボレーションループ（`<workflows/v4-collaboration-loop>` Design）の Learning 段の実現手段である。
+本 workflow は継続コラボレーションループ（`<workflows/collaboration-loop>` Design）の Learning 段の実現手段である。
 STEP-3 の処分区分判定（7カテゴリ + duplicate）は learning-promote の局所判定であり、Learning 評価結果の 7 系統（ループ全体の集計ビュー・最終振り分け先）とは別の軸である。
 7 系統・処分区分・8 寿命の三方対応表は `agentdev-learning-pipeline` の処分区分スキーマ参照ファイルが所有する（正）。
 
@@ -98,7 +98,7 @@ STEP-3 の処分区分判定（7カテゴリ + duplicate）は learning-promote 
 
 - **無条件の自動REQ化禁止**: 学びを直接 REQ 化しない。恒久契約（REQ/Decision/Design）への昇華可能性を STEP-3 で評価し、昇華可能なもののみ `promoted/` へ出力する。学びは昇華（`promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/case-auto`（内部 lifecycle））を経て初めて REQ 化される
 - **保留プール維持**: 昇華不能な知見（deferred 判定、情報が断片的、出現回数が少ない等）は `deferred.md` の保留プールで維持し、REQ 化しない。`deferred.md` は deferred カテゴリのエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の保留プール（living pool）である（learning pipeline 要件の保留プール維持条項）。終端保管ではなく、次回実行時に再評価の対象となる
-- **自律確定と HITL フォールバック**: 問題クラス分類、8軸評価、廃棄判定、昇華可能性、既存対策との関係の評価（STEP-2〜STEP-4）を経て、取得可能な根拠で処置を正規契約からの導出または委譲された裁量の範囲で確定できる項目はユーザー承認なしで確定し、人間判断への引き上げ条件（判断確定の境界を定める ADF 判断アーキテクチャ要件、`<foundations/v4-responsibility-boundaries>` Design「人間判断への引き上げ条件」節）に該当する項目のみ HITL 対象とする（learning 分類確定契約の自律確定と HITL 限定条項）。自律確定はユーザー承認の擬制ではなく、モデルの自己申告による確信度や固定パーセンテージのみで可否を判定しない。自律確定可否の判定基準（人間判断への引き上げ条件、promote 系への適用）は横断契約Design `<foundations/v4-responsibility-boundaries>`「HITL 判断確定原則」節が集約所有し、本スキルは判定表を複製しない（extension 経由で解決）。deferred・未処理項目を自動削除しない既存の安全境界は自律確定によって迂回しない。自律確定項目の証跡（判定結果、主要根拠、HITL 不要理由）は evaluation-report.md 等の既存成果物を優先利用し、新規永続成果物を必須としない
+- **自律確定と HITL フォールバック**: 問題クラス分類、8軸評価、廃棄判定、昇華可能性、既存対策との関係の評価（STEP-2〜STEP-4）を経て、取得可能な根拠で処置を正規契約からの導出または委譲された裁量の範囲で確定できる項目はユーザー承認なしで確定し、人間判断への引き上げ条件（判断確定の境界を定める ADF 判断アーキテクチャ要件、`<foundations/responsibility-boundaries>` Design「人間判断への引き上げ条件」節）に該当する項目のみ HITL 対象とする（learning 分類確定契約の自律確定と HITL 限定条項）。自律確定はユーザー承認の擬制ではなく、モデルの自己申告による確信度や固定パーセンテージのみで可否を判定しない。自律確定可否の判定基準（人間判断への引き上げ条件、promote 系への適用）は横断契約Design `<foundations/responsibility-boundaries>`「HITL 判断確定原則」節が集約所有し、本スキルは判定表を複製しない（extension 経由で解決）。deferred・未処理項目を自動削除しない既存の安全境界は自律確定によって迂回しない。自律確定項目の証跡（判定結果、主要根拠、HITL 不要理由）は evaluation-report.md 等の既存成果物を優先利用し、新規永続成果物を必須としない
 - **prune 対象**: staged（採用済み成果物生成済み）/ rejected / duplicate のエントリのみ。deferred / 未処理のエントリは残す。staged エントリ除去時に採用済み成果物の「元learning item/ 根拠」セクションに証拠を保存する。STEP-5 の判定確定（自律確定またはユーザー承認）と同時に prune も承認済みとみなし、追加確認なしで削除する
 - **直接反映禁止**: 採用済み成果物は `.agentdev/learning/promoted/` のみに生成する。`.opencode/` 直接書込、`case-run` への直接受け渡しは禁止（`/agentdev/backlog-review` 経由のみ）
 - **evaluation-report.md**: 本 workflow が生成、管理する（外部コマンドの事前生成に依存しない）。毎回上書きされ長期履歴ではない
@@ -110,8 +110,8 @@ STEP-3 の処分区分判定（7カテゴリ + duplicate）は learning-promote 
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
-- **`<foundations/v4-durable-state-and-recovery>` Design**: 永続状態の優先順位、current STEP 再構成
+- **`<foundations/durable-state-and-recovery>` Design**: STEP reference 構造、resume point
+- **`<foundations/durable-state-and-recovery>` Design**: 永続状態の優先順位、current STEP 再構成
 - **Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則の Decision**: 責務3層分化の採用記録（docs/decisions/ 配下）
 - **STEP resume point と会話記憶非依存の Decision**: STEP resume point 採用の記録（docs/decisions/ 配下）
 - **learning-promote command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

@@ -8,7 +8,7 @@ updated: "2026-11-13"
 
 # Decision Lifecycle
 
-本 Design の状態記述は ADF v4 ライフサイクル状態機械（workflows/v4-lifecycle-state-machine.md）の Decision status 部分ビューが一般化契約として被覆する。status 値域と遷移の一般化契約は workflows/v4-lifecycle-state-machine.md が所有する。関係モデル・粒度管理・健全性評価は本 Design が所有する。
+本 Design の状態記述は ADF v4 ライフサイクル状態機械（workflows/lifecycle-state-machine.md）の Decision status 部分ビューが一般化契約として被覆する。status 値域と遷移の一般化契約は workflows/lifecycle-state-machine.md が所有する。関係モデル・粒度管理・健全性評価は本 Design が所有する。
 
 本 Design は agent-dev-flow リポジトリのみに適用される。
 
@@ -65,7 +65,7 @@ Decision frontmatter の `relations` フィールドで関係を宣言する。
 ---
 id: DEC-{NNN}
 title: {Decision タイトル}
-status: proposed | accepted | superseded | deprecated（status 値域と遷移の一般化契約は workflows/v4-lifecycle-state-machine.md が所有する）
+status: proposed | accepted | superseded | deprecated（status 値域と遷移の一般化契約は workflows/lifecycle-state-machine.md が所有する）
 created: {YYYY-MM-DD}
 updated: {YYYY-MM-DD}
 relations:

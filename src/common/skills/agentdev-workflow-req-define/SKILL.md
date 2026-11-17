@@ -19,7 +19,7 @@ req-define command は公開 interface（入出力契約・ガードレール）
 - GitHub Issue URL（既存Issueの場合）、エラー・ログ・障害情報、外部課題、finding
 - 工程駆動で形成・反映済みの正規成果物（canonical REQ/Decision/Design）への後続変更要求。工程駆動の操作や遷移を前置必須とせず、本 workflow から直接受理する（参照専用入力）
 - ユーザーが明示した入力ファイル（設計メモ、調査メモ、RU `.agentdev/backlog/req-units/RU-*.md` 等、参照専用）
-- エラー・障害入力では、現象理解 → 原因分析 → 期待状態 → 影響分析 → 要求化の必要性の評価経路を経て REQ/Decision/Design へ接続する（`v4-standard-lifecycle` Design「req-define の入力意味と要件化責務」節）
+- エラー・障害入力では、現象理解 → 原因分析 → 期待状態 → 影響分析 → 要求化の必要性の評価経路を経て REQ/Decision/Design へ接続する（`standard-lifecycle` Design「req-define の入力意味と要件化責務」節）
 - Definition 保存内部責務の SPLIT 検出時の検出事項、inspect-skills 診断結果の検出事項
 
 ## 出力
@@ -35,7 +35,7 @@ req-define command は公開 interface（入出力契約・ガードレール）
 ## 制御平面（STEP 一覧）
 
 req-define workflow は次の11 STEP で構成する。
-各 STEP は再開ポイント（resume point）を持つ（STEP resume point と会話記憶非依存、`docs/designs/<foundations/v4-durable-state-and-recovery>.md`）。
+各 STEP は再開ポイント（resume point）を持つ（STEP resume point と会話記憶非依存、`docs/designs/<foundations/durable-state-and-recovery>.md`）。
 対話の進行は永続状態（入力ファイル、壁打ちで確定した合議内容を含む draft-data 下書き）から再構成でき、会話コンテキストのみに依存しない。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -117,7 +117,7 @@ req-define workflow は次の11 STEP で構成する。
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
+- **`<foundations/durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **責務3層分化と1:N分割原則**: Command は公開入口、Workflow Skill は工程の実装、Capability Skill は共通能力を所有する。Workflow Skill の分割は制御構造の実質差異に基づき評価し、操作の違いだけでは分割しない
 - **STEP resume point と会話記憶非依存**: 安定した STEP 識別子と永続情報から再開点を再構成する。再開点を決める契約と、実行基盤による現在 STEP の選択処理を区別する。
 - **req-define command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

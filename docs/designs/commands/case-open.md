@@ -192,7 +192,7 @@ case-open は、上流工程（req-define）で確定した対象要件と実行
 
 ## 参照する横断 Design
 
-- [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（フェーズ定義、標準経路構成）
+- [workflows/lifecycle-state-machine.md](../workflows/lifecycle-state-machine.md)（フェーズ定義、標準経路構成）
 - [commands/case-ready.md](../commands/case-ready.md)（Definition Package 構成、設計PR lifecycle、canonical Definition 判定、冪等キー。case-open 側は本 Design）
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Split Rule、自工程 deviation capture）
 - [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（Issue 本文品質検査）
@@ -246,7 +246,7 @@ case-open が使用する検査ツール（[integrity-contracts.md](../integrity
 ### 挿入位置（REQ-015-009）
 
 review 挿入位置は「Root Case 本文候補と Definition Package 構成案確定後・最初の GitHub Issue 作成（Root Case 作成）前」である。
-REQ-030 への縮小に伴い、かつて case-open が構成していた execution structure（Epic / Wave / Issue 構成）と完了条件（QG-2 検証）の配置は case-ready に確定している（QG-2 の配置の正は v4-quality-gate-model Design と agentdev-quality-gates の QG-2 reference の配置の表。2026-11-17 の利用者判断）。そのため review 対象は case-open が現に構成する2者である。
+REQ-030 への縮小に伴い、かつて case-open が構成していた execution structure（Epic / Wave / Issue 構成）と完了条件（QG-2 検証）の配置は case-ready に確定している（QG-2 の配置の正は quality-gate-model Design と agentdev-quality-gates の QG-2 reference の配置の表。2026-11-17 の利用者判断）。そのため review 対象は case-open が現に構成する2者である。
 
 ### 発動条件判定 Step（REQ-015-001、REQ-015-002、REQ-015-003）
 
@@ -261,10 +261,10 @@ REQ-030 への縮小に伴い、かつて case-open が構成していた execut
 
 発動条件判定 Step で発動と判定された場合、review 呼出 Step で adversarial-review を呼び出す（REQ-015-001）。
 
-- **委譲契約**: adversarial-review は `semantic_review`（書き込み禁止型）として適用する（[v4-delegation-contracts Design](../workflows/v4-delegation-contracts.md)「adversarial-review との委譲契約接続」節）。adversarial-review 自身は対象ファイル、Issue、PR、git 操作を行わない（REQ-014-004）。
+- **委譲契約**: adversarial-review は `semantic_review`（書き込み禁止型）として適用する（[delegation-contracts Design](../workflows/delegation-contracts.md)「adversarial-review との委譲契約接続」節）。adversarial-review 自身は対象ファイル、Issue、PR、git 操作を行わない（REQ-014-004）。
 - **review 対象**: Root Case 本文候補、Definition Package 構成案の2者。
 - **採用後戻り先**: Root Case 本文候補に関わる finding は本文候補生成へ戻し再評価する。Definition Package 構成案に関わる finding は構成案評価へ戻す。accepted finding の対象候補への反映は case-open（呼出元）の責務である（REQ-014-006）。
-- **unresolved 時の取扱い**: 未解決のユーザー判断事項が残る場合、Root Case 作成へ進まない（REQ-014-009）。工程委譲起源であるため、既存 status（pass/warn/fail/partial）に unresolved 判断事項を付加し、case-auto 経由時は user-decision-required 停止理由分類として伝播する（REQ-014-012、[v4-lifecycle-state-machine Design](../workflows/v4-lifecycle-state-machine.md)「adversarial-review 由来の停止信号」節）。
+- **unresolved 時の取扱い**: 未解決のユーザー判断事項が残る場合、Root Case 作成へ進まない（REQ-014-009）。工程委譲起源であるため、既存 status（pass/warn/fail/partial）に unresolved 判断事項を付加し、case-auto 経由時は user-decision-required 停止理由分類として伝播する（REQ-014-012、[lifecycle-state-machine Design](../workflows/lifecycle-state-machine.md)「adversarial-review 由来の停止信号」節）。
 - **呼出失敗時**: adversarial-review の呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し、利用不能を報告した上で従来フローと既存 QG/HITL を維持する（REQ-014-010）。
 
 ### 変更影響別の再実行ルール（REQ-014-007）
@@ -290,7 +290,7 @@ review の結果、Root Case 本文候補、Definition Package 構成案のい�
 
 ### 正規所有者マトリックス参照
 
-本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、v4-delegation-contracts Design「adversarial-review との委譲契約接続」節、v4-lifecycle-state-machine Design との間で意味の重複、矛盾を生じない。
+本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、lifecycle-state-machine Design との間で意味の重複、矛盾を生じない。
 case-open command 固有の挿入境界（発動条件、挿入構造、変更影響別再実行ルール、順序）のみを本節が所有し、共通 caller integration 契約、adversarial-review 自身の振る舞い契約、再 review 条件と停止条件の詳細は各正規所有者 Design を正とする。
 
 ## 受け入れ義務保存の投影（REQ-030-019〜021、RU-20261004-08）

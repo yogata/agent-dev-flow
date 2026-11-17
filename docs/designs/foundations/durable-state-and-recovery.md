@@ -1,17 +1,17 @@
 ---
-title: ADF v4 durable state と再構成・恢復（配置表・権威移行・部分失敗調整）
+title: ADF durable state と再構成・恢復（配置表・権威移行・部分失敗調整）
 status: accepted
 created: 2026-09-19
-updated: 2026-11-12
+updated: 2026-11-18
 ---
 <!-- ADF-COVERS(design): REQ-090-006 -->
 <!-- ADF-COVERS(design): REQ-103-011（REQ-103 の評価再実行・再開経路の設計対応面） -->
 <!-- ADF-COVERS(implementation): REQ-001-034, REQ-001-043, REQ-008-001, REQ-008-002, REQ-008-004, REQ-008-005, REQ-008-006, REQ-008-007, REQ-008-009, REQ-008-012, REQ-008-014 -->
 <!-- ADF-COVERS(implementation): REQ-002-036, REQ-005-002, REQ-005-003, REQ-005-004, REQ-005-024, REQ-048-001, REQ-048-002, REQ-048-003, REQ-048-004, REQ-048-005 -->
 
-# ADF v4 durable state と再構成・恢復（配置表・権威移行・部分失敗調整）
+# ADF durable state と再構成・恢復（配置表・権威移行・部分失敗調整）
 
-位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）の全行 executed と実際の処遇状態の確認をもってこの移行規則は現行規範ではなく、歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
+位置づけ: 本 Design は現行 durable state と再構成・恢復モデルの定義である。
 
 ## 5 分類と配置表
 
@@ -41,7 +41,7 @@ REQ-001-034「状態保持領域内の作業用ドラフトは正規のドメイ
 
 ## 再構成優先順位の一般化
 
-中断再開の入力解決は SSoT 再構成 > identifier 保持 > 最小 scalar > runtime artifact の優先順位に従う（input-resolution-and-durable-state Design の v3 契約を全実行単位（Case、Wave、委譲、STEP）へ一般化。v3 側の処遇・実行段階の原本は foundations/v3-v4-crosswalk.md の references/crosswalk-inventory.md が所有する）。
+中断再開の入力解決は SSoT 再構成 > identifier 保持 > 最小 scalar > runtime artifact の優先順位に従う（input-resolution-and-durable-state Design の契約を全実行単位（Case、Wave、委譲、STEP）へ一般化）。
 
 - cursor 的状態（現在 stage、workflow route）を正規状態として保存しない。最も早い未収束 stage として再構成する
 - 起動時対象集合等の実行中の一時保持は、中断再開に必要な期間に限定してローカルに保持してよい（正規状態ではない）
@@ -55,7 +55,7 @@ REQ-001-034「状態保持領域内の作業用ドラフトは正規のドメイ
 - 変更影響がある古い判定を再利用せず、成功済み副作用を重複実行せず、影響しない証拠は再利用する
 - 判定未確定自体は durable state enum へ新状態を追加せず、既存状態と証跡記録（記録としての未確定事実）の組合せで扱う
 - 修復・再試行・設定等の運用介入を判定方式の代替または新規規範の確定と混同しない
-- 契約面の正は v4-responsibility-boundaries Design「閉じた意味評価の障害時契約」節が所有し、本節は durable state 面の再開契約を所有する
+- 契約面の正は responsibility-boundaries Design「閉じた意味評価の障害時契約」節が所有し、本節は durable state 面の再開契約を所有する
 
 ## 権威移行点
 
@@ -75,7 +75,6 @@ repo 外の一時証跡退避先（OS 一時ディレクトリ等）はローカ
 
 ## v3 関連 Design の処遇
 
-input-resolution-and-durable-state、step-reference-contract 等、v3 関連 Design の処遇・実行段階・被覆関係の原本は foundations/v3-v4-crosswalk.md の references/crosswalk-inventory.md が所有する。
 
 ## フェーズ境界と SSoT 遷移
 

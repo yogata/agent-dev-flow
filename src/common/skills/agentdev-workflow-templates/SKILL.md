@@ -113,7 +113,7 @@ Case Issue の工程記録（記録様式の正は workflows/issue-lifecycle-rec
 
 PR 本文テンプレートに、ADF 実行の識別情報を構造化して記録する「実行識別情報」セクションを定義する。
 Issue 本文には本セクションを設けない（実行単位・委譲単位・Case・GitHub Issue・PR・ADF 成果物は Issue 番号、親Epic 参照、実行構成表、Refs 行等の canonical 成果物関係から相関でき、本文へ一覧化しない）。
-記録先割当と意味集合は v4-durable-state-and-recovery Design「ADF 実行識別情報の記録契約」節が正規所有し、本スキルはテンプレートセクション形式を提供する。
+記録先割当と意味集合は durable-state-and-recovery Design「ADF 実行識別情報の記録契約」節が正規所有し、本スキルはテンプレートセクション形式を提供する。
 
 #### 対象テンプレートと記録内容
 
@@ -150,7 +150,7 @@ Issue 本文には本セクションを設けない（実行単位・委譲単�
 ### 検証差分セクション（PR テンプレート形式）
 
 PR 本文テンプレートに、検証の構造化記録を行う「検証差分」セクションを定義する。
-記録先割当と意味集合は v4-durable-state-and-recovery Design「ADF 実行識別情報の記録契約」節（PR 本文: 検証種別と検証結果）が正規所有し、本スキルはテンプレートセクション形式を提供する。
+記録先割当と意味集合は durable-state-and-recovery Design「ADF 実行識別情報の記録契約」節（PR 本文: 検証種別と検証結果）が正規所有し、本スキルはテンプレートセクション形式を提供する。
 
 #### 対象テンプレートと記録内容
 
@@ -186,7 +186,7 @@ PR 本文テンプレートに、検証の構造化記録を行う「検証差�
 
 #### 検証証跡の必須要素
 
-件数突合系の gate は、種類ごとに実行する。各実行の `stdout` と `stderr` を分けて保存し、検証差分には保存先、終了コード、checker の版、検査範囲、実行環境を記録する。checker 固有の追加要件は v4-durable-state-and-recovery Design「ADF 実行識別情報の記録契約」節に従う。
+件数突合系の gate は、種類ごとに実行する。各実行の `stdout` と `stderr` を分けて保存し、検証差分には保存先、終了コード、checker の版、検査範囲、実行環境を記録する。checker 固有の追加要件は durable-state-and-recovery Design「ADF 実行識別情報の記録契約」節に従う。
 
 #### 共存と所有境界
 
@@ -224,7 +224,7 @@ Case Issue 本文テンプレートに、工程記録の「進行状況」「結
 #### セクション仕様
 
 - セクション見出しは「進行状況」「結果」とし、進行状況は `<!-- 【必須】 -->` マーカー付きの必須セクションとする。結果は完了・中止確定時にのみ作成する非常設セクションであり、起票時の本文には含めない
-- 「進行状況」は 正規状態（Root Case のみ。open、ready、running、blocked、review、closed、cancelled の7値域。値の正は workflows/v4-lifecycle-state-machine Design）と 開始日時・終了日時 を key-value 行（`- {key}: {value}`）で保持する。Child Issue は開始日時・終了日時のみを保持する（子状態は親 Epic の実行構成表が所有する）
+- 「進行状況」は 正規状態（Root Case のみ。open、ready、running、blocked、review、closed、cancelled の7値域。値の正は workflows/lifecycle-state-machine Design）と 開始日時・終了日時 を key-value 行（`- {key}: {value}`）で保持する。Child Issue は開始日時・終了日時のみを保持する（子状態は親 Epic の実行構成表が所有する）
 - 表示用の進行状態4値、現在工程、担当役割、次の行動、最新記録参照、停止・待機理由は保存しない
 - 「結果」は 成果物 と 残件の扱い を key-value 行で保持する。終了状態は進行状況の正規状態が正であり、重複保存しない
 - 開始日時は初めて実装または検証に実着手した時刻（case-run で設定）であり、停止・再開で上書きしない。終了日時は Root Case は完了または中止確定時、Child は completed 確定時にのみ設定する

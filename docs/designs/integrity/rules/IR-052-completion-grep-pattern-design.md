@@ -19,7 +19,7 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_conten
 | detection_method | 設計基準ルール（実装時の静的レビュー）。grep ベース checkbox 検出を実装する場合、除外条件、スコープ段階化をコードレビューで確認 |
 | affected_artifacts | [case-close, case-auto, quality-gates] |
 | related_req | [REQ-010-011] |
-| related_design | [integrity-contracts.md, v4-quality-gate-model.md] |
+| related_design | [integrity-contracts.md, quality-gate-model.md] |
 | gate_level | full-audit |
 | false_positive_risk | 高。現在実装なし。grep 実装時に否定文脈除外、anti-pattern 例示除外を誤ると true negative を取りこぼす |
 | regression_test | (grep 実装追加時) |

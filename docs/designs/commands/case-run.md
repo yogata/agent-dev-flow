@@ -310,11 +310,11 @@ case-run の実行担当（委譲内サブエージェント）が、実装作�
 
 ## 参照する横断 Design
 
-- [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（Pattern Taxonomy（manager-orchestrator）の後継）
-- [workflows/v4-delegation-contracts.md](../workflows/v4-delegation-contracts.md)（controlled_case_execution 委譲）
+- [workflows/lifecycle-state-machine.md](../workflows/lifecycle-state-machine.md)（Pattern Taxonomy（manager-orchestrator）の後継）
+- [workflows/delegation-contracts.md](../workflows/delegation-contracts.md)（controlled_case_execution 委譲）
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（intake / learning capture（PR 本文記録のみ））
-- [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（子Issue 状態 enum〔durable state enum・階層合成〕。Epic Wave 実行モデルの運用契約は本 Design「v3 epic-wave-model Design からの吸収」節）
-- [v4-quality-gate-model.md](../quality/v4-quality-gate-model.md)（QG-3（実行担当サブエージェント責務））
+- [workflows/lifecycle-state-machine.md](../workflows/lifecycle-state-machine.md)（子Issue 状態 enum〔durable state enum・階層合成〕。Epic Wave 実行モデルの運用契約は本 Design「v3 epic-wave-model Design からの吸収」節）
+- [quality-gate-model.md](../quality/quality-gate-model.md)（QG-3（実行担当サブエージェント責務））
 
 ### case-run が使用する検査ツール
 
@@ -586,16 +586,16 @@ unresolved な本質的争点またはユーザー判断事項が残る場合、
 
 ### 正規所有者マトリックス参照
 
-本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、v4-delegation-contracts Design「adversarial-review との委譲契約接続」節、`agentdev-case-run-execution-adapter` Design「adversarial-review 統合（実装方針→review→結果反映）」節との間で意味の重複、矛盾を生じない。
+本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、`agentdev-case-run-execution-adapter` Design「adversarial-review 統合（実装方針→review→結果反映）」節との間で意味の重複、矛盾を生じない。
 case-run command 固有の挿入境界（委譲内実施、委譲起動位置、実装方針限定、blocked 遷移）のみを本節が所有し、実装方針形成、review 呼出、結果反映の内部手続きの詳細は `agentdev-case-run-execution-adapter` Design を正とする。
 
 
 ## v3 epic-wave-model Design からの吸収
 
-v3 epic-wave-model Design が所有していた case-run Epic Wave 実行モデル、Epic 検出ルール、Wave 解析プロトコルのうち case-run 実行側の運用契約は本 Design の規定へ吸収された。Epic Wave 実行モード（case-run #epic）の実行契約は廃止され、Wave 実行制御は case-auto の orchestration stage 3 が単一所有する（REQ-031-015、DEC-041）。REQ-035-012（同一 Wave 内の子 Issue 間の変更対象ファイル重複の前置検出を Wave 構成時の情報収集として維持し、検出結果を実行・統合時の競合リスク情報として用いる。コンフリクト解消モデルと execution_unit 間並列可否の判定軸の維持、mergeable 作成時状態のみで Wave の安全性を判断しないこと）の implementation 側の正規所有者は本 Design である（sidecar `traceability/agentdev-workflow-case-run.yaml`）。構成判断側の重複前置検出契約は case-ready Design「v3 epic-wave-model Design からの吸収」節が所有する。旧 Design は第5段で supersede とされ（物理削除は docs-chore OU-003）、対応関係の原本は v3-v4-crosswalk references/crosswalk-inventory.md が追跡する。
+v3 epic-wave-model Design が所有していた case-run Epic Wave 実行モデル、Epic 検出ルール、Wave 解析プロトコルのうち case-run 実行側の運用契約は本 Design の規定へ吸収された。Epic Wave 実行モード（case-run #epic）の実行契約は廃止され、Wave 実行制御は case-auto の orchestration stage 3 が単一所有する（REQ-031-015、DEC-041）。REQ-035-012（同一 Wave 内の子 Issue 間の変更対象ファイル重複の前置検出を Wave 構成時の情報収集として維持し、検出結果を実行・統合時の競合リスク情報として用いる。コンフリクト解消モデルと execution_unit 間並列可否の判定軸の維持、mergeable 作成時状態のみで Wave の安全性を判断しないこと）の implementation 側の正規所有者は本 Design である（sidecar `traceability/agentdev-workflow-case-run.yaml`）。構成判断側の重複前置検出契約は case-ready Design「v3 epic-wave-model Design からの吸収」節が所有する。旧 Design は削除済みであり、対応関係の記録は Git 履歴で担保する（REQ-103-020）。
 
 - Epic 検出ルール: Epic 入力の受理は case-auto 経由の正規呼出へ限定され、case-run 自身は常に単一 Issue を処理する。Epic は複数 execution unit の協調管理が必要な変更であり、規模（scale）から独立した概念である
-- Wave 解析プロトコル: Wave 構成の読み取りと現在 Wave の子 Issue 状態判定（pending/completed/blocked/failed/delegation-unavailable から実行可能な Wave を判定）は case-auto の orchestration stage 3 が所有する。Wave 状態は永続化せず子 Issue 状態から導出する（REQ-035-005、v4-lifecycle-state-machine 階層合成）。case-run は委譲された単一 Issue の重複解消方針の参照と検出不能報告の責務を維持する（REQ-031-027）
+- Wave 解析プロトコル: Wave 構成の読み取りと現在 Wave の子 Issue 状態判定（pending/completed/blocked/failed/delegation-unavailable から実行可能な Wave を判定）は case-auto の orchestration stage 3 が所有する。Wave 状態は永続化せず子 Issue 状態から導出する（REQ-035-005、lifecycle-state-machine 階層合成）。case-run は委譲された単一 Issue の重複解消方針の参照と検出不能報告の責務を維持する（REQ-031-027）
 
 ## 重要変更の通知と結果説明
 

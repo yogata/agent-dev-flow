@@ -1,12 +1,12 @@
 # STEP-6 / STEP-7 / STEP-8: 確定（自律確定判定と HITL 確定）・処理実行・完了報告と永続化（hitl-and-disposition）
 
 > 本 reference は `agentdev-workflow-inspect-promote` SKILL.md の制御平面（STEP 一覧）STEP-6〜STEP-8 詳細である。
-> 各 STEP は resume point を持つ（`<foundations/v4-durable-state-and-recovery>` Design）。
+> 各 STEP は resume point を持つ（`<foundations/durable-state-and-recovery>` Design）。
 
 ## STEP-6: 確定（自律確定判定と HITL 確定）
 
 - **Purpose**: 分類・検証と必要な adversarial-review を経た検出事項について、自律確定判定と HITL 確定により分類を確定する
-- **Input Resolution**: STEP-5 の反映済み暫定分類結果（skip 時は STEP-3 の暫定分類結果）。検出事項本文は inbox ファイル（durable state）から読み取る。自律確定可否の判定基準は横断契約Design（v4-responsibility-boundaries Design「HITL 判断確定原則」節、extension 経由で解決）の人間判断への引き上げ条件を正とし、本 reference は判定表を複製しない
+- **Input Resolution**: STEP-5 の反映済み暫定分類結果（skip 時は STEP-3 の暫定分類結果）。検出事項本文は inbox ファイル（durable state）から読み取る。自律確定可否の判定基準は横断契約Design（responsibility-boundaries Design「HITL 判断確定原則」節、extension 経由で解決）の人間判断への引き上げ条件を正とし、本 reference は判定表を複製しない
 - **Preconditions**: STEP-5 完了または skip 条件該当、確定対象の検出事項が1件以上存在
 - **Procedure**:
   1. **自律確定判定**: 人間判断への引き上げ条件に照らし、取得可能な根拠から promote / defer / reject を正規契約からの導出または委譲された裁量の範囲で確定できる検出事項をユーザー承認なしで確定する（inspect-promote の自律確定と HITL 限定条項）。モデルの自己申告による確信度や固定パーセンテージのみで可否を判定しない

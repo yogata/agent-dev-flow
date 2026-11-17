@@ -65,7 +65,7 @@ REQ-041-017の成立は系統別の起動と活動区間の実観測で確認す
 
 - backlog-auto は backlog-driven の要求入口であり、Intake・Learning・Backlog を継続的な発見・改善と要件化への接続能力として維持する（REQ-108-011）。発見・学習情報は必要な評価と承認（昇格3系統の HITL、backlog-review の承認）を経て RU となり、req-define → case-auto へ渡される。実行から生じた改善情報も Capture 経路で同じ循環へ戻る。
 - 旧公開コマンド名や旧内部状態の維持を合否条件としない（REQ-108-011）。v5 の実行モデルの実現確定に伴う公開経路の再構成があっても、発見から要件化・実行・検証への接続能力の維持が本 Design の合格条件である。
-- v5 の実行モデルの実現確定までの間、本節の運用は現行の実行契約（REQ-108-012 移行期権威行）の下で行う。循環の実現手段の v5 向け処遇は v4 -> v5 crosswalk（[../foundations/references/v4-v5-crosswalk.md](../foundations/references/v4-v5-crosswalk.md)）の棚卸し対象として管理する。
+- v5 の実行モデルの実現確定までの間、本節の運用は現行の実行契約（REQ-108-012 移行期権威行）の下で行う。循環の実現手段の v5 向け処遇の棚卸し処遇は、工程遷移・独立レビューと双経路併存モデル（[../workflows/phase-transition-and-coexistence-model.md](../workflows/phase-transition-and-coexistence-model.md)）「双経路併存と移行」節の権威継続の記述へ従う。
 
 ## 一気通貫実行の拡張（REQ-114）
 
@@ -83,9 +83,9 @@ REQ-041-017の成立は系統別の起動と活動区間の実観測で確認す
 
 ## 参照する横断 Design
 
-- [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（コマンド分類、共通実行契約）
+- [workflows/lifecycle-state-machine.md](../workflows/lifecycle-state-machine.md)（コマンド分類、共通実行契約）
 - [case-auto.md](case-auto.md)（orchestration stage モデル・ドラフト間並列実行モデル。v3 epic-wave-model Design 吸収先）
-- [workflows/v4-collaboration-loop.md](../workflows/v4-collaboration-loop.md)（継続コラボレーションループ: ループ内位置づけ、RU 生成・合流）
+- [workflows/collaboration-loop.md](../workflows/collaboration-loop.md)（継続コラボレーションループ: ループ内位置づけ、RU 生成・合流）
 
 ## 対象外
 

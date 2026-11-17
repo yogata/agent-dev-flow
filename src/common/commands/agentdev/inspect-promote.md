@@ -22,7 +22,7 @@ description: 検出事項を分類、採用し、採用済み成果物として 
 
 ## 自動 promote 対象カテゴリ
 
-`--auto` で自動 promote されるカテゴリ、投入先、実行ログ、誤検知 revoke 手順の詳細は v4-responsibility-boundaries Design（extension 経由で解決）の「ADF判断アーキテクチャ詳細基準」節に原本を置く。
+`--auto` で自動 promote されるカテゴリ、投入先、実行ログ、誤検知 revoke 手順の詳細は responsibility-boundaries Design（extension 経由で解決）の「ADF判断アーキテクチャ詳細基準」節に原本を置く。
 本コマンドはカテゴリ定義を重複保持しない。
 
 ## 自律確定と HITL フォールバック
@@ -45,7 +45,7 @@ promote / defer / reject の判断の自律確定の適用条件、部分自律�
 - reject された検出事項は即時削除し、reject 時の commit message に却下理由を含める（`archive/rejected/` への移動は廃止）
 - defer された検出事項は `.agentdev/inspect/inbox/` に残置する
 - docs-check ルール／検査データ追加候補は独立 route とせず、採用済み成果物の要件化方向または受け入れ条件に含める
-- `--auto` は自動 promote 対象カテゴリ（v4-responsibility-boundaries Design 参照、extension 経由）に合致する検出事項のみを投入し、カテゴリに合致しない検出事項は手動分類へ回す。手動分類の確定境界は「自律確定と HITL フォールバック」節の正本に従う
+- `--auto` は自動 promote 対象カテゴリ（responsibility-boundaries Design 参照、extension 経由）に合致する検出事項のみを投入し、カテゴリに合致しない検出事項は手動分類へ回す。手動分類の確定境界は「自律確定と HITL フォールバック」節の正本に従う
 - `--auto` 実行の都度、投入対象、根拠を `.agentdev/inspect/promoted/auto-promote-log.md` に記録する（誤検知 revoke 手順は同 Design 参照）
 
 ## ガードレール

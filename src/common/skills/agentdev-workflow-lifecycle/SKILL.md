@@ -20,18 +20,18 @@ agentdev系コマンドのフェーズ定義、SSoT遷移、work_type 判定基�
 ### 宣言的定義と Input Resolution
 
 本スキルが提供する宣言的定義は、各 STEP の Input Resolution において永続状態の優先順位の最上位（SSoT 再構成）に位置する。
-優先順位の詳細は `<foundations/v4-durable-state-and-recovery>` Design 参照。
+優先順位の詳細は `<foundations/durable-state-and-recovery>` Design 参照。
 
 | 宣言的定義 | SSoT 配置 | 利用 STEP |
 |---|---|---|
-| work_type 判定基準 | 本スキル + `<workflows/v4-standard-lifecycle>` Design「work_type / scale / Epic / Wave の v4 意味モデル」節 | case-open / case-run `prepare` STEP |
+| work_type 判定基準 | 本スキル + `<workflows/standard-lifecycle>` Design「work_type / scale / Epic / Wave の v4 意味モデル」節 | case-open / case-run `prepare` STEP |
 | scale 判定基準 | 本スキル | req-define / case-open `prepare` STEP |
 | SSoT 遷移定義 | 本スキル | 全 workflow の STEP transition |
 | 上位への引き継ぎ判定 | 本スキル（`references/upstream-handoff.md`） | 全 workflow の `prepare` STEP |
 | 工程間構造化文脈引き継ぎ | 本スキル（`references/structured-stage-handoff.md`） | 全 workflow の STEP transition、完了報告 |
 | 参照先解決ポリシー（source / projection 目的判別） | 本スキル（`references/reference-resolution.md`） | 全 workflow の canonical_references 生成・消費、配布物参照の読み取り先解決 |
 
-STEP reference 8 要素、STEP 識別子、永続状態復元契約は `<foundations/v4-durable-state-and-recovery>` Design に従う。
+STEP reference 8 要素、STEP 識別子、永続状態復元契約は `<foundations/durable-state-and-recovery>` Design に従う。
 compaction 後の current STEP 復元、ToDo 使用、compaction 検出の実処理は harness 固有（AGENTS.md、harness reference）。
 
 ## work_type とコマンド経路
@@ -42,7 +42,7 @@ Issue/PR をスキップする直接完了経路は存在しない。
 
 workflow_route（direct_case 等）は work_type 固定分類ではなく、Definition 構成（artifact_actions の有無等）から導出される値である。
 `direct_case` は Definition 保存工程を別入口で実行しないことを指し、Issue/PR を経由しないことを指さない。
-導出表の正は `<foundations/design-principles>` Design「実行経路の導出（Definition 構成一次）」節であり、`<workflows/v4-standard-lifecycle>` Design「work_type / scale / Epic / Wave の v4 意味モデル」節に整合する。
+導出表の正は `<foundations/design-principles>` Design「実行経路の導出（Definition 構成一次）」節であり、`<workflows/standard-lifecycle>` Design「work_type / scale / Epic / Wave の v4 意味モデル」節に整合する。
 
 ### 経路一覧
 
@@ -77,7 +77,7 @@ docs 更新責務は全 work_type 共通である。
 
 ## スケール判定基準
 
-scale（standard/ large）判定基準である。scale は全 work_type にわたって standard、large を設定できる。大規模 bugfix 等も scale/Epic 構成の対象になり得る（v4-standard-lifecycle Design）。
+scale（standard/ large）判定基準である。scale は全 work_type にわたって standard、large を設定できる。大規模 bugfix 等も scale/Epic 構成の対象になり得る（standard-lifecycle Design）。
 req-define Step 8 が参照する。
 
 ### standard
@@ -127,7 +127,7 @@ decision 成果物は、工程をまたぐ意思決定・未解決課題の管�
 promote 系コマンド（intake-promote・learning-promote・inspect-promote）の判断が正規契約からの導出または委譲された裁量の範囲で確定できる対象はユーザー承認なしで確定する（自律確定）。人間に留保された判断が必要な対象のみを HITL 対象とする。
 同一実行内に自律確定可能な対象と人間に留保された判断が必要な対象が混在する場合、未決項目に依存しない対象を先行確定する（部分自律確定）。
 自律確定はユーザー承認の擬制ではなく、保留・未処理の対象を自動削除しない安全境界は維持する。
-自律確定可否の詳細判定（確定権限3分類〔正規契約からの導出・委譲された裁量・人間に留保された判断〕の判定表、人間判断への引き上げ条件）は v4-responsibility-boundaries Design（extension 経由で解決）「ADF判断アーキテクチャ詳細基準」節が集約所有し、本節と各 command 定義・Workflow Skill は判定表を複製しない。
+自律確定可否の詳細判定（確定権限3分類〔正規契約からの導出・委譲された裁量・人間に留保された判断〕の判定表、人間判断への引き上げ条件）は responsibility-boundaries Design（extension 経由で解決）「ADF判断アーキテクチャ詳細基準」節が集約所有し、本節と各 command 定義・Workflow Skill は判定表を複製しない。
 
 ### inspect-* コマンド選択 routing
 

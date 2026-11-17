@@ -117,4 +117,4 @@ Senpi は宣言ファイル解決（src/third-party/skills.yaml 優先、.agentd
 
 外部ソースからの取得操作（REQ-052-011・Custom Tool agentdev_third_party）は v4 の Harness/Backend adapter 境界（ADF v4 実装責務境界 Design・DEC-036）の I/O 側に位置づく。取得プロファイルと非破壊制御（本 Design 既有）は不変である。
 
-定義の所有は v4-responsibility-boundaries へ参照する。既存節は不変とする。ADF-COVERS 宣言は追加しない。
+定義の所有は responsibility-boundaries へ参照する。既存節は不変とする。ADF-COVERS 宣言は追加しない。

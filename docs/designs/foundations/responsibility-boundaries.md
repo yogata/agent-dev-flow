@@ -1,8 +1,8 @@
 ---
-title: ADF v4 実装責務境界（意味判断 Skill / 決定的処理 code / Harness adapter / Project Extensions）
+title: ADF 実装責務境界（意味判断 Skill / 決定的処理 code / Harness adapter / Project Extensions）
 status: accepted
 created: 2026-09-18
-updated: 2026-11-12
+updated: 2026-11-18
 ---
 <!-- ADF-COVERS(implementation): REQ-003-021, REQ-003-022, REQ-003-023 -->
 <!-- ADF-COVERS(implementation): REQ-096-010, REQ-096-014, REQ-096-021, REQ-096-025, REQ-096-027, REQ-096-028, REQ-096-029, REQ-096-030（ADF判断アーキテクチャの正規実体としての実装対応。REQ-096-028/029/030 は本文規範の実保持を適用時に確認〔閉包条件節等の契約面実在を確認済み 2026-10-27〕） -->
@@ -10,9 +10,9 @@ updated: 2026-11-12
 <!-- ADF-COVERS(design): REQ-103-002, REQ-103-003, REQ-103-004, REQ-103-005, REQ-103-006, REQ-103-007, REQ-103-008, REQ-103-010, REQ-103-012（REQ-103 の判断アーキテクチャ・人間判断境界の設計対応面） -->
 <!-- ADF-COVERS(implementation): REQ-103-002, REQ-103-003, REQ-103-004, REQ-103-005, REQ-103-006, REQ-103-012（REQ-103 の判断方法 3 分類判別基準・確定権限 3 分類判定表・閉包条件・採用理由と評価器適格性の記録契約・人間判断引き上げ条件の詳細基準節が契約面の構成実体） -->
 
-# ADF v4 実装責務境界（意味判断 Skill / 決定的処理 code / Harness adapter / Project Extensions）
+# ADF 実装責務境界（意味判断 Skill / 決定的処理 code / Harness adapter / Project Extensions）
 
-位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）の全行 executed と実際の処遇状態の確認をもってこの移行規則は現行規範ではなく、歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
+位置づけ: 本 Design は現行実装責務境界の定義である。
 
 ## 意味判断・決定的処理の責務境界
 
@@ -118,9 +118,9 @@ HITL は判断の確定に限定し作業実行を代行しない（REQ-003-021�
 必須の閉じた意味評価が、評価器の未設定、利用不能、timeout、rate limit、network error、provider error、応答検証失敗等で成立しない場合、次の契約に従う。
 
 - LLM fallback 禁止（REQ-103-008）: LLM 推論へ fallback して判定を継続しない。LLM 推論を前段失敗時の一般 fallback としない（REQ-103-007 と同一境界。開いた LLM 推論の限定は本 Design「判断方法3分類の判別基準」節と「開いた推論の適用範囲限定」節）
-- 判定未確定と依存後続抑止（REQ-103-009）: 必要な判定を未確定として扱い、当該判定に依存する後続の副作用および状態遷移を開始しない。判定不能を不合格または非該当へ変換せず、依存しない独立処理を一律に停止しない。runtime 面の適用は v4-runtime-execution-model Design「判定未確定時の依存後続抑止」節が所有する
+- 判定未確定と依存後続抑止（REQ-103-009）: 必要な判定を未確定として扱い、当該判定に依存する後続の副作用および状態遷移を開始しない。判定不能を不合格または非該当へ変換せず、依存しない独立処理を一律に停止しない。runtime 面の適用は runtime-execution-model Design「判定未確定時の依存後続抑止」節が所有する
 - 評価器障害由来の人間判断移行不在（REQ-103-010）: 評価器障害だけを理由に人間判断へ移行しない。人間判断への移行は、当該判断自体が人間に留保された判断である場合に限る（「人間判断への引き上げ条件」節）
-- 復旧後の正規再開経路（REQ-103-011）: 評価器復旧後、未確定状態から正規の再実行・再開経路によって評価を再実行する。再開前に入力・規則・成果物・証拠への変更影響を確認し、影響する古い判定を再利用せず、成功済み副作用を重複実行せず、影響しない証拠は再利用する。durable state 面の再開契約は v4-durable-state-and-recovery Design「評価器復旧後の評価再開契約」節が所有する。修復・再試行・設定等の運用介入を判定方式の代替または新規規範の確定と混同しない
+- 復旧後の正規再開経路（REQ-103-011）: 評価器復旧後、未確定状態から正規の再実行・再開経路によって評価を再実行する。再開前に入力・規則・成果物・証拠への変更影響を確認し、影響する古い判定を再利用せず、成功済み副作用を重複実行せず、影響しない証拠は再利用する。durable state 面の再開契約は durable-state-and-recovery Design「評価器復旧後の評価再開契約」節が所有する。修復・再試行・設定等の運用介入を判定方式の代替または新規規範の確定と混同しない
 
 ### 開いた推論の適用範囲限定（REQ-103-007）
 
@@ -153,20 +153,3 @@ REQ-096-010、REQ-096-014、REQ-096-021、REQ-096-025、REQ-096-027、REQ-096-02
 - REQ-096-029（中央判断機構の不導入）は否定的契約であり、該当実装の不在が実現である。
 - REQ-096-010、REQ-096-014、REQ-096-021、REQ-096-025、REQ-096-027 は各 Workflow Skill・Capability Skill と Decision（DEC-039、DEC-048）へ分散して実装される横断規範であり、単一実装成果物への集約対応は実態を歪める。
 - 本判断は REQ-096-031 の実現面（Case #3337・RA-007）での記録である。個別行について対応作成が必要になった場合は、後続対応で該当 component の sidecar へ登録する。
-
-### v4 責務分類語彙の後継（DEC-036 決定(1) 列挙の移行先。旧「semantic 6 項目・
-deterministic 11 項目」の正典継承）
-
-skill Design の「v4 責務分類」3区分（semantic 担当 / deterministic 委譲先 / 知識提供）は
-次の語彙対応で移行する: semantic 担当 → 意味判断担当（閉じた意味評価・開いた推論を所有）、
-deterministic 委譲先 → 決定的処理委譲先、知識提供 → 維持。旧列挙項目の新分類への写像は
-次のとおり:
-
-| 旧分類（DEC-036 決定(1)） | 項目 | 新分類 |
-|---|---|---|
-| semantic | requirement analysis、architecture/design judgment、decomposition judgment、adversarial review、learning evaluation、semantic classification（6項目） | 閉じた意味評価または開いた推論（判断単位ごとに閉包条件で判別） |
-| deterministic | parsing、validation、ID 採番、状態遷移、dependency graph、Wave scheduling、path safety、traceability extraction、evidence aggregation、API I/O、file transformation（11項目） | 決定的処理 |
-
-旧語彙（semantic 6 項目・deterministic 11 項目）を正典参照として残存させない。skill Design
-3区分節の語彙移行と skills/_template.md の書式更改は RA-004 が担う。Root Case #3011 分類
-語彙表は移行後の語彙対応の履歴参照として扱い、正典とはしない。

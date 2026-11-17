@@ -98,7 +98,7 @@ Command は Skill を参照して判断を利用し、Skill は必要な詳細�
 |---|---|---|
 | Command | 公開interface・dispatch | REQ-002・各command固有REQ |
 | Workflow Skill | workflow実装本体・STEP transition | REQ-005・workflow-skill-model.md |
-| STEP reference | STEP詳細・resume point | REQ-005・v4-durable-state-and-recovery.md |
+| STEP reference | STEP詳細・resume point | REQ-005・durable-state-and-recovery.md |
 | Capability Skill | 共通能力 | REQ-027・workflow-skill-model.md |
 | Workflow Extension | 公開Workflow Skill 拡張 | REQ-002・project-extensions.md |
 | internal Workflow Extension | Workflow Skill 内部拡張 | REQ-002・project-extensions.md |
@@ -106,7 +106,7 @@ Command は Skill を参照して判断を利用し、Skill は必要な詳細�
 
 ## 親エージェント / サブエージェント責務
 
-サブエージェント委譲時の責務境界は v2:ADR-0112 と REQ-003 に従う。委譲時最小契約・委譲種別・委譲制約の原本は workflows/v4-delegation-contracts Design が所有し、責務の判断方法3分類（決定的処理・閉じた意味評価・開いた推論）の判別は DEC-048 と foundations/v4-responsibility-boundaries Design「判断方法3分類の判別基準」節に従う。
+サブエージェント委譲時の責務境界は v2:ADR-0112 と REQ-003 に従う。委譲時最小契約・委譲種別・委譲制約の原本は workflows/delegation-contracts Design が所有し、責務の判断方法3分類（決定的処理・閉じた意味評価・開いた推論）の判別は DEC-048 と foundations/responsibility-boundaries Design「判断方法3分類の判別基準」節に従う。
 
 | 主体 | 保持する責務 | 禁止される責務 |
 |---|---|---|

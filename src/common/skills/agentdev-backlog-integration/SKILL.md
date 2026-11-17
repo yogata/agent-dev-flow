@@ -40,7 +40,7 @@ command 本文内で backlog-review を参照する場合はこちらを使用�
 | 矛盾検出への引き渡し | caller 統合運用要件（backlog-review の review 挿入境界） | review で指摘された矛盾は既存矛盾検出ロジックへ渡し、review 内で自動解決しない |
 | 発動条件 | 共通の発動契約と呼出元固有のスキップ条件 | 原則実行（初期値オン）。ユーザー明示指定を必須とせず、スキップは backlog-review command Design に定める条件に従う |
 | 従来フロー維持 | caller 統合運用要件（backlog-review の review 挿入境界） | 条件非該当時、呼出失敗時は従来フローを維持（順序の正は backlog-review command Design） |
-| 副作用境界 | caller integration 共通契約 | `semantic_review`（書き込み禁止型）、新規 artifact 非生成（正は adversarial-review Design、v4-delegation-contracts Design） |
+| 副作用境界 | caller integration 共通契約 | `semantic_review`（書き込み禁止型）、新規 artifact 非生成（正は adversarial-review Design、delegation-contracts Design） |
 | accepted finding 反映 | caller integration 共通契約 | accepted finding の RU 構成案への反映は呼出元責務（正は adversarial-review Design） |
 | 再 review 条件 | caller integration 共通契約 | 意味内容変更時のみ再発動可能、同一 finding 再起票禁止（正は adversarial-review Design） |
 | unresolved 時の扱い | caller integration 共通契約 | unresolved 残時は不可逆処理へ進まない（正は adversarial-review Design） |
@@ -55,7 +55,7 @@ REQ / Decision / Design 反映、ガードレール移管、Project Extension �
 
 ## 継続コラボレーションループにおける位置づけ
 
-backlog-review は継続コラボレーションループ（`<workflows/v4-collaboration-loop>` Design）の Backlog 段の実現手段である。
+backlog-review は継続コラボレーションループ（`<workflows/collaboration-loop>` Design）の Backlog 段の実現手段である。
 Intake / Learning / inspect の各昇格系統由来の採用済み成果物は本段で統合・分析され、RU 化によって req-define へ合流する。docs/knowledge/ へ直接保存される知識文書は RU 化を経ない。
 
 ## See Also

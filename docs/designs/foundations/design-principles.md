@@ -60,7 +60,7 @@ workflow_route（direct_case 等）は導出結果ラベルであり、work_type
 | REQ 保存あり・設計PRあり・Epic 構成なし | feature standard 等 | req_backed_case | req-define → case-auto。defining（設計PR）→ ready → running → closing |
 | REQ 保存あり・Epic 構成あり | feature large、大規模 bugfix・maintenance 等 | epic_case | req-define → case-auto。Epic 構成と Wave スケジューリング付きの実行 |
 
-大規模 bugfix 等も scale/Epic/Wave の対象になり得る。work_type と scale は直交する（v4-standard-lifecycle Design）。
+大規模 bugfix 等も scale/Epic/Wave の対象になり得る。work_type と scale は直交する（standard-lifecycle Design）。
 
 ---
 

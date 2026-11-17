@@ -41,9 +41,9 @@ README は agent-dev-flow リポジトリの構成要素（identity、参照先�
 
 ### 成果物の意味境界の運用面と工程別正式確定（REQ-088-006、REQ-105）
 
-REQ、Decision、Design、Implementation、Evidence の意味境界の基盤モデル定義は `../foundations/v4-operating-model.md`「中核文書モデル」節が正規所有する。本 Design はその運用面（文書種別ごとの責務、配置基準、対応関係の表現方法）を所有し、[artifact-contracts.md](artifact-contracts.md) は成果物間の入出力と操作契約を扱う副次参照である。
+REQ、Decision、Design、Implementation、Evidence の意味境界の基盤モデル定義は `../foundations/operating-model.md`「中核文書モデル」節が正規所有する。本 Design はその運用面（文書種別ごとの責務、配置基準、対応関係の表現方法）を所有し、[artifact-contracts.md](artifact-contracts.md) は成果物間の入出力と操作契約を扱う副次参照である。
 
-工程別の成果物の正式確定と最終的な要求充足は別判定である（REQ-105）。文書種別のライフサイクル上の確定（Design の accepted 遷移、REQ の現行要件への採用、Decision の accepted 遷移）は当該工程の成果物の正式確定を表し、それをもって最終的な要求充足済みと判定しない。最終的な要求充足の判定は case-close の QG-4 最終完了判定（REQ-021-025、REQ-032）が所有する。ゲートが判定条件の前提とする工程・成果物規約は、プロジェクトが採用した採用済み規約から解決し、採用宣言が存在しない間は移行期デフォルト（REQ-105-008）として当該プロジェクトの現に実効している運用を用いる（`../foundations/v5-adopted-conventions.md`）。
+工程別の成果物の正式確定と最終的な要求充足は別判定である（REQ-105）。文書種別のライフサイクル上の確定（Design の accepted 遷移、REQ の現行要件への採用、Decision の accepted 遷移）は当該工程の成果物の正式確定を表し、それをもって最終的な要求充足済みと判定しない。最終的な要求充足の判定は case-close の QG-4 最終完了判定（REQ-021-025、REQ-032）が所有する。ゲートが判定条件の前提とする工程・成果物規約は、プロジェクトが採用した採用済み規約から解決し、採用宣言が存在しない間は移行期デフォルト（REQ-105-008）として当該プロジェクトの現に実効している運用を用いる（`../foundations/adopted-conventions.md`）。
 
 正規の確定経路と確定状態反映の運用（REQ-105-011）。ライフサイクル上の確定は、判定結果ではなく正規経路の操作で確定状態を反映する。Design は case-close の Design 確定フロー（変更駆動）または工程駆動の既存確定経路で draft から accepted へ遷移し、docs/designs/README.md の status 列を同時に更新して一覧との整合を維持する。判定器（`agentdev-artifact-semantics` finalize）の finalized: true は確定操作の完了を表さない。権限外の状態変更を行わない。
 

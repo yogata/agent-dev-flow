@@ -20,7 +20,7 @@ Knowledge、Report、guides は基準の階層の外側にある補助文書種�
 ## Project Contract の全体像
 
 REQ → Decision → Design の説明だけでは Project Contract の全体を捉えられない。
-Project Contract は Project の現在契約を論理的に再構成する情報モデルとして定義され、その構成方法は [REQ-088](../requirements/REQ-088.md)、論理ビューと再構成手順の現在の記述は [ADF v4 Operating Model](../designs/foundations/v4-operating-model.md)「Project Contract の論理ビュー」節を基準として読む。
+Project Contract は Project の現在契約を論理的に再構成する情報モデルとして定義され、その構成方法は [REQ-088](../requirements/REQ-088.md)、論理ビューと再構成手順の現在の記述は [ADF v4 Operating Model](../designs/foundations/operating-model.md)「Project Contract の論理ビュー」節を基準として読む。
 
 本ガイドの説明する REQ / Decision / Design の関係は、Project Contract を構成する一部の要素に対する基準関係の説明である。
 
@@ -100,4 +100,4 @@ REQ/Decision/Design と矛盾する記述がある場合は基準文書を優先
 guides（本ファイルを含む）は参照用読み物であり、基準文書への導線を提供する。
 文書種別の責務と配置基準の正は [REQ-001](../requirements/REQ-001.md) と [文書種別責務・配置基準](../designs/responsibilities/document-type-responsibilities.md) にある。
 判断方法と確定権限の分離、人間判断境界の正は [REQ-096](../requirements/REQ-096.md) と [DEC-048](../decisions/DEC-048.md) にある。
-三層責務と標準運用モデルの正は [REQ-088](../requirements/REQ-088.md) と [ADF v4 Operating Model](../designs/foundations/v4-operating-model.md) にある。
+三層責務と標準運用モデルの正は [REQ-088](../requirements/REQ-088.md) と [ADF v4 Operating Model](../designs/foundations/operating-model.md) にある。

@@ -77,7 +77,7 @@ updated: 2026-10-03
 
 ## v4 責務分類
 
-ADF v4 の責務分類（正典: DEC-048、foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節）における本 Design の 3 区分（意味判断担当〔閉じた意味評価・開いた推論を所有〕/ 決定的処理委譲先 / 知識提供）。語彙の原本は foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節であり、本節はその確定値を記録する。
+ADF v4 の責務分類（正典: DEC-048、foundations/responsibility-boundaries Design「v4 責務分類語彙の後継」節）における本 Design の 3 区分（意味判断担当〔閉じた意味評価・開いた推論を所有〕/ 決定的処理委譲先 / 知識提供）。語彙の原本は foundations/responsibility-boundaries Design「v4 責務分類語彙の後継」節であり、本節はその確定値を記録する。
 
 - **意味判断担当**: 0 件
 - **決定的処理委譲先**: parsing/validation（extension 状態解決）→ scripts/lib/extension_state.ts
@@ -87,7 +87,7 @@ ADF v4 の責務分類（正典: DEC-048、foundations/v4-responsibility-boundar
 
 本スキルが担う Project Extensions は v4 では標準プロセスへの追加を行う semantic extension point として位置づける。
 
-定義の所有は ADF v4 責務境界 Design（foundations/v4-responsibility-boundaries）であり、拡張点の概念分類（表現力 6 項目）と追加モデル原則の詳細は同 Design を参照する。
+定義の所有は ADF v4 責務境界 Design（foundations/responsibility-boundaries）であり、拡張点の概念分類（表現力 6 項目）と追加モデル原則の詳細は同 Design を参照する。
 
 現行の kind 3 値・id binding・状態機械・5 セクション読取・上書きでない扱いは v4 でも維持する。
 

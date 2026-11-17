@@ -128,13 +128,13 @@ QG-4 final acceptance の変更ファイル突合検証における I/O 操作�
 
 ## See Also
 
-- [v4-quality-gate-model.md](../quality/v4-quality-gate-model.md)（Design 定義）
+- [quality-gate-model.md](../quality/quality-gate-model.md)（Design 定義）
 - [commands/req-define.md](../commands/req-define.md), [commands/case-ready.md](../commands/case-ready.md), [commands/case-revise.md](../commands/case-revise.md), [commands/case-open.md](../commands/case-open.md), [commands/case-run.md](../commands/case-run.md), [commands/case-close.md](../commands/case-close.md)（適用先）
 - REQ-001（REQ/Design 責務分離の徹底）
 
 ## v4 責務分類
 
-ADF v4 の責務分類（正典: DEC-048、foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節）における本 Design の 3 区分（意味判断担当〔閉じた意味評価・開いた推論を所有〕/ 決定的処理委譲先 / 知識提供）。語彙の原本は foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節であり、本節はその確定値を記録する。
+ADF v4 の責務分類（正典: DEC-048、foundations/responsibility-boundaries Design「v4 責務分類語彙の後継」節）における本 Design の 3 区分（意味判断担当〔閉じた意味評価・開いた推論を所有〕/ 決定的処理委譲先 / 知識提供）。語彙の原本は foundations/responsibility-boundaries Design「v4 責務分類語彙の後継」節であり、本節はその確定値を記録する。
 
 - **意味判断担当**: 0 件
 - **決定的処理委譲先**: なし（判定実行は各工程の検証資産）

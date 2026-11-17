@@ -10,7 +10,7 @@ case-run コマンドの状態機械、サブエージェントプロトコル�
 ## 状態機械
 
 case-run は常に単一 Issue を処理する（委譲は単一 Issue あたり1件。Epic・Wave を処理対象とする実行契約は廃止され、Wave 実行制御は case-auto の orchestration stage 3 が単一所有する）。Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない（Wave 構成生成は case-open、Wave 境界クローズは case-close の責務）。
-Epic 全体の進行は case-auto が orchestration stage 3 の共有 active Issue task 枠で子 Issue へインライン case-run を反復制御する形で担い、Wave 内の子Issue 選択、実行並列制御は case-auto stage 3 が、Wave 境界クローズ、Epic Issue 本文実行構成表の子状態更新は case-close(#epic) が担う（単一書き手: v4-runtime-execution-model Design「直列化単位表」）。
+Epic 全体の進行は case-auto が orchestration stage 3 の共有 active Issue task 枠で子 Issue へインライン case-run を反復制御する形で担い、Wave 内の子Issue 選択、実行並列制御は case-auto stage 3 が、Wave 境界クローズ、Epic Issue 本文実行構成表の子状態更新は case-close(#epic) が担う（単一書き手: runtime-execution-model Design「直列化単位表」）。
 
 ### case-run internal lifecycle フェーズ構成
 
@@ -26,8 +26,8 @@ case-run は orchestration stage（case-auto が管理する command 間進行�
 ## STEP model（workflow STEP 契約・STEP resume point と会話記憶非依存）
 
 本スキルは Workflow Skill として case-run workflow の STEP transition を所有する（制御平面）。
-STEP 識別子は workflow 内安定識別子であり、STEP reference 8 要素（Purpose / Input Resolution / Preconditions / Procedure / Result / Evidence / Completion Verification / Resume-Idempotency）は `<foundations/v4-durable-state-and-recovery>` Design に従う。
-STEP 識別子と永続状態から current STEP を復元する契約は `<foundations/v4-durable-state-and-recovery>` Design に従う。
+STEP 識別子は workflow 内安定識別子であり、STEP reference 8 要素（Purpose / Input Resolution / Preconditions / Procedure / Result / Evidence / Completion Verification / Resume-Idempotency）は `<foundations/durable-state-and-recovery>` Design に従う。
+STEP 識別子と永続状態から current STEP を復元する契約は `<foundations/durable-state-and-recovery>` Design に従う。
 
 ### STEP 識別子（case-run workflow）
 
@@ -43,7 +43,7 @@ STEP 識別子は command 固定番号（STEP-1, STEP-2 等）とは区別する
 ### 永続状態（case-run workflow）
 
 compaction や中断再開後に current STEP と必要入力を復元するための永続状態。
-優先順位は `<foundations/v4-durable-state-and-recovery>` Design に従う。
+優先順位は `<foundations/durable-state-and-recovery>` Design に従う。
 
 1. **SSoT 再構成**: Issue 本文、要件doc、REQ/Decision/Design から再取得・再検証
 2. **identifier 保持**: Issue 番号、PR 番号、worktree ブランチ名、STEP 識別子

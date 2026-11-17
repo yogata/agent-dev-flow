@@ -8,8 +8,8 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 第4世代（v4）の現在像を定義する正規文書への導線は次のとおりである。
 
 - 憲章と責務境界: [DEC-001](decisions/DEC-001.md)、[憲章](guides/charter.md)
-- 三層責務と標準運用モデル: [REQ-088](requirements/REQ-088.md)、[ADF v4 Operating Model](designs/foundations/v4-operating-model.md)、[DEC-031](decisions/DEC-031.md)
-- Project Contract の論理ビューと再構成方法: [REQ-088](requirements/REQ-088.md)、[ADF v4 Operating Model](designs/foundations/v4-operating-model.md)「Project Contract の論理ビュー」節
+- 三層責務と標準運用モデル: [REQ-088](requirements/REQ-088.md)、[ADF v4 Operating Model](designs/foundations/operating-model.md)、[DEC-031](decisions/DEC-031.md)
+- Project Contract の論理ビューと再構成方法: [REQ-088](requirements/REQ-088.md)、[ADF v4 Operating Model](designs/foundations/operating-model.md)「Project Contract の論理ビュー」節
 - 標準入口と標準実行: [クイックスタート](guides/quickstart.md)、[要件定義 → Case実行フロー](guides/req-case-flow.md)。req-define と backlog-auto が要求入口、case-auto が標準実行
 - 判断方法と確定権限の分離、人間判断境界: [REQ-096](requirements/REQ-096.md)、[DEC-048](decisions/DEC-048.md)
 - REQ / Decision / Design / Knowledge / Report / Guide の文書責務: [REQ-001](requirements/REQ-001.md)、[プロジェクトドキュメントと Design](guides/project-docs-and-specs.md)
@@ -157,7 +157,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-033](decisions/DEC-033.md) | ADF v4 公開運用モデル（UX 2入口収斂・内部 lifecycle・継続コラボレーションループ・学習昇格ガード）（superseded by DEC-055〔Wave を実行スケジューリング単位とする規定を DEC-055 が置換（Wave＝意味的な依存関係のまとまり、並列上限は独立した実行制御）。UX 2入口収斂、内部 lifecycle、継続コラボレーションループ、学習昇格ガード、work_type/scale/Epic の規定は維持する〕） |
 | [DEC-034](decisions/DEC-034.md) | v4 の移行・release 標準境界（非破壊移行原則・v4.0.0-rc.1 cutover・self-hosting）（superseded by DEC-056〔v4→v5 移行への手順・切替構成の直接適用を DEC-056 が置換。非破壊移行原則（決定1）と検証重視は維持する。決定2・3の v4.0.0-rc.1 cutover と v4.0.0 release 条件は v3→v4 移行の歴史的記録として維持する〕） |
 | [DEC-035](decisions/DEC-035.md) | v4 Quality / Verification / Evidence / Gate モデルへの分解 |
-| [DEC-036](decisions/DEC-036.md) | 意味 Skill と決定的実装の責務分離および Harness/Backend adapter 境界（superseded by DEC-048〔決定(1)（deterministic 処理／semantic 判断の二分法）は DEC-048 が部分置換。決定(2)（Harness/Backend adapter 境界）のうち配備形態（原本配置・投影モデル）に関する部分は DEC-049（ADF 共通原本とホスト接続領域の分離）が部分置換する。責務境界（semantic contract と実行機構の分離）、adapter 追加契機、決定(3)（Project Extensions の位置づけ）は本 Decision が維持する（status: accepted 維持）。semantic 6 項目・deterministic 11 項目の列挙の後継は foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節が所有する。〕） |
+| [DEC-036](decisions/DEC-036.md) | 意味 Skill と決定的実装の責務分離および Harness/Backend adapter 境界（superseded by DEC-048〔決定(1)（deterministic 処理／semantic 判断の二分法）は DEC-048 が部分置換。決定(2)（Harness/Backend adapter 境界）のうち配備形態（原本配置・投影モデル）に関する部分は DEC-049（ADF 共通原本とホスト接続領域の分離）が部分置換する。責務境界（semantic contract と実行機構の分離）、adapter 追加契機、決定(3)（Project Extensions の位置づけ）は本 Decision が維持する（status: accepted 維持）。semantic 6 項目・deterministic 11 項目の列挙の後継は foundations/responsibility-boundaries Design「v4 責務分類語彙の後継」節が所有する。〕） |
 | [DEC-037](decisions/DEC-037.md) | Traceability の Change / Evidence 中心への再中心化（superseded by DEC-054〔トレーサビリティモデルの標準関係構造（Design への定義権委譲を前提とした covers 単独の標準コア関係を含む）を DEC-054 が拡張（covers＋採用された隣接工程間対応）。直接走査、標準能力（coverage/impact/check）、用語政策の各決定は維持する〕） |
 | [DEC-038](decisions/DEC-038.md) | ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則） |
 | [DEC-039](decisions/DEC-039.md) | ADF v4 authority・副作用統制と冪等・並行性モデル |
@@ -196,14 +196,14 @@ Design は 3 層構造（commands / skills / workflows）と基盤 6 ドメイ�
 ### 横断 Design（`designs/workflows/`）
 
 - [Workflow Skill Model](designs/workflows/workflow-skill-model.md)
-- [サブエージェント委譲契約（v4）](designs/workflows/v4-delegation-contracts.md)
+- [サブエージェント委譲契約（v4）](designs/workflows/delegation-contracts.md)
 - [キャプチャ境界](designs/workflows/capture-boundaries.md)
 - [Issue タイトル記述規則](designs/workflows/issue-title-policy.md)
 - [Case Issue 工程記録モデル](designs/workflows/issue-lifecycle-records.md)
 - [execution_unit 構成アルゴリズム参照](designs/workflows/references/execution-unit-construction.md)
-- [ADF v4 標準ライフサイクル](designs/workflows/v4-standard-lifecycle.md)
-- [ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応）](designs/workflows/v4-lifecycle-state-machine.md)
-- [ADF v4 継続コラボレーションループ](designs/workflows/v4-collaboration-loop.md)
+- [ADF v4 標準ライフサイクル](designs/workflows/standard-lifecycle.md)
+- [ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応）](designs/workflows/lifecycle-state-machine.md)
+- [ADF v4 継続コラボレーションループ](designs/workflows/collaboration-loop.md)
 
 ### command Design / skill Design
 
@@ -226,15 +226,13 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 - [設計原則](designs/foundations/design-principles.md)
 - [Project Extensions](designs/foundations/project-extensions.md)
 - [harness 分離モデル](designs/foundations/harness-separation-model.md)
-- [ADF v4 Operating Model](designs/foundations/v4-operating-model.md)
-- [ADF v4 実装責務境界](designs/foundations/v4-responsibility-boundaries.md)
-- [ADF v4 Traceability モデル](designs/foundations/v4-traceability-model.md)
-- [v3 -> v4 Concept / Artifact Crosswalk](designs/foundations/v3-v4-crosswalk.md)
-- [ADF v4 Migration と Release の標準境界](designs/foundations/v4-migration-and-release.md)
+- [ADF Operating Model](designs/foundations/operating-model.md)
+- [ADF 実装責務境界](designs/foundations/responsibility-boundaries.md)
+- [ADF Traceability モデル](designs/foundations/traceability-model.md)
 - [マルチホスト原本モデル（共通原本とホスト別接続の分離）](designs/foundations/multi-host-canonical-model.md)
-- [ADF v4 durable state と再構成・恢復（配置表・権威移行・部分失敗調整）](designs/foundations/v4-durable-state-and-recovery.md)
-- [ADF v4 Runtime 実行モデル（authority 格子・直列化単位・冪等経路・runtime 制御ループ）](designs/foundations/v4-runtime-execution-model.md)
-- [ADF v5 採用規約機構（採用済み工程・成果物規約の宣言・保存・解決）](designs/foundations/v5-adopted-conventions.md)
+- [ADF durable state と再構成・恢復（配置表・権威移行・部分失敗調整）](designs/foundations/durable-state-and-recovery.md)
+- [ADF Runtime 実行モデル（authority 格子・直列化単位・冪等経路・runtime 制御ループ）](designs/foundations/runtime-execution-model.md)
+- [ADF 採用規約機構（採用済み工程・成果物規約の宣言・保存・解決）](designs/foundations/adopted-conventions.md)
 
 #### responsibilities/（文書種別、成果物責務）
 
@@ -251,7 +249,7 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 - [品質仕様](designs/quality/quality-specs.md)
 - [REQ 健全性メトリクス](designs/quality/req-health-metrics.md)
 - [Design 健全性メトリクス](designs/quality/design-health-metrics.md)
-- [ADF v4 Quality / Verification / Evidence / Gate モデル](designs/quality/v4-quality-gate-model.md)
+- [ADF v4 Quality / Verification / Evidence / Gate モデル](designs/quality/quality-gate-model.md)
 - [textlint 品質基盤](designs/quality/textlint-quality-runtime.md)
 
 #### integrity/（整合性契約、ルール）

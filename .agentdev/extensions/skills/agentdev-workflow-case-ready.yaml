@@ -4,9 +4,9 @@ kind: workflow-extension
 id: agentdev-workflow-case-ready
 
 context:
-  - id: v4-lifecycle-state-machine
+  - id: lifecycle-state-machine
     paths:
-      - "docs/designs/workflows/v4-lifecycle-state-machine.md"
+      - "docs/designs/workflows/lifecycle-state-machine.md"
     purpose: case-ready を含む工程接続と SSoT 遷移の確認
   - id: case-ready-spec
     paths:

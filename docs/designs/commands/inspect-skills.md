@@ -81,8 +81,8 @@ agentdev-traceability の coverage, impact, check を一般文書探索、構造
 
 ## 参照する横断 Design
 
-- [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（コマンド分類）
-- [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（検出事項プロトコル〔v4 帰属先〕）、[workflows/v4-collaboration-loop.md](../workflows/v4-collaboration-loop.md)（ループ統合: 検出事項の入力経路）
+- [workflows/lifecycle-state-machine.md](../workflows/lifecycle-state-machine.md)（コマンド分類）
+- [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（検出事項プロトコル〔v4 帰属先〕）、[workflows/collaboration-loop.md](../workflows/collaboration-loop.md)（ループ統合: 検出事項の入力経路）
 
 ## 対象外
 

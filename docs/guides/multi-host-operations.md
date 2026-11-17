@@ -51,7 +51,7 @@ AgentDevFlow は共通原本とホスト別接続領域に分かれる。
 
 ## 切替・復帰手順
 
-切替は「旧ホストの停止」から「新ホストでの再開」までの3段階で行う。手順は durable state と再構成の契約（[durable state と再構成](../designs/foundations/v4-durable-state-and-recovery.md)）に依拠する。
+切替は「旧ホストの停止」から「新ホストでの再開」までの3段階で行う。手順は durable state と再構成の契約（[durable state と再構成](../designs/foundations/durable-state-and-recovery.md)）に依拠する。
 
 ### 1. 切替元ホストの停止
 
@@ -129,5 +129,5 @@ case-open、case-ready、case-run、case-close、case-revise は内部 lifecycle
 - [マルチホスト原本モデル](../designs/foundations/multi-host-canonical-model.md): 共通原本とホスト別接続の配置契約
 - [DEC-049](../decisions/DEC-049.md): マルチホスト配布モデルの意思決定
 - [REQ-099](../requirements/REQ-099.md): マルチホスト併存利用の要件
-- [durable state と再構成](../designs/foundations/v4-durable-state-and-recovery.md): 永続状態の権威と再構成の契約
+- [durable state と再構成](../designs/foundations/durable-state-and-recovery.md): 永続状態の権威と再構成の契約
 - [コマンド選択](command-selection.md): 状態から次のコマンドを選ぶ入口表

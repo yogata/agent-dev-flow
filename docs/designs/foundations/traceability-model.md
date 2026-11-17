@@ -1,8 +1,8 @@
 ---
-title: ADF v4 Traceability モデル（Change / Evidence 中心）
+title: ADF Traceability モデル（Change / Evidence 中心）
 status: accepted
 created: 2026-09-18
-updated: "2026-11-13"
+updated: "2026-11-18"
 ---
 
 <!-- ADF-COVERS(design): REQ-012-026, REQ-012-027, REQ-012-028, REQ-012-029, REQ-012-030, REQ-012-031, REQ-012-032, REQ-012-033, REQ-012-034, REQ-012-035, REQ-012-036, REQ-012-037, REQ-012-038, REQ-012-039, REQ-012-040, REQ-012-041, REQ-012-042, REQ-012-054, REQ-012-052, REQ-012-053, REQ-012-056, REQ-012-057, REQ-012-058, REQ-012-059, REQ-002-048 -->
@@ -12,9 +12,9 @@ updated: "2026-11-13"
 <!-- ADF-COVERS(design): REQ-012-060, REQ-012-061 -->
 <!-- ADF-COVERS(implementation): REQ-106-001, REQ-106-002, REQ-106-003, REQ-106-004, REQ-106-005, REQ-106-006, REQ-106-007, REQ-106-008, REQ-106-009, REQ-107-001, REQ-107-002, REQ-107-003, REQ-107-004, REQ-107-005, REQ-107-006, REQ-107-007, REQ-107-008（v5 変更影響・追跡品質検証の語義は本 Design 本文の v5 語義更新節が所有し、REQ-106 の差分影響評価の構成実体は agentdev-traceability Design の impact 拡張節が、その利用側接続は case-revise Design が所有する） -->
 
-# ADF v4 Traceability モデル（Change / Evidence 中心）
+# ADF Traceability モデル（Change / Evidence 中心）
 
-位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）の全行 executed と実際の処遇状態の確認をもってこの移行規則は現行規範ではなく、歴史的説明として保持する（REQ-103-020）。あわせて本 Design は REQ-107（ADF v5 工程間追跡と品質検証の責務分離）と DEC-054（ADF v5 追跡・品質検証モデル）に基づく v5 追跡語義（標準関係、設計根拠対応の条件付き化、構造検査と意味品質検証の分離）を、v4 語義の搬送範囲とともに所有する。
+位置づけ: 本 Design は現行 Traceability モデルの定義である。あわせて本 Design は REQ-107（ADF v5 工程間追跡と品質検証の責務分離）と DEC-054（ADF v5 追跡・品質検証モデル）に基づく追跡語義（標準関係、設計根拠対応の条件付き化、構造検査と意味品質検証の分離）を所有する。
 
 本 Design は DEC-037（Traceability の Change / Evidence 中心への再中心化）の Design 実体である。DEC-037 の標準関係構造（covers 単独の標準コア関係）は DEC-054 が covers と採用された隣接工程間対応へ拡張した。モデル要素、完全性規則、保存方式、直接走査、用語政策の所有対応は吸収節に定める。
 
@@ -51,17 +51,17 @@ Traceability の主目的は次の 4 問いに答えられることである。
 | fail-open | 実行不能を処理の妨げにしない契約 | 検出不能の旨を報告して継続する |
 | advisory | 結果に強制力を持たない助言 | 採否は判断者が決める。空結果を証明として扱わない |
 
-## 標準関係の構造（v5 語義）
+## 標準関係の構造
 
 本 Design が扱う標準関係は、covers 対応関係と、プロジェクトの採用した工程に基づく隣接工程間の対応関係である（REQ-012-027、REQ-107-001）。
 
 - **covers 対応関係**: 成果物が要件へ明示的に対応する対応関係。decision / design / implementation / verification の 4 役割を持つ
-- **採用された隣接工程間対応**: プロジェクトの採用した隣接工程の成果物・追跡単位を明示的に関連付ける対応関係。上流と下流を双方向に追跡できる（REQ-107-001）。宣言と保存は採用規約機構（v5-adopted-conventions Design「宣言と保存」節）が所有し、物理形式は REQ-107 適用範囲の対象外とする。機械解決の実装面は後続の実装 Design が所有する
+- **採用された隣接工程間対応**: プロジェクトの採用した隣接工程の成果物・追跡単位を明示的に関連付ける対応関係。上流と下流を双方向に追跡できる（REQ-107-001）。宣言と保存は採用規約機構（adopted-conventions Design「宣言と保存」節）が所有し、物理形式は REQ-107 適用範囲の対象外とする。機械解決の実装面は後続の実装 Design が所有する
 
 標準関係の境界は次の 2 条である。
 
 - 採用された隣接工程間対応は有界な標準関係である。多数の関係型の持ち込み（REQ-012-039）や汎用の関係拡張機構の新設（REQ-012-040）に該当しない
-- すべての成果物に要件との重複した直接対応を必須とせず、採用された隣接工程間対応で追跡できる（REQ-107-002）。実装・検証の要件側直接対応の義務（実装成果物 1 件以上、検証対応必須行の検証手段 1 件以上）は REQ-012-032 が維持する。存在しない詳細工程への対応を強制しない。未採用の参照例の工程を判定基準に含めない点は、v5-adopted-conventions Design「未採用参照例を欠落と誤判定しない判定規則」節に従う
+- すべての成果物に要件との重複した直接対応を必須とせず、採用された隣接工程間対応で追跡できる（REQ-107-002）。実装・検証の要件側直接対応の義務（実装成果物 1 件以上、検証対応必須行の検証手段 1 件以上）は REQ-012-032 が維持する。存在しない詳細工程への対応を強制しない。未採用の参照例の工程を判定基準に含めない点は、adopted-conventions Design「未採用参照例を欠落と誤判定しない判定規則」節に従う
 
 ## 永続情報と導出可能情報の分離
 
@@ -105,7 +105,7 @@ global completeness の位置づけ（診断・影響分析の必要性から co
 | 層 | 対象 scope | 判定性格 | 運用 |
 |---|---|---|---|
 | lifecycle gate completeness | 対象要件行 scope（当該 Case の対象要件行） | fail-closed（case-ready のトレーサビリティ完全性ゲート、case-close の QG-4） | 対象要件行の設計根拠対応（プロジェクトの採用した工程・成果物規約が要求するもの。独立 Design 文書を必須とする採用の場合は Design 対応）、implementation 対応、検証対応（policy が required と判定する行）の欠落を不合格とする（REQ-021-018、REQ-021-024、REQ-021-025） |
-| corpus completeness | corpus 全体（全現行要件行） | advisory・fail-open（診断指標の数値追跡） | 計数を v4 移行期間の既知債務として追跡し、到達目標状態の診断に使う。lifecycle gate の判定に使用しない |
+| corpus completeness | corpus 全体（全現行要件行） | advisory・fail-open（診断指標の数値追跡） | 計数を既知債務として追跡し、到達目標状態の診断に使う。lifecycle gate の判定に使用しない |
 
 ### 解釈 clause
 
@@ -113,11 +113,11 @@ REQ-012-029（実装対応）、REQ-012-030（検証対応・policy が required
 
 ### corpus 債務方針
 
-missing-design 942 件と missing-implementation 111 件（2026-09-19 時点の baseline @54c0fde3）は v4 移行期間の既知債務である。missing-design の計上は、採用規約が独立 Design 文書を必須とする採用の場合の Design 対応欠落として語義づけられる（解釈 clause 参照）。corpus 値の是正は第13段 full validation で評価し、lifecycle gate を阻害しない。corpus 計数の増減は診断指標として追跡する。
+missing-design 942 件と missing-implementation 111 件（2026-09-19 時点の baseline @54c0fde3）は既知債務である。missing-design の計上は、採用規約が独立 Design 文書を必須とする採用の場合の Design 対応欠落として語義づけられる（解釈 clause 参照）。corpus 値の是正は第13段 full validation で評価し、lifecycle gate を阻害しない。corpus 計数の増減は診断指標として追跡する。
 
 ## Evidence 第一級の位置づけ
 
-- Evidence の定義は v4-quality-gate-model（Quality 5 概念分解の Evidence）が所有する。本 Design は定義を重複させず、検証手段と Evidence ソース（Issue / PR / QG）の関係と識別子結合のみを記述する
+- Evidence の定義は quality-gate-model（Quality 5 概念分解の Evidence）が所有する。本 Design は定義を重複させず、検証手段と Evidence ソース（Issue / PR / QG）の関係と識別子結合のみを記述する
 - 検証手段はトレーサビリティ（verification 役割の対応関係）が扱い、実行結果は Issue / PR / QG が扱う。特定時点の検証結果を対応関係として保存しない（REQ-021-019）
 - Q3 への回答は、verification 役割の coverage と Evidence ソースの識別子結合の合成で行う
 - 識別子結合は、検証手段の対応関係（REQ 行 ID と verification 役割）と実行結果の記録（Issue 番号、PR 番号、Gate 実行記録）を結び付ける。結合の永続化は Issue / PR / QG 側が担う
@@ -152,4 +152,3 @@ missing-design 942 件と missing-implementation 111 件（2026-09-19 時点の 
 ## 関係
 
 - 本 Design は DEC-037 の Design 実体である。DEC-037 の標準関係構造（covers 単独の標準コア関係）は DEC-054 が covers と採用された隣接工程間対応へ拡張した（部分置換）。拡張後の語義は本 Design の標準関係の構造節が所有する
-- foundations/traceability-model.md は crosswalk 第7段の実行（物理削除）をもって権威を本 Design へ移行する。移行までの間は両 Design の要求実現関係部分の宣言が重複する（移行期間の許容状態）

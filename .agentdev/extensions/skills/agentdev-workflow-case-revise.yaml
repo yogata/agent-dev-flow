@@ -8,9 +8,9 @@ context:
     paths:
       - "docs/designs/commands/case-ready.md"
     purpose: Definition Amendment の保存・確定境界の確認
-  - id: v4-lifecycle-state-machine
+  - id: lifecycle-state-machine
     paths:
-      - "docs/designs/workflows/v4-lifecycle-state-machine.md"
+      - "docs/designs/workflows/lifecycle-state-machine.md"
     purpose: 再合意済み変更後の case-ready 接続の確認
   - id: case-revise-spec
     paths:

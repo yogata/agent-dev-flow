@@ -258,8 +258,8 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-017 | relates-to | DEC-009 | Decision 成果物型の TIM 上の位置づけ（ADF 拡張） |
 | DEC-017 | relates-to | DEC-010 | 4層分離はトレーサビリティ機能内部の概念層であり、Command / Workflow Skill / Capability Skill の配布物3層モデルとは別軸である |
 | DEC-019 | relates-to | DEC-015 | ADF vs harness の責務分界とは軸が異なる（ADF 固有 vs 一般処理の標準 API 委譲）。責務分界の類推として参照する |
-| DEC-037 | supersedes | DEC-017 | Traceability の主目的の定義権（要件中心の対応完全性から Change/Evidence 中心への再中心化）を v4-traceability-model Design へ移動。DEC-017 決定2（直接走査）・決定3（標準スキル）・決定5（用語政策）は搬送範囲表で維持 |
-| DEC-037 | supersedes | DEC-030 | Traceability の主目的の定義権（要件中心の対応完全性から Change/Evidence 中心への再中心化）を v4-traceability-model Design へ移動。DEC-030 の機構上の決定は搬送範囲表で維持 |
+| DEC-037 | supersedes | DEC-017 | Traceability の主目的の定義権（要件中心の対応完全性から Change/Evidence 中心への再中心化）を traceability-model Design へ移動。DEC-017 決定2（直接走査）・決定3（標準スキル）・決定5（用語政策）は搬送範囲表で維持 |
+| DEC-037 | supersedes | DEC-030 | Traceability の主目的の定義権（要件中心の対応完全性から Change/Evidence 中心への再中心化）を traceability-model Design へ移動。DEC-030 の機構上の決定は搬送範囲表で維持 |
 | DEC-033 | supersedes | DEC-029 | 公開ワークフロー状態遷移中心再構成を v4 公開運用モデル（UX 2入口収斂・内部 lifecycle）へ一般化して置換 |
 | DEC-036 | supersedes | DEC-015 | 主後継。決定論的実行中核と実行基盤実行機構の責務分界を semantic Skill / deterministic code 分離へ発展・置換 |
 | DEC-036 | supersedes | DEC-002 | OpenCode ソース・プロジェクション分離の v4 再定義（配備形態として adapter 境界へ統合）を本 Decision の Harness/Backend adapter 境界が所有する |

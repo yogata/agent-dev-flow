@@ -61,7 +61,7 @@ ADF v5.1.0の工程駆動コラボレーション、工程遷移・独立レビ�
 
 - 2026-10-10〜12のChatGPTでのv5.1.0工程駆動の議論。検討事項を段階的に育てること、工程の深度・進行判断を利用者に残すこと、作業管理・自動採点を中核にしないことに関する利用者の判断。
 - REQ-110（テーマの形成・更新、外部検討、成果物の段階形成と対象外）、REQ-111（独立レビュー、利用者による遷移判断）、DEC-057・DEC-058（採用背景）。
-- docs/designs/workflows/v51-phase-driven-collaboration-model.md、v51-phase-transition-and-coexistence-model.md（現在の責務境界）。正規要求・設計の再定義ではなく、その背景の判断材料を補足する。
+- docs/designs/workflows/phase-driven-collaboration-model.md、phase-transition-and-coexistence-model.md（現在の責務境界）。正規要求・設計の再定義ではなく、その背景の判断材料を補足する。
 
 - 2026-10-15の補強では、利用者提供の `adf-domain-knowledge-discussion-note-v07.md` 第2・3・7章と、`adf-v5.1-discussion-synthesis-2026-10-12-standards-agreed.md` 第2.3・4.1・10.5節を参照し、REQ-105-006/007・REQ-111-001〜003とも照合した。整理ノートに記録された合意と、今回追加した比較・再評価観点を区別する。今回元の全会話を取得したものではなく、全履歴の網羅や実利用効果を証明しない。補強内容は同日の棚卸し提案に対する利用者承認を経た。
 

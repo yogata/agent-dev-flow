@@ -77,7 +77,7 @@ orchestration 中の警告・確認・選択肢提示に由来する HITL questi
   - 結果状態の4次元集約（REQ-034-031）: 各工程の output_contract から (1) 工程結果 pass/warn/fail、(2) artifact_action 適用結果 applied/skipped/failed/no-op、(3) 定義適用工程完了状態、(4) OU ライフサイクル完了状態を収集し混同なく保持する。集約規則の詳細は後述「結果状態の4次元集約（REQ-034-031）」セクション
 - Wave 反復制御（Epic Issue 指定時）
   - case-auto が Epic Issue 番号を記録。Epic Issue 本文の実行構成から Wave 構成、各子Issue 状態を読み取る（読み取りのみ。Epic Issue 本文の書き込みは case-close 相当の統合処理の責務）
-  - case-auto が現在 Wave の未着手（pending）子Issue を認識し、Epic・Wave・Standard Issue を横断する共有 active Issue task 枠（REQ-034-027。上限・空き枠補充・起動間隔 10 秒は後述「runtime 制御契約」節と v4-runtime-execution-model「runtime 制御ループ」節参照）で各子Issue へインライン case-run を実行。各子Issue の実行担当サブエージェントへ case-auto から直接委譲
+  - case-auto が現在 Wave の未着手（pending）子Issue を認識し、Epic・Wave・Standard Issue を横断する共有 active Issue task 枠（REQ-034-027。上限・空き枠補充・起動間隔 10 秒は後述「runtime 制御契約」節と runtime-execution-model「runtime 制御ループ」節参照）で各子Issue へインライン case-run を実行。各子Issue の実行担当サブエージェントへ case-auto から直接委譲
   - case-run は単一 Issue 実行に専念し（REQ-031-015）、Wave 内子Issue の並列起動・fan-out/fan-in の制御は case-auto の orchestration が単一所有する（DEC-041）。case-run に独立実行枠は存在しない
   - completed-pr の子Issue がある場合、case-close(#epic) 相当の統合処理を Wave 反復を進行させる stage 3 内部処理として実施（統合処理は active Issue task の実行枠を消費しないが共有書き込みの直列化点として扱う。REQ-034-042）
   - 子 Issue の開始条件は必要な意味的依存条件の充足のみとする（依存充足ゲート・スロット型キュー。DEC-051）。Wave 収束（全子 Issue の実行結果確定）を後続の子 Issue 開始の前提としない。Wave 構成は意味的依存 DAG から導出される実行構成の記録単位として維持する（REQ-035-016）
@@ -113,7 +113,7 @@ context 管理:
 - 発動条件は環境制約（恒常的な書込み不能）に限定する。一時障害は既存の再試行・回復経路（子 task 中断回復パス、infra-transient 停止分類、委譲起動不能時の扱い）で扱い、フォールバックを発動しない
 - フォールバック発動時は委譲記録に発動理由（環境制約の内容）と親実施の事実を記録する
 - この許容は agentdev_gh 等の Custom Tool 境界と git 操作ガードレールを置き換えるものではない
-- 契約水準の正は REQ-003-031 および [workflows/v4-delegation-contracts.md](../workflows/v4-delegation-contracts.md)「環境制約時の親オーケストレータ直接書込みフォールバック（REQ-003-031）」節であり、本節はその case-auto 実現面の明記である
+- 契約水準の正は REQ-003-031 および [workflows/delegation-contracts.md](../workflows/delegation-contracts.md)「環境制約時の親オーケストレータ直接書込みフォールバック（REQ-003-031）」節であり、本節はその case-auto 実現面の明記である
 
 ## 所有関係と委譲
 
@@ -125,9 +125,9 @@ context 管理:
 
 ## 参照する横断 Design
 
-- [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（Pattern Taxonomy（manager-orchestrator））
-- [workflows/v4-delegation-contracts.md](../workflows/v4-delegation-contracts.md)（step_execution 委譲（v2:ADR-0127））
-- [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（Epic Wave 反復制御〔Wave 状態は子Issue 状態からの導出投影〕）
+- [workflows/lifecycle-state-machine.md](../workflows/lifecycle-state-machine.md)（Pattern Taxonomy（manager-orchestrator））
+- [workflows/delegation-contracts.md](../workflows/delegation-contracts.md)（step_execution 委譲（v2:ADR-0127））
+- [workflows/lifecycle-state-machine.md](../workflows/lifecycle-state-machine.md)（Epic Wave 反復制御〔Wave 状態は子Issue 状態からの導出投影〕）
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 責務（委譲））
 
 ## 対象外
@@ -222,7 +222,7 @@ Epic、Wave、Standard Issue、case-run 呼出しごとの独立した実行枠�
 
 ### runtime 制御契約
 
-stage 3 の runtime 制御ループは case-auto が所有し、次の契約に従う（REQ-034-040〜045、REQ-035-016、REQ-035-017、DEC-041、DEC-042。詳細は v4-runtime-execution-model「runtime 制御ループ」節）:
+stage 3 の runtime 制御ループは case-auto が所有し、次の契約に従う（REQ-034-040〜045、REQ-035-016、REQ-035-017、DEC-041、DEC-042。詳細は runtime-execution-model「runtime 制御ループ」節）:
 
 - 共有 active 枠: 1 active task は 1 Issue への実装実行委譲であり、Epic・Wave・Standard Issue を横断して active Issue task 数が上限（現行 5）を超えない
 - 空き枠補充: 各 Epic の依存充足済みの子 Issue（Wave の前後を前提としない）と Standard Issue から開始条件を満たす Issue を候補として認識し、active 数が上限未満で実行上の安全条件を満たす候補がある限り補充する（横断補充は best-effort でなく必須）。最初に起動した全 task の完了を待つ固定 batch 方式を取らず、起動間隔（10 秒）と局所的な競合回避の運用は維持する（REQ-034-040）
@@ -491,11 +491,11 @@ orchestration における受け入れ義務保存の実行時投影。
 
 本節は case-auto orchestration と ADF v5 有限実行（REQ-108）の接続を所有する。
 
-- 実行境界（REQ-108-001）: case 系各工程の委譲は委譲時最小契約（inputs、side_effect_boundary、output_contract、capture_handoff）により、実行範囲、入力、権限、検証条件をその実行中に確認できる有限実行として成立する。確認経路の正は v4-delegation-contracts Design「委譲時最小契約」節であり、本節は重複定義しない。
+- 実行境界（REQ-108-001）: case 系各工程の委譲は委譲時最小契約（inputs、side_effect_boundary、output_contract、capture_handoff）により、実行範囲、入力、権限、検証条件をその実行中に確認できる有限実行として成立する。確認経路の正は delegation-contracts Design「委譲時最小契約」節であり、本節は重複定義しない。
 - 責務分割（REQ-108-002）: case 系内部 lifecycle の各段階は v5 の責務分割語彙へ次のとおり対応する。case-open は Issue 協調（Root Case 確立）、case-ready は設計確定（execution contract と実行構造の確定）、case-run は実装・構築、case-close は検証と後処理（完了判定・マージ・Capture 回収）。各段階の独立終了の要件（設計形成が実装や Issue 作成を強制されずに独立終了できる）は現行では lifecycle 駆動の順序制御の下で実現しており、工程独立実行への接続は v5 の実行モデルの実現確定後に行う。
 - Wave の意味（REQ-108-008）: Wave は意味的な依存関係のまとまりである。Wave 構成は意味的依存 DAG から決定的に導出される実行構成の記録単位であり、runtime 上の batch や一時直列化を Wave 分割として永続化しない（「runtime 制御契約」節）。
 - 並列実行上限の実行制御独立（REQ-108-008、DEC-051 継承）: 共有 active Issue task 数の上限は Wave の個数や親子 Issue の個数から独立した実行制御であり（「並列実行の判定」「runtime 制御契約」節が正）、Epic・Wave・Standard Issue・case-run 呼び出しごとの独立した実行枠を設けない。
-- 移行期権威行（REQ-108-012）: v5 の実行モデルの実現確定までの間、本 Design と現行の実行契約（REQ-005、REQ-006、REQ-030〜032、REQ-034、REQ-035、REQ-061、REQ-062）が実行経路の正である。v5 モデルと両立しない現行要件行の再定義は、v4 -> v5 crosswalk（[../foundations/references/v4-v5-crosswalk.md](../foundations/references/v4-v5-crosswalk.md)）が優先順位を付けて棚卸し対象として管理し、本 Design は対象行の再定義を実行しない。
+- 移行期権威行（REQ-108-012）: v5 の実行モデルの実現確定までの間、本 Design と現行の実行契約（REQ-005、REQ-006、REQ-030〜032、REQ-034、REQ-035、REQ-061、REQ-062）が実行経路の正である。v5 モデルと両立しない現行要件行の棚卸し処遇は、工程遷移・独立レビューと双経路併存モデル（[../workflows/phase-transition-and-coexistence-model.md](../workflows/phase-transition-and-coexistence-model.md)）「双経路併存と移行」節の権威継続の記述（REQ-108-012、後継経路採用まで現行経路が正）へ従い、本 Design は対象行の再定義を実行しない。
 
 ## 採用規約の解決の実行経路接続（REQ-104）
 
@@ -534,13 +534,13 @@ orchestration における受け入れ義務保存の実行時投影。
 本節は case-auto が下位 command（case-run インライン実行、工程委譲）から adversarial-review 由来の停止信号を受領した際の停止伝播挙動を所有する（REQ-015-012）。
 共通契約（REQ-014）の正規定義は重複せず、各正規所有者を参照する（REQ-014-011）。
 
-- user-decision-required の位置づけ: [skills/agentdev-adversarial-review.md](../skills/agentdev-adversarial-review.md)（REQ-014-012。停止信号の状態遷移一般化は v4-lifecycle-state-machine）
-- parent_decision_required / decision_context 適用: [v4-delegation-contracts.md](../workflows/v4-delegation-contracts.md)「review 経路での parent_decision_required / decision_context 適用」節
+- user-decision-required の位置づけ: [skills/agentdev-adversarial-review.md](../skills/agentdev-adversarial-review.md)（REQ-014-012。停止信号の状態遷移一般化は lifecycle-state-machine）
+- parent_decision_required / decision_context 適用: [delegation-contracts.md](../workflows/delegation-contracts.md)「review 経路での parent_decision_required / decision_context 適用」節
 - 再 review 条件、再 review 停止条件: adversarial-review Design（REQ-014-007）
 
 ### user-decision-required の位置づけ（REQ-014-012）
 
-user-decision-required は case-run result enum（completed-pr / blocked / failed / delegation-unavailable）の第5状態ではなく、既存結果に付随する停止理由分類である（REQ-014-012、v4-lifecycle-state-machine Design が正）。
+user-decision-required は case-run result enum（completed-pr / blocked / failed / delegation-unavailable）の第5状態ではなく、既存結果に付随する停止理由分類である（REQ-014-012、lifecycle-state-machine Design が正）。
 case-auto は user-decision-required を新規 result 状態として扱わず、result 4状態のいずれかに付随する分類として受領する。
 
 | 起源 | 受領形式 |
@@ -558,8 +558,8 @@ case-auto は下位 command から user-decision-required + decision_context を
 
 1. **限定的親判断解決の先行**: 正規契約から導出可能なもの・委譲された裁量の範囲内のものは、回答して当該下位の再開点（resume point）から再開する（REQ-034-032/033）
 2. **自走停止（上位合意矛盾・新規ユーザー判断等のみ）**: 上位合意矛盾、または新規ユーザー価値判断・対象範囲変更・外部契約変更等（REQ-034-034。人間に留保された判断〔REQ-096-005〕の新規確定を要する場合）に限り、対象 execution_unit（Issue）の処理を停止し、ユーザー判断を待機する。他の ready 対象の execution_unit がある場合は継続する（部分停止、REQ-034-035/016 準拠）
-3. **ユーザー提示**: decision_context（対象案、合意候補、未解決争点、推奨案と根拠、ユーザーに確定してほしい判断）をユーザーへ提示する（decision_context 構成は v4-delegation-contracts Design が正）
-4. **resume point の記録**: 停止時の resume point を記録する。resume point は v4-lifecycle-state-machine Design に従い、case-run 起源の場合は当該 Issue の case-run 再開ポイント（準備フェーズ、実装フェーズ、提出フェーズのいずれか）、工程委譲起源の場合は当該工程の委譲起点とする
+3. **ユーザー提示**: decision_context（対象案、合意候補、未解決争点、推奨案と根拠、ユーザーに確定してほしい判断）をユーザーへ提示する（decision_context 構成は delegation-contracts Design が正）
+4. **resume point の記録**: 停止時の resume point を記録する。resume point は lifecycle-state-machine Design に従い、case-run 起源の場合は当該 Issue の case-run 再開ポイント（準備フェーズ、実装フェーズ、提出フェーズのいずれか）、工程委譲起源の場合は当該工程の委譲起点とする
 5. **resume point から再開**: ユーザー判断の解決後、resume point から処理を再開する。
 adversarial-review の再発動要否は adversarial-review Design「再 review 条件」「再 review 停止条件」の各節に従い（REQ-014-007）、case-auto は独自に判断しない。
 adversarial-review 自体を恒久的な統制ゲートとしない（REQ-014-009）
@@ -604,7 +604,7 @@ DEC-008 は歴史的判断記録として参照を維持し、本 Design の現�
 
 case-auto は回答、根拠、または作業仮定を下位 command へ返し、既存 resume point（REQ-006-114）から処理を継続する。
 新規の永続結果型を導入しない。
-resume point の仕様は v4-lifecycle-state-machine Design、v4-delegation-contracts Design「review 経路での parent_decision_required / decision_context 適用」節に従う。
+resume point の仕様は lifecycle-state-machine Design、delegation-contracts Design「review 経路での parent_decision_required / decision_context 適用」節に従う。
 adversarial-review の再実行要否は adversarial-review 側の再 review 契約（REQ-014-007/008）に従い、case-auto は独自の再 review 条件を持たない。
 
 ### case-auto が行わないこと（REQ-015-012 維持、DEC-008 決定6）
@@ -621,11 +621,11 @@ HITL 境界の変更ではなく、既存停止経路（REQ-034-022）の分類�
 
 ## v3 epic-wave-model Design からの吸収
 
-v3 epic-wave-model Design が所有していた orchestration stage モデル、ドラフト間並列実行モデル（REQ-034-025〜029）、execution_unit 並列 orchestration、case-auto 停止条件と停止理由分類のうち case-auto 実行側の運用契約は本 Design の規定へ吸収された。旧 Design は第5段で supersede とされ（物理削除は docs-chore OU-003）、対応関係の原本は v3-v4-crosswalk references/crosswalk-inventory.md が追跡する。
+v3 epic-wave-model Design が所有していた orchestration stage モデル、ドラフト間並列実行モデル（REQ-034-025〜029）、execution_unit 並列 orchestration、case-auto 停止条件と停止理由分類のうち case-auto 実行側の運用契約は本 Design の規定へ吸収された。旧 Design は削除済みであり、対応関係の記録は Git 履歴で担保する（REQ-103-020）。
 
 - orchestration stage: case-auto 内部工程を stage として構成し、ドラフト間並列実行は stage 3 で共有 active Issue task 枠（REQ-034-027、起動間隔 10 秒。Epic・Wave・Standard を横断する単一所有枠、DEC-041）とする
-- ドラフト間並列実行モデル: 複数 draft（OU 群）を依存グラフから解析し、並列実行可能性に基づいて同時起動する。直列化の単位は v4-runtime-execution-model「直列化単位表」に従う
-- 停止理由分類: 停止条件の発生時に停止理由を分類して報告する。user-decision-required は result enum の状態ではなく停止理由分類として維持する（v4-lifecycle-state-machine 異常・例外状態と回復経路）
+- ドラフト間並列実行モデル: 複数 draft（OU 群）を依存グラフから解析し、並列実行可能性に基づいて同時起動する。直列化の単位は runtime-execution-model「直列化単位表」に従う
+- 停止理由分類: 停止条件の発生時に停止理由を分類して報告する。user-decision-required は result enum の状態ではなく停止理由分類として維持する（lifecycle-state-machine 異常・例外状態と回復経路）
 
 ## 重要変更の通知と結果説明
 
