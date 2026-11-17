@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261117T131543Z-6e6a",
+  "workflow": "req-define-step3",
+  "evaluationKind": "existing-req-matching",
+  "subject": "実験原則移行・レガシー一括整理の既存REQ照合操作分類（REQ-121/109/003/058、実質変更14件、機械的11件、操作なし6件、新規REQ要否）",
+  "sourceRevision": "0a471289163c405e9d7e40a3f44de1b0e8a62fc3",
+  "durationMs": 633,
+  "inputTokens": 4584,
+  "inputs": {
+    "requestDigest": "57a61427418bd7948928cbb26573e120bbfe85d5689e68173a13693e1a1c488d",
+    "references": [
+      {
+        "digest": "56bbeda5e73c2915c62b6621e5e93cdebf9a8b8396572c1dd3330cdcd8d7f3b3",
+        "label": "要件入力（計画本体、外部 vault・リポジトリ外）",
+        "path": "C:/Users/ogatay/work/hermes-vault/project-list/req-input-experimental-cleanup-20261117.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-req121",
+      "questionForm": "choice",
+      "value": "update: REQ 廃止（retired/ 移行）を update 操作+廃止指示内容で表現する",
+      "probabilityDistribution": {
+        "update: REQ 廃止（retired/ 移行）を update 操作+廃止指示内容で表現する": 1,
+        "update: 行修正のみで現行維持（恒久保持義務の文言を緩和）": 0,
+        "append: 原則3に基づく例外規定の追加": 0,
+        "REQ操作なし: draft の realization で扱い REQ は編集しない": 0
+      }
+    },
+    {
+      "questionId": "q2-req109",
+      "questionForm": "choice",
+      "value": "update: 新原則と意味衝突する 109-002/004/007/008 の4行を修正し、維持行（001/005/006）は存続",
+      "probabilityDistribution": {
+        "update: 新原則と意味衝突する 109-002/004/007/008 の4行を修正し、維持行（001/005/006）は存続": 1,
+        "update: REQ 全体を廃止（retired/ 移行）": 0,
+        "REQ操作なし: 意味衝突はない": 0,
+        "保留: 追加調査が必要": 0
+      }
+    },
+    {
+      "questionId": "q3-substantive14",
+      "questionForm": "choice",
+      "value": "update: 全件 UPDATE（削除対象機構を義務付ける行の廃止・文言修正を含む）",
+      "probabilityDistribution": {
+        "update: 全件 UPDATE（削除対象機構を義務付ける行の廃止・文言修正を含む）": 0.98,
+        "update: REQ-010/036/007/055 の baseline 系のみ（他は機械的参照で足りる）": 0,
+        "REQ操作なし: 全件 realization で処理": 0,
+        "保留: 一部判断保留": 0.02
+      }
+    },
+    {
+      "questionId": "q4-req003",
+      "questionForm": "choice",
+      "value": "update: 3 concern を個別 action として UPDATE（フォールバック行追加・参照置換・003-024 行修正）",
+      "probabilityDistribution": {
+        "update: 3 concern を個別 action として UPDATE（フォールバック行追加・参照置換・003-024 行修正）": 0.97,
+        "update: フォールバック明記のみ（残りは realization）": 0.02,
+        "append: フォールバック例外の追加のみ": 0.01,
+        "REQ操作なし": 0
+      }
+    },
+    {
+      "questionId": "q5-req058",
+      "questionForm": "choice",
+      "value": "update: retired-artifact-registry.yaml 削除に伴う行修正（既存クリーンアップ契約行の整合化）",
+      "probabilityDistribution": {
+        "update: retired-artifact-registry.yaml 削除に伴う行修正（既存クリーンアップ契約行の整合化）": 0.57,
+        "append: クリーンアップ契約の新規追加": 0.14,
+        "REQ操作なし: realization のみで足りる": 0.24,
+        "保留": 0.05
+      }
+    },
+    {
+      "questionId": "q6-mechanical11",
+      "questionForm": "choice",
+      "value": "update: 機械的参照置換として全件 UPDATE（意味変更なし、artifact_actions に明示）",
+      "probabilityDistribution": {
+        "update: 機械的参照置換として全件 UPDATE（意味変更なし、artifact_actions に明示）": 0.77,
+        "REQ操作なし: draft の機械的置換指示（realization）で扱い REQ ファイルは編集しない": 0.23,
+        "保留: 置換対象の確定を待つ": 0
+      }
+    },
+    {
+      "questionId": "q7-noop6",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.72,
+        "false": 0.28
+      }
+    },
+    {
+      "questionId": "q8-no-new-req",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.73,
+        "false": 0.27
+      }
+    }
+  ],
+  "confidence": 1,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-req121",
+        "value": "update: REQ 廃止（retired/ 移行）を update 操作+廃止指示内容で表現する"
+      },
+      {
+        "questionId": "q2-req109",
+        "value": "update: 新原則と意味衝突する 109-002/004/007/008 の4行を修正し、維持行（001/005/006）は存続"
+      },
+      {
+        "questionId": "q3-substantive14",
+        "value": "update: 全件 UPDATE（削除対象機構を義務付ける行の廃止・文言修正を含む）"
+      },
+      {
+        "questionId": "q4-req003",
+        "value": "update: 3 concern を個別 action として UPDATE（フォールバック行追加・参照置換・003-024 行修正）"
+      },
+      {
+        "questionId": "q5-req058",
+        "value": "update: retired-artifact-registry.yaml 削除に伴う行修正（既存クリーンアップ契約行の整合化）"
+      },
+      {
+        "questionId": "q6-mechanical11",
+        "value": "update: 機械的参照置換として全件 UPDATE（意味変更なし、artifact_actions に明示）"
+      },
+      {
+        "questionId": "q7-noop6",
+        "value": true
+      },
+      {
+        "questionId": "q8-no-new-req",
+        "value": true
+      }
+    ]
+  }
+}
