@@ -18,7 +18,7 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integr
 | category | obsolete-structure |
 | detection_method | `check_integrity.ts` による行単位走査。検出パターンはスクリプト内 `IR065_VOCAB_PATTERNS` 定数、許容条件の運用データ（existence_probe、exemption_files、否定文脈語）は `data/obsolete-vocabulary-map.yaml` が宣言する |
 | affected_artifacts | [docs/designs/**, docs/requirements/*.md, docs/decisions/*.md, docs/guides/*.md, src/opencode/**, .opencode/commands/**, .agentdev/extensions/**]（詳細は yaml scope） |
-| related_req | [REQ-010-066, REQ-010-068] |
+| related_req | [REQ-010-068] |
 | related_design | [../integrity-rule-catalog.md, data/obsolete-vocabulary-map.yaml] |
 | gate_level | full-audit |
 | false_positive_risk | 中。行レベル履歴マーカー（旧/移行/廃止/履歴 等、`hasLineLevelHistoryMarker`）、retired 系見出し配下、superseded Decision、否定文脈語、exemption_files、existence_probe で歴史文脈を許容する。`REQ/ADR/` 種別列挙は Wave 2 の正規化対象外領域に 34 件残存するため baseline で管理する |
