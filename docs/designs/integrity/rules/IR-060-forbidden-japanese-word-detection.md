@@ -12,7 +12,7 @@ verification_path: src/opencode/plugins/agentdev-textlint-guard/tests/standard-d
 
 現行 Markdown 本文における、固定置換できる禁止表現の機械検出。
 一般文章の表層検査は textlint 共通基盤が所有し、本ルールは移管対象と移管対象外の責務境界を記録する。
-履歴文脈、廃止語彙、旧パス、識別子に関わる検査は IR-065 / IR-066 等の既存 integrity checker が所有する。
+履歴文脈、廃止語彙、旧パス、識別子に関わる検査は、かつて既存 integrity checker が担っていた（当該廃止語彙・旧パス検出ルールは Epic #4126 Phase 4 で削除済み。現行では IR-015 系の retired 参照検査と inspect-docs の意味診断が扱う）。
 
 | Field | Value |
 |-------|-------|
@@ -53,8 +53,8 @@ verification_path: src/opencode/plugins/agentdev-textlint-guard/tests/standard-d
 
 ## 既存 integrity checker との境界
 
-IR-065 は廃止語彙の現行使用を、IR-066 は旧パス・削除済み名称・歴史的識別子を検査する。
-これらは存在確認、履歴文脈、否定文脈を扱うため、textlint の一般文章辞書へ移管しない。
+廃止語彙・旧パス・削除済み名称・歴史的識別子の検査を担っていたルールは Epic #4126 Phase 4 で削除済みである。
+これらは存在確認、履歴文脈、否定文脈を扱う検査であり、textlint の一般文章辞書へは移管していない。
 IR-060 は一般文章の固定置換だけを扱い、構造、参照、ライフサイクルの検査を重複実装しない。
 
 ## 関連

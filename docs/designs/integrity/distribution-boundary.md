@@ -82,35 +82,19 @@ distribution purity check は、distribution-bound artifact 内の producer 側�
 REQ-029-004 が許容する generic および template 参照は、producer 内部へ解決しないことを条件に許容する。
 ルールレベルで許容集合を定義し、個別承認例外（individual accepted exception）とは区別する。
 
-## ベースラインと個別承認例外の区別
+## baseline 運用の撤廃と residual 参照の処遇区分（REQ-010-074/079、Epic #4126 Phase 4）
 
-ベースライン（baseline）は既知の検出事項集合を管理する運用機構であり、ルールレベルの許容（generic と template）とは別物である。
-個別承認例外は特定の検出事項に対して個別に付与された承認であり、ルール一般を書き換えない。
-誤検出抑制（false-positive suppression）は検出器の挙動であり、承認例外とは区別する。
+baseline（IR-059 baseline、NG baseline）による既知違反の免除管理・delta 運用、および個別承認例外（exemptions.json）は撤廃済みである（IR-055・IR-059 の検出器自体は存続。IR-073 と同一の扱い）。
+検出された concrete-id 等の違反は免除せず、検出エントリごとに次の処遇区分で直接修正する。
+
+- **表現是正区分**: 文面が自己完結しており、出典参照の除去または一般化表現への置換で consumer 解決不能性が解消できる参照。配布物本文の記述規則に従い是正する
+- **出典移管区分**: 出典明示の情報価値が是正で代替できず、producer 側開発者向けの正規出典として保持する価値がある参照。出典情報の正規保持先は producer 側 traceability/ 配下 sidecar への登録であり、配布物本文へ出典番号を投影しない
+
+配布物本文の記述規則（一般化表現、concrete ID 非記載）が原則である。ルールレベルの許容（generic と template）と誤検出抑制（false-positive suppression、検出器の挙動調整）は baseline 機構と別物として現行どおり維持する。
 
 ID プレースホルダー（IR-{NNNN} 等）の裸出力は、表の根拠列・パターン定義内など正規様式として許容する領域を除外規則で定義する。許容領域の裸出力は unclassified-entry 検出の対象外とする（IR-064 文脈許容様式との連動: ru-batch-20260903）。
 
-### concrete-id ベースライン再取得手順
-
-配布依存境界の concrete-id ベースラインは、配布物の concrete ID 是正完了後に次の手順で再取得する。
-
-1. 対象 commit を最新 main として特定する
-2. source profile と link profile を main root から読取専用で実行する（checker 実行契約の安定実行経路に従う）
-3. 検出された concrete-id エントリ集合（対象 commit、profile 種別、エントリ一覧、件数）を記録様式に従い baseline へ反映する
-4. 再取得の根拠（対象 commit SHA、実行コマンド、件数の増減）を PR 本文へ記載する
-
-再取得により、解消済み違反の baseline 残存と、現行違反 0件との差異を解消する。
-
-baseline 未整備環境で concrete-id 検出を伴う gate を実行する場合の対照実行による合格判定（新規違反 delta 0 実証）の判定手順は、NG baseline 運用手順（integrity-contracts.md）が正規所有する。本 Design は判定手順を複製せず、参照に留める。
-
-### 検査機構間の baseline 運用の整合と residual 参照の処遇区分
-
-check_distribution_boundary と check_integrity は、重複する検出対象領域で baseline 管理（approved additions）の適用有無が分かれ得る。判定差は baseline 運用の機構統合ではなく、検出エントリごとの処遇区分で解消する。判定差の解消は baseline 参照統合（check_distribution_boundary が check_integrity の baseline を機械的に参照する方式）を行わず、処遇区分のみで運用する。
-
-- **表現是正区分**: 文面が自己完結しており、出典参照の除去または一般化表現への置換で consumer 解決不能性が解消できる参照。配布物本文の記述規則に従い是正する。是正完了後、baseline 残置は concrete-id ベースライン再取得手順で解消する
-- **baseline 追加区分**: 出典明示の情報価値が是正で代替できず、producer 側開発者向けの正規出典として保持する価値が明示承認された参照。個別承認例外として baseline へ登録し、検査から許容する
-
-配布物本文の記述規則（一般化表現、concrete ID 非記載）が原則であり、baseline 追加は例外である。該当エントリが baseline 管理済みの別検査機構で許容されていることだけを baseline 追加の根拠にしない。出典情報の正規保持先は producer 側 traceability/ 配下 sidecar であり、配布物本文へ出典番号を投影しない。
+配布物本文の記述規則に従わない producer 内部参照の排除（REQ-029-001）と baseline 変更禁止の制約（撤廃済み）に依存する表現は、上記の処遇区分へ読み替える。
 
 ## 共有 detector と adapter の契約
 
@@ -169,7 +153,7 @@ Epic 実装はこれに従う。
 - 共有 module: 副作用なし（side-effect-free）の canonical detector module は repo-agentdev-integrity 配下が所有する。想定モジュールパスは `.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts`。既存の checker はこの共有 module への adapter となる。
 - repo-local plugin: 原本は `src/opencode/plugins/agentdev-distribution-boundary-guard/` 配下（package.json に repo-local 配布除外の判定根拠を含む）。利用側は self-sync 投影（`.opencode/plugins/agentdev-distribution-boundary-guard/` junction + depth-1 loader shim `agentdev-distribution-boundary-guard.ts`）。
 - plugin からの相対 import は、移動後に想定モジュールパス（canonical detector `.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts`）へ src 配下から .opencode 配下への逆向き参照になる（REQ-018 テスト fallback 観点）。
-- 旧名称・旧パス（distribution-boundary-guard、`.opencode/plugins/distribution-boundary-guard.ts`）を obsolete-vocabulary-map.yaml（IR-066）へ登録し、並存禁止を機械検出可能にする方針とする。
+- 旧名称・旧パス（distribution-boundary-guard、`.opencode/plugins/distribution-boundary-guard.ts`）の残存は IR-055（runtime-unresolved-reference）の検出対象であり、 旧パス対照表（obsolete-vocabulary-map.yaml、削除済み）への登録運用は撤廃済みである。並存禁止は IR-055 の検出と case-close の最終検証で担保する。
 - 事前書き込み gate: OpenCode の `tool.execute.before` フック（サポート対象は `edit`、`write`、`apply_patch`）で構成する。adapter は prospective content を評価し、違反または検査エラー時に書き込みを block する。
 - archive 公開前検査の呼び出し点: `scripts/self/release/package-release-archive.ps1` が最終公開前に一時 archive を検証する。
 - archive-installed 検証の配置: 一時的な consumer/archive-install パスを用いて archive-installed projection を検証する。consumer 向け公開入口（scripts/install.ps1）へ新たな責務を追加しない。archive-installed 検証は consumer 向け公開入口を利用しない別経路を維持する（特定入口名への再刻印を避け、将来の入口再編で再度陳腐化しない一般化表現とする）。

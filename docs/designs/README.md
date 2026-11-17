@@ -18,8 +18,7 @@ Design ファイルは、REQ を満たすために現在採用している内部
 - **更新タイミング**: case-ready / case-revise（draft 保存。保存実体は Capability Skill 委譲）、case-close（draft から accepted への昇格）の各工程で本ファイルの status 列を更新する。基盤Design も同一工程に従う
 - **欠落扱い**: `status` frontmatter を持たない Design は `accepted` 相当として扱う
 
-draft status の Design が一定期間更新されず放置されることを検出するルール（IR-054）は [integrity-rule-catalog.md](integrity/integrity-rule-catalog.md) 参照。
-基盤Design も IR-054 の検出対象に含む。
+draft status の Design の放置は本 README の status 列追跡と case-close の Design 確定工程で管理する（旧 draft 放置検出ルールは Epic #4126 Phase 4 で削除済み）。
 
 ### 基盤Design 一覧表の status 列
 

@@ -40,7 +40,7 @@ req-health-metrics.md と対となる Design 健全性の定量メトリクス�
 |---|---|---|
 | 0〜30 日 | +0 | 健全 |
 | 31〜90 日 | +1 | 放置傾向。case-close での昇格を促進 |
-| 91 日以上 | +2 | 放置。IR-054 対象 |
+| 91 日以上 | +2 | 放置（status 列追跡対象） |
 
 ### ドメイン分類適合
 
@@ -59,7 +59,7 @@ Design 計測例（全 Design の行数・status・ドメイン分類の表）�
 
 - **req-health-metrics.md**: REQ 健全性メトリクス。本 Design は Design 健全性メトリクスとして対をなす（REQ/Design 双方向メトリクス）
 - **document-model.md**: ドメイン分類の定義元。本 Design のドメイン分類適合判定が参照する
-- **integrity-rule-catalog.md IR-054**: draft Design 放置検出ルール。本 Design の放置期間閾値と連動する
+- **draft Design 放置管理**: docs/designs/README.md status 列追跡と case-close の Design 確定工程で管理する（旧 draft 放置検出ルールは Epic #4126 Phase 4 で削除済み）。本 Design の放置期間閾値と連動する
 - **REQ-001**: Design status 追跡と draft 放置検出。本 Design の放置期間メトリクスと連動する
 
 ## 機械化境界

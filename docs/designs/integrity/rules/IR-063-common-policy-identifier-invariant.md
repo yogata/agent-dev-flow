@@ -54,10 +54,9 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integr
 | registry 所有 skill を含まない配布ツリー | registry 所有 skill（`agentdev-command-authoring`）自体が存在しない最小構成（テスト fixture 等）は本検査の適用対象外 |
 | repo-local command（`.opencode/commands/repo/`） | 配布対象外のため機械検査の対象外 |
 
-## baseline 運用
+## baseline 運用（撤廃済み）
 
-新体系の検査は移行完了時点で既知違反 0 であるため、NG baseline エントリを持たない。新規違反は strict fail として扱う。
-
+baseline による既知違反の免除管理・delta 運用は撤廃済みである（REQ-010-074/079、Epic #4126 Phase 4）。導入時点の既知違反は全件解消済みであり、現行の検出違反は免除せず対象側の直接修正で即時解消する。新規違反は strict fail として失敗する。
 ## See Also
 
 - [integrity-rule-catalog.md](../integrity-rule-catalog.md)

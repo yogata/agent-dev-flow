@@ -1,6 +1,6 @@
 // ADF-COVERS(implementation): REQ-047-009
 // ADF-COVERS(implementation): REQ-047-010
-// IR-046/047/048 rules: repo-self-hosting-specific distribution integrity
+// IR-047/048 rules: repo-self-hosting-specific distribution integrity
 // checks that complement the canonical detector. Phase 3 §6.3 / Phase 6
 // delegation. Declarative data is in data/distribution-targets.yaml (Wave 6).
 // Per REQ-047-009 the YAML is the canonical detection-definition source and
@@ -53,8 +53,6 @@ const DISTRIBUTION_TARGETS_LOCAL_PATH = path.join(
 );
 
 export interface DistributionTargets {
-  /** IR-046: self-hosting-only content markers forbidden in distributed content. */
-  readonly ir046Markers: readonly string[];
   /** IR-047: subdirectories allowed under src/opencode-local/. */
   readonly ir047Allowed: readonly string[];
   /** IR-048: generated_by marker prefix scanned in the local-mode link target. */
@@ -144,7 +142,6 @@ export function loadDistributionTargets(
   }
   const root = parsed as Record<string, unknown>;
 
-  const repoKind = requireObject(root.repo_kind_rules, "repo_kind_rules");
   const linkTarget = requireObject(
     root.link_target_structure_rules,
     "link_target_structure_rules",
@@ -155,10 +152,6 @@ export function loadDistributionTargets(
   );
 
   return {
-    ir046Markers: requireStringArray(
-      repoKind.self_hosting_only_markers,
-      "repo_kind_rules.self_hosting_only_markers",
-    ),
     ir047Allowed: requireStringArray(
       linkTarget.allowed_link_subdirs,
       "link_target_structure_rules.allowed_link_subdirs",
@@ -174,7 +167,6 @@ export interface DistributionRulesResult {
   ok: boolean;
   findings: DistributionRuleFinding[];
   stats: {
-    ir046_hits: number;
     ir047_hits: number;
     ir048_hits: number;
     scanned_files: number;
@@ -255,32 +247,6 @@ function scanTexts(files: readonly string[]): ScannedFile[] {
     out.push({ file, text: r.ok ? r.text : null });
   }
   return out;
-}
-
-function checkIr046(
-  scanned: readonly ScannedFile[],
-  markers: readonly string[],
-): DistributionRuleFinding[] {
-  const findings: DistributionRuleFinding[] = [];
-  for (const { file, text } of scanned) {
-    if (text === null) continue;
-    const lines = text.split(/\r?\n/);
-    for (let i = 0; i < lines.length; i++) {
-      for (const marker of markers) {
-        const line = lines[i];
-        if (line !== undefined && line.includes(marker)) {
-          findings.push({
-            rule: "ir046",
-            file,
-            line: i + 1,
-            matched: marker,
-            description: "self-hosting-only marker detected in distributed content",
-          });
-        }
-      }
-    }
-  }
-  return findings;
 }
 
 function checkIr047(
@@ -373,12 +339,10 @@ export function checkDistributionRules(repoRoot: string): DistributionRulesResul
   const publicFiles = listPublicMarkdownFiles(repoRoot);
   const publicScanned = scanTexts(publicFiles);
 
-  const ir046 = checkIr046(publicScanned, targets.ir046Markers);
   const ir047 = checkIr047(repoRoot, targets.ir047Allowed);
   const ir048 = checkIr048(repoRoot, targets.ir048Prefix);
 
   const findings: DistributionRuleFinding[] = [
-    ...ir046,
     ...ir047,
     ...ir048.findings,
   ];
@@ -387,7 +351,6 @@ export function checkDistributionRules(repoRoot: string): DistributionRulesResul
     ok: findings.length === 0,
     findings,
     stats: {
-      ir046_hits: ir046.length,
       ir047_hits: ir047.length,
       ir048_hits: ir048.findings.length,
       scanned_files: publicScanned.length + ir048.scanned,

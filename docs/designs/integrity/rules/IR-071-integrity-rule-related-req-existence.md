@@ -44,10 +44,9 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integr
 | プレースホルダー様式例示（`REQ-010-NNN` 等の非数字形式） | 正規表現上マッチしない（REQ-010-065 許容条件準拠） |
 | related_req 未記述・空配列の IR | 実在性検査の対象フィールドが存在しない（IR-061 の `-` セル等） |
 
-## baseline 運用
+## baseline 運用（撤廃済み）
 
-本ルールは strict で即時 fail とする（baseline 不要）。導入時点（REQ-051-009、Case #3119）で既知のファントム参照は IR-055 の再アンカー（fix → 検査導入の順序、CR-003）により解消済みであるため、導入直後の自己適用で既存違反は発生しない設計である。
-
+baseline による既知違反の免除管理・delta 運用は撤廃済みである（REQ-010-074/079、Epic #4126 Phase 4）。導入時点の既知違反は全件解消済みであり、現行の検出違反は免除せず対象側の直接修正で即時解消する。新規違反は strict fail として失敗する。
 ## See Also
 
 - [integrity-rule-catalog.md](../integrity-rule-catalog.md)

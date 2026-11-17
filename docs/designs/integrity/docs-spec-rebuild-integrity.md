@@ -73,7 +73,7 @@ BOM なし UTF-8 かつ単一の改行コードで構成されたファイルは
 | pre-existing | 今回の変更以前から存在する既知の問題 | 別途要件化 |
 | 今回修正対象 | 今回の変更で導入、残存した問題 | 今回の Issue で修正 |
 
-## REQ-002-028/029/035 RETIRE 後の正規根拠
+## 旧配布物品質契約行（`REQ-002-028/029/035` 相当、DEC-014 決定6 で RETIRE）の正規根拠
 
 構文健全性検査と責務整合検査の正規根拠は、本 Design（docs-spec-rebuild-integrity.md）と `responsibilities/document-type-responsibilities.md`、`quality/req-health-metrics.md` の既存品質契約である。
 REQ-007 行は新設しない。

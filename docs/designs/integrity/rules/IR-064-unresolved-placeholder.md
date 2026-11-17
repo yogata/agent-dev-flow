@@ -45,10 +45,9 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integr
 | 全角引用「」内 | 検出キーワードの列挙例示（「TODO」「FIXME」等） |
 | 表の根拠列・検出器語彙・パターン定義内の裸出力 | 正規様式の文脈許容。IR-{NNNN} 等の ID プレースホルダーは本文中では backtick 包囲を正とするが、表の根拠列・検出器語彙・パターン定義内など様式上 backtick 包囲が成立しない領域は裸出力を許容する。許容領域の定義は distribution-boundary Design の除外規則と一致させる |
 
-## baseline 運用
+## baseline 運用（撤廃済み）
 
-導入時点（Issue #2372、2026-08-22）の既知違反は ID プレースホルダー裸出力 48 件（TODO 系は 0 件）。裸出力は委譲注記様式として一貫使用されているが、様式の正規契約（backtick 包囲等）が未確定のためヒューリスティック（heuristic）とし、NG baseline additions manifest（provenance `issue-2372-ir064-initial-baseline`）で管理する。様式の正規化は Design 確定候補・intake 経由で判断する。
-
+baseline による既知違反の免除管理・delta 運用は撤廃済みである（REQ-010-074/079、Epic #4126 Phase 4）。導入時点の既知違反は全件解消済みであり、現行の検出違反は免除せず対象側の直接修正で即時解消する。新規違反は strict fail として失敗する。
 ## See Also
 
 - [integrity-rule-catalog.md](../integrity-rule-catalog.md)

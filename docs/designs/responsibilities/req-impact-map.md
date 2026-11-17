@@ -26,16 +26,15 @@ updated: 2026-11-15
 <!-- AUTOGEN:BEGIN:id=req-impact-map-req-ir-crossref -->
 | REQ | タイトル | 影響する Rule IDs |
 |-----|---------|------------------|
-| [REQ-001](../../requirements/REQ-001.md) | 文書体系と持続可能な基準構造 | IR-001, IR-024, IR-025, IR-027, IR-037, IR-038, IR-039, IR-040, IR-041, IR-042, IR-043, IR-044, IR-054, IR-057 |
-| [REQ-002](../../requirements/REQ-002.md) | 配布成果物の責務境界 | IR-006, IR-014, IR-056, IR-058 |
+| [REQ-001](../../requirements/REQ-001.md) | 文書体系と持続可能な基準構造 | IR-001, IR-024, IR-025, IR-027, IR-037, IR-038, IR-039, IR-040, IR-041, IR-042, IR-043, IR-044 |
+| [REQ-002](../../requirements/REQ-002.md) | 配布成果物の責務境界 | IR-006, IR-056, IR-058 |
 | [REQ-003](../../requirements/REQ-003.md) | 委譲時の判断・承認・副作用境界 | IR-030, IR-031, IR-032, IR-033 |
-| [REQ-009](../../requirements/REQ-009.md) | 配布基盤と導入モデル | IR-046, IR-048, IR-057 |
-| [REQ-010](../../requirements/REQ-010.md) | 自己監査コマンド（docs-check） | IR-001, IR-002, IR-003, IR-004, IR-005, IR-007, IR-010, IR-012, IR-015, IR-018, IR-021, IR-024, IR-034, IR-035, IR-039, IR-044, IR-049, IR-050, IR-051, IR-052, IR-060, IR-062, IR-063, IR-064, IR-065, IR-066, IR-067, IR-068, IR-069, IR-070, IR-072, IR-073 |
+| [REQ-009](../../requirements/REQ-009.md) | 配布基盤と導入モデル | IR-048 |
+| [REQ-010](../../requirements/REQ-010.md) | 自己監査コマンド（docs-check） | IR-001, IR-002, IR-003, IR-004, IR-005, IR-007, IR-010, IR-012, IR-015, IR-018, IR-024, IR-034, IR-035, IR-039, IR-044, IR-049, IR-050, IR-051, IR-052, IR-060, IR-062, IR-063, IR-064, IR-067, IR-068, IR-069, IR-070, IR-072, IR-073 |
 | [REQ-011](../../requirements/REQ-011.md) | I/O境界と外部連携手段 | IR-053 |
 | [REQ-018](../../requirements/REQ-018.md) | worktree 構造的制約とテスト fallback | IR-068 |
 | [REQ-029](../../requirements/REQ-029.md) | 配布依存境界 | IR-055, IR-059 |
-| [REQ-036](../../requirements/REQ-036.md) | 検出と診断コマンド群（inspect 系） | IR-008, IR-009, IR-013, IR-057, IR-060 |
-| [REQ-037](../../requirements/REQ-037.md) | 取り込みパイプライン（intake） | IR-014 |
+| [REQ-036](../../requirements/REQ-036.md) | 検出と診断コマンド群（inspect 系） | IR-008, IR-013, IR-060 |
 | [REQ-039](../../requirements/REQ-039.md) | バックログ統合（backlog-review） | IR-006 |
 | [REQ-047](../../requirements/REQ-047.md) | 規則所有権の一方向化 | IR-074 |
 | [REQ-051](../../requirements/REQ-051.md) | ガードレール識別体系と機械検査の再編 | IR-063, IR-071 |
@@ -48,9 +47,9 @@ updated: 2026-11-15
 REQ 全体ではなく要件行粒度で境界基準、検出観点の影響を追跡する必要がある場合に使用する。
 これらの要件行はすべて IR-044（REQ/Design 境界違反検出）を通じてカタログに紐づく。
 
-従来 REQ-002-021、022、023、024、025、026、032 に紐づいていた配布依存境界の影響エントリは MOVE 先（REQ-029-001..008）へ差し替え済みである。
+従来の配布依存境界関連の旧行群（`REQ-002-021..026`、`032` 相当。現行 corpus には存在しない行）に紐づいていた影響エントリは MOVE 先（REQ-029-001..008）へ差し替え済みである。
 REQ-002-027 は更新後の意味（実行時依存として使用するパスは導入先環境で解決可能）へ差し替えた。
-REQ-002-028、029、035 は RETIRE 扱いとし、それぞれの検査（構文健全性、責務整合、case-auto.md 段階解消）は既存品質契約（`integrity/docs-spec-rebuild-integrity.md`、`responsibilities/document-type-responsibilities.md`、`quality/req-health-metrics.md`）と Epic 完了条件へ集約した（REQ-007 行は新設しない）。
+旧配布物品質契約行（`REQ-002-028/029/035` 相当、現行 corpus には存在しない行。DEC-014 決定6）は RETIRE 扱いとし、それぞれの検査（構文健全性、責務整合、case-auto.md 段階解消）は既存品質契約（`integrity/docs-spec-rebuild-integrity.md`、`responsibilities/document-type-responsibilities.md`、`quality/req-health-metrics.md`）と Epic 完了条件へ集約した（REQ-007 行は新設しない）。
 詳細は Retired cross-references 節へ追記する。
 
 | 要件行 | 影響するアーティファクト / スキル / コマンド | 経由 |
@@ -61,15 +60,15 @@ REQ-002-028、029、035 は RETIRE 扱いとし、それぞれの検査（構文
 
 ## 再発トリアージ（Recurrence Triage）
 
-再発検出事項検出時の対応ループ:
+再発検出事項検出時の対応ループ（baseline による既知/新規管理は撤廃済み。検出違反は全件を新規扱いで直接修正する）:
 
-1. **検出**: 検出事項が基準既知（baseline-known）に存在するか確認
-2. **分類**: known (基準済み) vs new
-3. **再発判定**: known 検出事項が再度検出された場合:
+1. **検出**: 検出事項を全件新規として報告する（baseline による免除管理は行わない。REQ-010-074/079）
+2. **分類**: 誤検知（false positive）か真の違反かを判定する
+3. **再発判定**:
   - ルール、検出器の誤検知 → ルールを修正（false positive）
   - 真の再発 → 検出器を強化、または検出ルールを追加
-  - 基準判定ミス → 基準（baseline）を更新
-4. **改善ループ**: ルールカタログ / 基準 / 影響マップ / 例外を更新
+  - 対象側の要因 → 対象ファイル側を直接修正する
+4. **改善ループ**: ルールカタログ / 影響マップ / 例外を更新
 5. **記録**: トリアージ結果を整合性レポートに記録
 
 ## IR → REQ 逆方向参照（ACT-SPEC-006）
@@ -133,3 +132,19 @@ IR-020（基準既知（baseline-known）と新規 finding の区別）は独立
 | 旧交叉参照 | 旧タイトル | 再配置元 | 再配置日 | 後継 |
 |---|---|---|---|---|
 | `IR-020` | 基準既知（baseline-known）と新規 finding の区別 | integrity-rule-catalog.md ルールインデックス AUTOGEN（`catalog-ir-entries-pre-045`）・影響マトリクス REQ-010 行 AUTOGEN・rule-ownership.md IR 別関連マッピング AUTOGEN・check_integrity.ts annotateIrIds の IR-020 名義 | 2026-11-15 | integrity-contracts.md「finding-baseline 分類」「RuntimeReference baseline 運用手順」「NG baseline 運用手順」各節 |
+
+### IR-009/014/021/046/054/057/065/066 削除に伴う交叉参照再配置
+
+IR-009（旧 namespace 残存）、IR-014（reference/ 残存検出）、IR-021（廃止済み skill 参照検出）、IR-046（consumer-generated リポジトリ種別誤検知防止）、IR-054（draft Design 放置検出）、IR-057（obsolete-spec-path-after-domain-split）、IR-065（obsolete-vocabulary-current-use）、IR-066（legacy-path-removed-name）の8ルールは、レガシー移行資産の完全削除（Epic #4126 Phase 4、OU-004）に伴いルールファイル・checker 実装・テストアサーションを物理削除した（DEC-064、REQ-010-003）。移行期の暫定統制であり、恒久維持義務を負わない。
+宣言的データ（data/obsolete-path-map.yaml、data/obsolete-vocabulary-map.yaml、data/retired-artifact-registry.yaml）と実装側スクリプト（ir057_history_exemption.ts、check_retired_artifact_residual.ts）も同時に削除した。IR-055・IR-059 は baseline 運用のみ撤廃して検出器として存続する。影響マトリクスの各行は AUTOGEN 再生成により削除 IR を自動除外する。
+
+| 旧交叉参照 | 旧タイトル | 再配置元 | 再配置日 | 後継 |
+|---|---|---|---|---|
+| `IR-009` | 旧 namespace 残存 | 影響マトリクス REQ-010/REQ-036 行 AUTOGEN・rule-ownership.md IR 別関連マッピング AUTOGEN・check_integrity.ts checkLegacyNamespace | 2026-11-18 | なし（レガシー移行資産の完全削除で暫定統制の義務消滅） |
+| `IR-014` | reference/ 残存検出 | 影響マトリクス REQ-002/REQ-037 行 AUTOGEN・rule-ownership.md IR 別関連マッピング AUTOGEN・check_integrity.ts checkObsoleteReferenceDirs | 2026-11-18 | なし（SKILL frontmatter 検査の obsolete reference/ 判定も同時削除） |
+| `IR-021` | 廃止済み skill 参照検出 | 影響マトリクス REQ-010 行 AUTOGEN・rule-ownership.md IR 別関連マッピング AUTOGEN・check_integrity.ts checkAbolishedSkillReferences | 2026-11-18 | なし（同上） |
+| `IR-046` | consumer-generated リポジトリ種別誤検知防止 | 影響マトリクス REQ-009 行 AUTOGEN・rule-ownership.md IR 別関連マッピング AUTOGEN・lib/distribution-boundary-rules.ts checkIr046 | 2026-11-18 | なし（IR-047/048 は存続） |
+| `IR-054` | draft Design 放置検出 | 影響マトリクス REQ-001 行 AUTOGEN・rule-ownership.md IR 別関連マッピング AUTOGEN・check_integrity.ts checkDraftSpecStaleness | 2026-11-18 | docs/designs/README.md status 列追跡 + case-close Design 確定工程 |
+| `IR-057` | obsolete-spec-path-after-domain-split | 影響マトリクス REQ-001/REQ-009/REQ-036 行 AUTOGEN・rule-ownership.md IR 別関連マッピング AUTOGEN・check_integrity.ts checkObsoleteSpecPath・check_changed_docs.ts IR-057 validator | 2026-11-18 | なし（data/obsolete-path-map.yaml も同時削除） |
+| `IR-065` | obsolete-vocabulary-current-use | 影響マトリクス REQ-010 行 AUTOGEN・rule-ownership.md IR 別関連マッピング AUTOGEN・check_integrity.ts checkObsoleteVocabulary | 2026-11-18 | なし（data/obsolete-vocabulary-map.yaml も同時削除。vocabulary-registry 対照表運用は存続） |
+| `IR-066` | legacy-path-removed-name | 影響マトリクス REQ-010 行 AUTOGEN・rule-ownership.md IR 別関連マッピング AUTOGEN・check_integrity.ts checkObsoleteVocabulary / checkDocsDesignsLegacyPathDeclarations | 2026-11-18 | なし（同上） |

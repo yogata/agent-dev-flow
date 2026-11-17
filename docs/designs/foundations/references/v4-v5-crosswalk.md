@@ -92,7 +92,7 @@ REQ-111、DEC-058 に基づく工程駆動実行の確定は、REQ-005-001/010/0
 本節は 2026-11-15 の joint triage (b)（inspect S-1 promote 成果物に由来する draft 放置解消）の実施記録である。処遇実行原則に従い対象行本文の書き換えと廃止・昇格は行わず、status は draft を維持する。
 
 - 親 v5-adopted-conventions の 2026-11-04「解決手順」節更新（resolver 接続点の構造化）の子側波及はなしと判定した。採用規約 resolver の接続構造と本 crosswalk の棚卸し構造（分類スキーマ・処遇実行原則）は独立に保持する
-- living tracking（planned → confirmed → executed）の長期休止期間と frontmatter updated の最新化は併存する。処遇遷移は後続工程の契機で記録され、updated（内容最終変更日）の進行とは独立である（IR-054 対応）
+- living tracking（planned → confirmed → executed）の長期休止期間と frontmatter updated の最新化は併存する。処遇遷移は後続工程の契機で記録され、updated（内容最終変更日）の進行とは独立である（旧 draft 放置検出ルール対応。同ルールは Epic #4126 Phase 4 で削除済み）
 - R-1（REQ-035-006 の旧 Wave 語彙「実行スケジューリング単位」）の再評価: 処遇実行原則により対象行本文は書き換えない。keep 処遇と備考の後続処理扱いを維持し、defer を継続する（再評価契機: REQ-035 次回更新時または v5 実行モデルの実現確定時）
 - S-2（REQ-108-012 と REQ-111-013 の covers 宣言重複）の再評価: 両宣言のスコープは補完的である（現行経路権威の維持と処遇記録構造の所有）。集約せず、宣言行様式は変更しない。defer を継続する（再評価契機: v4-standard-lifecycle Design の次回更新時）
 - 親行（docs/designs/README.md の v5-adopted-conventions 行）の備考へ本 joint triage の実施記録を追記した

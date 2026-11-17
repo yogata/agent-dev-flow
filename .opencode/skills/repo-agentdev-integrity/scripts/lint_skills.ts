@@ -94,13 +94,8 @@ function extractSeeAlsoReferences(content: string): string[] {
 //   Workflow Skill のみ肯定検証）/ 300 行超 references の目次欠落。
 // warn: 集約予算（平均 350×N、N = src/common/skills 配下の SKILL.md 実ファイル数）。
 //
-// Pre-existing violations known at introduction are grandfathered via
-// baselines/lint-skills-baseline.json using the same delta-aware semantics as
-// the check_integrity.ts NG baseline (v2:REQ-0161-005): baseline-known
-// ng/warning findings are demoted to info, only findings exceeding the
-// baseline drive the exit code. OU-002〜005 (Epic #2178 Waves 2-3) remove the
-// violations and must shrink or delete the corresponding baseline entries in
-// the same PRs.
+// baseline による grandfathering は撤廃済み（baseline 運用の撤廃）。検出された
+// 違反は免除せず、対象側の直接修正で解消する。
 
 const AG005_CATEGORY = "AG-005";
 const DESC_INDIVIDUAL_LIMIT = 600;
@@ -336,112 +331,6 @@ function aggregateBudgetResultAg005(
   );
 }
 
-// ===== lint-skills NG baseline（AG-005 既知違反の grandfathering）=====
-//
-// check_integrity.ts の NG baseline（v2:REQ-0161-005）と同じ delta-aware 準拠:
-// baseline-known の ng/warning は info へ降格し、baseline を超過した分（delta）のみ
-// exit code を駆動する。bucket key は check + file（各 check/file は最大1 finding の
-// ため evidence は key に含めない）。baseline は明示的に編集して更新する（自動再生成
-// なし）。実欠陥の恒久隠蔽ではなく、OU-002〜005（Epic #2178）での解消までの承認録。
-
-const LINT_SKILLS_BASELINE_PATH = path.join(
-  ".opencode",
-  "skills",
-  "repo-agentdev-integrity",
-  "baselines",
-  "lint-skills-baseline.json",
-);
-
-interface LintSkillsBaselineEntry {
-  check: string;
-  file: string | null;
-  count: number;
-  provenance: string;
-  reason: string;
-}
-
-interface LintSkillsBaseline {
-  version: number;
-  rule_id: string;
-  generated_at: string;
-  entries: LintSkillsBaselineEntry[];
-}
-
-function loadLintSkillsBaseline(repoRoot: string): LintSkillsBaseline | null {
-  try {
-    const raw = fs.readFileSync(path.join(repoRoot, LINT_SKILLS_BASELINE_PATH), "utf-8");
-    const parsed = JSON.parse(raw) as Partial<LintSkillsBaseline>;
-    if (!parsed || !Array.isArray(parsed.entries)) return null;
-    return {
-      version: typeof parsed.version === "number" ? parsed.version : 1,
-      rule_id: parsed.rule_id ?? "LINT-SKILLS-NG-BASELINE",
-      generated_at: parsed.generated_at ?? "",
-      entries: parsed.entries.map((e) => ({
-        check: String(e.check ?? ""),
-        file: e.file === null || e.file === undefined ? null : String(e.file),
-        count: typeof e.count === "number" ? e.count : 0,
-        provenance: e.provenance ? String(e.provenance) : "legacy",
-        reason: e.reason ? String(e.reason) : "",
-      })),
-    };
-  } catch {
-    return null;
-  }
-}
-
-function lintBaselineKey(check: string, file: string | null): string {
-  return `${check}\t${file ?? ""}`;
-}
-
-function applyLintSkillsBaseline(
-  results: CheckResult[],
-  baseline: LintSkillsBaseline,
-): { demoted: number; delta: number } {
-  const baselineIndex = new Map<string, { count: number; provenance: string }>();
-  for (const entry of baseline.entries) {
-    baselineIndex.set(lintBaselineKey(entry.check, entry.file), {
-      count: entry.count,
-      provenance: entry.provenance,
-    });
-  }
-
-  const currentCounts = new Map<string, number>();
-  for (const r of results) {
-    if (r.level !== "ng" && r.level !== "warning") continue;
-    const key = lintBaselineKey(r.check, r.file ?? null);
-    currentCounts.set(key, (currentCounts.get(key) ?? 0) + 1);
-  }
-  const newBuckets = new Set<string>();
-  for (const [key, count] of currentCounts) {
-    if (count > (baselineIndex.get(key)?.count ?? 0)) newBuckets.add(key);
-  }
-
-  const emittedPerBucket = new Map<string, number>();
-  let demoted = 0;
-  let delta = 0;
-  for (const r of results) {
-    if (r.level !== "ng" && r.level !== "warning") continue;
-    const key = lintBaselineKey(r.check, r.file ?? null);
-    const baselineCount = baselineIndex.get(key)?.count ?? 0;
-    const provenance = baselineIndex.get(key)?.provenance ?? "legacy";
-    const emitted = emittedPerBucket.get(key) ?? 0;
-    emittedPerBucket.set(key, emitted + 1);
-    if (emitted < baselineCount && !newBuckets.has(key)) {
-      r.level = "info";
-      r.finding_level = "observation";
-      const tag =
-        provenance === "legacy"
-          ? "[baseline-known]"
-          : `[baseline-known provenance=${provenance}]`;
-      r.message = `${tag} ${r.message} (lint-skills baseline, not yet cleaned)`;
-      demoted++;
-    } else {
-      delta++;
-    }
-  }
-  return { demoted, delta };
-}
-
 // ===== NG/warning 区別 summary と実行環境差記録（REQ-010-082 / AG-012）=====
 //
 // summary 出力に検証不通過（NG）と傾向管理（warning）の区別を明示し、warning
@@ -453,8 +342,8 @@ function applyLintSkillsBaseline(
 // は gitignore の `.opencode/skills/*` 除外対象であり、`repo-*/`（tracked 例外的）と
 // junction 先 src/common/skills 配下に存在するスキルのみ管理対象。distributed
 // layout（projection 走査 かつ src/common/skills 存在）でこの条件に当てはまらない
-// スキルは main root 実行時のみ検出される環境差として記録する（baseline 登録・
-// 無視は行わず、走査対象を維持する）。
+// スキルは main root 実行時のみ検出される環境差として記録する（無視は行わず、
+// 走査対象を維持する）。
 
 const LOCAL_SKILL_ENV_LABEL =
   "[実行環境差: git 管理外ローカルスキル (main root 実行時のみ検出)]";
@@ -504,7 +393,7 @@ function buildSummaryNotes(
   }
   if (localWarningCount > 0) {
     notes.push(
-      `git 管理外ローカルユーザースキル起因の warning: ${localWarningCount} 件（${localSkillNames.join(", ")}。main root 実行時のみ検出の実行環境差。baseline 登録・無視は行わず、走査対象を維持する）。`,
+      `git 管理外ローカルユーザースキル起因の warning: ${localWarningCount} 件（${localSkillNames.join(", ")}。main root 実行時のみ検出の実行環境差。無視は行わず、走査対象を維持する）。`,
     );
   }
   return notes;
@@ -845,14 +734,6 @@ function main(): void {
     }
   }
   allResults.push(aggregateBudgetResultAg005(agTotalChars, agSkillCount));
-
-  const baseline = loadLintSkillsBaseline(repoRoot);
-  if (baseline) {
-    const applied = applyLintSkillsBaseline(allResults, baseline);
-    console.error(
-      `[lint-skills] baseline applied: ${applied.demoted} baseline-known (demoted to info), ${applied.delta} new unmanaged (delta, exit code driver).`,
-    );
-  }
 
   const localSkillSet = listGitUnmanagedLocalSkills(repoRoot, skillsDir);
   annotateLocalSkillFindings(allResults, localSkillSet);

@@ -11,12 +11,12 @@
 // This file is the adapter over the canonical side-effect-free detector at
 // ./lib/distribution-boundary.ts. Per docs/designs/integrity/distribution-boundary.md
 // (stable implementation contract) the canonical detector owns classification;
-// this adapter adds filesystem scanning, baseline/exemption/delta bookkeeping,
-// the repo-self-hosting-specific IR-046/047/048 rules, and the CLI.
+// this adapter adds filesystem scanning, the repo-self-hosting-specific
+// IR-047/048 rules, and the CLI.
 //
 // Detection behaviour (patterns, template allowance, README allowance) is
 // owned by the lib module. This adapter only translates lib Detection records
-// into the legacy BoundaryFailure shape and applies baseline/exemption policy.
+// into the legacy BoundaryFailure shape.
 //
 // PR #2092 review fixes wired into the adapter:
 //   - Strict byte-level reading (readArtifactBytes via classifyBytes) so
@@ -34,9 +34,7 @@
 // Adapter body is split for the 250 pure-LOC ceiling:
 //   - lib/distribution-boundary-types.ts           shared types
 //   - lib/distribution-boundary-fs.ts              fs scanning + strict bytes
-//   - lib/distribution-boundary-baseline.ts        baseline + delta
-//   - lib/distribution-boundary-exemptions.ts      exemption load + apply
-//   - lib/distribution-boundary-rules.ts           IR-046/047/048 rules
+//   - lib/distribution-boundary-rules.ts           IR-047/048 rules
 //
 // Exit codes: 0 ok, 1 violation, 2 error.
 
@@ -61,25 +59,8 @@ import { runCli } from "./check_distribution_boundary_cli.ts";
 export type {
   BoundaryFailure,
   BoundaryReport,
-  BaselineEntry,
-  BaselineFile,
-  ExemptionEntry,
-  ExemptionFile,
-  ExemptionRationaleCategory,
-  ExemptionReviewStatus,
-  DeltaReport,
   DistributionRuleFinding,
 } from "./lib/distribution-boundary-types.ts";
-export {
-  buildBaseline,
-  saveBaseline,
-  loadBaseline,
-  computeDelta,
-} from "./lib/distribution-boundary-baseline.ts";
-export {
-  loadExemptions,
-  applyExemptions,
-} from "./lib/distribution-boundary-exemptions.ts";
 export { checkDistributionRules } from "./lib/distribution-boundary-rules.ts";
 export {
   CONCRETE_ID_PATTERN,

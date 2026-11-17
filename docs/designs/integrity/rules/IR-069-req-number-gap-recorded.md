@@ -52,10 +52,9 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integr
 | README の AUTOGEN ブロック内の言及 | 機械生成領域。手書きの明記は再生成で失われるため明記として数えない（明記は AUTOGEN 外の本文に置く） |
 | 「欠番」行上の実在番号の単体トークン | 採番由来などの文脈言及（例: 「REQ-082 採番時」）。実体不在の単体トークンのみ明記主張として扱う |
 
-## baseline 運用
+## baseline 運用（撤廃済み）
 
-導入時点（Case #2917、2026-09-17）の現行リポジトリは、REQ-063〜REQ-081（19連番）が README 2件に明記済み、REQ-084〜REQ-086 が末尾予約枠（共有予約枠 REQ-083〜096 の未使用・返却枠）として本ルールの検出対象外である。既知違反は存在しないため NG baseline の追加登録は行わない。予約枠解消後も実体化しない番号が残る場合は、numbering-policy「既知の欠番」への記録と README 明記を追加して解消する。
-
+baseline による既知違反の免除管理・delta 運用は撤廃済みである（REQ-010-074/079、Epic #4126 Phase 4）。導入時点の既知違反は全件解消済みであり、現行の検出違反は免除せず対象側の直接修正で即時解消する。新規違反は strict fail として失敗する。
 ## See Also
 
 - [integrity-rule-catalog.md](../integrity-rule-catalog.md)

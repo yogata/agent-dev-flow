@@ -114,9 +114,9 @@ docs 横断診断は本 skill が正規の所有者となる（REQ-036-013 の d
   存在する場合は乖離と判定せず、該当記録の文脈（再評価契機を含む）を finding へ添付する
   （adversarial-review F7。この文脈提示が再評価契機の消費者契約となる）
 - 単なる draft の存在は指摘しない。経過時間（frontmatter updated からの日数）を判定根拠に使わない
-  （IR-054 の時間ベース放置検出と判定基準を分離する）
+  （旧 draft 放置検出ルールの時間ベース検出と判定基準を分離する。同ルールは Epic #4126 Phase 4 で削除済み）
 - 適用起点は本診断の実装以降に完了した Case を対象とし、実装前の歴史的完了 Case に遡って
-  適用しない（baseline 注記、adversarial-review F7(d) 推奨）
+  適用しない（adversarial-review F7(d) 推奨）
 
 ### 出力と副作用
 

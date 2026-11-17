@@ -50,10 +50,9 @@ IR-016 系の投影検査（`checkSourceProjectionConsistency`、`checkBrokenJun
 | junction 不在環境（worktree 等）の投影比較 | REQ-018 構造的制約（junction は worktree へ伝播しない）。info で skip |
 | third-party 取得機構経由で配置された投影物（管理登録済み） | third-party 取得機構（agentdev_third_party 操作契約）経由で配置された投影物は管理対象として許容する（INSPECTION-TOLERATED）。許容対象の機械的識別は skill-projection-manifest の管理登録（third-party 由来であることの宣言）で行い、未登録の third-party 起源配置は引き続き検出する。許容は検出ノイズ抑制であり走査除外ではない（ru-batch-20260903） |
 
-## baseline 運用
+## baseline 運用（撤廃済み）
 
-導入時点（Issue #2383、2026-08-22）に検出された投影乖離（projection-missing）とリンク先欠損 stale junction（projection-broken）の既知違反は、NG baseline additions（provenance `issue-2383-f01-junction-rebuild-pending`）で管理する。junction 再構築は `.opencode/skills/*` が .gitignore 対象の局所運用タスクであり PR 成果外（RD-002）のため、PR マージ後の手動再構築（install script -Mode apply）で解消する。baseline 適用後、新規の投影乖離（スキル追加時の junction 追加漏れ等）は即時に strict fail として検出する。
-
+baseline による既知違反の免除管理・delta 運用は撤廃済みである（REQ-010-074/079、Epic #4126 Phase 4）。導入時点の既知違反は全件解消済みであり、現行の検出違反は免除せず対象側の直接修正で即時解消する。新規違反は strict fail として失敗する。
 ## See Also
 
 - [integrity-rule-catalog.md](../integrity-rule-catalog.md)

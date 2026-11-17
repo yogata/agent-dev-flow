@@ -132,55 +132,9 @@ STEP-3 の最終検証は、当該 Case の変更内容、依存関係、リス�
 - **cwd 依存テスト混在スイートの運用注記**: 対象スイートには cwd 依存テストが混在するため、カレントディレクトトリビアな実行（`bun test` 単体等）で代替しない
 - **QG-4 checker 実測の実施時点**: full integrity suite および個別 checker の実測は、merge 直前の origin/main 取り込み済み branch HEAD で実施する。検出した新規 NG の出所が自 Case 変更であることを evidence として記録し、provenance-tracked baseline への登録漏れを検査する（詳細3要素は `agentdev-quality-gates` references `qg-4-final-acceptance.md`「QG-4 checker 実測手順（merge 直前 HEAD・evidence 化・baseline 登録漏れ検査）」節を参照）
 
-**baseline 更新手順の provenance 規約（参照是正系 ACT の baseline 要否確認を含む）**: 本工程で baseline（NG baseline・BaselineFile・恒久免除レジストリ）の更新が必要になった場合は、次の provenance 規約に従う。契約の正は checker 実行契約 Design「baseline 退避物と BaselineFile の役割分離と合否判定基準」節であり、本 reference は工程側の確認手順のみを扱う:
+**baseline 更新手順の provenance 規約（撤廃済み）**
 
-- baseline エントリへの追加・更新は provenance（起因の由来、正当化の参照先 rationale_ref、適用日）付きでのみ行う。無条件追加をしない
-- BaselineFile の全量再生成は cap 更新（増分反映）と使い分け、全量再生成時は従来の approved provenance を引き継ぐことを確認する（provenance 保全）
-- 参照是正系 ACT（旧パス→新パスの参照切替、横断是正、走査先変更を含む）を含む変更では、本工程の checker 実行前に baseline 要否確認の前置を行う: 既存 baseline エントリの期待値・除外定義が当該変更の走査先パス・検出文言に依存するかを確認し、依存する場合は baseline 期待値・除外定義の追随更新を同一 PR で処置する。要否確認の実施記録（依存なし確認または更新実施の別）を Evidence へ残す
-- baseline の更新が必要な場合は正規所有工程（case-run 差し戻し後の修正等）へ任せる場合を除き、本工程の対象範囲内で provenance 付きで処置し、未登録・未更新のまま green 判定をしない
-
-### STEP-3-2: Design 状態評価フロー（棚卸し制）
-
-対象 REQ に基づく draft Design 棚卸し列挙と、PR 本文の `## Design確定候補` セクション（case-run/ driver が記録）の申告候補を統合し、Design の確定、昇格を処理する。
-申告セクションは補助入力であり、セクション不存在・空の場合も棚卸し列挙を実行する（申告の不在を理由に棚卸しを省略しない）。
-契約の正は case-close Design「Design 状態評価の棚卸し制（STEP-3 拡張）」であり、本 STEP はその workflow 側実装である。
-
-#### 棚卸し列挙
-
-1. 当該 Case の対象 REQ を特定する（Issue 本文の REQ 参照から導出。REQ ファイル単位の近似列挙を許容）
-2. 正規 Design 文書（Design 一覧表が status を追跡する docs 配下の正規成果物。`<designs/README.md>` が追跡情報源）から、
-   当該 REQ を ADF-COVERS 宣言（implementation 役割）でカバーし frontmatter status が draft の Design を
-   逆算列挙する。projection 配下は対象外とし、列挙対象は正規成果物のみとする。
-   ADF-COVERS 宣言の解析は `agentdev-traceability` の能力（coverage）を参照できる（fail-open。
-   不在・実行失敗・空結果時は正規成果物の直接走査（`rg` 等）で継続する）
-   coverage で解析する場合は役割付き対応関係が全件返却されるため、呼出側が役割解釈を行う。
-   列挙・集約突合の対象として数えるのは implementation 役割かつ docs/ 配下（正規 Design 文書）パスの
-   対応関係のみ（役割フィルタの適用は必須）とし、design 役割・verification 役割は対象に含めない。
-   coverage は sidecar と inline declaration を同じ論理的な対応関係として返すため、突合は対応関係の
-   表現形式を区別せずに行う
-3. PR 本文「Design 確定候補」セクションの申告候補を列挙結果へ統合する（同一 Design は 1 候補にまとめ、
-   二重処理しない。申告のみ存在する Design も評価対象に含める）
-4. 統合後の候補が 0 件の場合は 0 件確認を記録して Design 状態評価を正常完了する（エラー停止しない）
-
-#### 全件評価
-
-| 処理パターン | 条件 | アクション |
-|---|---|---|
-| (a) case-close 内で Design 昇格 | 統合後の候補 Design の `status` が `draft`、STEP-3-1「Design 本文と実装の最終矛盾確認」により実装・検証との整合を確認済み | 対象 Design の `status` を `draft` → `accepted` に昇格し、Design 一覧表（Design README）の status 列を同時更新する（編集スコープ: プロジェクトの Design ファイル群） |
-| (b) Design 保存提案（case-revise 経由） | Design 確定候補が Design ファイル未保存 | 内部 lifecycle 段階 case-revise の再実行を提案し（case-ready の Design 保存内部責務で Design ファイルを保存）、case-close は完了させる |
-| (c) 見送り | 整合確認の結果、当該 Case で確定できないと判断 | 見送り理由と再評価契機を当該 Case の Issue への対応記録コメント（検証差分節）へ記録し、現在 Design 本文へ作業履歴として新規保存しない。Design 本文へは対応記録・経緯記録を新規追記しない |
-
-- 見送り（評価実施・確定不可）と未評価（評価未実施）を区別して記録する
-- 新規の一時成果物種別・新規ドメイン状態は作らない（見送り記録は既存の履歴チャネル〔対応記録コメント〕に保存し、Design 本体へは新規保存しない）
-- **完了ゲート**: 統合後の全候補が (a) 昇格または (c) 見送りのいずれかの評価結果を持つことを case-close 完了条件に含める。評価結果のない候補（未評価）が残る場合は完了扱いにしない（停止または継続扱い）
-
-#### 冪等（再実行）
-
-- accepted 済み Design は棚卸し列挙の評価対象から除外する（重複する状態遷移・承認記録を生成しない）
-- 同一 Case 再実行では対応記録コメントに保存された既存の見送り記録を評価結果として認定し、重複する見送り記録を生成しない
-
-Design status 昇格タイミング（draft → accepted）の詳細、frontmatter `status` と `updated` の更新、Design 確定候補処理の詳細は `agentdev-design-file-manager/references/design-lifecycle-application.md` を参照。
-
+baseline（NG baseline・BaselineFile・恒久免除レジストリ）の更新と provenance 規約は baseline 機構の撤廃（docs-check 要件の baseline 撤廃行群、Epic #4126 Phase 4）に伴い廃止済みである。検出違反は免除せず対象側の直接修正で解消し、参照是正系 ACT（旧パス→新パスの参照解消等）は当該変更の Case 内で完結させる。
 ## case-close が使用する検査ツール
 
 - `check_changed_docs.ts`（`--workflow case-close`、`--files <PR 変更ファイル一覧>`、targeted docs guard で実行）

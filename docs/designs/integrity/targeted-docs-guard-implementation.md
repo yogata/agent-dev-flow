@@ -56,8 +56,6 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 - README 索引更新要否判定
 - Decision参照がある場合の相互参照更新要否判定
 - 関連Design候補がある場合の `docs/designs/README.md` 更新要否判定
-- 旧Design直下パス混入検出（IR-057）
-- local版旧生成方式語彙混入検出（IR-057）
 - 文書種別責務と日本語執筆規範の機械化可能範囲の検査
 
 ### Design 保存（case-ready / case-revise、Design files）向け検査
@@ -70,8 +68,6 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 - Designドメイン分類の妥当性
 - 新規Design、移動、改名、主要入口変更時の README 索引更新要否判定
 - 変更Designと近接リンクのリンク整合
-- 旧Design直下パス混入検出（IR-057）
-- local版旧生成方式語彙混入検出（IR-057）
 - command Designの場合の対象command原本との最低限の整合
 - skill Designの場合の対象skill原本との最低限の整合
 - integrity Designの場合の catalog/rule file/script 整合
@@ -92,8 +88,6 @@ case-close では保存工程より広めに以下を確認する。
 - 変更ファイル対象の targeted docs guard 実行
 - draft→accepted 等の Design status変更時の `docs/designs/README.md` 同期
 - Issue/PRで宣言した文書更新対象と実変更ファイルの対応（`--declared-files` 使用時）
-- 旧Design直下パス混入検出（IR-057）
-- local版旧生成方式語彙混入検出（IR-057）
 - full docs-check 実行要否判定
 
 ### case-run 向け検査
@@ -179,9 +173,7 @@ TargetedDocsReport 型契約の原本は [integrity-contracts.md](integrity-cont
 旧Design直下配置前提の除去、repo-agentdev-integrity の `docs/designs/**/*.md` 再帰対応は [references/targeted-docs-guard-implementation-details.md](references/targeted-docs-guard-implementation-details.md) 完了済み移行作業節へ分離した。
 両対応は v2:REQ-0158 から移管され、完了済みである。
 
-## obsolete-path-map.yaml 運用
 
-`.opencode/skills/repo-agentdev-integrity/data/obsolete-path-map.yaml` による旧Design直下パス→現行ドメイン分割パス対応表の運用（v2:REQ-0158 より移管）。
 
 - 各エントリは `old`、`new`、`severity`、`scope`（`include`、`exclude`）を持つ
 - `severity` は旧直下パス参照を `ng` とする
@@ -189,7 +181,6 @@ TargetedDocsReport 型契約の原本は [integrity-contracts.md](integrity-cont
 - `scope.exclude` は `docs/requirements/retired/**` と `docs/decisions/retired/**` とする
 - ドメイン分割による移送が発生した場合は、移送単位で旧パスと新パスの対応を追記する（REQ-001-010）
 
-検出語彙の分類（単独検出語 / 近接条件つき検出語）は IR-057（`rules/IR-057-obsolete-spec-path-after-domain-split.md`）ならびに `obsolete-path-map.yaml` を SSoT とする。
 
 ## skill rename 対称性検査観点
 
@@ -215,6 +206,4 @@ check_skill_rename_symmetry が実施する検査契約。REQ-010-063 と同一�
 - v2:REQ-0158（Targeted Docs Integrity Guard、retired。履歴参照）
 - `docs/designs/integrity/validator-split-criteria.md`（validator 分割基準、Phase 6 の詳細）
 - `docs/designs/integrity/integrity-contracts.md`（Workflow×ツールマトリックス表、TargetedDocsReport 型契約）
-- `docs/designs/integrity/rules/IR-057-obsolete-spec-path-after-domain-split.md`（旧Design直下パス検出、link mode 統一で廃止確定となった旧生成方式語彙の検出）
-- `docs/designs/integrity/obsolete-path-map.yaml`（旧パス対照表）
 

@@ -56,7 +56,7 @@ draft から accepted への状態遷移と Design 管理インデックスの s
 置換時は旧 Design を現行ツリーから除外し、履歴は Git、Issue、Decision 等の既存履歴手段から確認する。
 `superseded`、`superseded_by` を Design ライフサイクルで使用しない。
 
-## Design 一覧表（docs/designs/README.md 相当）登録
+## Design 一覧表（docs 配下の Design README 相当）登録
 
 新規 Design 作成時（CREATE）は Design 一覧表へ当該 Design の行を登録する。
 

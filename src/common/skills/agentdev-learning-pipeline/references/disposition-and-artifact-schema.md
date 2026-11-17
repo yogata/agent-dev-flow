@@ -32,7 +32,7 @@ living pool は終端保管ではなく、次回 `/agentdev/learning-promote` �
 |---|---|---|
 | 1 | 恒久契約候補（REQ） | 要件変更、機能追加の要因となる知見、既存 REQ の更新が必要な内容。**自動 REQ 化ではなく候補扱い**。確定は `/agentdev/req-define` → `/agentdev/case-auto`（内部 lifecycle）経路で行う |
 | 2 | 恒久契約候補（Decision） | アーキテクチャに関する設計判断、技術選定の理由を記録すべき内容。禁止条件フィルタリングゲート適用後の候補 |
-| 3 | 恒久契約候補（Design） | システム仕様、実装パターン、設計原則として docs/designs/ に反映すべき内容 |
+| 3 | 恒久契約候補（Design） | システム仕様、実装パターン、設計原則として docs 配下の Design 文書群に反映すべき内容 |
 | 4 | project knowledge | プロジェクト固有の落とし穴、環境依存の知見、汎用化が難しい内容。保存先の候補判定は「プロジェクト固有知識の反映先振り分け」参照 |
 | 5 | 既存対策の更新 | 同種の問題を防止する既存対策が存在するが、陳腐化、不備、適用漏れがある。既存事実の整備状況（ギャップ分類と詳細）として req-define へ引き渡す |
 | 6 | deferred | まだ昇華の余地がない、情報が断片的、出現回数が少ない。**living pool（`deferred.md`）で維持し REQ 化しない** |
@@ -68,7 +68,7 @@ Learning 評価結果の 7 系統・処分区分・8 寿命を次の三方対応
 確認結果は、req-define が変更方針を確定できる既存事実の整備状況として採用済み成果物へ記録する。実現先の選択は行わない。
 
 既存対策の確認対象:
-- `docs/requirements/`, `docs/designs/`, `docs/decisions/` 配下（恒久契約）
+- docs 配下の requirements / designs / decisions 文書群（恒久契約）
 - `docs/knowledge/` 配下（プロジェクト知識）
 - `.opencode/commands/`, `.opencode/skills/` 配下（配布 command・skill。templates、scripts、hook、Custom Tool の契約を含む）
 
@@ -176,7 +176,7 @@ project knowledge を一律 `.agentdev/learning/project-knowledge.md` に保存�
 | 内容の性質 | 反映先 |
 |---|---|
 | 常時必要な短いルール | `AGENTS.md` |
-| 現在のシステム事実として固定すべき技術事実 | `docs/designs/<**/*>.md` |
+| 現在のシステム事実として固定すべき技術事実 | docs 配下の Design 文書 |
 | 再利用可能な判断知識（リスク導出規則） | `docs/knowledge/`（知識文書契約（1知識1ファイル、kebab-case slug、必須内容5項目）に従う知識文書として保存する。backlog-review の利用者承認後に docs/knowledge/ へ直接保存され、RU → req-define の要件化経路を通らない） |
 | 設計判断 | `docs/decisions/<*>.md` |
 | 要件変更 | `docs/requirements/<*>.md` |

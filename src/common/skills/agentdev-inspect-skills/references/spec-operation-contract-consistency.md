@@ -66,7 +66,7 @@ Design 側は薄いルーティング入口として要約版を保持する。
 
 ### 1. 対象 Design の特定
 
-`docs/designs/` 配下を走査し、`## 操作契約` 見出しを含む Design ファイルを特定する。
+docs 配下の Design 文書群を走査し、`## 操作契約` 見出しを含む Design ファイルを特定する。
 現在は custom-tool-contracts Design のみが該当する。
 新規追加 Design が同見出しを持つ場合、自動的に対象に含める。
 
@@ -126,7 +126,7 @@ Recommended route には操作契約実体（Tool 実装）側の修正、`spec`
 
 ```markdown
 - Finding: Design 操作契約テーブルと操作契約実体の操作集合が不一致
-- Target: Design docs/designs/responsibilities/custom-tool-contracts.md、src/common/tools/agentdev-gh/contracts.ts
+- Target: Design `docs/designs/`responsibilities/custom-tool-contracts.md、src/common/tools/agentdev-gh/contracts.ts
 - Classification: spec-operation-contract-consistency
 - Evidence: Design 操作契約テーブルに「Issue close」手続きがあるが、操作契約実体に該当手続きの操作定義が存在しない
 - Recommended route: 操作契約実体（src/common/tools/agentdev-gh/contracts.ts）

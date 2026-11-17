@@ -156,7 +156,6 @@ rationale はいずれも例示由来（検出ルール自体が破損形・異�
 - docs/designs/integrity/integrity-contracts.md × broken-code-span: コードブロック検出平面の説明表でバッククォート3連（code fence）記法を例示
 - docs/designs/integrity/rules/IR-052-completion-grep-pattern-design.md × broken-code-span: コードブロック内検出対象の説明表でバッククォート3連（code fence）記法を例示
 - docs/designs/integrity/rules/IR-064-unresolved-placeholder.md × broken-code-span: 検出対象外（code block 囲み内）の説明でバッククォート3連（code fence）記法を例示
-- docs/designs/integrity/rules/IR-066-legacy-path-removed-name.md × stale-reference: REQ-0108-NNN 旧ナンバリング検出ルール自体が旧形式を実例として列挙するルール定義
 - docs/designs/integrity/rules/IR-069-req-number-gap-recorded.md × stale-reference: 採番例外記録の文脈で旧ナンバリング REQ-0108-194 を歴史的根拠として引用
 - docs/designs/integrity/content-corruption-checker.md × stale-reference: stale-reference 検出カテゴリの説明が旧ナンバリング形式参照を実例として列挙し、IR-069 許容例と同一の旧ナンバリング引用を含む Design 記述（自己言及）
 - docs/designs/integrity/content-corruption-checker.md × known-corruption-literal: 既知混入形確定一致シグナル自体が混入形（卡out）を実例として列挙する Design 記述

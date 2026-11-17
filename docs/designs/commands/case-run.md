@@ -410,7 +410,7 @@ case-run および実行担当サブエージェントは検証結果と証拠�
 
 - worktree precondition gate: worktree+ブランチ作成済みを検証（`git worktree list` + `git rev-parse --show-toplevel`）。検証失敗時は 実行担当サブエージェント起動禁止
 - 実行担当サブエージェント result 4状態（completed-pr / blocked / failed / delegation-unavailable）の取り扱い正確性
-- PR URL 受領の確実性（REQ-006-021 廃止に伴い PR URL フォールバック検索不使用）
+- PR URL 受領の確実性（`REQ-006-105..111` の PR URL 義務に伴い PR URL フォールバック検索不使用）
 - Epic Wave 実行モードの Wave 単位処理の不実施（Wave 構成の読み取り、現在 Wave 判定、fan-out/fan-in、子 Issue 並列起動を行わない。REQ-031-015）、再開時の単一 Issue 冪等処理（REQ-031-016）
 - 出力制約: PR 本文、commit message は verbatim で返す（成果物本文）
 

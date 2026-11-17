@@ -15,7 +15,7 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integr
 | Field | Value |
 |-------|-------|
 | rule_id | IR-073 |
-| description | リポジトリの未追跡かつ gitignore 管理対象外のファイル・ディレクトリの残存を検出する恒常検査である（REQ-010-084 準拠の新規検査クラス、Case #3841）。許容は gitignore（正規の非追跡領域宣言）と承認一覧（baselines/ng-baseline.json。既存の ng-baseline 機構と同一の物理実体で管理する category/check/file/evidence/count/provenance/reason の恒久承認記録）で管理し、承認一覧対象外の検出は NG として終了コードを駆動し、承認済み検出は承認記録（`[baseline-known provenance=...]` 付き info）として報告にとどめる。承認の追加は検出契機ごとに人間の運用判断による明示承認（provenance 付き baseline 登録）として記録され、検査実行が承認を自動追加しない |
+| description | リポジトリの未追跡かつ gitignore 管理対象外のファイル・ディレクトリの残存を検出する恒常検査である（REQ-010-084 準拠の新規検査クラス、Case #3841）。許容は gitignore（正規の非追跡領域宣言）と.gitignore 宣言で管理し、承認一覧対象外の検出は NG として終了コードを駆動し、承認済み検出は承認記録（`[baseline-known provenance=...]` 付き info）として報告にとどめる。承認の追加は検出契機ごとに人間の運用判断による明示承認（provenance 付き baseline 登録）として記録され、検査実行が承認を自動追加しない |
 | severity | strict |
 | category | repository-state-drift |
 | detection_method | `check_integrity.ts`（`checkUntrackedResidue`）による検出。`git ls-files --others --exclude-standard`（repo root 実行）で未追跡かつ gitignore 管理対象外のファイルを再帰列挙し、ディレクトリ残存は配下ファイルの検出として扱う。`--directory` は無視対象のみを含むディレクトリまで列挙するため使用しない。git 作業ツリーでない環境では info で skip する（検査が原理的に成立しないため、IR-072 の git 履歴不在時 info スキップと同一扱い）。検出報告のメッセージには gitignore 追加の提案（正当な非追跡領域のため）と承認一覧登録手順の案内を含む。承認済み検出の demote は main の `applyNgBaseline`（bucket: category=UntrackedResidue / check=untracked-residue / file=対象パス / evidence 空値）により行う |
@@ -26,7 +26,7 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integr
 | false_positive_risk | 低。gitignore 管理対象外の未追跡ファイルのみを計上するため、正規の非追跡領域宣言（gitignore）済みパスは検出しない。 checker 自身の報告ファイル出力先（`.agentdev/integrity/reports/`）等の検査基盤由来パスは gitignore 宣言済みのため検出しない。導入時点の対象リポジトリに未追跡残存が既存する場合は導入直後の自己適用で NG が発生し得る（本 Case の対象リポジトリ baseline は未追跡 0 件であることを Case #3841 で確認済み。検出時は gitignore 追加または承認一覧登録を人間の運用判断で処置する） |
 | regression_test | `check_integrity.test.ts` describe "IR-073 untracked-residue (REQ-010-084)"。陽性例（repo root 直下と `.agentdev` 配下非契約パスの未追跡残存を NG 検出）・許容例（gitignore 管理対象の `.agentdev/tmp/` は検出しない）・承認例（ng-baseline.json 承認一覧登録分は `[baseline-known provenance=...]` 付き info として承認記録報告し NG にしない。未承認残存は NG のまま終了コードを駆動）・案内例（検出報告に gitignore 追加提案と承認一覧登録手順の案内を含む）・クリーン状態例（未追跡残存 0 件時は ok 報告）の fixture（git init + base commit + 残存 seed） |
 | finding_route | intake |
-| triage_action | 正規の非追跡領域であれば `.gitignore` への追加を提案し、恒久的な許容であれば provenance 付きで承認一覧（baselines/ng-baseline.json）へ人間の運用判断で明示登録する。それ以外は commit して git 管理状態へ置く。本検査が承認を自動追加することはない |
+| triage_action | 正規の非追跡領域であれば `.gitignore` への追加を提案し、恒久的な許容であれば provenance 付きで.gitignore 宣言へ人間の運用判断で明示登録する。それ以外は commit して git 管理状態へ置く。本検査が承認を自動追加することはない |
 | last_verified | 2026-10-22 |
 
 ## 検査項目
@@ -44,13 +44,12 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integr
 | 対象 | 理由 |
 |------|------|
 | gitignore（正規の非追跡領域宣言）対象パス | gitignore 管理対象は本検査の検出対象外（`--exclude-standard` が除外） |
-| 承認一覧（baselines/ng-baseline.json）登録パス | provenance 付き恒久承認記録。承認済み検出は承認記録として報告にとどめる |
+| .gitignore 宣言登録パス | provenance 付き恒久承認記録。承認済み検出は承認記録として報告にとどめる |
 | git 作業ツリーでない環境 | 検査自体が成立しないため info スキップ |
 
-## baseline 運用
+## baseline 運用（撤廃済み）
 
-承認一覧は既存の ng-baseline 機構と同一の物理実体（baselines/ng-baseline.json）で管理する（REQ-010-084 の単一物理実体要件）。bucket は category=UntrackedResidue / check=untracked-residue / file=対象パス / evidence 空値で、count、provenance、reason を必須とする。承認の追加は `--update-ng-baseline` と additions manifest（provenance / reason 必須、fail-closed）または手動編集のいずれかで行い、検査実行が承認を自動追加しない。導入時点で対象リポジトリの未追跡残存が 0 件である baseline（Case #3841 で確認済み）を前提とするため、初期承認登録は不要である。
-
+baseline による既知違反の免除管理・delta 運用は撤廃済みである（REQ-010-074/079、Epic #4126 Phase 4）。導入時点の既知違反は全件解消済みであり、現行の検出違反は免除せず対象側の直接修正で即時解消する。新規違反は strict fail として失敗する。
 ## See Also
 
 - [integrity-rule-catalog.md](../integrity-rule-catalog.md)

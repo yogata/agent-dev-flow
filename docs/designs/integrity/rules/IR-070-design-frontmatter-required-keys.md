@@ -16,7 +16,7 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_design
 | description | docs/designs/** の Design frontmatter は `title` / `status` / `created` / `updated` を必須キーとして機械検査する。キー欠落、行頭空白付きキー行によるキー名破損（正典の検出列挙における「updated値のキー名欠落」）、値形式不正（created / updated の ISO 8601 日付形式、status の draft / accepted 値域）を検出する（checker-execution-contracts Design「Design frontmatter 必須キー検証観点」節の実現、Case #3042 Wave 2・RA-006） |
 | severity | strict |
 | category | document-drift |
-| detection_method | `check_design_frontmatter.ts`（repo-local 独立 checker）による走査。(1) `docs/designs/**/*.md` を `globWalkRel`（node:fs glob 共有ヘルパー）で列挙し、列挙件数と検査対象・対象外の件数整合を report に含める（二重確認）。(2) 除外規定（README.md、`references/` / `audits/` / `baselines/` 配下、`baseline_for` / `audit_for` 信号キー保持ファイル）を適用する。(3) frontmatter ブロック抽出と ISO 8601 日付妥当性は Knowledge frontmatter 検査（`check_knowledge_docs.ts`）と同一実装を import して用いる（REQ-010-062: 既存 checker 規則からの期待値導出）。(4) 必須キー（`title` / `status` / `created` / `updated`）の欠落・空値、クォート剥がし後の日付形式、status 値域、行頭空白付き必須キー行を検出する |
+| detection_method | `check_design_frontmatter.ts`（repo-local 独立 checker）による走査。(1) `docs/designs/**/*.md` を `globWalkRel`（node:fs glob 共有ヘルパー）で列挙し、列挙件数と検査対象・対象外の件数整合を report に含める（二重確認）。(2) 除外規定（README.md、`references/` / `audits/` 配下、`audit_for` 信号キー保持ファイル）を適用する。(3) frontmatter ブロック抽出と ISO 8601 日付妥当性は Knowledge frontmatter 検査（`check_knowledge_docs.ts`）と同一実装を import して用いる（REQ-010-062: 既存 checker 規則からの期待値導出）。(4) 必須キー（`title` / `status` / `created` / `updated`）の欠落・空値、クォート剥がし後の日付形式、status 値域、行頭空白付き必須キー行を検出する |
 | affected_artifacts | [docs/designs/**/*.md] |
 | related_req | [REQ-010-062, REQ-010-068] |
 | related_design | [../checker-execution-contracts.md, ../integrity-rule-catalog.md, ../../foundations/patterns.md] |
@@ -45,12 +45,11 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_design
 | `references/` サブディレクトリ配下 | 親 Design の補助資料（詳細・実装固有事項）であり Design 索引の独立行対象外（docs/designs/README.md「references/ の Design は親 Design 行の備考欄で言及し、独立行としては登録しない」）。frontmatter を持たない references 文書（例: foundations/references/crosswalk-inventory.md）は Design frontmatter 規約の適用対象外 |
 | `audits/` / `baselines/` 配下 | 歴史記録・baseline（checker-execution-contracts Design「検出対象除外規定」の正規列挙） |
 | `baseline_for` / `audit_for` 信号キー保持ファイル | 監査記録・baseline としての免除規定（checker-execution-contracts Design「検出対象除外規定」） |
-| `updated >= created` の順序比較 | 正典の検出列挙「キー欠落、updated値のキー名欠落、値形式不正」に含まれないため検出対象外。既知の順序不一致（rules/IR-006・IR-057 の updated が created より前）は本ルールでは検出しない |
+| `updated >= created` の順序比較 | 正典の検出列挙「キー欠落、updated値のキー名欠落、値形式不正」に含まれないため検出対象外。既知の順序不一致（旧ルール群で updated が created より前の実例）は本ルールでは検出しない |
 
-## baseline 運用
+## baseline 運用（撤廃済み）
 
-導入時点（Case #3042 Wave 2、2026-09-20）の現行リポジトリは、Design corpus の必須キー欠落 2 件（integrity/integrity-contracts.md の行頭空白付き ` updated:` 行、workflows/v4-collaboration-loop.md の updated 欠落）を同一 PR で修復済みのため、本ルールによる既知違反は存在せず NG baseline の追加登録は行わない。
-
+baseline による既知違反の免除管理・delta 運用は撤廃済みである（REQ-010-074/079、Epic #4126 Phase 4）。導入時点の既知違反は全件解消済みであり、現行の検出違反は免除せず対象側の直接修正で即時解消する。新規違反は strict fail として失敗する。
 ## See Also
 
 - [integrity-rule-catalog.md](../integrity-rule-catalog.md)
