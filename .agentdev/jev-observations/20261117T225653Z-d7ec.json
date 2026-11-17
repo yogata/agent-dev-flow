@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261117T225653Z-d7ec",
+  "workflow": "case-ready",
+  "evaluationKind": "execution-structure-wave-parallelizability",
+  "subject": "Root Case #4138 実行構造確定（Wave-1 OU-001〜004 の並列可否）",
+  "sourceRevision": "63dc4597d553d85ff8c977257451081922293597",
+  "durationMs": 243,
+  "inputTokens": 1224,
+  "inputs": {
+    "requestDigest": "b74ddd96a681b477463befb7169c914db17cdb7c47a5540900379dbe73e9b898"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "wave-parallelizable",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.95,
+        "false": 0.050000000000000044
+      }
+    }
+  ],
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "wave-parallelizable",
+        "value": true
+      }
+    ]
+  }
+}

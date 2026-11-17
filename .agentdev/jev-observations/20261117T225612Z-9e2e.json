@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261117T225612Z-9e2e",
+  "workflow": "case-ready",
+  "evaluationKind": "execution-structure-standard-epic",
+  "subject": "Root Case #4138 実行構造確定（Standard/Epic 確定の3軸判断と帰属）",
+  "sourceRevision": "63dc4597d553d85ff8c977257451081922293597",
+  "durationMs": 790,
+  "inputTokens": 1339,
+  "inputs": {
+    "requestDigest": "7b5c94d2396f0843209f8934dbba39470a101699206d8b4ce6e75aa6023baa3c"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-attribution",
+      "questionForm": "choice",
+      "value": "Epic",
+      "probabilityDistribution": {
+        "Standard": 0.04,
+        "Epic": 0.96
+      }
+    },
+    {
+      "questionId": "dependency-strength",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "関連": 0.02,
+        "弱": 0.04,
+        "必須": 0.94
+      }
+    },
+    {
+      "questionId": "functional-coherence",
+      "questionForm": "score",
+      "value": 2,
+      "probabilityDistribution": {
+        "分散": 0.02,
+        "部分的": 0.47,
+        "一貫": 0.51
+      }
+    }
+  ],
+  "confidence": 0.92,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-attribution",
+        "value": "Epic"
+      },
+      {
+        "questionId": "dependency-strength",
+        "value": 2
+      },
+      {
+        "questionId": "functional-coherence",
+        "value": 2
+      }
+    ]
+  }
+}
