@@ -2,7 +2,7 @@
 title: intake-capture Design
 status: accepted
 created: 2026-06-21
-updated: "2026-10-05"
+updated: "2026-11-18"
 ---
 <!-- ADF-COVERS(implementation): REQ-037-001, REQ-037-002, REQ-037-004, REQ-037-008, REQ-037-010 -->
 <!-- ADF-COVERS(implementation): REQ-037-002, REQ-037-004 -->

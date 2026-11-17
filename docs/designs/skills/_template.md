@@ -2,7 +2,7 @@
 title: skill Design テンプレート
 status: accepted
 created: 2026-06-21
-updated: 2026-10-03
+updated: 2026-11-18
 ---
 
 # skill Design テンプレート

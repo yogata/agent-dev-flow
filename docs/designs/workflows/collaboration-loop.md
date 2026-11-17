@@ -102,7 +102,7 @@ standard-lifecycle の循環において req-define → REQ/Decision/Design → 
 
 - Intake・Learning・Backlog は v5 においても継続的な発見・改善と要件化への接続能力として維持する（REQ-108-011）。発見・学習情報を必要な評価と承認を経て要件候補へ接続し、実行から生じた改善情報を同じ循環へ戻す構造は本 Design「循環の各段責務」節が正である。
 - 旧公開コマンド名や旧内部状態の維持を合否条件としない（REQ-108-011）。循環の実現手段の構成（コマンド名、実現手段対応表の行）は v5 の実行モデルの実現確定に伴って再構成され得る。
-- v5 の実行モデルの実現確定までの間、本 Design の循環実現手段は現行の実行契約の下で運用する（REQ-108-012 移行期権威行）。実現手段の v5 向け処遇の棚卸し処遇は、工程遷移・独立レビューと双経路併存モデル（[../phase-transition-and-coexistence-model.md](../phase-transition-and-coexistence-model.md)）「双経路併存と移行」節の権威継続の記述（REQ-108-012、後継経路採用まで現行経路が正）へ従う。
+- v5 の実行モデルの実現確定までの間、本 Design の循環実現手段は現行の実行契約の下で運用する（REQ-108-012 移行期権威行）。実現手段の v5 向け処遇の棚卸し処遇は、工程遷移・独立レビューと双経路併存モデル（[phase-transition-and-coexistence-model.md](phase-transition-and-coexistence-model.md)）「双経路併存と移行」節の権威継続の記述（REQ-108-012、後継経路採用まで現行経路が正）へ従う。
 
 ## v3 backlog-artifact-lifecycle Design からの吸収
 

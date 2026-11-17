@@ -2,7 +2,7 @@
 title: 品質仕様
 status: accepted
 created: 2026-08-20
-updated: 2026-09-19
+updated: 2026-11-18
 ---
 <!-- ADF-COVERS(implementation): REQ-007-006, REQ-007-007, REQ-007-008, REQ-007-009 -->
 

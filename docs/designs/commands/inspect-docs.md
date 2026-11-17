@@ -2,7 +2,7 @@
 title: inspect-docs Design
 status: accepted
 created: 2026-06-21
-updated: 2026-11-11
+updated: 2026-11-18
 ---
 
 <!-- ADF-COVERS(implementation): REQ-021-021 -->

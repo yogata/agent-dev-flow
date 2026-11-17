@@ -3234,6 +3234,23 @@ function checkVariantRegistryRegistered(
 function checkSkillFrontmatter(skillsDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const skillDirs = listDirs(skillsDir);
+  // third-party Skills (declared in src/third-party/skills.yaml) are exempt from
+  // the USE FOR boundary warning: checker-execution-contracts Design
+  // "third-party Skill 境界使用の扱い" (former skill-use-for-boundary exemption,
+  // Epic #4126 Phase 4). Fail-closed: unreadable declaration yields an empty set.
+  const declaredThirdPartySkills = loadIr058DeclaredSkillNames(root);
+  // checker-execution-contracts Design names 4 third-party Skills explicitly:
+  // explainer / explainer-book / first-reader / yomiyasu. Only yomiyasu is
+  // declared in src/third-party/skills.yaml today, so the named 4 are added
+  // here as the detector-level counterpart of that Design clause.
+  for (const named of [
+    "explainer",
+    "explainer-book",
+    "first-reader",
+    "yomiyasu",
+  ]) {
+    declaredThirdPartySkills.add(named);
+  }
 
   for (const dir of skillDirs) {
     const skillMdPath = path.join(skillsDir, dir, "SKILL.md");
@@ -3264,7 +3281,12 @@ function checkSkillFrontmatter(skillsDir: string, root: string): CheckResult[] {
     }
 
     // v2:REQ-0108-093: USE FOR / DO NOT USE FOR boundary
-    if (!content.includes("USE FOR") && !content.includes("use for")) {
+    const isDeclaredThirdParty = declaredThirdPartySkills.has(dir);
+    if (
+      !isDeclaredThirdParty &&
+      !content.includes("USE FOR") &&
+      !content.includes("use for")
+    ) {
       results.push(
         warn(
           "Skill",

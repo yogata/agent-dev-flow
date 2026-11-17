@@ -2,7 +2,7 @@
 title: Case Issue 工程記録モデル（issue-lifecycle-records）
 status: accepted
 created: 2026-10-03
-updated: "2026-10-20"
+updated: "2026-11-18"
 ---
 <!-- ADF-COVERS(design): REQ-101-001, REQ-101-002, REQ-101-003, REQ-101-004, REQ-101-006, REQ-101-007, REQ-101-008, REQ-101-009, REQ-101-010, REQ-101-011, REQ-101-012, REQ-101-013, REQ-101-014, REQ-101-015, REQ-101-016 -->
 <!-- ADF-COVERS(design): REQ-101-020 -->

@@ -2,7 +2,7 @@
 title: "`agentdev-git-worktree-test-fallback` Design"
 status: accepted
 created: "2026-08-09"
-updated: "2026-10-05"
+updated: "2026-11-18"
 ---
 <!-- ADF-COVERS(implementation): REQ-018-001, REQ-018-002 -->
 <!-- ADF-COVERS(design): REQ-018-005, REQ-018-006, REQ-018-007, REQ-018-008 -->
