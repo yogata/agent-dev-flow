@@ -10,7 +10,7 @@
 DEC-018 は欠番であり、対応する Decision ファイルは存在しない。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は53件、提案中の Decision は1件である。
+現行の承認済み Decision は54件、提案中の Decision は0件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -78,7 +78,7 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 | DEC-061 | Release 公開操作のカタログ正規化（承認後の workflow 実行経路） | accepted | 2026-10-20 |
 | DEC-062 | 要件ID桁数の受理上限撤廃と表示ゼロ埋め・受理検証の分離 | accepted | 2026-10-26 |
 | DEC-063 | 分割③ CI 日次定期実行（cron schedule）の撤去 | accepted | 2026-11-16 |
-| DEC-064 | 実験前提の恒久運用原則の採用と移行完了後レガシー資産の扱い境界 | proposed | 2026-11-17 |
+| DEC-064 | 実験前提の恒久運用原則の採用と移行完了後レガシー資産の扱い境界 | accepted | 2026-11-17 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -144,12 +144,12 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 - [DEC-061](DEC-061.md)（Release 公開操作のカタログ正規化（承認後の workflow 実行経路））
 - [DEC-062](DEC-062.md)（要件ID桁数の受理上限撤廃と表示ゼロ埋め・受理検証の分離）
 - [DEC-063](DEC-063.md)（分割③ CI 日次定期実行（cron schedule）の撤去）
+- [DEC-064](DEC-064.md)（実験前提の恒久運用原則の採用と移行完了後レガシー資産の扱い境界）
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
-- [DEC-064](DEC-064.md)（実験前提の恒久運用原則の採用と移行完了後レガシー資産の扱い境界）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
