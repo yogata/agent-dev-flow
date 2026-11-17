@@ -2,7 +2,7 @@
 title: "決定的破損検査クラス"
 status: accepted
 created: "2026-08-30"
-updated: "2026-10-16"
+updated: "2026-11-18"
 ---
 
 <!-- ADF-COVERS(design): REQ-010-071, REQ-010-083, REQ-053-012 -->

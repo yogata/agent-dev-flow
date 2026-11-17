@@ -2,7 +2,7 @@
 title: "IR-072: req-updated-freshness"
 status: accepted
 created: 2026-09-29
-updated: 2026-10-09
+updated: "2026-11-18"
 detection_method_class: machine-check
 implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
 verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts

@@ -2,7 +2,7 @@
 title: REQ 影響マップ
 status: accepted
 created: 2026-08-20
-updated: 2026-11-15
+updated: "2026-11-18"
 ---
 
 # REQ 影響マップ

@@ -2,7 +2,7 @@
 title: 語彙レジストリ
 status: accepted
 created: 2026-08-20
-updated: 2026-10-14
+updated: "2026-11-18"
 ---
 
 <!-- ADF-COVERS(design): REQ-094-008, REQ-094-012 -->

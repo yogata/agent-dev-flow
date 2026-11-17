@@ -2,7 +2,7 @@
 title: v4 -> v5 Concept / Artifact Crosswalk
 status: draft
 created: 2026-10-09
-updated: 2026-11-15
+updated: "2026-11-18"
 ---
 
 <!-- ADF-COVERS(design): REQ-108-012 -->
