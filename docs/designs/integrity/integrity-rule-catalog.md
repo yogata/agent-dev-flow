@@ -2,7 +2,7 @@
 title: 整合性ルールカタログ
 status: accepted
 created: 2026-08-20
-updated: 2026-11-15
+updated: "2026-11-18"
 ---
 <!-- ADF-COVERS(implementation): REQ-010-009 -->
 <!-- ADF-COVERS(design): REQ-051-009 -->
@@ -43,8 +43,9 @@ DEC-013 AG-009 により、`lifecycle_state`、`enforcement_mode`、`baseline_st
 廃止済み IR の file-backed tombstone（IR-011 型）は AG-008 により物理削除し、`lifecycle_state: superseded` 等の表現を使わない。
 識別子の再利用禁止は `foundations/numbering-policy.md` が保持し、履歴性は Git で担保する。
 
-finding-baseline 分類（new/known/resolved）は IR スキーマから分離し、finding 側の状態として [integrity-contracts.md](integrity-contracts.md)「finding-baseline 分類」で定義する。
-本カタログは finding-baseline 分類を再定義しない。
+baseline による既知/新規分類（finding-baseline 分類）と恒久免除レジストリは撤廃済みである（REQ-010-074/079、Epic #4126 Phase 4）。
+検出違反は免除せず全件を新規扱いで報告し、対象ファイル側の直接修正で即時解消する。
+本カタログは baseline 分類を再定義しない。
 
 `severity`、`gate_level` は現行 IR に対する独立軸として維持する（REQ-036-022、retired REQ-028-009 決定7）。
 IR lifecycle の代替とせず、実行可能 detector を持つ現行 IR の実行特性を表す。
@@ -94,15 +95,12 @@ IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 か
 - [IR-006: Command frontmatter 許可フィールド](rules/IR-006-command-allowed-frontmatter.md)
 - [IR-007: Skill frontmatter name ↔ dir](rules/IR-007-skill-name-dir-match.md)
 - [IR-008: Skill references/ 存在](rules/IR-008-skill-references-existence.md)
-- [IR-009: 旧 namespace 残存](rules/IR-009-obsolete-namespace-residual.md)
 - [IR-010: ADR status 正規化](rules/IR-010-adr-status-normalization.md)
 - [IR-012: Template 必須セクション](rules/IR-012-template-required-sections.md)
 - [IR-013: 完了報告種別実在](rules/IR-013-variant-path-existence.md)
-- [IR-014: reference/ 残存検出](rules/IR-014-singular-reference-dir-residual.md)
 - [IR-015: 廃止 REQ 現行参照検出](rules/IR-015-retired-req-current-ref-detection.md)
 - [IR-016: Source/projection 整合性](rules/IR-016-source-projection-integrity.md)
 - [IR-018: REQ 範囲表記鮮度](rules/IR-018-req-range-notation-freshness.md)
-- [IR-021: 廃止済み skill 参照検出](rules/IR-021-retired-skill-reference-detection.md)
 - [IR-024: Command README ↔ 実体](rules/IR-024-command-readme-actual.md)
 - [IR-025: 廃止 Decision path 規則](rules/IR-025-retired-adr-path-rule.md)
 - [IR-027: 廃止 ADR 現行根拠引用検出](rules/IR-027-retired-adr-current-authority-citation.md)
@@ -147,21 +145,39 @@ IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 か
 > IR-045 識別子は `vocabulary-registry.md`「文意品質検出対象語（IR-045）」で文意品質検出対象語の参照として残る。
 > 新規検出時の復活運用（REQ-010-003）に従い、必要に応じて docs-check 検出対象への復活を検討する。
 
+### IR-009/014/021/046/054/057/065/066: 削除（OU-004、Epic #4126 Phase 4）
+
+> **削除済み（REQ-010-003、REQ-010-074/079、DEC-064）**: 8ルールの検査は機械検出層から削除し、ルールファイル（rules/IR-{009,014,021,046,054,057,065,066}-*.md）と checker 実装・テストアサーションを物理削除した。
+> 削除根拠: 旧 namespace・旧パス・廃止語彙の残存検出は移行期の暫定統制であり、レガシー移行資産の完全削除（Epic #4126）完了後は恒久維持義務を負わない（DEC-064）。IR-054（draft Design 放置検出）は Design status 追跡（docs/designs/README.md status 列）と case-close の Design 確定工程で代替する。
+> IR-055・IR-059 は baseline 運用のみ撤廃して検出器として存続する（検出違反は直接修正で解消。IR-073 と同一の扱い）。
+> catalog↔実装双方向同期運用手順（REQ-010-003）に従い、当該 IR エントリをカタログ一覧から除去した。
+
+| IR | 旧タイトル | 処置 | 根拠 |
+|---|---|---|---|
+| IR-009 | 旧 namespace 残存 | 削除（欠番） | Epic #4126 Phase 4（レガシー移行資産の完全削除） |
+| IR-014 | reference/ 残存検出 | 削除（欠番） | 同上（Skill frontmatter 検査の obsolete reference/ 判定も同時に削除） |
+| IR-021 | 廃止済み skill 参照検出 | 削除（欠番） | 同上 |
+| IR-046 | consumer-generated リポジトリ種別誤検知防止 | 削除（欠番） | 同上（IR-047/048 は存続） |
+| IR-054 | draft Design 放置検出 | 削除（欠番） | 同上（Design status 追跡と case-close Design 確定で代替） |
+| IR-057 | obsolete-spec-path-after-domain-split | 削除（欠番） | 同上（targeted docs guard の IR-057 validator も同時に削除） |
+| IR-065 | obsolete-vocabulary-current-use | 削除（欠番） | 同上（vocabulary-registry の対照表運用は存続） |
+| IR-066 | legacy-path-removed-name | 削除（欠番） | 同上 |
+
+> 識別子の再利用禁止は `foundations/numbering-policy.md` が保持し、履歴性は Git で担保する（DEC-013 AG-008）。
+> 上記 8 IR は欠番として維持し、再登録は新規統制追加原則（DEC-001 決定4）の立証を要する。
+
 IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生成する（SC-002 Phase C、IR-061）。
 直接編集は行わない。
 
 <!-- AUTOGEN:BEGIN:id=catalog-ir-entries-post-045 -->
-- [IR-046: consumer-generated リポジトリ種別誤検知防止](rules/IR-046-consumer-generated-repo-type-fp-prevention.md)
 - [IR-048: generated_by 識別子整合性](rules/IR-048-generated-by-identifier-integrity.md)
 - [IR-049: Command file format violation](rules/IR-049-command-file-format-violation.md)
 - [IR-050: load_skills command 誤指定検出](rules/IR-050-load-skills-command-mis-specification.md)
 - [IR-051: 実行主体の skill 表記誤認検出](rules/IR-051-executor-skill-notation-misrecognition.md)
 - [IR-052: 完了条件 grep パターン設計（REQ-010-011）](rules/IR-052-completion-grep-pattern-design.md)
 - [IR-053: gh 直接記述検出](rules/IR-053-gh-direct-invocation-detection.md)
-- [IR-054: draft Design 放置検出](rules/IR-054-draft-spec-abandonment-detection.md)
 - [IR-055: runtime-unresolved-reference（配布物内の導入先未解決参照検出）](rules/IR-055-runtime-unresolved-reference.md)
 - [IR-056: project-extensions-integrity](rules/IR-056-project-extensions-integrity.md)
-- [IR-057: obsolete-spec-path-after-domain-split](rules/IR-057-obsolete-spec-path-after-domain-split.md)
 - [IR-058: distribution-untracked-skill-reference](rules/IR-058-distribution-untracked-skill-reference.md)
 - [IR-059: distribution-reference-boundary](rules/IR-059-distribution-reference-boundary.md)
 - [IR-060: forbidden Japanese word detection](rules/IR-060-forbidden-japanese-word-detection.md)
@@ -169,8 +185,6 @@ IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生�
 - [IR-062: skill/command パス参照実在](rules/IR-062-reference-path-existence.md)
 - [IR-063: common-policy-identifier-invariant](rules/IR-063-common-policy-identifier-invariant.md)
 - [IR-064: unresolved-placeholder](rules/IR-064-unresolved-placeholder.md)
-- [IR-065: obsolete-vocabulary-current-use](rules/IR-065-obsolete-vocabulary-current-use.md)
-- [IR-066: legacy-path-removed-name](rules/IR-066-legacy-path-removed-name.md)
 - [IR-067: referenced-req-row-existence](rules/IR-067-referenced-req-row-existence.md)
 - [IR-068: skill-projection-manifest](rules/IR-068-skill-projection-manifest.md)
 - [IR-069: req-number-gap-recorded](rules/IR-069-req-number-gap-recorded.md)
@@ -236,7 +250,7 @@ AG-005 規則群（`lint_skills.ts`、RU-0018 / Issue #2179、PR #2184 で main 
 
 正規所有者（Design が正、linter は検出ビュー）: `agentdev-skill-authoring` Design「skill 記述基準（層1〜3）」、`command-file-format` Design「機械検査対象」。
 
-登録判断: 新規カテゴリ追加判定フローに従い、(1) 検出が機械的パターンマッチで完結する、(2) 判定基準の正典が既存 Design（skill authoring 層1〜2）に存在し checker は検出ビューに留まる、(3) 既存 IR カテゴリと検出対象が重複しない、の各条件を満たすため checker カテゴリとして登録し IR 番号付与は行わないものと判定した。既知違反は `baselines/lint-skills-baseline.json`（delta-aware、baseline-known は info 降格）で管理する。
+登録判断: 新規カテゴリ追加判定フローに従い、(1) 検出が機械的パターンマッチで完結する、(2) 判定基準の正典が既存 Design（skill authoring 層1〜2）に存在し checker は検出ビューに留まる、(3) 既存 IR カテゴリと検出対象が重複しない、の各条件を満たすため checker カテゴリとして登録し IR 番号付与は行わないものと判定した。検出された違反は baseline による免除管理を行わず（REQ-010-082）、対象側の直接修正で 0 件化する運用とする。
 
 ### IR-055 heuristic 行内複数パターン集計仕様（REQ-029-002〜081）
 
@@ -248,9 +262,6 @@ IR-055（runtime-unresolved-reference）の heuristic 検出は、行内に複�
 
 **ファイルパス・行番号表現**: 検出結果レコードは `ファイルパス:行番号:違反内容:検出ルール` 形式とし、同一行に複数パターン種別が存在する場合はパターン種別ごとに別レコードとして列挙する。
 同一行の複数パターンを単一レコードへ圧縮しない。
-
-**baseline 整合**: `docs/designs/foundations/harness-separation-model.md` の baseline リスト（11件）は本集計仕様に従って再抽出した結果と一致すること。
-baseline 抽出元と Design 記載の不一致が検出された場合、本節の集計仕様を正として実装または baseline を調整する。
 
 **適用対象**: heuristic level（WARNING）の検出に適用する。
 strict level（NG）の検出は行単位1件の従来仕様を維持し、本節の対象外とする。
@@ -284,7 +295,6 @@ docs-check（`/repo/docs-check`、`check_integrity.ts`）と skill 定義（SKIL
 | 検出パターン（正規表現、構造判定） | ✓ 実装 | ✗ 参照のみ |
 | severity 分類（strict/heuristic/observation） | ✓ 実装 | ✗ 運用基準の説明のみ |
 | exemption 条件の判定 | ✓ 実装 | ✗ 境界ケースの文書化のみ |
-| baseline_status 管理 | ✓ 実行時更新 | ✗ 運用手順の説明のみ |
 | 新規ルール追加判定フロー | ✗ | ✓ SKILL.md に定義（下記「新規カテゴリ追加判定フロー」参照） |
 | catalog↔実装同期運用 | ✗ | ✓ integrity-contracts.md に定義 |
 
@@ -306,7 +316,7 @@ docs-check（`/repo/docs-check`、`check_integrity.ts`）と skill 定義（SKIL
 checkReferencePathIntegrity (REQ-010-010)
 ├── depends on → SCRIPT_TEMPLATE_REF_PATTERNS（正規表現定義）
 ├── depends on → resolveReferencePath（パス解決・src fallback）
-└── affects → checkObsoleteReferenceDirs（reference/ vs references/）
+└── affects → なし（独立ルール）
 
 checkSourceProjectionConsistency
 ├── depends on → isInsideWorktree（worktree skip・REQ-010-010）
@@ -329,7 +339,7 @@ checkWorkflowStatusProhibition
 新規 NG ルール、検査カテゴリを追加する際の副作用評価フロー。
 `repo-agentdev-integrity` SKILL.md が主体となり、以下を満たしてから追加する。
 
-1. **既存 NG への副作用評価**: 新ルールが既存ルールの誤検知を増加させないか。特に exemption 条件、baseline_status、severity 分類の整合性を確認する
+1. **既存 NG への副作用評価**: 新ルールが既存ルールの誤検知を増加させないか。特に exemption 条件、severity 分類の整合性を確認する
 2. **catalog エントリ追加**: `integrity-rule-catalog.md` に12フィールド以上の IR エントリを追加する（DEC-013 適用後、field 数 ≥ 12）。新規 IR 登録 gate（(a)/(b)）の確認を必須とする
 3. **実装追加**: `check_integrity.ts` に検出関数を実装する。exemption 条件、false_positive_risk を実装に反映する
 4. **テストデータ更新**: `check_integrity.test.ts` の有効なテストデータ（valid fixture）が新ルールで NG とならないことを確認する（drift detection smoke test）
@@ -346,7 +356,7 @@ checkWorkflowStatusProhibition
 
 | バックエンド | 適用範囲 | 根拠 |
 |--------------|----------|------|
-| `check_integrity.ts`（docs-check + IR ルール） | REQ/Design/reference 整合性の**決定論的**検出。frontmatter 許可フィールド、ID 一意性、リンク到達性、Step 形式、namespace legacy 残存、ADR status 正規化、draft Design 放置検出、配布物内の導入先未解決参照検出等、本カタログ（IR-001〜IR-055、IR-045 は docs-check 対象外として削除済み）が定義する検出 | 機械的検出層（[integrity-contracts.md](integrity-contracts.md)「3層検出構造の責務分担」、REQ-010-003、REQ-036-008、REQ-029-002/080/081） |
+| `check_integrity.ts`（docs-check + IR ルール） | REQ/Design/reference 整合性の**決定論的**検出。frontmatter 許可フィールド、ID 一意性、リンク到達性、Step 形式、ADR status 正規化、配布物内の導入先未解決参照検出等、本カタログ（現行 IR。IR-045、IR-009/014/021/046/054/057/065/066 は削除済み）が定義する検出 | 機械的検出層（[integrity-contracts.md](integrity-contracts.md)「3層検出構造の責務分担」、REQ-010-003、REQ-036-008、REQ-029-002/080/081） |
 | inspect-* skills（inspect-docs / inspect-skills） | 配布物整合性検査（REQ-002-006/007）。構文健全性の重複検出、文意保持の意味解析、責務説明照合など意味判断を含む診断 | 意味的診断層。詳細は [docs-spec-rebuild-integrity.md](docs-spec-rebuild-integrity.md)「検査バックエンド責務分担」参照 |
 
 **配布物整合性検査（REQ-002-006/007: 文意保持・構文健全性・責務整合などの意味的観点）は `check_integrity.ts` に追加せず、inspect-* skills に集約する**。
@@ -404,7 +414,7 @@ Gxx 連番検査（開始番号・欠番・重複・未定義参照）を廃止�
 - 廃止済み Gxx 表記の残存検出（G[0-9]{2} パターンの現行契約残存）
 - Command / Workflow Skill 間の workflow 契約重複の回帰検出（工程表・公開順序の要約の Command 残存）
 
-個別ルールの IR 登録と baseline の置換は、本セクションを正規所有者として整理する。
+個別ルールの IR 登録は、本セクションを正規所有者として整理する。
 
 ## メタ整合性
 

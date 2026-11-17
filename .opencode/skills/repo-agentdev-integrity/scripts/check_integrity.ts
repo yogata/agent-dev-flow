@@ -94,11 +94,6 @@ import {
   generateDocsReadmeDecisionTable,
 } from "./generate_indexes.ts";
 import {
-  isFileLevelHistoryExempt,
-  hasLineLevelHistoryMarker,
-  isIr057PathExempt,
-} from "./ir057_history_exemption.ts";
-import {
   extractCurrentAdrReadmeInventory,
   extractCurrentAdrRefs,
   extractCurrentDecRefs,
@@ -109,7 +104,7 @@ import { globWalkRel } from "./lib/glob_walk.ts";
 const SCRIPT_NAME = "check_integrity.ts";
 const DESCRIPTION = "AgentDevFlow artifact integrity validator";
 const USAGE =
-  "bun run check_integrity.ts [--help] [--json] [--dry-run] [--classification] [--profile source|installed|release] [--archive <zip>] [--root <path>] [--update-ir055-baseline] [--update-warning-cap [--raise-warning-cap]] [--update-ng-baseline --ng-baseline-additions <manifest.json>]";
+  "bun run check_integrity.ts [--help] [--json] [--dry-run] [--classification] [--profile source|installed|release] [--archive <zip>] [--root <path>]"
 
 const path = require("path") as typeof import("path");
 const fs = require("fs") as typeof import("fs");
@@ -949,80 +944,6 @@ function stripInlineCode(text: string): string {
   return text.replace(/`[^`]+`/g, "");
 }
 
-function checkLegacyNamespace(
-  skillsDir: string,
-  cmdDir: string,
-  root: string,
-): CheckResult[] {
-  const results: CheckResult[] = [];
-  const filesToCheck: string[] = [];
-
-  const skillDirs = listDirs(skillsDir);
-  for (const dir of skillDirs) {
-    const skillMd = path.join(skillsDir, dir, "SKILL.md");
-    if (fs.existsSync(skillMd)) filesToCheck.push(skillMd);
-  }
-
-  const cmdFiles = listFiles(cmdDir).filter(
-    (f) => f !== "README.md" && f !== "integrity-check.md",
-  );
-  for (const file of cmdFiles) {
-    filesToCheck.push(path.join(cmdDir, file));
-  }
-
-  const pathRefExemptPatterns = [
-    /templates\//,
-    /\/commands\/agentdev\//,
-    /\.opencode\//,
-    /\.test\./,
-    /_test\./,
-  ];
-
-  let foundLegacy = false;
-  for (const filePath of filesToCheck) {
-    const content = readText(filePath);
-    if (!content) continue;
-    const relPath = resolveRelative(filePath, root);
-    if (isLegacyExemptPath(relPath)) continue;
-    const lines = content.split("\n");
-    for (const { pattern, name } of LEGACY_PATTERNS) {
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        if (pathRefExemptPatterns.some((p) => p.test(line))) continue;
-        const lineToTest = stripInlineCode(line);
-        pattern.lastIndex = 0;
-        const slashMatch = pattern.exec(lineToTest);
-        if (slashMatch) {
-          const ctxStart = Math.max(0, slashMatch.index - 1);
-          if (isPathFragment(lineToTest.substring(ctxStart, slashMatch.index + slashMatch[0].length))) {
-            continue;
-          }
-          foundLegacy = true;
-          results.push(
-            ng(
-              "Namespace",
-              "legacy-namespace",
-              `Legacy pattern '${name}' found`,
-              relPath,
-            ),
-          );
-          break;
-        }
-      }
-    }
-  }
-
-  if (!foundLegacy) {
-    results.push(
-      ok(
-        "Namespace",
-        "legacy-namespace",
-        "No legacy namespace patterns detected",
-      ),
-    );
-  }
-  return results;
-}
 
 function checkNameCollision(skillsDir: string, root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -2975,50 +2896,6 @@ function checkSpecReadmeIndexSync(root: string): CheckResult[] {
   return results;
 }
 
-// ─── Obsolete reference/ directory detection (v2:REQ-0108-039, 040) ──────────
-
-function checkObsoleteReferenceDirs(
-  skillsDir: string,
-  root: string,
-): CheckResult[] {
-  const results: CheckResult[] = [];
-  const skillDirs = listDirs(skillsDir);
-  let foundObsolete = false;
-
-  for (const dir of skillDirs) {
-    const obsoleteDir = path.join(skillsDir, dir, "reference");
-    if (fs.existsSync(obsoleteDir)) {
-      foundObsolete = true;
-      const relDir = resolveRelative(obsoleteDir, root);
-      results.push(
-        ng(
-          "Canonical",
-          "obsolete-reference-dir",
-          `Obsolete 'reference/' directory found (should be 'references/')`,
-          relDir,
-          undefined,
-          {
-            evidence: relDir,
-            expected: "directory should be named 'references/' (canonical)",
-            route: "intake",
-          },
-        ),
-      );
-    }
-  }
-
-  if (!foundObsolete) {
-    results.push(
-      ok(
-        "Canonical",
-        "obsolete-reference-dir",
-        "No obsolete 'reference/' directories found (all use canonical 'references/')",
-      ),
-    );
-  }
-  return results;
-}
-
 // ─── Bare slash check scoped to public command invocation (v2:REQ-0108-076) ────
 
 const BARE_SLASH_COMMAND_PATTERNS = [
@@ -3417,8 +3294,7 @@ function checkSkillFrontmatter(skillsDir: string, root: string): CheckResult[] {
       );
     }
 
-    // v2:REQ-0108-094: reference/ vs references/ (also covered by checkObsoleteReferenceDirs,
-    // but check per SKILL.md reference)
+    // v2:REQ-0108-094: reference/ vs references/ (check per SKILL.md reference)
     const obsoleteRefDir = path.join(skillsDir, dir, "reference");
     if (fs.existsSync(obsoleteRefDir)) {
       results.push(
@@ -4748,128 +4624,7 @@ function checkReqBacklogResidualDetection(root: string): CheckResult[] {
   return results;
 }
 
-// ─── Abolished skill references detection (v2:REQ-0108-126, 127) ──────────────
 
-const ABOLISHED_SKILLS_DETECTION_LIST = ["agentdev-workflow-reporting"];
-
-function checkAbolishedSkillReferences(root: string): CheckResult[] {
-  const results: CheckResult[] = [];
-  let foundViolation = false;
-
-  const exemptPatterns = [
-    /\.test\./,
-    /_test\./,
-    /integrity-check\.md$/,
-    /vocabulary-registry\.md$/,
-    /gate-levels\.md$/,
-    /integrity-contracts\.md$/,
-    /integrity-rule-catalog\.md$/,
-  ];
-
-  const filesToScan: string[] = [];
-
-  // Scope: .opencode/commands/**/*.md (v2:REQ-0108-127)
-  const cmdDir = path.join(root, ".opencode", "commands");
-  if (fs.existsSync(cmdDir)) {
-    function collectCmdFiles(dir: string): void {
-      const entries = fs.readdirSync(dir, {
-        withFileTypes: true,
-      }) as import("fs").Dirent[];
-      for (const entry of entries) {
-        const fp = path.join(dir, entry.name);
-        if (entry.isDirectory()) collectCmdFiles(fp);
-        else if (entry.name.endsWith(".md")) filesToScan.push(fp);
-      }
-    }
-    collectCmdFiles(cmdDir);
-  }
-
-  // Scope: .opencode/skills/*/SKILL.md and references/**/*.md
-  const skillsDir = path.join(root, ".opencode", "skills");
-  if (fs.existsSync(skillsDir)) {
-    for (const skillDir of listDirs(skillsDir)) {
-      const skillMd = path.join(skillsDir, skillDir, "SKILL.md");
-      if (fs.existsSync(skillMd)) filesToScan.push(skillMd);
-      const refsDir = path.join(skillsDir, skillDir, "references");
-      if (fs.existsSync(refsDir)) {
-        function collectRefFiles(dir: string): void {
-          const entries = fs.readdirSync(dir, {
-            withFileTypes: true,
-          }) as import("fs").Dirent[];
-          for (const entry of entries) {
-            const fp = path.join(dir, entry.name);
-            if (entry.isDirectory()) collectRefFiles(fp);
-            else if (entry.name.endsWith(".md")) filesToScan.push(fp);
-          }
-        }
-        collectRefFiles(refsDir);
-      }
-    }
-  }
-
-  // Scope: docs/designs/**/*.md (runtime guidance) — v2:REQ-0158-004: recursive
-  const designsDir = path.join(root, "docs", "designs");
-  if (fs.existsSync(designsDir)) {
-    for (const f of collectSpecMarkdownRecursively(designsDir)) {
-      filesToScan.push(f);
-    }
-  }
-
-  // Scope: docs/DOC-MAP.md
-  const docMap = path.join(root, "docs", "DOC-MAP.md");
-  if (fs.existsSync(docMap)) filesToScan.push(docMap);
-
-  for (const fullPath of filesToScan) {
-    const relPath = resolveRelative(fullPath, root);
-    if (exemptPatterns.some((p) => p.test(relPath))) continue;
-    // v2:REQ-0145-015: 検出ルール説明文（IR-*.md）は廃止 skill 例を含むため除外
-    if (isIntegrityRuleDescriptionFile(relPath)) continue;
-    const content = readText(fullPath);
-    if (!content) continue;
-
-    for (const abolished of ABOLISHED_SKILLS_DETECTION_LIST) {
-      const re = new RegExp(
-        "\\b" +
-          abolished.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") +
-          "\\b",
-        "g",
-      );
-      if (re.test(content)) {
-        foundViolation = true;
-        const result = ng(
-          "Canonical",
-          "abolished-skill-references",
-          "Reference to abolished skill '" +
-            abolished +
-            "' detected in " +
-            relPath +
-            " (v2:REQ-0108-126)",
-          relPath,
-          undefined,
-          {
-            evidence: abolished,
-            expected: "skill '" + abolished + "' is abolished; remove references",
-            route: "intake",
-            finding_category: "obsolete-structure",
-          },
-        );
-        result.finding_level = "strict";
-        results.push(result);
-      }
-    }
-  }
-
-  if (!foundViolation) {
-    results.push(
-      ok(
-        "Canonical",
-        "abolished-skill-references",
-        "No references to abolished skills detected",
-      ),
-    );
-  }
-  return results;
-}
 
 // ─── REQ range staleness check (INC-0027) ─────────────────────────────────
 
@@ -5141,7 +4896,6 @@ function checkSkillCategoryGap(
     ["Skill rename 対称性", ["SkillRenameSymmetry"]],
     ["Common policy identifier invariant", ["CommonPolicyIdentifierInvariant"]],
     ["Unresolved placeholder", ["UnresolvedPlaceholder"]],
-    ["Obsolete vocabulary & legacy path", ["ObsoleteVocabulary"]],
     ["引用 REQ 行実在性", ["ReferencedReqRowExistence"]],
     ["スキル集合突合（投影マニフェスト）", ["SkillProjectionManifest"]],
     ["REQ 番号ギャップ検査", ["ReqNumberGap"]],
@@ -7211,8 +6965,8 @@ const IR053_GH_DIRECT_PATTERN =
 // not an instruction to bypass it, and is tolerated structurally
 // (sentence-scoped; negations in other sentences stay detected). The
 // tolerance is declared in the detector spec (integrity-contracts.md
-// 「IR-053 検出器仕様と既知許容」) and involves no ng-baseline /
-// exemptions registration (per-occurrence enumeration would bypass the
+// 「IR-053 検出器仕様と既知許容」) and involves no baseline / exemption
+// registration (per-occurrence enumeration would bypass the
 // positive detector spec).
 const IR053_NEGATED_USE_PATTERN = /(?:しません|しない|せず)/;
 
@@ -7229,7 +6983,7 @@ function isNegatedUseMention(line: string, matchEndIndex: number): boolean {
 // safe page limit; write-path gh remains prohibited (compensation test).
 // Each file is registered in both projection spellings (`.opencode/` in the
 // main junction environment, `src/common/` in worktree fallback), mirroring
-// the ng-baseline bucket key normalization (OU-0008).
+// the former baseline bucket key normalization (OU-0008, baseline 運用は撤廃済み).
 const IR053_EXEMPT_PATHS: RegExp[] = [
   /^(?:src\/common|\.opencode)\/skills\/agentdev-issue-management\/references\/issue-operation-safety\.md$/,
   /^(?:src\/common|\.opencode)\/skills\/agentdev-workflow-case-open\/references\/definition-pr-and-idempotency\.md$/,
@@ -7312,81 +7066,6 @@ function checkGhDirectInvocation(root: string): CheckResult[] {
   return results;
 }
 
-// ===== IR-054: draft Design 放置検出 (v2:REQ-0154-002) =====
-// 閾値: 30日（docs/designs/integrity-rule-catalog.md「IR-054 閾値設計」が原本）
-const IR054_DRAFT_STALE_DAYS = 30;
-const IR054_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
-
-function checkDraftSpecStaleness(designsDir: string, root: string): CheckResult[] {
-  const results: CheckResult[] = [];
-  if (!fs.existsSync(designsDir)) return results;
-
-  // docs/designs/**/*.md を再帰収集（README.md は対象外）
-  const collected: string[] = [];
-  walkMarkdown(designsDir, collected);
-  const specFiles = collected.filter((full) => {
-    const base = path.basename(full);
-    return base !== "README.md";
-  });
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  let foundStale = false;
-  let draftCount = 0;
-
-  for (const fullPath of specFiles) {
-    const content = readText(fullPath);
-    if (!content) continue;
-    const fm = parseFrontmatter(content);
-    if (!fm) continue;
-    const status = fm["status"];
-    if (typeof status !== "string" || status !== "draft") continue;
-    draftCount++;
-
-    const updated = fm["updated"];
-    if (typeof updated !== "string") continue; // updated なしは別ルール（IR-002 相当）対象
-    const m = updated.match(IR054_DATE_PATTERN);
-    if (!m) continue;
-    const updatedDate = new Date(
-      Number(m[1]),
-      Number(m[2]) - 1,
-      Number(m[3]),
-    );
-    if (isNaN(updatedDate.getTime())) continue;
-
-    const diffMs = today.getTime() - updatedDate.getTime();
-    const ageDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    if (ageDays > IR054_DRAFT_STALE_DAYS) {
-      foundStale = true;
-      results.push(
-        warn(
-          "Designs",
-          "draft-spec-staleness",
-          `Draft Design stale: age=${ageDays}d (threshold=${IR054_DRAFT_STALE_DAYS}d), updated=${updated}. Triage: (a) promote to accepted via case-close Design determination, (b) update content and bump updated, or (c) retire (IR-054, v2:REQ-0154-002)`,
-          resolveRelative(fullPath, root),
-          1,
-          {
-            evidence: `status: draft, updated: ${updated}, age: ${ageDays}d`,
-            expected: `draft Design updated within ${IR054_DRAFT_STALE_DAYS} days, or promoted to accepted`,
-            route: "intake",
-          },
-        ),
-      );
-    }
-  }
-
-  if (!foundStale) {
-    results.push(
-      ok(
-        "Designs",
-        "draft-spec-staleness",
-        `No stale draft Designs detected (checked ${draftCount} draft Designs, threshold ${IR054_DRAFT_STALE_DAYS}d) (IR-054, v2:REQ-0154-002)`,
-      ),
-    );
-  }
-  return results;
-}
-
 // ===== IR-055: runtime-unresolved-reference (v2:REQ-0108-263, v2:REQ-0108-264) =====
 // Detects references in distribution files (src/common/commands/agentdev/**/*.md,
 // src/common/skills/agentdev-*/**/*.md) that cannot be resolved in consumer
@@ -7400,9 +7079,8 @@ function checkDraftSpecStaleness(designsDir: string, root: string): CheckResult[
 // ADR-NNNN references are flagged as residual (migration leftover).
 // AG-010 (historical reference protection): v2:ADR-NNNN is exempted via the
 // v2: prefix filter in extractRefsWithoutV2Prefix-equivalent line scans.
-// Gradual rollout (v2:REQ-0108-264): baseline-known violations are reported as info
-// (no fail). New violations (delta from baseline) are reported as warn/ng and
-// fail in delta guard / impact guard. Full audit fails once baseline reaches 0.
+// baseline 運用撤廃後は全違反を直接報告する（strict → ng、heuristic → warn）。
+// 検出違反は免除せず、対象ファイル側の直接修正で解消する。
 
 const IR055_STRICT_PATTERNS: ReadonlyArray<{ name: string; pattern: RegExp }> = [
   // REQ 行ID の抽出は桁数上限なし（受理上限撤廃 Decision）。前置一致除外のための
@@ -7435,56 +7113,7 @@ const IR055_EXEMPT_PATH_PATTERNS: RegExp[] = [
   /\/integrity-rule-catalog\.md$/,
   /\/integrity-contracts\.md$/,
   /\/rules\/IR-055[-/]/,
-  /\/baselines\/ir-055-baseline\.json$/,
 ];
-
-const IR055_BASELINE_PATH = path.join(
-  ".opencode",
-  "skills",
-  "repo-agentdev-integrity",
-  "baselines",
-  "ir-055-baseline.json",
-);
-
-interface Ir055BaselineEntry {
-  file: string;
-  pattern: string;
-  severity: "strict" | "heuristic";
-  count: number;
-  classification?: "baseline";
-  reason?: string;
-}
-
-interface Ir055Baseline {
-  version: number;
-  rule_id: "IR-055";
-  generated_at: string;
-  /**
-   * Full-audit warning ratchet cap (integrity-contracts「IR-055 warning 総数
-   * ratchet（full-audit 契約）」). Pre-demote warning total must stay <= cap;
-   * decreases are free, increases require --raise-warning-cap.
-   */
-  warning_total_cap?: number;
-  entries: Ir055BaselineEntry[];
-}
-
-function loadIr055Baseline(root: string): Ir055Baseline | null {
-  const baselineAbs = path.join(root, IR055_BASELINE_PATH);
-  const content = readText(baselineAbs);
-  if (!content) return null;
-  try {
-    return JSON.parse(content) as Ir055Baseline;
-  } catch {
-    return null;
-  }
-}
-
-function writeIr055Baseline(root: string, baseline: Ir055Baseline): void {
-  const baselineAbs = path.join(root, IR055_BASELINE_PATH);
-  const dir = path.dirname(baselineAbs);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(baselineAbs, JSON.stringify(baseline, null, 2) + "\n", "utf-8");
-}
 
 function isIr055ExemptPath(relPath: string): boolean {
   return IR055_EXEMPT_PATH_PATTERNS.some((re) => re.test(relPath));
@@ -7593,134 +7222,44 @@ function collectIr055Violations(root: string): Ir055RawViolation[] {
   return violations;
 }
 
-function summarizeIr055Violations(
-  violations: Ir055RawViolation[],
-): Map<string, Ir055BaselineEntry> {
-  // Key: `${file}\t${pattern}\t${severity}` → aggregated count.
-  const summary = new Map<string, Ir055BaselineEntry>();
-  for (const v of violations) {
-    const key = `${v.file}\t${v.pattern}\t${v.severity}`;
-    const existing = summary.get(key);
-    if (existing) {
-      existing.count++;
-    } else {
-      summary.set(key, {
-        file: v.file,
-        pattern: v.pattern,
-        severity: v.severity,
-        count: 1,
-      });
-    }
-  }
-  return summary;
-}
-
 function checkRuntimeUnresolvedReference(root: string): CheckResult[] {
   const results: CheckResult[] = [];
   const violations = collectIr055Violations(root);
-  const baseline = loadIr055Baseline(root);
 
-  // Index baseline by `${file}\t${pattern}\t${severity}` for O(1) lookup.
-  const baselineIndex = new Map<string, number>();
-  if (baseline) {
-    for (const entry of baseline.entries) {
-      const key = `${entry.file}\t${entry.pattern}\t${entry.severity}`;
-      baselineIndex.set(key, entry.count);
-    }
-  }
-
-  // Count current violations per (file, pattern, severity) bucket so we can
-  // distinguish baseline-known from new at the bucket granularity.
-  const currentSummary = summarizeIr055Violations(violations);
-
-  // Per-bucket classification. A bucket with count <= baseline is fully
-  // baseline-known (reported as info). Any excess is "new" and reported as
-  // warn (heuristic) or ng (strict) so delta guard fails on new growth.
-  const newBuckets = new Set<string>();
-  for (const [key, entry] of currentSummary) {
-    const baselineCount = baselineIndex.get(key) ?? 0;
-    if (entry.count > baselineCount) {
-      newBuckets.add(key);
-    }
-  }
-
-  // Re-walk violations to emit per-line results, tracking how many we've
-  // emitted per bucket so only the excess (new) entries are flagged.
-  const emittedPerBucket = new Map<string, number>();
-
-  // Sort violations by (file, line) so that for each bucket the earliest
-  // occurrences are treated as baseline-known and the trailing ones as new.
-  // This keeps the "new" tag stable relative to file position.
-  const sorted = [...violations].sort((a, b) => {
-    if (a.file !== b.file) return a.file < b.file ? -1 : 1;
-    return a.line - b.line;
-  });
-
-  let baselineKnownCount = 0;
-  let newCount = 0;
-
-  for (const v of sorted) {
-    const key = `${v.file}\t${v.pattern}\t${v.severity}`;
-    const baselineCount = baselineIndex.get(key) ?? 0;
-    const emitted = emittedPerBucket.get(key) ?? 0;
-    emittedPerBucket.set(key, emitted + 1);
-    const isBaselineKnown = emitted < baselineCount;
-
+  for (const v of violations) {
     const expected =
       v.severity === "strict"
         ? `distribution files must not contain ${v.pattern} references (unresolved in consumer env)`
         : `distribution files should avoid ${v.pattern} references (likely unresolved in consumer env)`;
 
     const route: FindingRoute = "intake";
-
-    if (isBaselineKnown) {
-      baselineKnownCount++;
-      results.push(
-        info(
-          "RuntimeReference",
-          "runtime-unresolved-reference",
-          `Baseline-known ${v.severity} violation: ${v.pattern} reference '${v.evidence}' (IR-055 baseline, not yet cleaned)`,
-          v.file,
-          v.line,
-          {
-            evidence: v.evidence,
-            expected,
-            route,
-            finding_category: "broken-reference",
-            finding_level: v.severity,
-          },
-        ),
-      );
-    } else {
-      newCount++;
-      const ctor = v.severity === "strict" ? ng : warn;
-      results.push(
-        ctor(
-          "RuntimeReference",
-          "runtime-unresolved-reference",
-          `New ${v.severity} violation: ${v.pattern} reference '${v.evidence}' detected (IR-055 delta from baseline)`,
-          v.file,
-          v.line,
-          {
-            evidence: v.evidence,
-            expected,
-            route,
-            finding_category: "broken-reference",
-            finding_level: v.severity,
-          },
-        ),
-      );
-    }
+    const ctor = v.severity === "strict" ? ng : warn;
+    results.push(
+      ctor(
+        "RuntimeReference",
+        "runtime-unresolved-reference",
+        `${v.severity === "strict" ? "Strict" : "Heuristic"} violation: ${v.pattern} reference '${v.evidence}' detected (IR-055)`,
+        v.file,
+        v.line,
+        {
+          evidence: v.evidence,
+          expected,
+          route,
+          finding_category: "broken-reference",
+          finding_level: v.severity,
+        },
+      ),
+    );
   }
 
   // Always emit a summary result so the check surface is visible even when
-  // there are zero violations (post-cleanup steady state).
-  if (newCount === 0) {
+  // there are zero violations (steady state).
+  if (violations.length === 0) {
     results.push(
       ok(
         "RuntimeReference",
         "runtime-unresolved-reference",
-        `IR-055 runtime-unresolved-reference: ${baselineKnownCount} baseline-known (info), 0 new violations. Full audit report-only mode (v2:REQ-0108-264).`,
+        `IR-055 runtime-unresolved-reference: ${violations.length} violations, all distribution surfaces clean.`,
       ),
     );
   }
@@ -7728,788 +7267,7 @@ function checkRuntimeUnresolvedReference(root: string): CheckResult[] {
   return results;
 }
 
-const IR055_HEURISTIC_BASELINE_REASON =
-  "意図的残存: 本体 docs への誘導参照として保持（統一選択基準 (a) baseline 登録、段階導入 REQ-010-007 の baseline 許容対象）";
-
-function updateIr055Baseline(root: string): void {
-  const violations = collectIr055Violations(root);
-  const summary = summarizeIr055Violations(violations);
-  for (const entry of summary.values()) {
-    if (entry.severity === "heuristic") {
-      entry.classification = "baseline";
-      entry.reason = IR055_HEURISTIC_BASELINE_REASON;
-    }
-  }
-  const baseline: Ir055Baseline = {
-    version: 1,
-    rule_id: "IR-055",
-    generated_at: new Date().toISOString().slice(0, 10),
-    entries: [...summary.values()].sort((a, b) => {
-      if (a.file !== b.file) return a.file < b.file ? -1 : 1;
-      if (a.pattern !== b.pattern) return a.pattern < b.pattern ? -1 : 1;
-      return a.severity < b.severity ? -1 : 1;
-    }),
-  };
-  writeIr055Baseline(root, baseline);
-  console.error(
-    `[integrity] IR-055 baseline regenerated: ${baseline.entries.length} entries across ${new Set(baseline.entries.map((e) => e.file)).size} files (${violations.length} total violations).`,
-  );
-}
-
-// ===== 恒久免除レジストリ (integrity-contracts「恒久免除レジストリ
-// （baselines/exemptions.json）の運用」) + IR-055 warning 総数 ratchet =====
-// Schema version 2 (fail-closed): each entry carries rule_id, an accepted
-// rationale_ref pointing at an existing repo-relative justification path, and
-// review_status === "accepted". Exempted warnings become permanent-exemption
-// info findings and are excluded from the baseline debt (ng-baseline demote
-// and the warning_total_cap count).
-
-const EXEMPTIONS_PATH = path.join(
-  ".opencode",
-  "skills",
-  "repo-agentdev-integrity",
-  "baselines",
-  "exemptions.json",
-);
-
-interface IntegrityExemptionEntry {
-  rule_id: string;
-  file: string | null;
-  evidence: string | null;
-  rationale_ref: string;
-  review_status: string;
-}
-
-interface IntegrityExemptions {
-  version: 2;
-  entries: IntegrityExemptionEntry[];
-}
-
-function loadExemptions(root: string): IntegrityExemptions | null {
-  const abs = path.join(root, EXEMPTIONS_PATH);
-  const content = readText(abs);
-  if (!content) return null;
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(content);
-  } catch (e) {
-    throw new Error(
-      `exemptions.json is not valid JSON: ${EXEMPTIONS_PATH} (${
-        e instanceof Error ? e.message : String(e)
-      })`,
-    );
-  }
-  const obj = parsed as Record<string, unknown> | null;
-  if (!obj || typeof obj !== "object" || obj.version !== 2) {
-    throw new Error(
-      `exemptions.json schema violation: "version" must be 2 (${EXEMPTIONS_PATH})`,
-    );
-  }
-  if (!Array.isArray(obj.entries)) {
-    throw new Error(
-      `exemptions.json schema violation: "entries" must be an array (${EXEMPTIONS_PATH})`,
-    );
-  }
-  const entries: IntegrityExemptionEntry[] = [];
-  const rawEntries = obj.entries as unknown[];
-  for (let i = 0; i < rawEntries.length; i++) {
-    const raw = rawEntries[i] as Record<string, unknown> | null;
-    if (!raw || typeof raw !== "object") {
-      throw new Error(
-        `exemptions.json schema violation: entries[${i}] is not an object (${EXEMPTIONS_PATH})`,
-      );
-    }
-    const ruleId = typeof raw.rule_id === "string" ? raw.rule_id.trim() : "";
-    if (!ruleId) {
-      throw new Error(
-        `exemptions.json schema violation: entries[${i}] missing required "rule_id" (${EXEMPTIONS_PATH})`,
-      );
-    }
-    const rationaleRef =
-      typeof raw.rationale_ref === "string" ? raw.rationale_ref.trim() : "";
-    if (!rationaleRef) {
-      throw new Error(
-        `exemptions.json schema violation: entries[${i}] (${ruleId}) missing required "rationale_ref" (${EXEMPTIONS_PATH})`,
-      );
-    }
-    if (!fs.existsSync(path.join(root, ...rationaleRef.split("/")))) {
-      throw new Error(
-        `exemptions.json schema violation: entries[${i}] (${ruleId}) rationale_ref does not resolve to an existing path: ${rationaleRef} (${EXEMPTIONS_PATH})`,
-      );
-    }
-    if (raw.review_status !== "accepted") {
-      throw new Error(
-        `exemptions.json schema violation: entries[${i}] (${ruleId}) review_status must be "accepted" (${EXEMPTIONS_PATH})`,
-      );
-    }
-    entries.push({
-      rule_id: ruleId,
-      file: raw.file == null ? null : String(raw.file),
-      evidence: raw.evidence == null ? null : String(raw.evidence),
-      rationale_ref: rationaleRef,
-      review_status: String(raw.review_status),
-    });
-  }
-  return { version: 2, entries };
-}
-
-/**
- * Demote exempted warnings to permanent-exemption info findings.
- * Runs BEFORE applyNgBaseline so an exempted warning can never be double-counted
- * as a baseline-known demote (the info level removes it from summarizeNgResults).
- * Returns the number of exempted findings.
- */
-function applyExemptions(
-  results: CheckResult[],
-  exemptions: IntegrityExemptions | null,
-): number {
-  if (!exemptions || exemptions.entries.length === 0) return 0;
-  let exempted = 0;
-  for (const r of results) {
-    if (r.level !== "warning") continue;
-    const matched = exemptions.entries.some(
-      (e) =>
-        e.rule_id === r.check &&
-        (e.file === null || (r.file ?? "") === e.file) &&
-        (e.evidence === null || (r.evidence ?? "") === e.evidence),
-    );
-    if (matched) {
-      r.level = "info";
-      r.finding_level = "observation";
-      r.message = `[exempted] ${r.message} (permanent exemption: ${EXEMPTIONS_PATH.replace(/\\/g, "/")})`;
-      exempted++;
-    }
-  }
-  return exempted;
-}
-
-function countPreDemoteWarnings(results: CheckResult[]): number {
-  return results.filter((r) => r.level === "warning").length;
-}
-
-function enforceWarningTotalCap(
-  root: string,
-  results: CheckResult[],
-  warningTotal: number,
-): void {
-  const baseline = loadIr055Baseline(root);
-  if (!baseline || typeof baseline.warning_total_cap !== "number") return;
-  const cap = baseline.warning_total_cap;
-  if (warningTotal <= cap) return;
-  results.push(
-    ng(
-      "RuntimeReference",
-      "warning-total-cap",
-      `IR-055 warning total (${warningTotal}) exceeds warning_total_cap (${cap}) in ir-055-baseline.json (ratchet: increases require --raise-warning-cap)`,
-      null,
-      undefined,
-      {
-        evidence: `warning_total=${warningTotal}, warning_total_cap=${cap}`,
-        expected: `pre-demote warning total <= ${cap}`,
-        route: "intake",
-      },
-    ),
-  );
-}
-
-function updateWarningTotalCap(
-  root: string,
-  warningTotal: number,
-  raiseRequested: boolean,
-): void {
-  const baseline = loadIr055Baseline(root);
-  if (!baseline) {
-    console.error(
-      "[integrity] IR-055 baseline not found; cannot update warning_total_cap.",
-    );
-    process.exit(EXIT_ERROR);
-  }
-  const currentCap =
-    typeof baseline.warning_total_cap === "number"
-      ? baseline.warning_total_cap
-      : null;
-  if (currentCap !== null && warningTotal > currentCap && !raiseRequested) {
-    console.error(
-      `[integrity] warning_total_cap update rejected: ${warningTotal} > ${currentCap} (ratchet: increase requires --raise-warning-cap).`,
-    );
-    process.exit(EXIT_ERROR);
-  }
-  if (currentCap !== null && warningTotal > currentCap) {
-    console.error(
-      `[integrity] --raise-warning-cap: warning_total_cap raised ${currentCap} -> ${warningTotal} (explicit increase acceptance).`,
-    );
-  }
-  baseline.warning_total_cap = warningTotal;
-  writeIr055Baseline(root, baseline);
-  console.error(
-    `[integrity] warning_total_cap updated to ${warningTotal} (was ${currentCap ?? "unset"}).`,
-  );
-}
-
-// ===== NG baseline (v2:REQ-0161-005): baseline-aware strict pass =====
-// The strict pass criterion ("exit 0 only when zero NG") is structurally
-// unreachable while a known baseline of pre-existing NGs exists. v2:REQ-0161-005
-// redefines the pass criterion as delta-aware: baseline-known NGs are demoted
-// to info (report-only), only NGs exceeding the baseline (new, caused by the
-// change under review) cause failure. The baseline is updated explicitly via
-// --update-ng-baseline with an approved additions manifest; it is NOT
-// auto-regenerated on every run, and unmanaged NGs are never absorbed.
-//
-// Bucket key: `${category}\t${check}\t${file||''}\t${evidence||''}`. A bucket
-// with current count <= baseline count is fully baseline-known.
-//
-// Design: docs/designs/integrity/integrity-contracts.md「NG baseline 運用手順」.
-// Each entry carries `provenance`（由来ラベル）and `reason`（承認理由）. Demoted
-// findings are classified into three report categories: baseline-known,
-// approved additions (provenance-tracked), new unmanaged NG.
-
-const NG_BASELINE_PATH = path.join(
-  ".opencode",
-  "skills",
-  "repo-agentdev-integrity",
-  "baselines",
-  "ng-baseline.json",
-);
-
-interface NgBaselineEntry {
-  category: string;
-  check: string;
-  file: string | null;
-  evidence: string | null;
-  count: number;
-  provenance: string;
-  reason: string;
-}
-
-interface NgBaseline {
-  version: number;
-  rule_id: "NG-BASELINE";
-  generated_at: string;
-  entries: NgBaselineEntry[];
-}
-
-// Entry in the additions manifest passed to --update-ng-baseline. Each addition
-// must declare a provenance label and a reason; entries without them are
-// rejected so the baseline cannot silently absorb unmanaged NGs.
-interface NgBaselineAddition {
-  category: string;
-  check: string;
-  file: string | null;
-  evidence: string | null;
-  count: number;
-  provenance: string;
-  reason: string;
-}
-
-interface NgBaselineAdditionsManifest {
-  additions: NgBaselineAddition[];
-}
-
-// Report returned by applyNgBaseline: three NG classification counts per design
-// (baseline-known, approved additions, new unmanaged).
-interface NgBaselineReport {
-  baselineKnown: number;
-  approvedAdditions: number;
-  newNg: number;
-}
-
-// OU-0008 (Issue #2206): パス bucket key の環境依存対策（Design integrity-contracts
-// 「baseline entry 運用契約」第2点）。main 環境（junction projection 実在）は
-// `.opencode/...` 表記、worktree 環境（junction 未伝播、§7.3 fallback）は
-// `src/common/...` 表記で同一ファイルを報告するため、bucket key 比較時のみ
-// 表記を正規化して相対パス基準へ統一する。bucket key 仕様自体
-// （category/check/file/evidence の4組）は維持する。
-function normalizeNgBaselineFilePath(file: string | null): string {
-  if (!file) return "";
-  const unified = file.replace(/\\/g, "/").replace(/^\.\//, "");
-  return unified.startsWith(".opencode/")
-    ? unified.replace(/^\.opencode\//, "src/common/")
-    : unified;
-}
-
-function ngBaselineKey(
-  category: string,
-  check: string,
-  file: string | null,
-  evidence: string | null,
-): string {
-  return `${category}\t${check}\t${normalizeNgBaselineFilePath(file)}\t${evidence ?? ""}`;
-}
-
-// Normalize a parsed entry to fill provenance/reason for backward compat with
-// baseline files written before v2:REQ-0161-005 introduced the fields. Missing
-// values are treated as "legacy" provenance so existing baseline NGs continue
-// to demote to info without forcing a one-shot migration of the JSON file.
-function normalizeNgBaselineEntry(raw: Partial<NgBaselineEntry>): NgBaselineEntry {
-  return {
-    category: String(raw.category ?? ""),
-    check: String(raw.check ?? ""),
-    file: raw.file === null || raw.file === undefined ? null : String(raw.file),
-    evidence:
-      raw.evidence === null || raw.evidence === undefined
-        ? null
-        : String(raw.evidence),
-    count: typeof raw.count === "number" ? raw.count : 0,
-    provenance: raw.provenance ? String(raw.provenance) : "legacy",
-    reason: raw.reason ? String(raw.reason) : "",
-  };
-}
-
-function loadNgBaseline(root: string): NgBaseline | null {
-  const baselineAbs = path.join(root, NG_BASELINE_PATH);
-  const content = readText(baselineAbs);
-  if (!content) return null;
-  try {
-    const parsed = JSON.parse(content) as Partial<NgBaseline>;
-    if (!parsed || !Array.isArray(parsed.entries)) return null;
-    return {
-      version: typeof parsed.version === "number" ? parsed.version : 1,
-      rule_id: "NG-BASELINE",
-      generated_at: parsed.generated_at ?? "",
-      entries: parsed.entries.map(normalizeNgBaselineEntry),
-    };
-  } catch {
-    return null;
-  }
-}
-
-function writeNgBaseline(root: string, baseline: NgBaseline): void {
-  const baselineAbs = path.join(root, NG_BASELINE_PATH);
-  const dir = path.dirname(baselineAbs);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(baselineAbs, JSON.stringify(baseline, null, 2) + "\n", "utf-8");
-}
-
-// Load the additions manifest from disk. Validates that every addition carries
-// non-empty provenance and reason; throws on a malformed manifest so the CLI
-// surfaces the error rather than silently absorbing unmanaged NGs.
-function loadNgBaselineAdditions(manifestPath: string): NgBaselineAddition[] {
-  const content = readText(manifestPath);
-  if (!content) {
-    throw new Error(
-      `NG baseline additions manifest not found or unreadable: ${manifestPath}`,
-    );
-  }
-  let parsed: Partial<NgBaselineAdditionsManifest>;
-  try {
-    parsed = JSON.parse(content) as Partial<NgBaselineAdditionsManifest>;
-  } catch (e) {
-    throw new Error(
-      `NG baseline additions manifest is not valid JSON: ${manifestPath} (${
-        e instanceof Error ? e.message : String(e)
-      })`,
-    );
-  }
-  if (!parsed || !Array.isArray(parsed.additions)) {
-    throw new Error(
-      `NG baseline additions manifest must have an "additions" array: ${manifestPath}`,
-    );
-  }
-  const additions: NgBaselineAddition[] = [];
-  for (let i = 0; i < parsed.additions.length; i++) {
-    const raw = parsed.additions[i];
-    if (!raw || typeof raw !== "object") {
-      throw new Error(
-        `NG baseline additions[${i}] is not an object in ${manifestPath}`,
-      );
-    }
-    const category = typeof raw.category === "string" ? raw.category : "";
-    const check = typeof raw.check === "string" ? raw.check : "";
-    if (!category || !check) {
-      throw new Error(
-        `NG baseline additions[${i}] missing required category/check in ${manifestPath}`,
-      );
-    }
-    const provenance =
-      typeof raw.provenance === "string" && raw.provenance.length > 0
-        ? raw.provenance
-        : "";
-    const reason =
-      typeof raw.reason === "string" && raw.reason.length > 0 ? raw.reason : "";
-    if (!provenance || !reason) {
-      throw new Error(
-        `NG baseline additions[${i}] (${category}/${check}) missing required provenance or reason in ${manifestPath}`,
-      );
-    }
-    additions.push({
-      category,
-      check,
-      file: raw.file === null || raw.file === undefined ? null : String(raw.file),
-      evidence:
-        raw.evidence === null || raw.evidence === undefined
-          ? null
-          : String(raw.evidence),
-      count: typeof raw.count === "number" && raw.count > 0 ? raw.count : 1,
-      provenance,
-      reason,
-    });
-  }
-  return additions;
-}
-
-function summarizeNgResults(
-  results: CheckResult[],
-): Map<string, NgBaselineEntry> {
-  const summary = new Map<string, NgBaselineEntry>();
-  for (const r of results) {
-    // v2:REQ-0161-005: baseline covers both ng and warning levels so the strict
-    // pass criterion (exit 0) is reachable while pre-existing findings remain.
-    if (r.level !== "ng" && r.level !== "warning") continue;
-    const key = ngBaselineKey(r.category, r.check, r.file ?? null, r.evidence ?? null);
-    const existing = summary.get(key);
-    if (existing) {
-      existing.count++;
-    } else {
-      summary.set(key, {
-        category: r.category,
-        check: r.check,
-        file: r.file ?? null,
-        evidence: r.evidence ?? null,
-        count: 1,
-      });
-    }
-  }
-  return summary;
-}
-
-// Demote baseline-known ng/warning to info so the exit code reflects only the
-// delta (new findings) exceeding the baseline. Returns counts split into three
-// Design categories: baseline-known (legacy entries, no provenance), approved
-// additions (entries with a non-legacy provenance label), and new unmanaged NG
-// (excess over baseline).
-function applyNgBaseline(
-  results: CheckResult[],
-  baseline: NgBaseline,
-): NgBaselineReport {
-  const baselineIndex = new Map<string, { count: number; provenance: string }>();
-  for (const entry of baseline.entries) {
-    const key = ngBaselineKey(entry.category, entry.check, entry.file, entry.evidence);
-    // OU-0008 (Issue #2206): 正規化により `.opencode/` 表記 entry と
-    // `src/common/` 表記 entry が同一 bucket へ衝突する場合、両者は同一論理 NG の
-    // 環境別観測であるため count の大きい方（通常は同数）を採用する。
-    const prev = baselineIndex.get(key);
-    if (!prev || entry.count > prev.count) {
-      baselineIndex.set(key, { count: entry.count, provenance: entry.provenance });
-    }
-  }
-
-  const currentSummary = summarizeNgResults(results);
-  const newBuckets = new Set<string>();
-  for (const [key, entry] of currentSummary) {
-    const baselineEntry = baselineIndex.get(key);
-    const baselineCount = baselineEntry?.count ?? 0;
-    if (entry.count > baselineCount) newBuckets.add(key);
-  }
-
-  const emittedPerBucket = new Map<string, number>();
-  let baselineKnown = 0;
-  let approvedAdditions = 0;
-  let newNg = 0;
-
-  for (const r of results) {
-    if (r.level !== "ng" && r.level !== "warning") continue;
-    const key = ngBaselineKey(r.category, r.check, r.file ?? null, r.evidence ?? null);
-    const baselineEntry = baselineIndex.get(key);
-    const baselineCount = baselineEntry?.count ?? 0;
-    const provenance = baselineEntry?.provenance ?? "legacy";
-    const emitted = emittedPerBucket.get(key) ?? 0;
-    emittedPerBucket.set(key, emitted + 1);
-    if (emitted < baselineCount && !newBuckets.has(key)) {
-      r.level = "info";
-      r.finding_level = "observation";
-      const tag =
-        provenance === "legacy"
-          ? "[baseline-known]"
-          : `[baseline-known provenance=${provenance}]`;
-      r.message = `${tag} ${r.message} (NG baseline, not yet cleaned)`;
-      if (provenance === "legacy") {
-        baselineKnown++;
-      } else {
-        approvedAdditions++;
-      }
-    } else {
-      newNg++;
-    }
-  }
-  return { baselineKnown, approvedAdditions, newNg };
-}
-
-// Selectively merge approved additions into the baseline. Per Design the update
-// does NOT regenerate the whole baseline from current NGs: it merges approved
-// deltas (each carrying provenance + reason) into existing buckets, leaving
-// unmanaged NGs out of the baseline so they remain restoration targets.
-function updateNgBaseline(
-  root: string,
-  results: CheckResult[],
-  additions: NgBaselineAddition[],
-): { addedEntries: number; updatedEntries: number } {
-  const baseline = loadNgBaseline(root) ?? {
-    version: 1,
-    rule_id: "NG-BASELINE" as const,
-    generated_at: new Date().toISOString().slice(0, 10),
-    entries: [],
-  };
-
-  const index = new Map<string, NgBaselineEntry>();
-  for (const entry of baseline.entries) {
-    const key = ngBaselineKey(entry.category, entry.check, entry.file, entry.evidence);
-    // OU-0008 (Issue #2206): 正規化で同一 bucket へ衝突する環境別表記 entry は
-    // 同一論理 NG として count の大きい方を採用する。
-    const prev = index.get(key);
-    if (!prev || entry.count > prev.count) {
-      index.set(key, entry);
-    }
-  }
-
-  // Current NG counts per bucket — used to cap the merged baseline count so a
-  // provenance label cannot raise the bucket above the observable NG count
-  // (prevents NG隠蔽 via over-counting).
-  const currentCounts = summarizeNgResults(results);
-
-  let addedEntries = 0;
-  let updatedEntries = 0;
-  for (const add of additions) {
-    const key = ngBaselineKey(add.category, add.check, add.file, add.evidence);
-    const current = currentCounts.get(key);
-    const existing = index.get(key);
-    const baseCount = existing ? existing.count : 0;
-    const mergedCount = baseCount + add.count;
-    // Cap at current observable count when current data is available: the
-    // baseline cannot exceed what the checks actually emit.
-    const finalCount = current ? Math.min(mergedCount, current.count) : mergedCount;
-    if (finalCount <= baseCount) {
-      // Nothing to add (current NG count already covered by baseline).
-      continue;
-    }
-    const entry: NgBaselineEntry = {
-      category: add.category,
-      check: add.check,
-      file: add.file,
-      evidence: add.evidence,
-      count: finalCount,
-      provenance: add.provenance,
-      reason: add.reason,
-    };
-    index.set(key, entry);
-    if (existing) updatedEntries++;
-    else addedEntries++;
-  }
-
-  const updated: NgBaseline = {
-    version: baseline.version,
-    rule_id: "NG-BASELINE",
-    generated_at: new Date().toISOString().slice(0, 10),
-    entries: [...index.values()].sort((a, b) => {
-      if (a.category !== b.category) return a.category < b.category ? -1 : 1;
-      if (a.check !== b.check) return a.check < b.check ? -1 : 1;
-      if ((a.file ?? "") !== (b.file ?? ""))
-        return (a.file ?? "") < (b.file ?? "") ? -1 : 1;
-      return 0;
-    }),
-  };
-  writeNgBaseline(root, updated);
-  console.error(
-    `[integrity] NG baseline updated: ${addedEntries} added, ${updatedEntries} updated (additions manifest: ${additions.length}).`,
-  );
-  return { addedEntries, updatedEntries };
-}
-
-// ===== IR-057: obsolete-spec-path-after-domain-split (v2:REQ-0158-002) =====
-// Detects残留する旧Design直下パス参照 (`docs/designs/<name>.md`) と link mode 統一
-// (v2:ADR-0131) に伴う廃止語彙 (`generation-flow.md`, `transform/`, `local-opencode-transform`,
-// 直接生成方式、生成フロー、再生成、上書き保護) を検出する。
-// `generated_by` は `local-opencode-transform` と同一ファイルに共存する場合のみ検出する。
-// 対照表: docs/designs/integrity/obsolete-path-map.yaml
-
-interface ObsoletePathEntry {
-  old: string;
-  new: string;
-  severity: string;
-}
-
-interface ObsoletePathMap {
-  scope: { include: string[]; exclude: string[] };
-  entries: ObsoletePathEntry[];
-  legacy_local_generation_vocabulary?: { term: string; severity: string }[];
-  legacy_local_generation_conditional_vocabulary?: { term: string; severity: string; proximity_required?: boolean }[];
-  generated_by_combination_rule?: {
-    trigger: string;
-    paired_with: string;
-    severity: string;
-  };
-}
-
-function loadObsoletePathMap(root: string): ObsoletePathMap | null {
-  const mapPath = path.join(
-    root,
-    ".opencode", "skills", "repo-agentdev-integrity", "data",
-    "obsolete-path-map.yaml",
-  );
-  const content = readText(mapPath);
-  if (!content) return null;
-
-  // 簡易YAMLパーサー（check_integrity.ts 内の parseFrontmatter と同レベルの依存）
-  // 構造化YAMLを扱うが、obsolete-path-map.yaml のスキーマに特化する。
-  const lines = content.split("\n");
-  const map: ObsoletePathMap = { scope: { include: [], exclude: [] }, entries: [] };
-  let section: "scope" | "entries" | "vocab" | "conditional_vocab" | "combo" | null = null;
-  let currentEntry: Partial<ObsoletePathEntry> | null = null;
-  let currentVocab: { term: string; severity: string; proximity_required?: boolean } | null = null;
-  let currentScopeKey: "include" | "exclude" | null = null;
-  let vocabTarget: "vocab" | "conditional_vocab" | null = null;
-
-  const flushEntry = () => {
-    if (currentEntry && currentEntry.old) {
-      map.entries.push(currentEntry as ObsoletePathEntry);
-    }
-    currentEntry = null;
-  };
-  const flushVocab = () => {
-    if (currentVocab && currentVocab.term) {
-      if (vocabTarget === "conditional_vocab") {
-        if (!map.legacy_local_generation_conditional_vocabulary) {
-          map.legacy_local_generation_conditional_vocabulary = [];
-        }
-        map.legacy_local_generation_conditional_vocabulary.push(currentVocab);
-      } else {
-        if (!map.legacy_local_generation_vocabulary) {
-          map.legacy_local_generation_vocabulary = [];
-        }
-        map.legacy_local_generation_vocabulary.push(currentVocab);
-      }
-    }
-    currentVocab = null;
-  };
-
-  for (const raw of lines) {
-    const line = raw.replace(/\r$/, "");
-    if (!line.trim() || line.trim().startsWith("#")) continue;
-
-    if (/^scope:/.test(line)) {
-      flushEntry();
-      flushVocab();
-      section = "scope";
-      continue;
-    }
-    if (/^entries:/.test(line)) {
-      flushEntry();
-      flushVocab();
-      section = "entries";
-      continue;
-    }
-    if (/^legacy_local_generation_vocabulary:/.test(line)) {
-      flushEntry();
-      flushVocab();
-      section = "vocab";
-      vocabTarget = "vocab";
-      continue;
-    }
-    if (/^legacy_local_generation_conditional_vocabulary:/.test(line)) {
-      flushEntry();
-      flushVocab();
-      section = "conditional_vocab";
-      vocabTarget = "conditional_vocab";
-      continue;
-    }
-    if (/^generated_by_combination_rule:/.test(line)) {
-      flushEntry();
-      flushVocab();
-      section = "combo";
-      continue;
-    }
-
-    if (section === "scope") {
-      const incMatch = line.match(/^\s*include:\s*$/);
-      if (incMatch) {
-        currentScopeKey = "include";
-        continue;
-      }
-      const excMatch = line.match(/^\s*exclude:\s*$/);
-      if (excMatch) {
-        currentScopeKey = "exclude";
-        continue;
-      }
-      const itemMatch = line.match(/^\s*-\s*"([^"]+)"/);
-      if (itemMatch && currentScopeKey) {
-        map.scope[currentScopeKey].push(itemMatch[1]);
-        continue;
-      }
-    }
-
-    if (section === "entries") {
-      const startMatch = line.match(/^\s*-\s*old:\s*"([^"]+)"/);
-      if (startMatch) {
-        flushEntry();
-        currentEntry = { old: startMatch[1] };
-        continue;
-      }
-      if (currentEntry) {
-        const newMatch = line.match(/^\s*new:\s*"([^"]+)"/);
-        if (newMatch) {
-          currentEntry.new = newMatch[1];
-          continue;
-        }
-        const sevMatch = line.match(/^\s*severity:\s*"([^"]+)"/);
-        if (sevMatch) {
-          currentEntry.severity = sevMatch[1];
-          continue;
-        }
-      }
-    }
-
-    if (section === "vocab" || section === "conditional_vocab") {
-      const startMatch = line.match(/^\s*-\s*term:\s*"([^"]+)"/);
-      if (startMatch) {
-        flushVocab();
-        currentVocab = { term: startMatch[1], severity: section === "conditional_vocab" ? "conditional" : "ng" };
-        continue;
-      }
-      if (currentVocab) {
-        const sevMatch = line.match(/^\s*severity:\s*"([^"]+)"/);
-        if (sevMatch) {
-          currentVocab.severity = sevMatch[1];
-          continue;
-        }
-        const proxMatch = line.match(/^\s*proximity_required:\s*(true|false)/);
-        if (proxMatch) {
-          currentVocab.proximity_required = proxMatch[1] === "true";
-          continue;
-        }
-      }
-    }
-
-    if (section === "combo" && map.generated_by_combination_rule) {
-      const m = line.match(/^\s*(trigger|paired_with|severity):\s*"([^"]+)"/);
-      if (m) {
-        (map.generated_by_combination_rule as any)[m[1]] = m[2];
-      }
-    }
-    if (section === "combo" && !map.generated_by_combination_rule) {
-      if (line.match(/^\s*(trigger|paired_with|severity):\s*"([^"]+)"/)) {
-        map.generated_by_combination_rule = {
-          trigger: "generated_by",
-          paired_with: "local-opencode-transform",
-          severity: "ng",
-        };
-        const m = line.match(/^\s*(trigger|paired_with|severity):\s*"([^"]+)"/);
-        if (m) {
-          (map.generated_by_combination_rule as any)[m[1]] = m[2];
-        }
-      }
-    }
-  }
-  flushEntry();
-  flushVocab();
-  return map;
-}
-
-function isIr057ExemptPath(relPath: string): boolean {
-  // IR-057 Design exemption 表に基づくパス単位免除は共有純粋関数へ委譲（REQ-0144-024）。
-  // targeted guard（check_changed_docs.ts）と同一の免除集合を使用する。
-  return isIr057PathExempt(relPath);
-}
-
-function isIr057InCodeBlock(lines: string[], lineIdx: number): boolean {
+function isInCodeBlock(lines: string[], lineIdx: number): boolean {
   // 行番号は 0-indexed。コードブロック内 (``` で囲まれた範囲) は exemption。
   let inCode = false;
   for (let i = 0; i <= lineIdx && i < lines.length; i++) {
@@ -8527,251 +7285,6 @@ function isIr057InCodeBlock(lines: string[], lineIdx: number): boolean {
     return countAbove % 2 === 1;
   }
   return inCode;
-}
-
-// IR-057 文書レベル履歴注記 exemption（Issue #1768、IR-057 Design「例外登録」セクション、v2:REQ-0144-024）。
-// targeted guard（check_changed_docs.ts）と共通の純粋関数へ集約し、exemption 判定を一致させる。
-const ir057HistoricalFileCache = new Map<string, boolean>();
-
-function isIr057HistoricalContext(
-  fullPath: string,
-  root: string,
-  line: string,
-): boolean {
-  const relPath = resolveRelative(fullPath, root);
-
-  let fileIsHistorical = ir057HistoricalFileCache.get(relPath);
-  if (fileIsHistorical === undefined) {
-    const content = readText(fullPath);
-    fileIsHistorical =
-      content !== null && isFileLevelHistoryExempt(relPath, content);
-    ir057HistoricalFileCache.set(relPath, fileIsHistorical);
-  }
-  if (fileIsHistorical) return true;
-
-  return hasLineLevelHistoryMarker(line);
-}
-
-function checkObsoleteSpecPath(root: string): CheckResult[] {
-  const results: CheckResult[] = [];
-  const map = loadObsoletePathMap(root);
-  if (!map) {
-    results.push(
-      info(
-        "CanonicalConflict",
-        "obsolete-spec-path",
-        "obsolete-path-map.yaml not found; IR-057 skipped",
-      ),
-    );
-    return results;
-  }
-
-  // 収集対象ファイル: scope.include に合致し scope.exclude に合致しない .md, .yaml ファイル
-  // 簡易実装: AGENTS.md, README.md, docs/**, src/**, .opencode/**
-  const targetFiles: string[] = [];
-  const candidateRoots = [
-    path.join(root, "AGENTS.md"),
-    path.join(root, "README.md"),
-  ];
-  const candidateDirs = [
-    path.join(root, "docs"),
-    path.join(root, "src"),
-    path.join(root, ".opencode"),
-  ];
-  for (const f of candidateRoots) {
-    if (fs.existsSync(f)) targetFiles.push(f);
-  }
-  for (const dir of candidateDirs) {
-    if (!fs.existsSync(dir)) continue;
-    const acc: string[] = [];
-    walkAllFiles(dir, acc);
-    targetFiles.push(...acc);
-  }
-
-  let foundViolation = false;
-
-  // 1. 旧Design直下パス参照検出
-  for (const fullPath of targetFiles) {
-    const relPath = resolveRelative(fullPath, root);
-    // scope.exclude 判定
-    if (isIr057ExemptPath(relPath)) continue;
-    // 対象外拡張子
-    if (!/\.(md|yaml|yml)$/.test(fullPath)) continue;
-
-    const content = readText(fullPath);
-    if (!content) continue;
-    const lines = content.split("\n");
-
-    for (const entry of map.entries) {
-      const pattern = entry.old;
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        if (!line.includes(pattern)) continue;
-        // コードブロック内は exemption
-        if (isIr057InCodeBlock(lines, i)) continue;
-        // 履歴 ADR コンテキストは exemption
-        if (isIr057HistoricalContext(fullPath, root, line)) continue;
-        // backticks 内 (例: `docs/designs/system.md`) も免除
-        if (isInsideCodeSpan(line, line.indexOf(pattern))) continue;
-        foundViolation = true;
-        results.push(
-          ng(
-            "CanonicalConflict",
-            "obsolete-spec-path",
-            `Old design direct path reference '${pattern}' detected (current: ${entry.new})`,
-            relPath,
-            i + 1,
-            {
-              evidence: line.trim(),
-              expected: `use current path: ${entry.new}`,
-              route: "intake",
-              finding_category: "broken-reference",
-              finding_level: "strict",
-            },
-          ),
-        );
-      }
-    }
-  }
-
-  // 2. legacy local generation vocabulary 検出
-  if (map.legacy_local_generation_vocabulary) {
-    for (const fullPath of targetFiles) {
-      const relPath = resolveRelative(fullPath, root);
-      if (isIr057ExemptPath(relPath)) continue;
-      if (!/\.(md|yaml|yml)$/.test(fullPath)) continue;
-
-      const content = readText(fullPath);
-      if (!content) continue;
-      const lines = content.split("\n");
-
-      for (const item of map.legacy_local_generation_vocabulary) {
-        for (let i = 0; i < lines.length; i++) {
-          const line = lines[i];
-          if (!line.includes(item.term)) continue;
-          if (isIr057InCodeBlock(lines, i)) continue;
-          if (isIr057HistoricalContext(fullPath, root, line)) continue;
-          if (isInsideCodeSpan(line, line.indexOf(item.term))) continue;
-          foundViolation = true;
-          results.push(
-            ng(
-              "CanonicalConflict",
-              "obsolete-spec-path",
-              `Legacy local generation vocabulary '${item.term}' detected (link mode unified, v2:ADR-0131)`,
-              relPath,
-              i + 1,
-              {
-                evidence: line.trim(),
-                expected:
-                  "remove legacy vocabulary; use link mode terminology (v2:ADR-0131)",
-                route: "intake",
-                finding_category: "broken-reference",
-                finding_level: "strict",
-              },
-            ),
-          );
-        }
-      }
-    }
-  }
-
-  // 3. generated_by + local-opencode-transform 組み合わせ検出
-  if (map.generated_by_combination_rule) {
-    const { trigger, paired_with } = map.generated_by_combination_rule;
-    for (const fullPath of targetFiles) {
-      const relPath = resolveRelative(fullPath, root);
-      if (isIr057ExemptPath(relPath)) continue;
-      if (!/\.(md|yaml|yml)$/.test(fullPath)) continue;
-
-      const content = readText(fullPath);
-      if (!content) continue;
-      if (!content.includes(trigger)) continue;
-      if (!content.includes(paired_with)) continue;
-
-      const lines = content.split("\n");
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        if (!line.includes(trigger)) continue;
-        if (isIr057InCodeBlock(lines, i)) continue;
-        if (isIr057HistoricalContext(fullPath, root, line)) continue;
-        if (isInsideCodeSpan(line, line.indexOf(trigger))) continue;
-        foundViolation = true;
-        results.push(
-          ng(
-            "CanonicalConflict",
-            "obsolete-spec-path",
-            `Legacy local generation identifier '${trigger}' coexists with '${paired_with}' (link mode unified, v2:ADR-0131)`,
-            relPath,
-            i + 1,
-            {
-              evidence: line.trim(),
-              expected:
-                "remove legacy generated_by: local-opencode-transform identifier",
-              route: "intake",
-              finding_category: "broken-reference",
-              finding_level: "strict",
-            },
-          ),
-        );
-      }
-    }
-  }
-
-  // 4. legacy local generation conditional vocabulary（近接条件つき検出語）検出
-  // 単独では検出せず、同一ファイル内に旧 local 生成方式文脈語がある場合のみ検出する
-  if (map.legacy_local_generation_conditional_vocabulary && map.legacy_local_generation_vocabulary) {
-    const contextTerms = map.legacy_local_generation_vocabulary.map((v) => v.term);
-    for (const fullPath of targetFiles) {
-      const relPath = resolveRelative(fullPath, root);
-      if (isIr057ExemptPath(relPath)) continue;
-      if (!/\.(md|yaml|yml)$/.test(fullPath)) continue;
-
-      const content = readText(fullPath);
-      if (!content) continue;
-      const hasContextTerm = contextTerms.some((t) => content.includes(t));
-      if (!hasContextTerm) continue;
-
-      const lines = content.split("\n");
-      for (const item of map.legacy_local_generation_conditional_vocabulary) {
-        for (let i = 0; i < lines.length; i++) {
-          const line = lines[i];
-          if (!line.includes(item.term)) continue;
-          if (isIr057InCodeBlock(lines, i)) continue;
-          if (isIr057HistoricalContext(fullPath, root, line)) continue;
-          if (isInsideCodeSpan(line, line.indexOf(item.term))) continue;
-          foundViolation = true;
-          results.push(
-            ng(
-              "CanonicalConflict",
-              "obsolete-spec-path",
-              `Legacy local generation conditional vocabulary '${item.term}' detected with context term nearby (link mode unified, v2:ADR-0131)`,
-              relPath,
-              i + 1,
-              {
-                evidence: line.trim(),
-                expected:
-                  "remove legacy vocabulary; use link mode terminology (v2:ADR-0131)",
-                route: "intake",
-                finding_category: "broken-reference",
-                finding_level: "strict",
-              },
-            ),
-          );
-        }
-      }
-    }
-  }
-
-  if (!foundViolation) {
-    results.push(
-      ok(
-        "CanonicalConflict",
-        "obsolete-spec-path",
-        "No obsolete design direct path references or legacy local generation vocabulary detected (IR-057, v2:REQ-0158-002)",
-      ),
-    );
-  }
-  return results;
 }
 
 // ===== IR-061: 索引類自動生成整合性 (SC-002 Phase C, v2:REQ-0108) =====
@@ -9747,7 +8260,7 @@ function checkUnresolvedPlaceholder(root: string): CheckResult[] {
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      if (isIr057InCodeBlock(lines, i)) continue;
+      if (isInCodeBlock(lines, i)) continue;
 
       // (a) 未解決 TODO 系マーカー（引用「」内の語彙列挙、code span 内は許容）
       IR064_TODO_MARKER_RE.lastIndex = 0;
@@ -9819,562 +8332,6 @@ function checkUnresolvedPlaceholder(root: string): CheckResult[] {
   return results;
 }
 
-// IR-065 (REQ-010-066) / IR-066 (REQ-010-067): 廃止語彙・旧パス・削除済み名称。
-// 許容条件の運用データ（existence_probe、exemption_files、否定文脈語）は
-// data/obsolete-vocabulary-map.yaml が宣言する。
-interface ObsoleteVocabEntry {
-  id: string;
-  rule: string;
-  probe: string;
-}
-
-// 構造的除外領域（REQ-010-066）: 語彙を引用・記録する領域を経路・領域ベースで
-// 除外する宣言。行番号・行内容の列挙を錨とせず、構造マーカー（領域境界）を錨とする。
-interface ObsoleteStructuralExclusion {
-  area: string;
-  anchor: string;
-  reason: string;
-}
-
-interface ObsoleteVocabMap {
-  scopeInclude: string[];
-  scopeExclude: string[];
-  exemptionFiles: Map<string, string>;
-  negationTerms: string[];
-  structuralExclusions: ObsoleteStructuralExclusion[];
-  vocab: ObsoleteVocabEntry[];
-}
-
-function unquoteYamlScalar(value: string): string {
-  const trimmed = value.trim();
-  if (
-    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
-    (trimmed.startsWith("'") && trimmed.endsWith("'"))
-  ) {
-    return trimmed.slice(1, -1);
-  }
-  return trimmed;
-}
-
-function loadObsoleteVocabularyMap(root: string): ObsoleteVocabMap | null {
-  const mapPath = path.join(
-    root,
-    ".opencode",
-    "skills",
-    "repo-agentdev-integrity",
-    "data",
-    "obsolete-vocabulary-map.yaml",
-  );
-  const content = readText(mapPath);
-  if (!content) return null;
-  const map: ObsoleteVocabMap = {
-    scopeInclude: [],
-    scopeExclude: [],
-    exemptionFiles: new Map<string, string>(),
-    negationTerms: [],
-    structuralExclusions: [],
-    vocab: [],
-  };
-  let section: "scope" | "exemption" | "negation" | "structural" | "vocab" | null = null;
-  let subsection: "include" | "exclude" | null = null;
-  let currentExemption: { path?: string; reason?: string } | null = null;
-  let currentExclusion: ObsoleteStructuralExclusion | null = null;
-  let currentVocab: Partial<ObsoleteVocabEntry> | null = null;
-  for (const raw of content.split("\n")) {
-    const line = raw.replace(/\r$/, "");
-    if (/^#/.test(line) || line.trim() === "") continue;
-    if (/^scope:/.test(line)) {
-      section = "scope";
-      subsection = null;
-      continue;
-    }
-    if (/^exemption_files:/.test(line)) {
-      section = "exemption";
-      currentExemption = null;
-      continue;
-    }
-    if (/^negation_context_terms:/.test(line)) {
-      section = "negation";
-      continue;
-    }
-    if (/^structural_exclusions:/.test(line)) {
-      section = "structural";
-      currentExclusion = null;
-      continue;
-    }
-    if (/^vocabulary:/.test(line)) {
-      section = "vocab";
-      currentVocab = null;
-      continue;
-    }
-    if (section === "scope") {
-      const sub = line.match(/^\s{2}(include|exclude):/);
-      if (sub) {
-        subsection = sub[1] as "include" | "exclude";
-        continue;
-      }
-      const item = line.match(/^\s{4}-\s+(.+)$/);
-      if (item && subsection === "include") {
-        map.scopeInclude.push(unquoteYamlScalar(item[1]));
-      } else if (item && subsection === "exclude") {
-        map.scopeExclude.push(unquoteYamlScalar(item[1]));
-      }
-      continue;
-    }
-    if (section === "exemption") {
-      const pathMatch = line.match(/^\s{2}-\s+path:\s*(.+)$/);
-      if (pathMatch) {
-        currentExemption = { path: unquoteYamlScalar(pathMatch[1]) };
-        continue;
-      }
-      const reasonMatch = line.match(/^\s{4}reason:\s*(.+)$/);
-      if (reasonMatch && currentExemption) {
-        currentExemption.reason = unquoteYamlScalar(reasonMatch[1]);
-        if (currentExemption.path) {
-          map.exemptionFiles.set(currentExemption.path, currentExemption.reason ?? "");
-        }
-        continue;
-      }
-      continue;
-    }
-    if (section === "negation") {
-      const item = line.match(/^\s{2}-\s+(.+)$/);
-      if (item) map.negationTerms.push(unquoteYamlScalar(item[1]));
-      continue;
-    }
-    if (section === "structural") {
-      const areaMatch = line.match(/^\s{2}-\s+area:\s*(.+)$/);
-      if (areaMatch) {
-        currentExclusion = {
-          area: unquoteYamlScalar(areaMatch[1]),
-          anchor: "",
-          reason: "",
-        };
-        map.structuralExclusions.push(currentExclusion);
-        continue;
-      }
-      const anchorMatch = line.match(/^\s{4}anchor:\s*(.+)$/);
-      if (anchorMatch && currentExclusion) {
-        currentExclusion.anchor = unquoteYamlScalar(anchorMatch[1]);
-        continue;
-      }
-      const reasonMatch = line.match(/^\s{4}reason:\s*(.+)$/);
-      if (reasonMatch && currentExclusion) {
-        currentExclusion.reason = unquoteYamlScalar(reasonMatch[1]);
-        continue;
-      }
-      continue;
-    }
-    if (section === "vocab") {
-      const idMatch = line.match(/^\s{2}-\s+id:\s*(.+)$/);
-      if (idMatch) {
-        if (currentVocab && currentVocab.id) {
-          map.vocab.push({
-            id: currentVocab.id,
-            rule: currentVocab.rule ?? "",
-            probe: currentVocab.probe ?? "",
-          });
-        }
-        currentVocab = { id: unquoteYamlScalar(idMatch[1]) };
-        continue;
-      }
-      const ruleMatch = line.match(/^\s{4}rule:\s*(.+)$/);
-      if (ruleMatch && currentVocab) {
-        currentVocab.rule = unquoteYamlScalar(ruleMatch[1]);
-        continue;
-      }
-      const probeMatch = line.match(/^\s{4}existence_probe:\s*(.+)$/);
-      if (probeMatch && currentVocab) {
-        currentVocab.probe = unquoteYamlScalar(probeMatch[1]);
-        continue;
-      }
-    }
-  }
-  if (currentVocab && currentVocab.id) {
-    map.vocab.push({
-      id: currentVocab.id,
-      rule: currentVocab.rule ?? "",
-      probe: currentVocab.probe ?? "",
-    });
-  }
-  return map;
-}
-
-// スペース正規化照合の共通ヘルパー（REQ-010-066、IR-065 rule Design
-// 「検出パターンのスペース正規化仕様」）。照合時にのみ対象行から半角・全角
-// スペース（U+0020/U+3000）を除去し、検出報告と位置依存の許容判定は原文行の
-// 位置で行う（正規化後の行を報告・証跡化しない）。行単位走査モデルは維持する。
-interface NormalizedVocabLine {
-  text: string;
-  originIndex: number[];
-}
-
-function normalizeLineForVocabMatch(line: string): NormalizedVocabLine {
-  const chars: string[] = [];
-  const originIndex: number[] = [];
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (ch === "\u0020" || ch === "\u3000") continue;
-    chars.push(ch);
-    originIndex.push(i);
-  }
-  return { text: chars.join(""), originIndex };
-}
-
-function mapNormalizedRangeToOrigin(
-  normalized: NormalizedVocabLine,
-  start: number,
-  end: number,
-): { start: number; end: number } {
-  if (normalized.originIndex.length === 0) return { start, end };
-  const from = normalized.originIndex[Math.min(start, normalized.originIndex.length - 1)];
-  const to =
-    normalized.originIndex[Math.min(end - 1, normalized.originIndex.length - 1)] + 1;
-  return { start: from, end: to };
-}
-
-// 正規化対象語彙は spaceNormalized: true で一覧管理する。spaceNormalized 語彙の
-// pattern は正規化後の語彙形（スペース除去後の文字列に一致する形）で記述する。
-const IR065_VOCAB_PATTERNS: ReadonlyArray<{
-  id: string;
-  pattern: RegExp;
-  spaceNormalized?: boolean;
-}> = [
-  // bare ADR-NNN（v2: プレフィックス付きは許容済み識別子のため除外）。
-  // 正規化照合により「v2: ADR-0123」等のスペース挿入バリアントも lookbehind で除外
-  { id: "bare-adr-identifier", pattern: /(?<!v2:)(?<![\w-])ADR-\d{3,4}(?!\d)/g, spaceNormalized: true },
-  { id: "docs-adr-path", pattern: /docs\/adr\//g, spaceNormalized: true },
-  // Wave 2 (#2371) で解消済みの孤立注記。再発は即 fail（strict）
-  { id: "adr-kind-annotation", pattern: /（ADR）/g, spaceNormalized: true },
-  { id: "req-adr-kind-enumeration", pattern: /REQ\/ADR\//g, spaceNormalized: true },
-  // 正規化語彙形での照合（原文「Artifact Graph」「Artifact　Graph」等が
-  // 正規化行では「ArtifactGraph」となり本パターンへ一致する）
-  { id: "artifact-graph-name", pattern: /\bArtifactGraph\b/g, spaceNormalized: true },
-  { id: "doc-map-name", pattern: /\bDOC-MAP\b/g, spaceNormalized: true },
-  // Issue #2742: 本ADR 自己言及（番号なし ADR 種別の現行言及）。
-  // 「本ADR」「本 ADR」「本　ADR」を正規化照合で検出する
-  { id: "self-adr-reference", pattern: /本ADR/g, spaceNormalized: true },
-];
-
-const IR066_VOCAB_PATTERNS: ReadonlyArray<{
-  id: string;
-  pattern: RegExp;
-  spaceNormalized?: boolean;
-}> = [
-  { id: "docs-specs-path", pattern: /docs\/specs\//g },
-  { id: "agentdev-graph-path", pattern: /\.agentdev\/graph/g },
-  { id: "agentdev-artifact-graph-skill", pattern: /agentdev-artifact-graph/g },
-  { id: "check-graph-script", pattern: /\bcheck_graph\b/g },
-  { id: "agentdev-spec-compliance-skill", pattern: /agentdev-spec-compliance/g },
-  { id: "agentdev-adr-guidelines-skill", pattern: /agentdev-adr-guidelines/g },
-  { id: "agentdev-adr-file-manager-skill", pattern: /agentdev-adr-file-manager/g },
-  { id: "agentdev-doc-map-skill", pattern: /agentdev-doc-map/g },
-  { id: "agentdev-workflow-reporting-skill", pattern: /agentdev-workflow-reporting/g },
-  // Issue #2383 (b): v1〜v4 監査観点再走査で採用した追加の廃止名称。
-  // 旧 command 名 inspect-extensions（DEC-006 で廃止）と F-01 stale junction
-  // 旧称 2 件（SPEC→Design 改称、Issue #2349）。
-  { id: "inspect-extensions-command", pattern: /\binspect-extensions\b/g },
-  { id: "agentdev-spec-file-manager-skill", pattern: /agentdev-spec-file-manager/g },
-  { id: "agentdev-workflow-spec-save-skill", pattern: /agentdev-workflow-spec-save/g },
-  // Issue #2480: distribution-boundary-guard Plugin のパッケージ正規化と
-  // agentdev 命名統一（REQ-002-045、AG-009）。旧名称・旧パス（旧名称を含む
-  // lib/tests ファイル名・パス表現も含む）の並存禁止。新名称
-  // agentdev-distribution-boundary-guard は lookbehind で検出対象外。
-  { id: "distribution-boundary-guard-plugin", pattern: /(?<!agentdev-)\bdistribution-boundary-guard\b/g },
-];
-
-function isSupersededDecision(relPath: string, content: string): boolean {
-  if (!/^docs\/decisions\/[^/]+\.md$/.test(relPath)) return false;
-  const statusMatch = content.match(/^status:\s*(\S+)/m);
-  return statusMatch !== null && statusMatch[1] === "superseded";
-}
-
-// 「## 廃止済み要件」等の retired 系見出し配下の行か（retired/ ディレクトリと
-// 同種の履歴領域。docs/requirements/README.md の廃止済み REQ タイトル表を含む）。
-function isIr065UnderRetiredHeading(lines: string[], lineIdx: number): boolean {
-  let underRetired = false;
-  for (let i = 0; i <= lineIdx && i < lines.length; i++) {
-    const headingMatch = lines[i].match(/^#{1,6}\s+(.+)$/);
-    if (headingMatch) {
-      underRetired =
-        /\b(retired|historical)\b|履歴|過去経緯|廃止済み|廃止|retired-no-successor|historical-only/i.test(
-          headingMatch[1],
-        );
-    }
-  }
-  return underRetired;
-}
-
-function checkObsoleteVocabulary(root: string): CheckResult[] {
-  const results: CheckResult[] = [];
-  const map = loadObsoleteVocabularyMap(root);
-  if (!map) {
-    results.push(
-      info(
-        "ObsoleteVocabulary",
-        "obsolete-vocabulary-map-load",
-        "obsolete-vocabulary-map.yaml not found; IR-065/IR-066 skipped",
-      ),
-    );
-    return results;
-  }
-
-  // existence_probe: probe 先が実在する語彙は現行機能として存在するため検出対象外
-  const activeVocab = new Map<string, { rule: string }>();
-  for (const v of map.vocab) {
-    if (v.probe && fs.existsSync(path.join(root, ...v.probe.split("/")))) continue;
-    activeVocab.set(v.id, { rule: v.rule });
-  }
-
-  // 走査対象収集（scope.include 配下、scope.exclude 接頭辞除外、.md/.yaml/.yml）
-  const targetFiles: string[] = [];
-  for (const inc of map.scopeInclude) {
-    const abs = path.join(root, ...inc.split("/"));
-    if (!fs.existsSync(abs)) continue;
-    if (fs.statSync(abs).isDirectory()) {
-      const acc: string[] = [];
-      walkAllFiles(abs, acc);
-      targetFiles.push(...acc);
-    } else {
-      targetFiles.push(abs);
-    }
-  }
-  const scoped = targetFiles.filter((f) => {
-    const rel = resolveRelative(f, root);
-    if (map.scopeExclude.some((p) => rel.startsWith(p))) return false;
-    // 構造的除外領域（REQ-010-066）: 語彙引用・記録領域の領域ベース除外
-    if (
-      map.structuralExclusions.some(
-        (e) => rel === e.area || rel.startsWith(e.area),
-      )
-    ) {
-      return false;
-    }
-    return /\.(md|yaml|yml)$/.test(f);
-  });
-
-  const allPatterns: ReadonlyArray<{
-    id: string;
-    pattern: RegExp;
-    rule: string;
-    spaceNormalized?: boolean;
-  }> = [
-    ...IR065_VOCAB_PATTERNS.map((p) => ({ ...p, rule: "IR-065" })),
-    ...IR066_VOCAB_PATTERNS.map((p) => ({ ...p, rule: "IR-066" })),
-  ];
-
-  // 検出シグナル（checker の IR065_/IR066_ 定数）と検出語彙宣言（yaml の
-  // vocabulary[]）の drift 検出（REQ-047-004、Issue #2373）。
-  // checker-execution-contracts「宣言的データの silent skip 禁止」の実装:
-  // 語彙 ID 集合・rule 割当が不一致の場合、検出を黙って読み飛ばさず報告する。
-  const declaredVocabRules = new Map<string, string>();
-  for (const v of map.vocab) declaredVocabRules.set(v.id, v.rule);
-  const checkerOnlyIds = allPatterns
-    .filter((p) => !declaredVocabRules.has(p.id))
-    .map((p) => `${p.id}(${p.rule})`);
-  const yamlOnlyIds = [...declaredVocabRules.keys()].filter(
-    (id) => !allPatterns.some((p) => p.id === id),
-  );
-  const ruleMismatches = allPatterns
-    .filter((p) => declaredVocabRules.has(p.id) && declaredVocabRules.get(p.id) !== p.rule)
-    .map((p) => `${p.id}: checker=${p.rule}, yaml=${declaredVocabRules.get(p.id)}`);
-  let driftDetected = false;
-  if (checkerOnlyIds.length > 0 || yamlOnlyIds.length > 0 || ruleMismatches.length > 0) {
-    driftDetected = true;
-    const parts: string[] = [];
-    if (checkerOnlyIds.length > 0)
-      parts.push(`checker-only vocabulary ids: ${checkerOnlyIds.join(", ")}`);
-    if (yamlOnlyIds.length > 0)
-      parts.push(`yaml-only vocabulary ids: ${yamlOnlyIds.join(", ")}`);
-    if (ruleMismatches.length > 0)
-      parts.push(`rule assignment mismatches: ${ruleMismatches.join(", ")}`);
-    results.push(
-      ng(
-        "ObsoleteVocabulary",
-        "obsolete-vocabulary-map-drift",
-        `IR-065/066 vocabulary map drift between data/obsolete-vocabulary-map.yaml vocabulary[] and checker IR065_/IR066_ pattern ids (${parts.join("; ")}) (REQ-047-004)`,
-        ".opencode/skills/repo-agentdev-integrity/data/obsolete-vocabulary-map.yaml",
-        undefined,
-        {
-          evidence: `checker-only:${checkerOnlyIds.length},yaml-only:${yamlOnlyIds.length},rule-mismatch:${ruleMismatches.length}`,
-          expected:
-            "keep vocabulary[] ids and rule assignments in sync with IR065_/IR066_ constants (same PR update)",
-          route: "intake",
-          finding_category: "obsolete-structure",
-          finding_level: "strict",
-        },
-      ),
-    );
-  }
-
-  let violationCount = 0;
-  for (const fullPath of scoped) {
-    const relPath = resolveRelative(fullPath, root);
-    // exemption_files（履歴説明として正当なファイル）
-    if (map.exemptionFiles.has(relPath)) continue;
-    const content = readText(fullPath);
-    if (!content) continue;
-    // superseded Decision は履歴文書としてファイル単位許容
-    if (isSupersededDecision(relPath, content)) continue;
-    const lines = content.split("\n");
-
-    for (const { id, pattern, rule, spaceNormalized } of allPatterns) {
-      if (!activeVocab.has(id)) continue;
-      const category = rule === "IR-065" ? "ObsoleteVocabulary" : "LegacyPathName";
-      const check = rule === "IR-065" ? "obsolete-vocabulary-current-use" : "legacy-path-removed-name";
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        // スペース正規化照合（REQ-010-066）: 照合時にのみ正規化し、報告と
-        // 位置依存の許容判定（code span 等）は原文位置で行う
-        const normalized = spaceNormalized ? normalizeLineForVocabMatch(line) : null;
-        const matchSource = normalized ? normalized.text : line;
-        pattern.lastIndex = 0;
-        let m: RegExpExecArray | null;
-        const reported = new Set<string>();
-        while ((m = pattern.exec(matchSource)) !== null) {
-          if (isIr057InCodeBlock(lines, i)) break;
-          let originStart = m.index;
-          let evidenceText = m[0];
-          if (normalized) {
-            const origin = mapNormalizedRangeToOrigin(
-              normalized,
-              m.index,
-              m.index + m[0].length,
-            );
-            originStart = origin.start;
-            evidenceText = line.slice(origin.start, origin.end);
-          }
-          if (isInsideCodeSpan(line, originStart)) continue;
-          // retired 系見出し配下（廃止済み要件表等）は履歴領域として許容
-          if (isIr065UnderRetiredHeading(lines, i)) continue;
-          // 行レベル履歴マーカー（旧/移行/廃止/履歴/経緯 等）は許容
-          if (hasLineLevelHistoryMarker(line)) continue;
-          // 否定文脈（廃止機能を「使わないこと」を定める現行契約の記述）は許容
-          if (map.negationTerms.some((t) => line.includes(t))) continue;
-          if (reported.has(evidenceText)) continue;
-          reported.add(evidenceText);
-          violationCount++;
-          const strict = id === "adr-kind-annotation";
-          const ctor = strict ? ng : warn;
-          results.push(
-            ctor(
-              category,
-              check,
-              `Obsolete ${rule === "IR-065" ? "vocabulary" : "path/removed name"} '${evidenceText}' (${id}) used as current concept (REQ-010-${rule === "IR-065" ? "066" : "067"}, ${rule})`,
-              relPath,
-              i + 1,
-              {
-                evidence: `${id}:${evidenceText}`,
-                expected: "replace with the current vocabulary or mark the mention as historical",
-                route: "intake",
-                finding_category: "obsolete-structure",
-                finding_level: strict ? "strict" : "heuristic",
-              },
-            ),
-          );
-        }
-      }
-    }
-  }
-  if (violationCount === 0 && !driftDetected) {
-    results.push(
-      ok(
-        "ObsoleteVocabulary",
-        "obsolete-vocabulary-current-use",
-        `IR-065/IR-066 obsolete vocabulary & legacy path: ${scoped.length} files scanned, 0 violations (REQ-010-066/067)`,
-      ),
-    );
-  }
-  return results;
-}
-
-// ─── IR-066: docs/designs 旧パス現在形宣言検出（REQ-010-067/068/080、Case #3457） ──
-// docs/designs/**/*.md の本文で src/opencode/commands/ または src/opencode/skills/ を
-// 原本・正規位置・検査対象として現在形で列挙する行を検出する（IR-066 ルール Design
-// 検査項目7、ACT-DESIGN-033）。DEC-049 以降の原本は共通正本 src/common/skills/ であり、
-// src/opencode/ はホスト接続領域である。
-// 免除（ルール Design detection_method の宣言どおり）:
-//   - code span 内の語彙言及（isInsideCodeSpan）
-//   - src/opencode/plugins/ 等ホスト接続領域の現存パス言及（同一行言及で行単位免除）
-//   - 歴史言及: v2: プレフィックス、行レベル履歴マーカー、retired 系見出し配下、
-//     frontmatter status: superseded の Design（ファイル単位）・supersede 注記行
-//   - 否定文脈（〜ではない・〜しない・対象外等。IR-065/066 共通の否定文脈語彙と同一系譜）
-//   - IR-055 の検出パターン語彙としての言及（同一行の IR-055 言及）
-// 検出ルール説明文（docs/designs/integrity/rules/IR-*.md）は v2:REQ-0145-015 により
-// スコープ除外する。
-const IR066_DOCS_LEGACY_PATH_RE = /src\/opencode\/(commands|skills)(?=\/|\b)/;
-const IR066_CANONICAL_POSITION_RE = /原本|正規位置|正規情報源|正規配置|格納位置|検査対象/;
-const IR066_HOST_AREA_PATH_RE = /src\/opencode\/(plugins|agents|mcp|local)(?=\/|\b)/;
-const IR066_NEGATION_CONTEXT_RE =
-  /廃止|含めない|とせず|しないこと|生成しない|前提としない|対象外|撤去|residual|ではない|ではなく/;
-
-function isSupersededDesignDocument(content: string): boolean {
-  const statusMatch = content.match(/^status:\s*(\S+)/m);
-  return statusMatch !== null && statusMatch[1] === "superseded";
-}
-
-function checkDocsDesignsLegacyPathDeclarations(root: string): CheckResult[] {
-  const results: CheckResult[] = [];
-  const designsDir = path.join(root, "docs", "designs");
-  if (!fs.existsSync(designsDir)) return results;
-  const files: string[] = [];
-  walkAllFiles(designsDir, files);
-  const mdFiles = files.filter((f) => /\.md$/.test(f));
-  let violationCount = 0;
-  let scanned = 0;
-  for (const fullPath of mdFiles) {
-    const relPath = resolveRelative(fullPath, root);
-    if (isIntegrityRuleDescriptionFile(relPath)) continue;
-    scanned++;
-    const content = readText(fullPath);
-    if (!content) continue;
-    if (isSupersededDesignDocument(content)) continue;
-    const lines = content.split("\n");
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const m = line.match(IR066_DOCS_LEGACY_PATH_RE);
-      if (!m || m.index === undefined) continue;
-      if (isInsideCodeSpan(line, m.index)) continue;
-      if (line.includes("IR-055")) continue;
-      if (IR066_HOST_AREA_PATH_RE.test(line)) continue;
-      if (/(^|[\s(（])v2:/.test(line)) continue;
-      if (hasLineLevelHistoryMarker(line)) continue;
-      if (/supersed/i.test(line)) continue;
-      if (IR066_NEGATION_CONTEXT_RE.test(line)) continue;
-      if (isIr065UnderRetiredHeading(lines, i)) continue;
-      if (!IR066_CANONICAL_POSITION_RE.test(line)) continue;
-      violationCount++;
-      results.push(
-        warn(
-          "LegacyPathName",
-          "docs-designs-legacy-path-declaration",
-          `Legacy path '${m[0]}' declared as the canonical origin/position in current tense (IR-066, REQ-010-067/080)`,
-          relPath,
-          i + 1,
-          {
-            evidence: `docs-designs-legacy-path-declaration:${m[0]}`,
-            expected:
-              "declare src/common/ as the canonical origin (DEC-049) or mark the mention as historical",
-            route: "intake",
-            finding_category: "obsolete-structure",
-            finding_level: "heuristic",
-          },
-        ),
-      );
-    }
-  }
-  if (violationCount === 0) {
-    results.push(
-      ok(
-        "LegacyPathName",
-        "docs-designs-legacy-path-declaration",
-        `IR-066 docs/designs legacy-path current-tense declaration: ${scanned} files scanned, 0 violations (REQ-010-067/080)`,
-      ),
-    );
-  }
-  return results;
-}
-
 // ─── IR-067: referenced-req-row-existence (REQ-010-069, Issue #2383 (a)) ─────
 // docs 本文が引用する階層 REQ 行 ID（REQ-NNN-NNN）の実在性を機械検査する。
 // ファントム引用（未コミット草案番号の引用残存、要件分割前の旧行 ID 残存）を検出する。
@@ -10389,6 +8346,17 @@ function checkDocsDesignsLegacyPathDeclarations(root: string): CheckResult[] {
 // Decision）。v2: プレフィックス免除、前置一致除外、後置数字の非消費（(?!\d) により
 // REQ-0063-0123 の REQ-0063-012 誤抽出を防止）を維持する。
 const IR067_ROW_ID_RE = /(?<!v2:)(?<![\w-])REQ-(\d+)-(\d+)(?![\w-])/g;
+
+function unquoteYamlScalar(value: string): string {
+  const trimmed = value.trim();
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    return trimmed.slice(1, -1);
+  }
+  return trimmed;
+}
 
 function buildReqRowIndex(root: string): Set<string> {
   const rows = new Set<string>();
@@ -10423,6 +8391,7 @@ function buildAutogenLineMask(lines: string[]): boolean[] {
   }
   return mask;
 }
+
 
 function checkReferencedReqRowExistence(root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -10477,7 +8446,7 @@ function checkReferencedReqRowExistence(root: string): CheckResult[] {
     const autogenMask = buildAutogenLineMask(lines);
     const reportedOnLine = new Set<string>();
     for (let i = 0; i < lines.length; i++) {
-      if (isIr057InCodeBlock(lines, i)) continue;
+      if (isInCodeBlock(lines, i)) continue;
       if (autogenMask[i]) continue;
       IR067_ROW_ID_RE.lastIndex = 0;
       let m: RegExpExecArray | null;
@@ -11540,13 +9509,10 @@ function checkReqUpdatedFreshness(root: string): CheckResult[] {
 // 検出は `git ls-files --others --exclude-standard`（gitignore 管理対象外の未追跡
 // ファイルを再帰列挙。ディレクトリ残存は配下ファイルの検出として扱う。--directory は
 // 無視対象のみを含むディレクトリまで列挙するため使用しない）。許容は gitignore
-// （正規の非追跡領域宣言）と承認一覧（ng-baseline.json。既存の ng-baseline 機構と
-// 同一の物理実体で管理する category/check/file/evidence/count/provenance/reason の
-// 恒久承認記録）で行う。承認一覧対象外の検出は NG として終了コードを駆動し、承認済み
-// 検出は main の applyNgBaseline により承認記録（[baseline-known provenance=...] 付き
-// info）として報告にとどめる。本検査が承認を自動追加することはなく、承認の追加は
-// 検出契機ごとに人間の運用判断による明示承認（provenance 付き baseline 登録）として
-// 行われる。
+// （正規の非追跡領域宣言）への追加のみで行う（baseline による恒久承認一覧は撤廃済み）。
+// 許容対象外の検出は NG として終了コードを駆動し、対象側の直接修正（残存物の削除、
+// または正規の非追跡領域としての gitignore 宣言）で解消する。本検査が違反を
+// 自動解消することはない。
 
 function checkUntrackedResidue(root: string): CheckResult[] {
   const results: CheckResult[] = [];
@@ -11577,12 +9543,12 @@ function checkUntrackedResidue(root: string): CheckResult[] {
       ng(
         "UntrackedResidue",
         "untracked-residue",
-        `untracked file/directory not managed by gitignore remains: ${rel}: 正規の非追跡領域であれば .gitignore への追加を提案し、恒久的な許容であれば provenance 付きで承認一覧（baselines/ng-baseline.json、category=UntrackedResidue / check=untracked-residue / file=<対象パス>）へ人間の運用判断で明示登録すること。本検査が承認を自動追加することはない（IR-073、REQ-010-084）`,
+        `untracked file/directory not managed by gitignore remains: ${rel}: 正規の非追跡領域であれば .gitignore への追加で宣言し、それ以外は対象側の直接修正（残存物の削除）で解消すること。検出違反は baseline による承認一覧へ登録せず免除しない（IR-073、REQ-010-084）`,
         resolveRelative(path.join(root, rel), root),
         undefined,
         {
           expected:
-            "no untracked non-ignored files/directories outside the approval list (commit, gitignore, or approval-list registration by explicit human decision)",
+            "no untracked non-ignored files/directories (commit, or gitignore declaration for legitimate non-tracked areas)",
           route: "intake",
           finding_category: "repository-state-drift",
           finding_level: "strict",
@@ -11683,6 +9649,22 @@ export function checkRepoLocalPluginProjectionSymmetry(
 
   // 正本 plugins ディレクトリ不在（自己ホスト構成でない環境）では検査対象なし。
   if (!fs.existsSync(sourcePluginsDir)) {
+    return results;
+  }
+
+  // worktree junction 未伝播の環境差（REQ-018-001、isInsideWorktree 判定）:
+  // 投影 plugins ディレクトリが不在の worktree 実行では検査対象が構造的に欠落する
+  // ため、欠落を違反ではなく環境差として info 報告し検査を skip する
+  // （junction 依存 checker の skip 挙動、worktree-operations.md の適用拡大）。
+  // main 環境（投影実在）では従来どおり対称性違反を NG 検出する。
+  if (isInsideWorktree(root) && !fs.existsSync(projectionPluginsDir)) {
+    results.push(
+      info(
+        "PluginProjection",
+        "repo-local-plugin-projection-symmetry",
+        "Skipped: .opencode/plugins projection absent in worktree (junction 未伝播の環境差。REQ-018-001、environment=worktree)",
+      ),
+    );
     return results;
   }
 
@@ -11947,11 +9929,6 @@ async function main(): Promise<void> {
     process.cwd();
   const root = findRepoRoot(scriptDir, { explicitRoot: options.root });
 
-  if (args.includes("--update-ir055-baseline")) {
-    updateIr055Baseline(root);
-    process.exit(EXIT_OK);
-  }
-
   // WP-3 (Issue #1928): release profile expands the archive, installs it, and
   // re-invokes the installed profile against the unpacked tree via --root.
   if (options.profile === "release") {
@@ -12050,7 +10027,6 @@ async function main(): Promise<void> {
     ...annotateIrIds(checkCommandReadmeSync(cmdDir, root), ["IR-024"]),
     ...annotateIrIds(checkExpandedReadmeSync(cmdDir, root), []),
     ...annotateIrIds(checkCommandInventory(cmdDir, root), []),
-    ...annotateIrIds(checkLegacyNamespace(skillsDir, cmdDir, root), ["IR-009"]),
     ...annotateIrIds(checkBareSlashScoped(skillsDir, cmdDir, root), []),
     ...annotateIrIds(checkNameCollision(skillsDir, root), []),
     ...annotateIrIds(checkDesignsExistence(designsDir, root), []),
@@ -12066,20 +10042,19 @@ async function main(): Promise<void> {
       ["IR-013"],
     ), // IR-013 (REQ-036-008, v2:REQ-0108-089~091)。results 統合への接続は Case #4079（RU-0286）
     ...annotateIrIds(checkTerminology(cmdDir, root), []),
-    ...annotateIrIds(checkLinkIntegrity(root), []),
+    ...annotateIrIds(checkLinkIntegrity(root), ["IR-025", "IR-037"]), // IR-025 (v2 ADR 参照・retired ADR path)、IR-037 (retired ADR 現行基準引用検出、v2:REQ-0112-048/050 統合実装)
     ...annotateIrIds(checkDecisionReadmeRetiredReqLink(root), []),
     ...annotateIrIds(checkDesignsRelativeLinkExistence(root), []),
     ...annotateIrIds(checkCanonicalBoundary(root), []),
     ...annotateIrIds(checkLifecycleBoundary(root), ["IR-003"]),
     ...annotateIrIds(checkExpandedLegacyNamespace(skillsDir, cmdDir, root), []),
-    ...annotateIrIds(checkReqRetiredIndexSync(reqDir, root), []),
+    ...annotateIrIds(checkReqRetiredIndexSync(reqDir, root), ["IR-043"]), // IR-043 (retired/README カバレッジ、v2:REQ-0161-005 系の retired README 双方向照合)
     ...annotateIrIds(checkDocMapReqSync(root), []),
     ...annotateIrIds(checkDocMapSpecSync(root), []),
     ...annotateIrIds(checkDocMapGuideSync(root), ["IR-042"]),
     ...annotateIrIds(checkAdrReadmeIndexSync(adrDir, root), []),
     ...annotateIrIds(checkSpecReadmeIndexSync(root), []),
     ...annotateIrIds(checkCommandMapConsistency(cmdDir, root, commandMapPath), []),
-    ...annotateIrIds(checkObsoleteReferenceDirs(skillsDir, root), ["IR-014"]),
     ...annotateIrIds(checkSkillFrontmatter(skillsDir, root), ["IR-007"]),
     ...annotateIrIds(checkCommandFrontmatterDetailed(cmdDir, root), ["IR-006"]),
     ...annotateIrIds(checkScriptTemplateReferencePaths(cmdDir, skillsDir, root), ["IR-008", "IR-062"]),
@@ -12089,7 +10064,6 @@ async function main(): Promise<void> {
     ...annotateIrIds(checkAcceptedAdrOnlyCitation(root), ["IR-027"]),
     ...annotateIrIds(checkPatternResidualDetection(root), ["IR-015"]),
     ...annotateIrIds(checkReqBacklogResidualDetection(root), []),
-    ...annotateIrIds(checkAbolishedSkillReferences(root), ["IR-021"]),
     ...annotateIrIds(checkReqRangeStaleness(root), ["IR-018"]),
     ...annotateIrIds(checkSkillCategoryGap(root, projectionSkillsDir, cmdDir), []),
     ...annotateIrIds(checkTemplatePathIntegrity(cmdDir, root), []),
@@ -12110,15 +10084,11 @@ async function main(): Promise<void> {
     ...annotateIrIds(checkReqVerificationBasis(root), []),
     ...annotateIrIds(checkReqDesignBoundaryViolation(root), ["IR-044"]), // IR-044 (v2:REQ-0108-259)
     ...annotateIrIds(checkGhDirectInvocation(root), ["IR-053"]), // IR-053 (v2:REQ-0152-001/002)
-    ...annotateIrIds(checkDraftSpecStaleness(designsDir, root), ["IR-054"]), // IR-054 (v2:REQ-0154-002)
     ...annotateIrIds(checkSisyphusJuniorUlwLoopMisclassification(root), []),
-    ...annotateIrIds(checkRuntimeUnresolvedReference(root), ["IR-055"]), // IR-055 (v2:REQ-0108-263/264)。baseline-known 判別の現行契約は integrity-contracts.md（finding-baseline 分類・NG baseline 運用手順）
-    ...annotateIrIds(checkObsoleteSpecPath(root), ["IR-057"]), // IR-057 (v2:REQ-0158-002)
+    ...annotateIrIds(checkRuntimeUnresolvedReference(root), ["IR-055"]), // IR-055 (v2:REQ-0108-263/264)。baseline 運用撤廃後は全違反を直接報告する（検出違反は免除せず対象ファイル側を直接修正）
     ...annotateIrIds(checkIndexGenerationConsistency(root), ["IR-061"]), // IR-061 (SC-002 Phase C, 索引類自動生成整合性)
     ...annotateIrIds(checkCommonPolicyIdentifierInvariant(root), ["IR-063"]), // IR-063 (REQ-051-005, REQ-010-064, Issue #2429)
     ...annotateIrIds(checkUnresolvedPlaceholder(root), ["IR-064"]), // IR-064 (REQ-010-065, Issue #2372)
-    ...annotateIrIds(checkObsoleteVocabulary(root), ["IR-065", "IR-066"]), // IR-065/IR-066 (REQ-010-066/067, Issue #2372)
-    ...annotateIrIds(checkDocsDesignsLegacyPathDeclarations(root), ["IR-066"]), // IR-066 docs/designs 現在形宣言 (REQ-010-067/080, Case #3457)
     ...annotateIrIds(checkReferencedReqRowExistence(root), ["IR-067"]), // IR-067 (REQ-010-069, Issue #2383 (a))
     ...annotateIrIds(checkSkillProjectionManifest(root), ["IR-068"]), // IR-068 (Issue #2383 (d), inspect F-01)
     ...annotateIrIds(checkReqNumberGapRecorded(root), ["IR-069"]), // IR-069 (REQ-010-070, Case #2917)
@@ -12169,64 +10139,6 @@ async function main(): Promise<void> {
 
   const processed = processResults(results);
 
-  // 恒久免除レジストリ適用（applyNgBaseline の demote 前に実施。exempt 分は
-  // info 化されるため ng-baseline demote と二重計上にならない）。
-  let exemptedCount: number | null = null;
-  try {
-    const exemptions = loadExemptions(root);
-    exemptedCount = applyExemptions(processed, exemptions);
-  } catch (e) {
-    console.error(`[integrity] ${e instanceof Error ? e.message : String(e)}`);
-    process.exit(EXIT_ERROR);
-  }
-
-  // IR-055 warning 総数 ratchet（demote 前総数・exemptions 適用後で比較）。
-  const preDemoteWarningTotal = countPreDemoteWarnings(processed);
-  if (args.includes("--update-warning-cap")) {
-    updateWarningTotalCap(
-      root,
-      preDemoteWarningTotal,
-      args.includes("--raise-warning-cap"),
-    );
-    process.exit(EXIT_OK);
-  }
-  enforceWarningTotalCap(root, processed, preDemoteWarningTotal);
-
-  // v2:REQ-0161-005: baseline-aware strict pass. When --update-ng-baseline is
-  // requested, merge the approved additions manifest into the baseline (the
-  // manifest is required; unmanaged NGs are never absorbed). Otherwise demote
-  // baseline-known NGs to info so the exit code reflects only the delta.
-  if (args.includes("--update-ng-baseline")) {
-    const additionsFlagIdx = args.indexOf("--ng-baseline-additions");
-    const manifestPath =
-      additionsFlagIdx >= 0 ? args[additionsFlagIdx + 1] : undefined;
-    if (!manifestPath) {
-      console.error(
-        "[integrity] --update-ng-baseline requires --ng-baseline-additions <manifest.json> (v2:REQ-0161-005: unmanaged NGs must not be absorbed).",
-      );
-      process.exit(EXIT_ERROR);
-    }
-    let additions: NgBaselineAddition[];
-    try {
-      additions = loadNgBaselineAdditions(manifestPath);
-    } catch (e) {
-      console.error(
-        `[integrity] ${
-          e instanceof Error ? e.message : String(e)
-        }`,
-      );
-      process.exit(EXIT_ERROR);
-    }
-    updateNgBaseline(root, processed, additions);
-    process.exit(EXIT_OK);
-  }
-
-  const ngBaseline = loadNgBaseline(root);
-  let ngBaselineInfo: NgBaselineReport | null = null;
-  if (ngBaseline) {
-    ngBaselineInfo = applyNgBaseline(processed, ngBaseline);
-  }
-
   const summary = computeSummary(processed);
 
   const report: IntegrityReport = {
@@ -12247,17 +10159,6 @@ async function main(): Promise<void> {
 
   const reportPath = writeReportFile(root, report);
   console.error(`Report written to: ${reportPath}`);
-  if (exemptedCount !== null) {
-    console.error(
-      `[integrity] Permanent exemptions applied: ${exemptedCount} warning(s) demoted to info (${EXEMPTIONS_PATH.replace(/\\/g, "/")}), excluded from the pre-demote warning total (${preDemoteWarningTotal}).`,
-    );
-  }
-  if (ngBaselineInfo) {
-    console.error(
-      `[integrity] NG baseline applied: ${ngBaselineInfo.baselineKnown} baseline-known (demoted to info), ${ngBaselineInfo.approvedAdditions} approved additions (provenance-tracked, demoted to info), ${ngBaselineInfo.newNg} new unmanaged NG (delta, exit code driver).`,
-    );
-  }
-
   const exitCode = determineExitCode(summary);
   process.exit(exitCode);
 }

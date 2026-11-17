@@ -18,8 +18,7 @@ Design ファイルは、REQ を満たすために現在採用している内部
 - **更新タイミング**: case-ready / case-revise（draft 保存。保存実体は Capability Skill 委譲）、case-close（draft から accepted への昇格）の各工程で本ファイルの status 列を更新する。基盤Design も同一工程に従う
 - **欠落扱い**: `status` frontmatter を持たない Design は `accepted` 相当として扱う
 
-draft status の Design が一定期間更新されず放置されることを検出するルール（IR-054）は [integrity-rule-catalog.md](integrity/integrity-rule-catalog.md) 参照。
-基盤Design も IR-054 の検出対象に含む。
+draft status の Design の放置は本 README の status 列追跡と case-close の Design 確定工程で管理する（旧 draft 放置検出ルールは Epic #4126 Phase 4 で削除済み）。
 
 ### 基盤Design 一覧表の status 列
 
@@ -241,7 +240,6 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | local/local-case-file.md | accepted | ローカルIssue共通スキーマ | ローカルIssueの共通メタデータ、role 条件付きスキーマ、状態遷移 |
 | local/install-script-usability.md | accepted | 導入スクリプトの使いやすさ詳細 | install/check/sync-self の使いやすさ詳細（対話ウィザード、cwd 安全化、ヘルプ、上級者向けオプション） |
 | local/third-party-skill-management.md | accepted | third-party Skill 管理 | third-party Skill の宣言（skills.yaml）と取得機構の正規仕様（source 形式判定、取得プロファイル、非破壊性、個別特例統合、参照点集約） |
-| local/adf-simplification-deferred-records.md | accepted | ADF全体簡素化計画の見送り記録 | ADF全体簡素化計画（第53報告）§3の見送り記録（見送りの意味の定義、第52報告 A-3・A-4 の処置確定、対応関係の注記、見送り表14行）の正規保存と再評価条件の保持。REQ-121-001 の design 対応 |
 
 #### authoring/（執筆規約）
 

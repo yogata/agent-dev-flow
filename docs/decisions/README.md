@@ -246,7 +246,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-012 | relates-to | DEC-036 | Project Extensions を標準プロセス置換ではなく semantic extension point とする決定(3) をもって本 Decision の再編方針が v4 で拡張されたことを示す関連 |
 | DEC-013 | relates-to | DEC-001 | 新規統制追加原則（決定4）との整合。本 Decision は lifecycle/enforcement の削除と新規存在条件の導入を伴う |
 | DEC-013 | relates-to | DEC-006 | 意味検査移管（RU-IR-007）は DEC-006 の適用範囲拡張ではなく REQ-010-003/004、REQ-036-006〜016 の一般原則の適用 |
-| DEC-013 | relates-to | DEC-009 | REQ-010-053..057 RETIRE は DEC-009 CR-001（ADR→Decision 移行の ID 変更例外）の適用外、欠番維持 |
+| DEC-013 | relates-to | DEC-009 | 旧 IR 状態モデル行群の RETIRE（詳細は DEC-013 本文・再配置記録参照）は DEC-009 CR-001（ADR→Decision 移行の ID 変更例外）の適用外、欠番維持 |
 | DEC-014 | relates-to | DEC-001 決定4 | 配布依存境界の多層 enforcement に対する新規統制追加原則の7条件立証 |
 | DEC-014 | relates-to | DEC-006 | DEC-006 の inspect 3-command 正規化と IR-056 の Project Extensions 検査分離を維持しつつ、IR-059 の範囲と経路を変更する後続決定。DEC-006 全体を置換しない |
 | DEC-014 | relates-to | DEC-013 | IR 存在条件モデルに従い、IR-059 の範囲変更を本 Decision で確定 |
@@ -288,7 +288,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-010 | [REQ-002](../requirements/REQ-002.md), [REQ-027](../requirements/REQ-027.md) | Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則（AG-003、AG-007、REQ-002-001〜004 意味変更） |
 | DEC-011 | [REQ-005](../requirements/REQ-005.md) | STEP resume point と会話記憶非依存（AG-004、AG-005、REQ-005-024 追記） |
 | DEC-012 | [REQ-002](../requirements/REQ-002.md) | Extension を file-kind から workflow/capability responsibility へ再編（AG-008、REQ-002-030/031 意味変更） |
-| DEC-013 | [REQ-010](../requirements/REQ-010.md) | IR 登録モデルの簡素化（AG-008 tombstone 廃止、AG-009 lifecycle/enforcement/baseline_status 簡素化、REQ-010-053..057 RETIRE、REQ-036-022 UPDATE）。歴史的根拠の retired REQ-028 は本文に保持し、その後継の決定は本 DEC-013 |
+| DEC-013 | [REQ-010](../requirements/REQ-010.md) | IR 登録モデルの簡素化（AG-008 tombstone 廃止、AG-009 lifecycle/enforcement/baseline_status 簡素化、旧 IR 状態モデル行群（`REQ-010-053..057` 相当）RETIRE、REQ-036-022 UPDATE）。歴史的根拠の retired REQ-028 は本文に保持し、その後継の決定は本 DEC-013 |
 | DEC-014 | [REQ-029](../requirements/REQ-029.md), [REQ-002](../requirements/REQ-002.md), [REQ-010](../requirements/REQ-010.md), [REQ-009](../requirements/REQ-009.md) | 配布依存境界の多層 enforcement（REQ-029 新設、REQ-002 縮約、REQ-010-060 最終保証 gate、REQ-009-045 release artifact 境界、IR-059 範囲と source/save/complete/release 経路変更） |
 | DEC-015 | [REQ-002](../requirements/REQ-002.md), [REQ-005](../requirements/REQ-005.md), [REQ-011](../requirements/REQ-011.md), [REQ-034](../requirements/REQ-034.md), [REQ-035](../requirements/REQ-035.md), [REQ-038](../requirements/REQ-038.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界（REQ-002-035/036、REQ-005-025〜028、REQ-011-019、REQ-034-035/036、REQ-035-011、REQ-038-005 と整合） |
 | DEC-016 | [REQ-009](../requirements/REQ-009.md) | 導入系スクリプトの副作用ゼロ原則（provisioning 責務の利用者移転、REQ-009-010 UPDATE、REQ-009-046〜049 APPEND と整合） |

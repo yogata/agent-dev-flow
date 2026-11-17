@@ -2,7 +2,7 @@
 title: `agentdev-case-run-execution-adapter` Design
 status: accepted
 created: 2026-06-21
-updated: 2026-10-06
+updated: "2026-11-18"
 ---
 <!-- ADF-COVERS(implementation): REQ-011-010, REQ-011-011, REQ-011-012, REQ-011-017, REQ-015-010, REQ-015-011, REQ-031-007, REQ-031-008 -->
 
@@ -36,7 +36,7 @@ command の具体名、起動手段は AGENTS.md および references/<harness>.
 
 - 実行担当サブエージェントの起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md に配置する（REQ-002-002）
 - worktree root 外での作業を禁止
-- PR URL を SSoT として返却（REQ-006-021 廃止に伴い PR URL フォールバック検索不使用）
+- PR URL を SSoT として返却（`REQ-006-105..111` の PR URL 義務に伴い PR URL フォールバック検索不使用）
 - 各ツール呼び出しは120秒 timeout で保護
 - runtime workspace（実行監査トレイル等）の構造、配置は harness の責務であり、配布 Design は関与しない（REQ-002-002）
 - 実行担当サブエージェントは検証証跡（標準出力、標準エラー、終了コード、版、検査範囲、実行環境）を PR 本文の検証差分セクション（verify-only closure では SSoT コメント）へ保持する。証跡の必須要素と再実行条件の正は agentdev-quality-gates Design「QG-4 検証証拠の再利用と再実行条件」が所有し、本 Design は保持経路のみを定義する（REQ-007-014/015）

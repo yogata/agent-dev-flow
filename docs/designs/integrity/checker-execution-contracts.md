@@ -2,7 +2,7 @@
 title: checker 実行契約と検出基盤規則
 status: accepted
 created: 2026-08-15
-updated: 2026-11-15
+updated: "2026-11-18"
 ---
 <!-- ADF-COVERS(design): REQ-010-009 -->
 <!-- ADF-COVERS(implementation): REQ-002-035 -->
@@ -55,15 +55,15 @@ checker の新規実装・修正時に適用するパターンマッチと網羅
 - 除外は対象ファイル単位とし、根拠（ルール自己参照、履歴参照領域、検出原理上の技術的除外）を文書化する。
 広域 glob による検出回避と検出無効化を許容しない（NG 隠蔽禁止、integrity-contracts と同一規定）
 - targeted docs guard は frontmatter または配置ディレクトリに基づく Design 判定を行い、非 Design ファイル
-（baseline snapshot、歴史記録ファイル等）の Design README 登録候補誤検出を抑止する
-- 歴史記録ファイル（docs/designs/integrity/audits/、baselines/ 等）は DEC-013 AG-008 適用範囲の
+（歴史記録ファイル等）の Design README 登録候補誤検出を抑止する
+- 歴史記録ファイル（docs/designs/integrity/audits/ 等）は DEC-013 AG-008 適用範囲の
 残存参照判定の対象外とする
 
 検出対象除外の正規列挙を次のとおり確定する。
 
 - node_modules 系: git 管理外ディレクトリ（`node_modules/` 等）はスキャン対象から除外する
-- frontmatter 信号キー: `baseline_for`、`audit_for` を検出制御用の正規信号キーとして列挙する。これらのキーを持つファイルは監査記録・baseline としての免除規定に従う
-- 監査記録・AUTOGEN に対する免除: 監査記録（audits/、baselines/ 配下の Report）と AUTOGEN ブロックは、歴史記録・機械生成領域として該当検出の免除対象とする
+- frontmatter 信号キー: `audit_for` を検出制御用の正規信号キーとして列挙する。このキーを持つファイルは監査記録としての免除規定に従う
+- 監査記録・AUTOGEN に対する免除: 監査記録（audits/ 配下の Report）と AUTOGEN ブロックは、歴史記録・機械生成領域として該当検出の免除対象とする
 - AUTOGEN retired 参照行領域の免除: AUTOGEN ブロック内の retired 参照行（機械生成領域として生成された索引行）は、retired 成果物残存検出の免除対象とする方針とする。機械生成領域への手動是正要求を行わない
 - em-dash 導入時のゲート方針: em-dash（—）を配布文書へ導入する場合は、意図しない異言語文字・記号の混入を検出する既存 checker の許容更新（導入対象の明示）を同一 PR で行うことを方針とする。checker 実装自体の変更は別 Case の責務であり、本 Design は方針のみを所有する
 - check_integrity の typecheck 対象外範囲: check_integrity（docs-check）の typecheck 対象は現行の対象範囲に限定し、配布 skill scripts 全体への対象拡張は行わない（対象拡張は本方針の対象外）。対象範囲の拡張判断は別途設計判断を要する
@@ -73,20 +73,14 @@ checker の新規実装・修正時に適用するパターンマッチと網羅
 - 宣言配置規約（対象外拡張子ファイルの対応宣言）: inline 宣言の走査対象は拡張子 .md / .ts の producer-only artifact のみであり（現行の走査対象方針を維持）、対象外拡張子のファイル（.ps1 等のスクリプト）の implementation / design 対応は top-level traceability/ 配下の sidecar へ宣言する。対象外拡張子ファイル内の ADF-COVERS 形式コメントは正規の対応宣言として扱わず、新規に配置しない。既存の対象外拡張子ファイル内の同形式コメントは sidecar 宣言への集約後に撤去する
 - docs/reports（履歴参照領域）: `docs/reports/` 配下（監査・評価・観測の Report）は履歴記録領域として各検出の対象から除外する。IR-067 の docs/reports 免除・REQ-053-039（歴史記録是正対象外）と同一の位置づけであり、traceability corpus の走査対象からも除外する。Report 文書内の REQ 行 ID 参照は歴史記録として対応関係管理対象外とする
 
-## baseline 退避物と BaselineFile の役割分離と合否判定基準
+## baseline 退避物の役割（baseline 機構撤廃後）
 
-baseline 退避物（checker 実行 stdout の退避。ok/failures/stats 形式）と delta 検査用 BaselineFile（entries 形式）は別役割である。退避物は比較証跡であり、BaselineFile は delta 検査の入力である。両者の形式非互換は欠陥ではなく役割差とする。
-
-合否判定基準:
-- 既知違反の合否は failures の一致（件数と内容）で判定する
-- 分類層（severity・bucket 別）の件数一致を確認する
-- scanned 件数差は環境差（走査環境・OS・junction 状態に由来）として不合格根拠にしない
-- BaselineFile の全量再生成は cap 更新（増分反映）と使い分け、全量再生成時は従来の approved provenance を引き継ぐことを確認する（provenance 保全）
+checker 実行 stdout の退避（ok/failures/stats 形式）は比較証跡としての役割を維持する。delta 検査用 BaselineFile（entries 形式）とその cap 更新・provenance 保全の契約は baseline 機構の撤廃（REQ-010-074/079、Epic #4126 Phase 4）に伴い廃止済みである。検出違反は全件を直接修正する。
 
 ## 宣言的データ YAML の schema 原則
 
-検出用の宣言的データ YAML（retired-artifact-registry、command-format-rules、delegation-contract-patterns、
-distribution-targets、obsolete-path-map、obsolete-vocabulary-map、skill-projection-manifest）は、
+検出用の宣言的データ YAML（command-format-rules、delegation-contract-patterns、
+distribution-targets、skill-projection-manifest）は、
 正となるスキーマを Design が所有する。各 YAML は検出用ビューであり、
 正規契約の情報源とはしない。
 YAML と正 Design の不一致は検査で検出対象とする。
@@ -108,9 +102,7 @@ data yaml の新設は、当該 yaml を読み込む消費者実装（checker �
 
 実装実例（新設時の消費者実装同時確定の参照例）:
 
-- `data/obsolete-vocabulary-map.yaml`: 消費者は check_integrity.ts の IR-065 / IR-066 語彙パターン検査
-  （IR065_VOCAB_PATTERNS / IR066_VOCAB_PATTERNS 定数）。語彙 ID 集合と rule 割当の不一致は
-  obsolete-vocabulary-map-drift 検査が strict fail で検出する（REQ-047-004）
+- `data/obsolete-vocabulary-map.yaml`: 削除済み（対応する廃止語彙検査の削除と同一 PR で削除。Epic #4126 Phase 4）。data yaml と消費者実装の同一 PR 同時確定契約の適用例は `data/skill-projection-manifest.yaml` の行を参照
 - `data/skill-projection-manifest.yaml`: 消費者は check_integrity.ts の IR-068 skill-projection-manifest
   検査（src 側スキル集合と投影スキル集合の突合）。manifest と src のスキル集合不一致は strict fail で
   検出する。worktree（junction 未伝播）では投影比較を info で skip する
@@ -118,6 +110,14 @@ data yaml の新設は、当該 yaml を読み込む消費者実装（checker �
 ### 宣言的データ読込原則
 
 検査対象の定義データ（検査ルール・配布対象一覧等）は宣言的データファイル（yaml）を原本とし、checker は定義をコード内に複製せず原本を読み込んで検査を実行する。原本欠損時は検査を実行せず fail-closed で停止する。command-format-rules.yaml・distribution-targets.yaml は本原則の適用対象とする（読込統合: ru-batch-20260903）。
+
+## third-party Skill 境界使用の扱い（skill-use-for-boundary 免除の代替扱い）
+
+third-party Skill 4件（explainer、explainer-book、first-reader、yomiyasu）の `.opencode/skills/` 配下配置に伴う境界検出（旧 skill-use-for-boundary 免除）は、恒久免除レジストリ（baselines/exemptions.json、撤廃済み）から本節への代替扱い記載で移行した（Epic #4126 Phase 4、REQ-010-074）。
+
+- 現行の扱い: third-party Skill は DEC-023 の取得機構（`src/third-party/skills.yaml` 宣言、agentdev_third_party 取得）で管理され、IR-058（distribution-untracked-skill-reference）の skills.yaml 宣言 carve-out と IR-068 の INSPECTION-TOLERATED 判定が検出器レベルの正規扱いを持つ。独立の免除登録は行わない
+- 再取得時の再発受容: third-party Skill の再取得（third-party-sync）で検出違反が再発した場合は、コードレベルの豁免（検出器の正当使用例外パス追加）または個別修正と再取得時の再発受容（同内容の再検出は既知の実行環境差として扱い、都度の免除登録を行わない）のいずれかで処理する。免除レジストリの再設置は行わない
+- 検出器の正当使用例外（IR-055 exempt path 等の checker 実装内パターン）を追加する場合は、本 Design「除外設定の文書化要件」に従い根拠を PR 本文へ記載する
 
 ## detector 命名規約
 
@@ -163,97 +163,13 @@ docs-check は、手動管理の索引一覧（docs/README.md ガイド一覧を
 - docs/knowledge/README.md「現在の知識文書」一覧は docs/knowledge/ 配下の実知識文書一覧と一致し、件数表記は実ファイル数と一致すること
 - knowledge README 列挙整合の正規検査経路は check_knowledge_docs.ts とし、docs/README.md ガイド一覧等の手動管理索引は README 突合系検査の組合せで整合を検査する。手動管理の一覧更新漏れ（実ファイルの追加・削除に対する一覧の追随漏れ）は本整合検査の検出対象とする
 
-## IR-055 warning 総数 ratchet と baseline provenance の実行契約
+## baseline provenance 実行契約の撤廃（REQ-010-074/079）
 
-IR-055 warning 総数 ratchet（ir-055-baseline.json の warning_total_cap 比較）の実行面の契約を次のとおり確定する。baseline 運用の正規所有は integrity-contracts.md とし、本節は実行面のみを所有する。
+IR-055 warning 総数 ratchet（warning_total_cap 比較）、baseline provenance 付きエントリ追加、恒久免除レジストリ（baselines/exemptions.json）の実行契約は baseline 機構の撤廃に伴い廃止済みである。検出された warning は provenance 登録を行わず、対象側の直接修正で解消する。
 
-- warning 総数が warning_total_cap を超過した場合は、明細再取得（check_integrity.ts 実行による実測）で起因を特定してから処置する。起因の分類は true positive（当該箇所の是正）と baseline-known（provenance 付き baseline または恒久免除レジストリ baselines/exemptions.json への追加）の2系統とする
-- warning_total_cap の引上げは --raise-warning-cap 明示フラグ経由のみ許容する。無条件の cap 引上げを禁止する。baseline 値（entries の count）は check_integrity.ts 実行の実測値に更新し、cap 値を実測に併せ替えない
-- baseline エントリおよび恒久免除レジストリへの追加は、provenance（起因の由来、正当化の参照先 rationale_ref、適用日）付きでのみ許容する。無条件 baseline 追加を禁止する
-- checker 出力（lint_skills 等を含む）は、検証不通過（NG）と傾向管理（warning）を summary で区別して報告する（REQ-010-082）。warning 存在時の運用（集約予算の漸進回収、git 管理外ローカルユーザースキルの環境差記録）は warning の無視・抑制による隠蔽を行わず、運用方針として確定して運用する
+### 対照実行（baseline 未整備環境での合格判定）の撤廃
 
-## 対象外
-
-- 各 checker の個別検出ロジック、検出シグナル、severity 判定（各 checker の Design と IR カタログ）
-- targeted docs guard のモード使い分け・引数形式の詳細（targeted-docs-guard-implementation Design）
-- AUTOGEN block ID の棚卸し規定（autogen-freshness-gate Design）
-- Workflow / Capability 機械分類規則（workflow-skill-model Design）
-- check_workflow_preventive.ts の extractYamlField（単一トップレベルフィールドの正規表現抽出）は宣言的データ読込原則の意図的な適用対象外とする。根拠: Issue #2352 の移行対象からの意図的除外、PR #2355 での ambiguous 判定記録、抽出対象が単一行 `field: value` 意味に限定され構造化 YAML 解析を必要としないこと。Bun.YAML 委譲の共有 lib（resolveExtensionState 系）とは責務が異なるため二重経路には該当しない（RU-0004 対象外明示。ユーザー決定 2026-09-04）
-
-## 安定実行経路
-
-stdout 証跡を要する checker（機械可読レポートを stdout 出力する checker）の実行は、モジュール import 経由（node --experimental-strip-types）を標準経路とする。Windows + bun 環境では bun run 経由の process.exit 実行で stdout レポートが失われることがあるため、CLI 経由で実行する場合は process.exit 前に stdout の flush を保証する終了手順を例外経路として用いる。
-
-安定実行経路の詳細は docs/knowledge/checker-cli-stdout-loss-on-windows-bun.md を参照する。
-
-### ESM 互換性要件
-
-checker は module import 経由（node --experimental-strip-types）での実行を前提とする。CommonJS API
-（`require.main`、`require` 等）への依存は、`import.meta.main`、`node:module` の `createRequire` 等による
-互換化を行うか、CLI 例外経路での実行に限定する。新規 checker は import 経由での実行を必須とし、
-既存 checker の互換化は本契約の要件として段階的に適用する。
-
-### link profile 実効実行要件
-
-checker および機械工程 script のパス引数（--root、gate spec の --input 等の入力パス）の解決基点は checker・script 起動時の作業ディレクトリ（cwd）であり repo root ではない。パス引数は絶対パスで構成する標準とする。絶対パスで構成しない場合は gate spec の cwd からの相対解決を意図したパスであることを呼出側が明示的に管理し、repo root 基準の相対パスを渡さないこと。checker 実行記録（検証差分・証跡）には root 等のパス引数の解決先（実測絶対パス）を明記すること。
-
-- link profile は main root を位置引数 `repoRoot` に指定して読取専用で実行する（worktree 汎用手順の読取専用実行・環境ラベル規定と整合）。
-- worktree 内実行は junction 未伝播により concrete-id 0件の無効実行になり得る。link profile を worktree で実行した
-  場合は実行環境ラベルを記録し、結果の採用可否を環境ラベルで判定する（REQ-018-004 の環境差区分に従う）。
-- source profile と link profile の対比表を検証結果の解釈に用いる。
-- worktree を検査対象とする checker の起動契約: 検査 skill は host 側配置を起点として起動し、検査対象 worktree の
-  絶対パスを `--root`（相当の repoRoot 明示指定）で指定して起動する。worktree への検査 skill 複製と配置先起点の
-  起動は標準としない。
-- 検査対象 root の誤解決（配置先起点の誤リポジトリ検査）と `files_checked` 空は検査見逃しとして扱う。
-  `files_checked` の内容と検査対象 worktree の変更ファイルの一致確認を検査結果の採用前の手順とする（REQ-010-076）。
-- 読み取り専用検査であり worktree への書込みを行わない。worktree 分離原則（POL-worktree-isolation）との関係:
-  検査は worktree の分離を壊さない読み取り専用操作として実行され、検査対象 root の明示指定と結果採用前の一致確認の
-  みを worktree 外（host 側）で行う。
-
-実行記録には、次の環境ラベルを必ず付す。
-
-| 項目 | 記録内容 |
-|---|---|
-| 実行環境 | main root または worktree root の別とパス |
-| junction 伝播状態 | worktree の `.opencode/skills/agentdev-*` 未伝播、または main root の junction 構成の状態 |
-| 依存パッケージ状態 | `node_modules` の伝播状態、`bun install` の要否および実施状況 |
-
-checker の stdout 証跡は、実行プロセスの終了状態と stdout を分離して退避する。非ゼロ終了時も
-機械可読な stdout を保持し、source profile と link profile の実行結果・環境ラベル・対比表を同一の
-検証記録から追跡できるようにする。
-
-本節は checker の実行契約だけを所有する。AG-005（`agentdev-skill-authoring`）の規則は
-command/skill の記述品質を所有し、worktree 汎用手順は `agentdev-git-worktree` の references が所有する。
-両者の手順を本 Design に重複記載せず、checker の実行結果解釈に必要な範囲だけを参照する。
-
-- Bun ランタイム API への依存を含む checker の実行経路選択は、本節末尾の「実行ランタイム選択規律（依存 API 別対応表）」が正規所有する
-
-IR-072 の PR 期間判定は author date（git log %as）を基準とする。採用理由: 対象期間の実施として意味があるのは変更が書かれた日付（author date）であり、マージ時刻や rebase による commit 日付の付け替えの影響を受けないためである。既知限界: 複数日にまたがって作成された PR では author date が期間境界を跨ぎ得るため、境界日付の取り扱い（含む/含まない）は checker 出力の解釈時に注意を要する。
-
-### worktree 環境での checker 実行 fallback（junction 未伝播時の SoT 直参照）
-
-worktree 環境で .opencode/skills/* junction を前提とする検査（docs/designs 側リンク検査、
-IR-062 reference-path-existence を含む）を実行する場合、junction 未伝播時には検査対象パスを
-source パス（SoT パス = 検査 root（--root 指定の対象 worktree）直下の src/common/ 配下。
-同一チェックアウト内）へ直参照 fallback して検査を実行する。
-メインリポジトリ作業コピー側の src/opencode へ解決することは誤解決（誤リポジトリ検査）として禁止する。
-
-- fallback 判定は junction（または投影ディレクトリ）の不在を検出した時点で行う
-- fallback で実行可能な検査は実行し、実行不能な既知 skip は環境差（REQ-018-004 の環境差扱い）として区別記録する
-- fallback を使用した検査では、実行環境（worktree / main、junction 伝播状態）を環境ラベルとして検証記録に明記する（REQ-018 の環境ラベル契約に従う）
-- worktree 単独実行で junction 依存検査が必要な場合は、temp 領域への junction 投影構成を前置手順として実施してから検査する（投影構成を作業 worktree へ適用しない）
-- fallback 経路で検査対象が 0 件（zero-targets）に解決された場合は、検査を実施していない無効分類として記録し、合格として扱わない
-- main root での再実行へ切替える条件（投影構成が不能・fallback で検査対象が空・結果の信頼性が確保できない場合）は main root 実体 + --root 明示指定による読取専用再実行とする
-- 本 fallback は REQ-018「junction を前提とする構造系テストは source パス（SoT パス）への fallback で実行される」規約の checker への適用であり、worktree 作成工程（junction 自動化）を変更しない
-- 環境差の由来分離・明示記録の運用は docs/knowledge/worktree-environment-fail-classification.md を参照する
-
-### baseline 未整備環境での対照実行の実行契約
-
-baseline 未整備環境での gate 実行に伴う対照実行（同一 detector・同一引数を baseline commit と変更 HEAD で同一環境再実行）の判定手順と記録形式は、NG baseline 運用手順（integrity-contracts.md「baseline 未整備環境での対照実行による合格判定」）が正規所有する。本 Design は実行面の次の事項のみを所有する。
-
-- 対照実行の両系統（baseline commit 側・変更 HEAD 側）の実行は、本 Design の checker 共通実行契約と worktree 検査対象 checker の起動契約（host 側起点、repoRoot 明示指定、読取専用）に従う
-- 両系統の実行には環境ラベルを必ず付す。環境ラベルが一致しない実行間の結果比較は delta 0 の証拠として採用しない（同一環境再実行の要求）
-- baseline commit 側の実行は detached worktree（worktree 汎用手順の baseline 比較手順）で行い、作業中 worktree の stash 往復を行わない
+baseline 未整備環境での対照実行による合格判定（新規違反 delta 0 実証）の実行契約は、baseline 機構の撤廃（REQ-010-074/079、Epic #4126 Phase 4）に伴い廃止済みである。現行の gate 合格判定は checker 自体の Exit 0（検出違反 0 件）による。検証時の baseline commit との比較が必要な場合は、worktree 汎用手順の detached worktree による baseline 比較手順を検証手段として使用できる（恒久手順の再設置ではない）。
 
 ### 実行ランタイム選択規律（依存 API 別対応表）
 
@@ -322,15 +238,15 @@ bun test の pass は型整合を保証しない。配布物（.ts・型定義�
 
 ### check_integrity テストスイート内の結果共有契約
 
-check_integrity.test.ts の回帰試験群は、同一テスト実行内で対象ルート・実効引数・入力状態（固定データ、宣言的定義、baseline 等）が同じ検査について検査器起動を1回に集約し、その結果を複数の確認で共有できる。本契約はテストスイートの実行形態に関する内部契約であり、検査ルール、検出能力、既存の確認内容、最終品質ゲートを変更しない。
+check_integrity.test.ts の回帰試験群は、同一テスト実行内で対象ルート・実効引数・入力状態（固定データ、宣言的定義等）が同じ検査について検査器起動を1回に集約し、その結果を複数の確認で共有できる。本契約はテストスイートの実行形態に関する内部契約であり、検査ルール、検出能力、既存の確認内容、最終品質ゲートを変更しない。
 
 - 結果共有は既存の準備処理（beforeAll 等）と明示的な結果変数で構成し、実行をまたぐ永続キャッシュや汎用キャッシュ基盤を作らない
 - 実リポジトリ回帰の4確認は1回の検査結果を共有する。個々のテスト名と確認内容を維持して失敗箇所を識別でき、共有結果を各テストが変更して他の確認を汚染しない
 - 不変の固定データは同一ルート・同一実効引数・同一入力状態の組合せごとに1回だけ検査する。引数や入力が異なる結果を混用しない
-- baseline 更新、入力編集、引数差、出力形式差、レポート保存等の状態変更操作を検証する試験は不変結果の共有へ混ぜない。状態変更前後は順序を維持し、変更後に新しく検査する。独立起動そのものを確認する試験の呼出しも維持する
+- 入力編集、引数差、出力形式差、レポート保存等の状態変更操作を検証する試験は不変結果の共有へ混ぜない。状態変更前後は順序を維持し、変更後に新しく検査する。独立起動そのものを確認する試験の呼出しも維持する
 - 共有対象群の各テストは選択実行時に必要な初期化を自身で行い、他テストの先行実行に依存して成立しない（ファイル単体指定の実行契約維持）
 - 初期化失敗、子プロセス起動失敗、異常終了、JSON 解釈失敗、不完全な必須結果は明確な試験失敗とし、空の結果や既定値で成功扱いにしない
-- 実行後に元の固定データ・baseline・作業リポジトリへ意図しない変更や不要なレポートを残さない。自分の生成物だけを後片付けし、既存の未追跡ファイルを削除しない
+- 実行後に元の固定データ・作業リポジトリへ意図しない変更や不要なレポートを残さない。自分の生成物だけを後片付けし、既存の未追跡ファイルを削除しない
 - 効果測定は同一条件（マシン、Bun 版、検査入力、配置、コマンド）で変更前後を複数回計測し、成功結果、所要時間、中央値・最大値、検査起動回数を記録する。件数一致だけで検出能力の同等性を証明したことにしない
 
 ## Design frontmatter 必須キー検証観点
@@ -342,11 +258,11 @@ docs/designs/** のDesign frontmatterは `title` / `status` / `created` / `updat
 checker 系スクリプトは bun 前提で記述されており、node 実行系（node --experimental-strip-types 等）での実行は
 require is not defined で失敗する。安定実行経路は bun run を使用する（Case #3252 実績）。
 spawnSync 型テストの固定 timeout は検査対象規模の増加（third-party 配布物追加等）で超過し得るため、
-実測分布に基づく値（30〜60秒）を設定し、baseline 対照実行（main と PR head の同条件比較）を
+実測分布に基づく値（30〜60秒）を設定し、main と PR head の同条件比較実行を
 環境起因切り分けの標準手順とする。
 
 ## See Also
 
-- integrity-contracts.md（スクリプト契約、NG baseline 運用、除外設定の文書化要件）
+- integrity-contracts.md（スクリプト契約、除外設定の文書化要件）
 - targeted-docs-guard-implementation.md（guard 実行契約）
 - workflows/workflow-skill-model.md（Workflow / Capability 機械分類表）

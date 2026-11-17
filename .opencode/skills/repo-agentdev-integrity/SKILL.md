@@ -66,7 +66,7 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 | Accepted ADR 引用 | `check_integrity.ts` | accepted 以外の ADR 引用検出（current baseline + retired 区別、推奨, REQ-0108-125, REQ-0112-050） |
 | Workflow template 構造 | `check_templates.ts` | frontmatter、必須セクション、placeholder、命名規則 |
 | Skill 構造 | `lint_skills.ts` | frontmatter name ↔ dir、USE FOR / DO NOT USE FOR、See Also |
-| AG-005 規則群 | `lint_skills.ts` | skill 記述基準（層1〜2）機械検査。hard 6規則（description 1024/600 文字上限、マーカー語・内部 ID 混入、USE FOR 二重保持、後続トリガー語（AG-004、command-bound のみ厳密検査）、300 行超 references の目次欠落）+ warn 1規則（description 集約予算 350×N）。検出規則の登録は integrity-rule-catalog「AG-005 規則群」節（REQ-0145-005 判定記録を含む）、既知違反は `baselines/lint-skills-baseline.json` で管理（delta-aware、baseline-known は info 降格） |
+| AG-005 規則群 | `lint_skills.ts` | skill 記述基準（層1〜2）機械検査。hard 6規則（description 1024/600 文字上限、マーカー語・内部 ID 混入、USE FOR 二重保持、後続トリガー語（AG-004、command-bound のみ厳密検査）、300 行超 references の目次欠落）+ warn 1規則（description 集約予算 350×N）。検出規則の登録は integrity-rule-catalog「AG-005 規則群」節（REQ-0145-005 判定記録を含む）、検出違反は baseline による免除管理を行わず（REQ-010-082）、対象側の直接修正で解消する |
 | Junction 整合性 | `check_integrity.ts` | broken junction / symlink 検出（Windows junction / Unix symlink のリンク先不存在） |
 | Capture boundary | `check_integrity.ts` | capture-boundaries.md 存在確認、PR template セクション名検証、command capture 責務記述確認（REQ-0105） |
 | REQ verification basis | `check_integrity.ts` | REQ 要件行の検証基準が 規範語ではなく必達要件判定であること（REQ-0115-044） |
@@ -74,7 +74,6 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 | Distribution untracked skill | `check_integrity.ts` | 配布物が `.opencode/skills/` 配下にのみ存在するスキルを参照した場合の src 昇格漏れ検出（IR-058, REQ-0159-003） |
 | Common policy identifier invariant | `check_integrity.ts` | 配布物（command・skill・template）のガードレール識別体系: 共通ポリシー意味識別子（POL-）の未定義参照・重複定義・registry 外定義、廃止済み Gxx 表記の残存検出（IR-063, REQ-051-005, REQ-010-064, Issue #2429）。識別子の定義実体は `agentdev-command-authoring` の共通ポリシー意味識別子 registry |
 | Unresolved placeholder | `check_integrity.ts` | 実行時配布対象の未解決プレースホルダー: TODO 系マーカー（strict）と ID プレースホルダー裸出力（heuristic）。許容条件: テンプレート、code block、code span、括弧内、引用「」内列挙（IR-064, REQ-010-065, Issue #2372） |
-| Obsolete vocabulary & legacy path | `check_integrity.ts` | 廃止語彙（旧 ADR 表記等）・旧パス・削除済み名称の現行概念としての使用検出（IR-065/IR-066, REQ-010-066/067, Issue #2372）。許容条件: `v2:` プレフィックス、行レベル履歴マーカー、superseded Decision、否定文脈、existence_probe、exemption_files（`data/obsolete-vocabulary-map.yaml`）。v1〜v4 監査観点再走査（Issue #2383 (b)）採用分の廃止語彙（`inspect-extensions`、`agentdev-spec-file-manager`、`agentdev-workflow-spec-save`）を IR-066 語彙へ拡張 |
 | 引用 REQ 行実在性 | `check_integrity.ts` | docs 本文が引用する階層 REQ 行 ID（REQ-NNN-NNN）の実在性検査。ファントム引用（未コミット草案番号・要件分割前の旧行 ID 残存）を検出（IR-067, REQ-010-069, Issue #2383 (a)）。許容条件: `v2:` プレフィックス、プレースホルダー様式例示（REQ-010-065）、code span/code block、テンプレート領域、IR ルール説明文、AUTOGEN ブロック、retired ディレクトリ。既知違反（要件分割由来の旧行 ID 引用）は NG baseline（delta-aware） |
 | スキル集合突合（投影マニフェスト） | `check_integrity.ts` | src 側スキル集合（SSoT）と `.opencode/skills` 投影スキル集合の突合を検査データ化（IR-068, Issue #2383 (d)、inspect F-01）。`data/skill-projection-manifest.yaml`（src 列挙の検出ビュー）との不一致はデータ鮮度 NG。投影比較は junction 環境のみ実施し、worktree（junction 未伝播、REQ-018）では info で skip。リンク先欠損の stale junction（解決不能投影エントリ）は projection-broken として検出 |
 | REQ 番号ギャップ検査 | `check_integrity.ts` | REQ 番号（3桁帯 REQ-001〜REQ-999）の実体（active + retired）から欠番を算出し、`docs/requirements/README.md` と `docs/README.md` の「欠番」明記（AUTOGEN 外の本文行）と突合。無記録の欠番と陳腐化した範囲明記を検出（IR-069, REQ-010-070）。最大番号直前の末尾予約枠は過渡帯として許容する |
@@ -86,7 +85,6 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 
 | 検査 | スクリプト | 内容 |
 |------|-----------|------|
-| Obsolete design path | `check_integrity.ts` | `obsolete-path-map.yaml` に基づく旧Design直下パス参照検出、直接生成方式語彙検出（IR-057, REQ-0158-002） |
 | Distribution reference boundary | `check_distribution_boundary.ts` | 配布 command/skill 本文（`src/opencode/commands/agentdev/**/*.md`, `src/opencode/skills/agentdev-*/**/*.md`）に含まれる具体ID（`ADR-NNNN`, `REQ-NNNN`）、具体パス（`docs/(adr\|requirements\designs)/<file>.md`、但し README.md とテンプレート表記は除外）、固定URL（blob/raw）を検出。project extensions 機構（配布物参照境界）の持続的検査を担う |
 | Targeted docs guard | `check_changed_docs.ts` | 変更ファイル限定の整合性検査。req-define / case-open / case-ready / case-close / docs-check の各 workflow で実行（Targeted Docs Guard 実装詳細 Design 参照） |
 | Workflow preventive checks | `check_workflow_preventive.ts` | AG-008 旧責務残存の予防検査7項目（全公開 Command の Workflow Skill dispatch 存在、dispatch 先 Skill 存在、Workflow Skill の description 簡潔トリガー項存在（AG-004、検出語は lint_skills.ts と統一）、旧 extension kind・runtime path 残存禁止、Command から Skill 内部 reference 直接依存禁止、Workflow/Capability 分類と Extension kind 整合、command-format rules と thin Command モデル無矛盾）。false positive 対策の exemption は script 本体に構造化 |

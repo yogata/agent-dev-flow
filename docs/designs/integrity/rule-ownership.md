@@ -70,13 +70,11 @@ req-impact-map.md の配置の原本は `../responsibilities/req-impact-map.md` 
 | 32 | local-case-file（ローカルIssue共通スキーマ） | REQ-009 (016-020, 024, 025) | local-case-file.md | ローカル版 OpenCode のローカルIssue YAML 前書き、role 条件付き status enum、labels 値域、見出し一覧、マージ結果記録 |
 | 33 | ローカル版 link mode 導入フロー、安全ゲート | REQ-009 (001-015) | runtime-package-boundary.md | link mode 接続手順、link target 確認、ジャンクション検出安全ゲート |
 | 34 | local-transform（ローカル版変換資産） | REQ-009 (028, 029, 032) | runtime-package-boundary.md | **確定廃止**（PR#1195 で transform/ 完全削除、REQ-009-004/009/028 確定廃止昇格）。変換用プロンプト、レビュー用プロンプト、変換仕様の要件は全て廃止済み。link mode の現行契約は `runtime-package-boundary.md` が所有する |
-| 35 | obsolete-spec-path（旧Design直下パス参照検出） | REQ-001 (006), REQ-009 (004), REQ-036 (012) | integrity-rule-catalog.md (IR-057) | docs/designs/ 基盤Design ドメイン別体系化（REQ-001）以前の直下パス参照を検出。`obsolete-path-map.yaml` を対照表として IR-057 が検証。link mode 統一（REQ-009）に伴う廃止語彙を「単独検出語」（即 ng）と「近接条件つき検出語」（conditional）に分離し検出。例外条件: obsolete-path-map.yaml 自体、IR-057 ルール説明、retired 配下、テスト fixture、コードブロック内検査 fixture。v2:REQ-0158 は Issue #1713 で retire 完了（検出契約は IR-057 が現行所有） |
 | 36 | project-extensions-integrity（extensions 機構整合性検査） | REQ-002 (001-003) | integrity-rule-catalog.md (IR-056) | project extensions 機構（Design `../foundations/project-extensions.md`）の整合性検査。extension スキーマ（5セクション構造）、kind/配置/id 対応、context.paths 実在、project-local skill 存在、旧 doc-inputs 残存検出、上書き意図検出、配布コード直接参照残存を検査。regression_test は `check_extensions.test.ts` が統合テストとして存在、正常系 ok=true 確認済み（Issue #1406 移行完了時）。旧機構から extensions 移行で再実装 |
 | 37 | IR 存在条件モデル（DEC-013 適用） | REQ-028 (008, 009, 010, 012; retired、恒常行は DEC-013 が移管受入れ), REQ-036 (022) | integrity-contracts.md | DEC-013 AG-008/009 適用後の IR モデルを所有。`lifecycle_state`、`enforcement_mode`、`baseline_status` を現行 IR 属性から削除し、「現存 IR = 現行 = executable detector」へ統一。8項目存在条件、finding-baseline 分類（finding 側）、新規 IR 登録 gate (a)/(b)、一時移行検査 registry を正規所有する。catalog（[integrity-rule-catalog.md](integrity-rule-catalog.md)）はスキーマ定義のみ重複所有し、判定規則は本ドメインへ委譲する |
-| 38 | skill 記述基準（層1〜2）機械検査（AG-005 規則群） | REQ-002, REQ-027 | agentdev-skill-authoring.md, command-file-format.md, integrity-rule-catalog.md（AG-005 規則群） | `lint_skills.ts` が検出する層1〜2記述基準検査（hard 6規則 + warn 1規則、RU-0018 / PR #2184）。検出規則の登録は integrity-rule-catalog「AG-005 規則群」節、正典は skill authoring Design と command-file-format Design。既知違反は `baselines/lint-skills-baseline.json` で管理 |
+| 38 | skill 記述基準（層1〜2）機械検査（AG-005 規則群） | REQ-002, REQ-027 | agentdev-skill-authoring.md, command-file-format.md, integrity-rule-catalog.md（AG-005 規則群） | `lint_skills.ts` が検出する層1〜2記述基準検査（hard 6規則 + warn 1規則、RU-0018 / PR #2184）。検出規則の登録は integrity-rule-catalog「AG-005 規則群」節、正典は skill authoring Design と command-file-format Design。検出違反は baseline による免除管理を行わず（REQ-010-082）、対象側の直接修正で解消する |
 | 39 | common-policy-identifier-invariant（ガードレール識別体系検査） | REQ-051 (005, 006), REQ-010 (064, 068) | integrity-rule-catalog.md (IR-063) | 配布物の共通ポリシー意味識別子（`POL-`）の未定義参照・重複定義・registry 外定義、廃止済み Gxx 表記の残存検出（Issue #2429、REQ-051）。旧 Gxx 連番検査（起点番号固定・欠番なし・重複なし、Issue #2372）は連番制度廃止に伴い置換済み。識別子の定義実体は `agentdev-command-authoring` の共通ポリシー意味識別子 registry が保持 |
-| 40 | unresolved-placeholder（未解決プレースホルダー検査） | REQ-010 (065, 068) | integrity-rule-catalog.md (IR-064) | 実行時配布対象の TODO 系マーカー（strict）と ID プレースホルダー裸出力（heuristic）。テンプレート・code span・括弧内等の許容条件付き（Issue #2372）。既知違反は NG baseline で管理 |
-| 41 | obsolete-vocabulary / legacy-path（廃止語彙・旧パス・削除済み名称検査） | REQ-010 (066, 067, 068) | integrity-rule-catalog.md (IR-065/IR-066) | 旧 ADR 表記等の廃止語彙と旧パス・削除済み名称の現行使用検出（Issue #2372）。許容条件の運用データは `data/obsolete-vocabulary-map.yaml`、検出シグナルは checker 実装が所有。v2: プレフィックス・履歴文脈・existence_probe 許容付き |
+| 40 | unresolved-placeholder（未解決プレースホルダー検査） | REQ-010 (065, 068) | integrity-rule-catalog.md (IR-064) | 実行時配布対象の TODO 系マーカー（strict）と ID プレースホルダー裸出力（heuristic）。テンプレート・code span・括弧内等の許容条件付き（Issue #2372）。検出違反は免除せず対象側の直接修正で解消する |
 
 ## 対象規則の所有権一方向化マトリクス（REQ-047）
 
@@ -87,10 +85,9 @@ REQ-047 が定める対象規則（command format、ガードレール番号、�
 | 対象規則 | 正規契約（意味の所有者） | 派生定義（機械判定可能な定義） | 実装詳細（checker） | 検証資産（test） |
 |---|---|---|---|---|
 | command format | [command-file-format.md](../authoring/command-file-format.md)（工程表形式が公開 command の正規形。ガードレール番号の様式も同 Design が所有） | `data/command-format-rules.yaml`（検出用ビュー） | `check_command_format.ts`（IR-049/028/029/030/031 検出定数、工程表検査）、`check_workflow_preventive.ts`（check 7: yaml の regex コンパイル性と thin 標本非拒否を検証） | `check_command_format.test.ts`、`check_workflow_preventive.test.ts`、`commands_error_cases.test.ts` |
-| ガードレール識別体系 | REQ-051-005/006、REQ-010-064/068（検出要件行）+ [IR-063](rules/IR-063-common-policy-identifier-invariant.md)（検出契約）+ command-file-format.md ガードレール識別体系節（ID 不要の Command 固有境界、共通ポリシーの意味識別子） | なし（検出は checker 内の抽出パターン。data yaml を持たない） | `check_integrity.ts`（checkCommonPolicyIdentifierInvariant） | `check_integrity.test.ts` IR-063 describe（baseline エントリなし） |
-| 廃止語彙と旧パス | 検出要件行は撤廃済み（REQ-010 の行修正で削除）+ [IR-065](rules/IR-065-obsolete-vocabulary-current-use.md) / [IR-066](rules/IR-066-legacy-path-removed-name.md)（検出契約） | `data/obsolete-vocabulary-map.yaml`（語彙 ID、existence_probe、exemption_files、否定文脈語の運用データ） | `check_integrity.ts`（checkObsoleteVocabulary。検出シグナル正規表現は IR065_/IR066_ 定数） | `check_integrity.test.ts` IR-065/066 describe（drift 検出含む）、NG baseline |
-| 配布境界 | REQ-029 + DEC-014 + [distribution-boundary.md](distribution-boundary.md)（検証モデル）+ [runtime-package-boundary.md](../local/runtime-package-boundary.md)（リポジトリ種別・命名規約） | `data/distribution-targets.yaml`（検出定義データ。現行 checker〔IR-046〜048〕は本 yaml を fail-closed 読込して検出に使用する。同期条件は下表） | `check_distribution_boundary.ts` + `lib/distribution-boundary-*.ts`、`src/opencode/plugins/agentdev-distribution-boundary-guard/` | `check_distribution_boundary.test.ts`、`distribution_boundary_routing_contract.test.ts`、boundary 系 test 群 |
-| 同種の integrity 検査定義（IR 体系一般） | [integrity-contracts.md](integrity-contracts.md)（strict/heuristic/observation 分類と検査カテゴリ）+ [integrity-rule-catalog.md](integrity-rule-catalog.md)（スキーマ）+ `rules/IR-NNN-*.md`（個別検出契約） | 各 data yaml（検出用ビュー）と baselines（既知違反の運用データ） | `check_integrity.ts` ほか checker 群 | 各 checker 対応の `*.test.ts` と回帰テスト群 |
+| ガードレール識別体系 | REQ-051-005/006、REQ-010-064/068（検出要件行）+ [IR-063](rules/IR-063-common-policy-identifier-invariant.md)（検出契約）+ command-file-format.md ガードレール識別体系節（ID 不要の Command 固有境界、共通ポリシーの意味識別子） | なし（検出は checker 内の抽出パターン。data yaml を持たない） | `check_integrity.ts`（checkCommonPolicyIdentifierInvariant） | `check_integrity.test.ts` IR-063 describe |
+| 配布境界 | REQ-029 + DEC-014 + [distribution-boundary.md](distribution-boundary.md)（検証モデル）+ [runtime-package-boundary.md](../local/runtime-package-boundary.md)（リポジトリ種別・命名規約） | `data/distribution-targets.yaml`（検出定義データ。現行 checker〔IR-047/048〕は本 yaml を fail-closed 読込して検出に使用する。同期条件は下表） | `check_distribution_boundary.ts` + `lib/distribution-boundary-*.ts`、`src/opencode/plugins/agentdev-distribution-boundary-guard/` | `check_distribution_boundary.test.ts`、`distribution_boundary_routing_contract.test.ts`、boundary 系 test 群 |
+| 同種の integrity 検査定義（IR 体系一般） | [integrity-contracts.md](integrity-contracts.md)（strict/heuristic/observation 分類と検査カテゴリ）+ [integrity-rule-catalog.md](integrity-rule-catalog.md)（スキーマ）+ `rules/IR-NNN-*.md`（個別検出契約） | 各 data yaml（検出用ビュー） | `check_integrity.ts` ほか checker 群 | 各 checker 対応の `*.test.ts` と回帰テスト群 |
 
 ### 同期条件と独立所有の明示（REQ-047-003）
 
@@ -99,8 +96,7 @@ REQ-047 が定める対象規則（command format、ガードレール番号、�
 | 箇所 | 独立所有の理由 | 同期条件 | 機械検証 |
 |---|---|---|---|
 | command-format-rules.yaml ↔ `check_command_format.ts` | 検出シグナルは checker 定数として実装され、yaml は検出用ビューとして分離される（checker は yaml を読まない） | 検出パターン変更は同一 PR で yaml・checker 定数・IR-028〜031 ルールファイルを更新する | `check_workflow_preventive.ts` check 7 が yaml の regex コンパイル性と thin 構造標本の非拒否を検証 |
-| obsolete-vocabulary-map.yaml ↔ `check_integrity.ts` | 許容条件の運用データ（probe、exemption、否定文脈）は yaml が、検出シグナル正規表現は checker が所有する（IR-065/066 の宣言どおり） | 語彙 ID 集合と rule 割当は yaml の `vocabulary[]` と checker の IR065_/IR066_ 定数で一致させる | `check_integrity.ts` の drift 検査（`obsolete-vocabulary-map-drift`）が双方向の差分を strict fail として検出（Issue #2373） |
-| distribution-targets.yaml ↔ `lib/distribution-boundary-rules.ts` | 検出定義データ（IR-046 の self-hosting-only markers、IR-047 の allowed サブディレクトリ、IR-048 の marker prefix）は yaml が canonical source であり（REQ-047-009）、lib 実装の `loadDistributionTargets` が fail-closed 読込して IR-046〜048 検出に使用する。検出の実行と finding 出力契約（rule 名・description 文言）は lib 実装が所有する | 検出規則変更は同一 PR で yaml・lib 実装・IR-046〜048 ルールファイルを更新する。yaml 読込は `loadDistributionTargets` の単一読込点として統合済み。yaml の廃止または読込経路変更は配布境界 checker の内部構成変更を伴うため追加判断とする | `check_distribution_boundary.test.ts` の `loadDistributionTargets: canonical yaml loading (REQ-047-009)` describe が canonical yaml 読込と yaml 欠損時の fail-closed を検証 |
+| distribution-targets.yaml ↔ `lib/distribution-boundary-rules.ts` | 検出定義データ（IR-047 の allowed サブディレクトリ、IR-048 の marker prefix）は yaml が canonical source であり（REQ-047-009）、lib 実装の `loadDistributionTargets` が fail-closed 読込して IR-047/048 検出に使用する。検出の実行と finding 出力契約（rule 名・description 文言）は lib 実装が所有する | 検出規則変更は同一 PR で yaml・lib 実装・IR-047/048 ルールファイルを更新する。yaml 読込は `loadDistributionTargets` の単一読込点として統合済み。yaml の廃止または読込経路変更は配布境界 checker の内部構成変更を伴うため追加判断とする | `check_distribution_boundary.test.ts` の `loadDistributionTargets: canonical yaml loading (REQ-047-009)` describe が canonical yaml 読込と yaml 欠損時の fail-closed を検証 |
 
 正規契約変更時の派生検査の陳腐化検出は、上表の機械検証に加え、既存の IR-061（AUTOGEN ブロック鮮度）、IR-074（ir-rule-classification-traceability。IR 分類と実装・試験パスの機械対応検査）、各 checker の回帰テスト（REQ-010-068）が担う。
 新規の生成機構やルールエンジンは導入しない（REQ-047-007）。
@@ -132,15 +128,12 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-006 | Command frontmatter 許可フィールド | REQ-002-015, REQ-039-002 | integrity-contracts.md, artifact-contracts.md |
 | IR-007 | Skill frontmatter name ↔ dir | REQ-010 | integrity-contracts.md |
 | IR-008 | Skill references/ 存在 | REQ-036-008 | integrity-contracts.md |
-| IR-009 | 旧 namespace 残存 | REQ-036-004 | integrity-contracts.md |
 | IR-010 | ADR status 正規化 | REQ-010 | integrity-contracts.md |
 | IR-012 | Template 必須セクション | REQ-010 (workflow template 構造) | integrity-contracts.md |
 | IR-013 | 完了報告種別実在 | REQ-036-008 | integrity-contracts.md |
-| IR-014 | reference/ 残存検出 | REQ-002-013, 039, REQ-037-006, 007 | artifact-responsibilities.md |
 | IR-015 | 廃止 REQ 現行参照検出 | REQ-010 | integrity-contracts.md |
 | IR-016 | Source/projection 整合性 | REQ-002-048-052 | system.md |
 | IR-018 | REQ 範囲表記鮮度 | REQ-010 | integrity-contracts.md |
-| IR-021 | 廃止済み skill 参照検出 | REQ-010 | integrity-contracts.md |
 | IR-024 | Command README ↔ 実体 | REQ-001-026, REQ-010-003 | integrity-contracts.md |
 | IR-025 | 廃止 Decision path 規則 | REQ-001-047, REQ-001-048 | integrity-contracts.md, document-model.md |
 | IR-027 | 廃止 ADR 現行根拠引用検出 | REQ-001-048, REQ-001-050 | integrity-contracts.md, document-model.md |
@@ -160,17 +153,14 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-042 | hardcoded-req-count | REQ-001 | integrity-contracts.md |
 | IR-043 | retired-readme-coverage | REQ-001 | integrity-contracts.md |
 | IR-044 | REQ/Design 境界違反検出 | REQ-001-002, REQ-001-003, REQ-001-067, REQ-001-068, REQ-010-002, REQ-010-012, REQ-001-049 | integrity-contracts.md, document-model.md |
-| IR-046 | consumer-generated リポジトリ種別誤検知防止 | REQ-009-007, REQ-009-011, REQ-009-014 | runtime-package-boundary.md |
 | IR-048 | generated_by 識別子整合性 | REQ-009-011, REQ-009-012, REQ-009-013 | runtime-package-boundary.md |
 | IR-049 | Command file format violation | v2:REQ-0143, REQ-010 | command-file-format.md, integrity-contracts.md |
 | IR-050 | load_skills command 誤指定検出 | v2:REQ-0140-027, REQ-010-010 | integrity-contracts.md, document-type-responsibilities.md |
 | IR-051 | 実行主体の skill 表記誤認検出 | REQ-053, REQ-010-010 | integrity-contracts.md, document-type-responsibilities.md |
 | IR-052 | 完了条件 grep パターン設計（REQ-010-011） | REQ-010-011 | integrity-contracts.md, quality-gate-model.md |
 | IR-053 | gh 直接記述検出 | REQ-011 | integrity-rule-catalog.md, integrity-contracts.md, ../../responsibilities/custom-tool-contracts.md |
-| IR-054 | draft Design 放置検出 | REQ-001-002 | integrity-rule-catalog.md, integrity-contracts.md |
 | IR-055 | runtime-unresolved-reference（配布物内の導入先未解決参照検出） | REQ-029-003 | integrity-rule-catalog.md, integrity-contracts.md |
 | IR-056 | project-extensions-integrity | REQ-002 | `foundations/project-extensions.md`, `integrity-rule-catalog.md` |
-| IR-057 | obsolete-spec-path-after-domain-split | REQ-001-006, REQ-009-004, REQ-036-012 | ../integrity/integrity-rule-catalog.md, obsolete-path-map.yaml, ../local/runtime-package-boundary.md |
 | IR-058 | distribution-untracked-skill-reference | REQ-002-001, REQ-002-002, REQ-002-003 | ../integrity/integrity-rule-catalog.md, ../local/runtime-package-boundary.md |
 | IR-059 | distribution-reference-boundary | REQ-029 | `distribution-boundary.md`, `foundations/project-extensions.md`, `integrity-rule-catalog.md` |
 | IR-060 | forbidden Japanese word detection | REQ-053-001, REQ-053-035, REQ-036-023, REQ-010-071 | ../../quality/textlint-quality-runtime.md, ../../responsibilities/document-type-responsibilities.md, ../integrity-rule-catalog.md |
@@ -178,8 +168,6 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-062 | skill/command パス参照実在 | REQ-010 | integrity-contracts.md, agentdev-skill-authoring.md, agentdev-command-authoring.md |
 | IR-063 | common-policy-identifier-invariant | REQ-051-005, REQ-051-006, REQ-010-064, REQ-010-068 | ../integrity-rule-catalog.md, ../../authoring/command-file-format.md |
 | IR-064 | unresolved-placeholder | REQ-010-065, REQ-010-068 | ../integrity-rule-catalog.md |
-| IR-065 | obsolete-vocabulary-current-use | REQ-010-068 | ../integrity-rule-catalog.md, data/obsolete-vocabulary-map.yaml |
-| IR-066 | legacy-path-removed-name | REQ-010-068 | ../integrity-rule-catalog.md, data/obsolete-vocabulary-map.yaml |
 | IR-067 | referenced-req-row-existence | REQ-010-069, REQ-010-065, REQ-010-068 | ../integrity-rule-catalog.md, ../checker-execution-contracts.md |
 | IR-068 | skill-projection-manifest | REQ-010-068, REQ-018-002 | ../../local/runtime-package-boundary.md, ../checker-execution-contracts.md, ../integrity-rule-catalog.md |
 | IR-069 | req-number-gap-recorded | REQ-010-068, REQ-010-070 | ../integrity-rule-catalog.md, ../../foundations/numbering-policy.md, ../checker-execution-contracts.md |

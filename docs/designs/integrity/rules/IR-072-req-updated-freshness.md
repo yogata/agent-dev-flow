@@ -2,7 +2,7 @@
 title: "IR-072: req-updated-freshness"
 status: accepted
 created: 2026-09-29
-updated: 2026-10-09
+updated: "2026-11-18"
 detection_method_class: machine-check
 implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
 verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts
@@ -50,10 +50,9 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integr
 | git 履歴不在ツリー（archive 展開等） | 検査自体が成立しないため info スキップ |
 | updated 欠落・非日付形式 | required-fields / IR-002 相当の別ルールが計上する（二重計上しない） |
 
-## baseline 運用
+## baseline 運用（撤廃済み）
 
-本ルールは strict で即時 fail とする（baseline 不要）。導入時点（REQ-010-068 準拠の新規検査クラス採用、Case #3233・RD-013・CR-003）で既知の不一致は全現行 REQ の frontmatter updated 機械的是正（metadata のみの変更・意味変更なし）を同一 Case で実施して解消するため、fix → 検査導入の順序（IR-071 の前例、REQ-029 再アンカー〔CR-003〕と同一）により導入直後の自己適用で既存違反は発生しない設計である。
-
+baseline による既知違反の免除管理・delta 運用は撤廃済みである（REQ-010-074/079、Epic #4126 Phase 4）。導入時点の既知違反は全件解消済みであり、現行の検出違反は免除せず対象側の直接修正で即時解消する。新規違反は strict fail として失敗する。
 ## See Also
 
 - [integrity-rule-catalog.md](../integrity-rule-catalog.md)

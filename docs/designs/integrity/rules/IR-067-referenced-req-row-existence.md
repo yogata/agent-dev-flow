@@ -2,7 +2,7 @@
 title: "IR-067: referenced-req-row-existence"
 status: accepted
 created: 2026-08-22
-updated: 2026-10-26
+updated: "2026-11-18"
 detection_method_class: machine-check
 implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
 verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts
@@ -49,10 +49,9 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integr
 | `docs/requirements/retired/`、`docs/decisions/retired/`、`docs/reports/` | 履歴領域 |
 | 旧4桁番号帯 `REQ-NNNN-NNN`（v2: なし、0141 未満） | 検出対象外（前置一致除外。F-04 是正は OU-007 スコープ） |
 
-## baseline 運用
+## baseline 運用（撤廃済み）
 
-導入時点の既知違反（要件分割由来の旧行 ID 引用）は NG baseline additions（provenance `issue-2383-ir067-initial-baseline`）で管理する。baseline に登録された既知違反の消化後は baseline 登録を解除し、docs/designs・docs/decisions を含む本文全走査で全件 strict 適用を継続する。baseline 登録後、新規のファントム引用（未コミット草案番号の混入等）は即時に strict fail として検出する。
-
+baseline による既知違反の免除管理・delta 運用は撤廃済みである（REQ-010-074/079、Epic #4126 Phase 4）。導入時点の既知違反は全件解消済みであり、現行の検出違反は免除せず対象側の直接修正で即時解消する。新規違反は strict fail として失敗する。
 ## See Also
 
 - [integrity-rule-catalog.md](../integrity-rule-catalog.md)

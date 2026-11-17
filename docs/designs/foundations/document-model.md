@@ -2,7 +2,7 @@
 title: 文書モデル
 status: accepted
 created: 2026-08-20
-updated: 2026-11-15
+updated: "2026-11-18"
 ---
 <!-- ADF-COVERS(implementation): REQ-001-001, REQ-001-002, REQ-001-003, REQ-001-004, REQ-001-005, REQ-001-006, REQ-001-007, REQ-001-020, REQ-001-035, REQ-001-038, REQ-001-039, REQ-001-040, REQ-001-041, REQ-001-052, REQ-056-001 -->
 <!-- ADF-COVERS(implementation): REQ-001-066, REQ-001-067, REQ-001-068 -->
@@ -418,7 +418,7 @@ accepted Decision は意味的に不変とする（REQ-001-056〜060）。
 | **配置先 (projection)** | 実行時環境への投影先 | `.opencode/commands/agentdev/*.md`、`.opencode/skills/agentdev-*/` |
 
 **投影方向**: 原本 → 配置先 のみ（逆方向の投影は行わない）。
-配置先での直接編集は禁止し、原本を変更後に同期スクリプトで配置先を更新する（配備形態〔共通原本・投影モデル〕の現行体制は DEC-049。旧: DEC-002→DEC-036）。
+配置先での直接編集は禁止し、原本を変更後に同期スクリプトで配置先を更新する（配備形態〔共通原本・投影モデル〕の現行体制は DEC-049。旧: DEC-002（過去経緯の履歴記録）→DEC-036）。
 
 ### 参照規則 <!-- REQ-001 -->
 
@@ -694,7 +694,7 @@ req-health-metrics.md と対となる Design 健全性の定量メトリクス�
 
 - draft Design ごとに accepted 化、統合、retire のいずれかを確定する
 - 未決着の draft Design を放置しない
-- draft status の Design が一定期間更新されず放置されることを検出するルール（IR-054）と連動する
+- draft status の Design の放置は docs/designs/README.md status 列追跡と case-close の Design 確定工程で管理する（旧 draft 放置検出ルールは Epic #4126 Phase 4 で削除済み）
 
 ### accepted Decision の意味変更
 

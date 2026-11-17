@@ -23,7 +23,6 @@ import { execSync } from "child_process";
 const SCRIPT_DIR = import.meta.dir;
 const SCRIPT_FILE = join(SCRIPT_DIR, "check_changed_docs.ts");
 const CLI_UTILS_FILE = join(SCRIPT_DIR, "cli_utils.ts");
-const HISTORY_EXEMPTION_FILE = join(SCRIPT_DIR, "ir057_history_exemption.ts");
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `changed-docs-test-${crypto.randomUUID().slice(0, 8)}`;
 const TEMP_ROOT = join(TEMP_BASE, RUN_ID);
@@ -70,19 +69,6 @@ function copyScripts(fixtureRoot: string): void {
   mkdirp(dest);
   copyFileSync(SCRIPT_FILE, join(dest, "check_changed_docs.ts"));
   copyFileSync(CLI_UTILS_FILE, join(dest, "cli_utils.ts"));
-  copyFileSync(HISTORY_EXEMPTION_FILE, join(dest, "ir057_history_exemption.ts"));
-  const dataDir = join(
-    fixtureRoot,
-    ".opencode",
-    "skills",
-    "repo-agentdev-integrity",
-    "data",
-  );
-  mkdirp(dataDir);
-  copyFileSync(
-    join(SCRIPT_DIR, "..", "data", "obsolete-path-map.yaml"),
-    join(dataDir, "obsolete-path-map.yaml"),
-  );
 }
 
 // Required TargetedDocsReport fields (REQ-0158 Phase 2 / AG-002 / Epic #1515 OU-005 TS-013).

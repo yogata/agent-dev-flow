@@ -100,7 +100,6 @@ interface SrcEnvOptions {
   skills: SkillFixture[];
   commands: string[];
   referenceFiles?: Record<string, string>; // skillName -> file content under references/
-  baselineEntries?: unknown[];
 }
 
 // AG-005 (Issue #2179) fixture environment: distribution SoT layout with
@@ -148,30 +147,6 @@ function setupSrcEnv(
   fs.mkdirSync(cmdDir, { recursive: true });
   for (const cmd of options.commands) {
     fs.writeFileSync(path.join(cmdDir, `${cmd}.md`), `# ${cmd}\n`);
-  }
-
-  if (options.baselineEntries) {
-    const baselineDir = path.join(
-      tempDir,
-      ".opencode",
-      "skills",
-      "repo-agentdev-integrity",
-      "baselines",
-    );
-    fs.mkdirSync(baselineDir, { recursive: true });
-    fs.writeFileSync(
-      path.join(baselineDir, "lint-skills-baseline.json"),
-      JSON.stringify(
-        {
-          version: 1,
-          rule_id: "LINT-SKILLS-NG-BASELINE",
-          generated_at: "2026-08-16",
-          entries: options.baselineEntries,
-        },
-        null,
-        2,
-      ),
-    );
   }
 
   return { tempDir, scriptPath };
@@ -737,137 +712,6 @@ describe("lint_skills.ts", () => {
     });
   });
 
-  describe("AG-005 baseline demotion (grandfathering)", () => {
-    let baselineEnv: { tempDir: string; scriptPath: string };
-
-    const baselineFixtureSkill = `---\nname: agentdev-ag-baselined\ndescription: Over 600 chars baselined. USE FOR: tests. DO NOT USE FOR: other. ${"z".repeat(620)}\n---\n\n## See Also\n`;
-    const baselineFixtureNewViolation = `---\nname: agentdev-ag-newviol\ndescription: Clean length. USE FOR: tests. DO NOT USE FOR: other.\n---\n\n## USE FOR\n\n- duplicated\n`;
-
-    beforeAll(() => {
-      baselineEnv = setupSrcEnv({
-        skills: [
-          { name: "agentdev-ag-baselined", content: baselineFixtureSkill },
-          { name: "agentdev-ag-newviol", content: baselineFixtureNewViolation },
-        ],
-        commands: [],
-        baselineEntries: [
-          {
-            check: "description length 600",
-            file: "agentdev-ag-baselined",
-            count: 1,
-            provenance: "test-provenance",
-            reason: "test fixture entry",
-          },
-        ],
-      });
-    });
-
-    it("demotes baseline-known ng to info with a provenance tag and keeps new violations as ng", async () => {
-      const result = await runScript(baselineEnv.scriptPath, ["--json"]);
-      const report: JsonReport = JSON.parse(result.stdout);
-
-      const baselined = report.results.filter(
-        (r) =>
-          r.check === "description length 600" &&
-          r.file === "agentdev-ag-baselined",
-      );
-      expect(baselined.length).toBe(1);
-      expect(baselined[0].level).toBe("info");
-      expect(baselined[0].message).toContain(
-        "[baseline-known provenance=test-provenance]",
-      );
-
-      const newViol = report.results.filter(
-        (r) =>
-          r.check === "USE FOR double keeping" &&
-          r.file === "agentdev-ag-newviol",
-      );
-      expect(newViol.length).toBe(1);
-      expect(newViol[0].level).toBe("ng");
-      expect(result.exitCode).toBe(1);
-    });
-
-    it("exits 0 when every finding is baseline-known", async () => {
-      const allBaselinedEnv = setupSrcEnv({
-        skills: [
-          { name: "agentdev-ag-baselined", content: baselineFixtureSkill },
-        ],
-        commands: [],
-        baselineEntries: [
-          {
-            check: "description length 600",
-            file: "agentdev-ag-baselined",
-            count: 1,
-            provenance: "test-provenance",
-            reason: "test fixture entry",
-          },
-          {
-            check: "description aggregate budget",
-            file: null,
-            count: 1,
-            provenance: "test-provenance",
-            reason: "test fixture entry (single 676-char description exceeds 350*1)",
-          },
-        ],
-      });
-      try {
-        const result = await runScript(allBaselinedEnv.scriptPath, ["--json"]);
-        expect(result.exitCode).toBe(0);
-        const report: JsonReport = JSON.parse(result.stdout);
-        expect(report.summary.ng).toBe(0);
-        expect(report.summary.warning).toBe(0);
-      } finally {
-        fs.rmSync(allBaselinedEnv.tempDir, { recursive: true, force: true });
-      }
-    });
-
-    it("keeps a same-check violation in a non-baselined file as ng (delta-aware)", async () => {
-      // baseline covers only agentdev-ag-baselined for check "description
-      // length 600"; a second 600-over file outside the baseline must stay ng
-      // (delta-aware semantics mirror check_integrity.ts: grandfathering must
-      // not hide NEW violations)
-      const deltaEnv = setupSrcEnv({
-        skills: [
-          {
-            name: "agentdev-ag-baselined",
-            content: `---\nname: agentdev-ag-baselined\ndescription: A. USE FOR: t. DO NOT USE FOR: o. ${"z".repeat(620)}\n---\n\n## See Also\n`,
-          },
-          {
-            name: "agentdev-ag-second",
-            content: `---\nname: agentdev-ag-second\ndescription: B. USE FOR: t. DO NOT USE FOR: o. ${"w".repeat(640)}\n---\n\n## See Also\n`,
-          },
-        ],
-        commands: [],
-        baselineEntries: [
-          {
-            check: "description length 600",
-            file: "agentdev-ag-baselined",
-            count: 1,
-            provenance: "test-provenance",
-            reason: "per-file grandfather entry",
-          },
-        ],
-      });
-      try {
-        const result = await runScript(deltaEnv.scriptPath, ["--json"]);
-        expect(result.exitCode).toBe(1);
-        const report: JsonReport = JSON.parse(result.stdout);
-        const ng = report.results.filter(
-          (r) => r.check === "description length 600" && r.level === "ng",
-        );
-        expect(ng.length).toBe(1);
-        expect(ng[0].file).toBe("agentdev-ag-second");
-        const info = report.results.filter(
-          (r) => r.check === "description length 600" && r.level === "info",
-        );
-        expect(info.length).toBe(1);
-        expect(info[0].file).toBe("agentdev-ag-baselined");
-      } finally {
-        fs.rmSync(deltaEnv.tempDir, { recursive: true, force: true });
-      }
-    });
-  });
-
   // ----- REQ-010-082: summary NG/warning 区別と実行環境差記録 -----
 
   describe("REQ-010-082: NG/warning distinction and local-skill env labels", () => {
@@ -975,7 +819,7 @@ description: A skill missing the trigger conventions
       expect(notes.join("\n")).toContain(
         "git 管理外ローカルユーザースキル起因の warning: 2 件（explainer-local",
       );
-      expect(notes.join("\n")).toContain("baseline 登録・無視は行わず");
+      expect(notes.join("\n")).toContain("無視は行わず");
       // 集約予算 warning が無い環境では漸進回収 note を出さない
       expect(notes.join("\n")).not.toContain("漸進回収");
     });

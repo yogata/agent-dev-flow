@@ -2,7 +2,7 @@
 title: アーティファクト契約
 status: accepted
 created: 2026-08-20
-updated: "2026-10-14"
+updated: "2026-11-18"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-005, REQ-002-006, REQ-002-016, REQ-002-034 -->
 <!-- ADF-COVERS(design): REQ-103-013, REQ-103-024, REQ-103-025（REQ-103 の soft contract 再定義・実現物整合・入力忠実性の設計対応面） -->
@@ -61,7 +61,7 @@ Command ──→ Skill ──→ Reference (references/)
 ## コマンドフロントマター契約
 
 command frontmatter 契約を description 単一へ同期する（ACT-DESIGN-001 と整合）。
-配布物自己完結と内部ID/内部パス排除の境界宣言を REQ-001-031/032 と整合させ、配布物の producer 内部依存・harness 固有詳細非依存は REQ-029-003..007 へ参照を分ける（REQ-002-021..029 の範囲参照は RETIRE/MOVE 済み）。
+配布物自己完結と内部ID/内部パス排除の境界宣言を REQ-001-031/032 と整合させ、配布物の producer 内部依存・harness 固有詳細非依存は REQ-029-003..007 へ参照を分ける（旧配布物品質契約行群 `REQ-002-021..029` 相当は RETIRE/MOVE 済み。現行は `REQ-029-001..008`）。
 「不一致時は本体Designを正とする」実行時契約を廃止し開発時 checker が Design と配布物の適合を保証する構造へ変更する旨を明記する。
 詳細 normative は移行計画 §5.2, §6.2。
 

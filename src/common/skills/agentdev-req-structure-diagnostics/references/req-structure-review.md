@@ -119,7 +119,7 @@ AgentDevFlow 内部 ID（`REQ-XXXX`/`ADR-XXXX`/`SPEC-{KIND}-{NNN}`/`IR-XX` 等�
 
 - 単語露出のみならず、当該 ID 参照が利用者にとって意味を持つかを判定する（利用者が当該 ID を追跡する導線がない場合は除去）。
 - `agentdev-*` スキル名、`/agentdev/*` コマンド名は配布物自身の識別子であり許容する（内部 ID ではない）。
-- 内部 ID を含む説明が必要な場合は、配布物ではなく `docs/designs/` または `docs/guides/` に配置する。
+- 内部 ID を含む説明が必要な場合は、配布物ではなく docs 配下の Design 文書または guide 文書に配置する。
 
 ## 配布物統合性検出
 
@@ -194,7 +194,7 @@ Design は 3 層構造（commands、skills、workflows）を持ち、横断 Desi
 |------|----------|----------------|
 | 横断 Design 中の個別動作 | workflows Design に個別 command または skill のみに適用される手順、ステップ、判定表が含まれる | 該当 command/skill Design へ移送（`MOVE`） |
 | 個別 Design 中の横断契約 | command Design または skill Design に複数 command/skill をまたぐ契約が含まれる | 横断 Design へ移送（`MOVE`） |
-| 旧 grab-bag Design 残存 | `docs/designs/<**/*>.md`（基盤Designドメイン直下）に複数関心事が混在 | 関心事別 Design へ分割（`SPLIT`） |
+| 旧 grab-bag Design 残存 | docs 配下の Design 文書（基盤Designドメイン直下）に複数関心事が混在 | 関心事別 Design へ分割（`SPLIT`） |
 
 ### 判定ルール
 
