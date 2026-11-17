@@ -9,6 +9,7 @@ implementation:
     - REQ-096-001
     - REQ-096-002
     - REQ-096-013
+    - REQ-032-048
   src/common/skills/agentdev-quality-gates/references/common-gate-contract.md:
     - REQ-096-011
     - REQ-096-012
@@ -44,6 +45,8 @@ implementation:
     - REQ-032-039
     - REQ-032-040
     - REQ-032-041
+    - REQ-032-047
+    - REQ-032-048
     - REQ-060-005
     - REQ-060-006
     - REQ-060-007
@@ -65,6 +68,7 @@ verification:
     - REQ-007-013
   src/common/skills/agentdev-quality-gates/references/qg-4-final-acceptance.md:
     - REQ-032-030
+    - REQ-032-048
     - REQ-060-007
   src/common/skills/agentdev-quality-gates/references/qg-2-acceptance-criteria-coverage.md:
     - REQ-061-054

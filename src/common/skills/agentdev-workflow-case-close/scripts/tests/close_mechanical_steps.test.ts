@@ -17,12 +17,14 @@ import {
   runCloseMechanicalSteps,
   serializeCloseAcceptanceRecord,
   validateInput,
+  validateVerificationScopeSelection,
   type CloseMechanicalInput,
   type CommandResult,
   type GateCommandSpec,
   type IntegrityFailureOrigin,
   type IntegrityMachineAcceptanceRecord,
   type MechanicalRunner,
+  type VerificationScopeSelection,
 } from "../src/close_mechanical_steps";
 import type { ConditionPopulation, ConditionVerdict } from "../src/final-acceptance";
 
@@ -67,6 +69,10 @@ function preMergeInput(overrides: Partial<CloseMechanicalInput> = {}): CloseMech
     contractStateCheck: {
       contractStatePaths: [".agentdev/jev-observations", ".agentdev/learning/inbox.md"],
       approvalEntries: [],
+    },
+    verificationScope: {
+      scopeKind: "full-repository",
+      selectionBasis: "検証義務がリポジトリ全体の試験を要求する対象のため",
     },
     ...overrides,
   };
@@ -237,6 +243,160 @@ describe("入力検証（品質ゲートの省略禁止）", () => {
   test("必須品質ゲートが揃った入力を受領する", () => {
     const validated = validateInput(preMergeInput() as unknown as Record<string, unknown>);
     expect(validated.phase).toBe("pre-merge");
+  });
+});
+
+describe("検証義務に基づく試験範囲選択の検査（verification-scope-selection）", () => {
+  const selectedScope: VerificationScopeSelection = {
+    scopeKind: "selected",
+    selectionBasis:
+      "変更対象が機械工程スクリプトと配布物文言の限定更新であり、変更ファイルに直接対応するテストと影響を受ける関連機能の試験で要求範囲が成立する",
+    executedVerifications: [
+      {
+        name: "bun test src/common/skills/agentdev-workflow-case-close/scripts/tests/",
+        obligationBasis: "実行契約の test strategy 項目（機械工程スクリプト変更の検証義務）",
+        relatesTo: "scripts/src/close_mechanical_steps.ts の変更に直接対応するスクリプトテスト群",
+        outcome: "合格（Ran N tests across M files、fail 0 件）",
+      },
+    ],
+    excludedVerifications: [
+      {
+        name: "full integrity suite（bun test 全件）",
+        exclusionBasis:
+          "影響範囲判定で共通基盤・関連機能への影響が未検出であり、変更ファイル対応試験で要求範囲が成立するため",
+      },
+    ],
+    impactDetection: {
+      method: "変更差分からテスト影響範囲検出 gate と変更誘発境界リスク分析を適用し、要求範囲を限定できる根拠を確認",
+      appliedMechanisms: ["テスト影響範囲検出 gate", "変更誘発境界リスク分析"],
+    },
+  };
+
+  test("pre-merge で試験範囲選択宣言が欠落する入力を拒否する（省略禁止）", () => {
+    const broken = {
+      ...(preMergeInput() as unknown as Record<string, unknown>),
+      verificationScope: undefined,
+    };
+    expect(() => validateInput(broken)).toThrow(/verification-scope-selection/);
+  });
+
+  test("scopeKind 不正・selectionBasis 欠落を拒否する", () => {
+    expect(() =>
+      validateVerificationScopeSelection({
+        scopeKind: "partial" as VerificationScopeSelection["scopeKind"],
+        selectionBasis: "根拠",
+      }),
+    ).toThrow(/scopeKind/);
+    expect(() =>
+      validateVerificationScopeSelection({
+        scopeKind: "selected",
+        selectionBasis: "",
+      }),
+    ).toThrow(/selectionBasis/);
+  });
+
+  test("明示要求がある対象での selected 範囲縮小を選択機構の適用対象外として拒否する", () => {
+    expect(() =>
+      validateVerificationScopeSelection({
+        ...selectedScope,
+        fullSuiteExplicitlyRequired: true,
+      }),
+    ).toThrow(/full-repository/);
+  });
+
+  test("selected での 0 件実行を成功扱いにしない（空の実行対象一覧を拒否する）", () => {
+    expect(() =>
+      validateVerificationScopeSelection({
+        ...selectedScope,
+        executedVerifications: [],
+      }),
+    ).toThrow(/non-empty/);
+    expect(() =>
+      validateVerificationScopeSelection({
+        scopeKind: "selected",
+        selectionBasis: "根拠",
+      }),
+    ).toThrow(/non-empty/);
+  });
+
+  test("selected での実行対象の記録欠落（義務の由来・対応づけ・結果）を拒否する", () => {
+    const broken = {
+      ...selectedScope,
+      executedVerifications: [
+        {
+          name: "実行対象",
+          obligationBasis: "",
+          relatesTo: "対応づけ",
+          outcome: "合格",
+        },
+      ],
+    };
+    expect(() => validateVerificationScopeSelection(broken)).toThrow(/obligationBasis/);
+  });
+
+  test("根拠のない除外（無条件除外）を拒否する", () => {
+    expect(() =>
+      validateVerificationScopeSelection({
+        ...selectedScope,
+        excludedVerifications: [
+          { name: "full integrity suite（bun test 全件）", exclusionBasis: "" },
+        ],
+      }),
+    ).toThrow(/exclusionBasis/);
+  });
+
+  test("影響範囲判定不能のフォールバック宣言と selected 範囲の矛盾を拒否する", () => {
+    expect(() =>
+      validateVerificationScopeSelection({
+        ...selectedScope,
+        impactDetection: {
+          method: "判定",
+          appliedMechanisms: ["テスト影響範囲検出 gate"],
+          fellBackToFullRepository: true,
+        },
+      }),
+    ).toThrow(/fellBackToFullRepository/);
+  });
+
+  test("正例: selected スコープの記録が揃った入力を受領する", () => {
+    expect(() => validateVerificationScopeSelection(selectedScope)).not.toThrow();
+    const validated = validateInput(
+      preMergeInput({ verificationScope: selectedScope }) as unknown as Record<string, unknown>,
+    );
+    expect(validated.verificationScope?.scopeKind).toBe("selected");
+  });
+
+  test("selected スコープの記録が verification-scope-selection step に反映される", () => {
+    const report = runCloseMechanicalSteps(
+      preMergeInput({ verificationScope: selectedScope }),
+      fakeRunner(),
+    );
+    const scopeStep = report.result.steps.find(
+      (step) => step.name === "verification-scope-selection",
+    );
+    expect(scopeStep?.status).toBe("pass");
+    expect(scopeStep?.detail).toMatchObject({
+      scopeKind: "selected",
+      executedVerificationCount: 1,
+      excludedVerificationCount: 1,
+    });
+  });
+
+  test("full-repository スコープでの機械受理不成立時は verification-scope-selection step が fail し終了操作を抑止する", () => {
+    const report = runCloseMechanicalSteps(
+      preMergeInput({
+        verificationScope: {
+          scopeKind: "full-repository",
+          selectionBasis: "検証義務がリポジトリ全体の試験を要求する対象のため",
+        },
+      }),
+      fakeRunner({ integrityExitCodes: { check_integrity: 1 } }),
+    );
+    const scopeStep = report.result.steps.find(
+      (step) => step.name === "verification-scope-selection",
+    );
+    expect(scopeStep?.status).toBe("fail");
+    expect(isCloseOperationPermitted(report).permitted).toBe(false);
   });
 });
 

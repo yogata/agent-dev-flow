@@ -6,11 +6,14 @@
 // 解析と状態更新、完了条件チェックボックス評価の機械的抽出（受入評価の母集団
 // 導出と final-acceptance.ts の evaluateFinalAcceptance への接続を兼ねる）、
 // 契約状態記録の commit 済み検証と未追跡残存検査、
-// AUTOGEN 再生成差分検出、full integrity suite の起動と結果集約（fail 全件の
-// 由来分類と機械受理基準の記録完備の検証を含む）、worktree/branch
+// AUTOGEN 再生成差分検出、検証義務に基づく試験範囲選択の検査（verification-scope-
+// selection step。full-repository 宣言では full integrity suite の起動と結果集約
+// 〔fail 全件の由来分類と機械受理基準の記録完備の検証を含む〕が現行どおり必須、
+// selected 宣言では選択した検証範囲の実行義務・記録完備を検査）、worktree/branch
 // クリーンアップを1 script の呼び出しに束ねる。受入評価の拒否・未確定と機械
 // 受理基準の拒否は報告 JSON（diff.acceptanceEvaluation、
-// diff.integrityMachineAcceptance と isCloseOperationPermitted）を通じて既存の
+// diff.integrityMachineAcceptance、diff.verificationScopeSelection と
+// isCloseOperationPermitted）を通じて既存の
 // 終了操作（STEP-5 の issue_close、E1〜E6 の Epic 終了・Wave クローズ）の実行
 // 抑制として消費される。GitHub I/O（pr_merge、issue_close、Issue 本文更新）
 // は行わない（読み取り系 gh pr view のみ）。意味判断（警告の重要度評価、Design
@@ -185,6 +188,70 @@ export interface MachineAcceptanceViolation {
   actual?: number;
 }
 
+/**
+ * 検証義務に基づく試験範囲選択の入力契約（case-close 実行契約 REQ の最終検証
+ * における検証義務に基づく試験範囲選択要件行の対応実体。repository top-level
+ * traceability/ 配下 sidecar 参照）。
+ * 検証義務がリポジトリ全体の試験を要求する対象では integrityGates による
+ * full integrity suite の起動・機械受理が現行どおり必須であり、試験範囲を
+ * 選択する case では選択した検証範囲の実行対象・結果・除外根拠の記録を必須と
+ * する（実行義務の省略禁止。0 件実行の成功扱い禁止。根拠のない除外の禁止）。
+ * 範囲選択と試験影響範囲判定の意味判断はモデルが担当し、本 script は宣言された
+ * 記録の存在・形式・整合を決定的に検査する。恒久台帳は設けない。
+ */
+export interface VerificationScopeSelection {
+  /** 範囲の種別。full-repository は検証義務がリポジトリ全体の試験を要求する対象。 */
+  scopeKind: "full-repository" | "selected";
+  /** 範囲選択の根拠（正規契約から導出した検証義務と選択理由の記録）。 */
+  selectionBasis: string;
+  /**
+   * リポジトリ全体の試験の明示要求（利用者または正規契約による）の有無。
+   * true の場合、selected への範囲縮小は選択機構の適用対象外として拒否する。
+   */
+  fullSuiteExplicitlyRequired?: boolean;
+  /**
+   * scopeKind が selected の場合の実行対象検証一覧（空配列は拒否）。
+   * 変更対象と関連試験の対応づけ（relatesTo）を実体として要求する。
+   */
+  executedVerifications?: readonly {
+    /** 実行した検証の識別（検証名・対象）。 */
+    name: string;
+    /** 実行の根拠となる検証義務の由来（正規契約上の根拠）。 */
+    obligationBasis: string;
+    /** 変更対象と当該検証の対応づけ（関連性の記録）。 */
+    relatesTo: string;
+    /** 実行結果（合格・不合格・実行形態の記録）。 */
+    outcome: string;
+  }[];
+  /**
+   * scopeKind が selected の場合の除外対象一覧（提供時）。各 exclusionBasis は
+   * 正規契約上の根拠であり、根拠のない除外（無条件除外）は拒否する。
+   */
+  excludedVerifications?: readonly {
+    /** 除外した検証の識別。 */
+    name: string;
+    /** 除外根拠（正規契約上の根拠。空は拒否）。 */
+    exclusionBasis: string;
+  }[];
+  /**
+   * 試験影響範囲判定の記録（テスト影響範囲検出 gate と変更誘発境界リスク分析の
+   * 既存機構の適用拡大としての判定。新しい品質ゲート・恒久台帳を構成しない）。
+   * 判定結果の記録は QG-4/完了条件照合の対象であり、判定できない場合の境界は
+   * リポジトリ全体の試験へのフォールバックである。
+   */
+  impactDetection?: {
+    /** 判定方法（正規契約から導出した検証義務に基づく判定の区分と導出経路）。 */
+    method: string;
+    /** 判定に適用した既存機構（テスト影響範囲検出 gate・変更誘発境界リスク分析等）。 */
+    appliedMechanisms: readonly string[];
+    /**
+     * 影響範囲の判定ができず、リポジトリ全体の試験へフォールバックした場合 true。
+     * true で scopeKind が selected の場合は矛盾として拒否する。
+     */
+    fellBackToFullRepository?: boolean;
+  };
+}
+
 /** 機械受理判定の入力となる gate 実行結果（実際の実行から取得した実体）。 */
 export interface IntegrityGateResult {
   name: string;
@@ -263,6 +330,13 @@ export interface CloseMechanicalInput {
   traceabilityKnownMissingBaseline?: WholeScopeKnownMissingBaseline;
   integrityGates?: readonly GateCommandSpec[];
   integrityMachineAcceptance?: IntegrityMachineAcceptanceRecord;
+  /**
+   * 検証義務に基づく試験範囲選択の宣言（pre-merge で必須）。
+   * full-repository では integrityGates による full integrity suite の起動・
+   * 機械受理が現行どおり必須であり、selected では選択した検証範囲の実行対象・
+   * 結果・除外根拠の記録を検査する。
+   */
+  verificationScope?: VerificationScopeSelection;
   textlintGate?: GateCommandSpec;
   cleanup?: { removeWorktree: boolean; removeBranch: string | null };
   acceptanceSubjectKind?: SubjectKind;
@@ -347,6 +421,109 @@ export function runValidateInputOnly(
     ...(validated.integrityGates ?? []),
   ].filter((gate): gate is GateCommandSpec => gate != null);
   return runGatePreValidation("close_mechanical_steps", gates, KNOWN_GATE_ARG_CONTRACTS, exists);
+}
+
+/**
+ * 試験範囲選択宣言の契約検証（fail-closed）。
+ * - scopeKind は full-repository または selected
+ * - selectionBasis は非空（範囲選択の根拠の記録を要求）
+ * - fullSuiteExplicitlyRequired: true での selected 範囲縮小は選択機構の
+ *   適用対象外として拒否する
+ * - selected では実行対象検証一覧が非空（0 件実行の成功扱い禁止）、各実行対象に
+ *   検証義務の由来・変更対象との対応づけ・実行結果を要求し、除外対象には正規
+ *   契約上の根拠を要求する（根拠のない除外・無条件除外の禁止）
+ * - full-repository では integrityGates による full integrity suite 起動が
+ *   現行どおり必須である旨を validateInput の必須ゲート検査が担保する
+ * - fellBackToFullRepository: true での selected 範囲は矛盾として拒否する
+ *   （判定できない場合の境界はリポジトリ全体の試験へのフォールバック）
+ */
+export function validateVerificationScopeSelection(scope: VerificationScopeSelection): void {
+  if (typeof scope !== "object" || scope === null || Array.isArray(scope)) {
+    fail("input.verificationScope must be an object");
+  }
+  if (scope.scopeKind !== "full-repository" && scope.scopeKind !== "selected") {
+    fail('input.verificationScope.scopeKind must be "full-repository" or "selected"');
+  }
+  if (!isNonEmptyString(scope.selectionBasis)) {
+    fail("input.verificationScope.selectionBasis is required (selection and exclusion grounds are completion-criteria verification targets)");
+  }
+  if (
+    scope.fullSuiteExplicitlyRequired === true &&
+    scope.scopeKind !== "full-repository"
+  ) {
+    fail(
+      "input.verificationScope.scopeKind must be full-repository when fullSuiteExplicitlyRequired is true (explicit full-suite requests are not subject to scope narrowing)",
+    );
+  }
+  if (
+    scope.impactDetection !== undefined &&
+    scope.impactDetection.fellBackToFullRepository === true &&
+    scope.scopeKind !== "full-repository"
+  ) {
+    fail(
+      "input.verificationScope.scopeKind must be full-repository when impactDetection.fellBackToFullRepository is true (undeterminable impact detection falls back to the full repository suite)",
+    );
+  }
+  if (scope.scopeKind === "selected") {
+    if (!Array.isArray(scope.executedVerifications) || scope.executedVerifications.length === 0) {
+      fail(
+        "input.verificationScope.executedVerifications must be a non-empty array for a selected scope (zero-execution success is not allowed)",
+      );
+    }
+    for (const verification of scope.executedVerifications) {
+      if (typeof verification !== "object" || verification === null) {
+        fail("input.verificationScope.executedVerifications entries must be objects");
+      }
+      for (const field of ["name", "obligationBasis", "relatesTo", "outcome"] as const) {
+        if (!isNonEmptyString(verification[field])) {
+          fail(
+            `input.verificationScope.executedVerifications requires a non-empty ${field} (execution targets, obligation grounds, change-relevance mapping, and outcomes are required records)`,
+          );
+        }
+      }
+    }
+    if (scope.excludedVerifications !== undefined) {
+      if (!Array.isArray(scope.excludedVerifications)) {
+        fail("input.verificationScope.excludedVerifications must be an array when provided");
+      }
+      for (const exclusion of scope.excludedVerifications) {
+        if (typeof exclusion !== "object" || exclusion === null) {
+          fail("input.verificationScope.excludedVerifications entries must be objects");
+        }
+        if (!isNonEmptyString(exclusion.name)) {
+          fail("input.verificationScope.excludedVerifications requires a non-empty name");
+        }
+        if (!isNonEmptyString(exclusion.exclusionBasis)) {
+          fail(
+            "input.verificationScope.excludedVerifications requires a non-empty exclusionBasis (unconditional exclusions are not allowed)",
+          );
+        }
+      }
+    }
+  }
+  if (scope.impactDetection !== undefined) {
+    const impact = scope.impactDetection;
+    if (typeof impact !== "object" || impact === null || Array.isArray(impact)) {
+      fail("input.verificationScope.impactDetection must be an object");
+    }
+    if (!isNonEmptyString(impact.method)) {
+      fail("input.verificationScope.impactDetection.method is required (impact-range determination is a completion-criteria verification target)");
+    }
+    if (
+      !Array.isArray(impact.appliedMechanisms) ||
+      impact.appliedMechanisms.some((mechanism) => !isNonEmptyString(mechanism))
+    ) {
+      fail(
+        "input.verificationScope.impactDetection.appliedMechanisms must be an array of non-empty strings (applied existing mechanisms are required records)",
+      );
+    }
+    if (
+      impact.fellBackToFullRepository !== undefined &&
+      typeof impact.fellBackToFullRepository !== "boolean"
+    ) {
+      fail("input.verificationScope.impactDetection.fellBackToFullRepository must be a boolean");
+    }
+  }
 }
 
 /** 入力 JSON を検証する。必須品質ゲートの欠落（省略）は失敗とする。 */
@@ -455,11 +632,15 @@ export function validateInput(value: unknown): CloseMechanicalInput {
     if (v.contractStateCheck == null) {
       missing.push("contract-state-residue-check");
     }
+    if (v.verificationScope == null) {
+      missing.push("verification-scope-selection");
+    }
     if (missing.length > 0) {
       fail(
         `required quality gates are missing from input (omission forbidden): ${missing.join(", ")}`,
       );
     }
+    validateVerificationScopeSelection(v.verificationScope as VerificationScopeSelection);
   }
   const residue = v.contractStateCheck;
   if (residue != null) {
@@ -1752,6 +1933,37 @@ export function runCloseMechanicalSteps(
       input.integrityMachineAcceptance,
       gateResults,
     );
+    const scope = input.verificationScope;
+    // 試験範囲選択の step 記録（検証義務ベースの最終検証）。
+    // full-repository は integrityGates の起動・機械受理（現行）に連動し、selected
+    // は選択された検証範囲の実行義務・記録完備の検査に連動する。validateInput で
+    // scope 宣言の欠落・形式違反・矛盾は検査起動前に拒否済みであるため、この step は
+    // 現行のフル suite 起動・機械受理の維持と選択範囲の記録完備を報告する。
+    const selectedScopeRecordsComplete =
+      scope !== undefined &&
+      (scope.scopeKind === "full-repository" ||
+        (Array.isArray(scope.executedVerifications) && scope.executedVerifications.length > 0));
+    steps.push({
+      name: "verification-scope-selection",
+      status: machineAcceptance.accepted && selectedScopeRecordsComplete ? "pass" : "fail",
+      detail: {
+        scopeKind: scope?.scopeKind ?? null,
+        selectionBasis: scope?.selectionBasis ?? null,
+        fullSuiteExplicitlyRequired: scope?.fullSuiteExplicitlyRequired === true,
+        executedVerificationCount: scope?.executedVerifications?.length ?? 0,
+        excludedVerificationCount: scope?.excludedVerifications?.length ?? 0,
+        impactDetection: scope?.impactDetection ?? null,
+        fullRepositorySuiteAccepted: machineAcceptance.accepted,
+      },
+    });
+    diff.verificationScopeSelection = {
+      scopeKind: scope?.scopeKind ?? null,
+      selectionBasis: scope?.selectionBasis ?? null,
+      executedVerifications: scope?.executedVerifications ?? [],
+      excludedVerifications: scope?.excludedVerifications ?? [],
+      impactDetection: scope?.impactDetection ?? null,
+      fullRepositorySuiteAccepted: machineAcceptance.accepted,
+    };
     steps.push({
       name: "full-integrity-suite",
       status: machineAcceptance.accepted ? "pass" : "fail",

@@ -2,6 +2,7 @@ component: agentdev-workflow-case-close
 implementation:
   src/common/skills/agentdev-workflow-case-close/scripts/src/verification-evidence-record.ts:
     - REQ-118-007
+    - REQ-032-047
   src/common/skills/agentdev-workflow-case-close/references/cleanup-and-capture.md:
     - REQ-018-008
     - REQ-032-007
@@ -18,6 +19,7 @@ implementation:
     - REQ-032-026
     - REQ-032-030
     - REQ-032-031
+    - REQ-032-047
     - REQ-060-007
     - REQ-096-012
     - REQ-096-013
@@ -49,6 +51,8 @@ implementation:
     - REQ-032-036
     - REQ-032-037
     - REQ-032-038
+    - REQ-032-047
+    - REQ-032-048
   src/common/skills/agentdev-workflow-case-close/references/pr-merge-and-conflict.md:
     - REQ-100-006
     - REQ-100-007
@@ -67,6 +71,7 @@ implementation:
     - REQ-032-038
     - REQ-032-039
     - REQ-032-042
+    - REQ-032-047
     - REQ-118-003
     - REQ-118-005
     - REQ-118-009
@@ -80,6 +85,8 @@ implementation:
     - REQ-108-020
     - REQ-118-008
     - REQ-032-044
+    - REQ-032-047
+    - REQ-032-048
 verification:
   src/common/skills/agentdev-workflow-case-close/scripts/tests/verification-evidence-record.test.ts:
     - REQ-118-007
@@ -97,6 +104,7 @@ verification:
     - REQ-032-038
     - REQ-032-039
     - REQ-032-042
+    - REQ-032-047
     - REQ-118-003
     - REQ-118-005
     - REQ-118-009
@@ -113,6 +121,8 @@ verification:
     - REQ-032-037
     - REQ-032-038
     - REQ-032-039
+    - REQ-032-047
+    - REQ-032-048
   src/common/skills/agentdev-workflow-case-close/references/issue-resolution-and-qg4.md:
     - REQ-032-030
   src/common/skills/agentdev-workflow-case-close/references/docs-and-design-promotion.md:

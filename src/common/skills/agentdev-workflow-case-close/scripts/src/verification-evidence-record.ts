@@ -29,7 +29,7 @@ export interface VerificationEvidenceRecord {
   input: string;
   /** 対象版（検証対象の版情報。監査値は計測基準〔基準 commit または時点〕を含む）。 */
   targetRevision: string;
-  /** 操作（実施した検証手順・実行工程）。 */
+  /** 操作（実施した検証手順・実行工程。試験範囲を選択した検証では選択した検証範囲の実行対象・除外根拠を含める）。 */
   operation: string;
   /** 実結果（観測された結果。終了コード・件数等の監査値を含む）。 */
   actualResult: string;

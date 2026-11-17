@@ -507,6 +507,7 @@ function New-MechanicalStepProbeInput {
                 contractStateCheck = @{ contractStatePaths = @('.agentdev/learning/inbox.md'); approvalEntries = @() }
                 issueUpdatedAt = '2025-01-01T00:00:00Z'
                 issueNumber = 1
+                verificationScope = @{ scopeKind = 'full-repository'; selectionBasis = 'probe fixture (full-repository representative input)' }
             }
         }
         'cross-dependency' {

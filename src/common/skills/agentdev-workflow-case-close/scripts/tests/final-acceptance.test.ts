@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-032-031, REQ-032-032, REQ-032-033, REQ-032-034, REQ-032-035, REQ-032-036, REQ-032-037, REQ-032-038, REQ-032-039
+// ADF-COVERS(verification): REQ-032-031, REQ-032-032, REQ-032-033, REQ-032-034, REQ-032-035, REQ-032-036, REQ-032-037, REQ-032-038, REQ-032-039, REQ-032-047, REQ-032-048
 /**
  * Full-route regression for the case-close QG-4 per-completion-condition final
  * acceptance determination (REQ-032-031 ... REQ-032-038).
@@ -391,6 +391,105 @@ describe("偽陽性シナリオの拒否", () => {
       ],
     });
     expect(result.closeAllowed).toBe(true);
+  });
+
+  test("FP-10: 試験範囲選択の根拠記録欠落・要求範囲未証明・明示要求での範囲縮小による pass を拒否する", () => {
+    const missingGrounds = evaluateFinalAcceptance({
+      subjectKind: "child-issue",
+      population: populated(1),
+      verdicts: [
+        {
+          conditionId: "AC-10a",
+          required: true,
+          category: "pass",
+          grounds: {
+            derivedFromContract: true,
+            evidenceProvesSemanticProposition: true,
+            verificationScopeEvidence: {
+              scopeSelectionGroundsRecorded: false,
+              executionProvesRequiredScope: true,
+              explicitFullSuiteNotSubstituted: true,
+            },
+          },
+        },
+      ],
+    });
+    expect(missingGrounds.closeAllowed).toBe(false);
+    expect(missingGrounds.violations.map((v) => v.code)).toContain(
+      "verification-scope-selection-grounds-missing",
+    );
+
+    const notProving = evaluateFinalAcceptance({
+      subjectKind: "child-issue",
+      population: populated(1),
+      verdicts: [
+        {
+          conditionId: "AC-10b",
+          required: true,
+          category: "pass",
+          grounds: {
+            derivedFromContract: true,
+            evidenceProvesSemanticProposition: true,
+            verificationScopeEvidence: {
+              scopeSelectionGroundsRecorded: true,
+              executionProvesRequiredScope: false,
+              explicitFullSuiteNotSubstituted: true,
+            },
+          },
+        },
+      ],
+    });
+    expect(notProving.closeAllowed).toBe(false);
+    expect(notProving.violations.map((v) => v.code)).toContain(
+      "execution-not-proving-required-scope",
+    );
+
+    const substituted = evaluateFinalAcceptance({
+      subjectKind: "child-issue",
+      population: populated(1),
+      verdicts: [
+        {
+          conditionId: "AC-10c",
+          required: true,
+          category: "pass",
+          grounds: {
+            derivedFromContract: true,
+            evidenceProvesSemanticProposition: true,
+            verificationScopeEvidence: {
+              scopeSelectionGroundsRecorded: true,
+              executionProvesRequiredScope: true,
+              explicitFullSuiteNotSubstituted: false,
+            },
+          },
+        },
+      ],
+    });
+    expect(substituted.closeAllowed).toBe(false);
+    expect(substituted.violations.map((v) => v.code)).toContain(
+      "explicit-full-suite-substituted-by-selection",
+    );
+
+    const sound = evaluateFinalAcceptance({
+      subjectKind: "child-issue",
+      population: populated(1),
+      verdicts: [
+        {
+          conditionId: "AC-10d",
+          required: true,
+          category: "pass",
+          grounds: {
+            derivedFromContract: true,
+            evidenceProvesSemanticProposition: true,
+            verificationScopeEvidence: {
+              scopeSelectionGroundsRecorded: true,
+              executionProvesRequiredScope: true,
+              explicitFullSuiteNotSubstituted: true,
+            },
+          },
+        },
+      ],
+    });
+    expect(sound.closeAllowed).toBe(true);
   });
 
   test("FP-8: 必須条件に fail が1件残る状態での completed/closed 遷移を拒否する", () => {

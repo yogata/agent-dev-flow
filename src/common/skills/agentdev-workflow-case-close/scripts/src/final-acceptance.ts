@@ -76,6 +76,19 @@ export interface ConditionGrounds {
     /** 未証明範囲が増えていないか（true は範囲増加を意味する）。 */
     unprovenScopeIncreased?: boolean;
   };
+  /**
+   * 検証義務ベースの試験範囲選択に基づく証拠の性質。検証義務が試験範囲選択を
+   * 含む場合に提供する。未提供時は当該検査の対象外であり、機械工程の
+   * verification-scope-selection step が宣言の検査を担う。
+   */
+  verificationScopeEvidence?: {
+    /** 試験範囲の選択根拠と除外根拠が正規契約から記録されているか。 */
+    scopeSelectionGroundsRecorded?: boolean;
+    /** 選択された検証範囲の実行結果が要求範囲の成立を証明しているか。 */
+    executionProvesRequiredScope?: boolean;
+    /** 明示要求がある対象で範囲縮小により全試験の確認を代替していないか。 */
+    explicitFullSuiteNotSubstituted?: boolean;
+  };
 }
 
 /**
@@ -223,7 +236,13 @@ export type ViolationCode =
   /** 反例を分類しただけで当該条件を達成扱いにしている。 */
   | "counterfinding-reclassified-only"
   /** 同等以上の観測能力・未証明範囲の不増を確認できない検証方法変更。 */
-  | "verification-method-weakened";
+  | "verification-method-weakened"
+  /** 試験範囲の選択根拠・除外根拠の記録が正規契約から欠落している。 */
+  | "verification-scope-selection-grounds-missing"
+  /** 選択された検証範囲の実行結果が要求範囲の成立を証明していない。 */
+  | "execution-not-proving-required-scope"
+  /** 明示要求がある対象で範囲縮小により全試験の確認を代替している。 */
+  | "explicit-full-suite-substituted-by-selection";
 
 /** 完了条件単位最終評価の結果。 */
 export interface FinalAcceptanceResult {
@@ -464,6 +483,30 @@ export function evaluateFinalAcceptance(
           conditionId: verdict.conditionId,
           detail: "同等以上の観測能力と未証明範囲の不増を確認できない検証方法変更を達成証拠にしている",
         });
+      }
+      if (g.verificationScopeEvidence !== undefined) {
+        const scopeEvidence = g.verificationScopeEvidence;
+        if (scopeEvidence.scopeSelectionGroundsRecorded !== true) {
+          violations.push({
+            code: "verification-scope-selection-grounds-missing",
+            conditionId: verdict.conditionId,
+            detail: "試験範囲の選択根拠・除外根拠の記録が正規契約から欠落している（選択根拠・除外根拠の記録は完了条件照合の対象）",
+          });
+        }
+        if (scopeEvidence.executionProvesRequiredScope !== true) {
+          violations.push({
+            code: "execution-not-proving-required-scope",
+            conditionId: verdict.conditionId,
+            detail: "選択された検証範囲の実行結果が要求範囲の成立を証明していない（対象の一部だけの検査で要求範囲全体の成立を主張していないかを含む）",
+          });
+        }
+        if (scopeEvidence.explicitFullSuiteNotSubstituted === false) {
+          violations.push({
+            code: "explicit-full-suite-substituted-by-selection",
+            conditionId: verdict.conditionId,
+            detail: "明示要求がある対象で選択機構による範囲縮小が行われ、リポジトリ全体の試験の実施・受理の確認を代替している",
+          });
+        }
       }
     }
 
