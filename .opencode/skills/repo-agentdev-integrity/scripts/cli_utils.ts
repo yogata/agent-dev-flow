@@ -323,8 +323,6 @@ OPTIONS:
   --profile <p>     Execution profile: source (default), installed, release (Issue #1928 / WP-3)
   --archive <zip>   Path to release archive. Required when --profile=release.
                     Ignored for source/installed.
-  --update-ir055-baseline  Regenerate IR-055 baseline file from current violations
-  --update-ng-baseline     Regenerate NG baseline file from current NG set (REQ-0161-005)
 
 EXIT CODES:
   0  No issues found

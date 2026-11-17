@@ -2211,10 +2211,10 @@ describe("IR-055 runtime-unresolved-reference (REQ-0108-263/264)", () => {
     }
   });
 
-  it("emits new (non-baseline) violations at warn/ng level (delta guard fail)", () => {
+  it("emits violations at warn/ng level without exemption (direct report)", () => {
     const r = getIr055InvariantJsonRun();
     const parsed = JSON.parse(r.stdout);
-    // No baseline file exists in this fixture → all violations are "new".
+    // baseline 免除は撤廃済み → fixture は検出違反を全件そのまま報告する。
     const newViolations = parsed.results.filter(
       (res: { check: string; level: string }) =>
         res.check === "runtime-unresolved-reference" &&
@@ -2661,9 +2661,9 @@ describe("IR-058 strict fail without skills.yaml (fail-closed)", () => {
 // N16（skill-category-gap: 「Skill rename 対称性」カテゴリの
 // categoryToCheckPattern map 未登録・check_skill_rename_symmetry.ts の
 // scriptFiles 対象未登録）と N17（command-capture-duty: case-close.md の
-// capture-boundaries 参照欠落）を実修復し、対応する baseline entry を
-// 除去した後の状態を保持することを検証する。baseline 更新だけで
-// gap/duty 違反を info へ降格していないことを回帰テストとして固定する。
+// capture-boundaries 参照欠落）を実修復した後の状態を保持することを検証する。
+// baseline 免除・delta 降格は撤廃済みであり、gap/duty 違反は免除せず
+// 対象側の直接修正で解消されたことを回帰テストとして固定する。
 
 describe("NG21 N16/N17 是正回帰 (Issue #2245, OU-0009)", () => {
   it("N16: 'Skill rename 対称性' カテゴリが gap で ng/warning にならないこと（map + scriptFiles 登録）", () => {

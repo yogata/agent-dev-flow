@@ -70,11 +70,11 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 | Junction 整合性 | `check_integrity.ts` | broken junction / symlink 検出（Windows junction / Unix symlink のリンク先不存在） |
 | Capture boundary | `check_integrity.ts` | capture-boundaries.md 存在確認、PR template セクション名検証、command capture 責務記述確認（REQ-0105） |
 | REQ verification basis | `check_integrity.ts` | REQ 要件行の検証基準が 規範語ではなく必達要件判定であること（REQ-0115-044） |
-| Runtime reference | `check_integrity.ts` | 配布物（src/opencode/commands/agentdev、src/opencode/skills/agentdev-*/**/*.md）内の導入先未解決参照検出。baseline 既知と新規区別、段階導入（IR-055, REQ-0108-263/264） |
+| Runtime reference | `check_integrity.ts` | 配布物（src/opencode/commands/agentdev、src/opencode/skills/agentdev-*/**/*.md）内の導入先未解決参照検出。検出違反は全件を厳格度どおりに報告し免除しない（IR-055, REQ-029-003） |
 | Distribution untracked skill | `check_integrity.ts` | 配布物が `.opencode/skills/` 配下にのみ存在するスキルを参照した場合の src 昇格漏れ検出（IR-058, REQ-0159-003） |
 | Common policy identifier invariant | `check_integrity.ts` | 配布物（command・skill・template）のガードレール識別体系: 共通ポリシー意味識別子（POL-）の未定義参照・重複定義・registry 外定義、廃止済み Gxx 表記の残存検出（IR-063, REQ-051-005, REQ-010-064, Issue #2429）。識別子の定義実体は `agentdev-command-authoring` の共通ポリシー意味識別子 registry |
 | Unresolved placeholder | `check_integrity.ts` | 実行時配布対象の未解決プレースホルダー: TODO 系マーカー（strict）と ID プレースホルダー裸出力（heuristic）。許容条件: テンプレート、code block、code span、括弧内、引用「」内列挙（IR-064, REQ-010-065, Issue #2372） |
-| 引用 REQ 行実在性 | `check_integrity.ts` | docs 本文が引用する階層 REQ 行 ID（REQ-NNN-NNN）の実在性検査。ファントム引用（未コミット草案番号・要件分割前の旧行 ID 残存）を検出（IR-067, REQ-010-069, Issue #2383 (a)）。許容条件: `v2:` プレフィックス、プレースホルダー様式例示（REQ-010-065）、code span/code block、テンプレート領域、IR ルール説明文、AUTOGEN ブロック、retired ディレクトリ。既知違反（要件分割由来の旧行 ID 引用）は NG baseline（delta-aware） |
+| 引用 REQ 行実在性 | `check_integrity.ts` | docs 本文が引用する階層 REQ 行 ID（REQ-NNN-NNN）の実在性検査。ファントム引用（未コミット草案番号・要件分割前の旧行 ID 残存）を検出（IR-067, REQ-010-069, Issue #2383 (a)）。許容条件: `v2:` プレフィックス、プレースホルダー様式例示（REQ-010-065）、code span/code block、テンプレート領域、IR ルール説明文、AUTOGEN ブロック、retired ディレクトリ。検出違反（要件分割由来の旧行 ID 引用を含む）は全件を報告し免除しない |
 | スキル集合突合（投影マニフェスト） | `check_integrity.ts` | src 側スキル集合（SSoT）と `.opencode/skills` 投影スキル集合の突合を検査データ化（IR-068, Issue #2383 (d)、inspect F-01）。`data/skill-projection-manifest.yaml`（src 列挙の検出ビュー）との不一致はデータ鮮度 NG。投影比較は junction 環境のみ実施し、worktree（junction 未伝播、REQ-018）では info で skip。リンク先欠損の stale junction（解決不能投影エントリ）は projection-broken として検出 |
 | REQ 番号ギャップ検査 | `check_integrity.ts` | REQ 番号（3桁帯 REQ-001〜REQ-999）の実体（active + retired）から欠番を算出し、`docs/requirements/README.md` と `docs/README.md` の「欠番」明記（AUTOGEN 外の本文行）と突合。無記録の欠番と陳腐化した範囲明記を検出（IR-069, REQ-010-070）。最大番号直前の末尾予約枠は過渡帯として許容する |
 | Skill rename 対称性 | `check_skill_rename_symmetry.ts` | 恒常検査: SKILL.md frontmatter `name` ↔ 親 dir、Design title token ↔ filename stem（frontmatter id ↔ 物理 path 整合、REQ-010-063）。`--rename <旧名>=<新名>` 宣言時のみ旧名・新名間の path 一致（src/opencode/skills/{name} ↔ docs/designs/skills/{name}.md の対称性）を検査。同名 Skill Design の存在は恒常不変条件としない（Workflow Skill は違反としない）。`status: superseded` Design の skill dir 欠落は許容、`status: draft` は warning |
@@ -205,9 +205,9 @@ worktree を検査対象とする場合は、host 側配置の本 skill（メイ
 
 判定項目（全て満たす必要あり）:
 
-1. 既存ルールの exemption 条件・baseline_status・severity 分類との整合性
-2. catalog エントリ（15 フィールド以上・`baseline_status: new`）の追加
-3. `check_integrity.ts` 実装（exemption・false_positive_risk 反映）
+1. 既存ルールの exemption 条件・severity 分類との整合性
+2. catalog エントリ（12 フィールド・DEC-013 適用後）の追加
+3. `check_integrity.ts` 実装（false_positive_risk 反映）
 4. `check_integrity.test.ts` の drift detection smoke test 通過
 5. 語彙検出関わる場合の `vocabulary-registry.md` 同期
 6. `check_integrity.ts` の `categoryToCheckPattern` map 更新（skill-category-gap 解消）
