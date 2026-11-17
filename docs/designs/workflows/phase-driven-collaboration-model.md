@@ -1,13 +1,13 @@
 ---
-title: ADF v5.1 工程駆動コラボレーションモデル（v51-phase-driven-collaboration-model）
+title: ADF 工程駆動コラボレーションモデル（phase-driven-collaboration-model）
 status: accepted
 created: 2026-10-12
-updated: 2026-10-25
+updated: 2026-11-18
 ---
 <!-- ADF-COVERS(design): REQ-110-001, REQ-110-002, REQ-110-003, REQ-110-004, REQ-110-005, REQ-110-006, REQ-110-007, REQ-110-008, REQ-110-009, REQ-110-010, REQ-110-011, REQ-110-012, REQ-110-013, REQ-110-014, REQ-110-015, REQ-110-016, REQ-110-017, REQ-110-018, REQ-110-019, REQ-110-020, REQ-110-021, REQ-110-022, REQ-110-023, REQ-110-024, REQ-110-025, REQ-110-026, REQ-110-027, REQ-110-028, REQ-110-029, REQ-110-030, REQ-110-031, REQ-110-032, REQ-110-033, REQ-110-034, REQ-110-035, REQ-110-036, REQ-110-037, REQ-110-038, REQ-110-039, REQ-110-040, REQ-110-041, REQ-104-008 -->
 <!-- ADF-COVERS(design): REQ-108-022, REQ-108-023, REQ-108-024（重要変更の通知と結果説明（phase-artifacts-update）節。AG-001・006 に対応。REQ-108-024 は工程駆動経路での検証構造） -->
 
-# ADF v5.1 工程駆動コラボレーションモデル
+# ADF 工程駆動コラボレーションモデル
 
 ## 目的
 
@@ -107,7 +107,7 @@ REQ の実事例を必須の検証対象とし、Decision・Design への適用�
 
 テーマ形成・更新、成果物反映の公開操作とWorkflow Skill群は個別の責務に分ける。テーマ正本の管理と外部検討の持出し・戻り受理はCapability Skillが所有する。各公開コマンド、Workflow Skill、Capability Skill、adapter、subagent、harness の具体的な分担は各成果物の設計時に定める。
 
-保存・確定経路の所有境界は変更駆動では case-ready / case-revise が所有する。工程駆動ルートの経路別所有境界とDesignのdraftからacceptedへの昇格は、v4-standard-lifecycle の工程駆動対応行（REQ-111、v51-phase-transition-and-coexistence-model 参照）および v4-v5-crosswalk の処遇記録と整合させる。本 Design はその境界を再定義しない。出所: 一時成果物 RU-0002 は case-ready 成功後に削除済みであり、出所記録は v4-v5-crosswalk と DEC-057/058 承認記録に残る。
+保存・確定経路の所有境界は変更駆動では case-ready / case-revise が所有する。工程駆動ルートの経路別所有境界とDesignのdraftからacceptedへの昇格は、standard-lifecycle の工程駆動対応行（REQ-111、phase-transition-and-coexistence-model 参照）および phase-transition-and-coexistence-model「双経路併存と移行」節の処遇記録と整合させる。本 Design はその境界を再定義しない。出所: 一時成果物 RU-0002 は case-ready 成功後に削除済みであり、出所記録は DEC-057/058 承認記録に残る。
 
 工程駆動ルートでは、phase-artifacts-update が採用済み内容の保存（既存成果物への増分更新と正規成果物の初回作成）を統括し、REQ・Decision・Design の作成・更新処理は各成果物の既存管理スキル（agentdev-req-file-manager、agentdev-decision-file-manager、agentdev-design-file-manager）へ委譲する。採番、配置、既存成果物との照合、文書形式、関連参照、インデックス更新、状態管理は各管理スキルの既存規則に従い、成果物の種類ごとに必要性を判断して初回作成を理由に一律に作成しない。初回作成にも部分反映・失敗時報告・再投入の既存規律を適用する。これに対し確定（Design の draft から accepted への昇格、Decision の状態遷移）の権限と経路は変更駆動・工程駆動のいずれでも既存のまま変更しない。前段の保存・確定経路の所有境界は変更駆動側の記述であり、工程駆動側の保存実行はこの境界を再定義しない。
 

@@ -1,21 +1,21 @@
 ---
-title: ADF v4 標準ライフサイクル（語彙直交性・公開 UX・req-define 入口・継続コラボレーションループ）
+title: ADF 標準ライフサイクル（語彙直交性・公開 UX・req-define 入口・継続コラボレーションループ）
 status: accepted
 created: 2026-09-18
-updated: "2026-11-12"
+updated: "2026-11-18"
 ---
 <!-- ADF-COVERS(design): REQ-001-053, REQ-001-054, REQ-004-018, REQ-004-054, REQ-004-055, REQ-005-001, REQ-005-005, REQ-005-006, REQ-005-007, REQ-005-008, REQ-005-010, REQ-005-011, REQ-005-029, REQ-006-114, REQ-030-016, REQ-031-031, REQ-032-028, REQ-034-001, REQ-034-039, REQ-061-036, REQ-062-009 -->
 <!-- ADF-COVERS(design): REQ-103-014, REQ-103-015, REQ-103-030（REQ-103 のライフサイクル責務単一所有・Wave 語彙・領域別並列化の設計対応面） -->
 <!-- ADF-COVERS(design): REQ-108-001, REQ-108-002, REQ-108-003, REQ-108-004, REQ-108-005, REQ-108-006, REQ-108-007, REQ-108-008, REQ-108-009, REQ-108-010, REQ-108-011, REQ-108-012, REQ-108-013 -->
-<!-- ADF-COVERS(implementation): REQ-108-001, REQ-108-002, REQ-108-003, REQ-108-004, REQ-108-005, REQ-108-006, REQ-108-007, REQ-108-008, REQ-108-009, REQ-108-010, REQ-108-011, REQ-108-012（v5 有限実行・責務再編の構成実体は v4-standard-lifecycle の後継更新として RA-007 が後続 OU で所有する。現行実行契約の正は REQ-108-012 が維持する）, REQ-111-013 -->
+<!-- ADF-COVERS(implementation): REQ-108-001, REQ-108-002, REQ-108-003, REQ-108-004, REQ-108-005, REQ-108-006, REQ-108-007, REQ-108-008, REQ-108-009, REQ-108-010, REQ-108-011, REQ-108-012（v5 有限実行・責務再編の構成実体は standard-lifecycle の後継更新として RA-007 が後続 OU で所有する。現行実行契約の正は REQ-108-012 が維持する）, REQ-111-013 -->
 
-# ADF v4 標準ライフサイクル（語彙直交性・公開 UX・req-define 入口・継続コラボレーションループ）
+# ADF 標準ライフサイクル（語彙直交性・公開 UX・req-define 入口・継続コラボレーションループ）
 
-位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）の全行 executed と実際の処遇状態の確認をもってこの移行規則は現行規範ではなく、歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
+位置づけ: 本 Design は現行標準ライフサイクルの定義である。
 
-## work_type / scale / Epic / Wave の v4 意味モデル
+## work_type / scale / Epic / Wave の意味モデル
 
-各語彙の責務定義と直交性（work_type は Issue 正規契約から除外、scale は構成判断のみ、Epic は協調管理、Wave は実行スケジューリング）、大規模 bugfix 等の表現、v3 の work_type+scale -> workflow_route 結合からの分離。
+各語彙の責務定義と直交性（work_type は Issue 正規契約から除外、scale は構成判断のみ、Epic は協調管理、Wave は実行スケジューリング）、大規模 bugfix 等の表現。
 
 - work_type: 変更の性質。Issue 本文の正規契約項目とせず、人間の検索・整理のための任意ラベル（物理ラベル運用）としてのみ扱う。req-define は完了報告種別選定のための内部値として用いる。Decision の必要性だけを理由に work_type を別種へ変換しない
 - scale: 変更・実行・協調の規模。実行構成の判断に必要な場合だけ用い、構成確定後に保存しない。特定 work_type に限定しない
@@ -31,7 +31,7 @@ updated: "2026-11-12"
 - 変更駆動経路は既存の外部的な作業結果と検証義務を引き続き成立させる。工程駆動の操作や工程遷移を前置必須としない
 - 工程駆動の公開操作はテーマ初回形成、テーマ更新、正規成果物への反映、独立レビューであり、利用者判断による工程遷移とともに工程駆動実行へ分類する
 - case-open、case-ready、case-run、case-close、case-revise は変更駆動の case-auto が駆動する内部 lifecycle であり、利用者が手動で順次実行する公開 UX としない
-- 後継経路（工程駆動実行）の実現・検証・正式採用の確定契機と、その時点での REQ-005-001/010/011 の処遇確定（棚卸し対象から confirmed への遷移）の記録様式は v4-v5-crosswalk が所有する。本 Design の双経路併存記述と経路別所有境界は処遇確定まで弱めない。設計PR の作成・マージだけでは後継経路の実現確定や旧経路の失効を意味しない（REQ-108-012、REQ-111-013）
+- 後継経路（工程駆動実行）の実現・検証・正式採用の確定契機と、その時点での REQ-005-001/010/011 の処遇確定（棚卸し対象から confirmed への遷移）の記録様式は、工程遷移・独立レビューと双経路併存モデル（[phase-transition-and-coexistence-model.md](phase-transition-and-coexistence-model.md)）「双経路併存と移行」節の権威継続の記述へ従う。本 Design の双経路併存記述と経路別所有境界は処遇確定まで弱めない。設計PR の作成・マージだけでは後継経路の実現確定や旧経路の失効を意味しない（REQ-108-012、REQ-111-013）
 
 ## req-define の入力意味と要件化責務
 
@@ -45,7 +45,7 @@ Observe -> Intake/Learning -> Backlog -> req-define -> REQ/Decision/Design -> ca
 
 - Intake は未処理の開発需要の受容、Learning は実行経験から得た再利用可能な知識の評価を担う
 - Learning の評価結果は寿命と内容に応じて 7 系統（Knowledge、Decision、Project Policy、Design update、REQ update、Intake/Backlog、一時的記録の終了）へ振り分ける
-- Loop 詳細（循環の各段責務、Observe と Integrate の責務定義、Learning 評価結果 7 系統の詳細、昇格ガード、.agentdev/ 状態領域の整合、v3 backlog-artifact-lifecycle Design からの吸収）は v4-collaboration-loop Design が所有する
+- Loop 詳細（循環の各段責務、Observe と Integrate の責務定義、Learning 評価結果 7 系統の詳細、昇格ガード、.agentdev/ 状態領域の整合、v3 backlog-artifact-lifecycle Design からの吸収）は collaboration-loop Design が所有する
 - Observe = 検出と回収（inspect 系コマンドの検出、クローズ済み GitHub 成果物からの回収（intake-from-github）、case-close における PR 本文 Capture 回収）。新規コマンドを増設しない
 - Integrate = 検証結果の統合と正規成果物の確定（case-close における PR マージ、docs 確定、Close 処理）
 
@@ -63,12 +63,12 @@ Observe -> Intake/Learning -> Backlog -> req-define -> REQ/Decision/Design -> ca
 | Child Issue 構成 | case-ready | REQ-061 |
 | Wave / 依存 DAG | 構成確定: case-ready、実行制御: case-auto orchestration stage 3 | REQ-061、REQ-034、workflows/references/execution-unit-construction.md |
 | 実装実行 | case-run（実行担当サブエージェントへ委譲 1 件。委譲内の実装・検証・PR 作成は委譲側の実行） | REQ-031、skills/agentdev-case-run-execution-adapter.md |
-| Verification / QG | 各配置点の Gate（QG-1〜QG-4 と工程内 gate 群） | quality/v4-quality-gate-model.md |
+| Verification / QG | 各配置点の Gate（QG-1〜QG-4 と工程内 gate 群） | quality/quality-gate-model.md |
 | merge / close | case-close | REQ-032、commands/case-close.md |
-| revise / resume | revise: case-revise、resume: case-auto（Root Case 指定入口） | REQ-062、REQ-034、v4-lifecycle-state-machine |
-| 工程駆動のテーマ操作・工程遷移 | 工程駆動経路の対応する公開操作 | REQ-111、v51-phase-transition-and-coexistence-model |
-| 工程駆動の正規成果物保存・確定 | 工程駆動経路の対応する確定操作（成果物種別ごとの正規所有境界を維持） | REQ-111、v51-phase-transition-and-coexistence-model |
-| 工程駆動 Design の draft から accepted への昇格 | 工程駆動経路の設計確定操作 | REQ-111、v51-phase-transition-and-coexistence-model |
+| revise / resume | revise: case-revise、resume: case-auto（Root Case 指定入口） | REQ-062、REQ-034、lifecycle-state-machine |
+| 工程駆動のテーマ操作・工程遷移 | 工程駆動経路の対応する公開操作 | REQ-111、phase-transition-and-coexistence-model |
+| 工程駆動の正規成果物保存・確定 | 工程駆動経路の対応する確定操作（成果物種別ごとの正規所有境界を維持） | REQ-111、phase-transition-and-coexistence-model |
+| 工程駆動 Design の draft から accepted への昇格 | 工程駆動経路の設計確定操作 | REQ-111、phase-transition-and-coexistence-model |
 
 ## Wave、意味的依存、実行並列上限、競合情報の一意定義（REQ-103-015）
 
@@ -81,4 +81,4 @@ Observe -> Intake/Learning -> Backlog -> req-define -> REQ/Decision/Design -> ca
 | 実行並列上限 | 同時に active にできる Issue task 数の論理上限 | ADF 契約（数値の所有は case-auto Design。DEC-041、DEC-051） | 構成判断（確定済み契約からの導出）。harness の同時起動制限は adapter・実装制約であり論理上限の根拠としない |
 | 競合情報 | Wave 割当時の依存ヒント交差の決定的比較結果（重複許容・衝突リスクの情報） | Epic の実行構成確定時に生成し、case-run へ引き渡す | 交差検出は決定的比較。衝突時の解消判断（該当ファイルの最新取得・直列化・rebase）は実行担当の委譲された裁量 |
 
-Wave 状態は保存せず Wave 内子Issue 状態から導出する（v4-lifecycle-state-machine）。実行並列上限と Wave は別概念であり、並列上限は Wave 内実行と横断補充の両方に適用される実行安全境界である。競合情報は依存ヒント粒度の粗さに由来する実行・統合時のリスク情報であり、Wave 割当や依存関係の定義そのものではない。
+Wave 状態は保存せず Wave 内子Issue 状態から導出する（lifecycle-state-machine）。実行並列上限と Wave は別概念であり、並列上限は Wave 内実行と横断補充の両方に適用される実行安全境界である。競合情報は依存ヒント粒度の粗さに由来する実行・統合時のリスク情報であり、Wave 割当や依存関係の定義そのものではない。

@@ -88,7 +88,7 @@ Gate が成果物と要件の対応関係（coverage、impact、check）を参�
 
 ## 5 概念への写像
 
-本契約の判定結果・証拠・Gate は ADF v4 Quality モデル（v4-quality-gate-model Design）の 5 概念（Quality Policy / Verification Obligation / Verifier / Evidence / Gate）へ次のように写像する。
+本契約の判定結果・証拠・Gate は ADF v4 Quality モデル（quality-gate-model Design）の 5 概念（Quality Policy / Verification Obligation / Verifier / Evidence / Gate）へ次のように写像する。
 
 ### verdict と Gate predicate の写像
 
@@ -102,19 +102,19 @@ Verifier の verdict は `pass`/ `warn`/ `fail`/ `partial` の 4 値であり（
 | `partial` | 判定保留として遷移不可（残余 Obligation の解消後に再判定が必要） |
 
 QG-4 は `partial` を不可として扱い、再判定は当該 close 内で完了させる。
-QG-1〜QG-4 は lifecycle 級 semantic Gate であり、遷移に直接接続せず、v4-lifecycle-state-machine の deterministic gate predicate 接続点（唯一の接続点）を経由して遷移を制御する。
-正規定義は v4-quality-gate-model Design「判定値と遷移接続」節を参照する。
+QG-1〜QG-4 は lifecycle 級 semantic Gate であり、遷移に直接接続せず、lifecycle-state-machine の deterministic gate predicate 接続点（唯一の接続点）を経由して遷移を制御する。
+正規定義は quality-gate-model Design「判定値と遷移接続」節を参照する。
 
 ### 証拠 3 分類と Verifier 分類の直交
 
 「証拠の種類」節の証拠 3 分類（機械的/ 構造的/ 推論）は Evidence の属性であり、Verifier 分類（deterministic/ semantic）とは直交する。
 構造的証拠はいずれの Verifier からも生成され得る。
 二つの分類を 1:1 対応として扱わない。
-正規定義は v4-quality-gate-model Design「証拠種別と Verifier 分類の直交」節を参照する。
+正規定義は quality-gate-model Design「証拠種別と Verifier 分類の直交」節を参照する。
 
 ### 完了条件単位の評価区分と Gate 判定値の写像境界
 
-完了条件単位の評価は、次の 4 値の評価区分を取り得る（v4-quality-gate-model Design「QG-2 / QG-4 の受け入れ義務保存拡張」節）。
+完了条件単位の評価は、次の 4 値の評価区分を取り得る（quality-gate-model Design「QG-2 / QG-4 の受け入れ義務保存拡張」節）。
 
 | 評価区分 | 意味 |
 |---------|------|
@@ -125,7 +125,7 @@ QG-1〜QG-4 は lifecycle 級 semantic Gate であり、遷移に直接接続せ
 
 この評価区分は完了条件単位の評価値であり、Gate の判定値（`pass`/ `warn`/ `fail`/ `partial`）ではない。
 新しい結果状態を追加しない。
-Gate 判定値への写像の正規所有は v4-quality-gate-model Design「判定値と遷移接続」節であり、本契約は写像境界のみ扱う。
+Gate 判定値への写像の正規所有は quality-gate-model Design「判定値と遷移接続」節であり、本契約は写像境界のみ扱う。
 
 - 必須条件の未達・未証明を Gate 全体の `warn` で通過させない
 - 完了条件単位の評価を既存の Gate 判定結果・Issue 状態と混在させない。完了条件の達成判定を既存の Gate 判定の結果で代替しない

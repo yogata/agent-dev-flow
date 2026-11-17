@@ -69,7 +69,7 @@ authoring Skill/Design がそれぞれ担当する。
 
 ## QG-2 投影契約
 
-QG-2 投影契約は v4 Quality モデル（docs/designs/quality/v4-quality-gate-model.md）における Gate（execution structure 確定時の Acceptance Coverage）への投影である。必須品質能力キーの対応表は Verification Obligation の導出材料、本 Design の合成規則は Obligation への artifact type と case-specific risk の供給経路として機能する。
+QG-2 投影契約は v4 Quality モデル（docs/designs/quality/quality-gate-model.md）における Gate（execution structure 確定時の Acceptance Coverage）への投影である。必須品質能力キーの対応表は Verification Obligation の導出材料、本 Design の合成規則は Obligation への artifact type と case-specific risk の供給経路として機能する。
 
 QG-2（agentdev-quality-gates）は次を検証する。
 (a) 変更予定成果物から導出される全ての必須品質能力が完了条件（検証項目）へ反映されていること

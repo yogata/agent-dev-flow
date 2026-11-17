@@ -24,7 +24,7 @@ description: Requirement-artifact traceability (coverage, impact, check) resolvi
 - Decision・Design・実装・検証の各対応は要件へ直接対応付ける。Design 対応を経由して実装または検証が成立したものと推定しない（推移阻止）
 - 1つの成果物が複数の要件へ対応でき、複数の役割を持てる
 - すべての成果物に要件との重複した直接対応を必須としない。採用された隣接工程間の対応（下記 links）で追跡でき、links 対応は covers の対応完全性検査の対象にしない
-- モデル要素・完全性規則・用語の正本は producer 側リポジトリの ADF v4 Traceability モデル Design（v4-traceability-model、docs/designs/<foundations/v4-traceability-model>.md）が所有する。本スキルはその利用知識と手順を提供し、規範の独立定義を行わない
+- モデル要素・完全性規則・用語の正本は producer 側リポジトリの ADF v4 Traceability モデル Design（traceability-model、docs/designs/<foundations/traceability-model>.md）が所有する。本スキルはその利用知識と手順を提供し、規範の独立定義を行わない
 
 ## 隣接工程間対応（links）
 
@@ -103,7 +103,7 @@ description: Requirement-artifact traceability (coverage, impact, check) resolvi
 
 check の12種検査: `malformed-declarations`（sidecar および inline declaration の形式・構文違反）、`unknown-roles`（未知の成果物役割）、`unknown-req-refs`（存在しない要件行への参照。sidecar、inline declaration、policy.yaml の optional 列挙を含む）、`invalid-artifact-paths`（存在しない、または取得不能な artifact path）、`missing-design`（Design 対応の欠落。現行要件行で0件）、`missing-implementation`（実装対応の欠落。現行要件行で0件）、`missing-verification`（検証対応の欠落。検証スコープポリシーが required と判定する現行要件行のみ計上）、`policy-invalid`（検証スコープポリシーの不正。schema 違反、default 値不正、optional 列挙の要件行 ID 形式違反、存在しない要件行の列挙、policy 読取不能）、`duplicate-inconsistencies`（同一論理関係の不整合な重複。同一 artifact パス × role × 要件行 ID の組み合わせが sidecar と inline declaration の間、または同一情報源内で矛盾する状態）、`malformed-links`（隣接工程間対応の宣言形式・構文違反。inline 宣言の形式不備・不明方向、sidecar links セクションの schema 不正）、`dangling-links`（links の source / target 参照先の不存在）、`derived-declaration-conflicts`（導出対応宣言と手動宣言の重複・矛盾。導出された論理関係と同一の手動宣言の共存〔重複〕、導出対象範囲の論理関係で手動宣言と導出結果が部分重複しつつ要件行 ID 集合が一致しない状態〔矛盾〕、導出規約 traceability/derivations.yaml の解析不能・schema 不備を計上。交差なしの共存〔導出に含まれない要件行 ID のみの手動宣言〕は手動付与対象の正当な残存として検出しない）。
 
-対応宣言の導出: `traceability/derivations.yaml`（repository-local 導出規約）が宣言するテストディレクトリ配下の `.test.ts` について、テスト本文の import 実測と検証対象モジュールへの手動対応宣言（inline + sidecar）から verification 対応を決定的に導出する。導出根拠のないテストは導出せず手動付与対象として残る。導出対象と手動付与対象の境界は v4-traceability-model Design「永続情報と導出可能情報の分離」節が所有する。検証対応要否はトレーサビリティポリシー（policy.yaml）が所有し導出しない。導出された対応宣言も対応関係の存在であり、対応宣言の存在だけを根拠に実現または検証の成立を推定しない（T-003）。
+対応宣言の導出: `traceability/derivations.yaml`（repository-local 導出規約）が宣言するテストディレクトリ配下の `.test.ts` について、テスト本文の import 実測と検証対象モジュールへの手動対応宣言（inline + sidecar）から verification 対応を決定的に導出する。導出根拠のないテストは導出せず手動付与対象として残る。導出対象と手動付与対象の境界は traceability-model Design「永続情報と導出可能情報の分離」節が所有する。検証対応要否はトレーサビリティポリシー（policy.yaml）が所有し導出しない。導出された対応宣言も対応関係の存在であり、対応宣言の存在だけを根拠に実現または検証の成立を推定しない（T-003）。
 
 - Decision 対応の欠落は不合格に計上しない（対応完全性規則の任意役割）
 - links の完全性検査は存在しない。links 宣言の不在は不合格に計上せず、links 対応は missing-* 判定の入力にしない（グループ化しても子要件行単位の検証義務が消えない）
@@ -184,5 +184,5 @@ bun .opencode/skills/agentdev-traceability/scripts/src/derivations.ts --root <re
 
 - [references/sidecar-and-policy.md](references/sidecar-and-policy.md): sidecar の作成・更新手順、links セクションの書式、検証スコープポリシー（`traceability/policy.yaml`）の利用手順、要件・Design・実装・検証変更時の対応関係更新手順
 - [references/check-interpretation.md](references/check-interpretation.md): check の11検出項目の finding 解釈、coverage / impact / links / inventory / reuse の利用方法と結果の読み方
-- **Design**: producer 側リポジトリの `agentdev-traceability` Design と ADF v4 Traceability モデル Design（v4-traceability-model、docs/designs/<foundations/v4-traceability-model>.md。本スキルの原本仕様とモデルの正本）
+- **Design**: producer 側リポジトリの `agentdev-traceability` Design と ADF v4 Traceability モデル Design（traceability-model、docs/designs/<foundations/traceability-model>.md。本スキルの原本仕様とモデルの正本）
 - **トレーサビリティ要件・意思決定**: producer 側リポジトリの要件インデックスと Decision インデックスを参照

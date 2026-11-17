@@ -1,5 +1,5 @@
 ---
-title: サブエージェント委譲契約（v4）
+title: サブエージェント委譲契約
 status: accepted
 created: 2026-09-20
 updated: "2026-11-18"
@@ -11,11 +11,11 @@ updated: "2026-11-18"
 <!-- ADF-COVERS(implementation): REQ-048-007, REQ-048-014 -->
 <!-- ADF-COVERS(design): REQ-003-030, REQ-003-031 -->
 
-# サブエージェント委譲契約（v4）
+# サブエージェント委譲契約
 
 ## 位置づけ
 
-本 Design は ADF v4 の委譲契約の原本である。v4 ライフサイクル状態機械（[v4-lifecycle-state-machine.md](v4-lifecycle-state-machine.md)）と v4 Runtime 実行モデル（[../foundations/v4-runtime-execution-model.md](../foundations/v4-runtime-execution-model.md)）の下位契約として、委譲時の最小契約と制約を所有する。result 4 状態の正は v4-lifecycle-state-machine へ、authority・副作用・冪等・並行性の正は v4-runtime-execution-model へ、それぞれ参照により接続し二重管理しない。
+本 Design は ADF v4 の委譲契約の原本である。v4 ライフサイクル状態機械（[lifecycle-state-machine.md](lifecycle-state-machine.md)）と v4 Runtime 実行モデル（[../foundations/runtime-execution-model.md](../foundations/runtime-execution-model.md)）の下位契約として、委譲時の最小契約と制約を所有する。result 4 状態の正は lifecycle-state-machine へ、authority・副作用・冪等・並行性の正は runtime-execution-model へ、それぞれ参照により接続し二重管理しない。
 
 初期適用対象、manager-orchestrator と軽量委譲の分離表、case-auto 並列委譲モデル拡張、責務分界表に相当する契約は各工程 Design と REQ-034 が所有し、本 Design は搬送しない。
 
@@ -72,7 +72,7 @@ capture_handoff:
 ### 実装委譲の受領側検査情報候補（output_contract）
 
 実装作業の委譲（case-run から実行担当サブエージェントへの委譲）では、受領側（case-run / case-auto）が契約完了検査（3点ゲート: 4状態 result 必須＋状態別必須欄。completed-pr は commit hash・PR URL、blocked・failed・delegation-unavailable は停止理由と再開情報〔SSoT 記録先を含む〕）を実行するため、委譲応答にこれらの情報候補を含める。
-output_contract の status 値（pass | warn | fail | partial）は委譲時最小契約の一般形であり、実装委譲の result 4状態契約（completed-pr / blocked / failed / delegation-unavailable、v4-lifecycle-state-machine.md が正規所有）とは別契約として区別する。
+output_contract の status 値（pass | warn | fail | partial）は委譲時最小契約の一般形であり、実装委譲の result 4状態契約（completed-pr / blocked / failed / delegation-unavailable、lifecycle-state-machine.md が正規所有）とは別契約として区別する。
 委譲時最小契約の骨格（inputs、side_effect_boundary、output_contract、capture_handoff）は変更しない。
 
 ### structured_context の SSoT 抽出制約
@@ -165,14 +165,14 @@ agent 起動、background task、並列実行、context 管理は ADF 配布物�
 
 ## result 4 状態と authority（参照縮約）
 
-- result 4 状態（completed-pr / blocked / failed / delegation-unavailable）と result enum の折り畳み契約の正は [v4-lifecycle-state-machine.md](v4-lifecycle-state-machine.md)「完了経路と result 状態の一般化」節が所有する。本 Design は再掲しない。
-- 副作用 4 分類と authority 格子、直列化単位 5 種、冪等経路、直列化違反・競合検出時の意味論、fail-closed 適用範囲の正は [../foundations/v4-runtime-execution-model.md](../foundations/v4-runtime-execution-model.md) が所有する。委譲に伴う副作用の権威と並行性は同 Design の authority 格子に従う。
+- result 4 状態（completed-pr / blocked / failed / delegation-unavailable）と result enum の折り畳み契約の正は [lifecycle-state-machine.md](lifecycle-state-machine.md)「完了経路と result 状態の一般化」節が所有する。本 Design は再掲しない。
+- 副作用 4 分類と authority 格子、直列化単位 5 種、冪等経路、直列化違反・競合検出時の意味論、fail-closed 適用範囲の正は [../foundations/runtime-execution-model.md](../foundations/runtime-execution-model.md) が所有する。委譲に伴う副作用の権威と並行性は同 Design の authority 格子に従う。
 
 ## adversarial-review との委譲契約接続
 
 本節は adversarial-review caller integration（REQ-014）が委譲契約へ接続する際の適用を所有する。
 共通 caller integration 契約の正規所有者は adversarial-review Design であり（REQ-014-003）、本節は重複定義せず、委譲契約側からの接続のみを規定する。
-REQ-003-011/012 の4状態契約（completed-pr/blocked/failed/delegation-unavailable）は維持し、adversarial-review 由来の結果は第5状態を増やさず既存状態へ折り畳む（REQ-014-012、v4-lifecycle-state-machine Design）。
+REQ-003-011/012 の4状態契約（completed-pr/blocked/failed/delegation-unavailable）は維持し、adversarial-review 由来の結果は第5状態を増やさず既存状態へ折り畳む（REQ-014-012、lifecycle-state-machine Design）。
 
 ### 委譲種別と副作用境界
 
@@ -210,7 +210,7 @@ case-auto は下位 command（case-run インライン実行、工程委譲）�
 
 **回答の返却と継続**: case-auto が decision_context を解決した場合、回答または作業仮定を下位 command へ返し、下位 command は Root Case 指定に基づく経路解決（REQ-006-114）から処理を継続する。
 新規の永続結果型を導入せず、既存の再開機構を再利用する（DEC-008 決定5）。
-状態機械の再開入口の仕様は v4-lifecycle-state-machine Design が正である。
+状態機械の再開入口の仕様は lifecycle-state-machine Design が正である。
 
 **非対象（REQ-015-012 維持）**: case-auto は decision_context の解決において raw finding を解釈、採否、候補反映しない。
 各 caller command は自身が所有する候補について finding の意味解釈、採否、候補への反映を維持し（REQ-014-006）、raw finding を case-auto へそのまま渡さない（REQ-034-032、AG-006）。
@@ -272,7 +272,7 @@ case-auto の MUST NOT DO を「実質的 Design / REQ / Decision 内容編集�
 req-define の委譲契約セクションは、各委譲について実行主体分類表を必須テンプレートとして含む。
 本分類軸は v2:ADR-0107 の成果物種別（command / skill / template / script）とは直交する。
 
-本節が実行主体分類表の正規所有 Design である（v4 -> v5 crosswalk Design「分類スキーマ」節および責務再編系 Design からの参照は本節へ付け替える）。類似仕様の実行主体分類表を他 Design へ重複新設しない。
+本節が実行主体分類表の正規所有 Design である（責務再編系 Design からの参照は本節へ付け替える）。類似仕様の実行主体分類表を他 Design へ重複新設しない。
 
 | 分類 | 意味 | 例 |
 |---|---|---|
@@ -304,8 +304,8 @@ case-run 委譲時に上位工程（case-auto orchestration・委譲 prompt 生�
 
 ## See Also
 
-- [v4-lifecycle-state-machine.md](v4-lifecycle-state-machine.md)（result 4 状態・resume point の正）
-- [../foundations/v4-runtime-execution-model.md](../foundations/v4-runtime-execution-model.md)（authority 格子・直列化単位・冪等経路の正）
+- [lifecycle-state-machine.md](lifecycle-state-machine.md)（result 4 状態・resume point の正）
+- [../foundations/runtime-execution-model.md](../foundations/runtime-execution-model.md)（authority 格子・直列化単位・冪等経路の正）
 - [../responsibilities/responsibility-boundary-purification.md](../responsibilities/responsibility-boundary-purification.md)（case 実行責務の 4 用語と所有者 SSoT、external execution boundary / harness execution mechanism の所有権）
 - [../commands/case-run.md](../commands/case-run.md)（Epic Wave 実行モデル〔v3 epic-wave-model Design 吸収先〕）
 - v2:ADR-0112（サブエージェント委譲の一般概念）

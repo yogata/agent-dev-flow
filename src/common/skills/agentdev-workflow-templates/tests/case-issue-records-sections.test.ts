@@ -42,7 +42,7 @@ const ABOLISHED_HEADINGS = [
 // 進行状況セクションの必須項目（正規状態は Root / Epic のみ、Child は日時のみ）
 const PROGRESS_ITEMS_ROOT = ["正規状態", "開始日時", "終了日時"];
 const PROGRESS_ITEMS_CHILD = ["開始日時", "終了日時"];
-// Root Case 正規状態の7値トークン（値の正は workflows/v4-lifecycle-state-machine Design）
+// Root Case 正規状態の7値トークン（値の正は workflows/lifecycle-state-machine Design）
 const CANONICAL_STATES = [
   "open",
   "ready",

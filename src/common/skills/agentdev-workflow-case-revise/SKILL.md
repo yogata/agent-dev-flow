@@ -36,7 +36,7 @@ case-revise command は公開 interface（入出力契約・ガードレール�
 ## 制御平面（STEP 一覧）
 
 case-revise workflow は次の5 STEP で構成する。
-各 STEP は再開ポイント（resume point）を持つ（STEP resume point と会話記憶非依存の Decision、`<foundations/v4-durable-state-and-recovery>` Design）。
+各 STEP は再開ポイント（resume point）を持つ（STEP resume point と会話記憶非依存の Decision、`<foundations/durable-state-and-recovery>` Design）。
 会話コンテキストに依存せず、永続状態（Root Case Issue、設計修正PR、REQ / Decision / Design、Epic Issue、子 Issue）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -102,7 +102,7 @@ case-revise workflow は次の5 STEP で構成する。
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
+- **`<foundations/durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **case-open / case-ready Design**: Definition Package、設計修正PRの lifecycle、canonical Definition 判定、冪等キー
 - **Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則の Decision**: 責務3層分化の採用記録（docs/decisions/ 配下）
 - **case-revise command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

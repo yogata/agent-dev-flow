@@ -1,15 +1,15 @@
 ---
-title: ADF v4 Runtime 実行モデル（authority 格子・直列化単位・冪等経路・runtime 制御ループ）
+title: ADF Runtime 実行モデル（authority 格子・直列化単位・冪等経路・runtime 制御ループ）
 status: accepted
 created: 2026-09-19
-updated: 2026-11-12
+updated: 2026-11-18
 ---
 <!-- ADF-COVERS(implementation): REQ-035-001, REQ-035-007 -->
-<!-- ADF-COVERS(design): REQ-103-009（REQ-103 の依存後続の副作用・状態遷移抑止の設計対応面。判断契約面は v4-responsibility-boundaries.md） -->
+<!-- ADF-COVERS(design): REQ-103-009（REQ-103 の依存後続の副作用・状態遷移抑止の設計対応面。判断契約面は responsibility-boundaries.md） -->
 
-# ADF v4 Runtime 実行モデル（authority 格子・直列化単位・冪等経路・runtime 制御ループ）
+# ADF Runtime 実行モデル（authority 格子・直列化単位・冪等経路・runtime 制御ループ）
 
-位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）の全行 executed と実際の処遇状態の確認をもってこの移行規則は現行規範ではなく、歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
+位置づけ: 本 Design は現行 Runtime 実行モデルの定義である。
 
 ## 副作用分類と authority 格子
 
@@ -82,10 +82,10 @@ tag・branch の lifecycle role 別サブ表:
 
 - 判定未確定を fail または非該当へ変換して後続を進めない（判定不能の不合格化をしない）
 - 依存しない独立処理を一律に停止しない
-- 判定未確定の状態記録は証跡（記録）として行い、durable state enum の新値を追加しない（v4-lifecycle-state-machine の enum 値域を拡張しない）
-- 復旧後の再実行は v4-durable-state-and-recovery Design「評価器復旧後の評価再開契約」節に従う
-- 契約面の正は v4-responsibility-boundaries Design「閉じた意味評価の障害時契約」節が所有し、本節は runtime 面の適用を所有する
+- 判定未確定の状態記録は証跡（記録）として行い、durable state enum の新値を追加しない（lifecycle-state-machine の enum 値域を拡張しない）
+- 復旧後の再実行は durable-state-and-recovery Design「評価器復旧後の評価再開契約」節に従う
+- 契約面の正は responsibility-boundaries Design「閉じた意味評価の障害時契約」節が所有し、本節は runtime 面の適用を所有する
 
 ## 決定的実行・adapter 実行との接続
 
-状態遷移 predicate 評価・冪等キー照合・依存解決・Wave scheduling の決定的所有は決定的処理（判断方法3分類の正典: DEC-048、foundations/v4-responsibility-boundaries Design「v4 責務分類語彙の後継」節）に従う（本 Design は再列挙しない）。意味判断（閉じた意味評価・開いた推論。要件解釈、block 判定、レビュー）は Skill が所有する。adapter execution（agent 起動、context、background execution、tool invocation の実行機構）は Harness/Backend adapter 境界（DEC-036 決定(2)）が所有し、本 Design の副作用分類・直列化単位は adapter 経由の実行にも適用される。
+状態遷移 predicate 評価・冪等キー照合・依存解決・Wave scheduling の決定的所有は決定的処理（判断方法3分類の正典: DEC-048、foundations/responsibility-boundaries Design「v4 責務分類語彙の後継」節）に従う（本 Design は再列挙しない）。意味判断（閉じた意味評価・開いた推論。要件解釈、block 判定、レビュー）は Skill が所有する。adapter execution（agent 起動、context、background execution、tool invocation の実行機構）は Harness/Backend adapter 境界（DEC-036 決定(2)）が所有し、本 Design の副作用分類・直列化単位は adapter 経由の実行にも適用される。

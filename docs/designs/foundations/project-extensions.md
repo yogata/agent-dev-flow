@@ -111,7 +111,7 @@ extension missing と legacy extension exists は別状態であり、前者は�
 ## v4 semantic extension point
 
 Project Extensions は v4 において標準プロセスへの追加を行う semantic extension point である。
-定義と権威は ADF v4 責務境界 Design（foundations/v4-responsibility-boundaries）が所有し、本節は参照にとどまる。
+定義と権威は ADF v4 責務境界 Design（foundations/responsibility-boundaries）が所有し、本節は参照にとどまる。
 
 表現力 6 項目（project context・rules・quality と evidence policy・project-specific verifier と check・tool と config integration・semantic guidance）は概念分類（拡張点カタログ）であり、現行 yaml スキーマの物理的な機能一覧を意味しない。
 現行 5 セクションとの対応は次のとおり。

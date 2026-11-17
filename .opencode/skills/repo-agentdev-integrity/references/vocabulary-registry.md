@@ -24,9 +24,9 @@ IR-050（load_skills 誤指定検出）・IR-051（実行主体 skill 表記誤�
 
 | コマンド名 | 種別 | 備考 |
 |------------|------|------|
-| `/agentdev/case-open` | 内部 lifecycle 段階 | v4 では case-auto 駆動の内部段階（DEC-029・v4-standard-lifecycle）。公開入口は `case-auto` |
-| `/agentdev/case-run` | 内部 lifecycle 段階 | v4 では case-auto 駆動の内部段階（DEC-029・v4-standard-lifecycle） |
-| `/agentdev/case-close` | 内部 lifecycle 段階 | v4 では case-auto 駆動の内部段階（DEC-029・v4-standard-lifecycle） |
+| `/agentdev/case-open` | 内部 lifecycle 段階 | v4 では case-auto 駆動の内部段階（DEC-029・standard-lifecycle）。公開入口は `case-auto` |
+| `/agentdev/case-run` | 内部 lifecycle 段階 | v4 では case-auto 駆動の内部段階（DEC-029・standard-lifecycle） |
+| `/agentdev/case-close` | 内部 lifecycle 段階 | v4 では case-auto 駆動の内部段階（DEC-029・standard-lifecycle） |
 | `/agentdev/case-update` | 廃止済み command | DEC-029 で完全廃止。Definition 変更経路は case-revise |
 | `/agentdev/case-auto` | 公開 command | `/agentdev/*` 名前空間 |
 | `/agentdev/req-define` | 公開 command | `/agentdev/*` 名前空間 |
@@ -391,9 +391,9 @@ IR-065（廃止語彙の現行使用検出）と IR-066（旧パス・削除済�
 
 ## v4 概念語彙（意味参照）
 
-v4 概念語彙の正規定義は `docs/designs/workflows/v4-standard-lifecycle.md`「work_type / scale / Epic / Wave の v4 意味モデル」節（L13-21）を参照する。概念再定義であり改名でないため、旧語彙→新語彙の対照行は作成しない（消費する検出規則が存在しない）。
+v4 概念語彙の正規定義は `docs/designs/workflows/standard-lifecycle.md`「work_type / scale / Epic / Wave の v4 意味モデル」節（L13-21）を参照する。概念再定義であり改名でないため、旧語彙→新語彙の対照行は作成しない（消費する検出規則が存在しない）。
 
-| 概念語彙 | 意味参照（v4-standard-lifecycle「work_type / scale / Epic / Wave の v4 意味モデル」節） |
+| 概念語彙 | 意味参照（standard-lifecycle「work_type / scale / Epic / Wave の v4 意味モデル」節） |
 |---|---|
 | work_type | 変更の性質。workflow route を直接決定する責務から分離する |
 | scale | 変更・実行・協調の規模。特定 work_type に限定しない |

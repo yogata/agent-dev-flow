@@ -146,7 +146,7 @@ export function validateRecordComment(kind: RecordKind, body: string): RecordCom
 }
 
 // Case Issue 本文の進行状況セクションの正規状態値（Root Case）。
-// 値域とトークンの正は v4-lifecycle-state-machine Design（ローカル版 case status
+// 値域とトークンの正は lifecycle-state-machine Design（ローカル版 case status
 // rules/status.yaml と同一の7値トークン、終端 = closed）。blocked・failed は
 // 子 Issue の状態として Epic 実行構成が所有するが、Root 自身の継続条件不足は
 // Root 固有の blocked で表す（子状態の重複コピー禁止とは区別する）。

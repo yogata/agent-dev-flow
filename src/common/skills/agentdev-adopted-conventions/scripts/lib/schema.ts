@@ -1,5 +1,5 @@
 // 採用規約（採用済み工程・工程間関係・必須成果物）の宣言 schema 型と検証。
-// v5 採用規約機構 Design（docs/designs/foundations/v5-adopted-conventions.md）の
+// v5 採用規約機構 Design（docs/designs/foundations/adopted-conventions.md）の
 // 実装側（機械的解決器）。
 //
 // - 採用規約は宣言的である。参照モデルの工程を既定で必須化せず、

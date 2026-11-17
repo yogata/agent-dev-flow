@@ -38,7 +38,7 @@ case-ready command は公開 interface（入出力契約・ガードレール）
 ## 制御平面（STEP 一覧）
 
 case-ready workflow は次の7 STEP で構成する。
-各 STEP は再開ポイント（resume point）を持つ（STEP resume point と会話記憶非依存の Decision、`<foundations/v4-durable-state-and-recovery>` Design）。
+各 STEP は再開ポイント（resume point）を持つ（STEP resume point と会話記憶非依存の Decision、`<foundations/durable-state-and-recovery>` Design）。
 会話コンテキストに依存せず、永続状態（Root Case Issue、設計PR、REQ / Decision / Design、Epic Issue、capture 成果物）から再開点を再構成する。
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -125,9 +125,9 @@ Decision 受理、execution contract と実行構造の確定、lifecycle gate �
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
+- **`<foundations/durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **case-open / case-ready Design**: Definition Package、設計PR lifecycle、canonical Definition 判定、冪等キー
-- **`<workflows/v4-standard-lifecycle>` Design**: work_type / scale / Epic / Wave の v4 意味モデル（OU / Epic / Wave / Issue 階層の語彙）
+- **`<workflows/standard-lifecycle>` Design**: work_type / scale / Epic / Wave の v4 意味モデル（OU / Epic / Wave / Issue 階層の語彙）
 - **`<workflows/issue-title-policy>` Design**: Epic 確定時の Root Case 接頭辞更新（`Epic: 主題`）と子 Issue タイトル（`[Epic #<親番号>] Wave-N: 主題`。`Task:` 接頭辞は廃止）の書式の単一参照点
 - **case-open / case-ready Design**: execution_unit 構成（連結成分・3軸判断の機械的判定手順を含む）と Wave 構成・Wave 重複前置検出
 - **Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則の Decision**: 責務3層分化の採用記録（docs/decisions/ 配下）

@@ -12,7 +12,7 @@ AgentDevFlow の品質基準、検証ルールを定義する。
 
 ## 品質ゲート（QG-1〜QG-4）
 
-品質要件の検証体系は v4 Quality モデル（docs/designs/quality/v4-quality-gate-model.md）が所有する。Quality Policy（何を品質として要求するか）・Verification Obligation・Verifier・Evidence・Gate の 5 概念に分解され、QG-1〜QG-4 は本モデルが lifecycle 遷移点から再導出した Gate 群の呼称である。判定値と遷移接続・証拠種別の扱いは同 Design の定めるところに従う。
+品質要件の検証体系は v4 Quality モデル（docs/designs/quality/quality-gate-model.md）が所有する。Quality Policy（何を品質として要求するか）・Verification Obligation・Verifier・Evidence・Gate の 5 概念に分解され、QG-1〜QG-4 は本モデルが lifecycle 遷移点から再導出した Gate 群の呼称である。判定値と遷移接続・証拠種別の扱いは同 Design の定めるところに従う。
 各 Gate の判定基準、検査観点は `agentdev-quality-gates` スキルの参照ファイルを参照。
 
 

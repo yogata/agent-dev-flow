@@ -297,7 +297,7 @@ describe("relied-diff 取得失敗の構造化報告と変更起点の保持", (
     expect(caseRevise).toContain("unverified");
     expect(caseRevise).toContain("fullyPropagated");
     const v51 = readFileSync(
-      "docs/designs/workflows/v51-phase-transition-and-coexistence-model.md",
+      "docs/designs/workflows/phase-transition-and-coexistence-model.md",
       "utf-8",
     );
     expect(v51).toContain("relied-diff");

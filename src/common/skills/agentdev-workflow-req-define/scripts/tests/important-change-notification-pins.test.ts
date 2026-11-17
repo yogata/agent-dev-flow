@@ -1,7 +1,7 @@
 // 重要変更の通知と結果説明（REQ-108-014〜023）の構造照合。
 //
 // Design 節（docs/designs/commands/req-define.md、case-ready.md、case-run.md、
-// case-auto.md、backlog-auto.md、docs/designs/workflows/v51-phase-driven-collaboration-model.md
+// case-auto.md、backlog-auto.md、docs/designs/workflows/phase-driven-collaboration-model.md
 // の「重要変更の通知と結果説明」節）が挙動契約の正であり、その実現面として各
 // workflow skill・委譲契約に組込まれた通知手順の必須要素と境界規律を anchor 型で
 // 照合する。恒常的な構造検証であり、test strategy TS-001〜TS-011 の公開入口からの
@@ -69,7 +69,7 @@ const DESIGN_SOURCES: Array<{ path: string; heading: string }> = [
   { path: "docs/designs/commands/case-auto.md", heading: "## 重要変更の通知と結果説明" },
   { path: "docs/designs/commands/backlog-auto.md", heading: "## 重要変更の通知と結果説明" },
   {
-    path: "docs/designs/workflows/v51-phase-driven-collaboration-model.md",
+    path: "docs/designs/workflows/phase-driven-collaboration-model.md",
     heading: "## 重要変更の通知と結果説明（phase-artifacts-update）",
   },
 ];

@@ -217,11 +217,11 @@ case-run 側の事前検査とは独立に実施する。検証手段との対�
 
 ## 参照する横断 Design
 
-- [workflows/v4-lifecycle-state-machine.md](../workflows/v4-lifecycle-state-machine.md)（Pattern Taxonomy（file-pipeline））
+- [workflows/lifecycle-state-machine.md](../workflows/lifecycle-state-machine.md)（Pattern Taxonomy（file-pipeline））
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（Capture 回収（intake/learning 分離））
-- [foundations/v4-runtime-execution-model.md](../foundations/v4-runtime-execution-model.md)（Epic Issue 本文の直列化〔per-Epic 単一書き手〕。Epic Wave クローズ運用は本 Design「Epic Wave クローズ」節）
-- [workflows/v4-collaboration-loop.md](../workflows/v4-collaboration-loop.md)（v3 ライフサイクル Design からの吸収記録: REQ ファイル整合性検査・README 索引影響規則の帰属〔agentdev-req-file-manager・agentdev-artifact-validation の各 Design 参照〕）
-- [v4-quality-gate-model.md](../quality/v4-quality-gate-model.md)（QG-4）
+- [foundations/runtime-execution-model.md](../foundations/runtime-execution-model.md)（Epic Issue 本文の直列化〔per-Epic 単一書き手〕。Epic Wave クローズ運用は本 Design「Epic Wave クローズ」節）
+- [workflows/collaboration-loop.md](../workflows/collaboration-loop.md)（v3 ライフサイクル Design からの吸収記録: REQ ファイル整合性検査・README 索引影響規則の帰属〔agentdev-req-file-manager・agentdev-artifact-validation の各 Design 参照〕）
+- [quality-gate-model.md](../quality/quality-gate-model.md)（QG-4）
 - [integrity-rule-catalog.md](../integrity/integrity-rule-catalog.md)（旧旧パス検出ルール（削除済み） obsolete-spec-path-after-domain-split、targeted docs guard 連携）
 
 ## targeted docs guard (v2:REQ-0158-003)

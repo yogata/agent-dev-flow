@@ -10,7 +10,7 @@ receivedAt: 2026-10-13T09:00:00Z
 theme: THEME-001
 purpose: "テーマAの具体化の外部意見"
 question: "分割の判断材料は何か"
-references: ["docs/designs/workflows/v51-phase-driven-collaboration-model.md"]
+references: ["docs/designs/workflows/phase-driven-collaboration-model.md"]
 ---
 
 ## 採用
@@ -50,7 +50,7 @@ describe("受領記録 frontmatter の検証", () => {
         theme: "THEME-001",
         purpose: "テーマAの具体化の外部意見",
         question: "分割の判断材料は何か",
-        references: ["docs/designs/workflows/v51-phase-driven-collaboration-model.md"],
+        references: ["docs/designs/workflows/phase-driven-collaboration-model.md"],
       },
       "2026-10-13-THEME-001.md",
     );

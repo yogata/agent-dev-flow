@@ -1,22 +1,22 @@
 ---
-id: v4-collaboration-loop
-title: ADF v4 継続コラボレーションループ
+id: collaboration-loop
+title: ADF 継続コラボレーションループ
 created: 2026-09-20
 status: accepted
-updated: 2026-10-09
+updated: 2026-11-18
 ---
 
 <!-- ADF-COVERS(design): REQ-090-005, REQ-090-006 -->
 <!-- ADF-COVERS(design): REQ-108-011, REQ-108-012 -->
 
-# ADF v4 継続コラボレーションループ
+# ADF 継続コラボレーションループ
 
 ## 位置づけ
 
-本 Design は v4-standard-lifecycle「継続コラボレーションループ」節の定義（循環・
+本 Design は standard-lifecycle「継続コラボレーションループ」節の定義（循環・
 Intake/Learning 責務・7 系統列挙・昇格ガード）を受けて、その詳細を所有する。
-循環の状態遷移の側は v4-lifecycle-state-machine が、永続状態の配置は
-v4-durable-state-and-recovery が所有する。
+循環の状態遷移の側は lifecycle-state-machine が、永続状態の配置は
+durable-state-and-recovery が所有する。
 
 ## 循環の各段責務
 
@@ -72,7 +72,7 @@ Learning 評価結果は次の 7 系統へ振り分けられる。7 系統はル
 
 ## 昇格ガード
 
-Learning と Observation は無条件に REQ へ昇格しない（v4-operating-model 情報寿命モデル）。
+Learning と Observation は無条件に REQ へ昇格しない（operating-model 情報寿命モデル）。
 昇格は恒久契約候補のみが backlog-review の承認と req-define の合意を経て実現する
 多段構造である。
 
@@ -91,7 +91,7 @@ Learning と Observation は無条件に REQ へ昇格しない（v4-operating-m
 
 ## ループ図の読み方
 
-v4-standard-lifecycle の循環において req-define → REQ/Decision/Design → case-auto の
+standard-lifecycle の循環において req-define → REQ/Decision/Design → case-auto の
 線形配置は、正規成果物の確定が case-auto 内部（case-ready）で起こる Definition 確定
 境界の単純化である。Backlog → req-define の縁は人間起点の承認境界であり、循環は
 自動継続しない。
@@ -102,7 +102,7 @@ v4-standard-lifecycle の循環において req-define → REQ/Decision/Design �
 
 - Intake・Learning・Backlog は v5 においても継続的な発見・改善と要件化への接続能力として維持する（REQ-108-011）。発見・学習情報を必要な評価と承認を経て要件候補へ接続し、実行から生じた改善情報を同じ循環へ戻す構造は本 Design「循環の各段責務」節が正である。
 - 旧公開コマンド名や旧内部状態の維持を合否条件としない（REQ-108-011）。循環の実現手段の構成（コマンド名、実現手段対応表の行）は v5 の実行モデルの実現確定に伴って再構成され得る。
-- v5 の実行モデルの実現確定までの間、本 Design の循環実現手段は現行の実行契約の下で運用する（REQ-108-012 移行期権威行）。実現手段の v5 向け処遇は v4 -> v5 crosswalk（[../foundations/references/v4-v5-crosswalk.md](../foundations/references/v4-v5-crosswalk.md)）の棚卸し対象として管理する。
+- v5 の実行モデルの実現確定までの間、本 Design の循環実現手段は現行の実行契約の下で運用する（REQ-108-012 移行期権威行）。実現手段の v5 向け処遇の棚卸し処遇は、工程遷移・独立レビューと双経路併存モデル（[../phase-transition-and-coexistence-model.md](../phase-transition-and-coexistence-model.md)）「双経路併存と移行」節の権威継続の記述（REQ-108-012、後継経路採用まで現行経路が正）へ従う。
 
 ## v3 backlog-artifact-lifecycle Design からの吸収
 
@@ -113,7 +113,7 @@ v4-standard-lifecycle の循環において req-define → REQ/Decision/Design �
 検出事項プロトコルは capture-boundaries Design、inspect-promote の分類確定状態再構成規則は
 commands/inspect-promote Design、REQ ファイル整合性検査・README 索引影響規則は
 agentdev-req-file-manager・agentdev-artifact-validation の各 Design、RU・draft の状態と
-削除契約は v4-lifecycle-state-machine と v4-durable-state-and-recovery（削除トリガーの実行契約は
+削除契約は lifecycle-state-machine と durable-state-and-recovery（削除トリガーの実行契約は
 commands/case-ready Design 参照）、artifact_actions
 ベース工程分岐は commands/req-define Design が所有する。
 

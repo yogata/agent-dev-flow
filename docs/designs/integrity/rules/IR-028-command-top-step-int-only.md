@@ -19,7 +19,7 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_comman
 | detection_method | `src/common/commands/agentdev/*.md` を対象に `Step \d+\.\d+` を検出。projection 側（.opencode 投影物）または integrity rule 内の旧語検出用文字列は除外が必要 |
 | affected_artifacts | [commands, command projection, integrity rules] |
 | related_req | -（要件行レベルの正規所有者なし。サブステップ様式の正規契約は command-file-format.md が所有） |
-| related_design | [../../authoring/command-file-format.md, artifact-contracts.md, v4-responsibility-boundaries.md] |
+| related_design | [../../authoring/command-file-format.md, artifact-contracts.md, responsibility-boundaries.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 中。旧語検出用の正規表現文字列と projection 側の残存確認文は除外が必要 |
 | regression_test | `check_command_format.ts`（ir028-command-top-step-alphabet 検出、commands 両ディレクトリ走査） |

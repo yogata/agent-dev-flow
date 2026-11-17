@@ -59,7 +59,7 @@ case-auto workflow は次の8 STEP で構成する。
 
 ### 再開プロトコル（resume protocol）
 
-- 再開点は永続状態から再構成する: `case_auto_started_at` と L1 工程別タイムスタンプ、Issue/PR の存在と番号、Epic Issue 本文の実行構成表（Wave 進行）、draft の有無（case-open 完了前のみ pre-reader）、各工程の完了結果、Root Case の正規状態（open、ready、running、blocked、review、closed、cancelled の7値。値の正は workflows/v4-lifecycle-state-machine Design）
+- 再開点は永続状態から再構成する: `case_auto_started_at` と L1 工程別タイムスタンプ、Issue/PR の存在と番号、Epic Issue 本文の実行構成表（Wave 進行）、draft の有無（case-open 完了前のみ pre-reader）、各工程の完了結果、Root Case の正規状態（open、ready、running、blocked、review、closed、cancelled の7値。値の正は workflows/lifecycle-state-machine Design）
 - 現在 stage は stage cursor を新たな正規状態として保存せず、起動時対象集合と各対象の正規状態（Issue / PR / Case 等）から最も早い未収束 stage として再構成する。完了済み対象を再実行せず、同一対象だけを後続 stage へ先行させない。起動時対象集合の安定識別子は中断再開に必要な期間に限りローカル一時実行状態として保持し、draft / RU の削除によって対象を実行中の対象集合から消失させない。正規成果物から再構成できる情報を別の正規状態として重複管理しない（case-auto Design「ドラフト間並列実行モデル」）
 - 停止時報告に再開点と再開可能な次コマンドを明示し、会話コンテキストの記憶に依存しない。case-ready 成功後の再開は Issue と Epic だけで成立させる（orchestration pre-reader 契約）
 
@@ -82,9 +82,9 @@ case-auto workflow は次の8 STEP で構成する。
 - 各 orchestration stage は stage 内最大並列・stage 間全対象収束（fan-in）で進行し、対象ごとの縦切り pipeline としない。当該 stage に属する全対象が正常完了し、または当該実行において後続 stage へ進めないことが既存契約上確定した結果（blocked / failed / delegation-unavailable 等の後続不能確定）に収束するまで次 stage を開始せず（未実行・実行中・状態不明・再試行要否未確定対象の残存は収束済みとしない）、後続不能対象を後続 stage の対象から除外しその存在だけを理由として独立した他対象の進行を停止しない（case-auto 実行契約）
 - main への push、capture、commit、同一 Epic Issue 本文への更新等の競合する共有書き込みは、当該競合部分のみを必要な単位で局所的に直列化し、当該競合と無関係な対象を含む stage 全体の直列化を行わない（case-auto 実行契約）。共有資源カテゴリと直列化単位の運用表（main への merge / push はリポジトリ単位、同一 Epic Issue 本文への更新は Epic 単位の per-Epic 単一書き手、採番・AUTOGEN 索引更新はグローバル、対象固有ファイルは対象単位で並列可。lock / queue / scheduler 方式は指定しない）は case-auto Design「複数 execution_unit 並列 orchestration」節参照
 - case-run internal lifecycle（state machine、self-healing loop 等）を複製せず case-run 側の正規所有に委譲する
-- stage 3 の共有 active Issue task 数の上限は固定値（5、実行安全境界。1 active task = 1 Issue への実装実行委譲。Epic・Wave・Standard Issue・case-run 呼出しごとの独立実行枠を設けない）。並列実行は必須であり、実行環境由来の障害（background task の消失、親 run の中断、provider failure 等）を理由とする同期逐次実行（順次フォールバック）への切替を行わない。並列起動が当該 stage の起動可能対象集合に対して1件も成立しない場合は、直列化で完了を装わず停止理由「並列起動不能」（原因の断定を含まない）と再開可能性を報告して停止する（case-auto Design「runtime 制御契約」節）。並列起動時は委譲起動ごとに10秒の起動間隔を置き、同一Tool一括ブロックでの複数起動発行は行わない（v4-runtime-execution-model Design「runtime 制御ループ」節〔起動間隔・並列数制御〕）。起動間隔は stage 1（case-open / case-revise 委譲）・stage 2（case-ready 委譲）・stage 4（case-close 委譲）の並列委譲起動にも同一に適用する。scheduling 制約（最大同時起動数・起動間隔）による batch 分割を orchestration stage の分割として扱わない
+- stage 3 の共有 active Issue task 数の上限は固定値（5、実行安全境界。1 active task = 1 Issue への実装実行委譲。Epic・Wave・Standard Issue・case-run 呼出しごとの独立実行枠を設けない）。並列実行は必須であり、実行環境由来の障害（background task の消失、親 run の中断、provider failure 等）を理由とする同期逐次実行（順次フォールバック）への切替を行わない。並列起動が当該 stage の起動可能対象集合に対して1件も成立しない場合は、直列化で完了を装わず停止理由「並列起動不能」（原因の断定を含まない）と再開可能性を報告して停止する（case-auto Design「runtime 制御契約」節）。並列起動時は委譲起動ごとに10秒の起動間隔を置き、同一Tool一括ブロックでの複数起動発行は行わない（runtime-execution-model Design「runtime 制御ループ」節〔起動間隔・並列数制御〕）。起動間隔は stage 1（case-open / case-revise 委譲）・stage 2（case-ready 委譲）・stage 4（case-close 委譲）の並列委譲起動にも同一に適用する。scheduling 制約（最大同時起動数・起動間隔）による batch 分割を orchestration stage の分割として扱わない
 - stage 2（case-ready）・stage 4（case-close）の並列委譲起動にも stage 3 と同一の並列必須・同期逐次フォールバック禁止・並列起動不能停止を適用する（前述条項の並列実行必須は stage 3 に限定しない）。stage 2・stage 4 の委譲指示は case-auto Design「委譲指示の構築規律（case-ready・case-close の並列委譲起動）」節に従い構築し、独立した対象全体の逐次実行を命じず、stage 間の順序（stage 間 fan-in）と stage 内の対象間順序を混同しない
-- stage 3 の runtime 制御契約（詳細は case-auto Design「runtime 制御契約」節と v4-runtime-execution-model Design「runtime 制御ループ」節）:
+- stage 3 の runtime 制御契約（詳細は case-auto Design「runtime 制御契約」節と runtime-execution-model Design「runtime 制御ループ」節）:
   - **空き枠補充**: active Issue task 数が上限未満の場合、各 Epic の依存充足済みの子 Issue（Wave の前後を前提としない）と Standard Issue から開始条件を満たす Issue を横断して候補として認識し、実行上の安全条件を満たす候補がある限り補充する（横断補充は best-effort でなく必須）。最初に起動した全 task の完了を待つ固定 batch 方式を取らず、起動は実行進行中に継続する。起動間隔（10 秒）と局所的な競合回避の運用は維持する
   - **状態管理**: Issue 実行の状態を pending、ready、active、実行結果確定で区別して管理する
   - **再開時の二重起動防止と上限超過防止**: 再開時は既存の active task を計上し、同一 Issue の二重起動と上限超過を防ぐ。状態不明の task は終了確認まで実行枠を解放せず、完了済み Issue を未完了に戻さない。再開時の状態再構成では、採用・未決・試作の区別を実際の正規情報（Issue 本文、Issue コメント SSoT、PR 本文、正規成果物）から再構成し、未決事項を無断で解決済みにせず、試作を正式採用へ変化させず、実施済みの独立作業を不当に重複実行せず完了扱いを消失させない（中断・再開時の採用・未決・試作状態維持の要件行の実装。既有義務の採用・未決・試作状態への適用であり、既存義務の再実装ではない。正規対応は repository top-level `traceability/` 配下 sidecar を参照）
@@ -101,8 +101,8 @@ case-auto workflow は次の8 STEP で構成する。
 ## v5 有限実行モード（開発中経路・移行期）
 
 v5 有限実行とワークフロー責務再編（正規判断は Decision 関連宣言、要件行との対応は repository top-level `traceability/` 配下 sidecar を参照）の実現面として、責務分割と有限実行のモード契約を本スキルが所有する。
-v5 の実行モデルの実現確定までの間、v4 標準モード（現行 orchestration、Root Case 必須の現行実行契約）が実行経路の正である（移行期権威行。正規定義は v4-v5-crosswalk Design 参照）。
-本モードは開発中の v5 経路であり、現行の正規利用経路（v4 標準モード）と区別して運用する。本モードの存在は crosswalk 棚卸し対象行の再定義を実行した扱いにならず、標準経路を置換せず、新たな公開実行経路の新設を伴わない。既存の委譲・隔離・並列実行・再開・最大自走・確定時検証の機能を失わず、巨大な実行状態を別名の巨大な状態へ置換えない。
+v5 の実行モデルの実現確定までの間、v4 標準モード（現行 orchestration、Root Case 必須の現行実行契約）が実行経路の正である（移行期権威行。正規定義は case-auto Design「有限実行の実行境界と責務分割への接続（REQ-108）」節の移行期権威行を参照）。
+本モードは開発中の v5 経路であり、現行の正規利用経路（v4 標準モード）と区別して運用する。本モードの存在は移行期棚卸し対象行の再定義を実行した扱いにならず、標準経路を置換せず、新たな公開実行経路の新設を伴わない。既存の委譲・隔離・並列実行・再開・最大自走・確定時検証の機能を失わず、巨大な実行状態を別名の巨大な状態へ置換えない。
 
 ### v5 責務分割と現行工程の対応
 
@@ -122,7 +122,7 @@ v5 の責務語彙（要求確定、設計確定、実装・構築、検証、Is
 - **v4 標準モード（現行正・既定）**: 従来どおり case-open → case-ready → case-run → case-close を駆動する。Root Case 確立、Definition Package、実行構造確定は現行実行契約のとおりであり、crosswalk 棚卸し対象行は移行期権威行の保護下で現行どおり正である
 - **v5 小規模連続実行モード**: 小規模の変更を入力として、Epic および GitHub Issue の生成を必須とせず、要求・設計の確認、実装・構築、検証、結果報告と改善情報回収（Capture 候補の PR 本文記録）までを連続実行する。単一対象を縦切りで実行し、Root Case / Epic / Child Issue を生成しない。実行範囲、入力、権限、検証条件を実行中に確認できる状態で実行する。不要な工程・独立文書・Issue を強制せず、採用された必要な要求・制約・検証義務を維持する。実装・検証・PR 作成の手順と副作用境界は case-run 委譲契約（result 4状態、worktree 隔離、3点ゲート）を準用し、成果物は PR で表出する。完了判定は要求充足の根拠（検証証拠）を確認した上で行い、PR マージや Issue 終了などの作業状態だけを完了の根拠にしない。連続実行した事実だけでは未成立の検証を完了扱いとせず、各段階の検証証拠に基づいて完了を判定する。Issue を生成しない場合でも検証証拠の記録（PR 本文の検証差分セクション）と Capture 回収の後処理を省略しない
 - **v5 設計確定モード**: 確定済み要件を入力とする設計形成を実行し、設計確定（case-open 実変更判定・設計PR作成、case-ready 設計PR受入・確定相当）で独立終了する。後続の実装構築・Issue 協調を強制されない。確定済み設計は canonical 成果物（docs/ Design・Decision）として永続化され、後続工程の正規入力となる。設計確定と最終的な要求充足の判定は別に扱う
-- **確定済み設計からの実装接続**: 利用者が確定済み詳細設計（canonical REQ/Decision/Design）と有限な実装対象・既存検証条件を指示した場合、req-define へ無条件に戻らず、実装・検証へ接続する。接続経路は v5 小規模連続実行モード（有限作業を Root Case / Epic / Issue を生成せず実行）または Root Case 指定の継続経路のいずれかであり、接続時に最新の実リポジトリの実装対象・依存・証拠を確認する。未検証の結果は未検証として報告する。実装・検証の手順と副作用境界は既存 case 実行契約（case-run 委譲契約: result 4状態・worktree 隔離・3点ゲート・PR 本文の検証証拠記録）を再利用し、新規の実行契約を導入しない（確定済み設計からの実装接続の実行主体と責務境界は Design `v51-phase-transition-and-coexistence-model`「実行主体と責務境界」節）
+- **確定済み設計からの実装接続**: 利用者が確定済み詳細設計（canonical REQ/Decision/Design）と有限な実装対象・既存検証条件を指示した場合、req-define へ無条件に戻らず、実装・検証へ接続する。接続経路は v5 小規模連続実行モード（有限作業を Root Case / Epic / Issue を生成せず実行）または Root Case 指定の継続経路のいずれかであり、接続時に最新の実リポジトリの実装対象・依存・証拠を確認する。未検証の結果は未検証として報告する。実装・検証の手順と副作用境界は既存 case 実行契約（case-run 委譲契約: result 4状態・worktree 隔離・3点ゲート・PR 本文の検証証拠記録）を再利用し、新規の実行契約を導入しない（確定済み設計からの実装接続の実行主体と責務境界は Design `phase-transition-and-coexistence-model`「実行主体と責務境界」節）
 - **単独工程の独立完了**: 要件確定のみ・設計確定のみ・確定済み設計からの実装・検証のみの各単独工程は、プロジェクトの採用済み工程・工程間関係・必須成果物の解決結果（採用規約の解決の公開操作契約を経て参照。正規対応は repository top-level `traceability/` 配下 sidecar を参照）を実行基準として、対象作業に必要な成果物と検証の成立を確認して独立完了する。後続実装・Issue・PR の一律要求と要件定義への無条件復帰を実行経路に組み込まない。設計確定のみの作業に後続実装を要求しない（独立レビューと設計確定独立終了の既有義務と整合。正規対応は repository top-level `traceability/` 配下 sidecar を参照）。詳細工程を採用しないプロジェクトでは標準案（参照モデルの詳細工程）を未採用候補として扱い、未採用の参照工程を単独工程の完了判定基準へ含めない
 - **Local 版での実装作業突合**: Local 版で実装作業（ファイル変更・commit）を伴う場合、ローカル記録と実 Git 取り込み結果（git status / git log / git diff）を独立して突合し、成功報告だけでは確定しない
 - **工程駆動成果物の再利用**: v5 モードの入力と検証条件に、工程駆動で形成・反映済みの正規成果物（canonical REQ/Decision/Design）を参照専用入力として利用できる。変更駆動の実行に工程駆動の操作・遷移を前置必須としない
@@ -189,6 +189,6 @@ case-auto 自身は全変更の意味判断を行わず、判断の局所所有�
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
+- **`<foundations/durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **Decision records**: Command / Workflow Skill / Capability Skill の責務分化、STEP resume point、bounded parent decision resolution、Definition 確定境界の正規判断
 - **case-auto command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

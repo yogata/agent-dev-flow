@@ -1,5 +1,5 @@
 // 変更前の証拠を再利用する場合の構造的適用可否確認（追跡・品質検証モデルにおける
-// 証拠再利用時の適用可否確認要件の機械解決面。v4-traceability-model Design と
+// 証拠再利用時の適用可否確認要件の機械解決面。traceability-model Design と
 // agentdev-traceability Design「advisory 能力と品質ゲートとしての check の境界」節の
 // 構造/意味分離に従う）。
 //

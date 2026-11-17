@@ -1,8 +1,8 @@
 ---
-title: ADF v4 Quality / Verification / Evidence / Gate モデル
+title: ADF Quality / Verification / Evidence / Gate モデル
 status: accepted
 created: 2026-09-18
-updated: 2026-11-17
+updated: 2026-11-18
 ---
 
 <!-- ADF-COVERS(implementation): REQ-003-013, REQ-007-006, REQ-007-007, REQ-007-008, REQ-007-009, REQ-054-003 -->
@@ -10,9 +10,9 @@ updated: 2026-11-17
 <!-- ADF-COVERS(design): REQ-103-018, REQ-103-019, REQ-103-029, REQ-103-031（REQ-103 の統制必要性・新規統制抑制・有限完了・最終検証判定の設計対応面） -->
 <!-- ADF-COVERS(implementation): REQ-103-018, REQ-103-019（統制種別必要性節と前置規律・検証体制の実装対応。統制の必要性説明の正規節を本 Design が所有する） -->
 
-# ADF v4 Quality / Verification / Evidence / Gate モデル
+# ADF Quality / Verification / Evidence / Gate モデル
 
-位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）の全行 executed と実際の処遇状態の確認をもってこの移行規則は現行規範ではなく、歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
+位置づけ: 本 Design は現行 Quality / Verification / Evidence / Gate モデルの定義である。
 
 ## 5 概念の定義と責務
 
@@ -25,21 +25,21 @@ Quality Policy / Verification Obligation / Verifier / Evidence / Gate の定義�
 - Gate: 次状態へ遷移するために必要な条件/Evidence が揃っているかを判定する predicate
 - Gate を checker、test、Skill の別名として定義せず、Bun invocation、path check、lint command 等の tool-specific detail は Gate の意味契約へ含めず Verifier/adapter/deterministic implementation 側へ置く
 
-## v4 standard lifecycle からの Gate 再導出
+## standard lifecycle からの Gate 再導出
 
 現行 QG-1〜QG-4 を前提としない再導出手順、requirements-driven verification（change -> risk -> verification obligation -> test strategy）との接続、要求形成時に必要 Evidence 種類を確定し実行後に同一 Evidence で完了判定する閉ループ。
 
-- 現行 QG-1〜QG-4 を v4 の前提とせず、v4 standard lifecycle と requirements-driven verification から必要な Gate を再導出する
+- 現行 QG-1〜QG-4 を v4 の前提とせず、standard lifecycle と requirements-driven verification から必要な Gate を再導出する
 - 要求形成時に必要 Evidence の種類が明確になり、実行後にその Evidence で完了判定できるモデルを作る
 
-## v4 standard lifecycle からの Gate 再導出（実行結果）
+## standard lifecycle からの Gate 再導出（実行結果）
 
 ### 再導出手順
 
-1. v4 standard lifecycle の公開遷移（Definition 保存完了、ready 遷移時の execution structure 確定、running への PR 化、closing 前）を対象遷移として列挙する
+1. standard lifecycle の公開遷移（Definition 保存完了、ready 遷移時の execution structure 確定、running への PR 化、closing 前）を対象遷移として列挙する
 2. 各対象遷移について、要件（change から risk を経由した verification obligation）と acceptance criteria から Verification Obligation を導出する
 3. 各 Obligation を満たす Verifier（deterministic / semantic）と、それが生成する Evidence（種別・保存契約）を確定する
-4. Evidence が揃っているかの predicate として Gate を定義し、v4-lifecycle-state-machine の deterministic gate predicate 接続点へ接続する
+4. Evidence が揃っているかの predicate として Gate を定義し、lifecycle-state-machine の deterministic gate predicate 接続点へ接続する
 5. 既存 gate 呼称（QG-1〜QG-4、工程内 gate 群）との対応を、保持・統合・置換・QG 番号なし工程内 gate の個別処遇として記録する
 
 ### 再導出結果（lifecycle 級 semantic Gate 群）
@@ -78,7 +78,7 @@ Quality Policy / Verification Obligation / Verifier / Evidence / Gate の定義�
 - Verifier の verdict は pass / warn / fail / partial の 4 値とする（common gate contract が定義）
 - Gate predicate への写像は、pass と warn を遷移可（warn は対応記録コメントへの記録を条件とする）、fail を遷移不可、partial を判定保留として遷移不可（残余 Obligation の解消後に再判定が必要）とする
 - QG-4 は partial を不可として扱い、再判定は当該 close 内で完了させる必要がある
-- semantic Verifier の verdict は deterministic gate predicate へ供給される。semantic gate は遷移に直接接続せず、v4-lifecycle-state-machine の deterministic gate predicate 接続点（唯一の接続点）を経由して遷移を制御する
+- semantic Verifier の verdict は deterministic gate predicate へ供給される。semantic gate は遷移に直接接続せず、lifecycle-state-machine の deterministic gate predicate 接続点（唯一の接続点）を経由して遷移を制御する
 
 ### 証拠種別と Verifier 分類の直交
 
@@ -101,7 +101,7 @@ v3 quality/quality-gates.md は本 Design により supersede 済みである。
 
 full integrity suite 受入れ基準・bun test 正規形・機械受理基準の正規形は、skill Design（skills/agentdev-quality-gates.md および references）が原本として保持する（REQ-060 が指定）。本 Design は意味契約と権威ポインタのみを所有し、実行詳細の二重管理を行わない。
 
-Gate 群の列挙と体系変更は本 Design（quality ドメイン）が所有する。Standard Operating Model（v4-standard-lifecycle）は work_type / scale / Epic / Wave の語彙と lifecycle 遷移を所有し、Gate の定義本体は本 Design に帰属する。
+Gate 群の列挙と体系変更は本 Design（quality ドメイン）が所有する。Standard Operating Model（standard-lifecycle）は work_type / scale / Epic / Wave の語彙と lifecycle 遷移を所有し、Gate の定義本体は本 Design に帰属する。
 
 ## QG-2 / QG-4 の受け入れ義務保存拡張（RU-20261004-08）
 
@@ -117,8 +117,8 @@ QG-2 / QG-4 の Verification Obligation への受け入れ義務保存の拡張�
 
 deterministic verifier と semantic verifier の分類、Evidence の保存契約（永続/参照可能）。
 
-- deterministic verifier は決定的処理として実行される検証であり、semantic verifier は閉じた意味評価または開いた推論を含む検証である。判断方法3分類の正典は DEC-048 と foundations/v4-responsibility-boundaries Design「判断方法3分類の判別基準」節であり、本分類は検証の実行方式の分類として判断方法3分類へ対応づく。旧 DEC-036 決定(1) の deterministic／semantic 二分法は判断方法の分類としては DEC-048 が置換済みであり、判断方法の分類として本分類（Verifier 分類）の語彙を使用しない
-- 必須の閉じた意味評価を検証とする semantic verifier が評価器障害（未設定、利用不能、timeout、rate limit、network error、provider error、応答検証失敗等）で成立しない場合、判定は未確定とし、LLM 推論へ fallback せず、partial（判定保留）として遷移不可を維持する（REQ-103-008、REQ-103-009。runtime 面の適用は v4-runtime-execution-model Design「判定未確定時の依存後続抑止」節）
+- deterministic verifier は決定的処理として実行される検証であり、semantic verifier は閉じた意味評価または開いた推論を含む検証である。判断方法3分類の正典は DEC-048 と foundations/responsibility-boundaries Design「判断方法3分類の判別基準」節であり、本分類は検証の実行方式の分類として判断方法3分類へ対応づく。旧 DEC-036 決定(1) の deterministic／semantic 二分法は判断方法の分類としては DEC-048 が置換済みであり、判断方法の分類として本分類（Verifier 分類）の語彙を使用しない
+- 必須の閉じた意味評価を検証とする semantic verifier が評価器障害（未設定、利用不能、timeout、rate limit、network error、provider error、応答検証失敗等）で成立しない場合、判定は未確定とし、LLM 推論へ fallback せず、partial（判定保留）として遷移不可を維持する（REQ-103-008、REQ-103-009。runtime 面の適用は runtime-execution-model Design「判定未確定時の依存後続抑止」節）
 
 ## 統制種別と必要性（REQ-103-018・019）
 
@@ -126,15 +126,15 @@ REQ-103-018 が列挙する統制種別ごとの正規モデル上の必要性�
 
 | 統制種別 | 正規モデル上の必要性 | 詳細契約の正規所有 |
 |---|---|---|
-| hard gate | 状態遷移を誤った前提で進行させない機械的拒否。モデルの遵守判断に委ねず、遷移・副作用の前に拒否する | 本 Design「5 概念の定義と責務」（Gate = 状態遷移 predicate）、v4-runtime-execution-model（authority 格子と直列化単位） |
-| fail-closed | 検査不能・異常・設定不備時に成功を偽装せず停止する。静かな成功による品質境界の崩壊を防ぐ | v4-runtime-execution-model「fail-closed 適用範囲」（書込み経路の統制点は fail-closed。助言的統合〔検査・診断系等〕のみ fail-open 許容） |
+| hard gate | 状態遷移を誤った前提で進行させない機械的拒否。モデルの遵守判断に委ねず、遷移・副作用の前に拒否する | 本 Design「5 概念の定義と責務」（Gate = 状態遷移 predicate）、runtime-execution-model（authority 格子と直列化単位） |
+| fail-closed | 検査不能・異常・設定不備時に成功を偽装せず停止する。静かな成功による品質境界の崩壊を防ぐ | runtime-execution-model「fail-closed 適用範囲」（書込み経路の統制点は fail-closed。助言的統合〔検査・診断系等〕のみ fail-open 許容） |
 | checker | 整合性検査の実行手段と検出基準を契約化し、検証の属人化と誤検出の反復を防止する | checker-execution-contracts（checker 共通実行契約、detector 命名規約）、integrity-contracts（深刻度分類） |
-| MUST NOT / 禁止規則 / must_not | 機械拒否に落とせない前提契約を規範として宣言し、checker・guard 実装の根拠を与える（LLM fallback 禁止、raw gh 書込み禁止、自動ループバック禁止、guard 迂回禁止等） | 各禁止を正規所有する REQ/Decision/Design（LLM fallback 禁止: v4-responsibility-boundaries「閉じた意味評価の障害時契約」、raw gh 書込み禁止: custom-tool-contracts「迂回防止」） |
+| MUST NOT / 禁止規則 / must_not | 機械拒否に落とせない前提契約を規範として宣言し、checker・guard 実装の根拠を与える（LLM fallback 禁止、raw gh 書込み禁止、自動ループバック禁止、guard 迂回禁止等） | 各禁止を正規所有する REQ/Decision/Design（LLM fallback 禁止: responsibility-boundaries「閉じた意味評価の障害時契約」、raw gh 書込み禁止: custom-tool-contracts「迂回防止」） |
 | adversarial-review | 本質的争点を人間判断へ引き上げる前に、複数視点の相互反証で争点解消を試みる。恒久統制ゲートではなく審議契約であり、skip 条件を契約として持つ | REQ-082、skills/agentdev-adversarial-review Design（3論理役割・動的レビュー戦略・read-only 境界） |
-| HITL | 人間に留保された判断（REQ-103-012）の確定を、判断確定のみに限定して工程へ接続する。作業実行の代行、運用介入の承認、評価器障害時の人間判断移行と混同しない | v4-responsibility-boundaries「HITL 判断確定原則」「人間判断への引き上げ条件」（評価器障害除外を含む） |
-| fallback | 障害時に正規の再実行・再開経路へ戻せること自体が要件である場合の代替経路のみを許し、判定方式の代替・無断の品質劣化経路を禁止する（LLM fallback 禁止、publish の copy/rename fallback 不導入） | v4-responsibility-boundaries「閉じた意味評価の障害時契約」、v4-runtime-execution-model「判定未確定時の依存後続抑止」、v4-durable-state-and-recovery「評価器復旧後の評価再開契約」 |
+| HITL | 人間に留保された判断（REQ-103-012）の確定を、判断確定のみに限定して工程へ接続する。作業実行の代行、運用介入の承認、評価器障害時の人間判断移行と混同しない | responsibility-boundaries「HITL 判断確定原則」「人間判断への引き上げ条件」（評価器障害除外を含む） |
+| fallback | 障害時に正規の再実行・再開経路へ戻せること自体が要件である場合の代替経路のみを許し、判定方式の代替・無断の品質劣化経路を禁止する（LLM fallback 禁止、publish の copy/rename fallback 不導入） | responsibility-boundaries「閉じた意味評価の障害時契約」、runtime-execution-model「判定未確定時の依存後続抑止」、durable-state-and-recovery「評価器復旧後の評価再開契約」 |
 | duplicated validation | 同一命題を正規工程として再判定することは禁止する（REQ-103-003）。一方、副作用の成功保証としての入力検証＋読戻し照合、列挙件数と期待件数の突合など、命題の異なる防御的な二重確認は区別して許容する | artifact-contracts（Custom Tool 操作契約の読戻し検証）、checker-execution-contracts「パターンマッチ・網羅検査設計の標準規約」（件数突合） |
-| state | 判断・進行・証跡の durable な保持と、復旧後の正規再開経路を契約化する。導出可能情報を恒久保持しない | v4-durable-state-and-recovery（5 分類と配置表、状態権威、部分失敗調整） |
+| state | 判断・進行・証跡の durable な保持と、復旧後の正規再開経路を契約化する。導出可能情報を恒久保持しない | durable-state-and-recovery（5 分類と配置表、状態権威、部分失敗調整） |
 | ledger | 判断根拠の到達性を保つ追跡対象を限定して保持する。恒久台帳の新設は必要性が立証された場合に限り、今回限りの記録を恒久台帳化しない（REQ-103-017） | traceability policy と sidecar（agentdev-traceability）、checker-execution-contracts「IR-055 warning 総数 ratchet と baseline provenance の実行契約」（provenance 付き baseline） |
 | routing | artifact 種別から必要な品質能力を決定的に導出し、検査の適用漏れと過剰適用の双方を防ぐ | artifact-quality-control-routing（合成規則、能力キー定義、QG-2 投影契約） |
 | additional schema | 構造化された副作用操作の入出力を検証可能にする。soft contract の決定的に扱える部分（存在確認、型、列挙値、ID、参照関係）の機械処理を許容する（REQ-103-013）。schema 検証の全面禁止を意味しない | artifact-contracts（soft contract 再定義、req_draft 出力構造）、custom-tool-contracts（Custom Tool 操作契約） |

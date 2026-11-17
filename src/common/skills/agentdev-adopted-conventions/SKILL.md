@@ -8,7 +8,7 @@ description: Deterministic resolver for adopted conventions (processes, relation
 本スキルは採用規約（プロジェクトが採用した詳細工程・工程間関係・必須成果物）を宣言・保存・解決する機構の、決定的解決器とその利用知識を提供する。
 工程構成に基づいて成果物の有無・成立を判定するすべての作業（Case 実行、品質ゲート、docs 診断等）から参照される。
 
-モデル・判定規則の規範は producer 側リポジトリの ADF v5 採用規約機構 Design（v5-adopted-conventions）が所有する。本スキルはその利用知識と実行能力を提供し、規範の独立定義を行わない。
+モデル・判定規則の規範は producer 側リポジトリの ADF v5 採用規約機構 Design（adopted-conventions）が所有する。本スキルはその利用知識と実行能力を提供し、規範の独立定義を行わない。
 
 ## モデルの基本（採用規約の 3 構成要素）
 

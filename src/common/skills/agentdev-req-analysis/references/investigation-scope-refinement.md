@@ -74,7 +74,7 @@ Design はパス参照（docs 配下の Design 文書パス）と用語参照の
 ## サブエージェント調査委譲への引き渡し
 
 調査優先対象リストはサブエージェント調査委譲の入力（`inputs`）に含める。
-委譲時最小契約（v4-delegation-contracts Design）に従い、リストは探索のヒントであり、サブエージェント調査委譲の出力契約（探索結果、分類候補、根拠）を変更しない。
+委譲時最小契約（delegation-contracts Design）に従い、リストは探索のヒントであり、サブエージェント調査委譲の出力契約（探索結果、分類候補、根拠）を変更しない。
 
 ```
 inputs:
@@ -105,10 +105,10 @@ inputs:
 - **ヒント扱い**: 絞り込み結果をハードフィルタとして扱わない。サブエージェント調査委譲が `unscoped` を調査対象から除外することを禁止する
 - **完全列挙の維持**: 実ファイル完全列挙の要求を本前処理で省略、代替しない
 - **全文の機械抽出**: 調査対象全文をモデルに逐語再生成させない。機械的手段による取得結果の参照（`full_text_refs`）を引き継ぐ
-- **責務境界**: 本前処理は探索の優先付けのみを担う。探索結果のドラフト反映は親エージェント（req-define）が行う（v4-delegation-contracts Design）
+- **責務境界**: 本前処理は探索の優先付けのみを担う。探索結果のドラフト反映は親エージェント（req-define）が行う（delegation-contracts Design）
 
 ## See Also
 
 - `agentdev-req-analysis` SKILL.md「既存REQ/Decisionの定量的照合」（REQ 完全列挙）
-- v4-delegation-contracts Design（委譲時最小契約）
+- delegation-contracts Design（委譲時最小契約）
 - REQ（本前処理の要件）

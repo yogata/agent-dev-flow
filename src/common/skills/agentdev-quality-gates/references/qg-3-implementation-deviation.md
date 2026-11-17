@@ -6,7 +6,7 @@ case-run で PR 作成前に、実装が Issue/ REQ/ Decision/ Design/ work plan
 
 ## v4 Quality モデルへの接続
 
-本 Gate は ADF v4 Quality モデル（v4-quality-gate-model Design）の lifecycle 級 semantic Gate 群として再導出された QG-3（Implementation Deviation）である。
+本 Gate は ADF v4 Quality モデル（quality-gate-model Design）の lifecycle 級 semantic Gate 群として再導出された QG-3（Implementation Deviation）である。
 本ファイルの 3 層は同 Design「再導出結果（lifecycle 級 semantic Gate 群）」表の QG-3 行と次のように対応する。
 
 | 層 | 対応内容 |
@@ -16,10 +16,10 @@ case-run で PR 作成前に、実装が Issue/ REQ/ Decision/ Design/ work plan
 | Evidence | PR 本文・乖離分類記録・検査ログ（機械的証拠・推論証拠） |
 
 - 対象遷移（v4 lifecycle deterministic gate predicate 接続点）: running への PR 化前
-- 判定値と Gate predicate の写像: `fail` は PR 化不可（遷移不可）。`pass`/ `warn` は継続可。写像の正規定義は v4-quality-gate-model Design「判定値と遷移接続」節と [common-gate-contract.md](common-gate-contract.md)「5 概念への写像」を参照する
-- 証拠分類の直交: 上表 Evidence の証拠分類（機械的/ 推論）は Evidence の属性であり、Verifier 分類（deterministic/ semantic）とは直交する。正規定義は v4-quality-gate-model Design「証拠種別と Verifier 分類の直交」節を参照する
+- 判定値と Gate predicate の写像: `fail` は PR 化不可（遷移不可）。`pass`/ `warn` は継続可。写像の正規定義は quality-gate-model Design「判定値と遷移接続」節と [common-gate-contract.md](common-gate-contract.md)「5 概念への写像」を参照する
+- 証拠分類の直交: 上表 Evidence の証拠分類（機械的/ 推論）は Evidence の属性であり、Verifier 分類（deterministic/ semantic）とは直交する。正規定義は quality-gate-model Design「証拠種別と Verifier 分類の直交」節を参照する
 - v3 からの処遇: 保持（配置点を PR 化前へ再錨定。同 Design「QG-1〜QG-4 個別処遇対応表」の QG-3 行。根拠は「実装差分検証 Obligation は PR route で不変」）
-- 責務分界: Gate の意味契約の正は v4-quality-gate-model Design が所有し、本ファイルは判定観点・乖離分類・検査手順の実行詳細を所有する（二重管理を行わない）
+- 責務分界: Gate の意味契約の正は quality-gate-model Design が所有し、本ファイルは判定観点・乖離分類・検査手順の実行詳細を所有する（二重管理を行わない）
 
 ## 配置
 

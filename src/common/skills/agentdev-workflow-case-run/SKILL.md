@@ -147,13 +147,13 @@ case-run は、実行担当サブエージェントへの委譲契約に重要�
 - **工程記録の取りまとめ反映**: 委譲 result 受領時・途中報告受領時は「工程記録の取りまとめ反映（記録契機）」節に従い、記録コメント投稿と本文進行状況・結果セクション更新を実行する（手順詳細は references/delegation-and-result.md）
 - **Findings / Design確定候補**: 実行担当サブエージェントが PR 本文の `## Findings / Capture候補` と `## Design確定候補` に記録する（別セクション、混在させない）。case-run の capture 責務は記録のみ
 - **外部実行ハーネスの中間成果物**: plan artifact 等を AgentDevFlow の永続成果物として扱わず、最終結果は PR URL で受領する
-- **検証用一時資材の作成・報告義務の委譲と後片付け結果の受領**: STEP-S4 の委譲 prompt には、一時資材の作成・利用・回収に関する義務を含める（v4-delegation-contracts Design「検証用一時資材の作成・報告義務」節。委譲先は既存の配置規則と権限に従う標準的な一時領域・リポジトリ内の作業領域・許可された外部環境で作成・利用し、利用終了時に安全条件が成立する範囲で回収する。継続利用する資材は引継ぎ事項として報告する）。STEP-S5 で委譲結果を受領した場合、検証結果に加え、後片付けの実施結果、確認根拠、未処理事項（未回収・確認不能・引継ぎ）が既存の報告経路で返されていることを確認する。必要な副作用が許可範囲を超える場合は既存の停止・判断経路を利用する（許可境界の正は委譲時の判断・承認・副作用境界の REQ。対応関係は repository top-level `traceability/` 配下 sidecar を参照）
+- **検証用一時資材の作成・報告義務の委譲と後片付け結果の受領**: STEP-S4 の委譲 prompt には、一時資材の作成・利用・回収に関する義務を含める（delegation-contracts Design「検証用一時資材の作成・報告義務」節。委譲先は既存の配置規則と権限に従う標準的な一時領域・リポジトリ内の作業領域・許可された外部環境で作成・利用し、利用終了時に安全条件が成立する範囲で回収する。継続利用する資材は引継ぎ事項として報告する）。STEP-S5 で委譲結果を受領した場合、検証結果に加え、後片付けの実施結果、確認根拠、未処理事項（未回収・確認不能・引継ぎ）が既存の報告経路で返されていることを確認する。必要な副作用が許可範囲を超える場合は既存の停止・判断経路を利用する（許可境界の正は委譲時の判断・承認・副作用境界の REQ。対応関係は repository top-level `traceability/` 配下 sidecar を参照）
 - **L2 タイムスタンプ**: worktree 設定、実行担当サブエージェント実行、worktree クリーンアップの各開始・終了時刻（JST）を計測し、完了報告の L2 内訳に含める（case-auto の L1 内訳の入力）
 
 ## See Also
 
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<foundations/v4-durable-state-and-recovery>` Design**: STEP reference 構造、resume point
+- **`<foundations/durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **責務3層分化と1:N分割原則**: Command は公開入口、Workflow Skill は工程の実装、Capability Skill は共通能力を所有する。Workflow Skill の分割は制御構造の実質差異に基づき評価し、操作の違いだけでは分割しない。
 - **STEP resume point と会話記憶非依存**: 安定した STEP 識別子と永続情報から再開点を再構成する。再開点を決める契約と、実行基盤による現在 STEP の選択処理を区別する。
 - **case-run command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）

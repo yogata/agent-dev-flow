@@ -37,7 +37,7 @@ case-run は実行担当サブエージェントを委譲起動する。
 - 委譲プロンプト: 実行 command を prompt 内で指定し Issue #N の実装を指示する（command の具体名は AGENTS.md 参照）。実行 command は Issue を success criteria に分解、各 criterion に observable evidence を要求、品質ゲート（code review + QA review + gate review）を実行する
 - 委譲プロンプト（worktree 指定）: 実行 command 指定以降に worktree root とブランチ名を含める（後述「委譲プロンプト構築例」参照）
 
-複数の実行担当サブエージェントを並列委譲する場合（Epic Wave 並列委譲、case-auto orchestration stage 3）、起動バーストによる実行基盤・モデル provider への瞬間的なリクエスト集中を抑えるため、委譲起動ごとに10秒の起動間隔を置く（v4-runtime-execution-model Design「runtime 制御ループ」節〔起動間隔・並列数制御〕）。
+複数の実行担当サブエージェントを並列委譲する場合（Epic Wave 並列委譲、case-auto orchestration stage 3）、起動バーストによる実行基盤・モデル provider への瞬間的なリクエスト集中を抑えるため、委譲起動ごとに10秒の起動間隔を置く（runtime-execution-model Design「runtime 制御ループ」節〔起動間隔・並列数制御〕）。
 最初の1件を起動した後、以降の各委譲起動の前に待機コマンド（例: `bash: sleep 10`）を実行してから発行する。
 同一のTool呼び出し一括ブロックで複数の委譲起動を発行しない（1ブロック1委譲起動）。
 
@@ -108,7 +108,7 @@ case-run は result から PR URL（PR番号）を取り出す。
   - Issue コメント（blocked / failed 時の SSoT コメント）
   - durable state ファイル（`.agentdev/` 配下、git 永続化対象）
 - 委譲側（case-run）は受領経路を委譲時に把握し、子 task 完了後の証跡読み戻しは一時 session 応答からではなく永続チャネルから行う
-- 本手順は委譲時の運用手順の明示であり、record-in-findings 契約自体、一時 session 通信機構、委譲契約の最小水準（手段非依存）は変更しない。`v4-delegation-contracts.md` Design への追記は行わない（証跡の永続チャネル受領経路の具体は adapter の運用手順として本 reference に属する）
+- 本手順は委譲時の運用手順の明示であり、record-in-findings 契約自体、一時 session 通信機構、委譲契約の最小水準（手段非依存）は変更しない。`delegation-contracts.md` Design への追記は行わない（証跡の永続チャネル受領経路の具体は adapter の運用手順として本 reference に属する）
 
 ## timeout、中断
 
@@ -170,7 +170,7 @@ plan_change: なし（委譲中に計画変更が生じた場合は result に�
 ## 委譲識別情報ブロック
 
 委譲 prompt には `<delegation-ident>` ブロックとして委譲識別情報を記録する。
-記録先割当は v4-durable-state-and-recovery Design「ADF 実行識別情報の記録契約」節に従い、委譲 prompt が委譲単位識別子の記録先となる。
+記録先割当は durable-state-and-recovery Design「ADF 実行識別情報の記録契約」節に従い、委譲 prompt が委譲単位識別子の記録先となる。
 
 | key | 意味 |
 |---|---|
@@ -185,7 +185,7 @@ plan_change: なし（委譲中に計画変更が生じた場合は result に�
 ## 構造化文脈の直列化（委譲時）
 
 委譲 prompt は、委譲時最小契約（入力（inputs）、副作用境界（side_effect_boundary）、出力契約（output_contract）、capture 引継ぎ（capture_handoff））の骨格を変更せず、入力（inputs）内に構造化文脈を直列化する。
-原本仕様は `<workflows/v4-delegation-contracts>` Design「構造化文脈引き継ぎ（委譲時）の直列化契約」であり、本節は配布物への適用形を定める。
+原本仕様は `<workflows/delegation-contracts>` Design「構造化文脈引き継ぎ（委譲時）の直列化契約」であり、本節は配布物への適用形を定める。
 
 構造化文脈は次の意味を扱う。
 
@@ -240,14 +240,14 @@ inputs:
 ### structured_context の SSoT 抽出と突合検査
 
 structured_context の生成（委譲 prompt 構築）は、次の抽出制約と突合検査に従う。
-原本仕様は `<workflows/v4-delegation-contracts>` Design「structured_context の SSoT 抽出制約」である。
+原本仕様は `<workflows/delegation-contracts>` Design「structured_context の SSoT 抽出制約」である。
 
 - structured_context の作業内容・purpose は、委譲先 Issue 本文の概要または正規 REQ から抽出する。親セッションの会話コンテキスト由来の推定・波及解釈を注入しない。
 - 委譲 prompt 生成時に、委譲先 Issue 番号と structured_context に含める対象成果物パス（Issue 本文の Execution Contract が示す変更対象成果物）の一致を検査する。不一致の場合は委譲を開始しない。
 - 正典から導出可能な補助情報（対象一覧・操作サマリ等）を委譲 prompt へ含める場合、当該補助情報は正典と機械突合可能な形式（対象ファイル、対象 REQ、対象成果物パス等を正典から機械的に列挙できる形）で記述する。委譲 prompt 生成時に正典と突合し、不一致を検出した場合は当該補助情報を委譲 prompt から除去するか、正典に一致する内容へ置換してから委譲を開始する（抽出制約の正典導出補助情報への拡張）。
 - 委譲を受けた実行側（実行担当サブエージェント）は、補助情報と正典の不一致を検出した場合、正典を優先し、補助情報を根拠とした対象判断・本文更新・実行継続を行わない。不一致の検出自体を親（case-run）へ報告する。
 - 委譲指示と Issue 本文の作業内容が乖離した過去事例（Issue #2566、Issue #2562）と同種の乖離は、上記の抽出制約と突合検査により契約上禁止となる。
-- 委譲 prompt 生成時、structured_context の「実装状態」要約（resolved_context の前工程で確定した事項・実装結果を含む実現状態の記述）は、Issue 本文 SSoT・git log 実測と突合してから委譲する。会話記憶のみから実施状態要約を生成しない。verify-only closure 前提の誤発火（PR なしクローズによる未実装完了扱い）を防止する。原本規約は `<workflows/v4-delegation-contracts>` Design「委譲コンテキストの実現状態突合」節である。
+- 委譲 prompt 生成時、structured_context の「実装状態」要約（resolved_context の前工程で確定した事項・実装結果を含む実現状態の記述）は、Issue 本文 SSoT・git log 実測と突合してから委譲する。会話記憶のみから実施状態要約を生成しない。verify-only closure 前提の誤発火（PR なしクローズによる未実装完了扱い）を防止する。原本規約は `<workflows/delegation-contracts>` Design「委譲コンテキストの実現状態突合」節である。
 
 ## 委譲プロンプト雛形（委譲契約必須テンプレート）
 
@@ -278,7 +278,7 @@ case-run は委譲プロンプト構築時に本テンプレート構造を維�
 - PR 本文の必須セクション: Refs（Issue 番号）、実行識別情報（adf_delegation へ委譲単位識別子を転記）、検証差分（実行工程 case-run の行ごとに観測証跡を記録）、Findings / Capture候補、Design確定候補。正: adapter skill「実行担当サブエージェントの責務」節、agentdev-workflow-templates の実行識別情報・検証差分セクション規約
 - SSoT チャネル: 成功（completed-pr）は PR 本文、blocked / failed は Issue コメント。一時 session 通信・ローカル変数・中間ファイルは SSoT ではない。正: adapter skill「Result 契約（最小契約）」節の SSoT 表
 - 禁止事項の要点: 完了条件チェックボックス更新（case-close 専任）、Issue 進行状況更新（取りまとめ専任）、raw gh CLI による GitHub 書込み（Custom Tool 経由）、配布物本文への concrete ID 直書き（対応関係は traceability/ sidecar へ）、`.agentdev/intake/` `.agentdev/learning/` の直接変更、生 gh WRITE 迂回、スイープ stage（`git add -A` 等）。正: 委譲 prompt の MUST NOT DO セクション、capture-boundaries reference
-- 検証用一時資材と後片付け: 検証用remote、clone、bare repository、退避ログ、補助スクリプト、専用server・process等の検証用一時資材（worktree クリーンアップとは別の検証作業の資材）は、許可された範囲で作成・利用し、安全条件が成立する範囲で回収する。後片付けの実施結果、確認根拠、未処理事項（未回収・確認不能・引継ぎ）を報告へ含め、継続利用する資材は引継ぎ事項として報告する。許可範囲を超える必要副作用は既存の停止・判断経路を利用する。正: v4-delegation-contracts Design「検証用一時資材の作成・報告義務」節、検証に伴う一時資材の取扱いと後片付け責任 Design「一時資材の配置・利用・回収」節
+- 検証用一時資材と後片付け: 検証用remote、clone、bare repository、退避ログ、補助スクリプト、専用server・process等の検証用一時資材（worktree クリーンアップとは別の検証作業の資材）は、許可された範囲で作成・利用し、安全条件が成立する範囲で回収する。後片付けの実施結果、確認根拠、未処理事項（未回収・確認不能・引継ぎ）を報告へ含め、継続利用する資材は引継ぎ事項として報告する。許可範囲を超える必要副作用は既存の停止・判断経路を利用する。正: delegation-contracts Design「検証用一時資材の作成・報告義務」節、検証に伴う一時資材の取扱いと後片付け責任 Design「一時資材の配置・利用・回収」節
 </delegation-contract-summary>
 ```
 

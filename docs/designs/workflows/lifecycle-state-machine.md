@@ -1,16 +1,16 @@
 ---
-title: ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応）
+title: ADF ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応）
 status: accepted
 created: 2026-09-19
-updated: 2026-11-12
+updated: 2026-11-18
 ---
 <!-- ADF-COVERS(implementation): REQ-008-003, REQ-008-008, REQ-008-036, REQ-008-037 -->
 <!-- ADF-COVERS(implementation): REQ-005-001, REQ-005-025, REQ-005-026, REQ-005-027, REQ-005-028, REQ-035-004, REQ-035-005 -->
 <!-- ADF-COVERS(design): REQ-006-112 -->
 
-# ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応）
+# ADF ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応）
 
-位置づけ: 本 Design は ADF v4 モデルの定義である。本 Design の規定が v3 accepted Design と衝突する場合、移行期間中は当該 v3 Design の処遇実行段階（v3-v4-crosswalk のreferences/crosswalk-inventory.md 実行段階列）まで v3 を正とし、当該段階での置換実行をもって権威は本 Design へ移行した。処遇記録（references/crosswalk-inventory.md）の全行 executed と実際の処遇状態の確認をもってこの移行規則は現行規範ではなく、歴史的説明として保持する（REQ-103-020）。既存 Design 群の本モデルへの準拠更新（置換・廃止を含む）は後続 Sequence で段階的に実施した。
+位置づけ: 本 Design は現行ライフサイクル状態機械の定義である。
 
 ## 二層状態モデル
 
@@ -33,7 +33,7 @@ v4 ライフサイクル状態は、durable state enum（永続状態）と runt
 
 各 durable 状態遷移は次の要素で定義する。
 
-- 遷移 predicate は deterministic gate（機械検証可能。本 Design が所有）と semantic gate（Skill の意味判断。Quality/Verification/Evidence/Gate モデル（v4-quality-gate-model Design）が所有）に分離する。deterministic gate は決定的処理として、semantic gate は閉じた意味評価または開いた推論として実行される（判断方法3分類の正典: DEC-048、foundations/v4-responsibility-boundaries Design「判断方法3分類の判別基準」節）。gate の実行方式分類（deterministic/semantic）を判断方法の分類として使用しない
+- 遷移 predicate は deterministic gate（機械検証可能。本 Design が所有）と semantic gate（Skill の意味判断。Quality/Verification/Evidence/Gate モデル（quality-gate-model Design）が所有）に分離する。deterministic gate は決定的処理として、semantic gate は閉じた意味評価または開いた推論として実行される（判断方法3分類の正典: DEC-048、foundations/responsibility-boundaries Design「判断方法3分類の判別基準」節）。gate の実行方式分類（deterministic/semantic）を判断方法の分類として使用しない
 - deterministic gate predicate を Gate モデルの唯一の接続点として宣言する（Quality 段階での Gate 再導出はこの接続点に接続する）
 - 遷移後状態の権威記録先を 1 つ定め、他の記録は投影とする（DEC-038 の 1 権威原則）
 - 遷移の合法性（禁止遷移を含む）は backend 抽象の論理規則として定義し、物理表現（GitHub の Issue 本文・ラベル・close reason、ローカル版の Issue ファイル）への写像は backend 別の物理写像表で与える
@@ -73,15 +73,15 @@ v4 ライフサイクル状態は、durable state enum（永続状態）と runt
 - 子Issue 実行状態（永続系 4 状態）と case-run result 4 状態、verify-only closure
 
 統合対象外の関連状態空間として、追跡Issue 6 状態（created/in-discussion/on-hold/ready/resolved/closed）を挙げる。追跡Issue lifecycle は Case 実行ライフサイクルの外の独立状態空間であり、本機械の部分ビューに含めない。
-v3 backlog-artifact-lifecycle Design の RU/draft 状態・削除契約は本 Design の RU/採用済み成果物/draft lifecycle 部分ビュー定義へ承継された（承継分配の正は第9段 Root Case #3022。配置・権威の詳細は v4-durable-state-and-recovery Design 参照）。
+v3 backlog-artifact-lifecycle Design の RU/draft 状態・削除契約は本 Design の RU/採用済み成果物/draft lifecycle 部分ビュー定義へ承継された（承継分配の正は第9段 Root Case #3022。配置・権威の詳細は durable-state-and-recovery Design 参照）。
 
 ## v3 状態関連 Design の処遇（planned supersede 記録）
 
-v3 状態関連 Design 9 件の処遇（planned supersede・実行段階）の原本は foundations/v3-v4-crosswalk.md の references/crosswalk-inventory.md（Design 表の supersede 行）が所有する。本 Design は各 v3 Design を一般化契約として被覆する関係のみを所有する。
+本 Design は一般化契約として他の状態関連 Design を被覆する関係のみを所有する。
 ## enum 整合の機械検査可能性
 
 状態 enum とその記録表現（Epic 本文ステータス表、Issue 本文状態記載、テンプレート）の間に不整合が生じないよう、enum 値の定義表を正とし、記録側表現は enum 値の写像であることを宣言する（v3 運用で観測された表現ドリフトの再発防止）。
 
 ## v3 workflow-contracts Design からの吸収
 
-v3 workflow-contracts Design が所有していた result 契約の 1 権威と導出投影への再編、共通実行契約の一般化、状態機械選択適用原則の継承（REQ-005-026）、runtime 実行状態の非永続化と正規状態からの再構成、報告における実行状態・停止理由・再開可否・処理固有結果の意味区別（REQ-005-025/027/028）は本 Design の規定へ吸収された。旧 Design は第4段で削除され、対応関係の原本は v3-v4-crosswalk references/crosswalk-inventory.md が追跡する。
+v3 workflow-contracts Design が所有していた result 契約の 1 権威と導出投影への再編、共通実行契約の一般化、状態機械選択適用原則の継承（REQ-005-026）、runtime 実行状態の非永続化と正規状態からの再構成、報告における実行状態・停止理由・再開可否・処理固有結果の意味区別（REQ-005-025/027/028）は本 Design の規定へ吸収された。旧 Design は削除済みであり、対応関係の記録は Git 履歴で担保する（REQ-103-020）。

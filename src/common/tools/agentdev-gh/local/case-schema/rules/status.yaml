@@ -6,7 +6,7 @@
 # role ごとの status 値域・終端状態・状態遷移を定義する。
 # role: tracking の 6 状態と三段写像（GitHub open/closed、Tool issue_close reason
 # の対応）の意味論の正は agentdev-issue-tracking Design が所有する。
-# role: case の 7 状態の正は REQ-006-112 と workflows/v4-lifecycle-state-machine
+# role: case の 7 状態の正は REQ-006-112 と workflows/lifecycle-state-machine
 # Design、物理表現（状態遷移表・禁止遷移）は docs/designs/local/local-case-file.md が
 # 所有する。本ファイルは docs/designs/local/local-case-file.md と矛盾してはならない。
 #
