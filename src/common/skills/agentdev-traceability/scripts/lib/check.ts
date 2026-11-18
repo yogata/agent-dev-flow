@@ -116,7 +116,7 @@ const MALFORMED_DECLARATION_FIXTURE_EXEMPTIONS: readonly {
 }[] = [
   {
     // distribution-boundary 検出器の escape 隠蔽 fail-closed 回帰テスト行。
-    file: ".opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.test.ts",
+    file: "src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/distribution-boundary.test.ts",
     lineIncludes: ["REQ", "-", "\\\\", "u0030", "\\\\", "u0031"].join(""),
   },
 ];

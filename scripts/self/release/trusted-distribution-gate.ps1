@@ -92,7 +92,7 @@ $ErrorActionPreference = 'Stop'
 # Resolve the protected CLI entry relative to this script
 # (scripts/self/release/ -> repo root is three levels up). We do NOT honor
 # any override path: the CLI must be the committed protected file.
-$cliTs = Join-Path (Join-Path $PSScriptRoot '..\..\..') '.opencode\skills\repo-agentdev-integrity\scripts\trusted-distribution-gate\cli.ts'
+$cliTs = Join-Path (Join-Path $PSScriptRoot '..\..\..') 'src\common\skills\repo-agentdev-integrity\trusted-distribution-gate\cli.ts'
 if (-not (Test-Path -LiteralPath $cliTs)) {
     [Console]::Error.WriteLine("trusted-distribution-gate: protected cli.ts missing at $cliTs")
     exit 9

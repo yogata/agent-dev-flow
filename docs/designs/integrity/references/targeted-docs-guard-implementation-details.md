@@ -2,7 +2,7 @@
 title: Targeted Docs Guard 実装詳細参照
 status: accepted
 created: 2026-08-20
-updated: 2026-10-22
+updated: "2026-11-18"
 ---
 
 # Targeted Docs Guard 実装詳細参照
@@ -13,7 +13,8 @@ updated: 2026-10-22
 ## Phase1-6 実装計画
 
 check_changed_docs.ts 中心の変更文書限定検査契約を Phase 1-6 で成熟させる。
-コマンドと check_changed_docs.ts の責務分担（コマンドが対象確定、check_changed_docs.ts が検査実行）、評価対象はフォーマット検査に限定（意味評価しない）を基本方針とする。
+コマンドと checker の責務分担（コマンドが対象確定、checker が検査実行）、評価対象はフォーマット検査に限定（意味評価しない）を基本方針とする。
+ checker 実装は旧 check_changed_docs.ts から検証エンジン cli.ts --workflow モード（engine targeted-gate）へ移行済みである。
 
 ### Phase 1: Design 配置
 
@@ -23,19 +24,20 @@ check_changed_docs.ts 中心の変更文書限定検査契約を Phase 1-6 で�
 ### Phase 2: report 契約固定
 
 - TargetedDocsReport 型が固定され、型/戻り値/JSON/text出力/テストが一致すること。
-- 必須フィールド: workflow, files_checked, coupled_files_checked, failures, warnings, doc_map_update_required, spec_readme_update_required, requirements_readme_update_required, full_docs_check_recommended, extensions_check_required, docInputsCheckRequired, declared_files_check。
+- 必須フィールド: workflow, files_checked, coupled_files_checked, unchecked_reasons, failures, warnings, doc_map_update_required, spec_readme_update_required, requirements_readme_update_required, full_docs_check_recommended, extensions_check_required, declared_files_check。
 上記リストのみを必須フィールドとし、それ以外を許容しない。
+`unchecked_reasons` は入力から除外されたパスとその理由（not-found / out-of-profile）を機械検証可能に報告するフィールドである（files_checked が入力の写しでないことの検査証拠）。
 
 ### Phase 3: 対象確定の命令側移行
 
-- 対象確定はコマンド側が行うこと。check_changed_docs.ts は対象選定の十分性を判定しないこと。
+- 対象確定はコマンド側が行うこと。checker（cli.ts --workflow）は対象選定の十分性を判定しないこと。
 - 対象があれば --files を渡し、対象なければ原則呼出さないこと。
 - --files の区切り形式は space 区切り（推奨）と comma 区切り（後方互換）の両方を受入れること（v2:REQ-0158-001 より統合）。
   例: `--files a.md b.md c.md`（space 区切り推奨）、`--files a.md,b.md,c.md`（comma 区切りも受入）。
 両形式の混在も可。
 usage メッセージ、--help 出力で区切り形式を明示すること。
 後方互換性を担保するため、従来の空白区切り形式を維持し、既存の入力を読み取れるようにすること。
-- --files 指定で files_checked が空の場合は失敗（FAILURE）扱い、--base-ref 指定で files_checked が空の場合は警告（WARNING）扱いとすること。
+- files_checked が空の場合は検証モード（--files / --base-ref）問わず失敗（FAILURE）扱いとすること（REQ-010-076。当初の「--base-ref 空 WARNING」仕様は false-clean 予防の FAILURE 統一で置換済み）。
 
 ### Phase 4: コマンド別最小監査範囲
 
@@ -55,13 +57,14 @@ usage メッセージ、--help 出力で区切り形式を明示すること。
 
 ## report フィールド一覧
 
-check_changed_docs.ts の report JSON に含まれる全フィールドを列挙する（v2:REQ-0158-004 より移管）。
+検証エンジン cli.ts --workflow（targeted docs guard）の report JSON に含まれる全フィールドを列挙する（v2:REQ-0158-004 より移管）。
 
 | フィールド | 型 | 説明 |
 |---|---|---|
 | `workflow` | string | 実行された workflow profile 名 |
-| `files_checked` | string[] | 検査対象ファイル一覧 |
+| `files_checked` | string[] | 検査対象ファイル一覧（実在確認と profile 絞り込みを通過した実検査対象集合。入力列挙の写しではない） |
 | `coupled_files_checked` | string[] | 連動ファイル（README 等）一覧 |
+| `unchecked_reasons` | { path, reason }[] | 入力から除外されたパスと理由（not-found / out-of-profile）。files_checked と入力の一致確認に使用する |
 | `failures` | Failure[] | 検出された違反一覧。各 failure は `rule_id`、`severity`、`file`、`line`、`message`、`expected` を持つ |
 | `warnings` | string[] | 警告一覧。`files_checked` 空の場合は理由（`--files` 指定の不備、PR 変更ファイル取得の失敗、検査対象パスの誤り等）の確認を促す内容を含む |
 | `doc_map_update_required` | boolean | README 索引更新要否（後方互換フィールド名、現在は README 索引更新要否判定に使用） |
@@ -69,7 +72,6 @@ check_changed_docs.ts の report JSON に含まれる全フィールドを列挙
 | `requirements_readme_update_required` | boolean | `docs/requirements/README.md` 更新要否 |
 | `full_docs_check_recommended` | boolean | full docs-check 実行要否 |
 | `extensions_check_required` | boolean | project extensions 検査の必要性 |
-| `docInputsCheckRequired` | boolean | 検査入力の必要性 |
 | `declared_files_check` | object | 宣言ファイル検査の実行結果（`--declared-files` 使用時） |
 
 `failure` オブジェクトのフィールド: `rule_id`、`severity`、`file`、`line`、`message`、`expected`。

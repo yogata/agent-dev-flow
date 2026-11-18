@@ -18,8 +18,8 @@ import {
   classifyPathImpact,
   judgePropagationCompletion,
   listTouchedPaths,
-} from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/relied_diff.ts";
-import type { PathGitFacts } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/relied_diff.ts";
+} from "../../../../skills/agentdev-traceability/scripts/lib/relied_diff.ts";
+import type { PathGitFacts } from "../../../../skills/agentdev-traceability/scripts/lib/relied_diff.ts";
 
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `trace-relied-${crypto.randomUUID().slice(0, 8)}`;

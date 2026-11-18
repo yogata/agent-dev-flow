@@ -1,0 +1,321 @@
+// Canonical manifest builder for the accepted package contract.
+//
+// Four canonical projections per docs/designs/integrity/distribution-boundary.md
+// §58-67:
+//
+//   source           — every tracked regular file under
+//                      src/common/commands/agentdev/**,
+//                      src/common/skills/agentdev-*/**,
+//                      src/common/skills/japanese-tech-writing/**,
+//                      src/common/tools/agentdev-*/**,
+//                      src/opencode/plugins/agentdev-/**
+//                      (including tests, fixtures, README, package.json,
+//                      tsconfig, lockfiles, and metadata — none excluded)
+//                      PLUS the trusted consumer bootstrap entry
+//                      scripts/install.ps1 and its runtime dependency
+//                      module scripts/consumer/common.ps1 (REQ-050-011:
+//                      the public entry and its execution dependency set
+//                      must be fully represented in the manifest).
+//
+//   link             — deterministic .opencode/** mapping of source-runtime
+//                      with identical blob digests.
+//
+//   archive          — source-runtime plus the archive-dedicated installer
+//                      original scripts/consumer/archive/install.ps1
+//                      (projected as scripts/install.ps1 inside the
+//                      archive, REQ-050-010) and README-INSTALL.md,
+//                      wrapped under agentdev-release-<short>/ at archive
+//                      root.
+//
+//   archive-installed — deterministic .opencode/** mapping of source-runtime
+//                      (no archive installer, no README-INSTALL.md;
+//                      the installer is verified separately by trusted
+//                      deterministic mapping/digest comparison, never by
+//                      execution).
+//
+// Runtime and bootstrap are internal source subsets (SourceSubset), not
+// public projection labels. They exist only so the manifest builder can
+// route paths into the correct projection (e.g. bootstrap is in `source`
+// but excluded from `link`/`archive-installed`).
+//
+// The builder is pure: it does not read git, the filesystem, or the network.
+// The launcher feeds it the candidate tree's git entries plus their
+// digests.
+
+// ADF-COVERS(implementation): REQ-050-011
+// ADF-COVERS(verification): REQ-050-011
+// ADF-COVERS(implementation): REQ-052-006, REQ-052-007
+
+import type { ManifestEntry, ManifestSet, Projection, SourceSubset } from "./types.ts";
+
+export interface ManifestEntryInput {
+  readonly path: string;
+  readonly sha256: string;
+  readonly size: number;
+}
+
+// ---------------------------------------------------------------------------
+// Source path predicates (internal subsets)
+//
+// AUDIT EXPECTATION INDEPENDENCE (I-004 reservation): the lists below are
+// the audit side's INDEPENDENTLY DEFINED distribution expectations. They are
+// deliberately NOT derived from the distribution exclusion canon
+// (scripts/consumer/distribution-exclusion.ps1) or from any installer
+// enumeration, and the canon must never be derived from them. Deriving the
+// audit expectation from the same definition that drives actual distribution
+// would let a wrongly canonicalized set be rubber-stamped by its own check.
+// Three distinct concerns are kept separate:
+//   - what the installers actually distribute (the installer entries + canon)
+//   - what SHOULD be distributed (this manifest's independent audit lists)
+//   - what must be protected against tampering (protected-paths.ts)
+// ---------------------------------------------------------------------------
+
+const RUNTIME_PREFIXES: readonly string[] = [
+  "src/common/commands/agentdev/",
+  "src/common/skills/agentdev-",
+  "src/common/skills/japanese-tech-writing/",
+  "src/common/tools/agentdev-",
+  "src/opencode/plugins/agentdev-",
+];
+
+// Repo-local plugins are excluded from every CONSUMER distribution entry
+// (checkout install, release archive staging, archive install) by the
+// distribution exclusion canon. The source projection keeps auditing the
+// originals, while the link / archive / archive-installed expectations must
+// exclude them or the physical install verification fails on files the
+// installer is contractually forbidden to place. Per the I-004 reservation
+// above, this list is an INDEPENDENTLY maintained audit expectation and is
+// deliberately NOT derived from the canon.
+const REPO_LOCAL_PLUGIN_PREFIXES: readonly string[] = [
+  "src/opencode/plugins/agentdev-distribution-boundary-guard/",
+];
+
+function isRepoLocalPluginPath(path: string): boolean {
+  return REPO_LOCAL_PLUGIN_PREFIXES.some((p) => path.startsWith(p));
+}
+
+/**
+ * Consumer-distributable runtime inputs: runtime paths minus repo-local
+ * plugins. Used by the link / archive / archive-installed manifest builders.
+ */
+export function filterConsumerDistributable(
+  inputs: readonly ManifestEntryInput[],
+): ManifestEntryInput[] {
+  return inputs.filter((i) => !isRepoLocalPluginPath(i.path));
+}
+
+const BOOTSTRAP_PATHS: readonly string[] = [
+  "scripts/install.ps1",
+  "scripts/consumer/common.ps1",
+  // Runtime dependency modules of the checkout consumer entry
+  // (REQ-050-011: the entry's execution dependency set must be fully
+  // represented). Independently maintained audit expectation - the shared
+  // judgment module and the distribution exclusion canon.
+  "scripts/consumer/install-sync-common.ps1",
+  "scripts/consumer/distribution-exclusion.ps1",
+];
+
+const ARCHIVE_EXTRA_REQUIRED: readonly string[] = [
+  // Archive-dedicated installer ORIGINAL (REQ-050-010). Inside the release
+  // archive it is placed under the projection name scripts/install.ps1 by
+  // the packager; the manifest tracks the repository original path.
+  "scripts/consumer/archive/install.ps1",
+  // Archive-bundled install guide. The manifest tracks the repository root
+  // original; the packager bundles it as README-INSTALL.md at archive root.
+  "README-INSTALL.md",
+  // The distribution exclusion canon
+  // (scripts/consumer/distribution-exclusion.ps1) travels inside the
+  // consumer release archive via packager staging, yet belongs ONLY in
+  // BOOTSTRAP_PATHS above: the blob loader assigns each shipped entry a
+  // single subset and bootstrap takes precedence over archive-extra, so
+  // listing it here would make buildArchiveManifest require an entry that
+  // never arrives in the archive-extra subset. Its in-archive presence is
+  // owned by the packager staging contract and the distribution-exclusion
+  // consistency tests.
+];
+
+export function isRequiredRuntimePath(path: string): boolean {
+  return RUNTIME_PREFIXES.some((p) => path.startsWith(p));
+}
+
+export function isRequiredBootstrapPath(path: string): boolean {
+  return BOOTSTRAP_PATHS.includes(path);
+}
+
+export function isRequiredArchiveExtraPath(path: string): boolean {
+  return ARCHIVE_EXTRA_REQUIRED.includes(path);
+}
+
+export function classifySourceSubset(path: string): SourceSubset | null {
+  if (isRequiredRuntimePath(path)) return "runtime";
+  if (isRequiredBootstrapPath(path)) return "bootstrap";
+  if (isRequiredArchiveExtraPath(path)) return "archive-extra";
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// SHA-256 validation
+// ---------------------------------------------------------------------------
+
+const SHA256_PATTERN = /^[0-9a-f]{64}$/;
+
+function assertValidEntry(entry: ManifestEntryInput, projection: Projection): void {
+  if (!SHA256_PATTERN.test(entry.sha256)) {
+    throw new ManifestError(
+      projection,
+      `invalid sha256 for ${entry.path}: ${entry.sha256}`,
+    );
+  }
+  if (!Number.isInteger(entry.size) || entry.size < 0) {
+    throw new ManifestError(
+      projection,
+      `invalid size for ${entry.path}: ${entry.size}`,
+    );
+  }
+}
+
+export class ManifestError extends Error {
+  constructor(public readonly projection: Projection, message: string) {
+    super(message);
+    this.name = "ManifestError";
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Builders
+// ---------------------------------------------------------------------------
+
+function toManifestEntry(input: ManifestEntryInput): ManifestEntry {
+  return {
+    path: input.path,
+    sha256: input.sha256,
+    size: input.size,
+  };
+}
+
+function dedupeAndSort(
+  projection: Projection,
+  entries: readonly ManifestEntry[],
+): readonly ManifestEntry[] {
+  const seen = new Set<string>();
+  for (const e of entries) {
+    if (seen.has(e.path)) {
+      throw new ManifestError(projection, `duplicate path: ${e.path}`);
+    }
+    seen.add(e.path);
+  }
+  return [...entries].sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+}
+
+/**
+ * Build the canonical `source` projection. Source includes runtime
+ * (src/opencode/**) AND bootstrap artifacts (scripts/install.ps1 plus its
+ * runtime dependency scripts/consumer/common.ps1, REQ-050-011). Both are
+ * producer-authored text shipped to the consumer.
+ */
+export function buildSourceManifest(
+  inputs: readonly ManifestEntryInput[],
+): ManifestSet {
+  const filtered = inputs.filter(
+    (i) => isRequiredRuntimePath(i.path) || isRequiredBootstrapPath(i.path),
+  );
+  if (filtered.length === 0) {
+    throw new ManifestError("source", "zero target entries");
+  }
+  for (const required of BOOTSTRAP_PATHS) {
+    if (!filtered.some((f) => f.path === required)) {
+      throw new ManifestError("source", `missing required bootstrap script: ${required}`);
+    }
+  }
+  for (const e of filtered) assertValidEntry(e, "source");
+  const entries = dedupeAndSort("source", filtered.map(toManifestEntry));
+  return { projection: "source", entries };
+}
+
+// Canonical runtime sources map to their .opencode/** link paths by dropping
+// the canonical root segment: src/common/{commands,skills,tools} and
+// src/opencode/plugins project 1:1 under .opencode/ (DEC-049 layout).
+// The mapping below is the audit side's independently maintained 配置写像
+// (placement mapping) expectation: it is not derived from any installer
+// enumeration and the installers must not derive their enumeration from it.
+const RUNTIME_LINK_PREFIXES: ReadonlyArray<readonly [string, string]> = [
+  ["src/common/commands/agentdev/", ".opencode/commands/agentdev/"],
+  ["src/common/skills/", ".opencode/skills/"],
+  ["src/common/tools/", ".opencode/tools/"],
+  ["src/opencode/plugins/", ".opencode/plugins/"],
+];
+
+/**
+ * Map a source-runtime path to its .opencode/** link path. Throws if the
+ * input is not a runtime path (defensive — the caller filters upstream).
+ */
+export function mapRuntimeToLinkPath(runtimePath: string): string {
+  for (const [sourcePrefix, linkPrefix] of RUNTIME_LINK_PREFIXES) {
+    if (runtimePath.startsWith(sourcePrefix)) {
+      return linkPrefix + runtimePath.substring(sourcePrefix.length);
+    }
+  }
+  throw new ManifestError("link", `not a runtime path: ${runtimePath}`);
+}
+
+export function buildLinkManifest(
+  runtimeInputs: readonly ManifestEntryInput[],
+): ManifestSet {
+  const distributable = filterConsumerDistributable(runtimeInputs);
+  if (distributable.length === 0) {
+    throw new ManifestError("link", "zero target entries");
+  }
+  const mapped: ManifestEntry[] = distributable.map((i) => {
+    assertValidEntry(i, "link");
+    return { path: mapRuntimeToLinkPath(i.path), sha256: i.sha256, size: i.size };
+  });
+  return { projection: "link", entries: dedupeAndSort("link", mapped) };
+}
+
+export function buildArchiveManifest(
+  runtimeInputs: readonly ManifestEntryInput[],
+  extraInputs: readonly ManifestEntryInput[],
+): ManifestSet {
+  const distributable = filterConsumerDistributable(runtimeInputs);
+  const extras = extraInputs.filter((i) => isRequiredArchiveExtraPath(i.path));
+  for (const required of ARCHIVE_EXTRA_REQUIRED) {
+    if (!extras.some((e) => e.path === required)) {
+      throw new ManifestError("archive", `missing required entry: ${required}`);
+    }
+  }
+  const combined = [...distributable, ...extras];
+  if (combined.length === 0) {
+    throw new ManifestError("archive", "zero target entries");
+  }
+  for (const e of combined) assertValidEntry(e, "archive");
+  return {
+    projection: "archive",
+    entries: dedupeAndSort("archive", combined.map(toManifestEntry)),
+  };
+}
+
+export function buildArchiveInstalledManifest(
+  runtimeInputs: readonly ManifestEntryInput[],
+): ManifestSet {
+  const distributable = filterConsumerDistributable(runtimeInputs);
+  if (distributable.length === 0) {
+    throw new ManifestError("archive-installed", "zero target entries");
+  }
+  const mapped: ManifestEntry[] = distributable.map((i) => {
+    assertValidEntry(i, "archive-installed");
+    return { path: mapRuntimeToLinkPath(i.path), sha256: i.sha256, size: i.size };
+  });
+  const entries = dedupeAndSort("archive-installed", mapped);
+  const result: ManifestSet = { projection: "archive-installed", entries };
+  if (result.projection !== "archive-installed") {
+    throw new ManifestError("archive-installed", `projection label corrupted: ${result.projection}`);
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Equality / diff — delegated to manifest-diff.ts (split for LOC ceiling)
+// ---------------------------------------------------------------------------
+
+export { manifestEntryEquals, diffManifests } from "./manifest-diff.ts";
+export type { ManifestDiff } from "./manifest-diff.ts";

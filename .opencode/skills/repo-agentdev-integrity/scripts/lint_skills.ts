@@ -30,15 +30,15 @@ import {
   determineExitCode,
   findRepoRoot,
   DEFAULT_PROFILE,
-} from "./cli_utils.ts";
-import type { CheckResult, ScanSummary, IntegrityReport } from "./cli_utils.ts";
-import { globWalkRel } from "./lib/glob_walk.ts";
+} from "../lib/cli_utils.ts";
+import type { CheckResult, ScanSummary, IntegrityReport } from "../lib/cli_utils.ts";
+import { globWalkRel } from "../lib/glob_walk.ts";
 import {
   WORKFLOW_TRIGGER_ITEM,
   WORKFLOW_TRIGGER_ITEM_FULL_FORM,
   listCommandBoundWorkflowSkills,
   parseSkillFrontMatterFields,
-} from "./lib/workflow_trigger.ts";
+} from "../lib/workflow_trigger.ts";
 
 const SCRIPT_NAME = "lint_skills.ts";
 const SCRIPT_DESCRIPTION = "Skill structure linter for AgentDevFlow";
@@ -70,15 +70,15 @@ function extractSeeAlsoReferences(content: string): string[] {
   const refs: string[] = [];
   const seeAlsoMatch = content.match(/## See Also([\s\S]*?)$/);
   if (!seeAlsoMatch) return refs;
-  const section = seeAlsoMatch[1];
+  const section = seeAlsoMatch[1]!;
   const boldPattern = /\*\*(agentdev-[a-z0-9-]+)\*\*/g;
   let match: RegExpExecArray | null;
   while ((match = boldPattern.exec(section)) !== null) {
-    refs.push(match[1]);
+    refs.push(match[1]!);
   }
   const linkPattern = /\[(agentdev-[a-z0-9-]+)\]\([^)]*\)/g;
   while ((match = linkPattern.exec(section)) !== null) {
-    refs.push(match[1]);
+    refs.push(match[1]!);
   }
   return [...new Set(refs)];
 }

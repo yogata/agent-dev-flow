@@ -90,10 +90,11 @@ updated: 2026-11-18
 
 ### TargetedDocsReport 型契約（targeted-docs-guard-implementation.md Phase 2）
 
-check_changed_docs.ts の JSON 出力型である TargetedDocsReport の型定義を固定する。
-必須フィールド: workflow, files_checked, coupled_files_checked, failures, warnings, doc_map_update_required, spec_readme_update_required, requirements_readme_update_required, full_docs_check_recommended, extensions_check_required, declared_files_check。
+検証エンジン cli.ts --workflow（targeted docs guard。明示対象指定による変更文書限定検査）の JSON 出力型である TargetedDocsReport の型定義を固定する。
+必須フィールド: workflow, files_checked, coupled_files_checked, unchecked_reasons, failures, warnings, doc_map_update_required, spec_readme_update_required, requirements_readme_update_required, full_docs_check_recommended, extensions_check_required, declared_files_check。
 上記リストのみを必須フィールドとし、それ以外を許容しない。
 型/戻り値/JSON/text出力/テストが一致する契約とする。
+`files_checked` は入力列挙の写しではなく、実在確認と workflow profile（appliesTo）による絞り込みを通過した実検査対象集合である。入力から除外されたパスは `unchecked_reasons`（not-found / out-of-profile）で機械検証可能に報告し、ワークフロー側は files_checked と検査対象変更ファイルの一致確認に使用する。
 
 ## スクリプト契約（Script Contract）
 
@@ -104,12 +105,13 @@ check_changed_docs.ts の JSON 出力型である TargetedDocsReport の型定�
 - stdout = 機械可読出力、stderr = 診断メッセージ
 - 非対話実行、破壊的変更禁止
 
-### check_changed_docs.ts 挙動Design 契約（targeted-docs-guard-implementation.md Phase 1, 3）
+### 検証エンジン cli.ts --workflow（targeted docs guard） 挙動Design 契約（targeted-docs-guard-implementation.md Phase 1, 3）
 
-check_changed_docs.ts は以下の挙動 Design 契約に従う。まず引数を解析して対象を確定し（entry）、--files または --base-ref から files_checked を生成し（対象解決）、--workflow に応じた profileFor を適用し（profile 呼出）、profile rules を実行し（validator 呼出）、TargetedDocsReport 形式で JSON/text を出力し（report 契約）、終了コードを FAILURE/WARNING/OK の 3 値で返す（exit code）。
+検証エンジン cli.ts --workflow（targeted docs guard）は以下の挙動 Design 契約に従う。まず引数を解析して対象を確定し（entry）、--files または --base-ref から files_checked を生成し（対象解決。--files は実在確認、--base-ref は git diff base...HEAD。Git 列挙失敗は終了コード 2 の error として表面化し空成功しない）、--workflow に応じた profileFor を適用し（profile 呼出）、残存ルール（rules レジストリ）の選択実行と更新要否フラグ判定を実行し（validator 呼出。違反は files_checked と連動対象に限定して報告）、TargetedDocsReport 形式で JSON/text を出力し（report 契約）、終了コードを OK(0) / FAILURE(1) / error(2) で返す（exit code）。
 
-対象確定はコマンド側が行い、check_changed_docs.ts は対象選定の十分性を判定しない。
---files 指定で files_checked が空の場合は FAILURE、--base-ref 指定で files_checked が空の場合は WARNING とする。
+対象確定はコマンド側が行い、検証エンジン cli.ts --workflow は対象選定の十分性を判定しない。
+files_checked が空の場合は検証モード（--files / --base-ref）問わず FAILURE とする（REQ-010-076。旧仕様の「--base-ref 空 WARNING」の非対称は廃止済み）。
+汎用差分実行（--changed）は本モードと独立に維持され、対象外のみの変更は即時 Exit 0 する（REQ-122-006）。engine の終了コード単独で workflow の受入を決定せず、空・不一致の fail-closed 判定はワークフロー側が行う。
 評価対象はフォーマット検査に限定し、意味評価を行わない。
 
 ## 適用範囲宣言
@@ -287,7 +289,7 @@ retired REQ-028-006 の詳細運用は別途 Definition 保存（case-ready / ca
 
 ## reference-path-existence 検出における backtick 囲みパスの扱い（REQ-010-009）
 
-`checkScriptTemplateReferencePaths`（`check_integrity.ts`）は command 定義と SKILL.md から抽出したパス参照（`.opencode/**`、`scripts/*.ts`、`templates/*.md`、`references/*.md`）の実在確認を行う。
+`checkScriptTemplateReferencePaths`（`検証エンジン cli.ts（旧 check_integrity.ts は rules レジストリへ分割統合、DEC-065 決定3）`）は command 定義と SKILL.md から抽出したパス参照（`.opencode/**`、`scripts/*.ts`、`templates/*.md`、`references/*.md`）の実在確認を行う。
 このとき Markdown backtick で囲まれたパス成分はインラインコード修飾（code formatting）と解釈し、パス解決前に backtick を除去する（例: `.opencode/commands/agentdev/templates/case-close/\`agentdev-push-failed\`.md` → `.opencode/commands/agentdev/templates/case-close/agentdev-push-failed.md`）。
 backtick 囲みのパス成分を実在確認する既存契約は維持する。
 
@@ -302,7 +304,7 @@ placeholder を含まない具体パスには実在確認を行い、未解決�
 | 報告時の evidence は backtick 含む原文を保持する | 著者が修正箇所を特定しやすくするため |
 
 本扱いは backtick 囲みをインラインコード表現として検出対象から除外する運用（パス参照として解釈しない運用）と対比した上で、実在確認の価値を維持するためパス参照として解釈する運用を採用した。
-検出ロジック（`check_integrity.ts`）と本節の記述は整合している。
+検出ロジック（`検証エンジン cli.ts（旧 check_integrity.ts は rules レジストリへ分割統合、DEC-065 決定3）`）と本節の記述は整合している。
 
 PR #2152（merge 4bf264b7）で実装された検出拡張4点を本節の正規契約として反映する。
 
@@ -337,7 +339,7 @@ docs-check は path exemption（`IR055_EXEMPT_PATH_PATTERNS`）で検出対象�
 | 隠蔽種別 | 例 | 対処 |
 |----------|----|------|
 | 広域 exemption || 広域 exemption | 対象を絞らない glob（`docs/**` 等）で検出を回避する | 許容しない。exemption は対象ファイル単位、かつ根拠文書化を必須とする |
-| 検出無効化 | check_integrity.ts の検出関数をコメントアウト、条件付きで回避 | 許容しない。検出の廃止は catalog↔実装双方向同期運用（REQ-010-003）に従い IR エントリの物理削除（AG-008、retired REQ-028-008）を行う |
+| 検出無効化 | 検証エンジン cli.ts（旧 check_integrity.ts は rules レジストリへ分割統合、DEC-065 決定3）の検出関数をコメントアウト、条件付きで回避 | 許容しない。検出の廃止は catalog↔実装双方向同期運用（REQ-010-003）に従い IR エントリの物理削除（AG-008、retired REQ-028-008）を行う |
 
 ### 除外設定の文書化要件
 
@@ -379,7 +381,7 @@ IR-053（gh 直接記述検出）の正規検出条件と既知許容を本節�
 
 ## catalog ↔ 実装双方向同期運用（REQ-010-003/004）
 
-[integrity-rule-catalog.md](integrity-rule-catalog.md) と `check_integrity.ts` 実装は双方向同期運用を行う。同期ルール:
+[integrity-rule-catalog.md](integrity-rule-catalog.md) と `検証エンジン cli.ts（旧 check_integrity.ts は rules レジストリへ分割統合、DEC-065 決定3）` 実装は双方向同期運用を行う。同期ルール:
 
 | イベント | catalog 側の処理 | 実装側の処理 |
 |---|---|---|
@@ -395,7 +397,7 @@ docs-check 項目役割範囲（バックエンド対象 vs skill 定義対象�
 本セクションは全 workflow の使用検査ツールを肯定表現で一元管理する SSoT であり、各 workflow Design から参照される。
 case-ready/case-revise（Definition 保存の内部責務）/case-run/case-close の各コマンドは対象ファイル種別に応じた最小監査範囲を定義し、case-run/case-close は永続文書更新を契機に検査する。
 
-| workflow | check_changed_docs.ts | check_extensions.ts | check_integrity.ts | test_strategy |
+| workflow | 検証エンジン cli.ts --workflow（targeted docs guard。明示対象指定） | 検証エンジン cli.ts（IR-056 として統合） | 検証エンジン cli.ts（旧 check_integrity.ts は rules レジストリへ分割統合、DEC-065 決定3） | test_strategy |
 |---|---|---|---|---|
 | case-ready / case-revise | ✓（REQ/Decision/Design files） | — | — | — |
 | case-open | — | — | — | — |
@@ -405,7 +407,7 @@ case-ready/case-revise（Definition 保存の内部責務）/case-run/case-close
 | /repo/docs-check | ✓ | ✓ | ✓（全体監査） | — |
 
 全セル肯定表現（✓ または —）を使用する（REQ-010-002, REQ-010-003 準拠）。
-check_integrity.ts 列は req-define と /repo/docs-check のみ ✓ とし、他 workflow は — で「使用しない」を暗黙表現する。
+検証エンジン cli.ts（旧 check_integrity.ts は rules レジストリへ分割統合、DEC-065 決定3） 列は req-define と /repo/docs-check のみ ✓ とし、他 workflow は — で「使用しない」を暗黙表現する。
 
 参照元 workflow Design 一覧（各 Design から本マトリックス表を参照）:
 
@@ -417,15 +419,15 @@ check_integrity.ts 列は req-define と /repo/docs-check のみ ✓ とし、�
 
 ## 実行プロファイル分離
 
-check_integrity.ts は3つの実行 profile（source/installed/release）を取り、原本検査、配置後検査、配布アーカイブ検査を区別する。
+検証エンジン cli.ts（旧 check_integrity.ts は rules レジストリへ分割統合、DEC-065 決定3） は3つの実行 profile（source/installed/release）を取り、原本検査、配置後検査、配布アーカイブ検査を区別する。
 各 profile における配布依存境界検査の契約（source/installed/release projection の分離、検査エラーの gate-not-passed 扱い、release profile の公開前検査における違反残存時の成功経路非保持）は `integrity/distribution-boundary.md` が正規所有する（DEC-014 決定5..7）。
 
 ### CLI
 
 ```text
-bun run check_integrity.ts --profile source
-bun run check_integrity.ts --profile installed
-bun run check_integrity.ts --profile release --archive <zip-path>
+bun run 検証エンジン cli.ts（旧 check_integrity.ts は rules レジストリへ分割統合、DEC-065 決定3） --profile source
+bun run 検証エンジン cli.ts（旧 check_integrity.ts は rules レジストリへ分割統合、DEC-065 決定3） --profile installed
+bun run 検証エンジン cli.ts（旧 check_integrity.ts は rules レジストリへ分割統合、DEC-065 決定3） --profile release --archive <zip-path>
 ```
 
 `--profile` 未指定時は `source` とする。

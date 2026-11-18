@@ -4,22 +4,22 @@ import { afterAll, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
-import { formatCompositeId, extractAllCompositeIds, nextRowNumber } from "../../../../../src/common/skills/agentdev-req-file-manager/scripts/src/alloc-composite-id.ts";
-import { extractCompositeIdNumbers as readAllocated } from "../../../../../src/common/skills/agentdev-req-file-manager/scripts/lib/frontmatter.ts";
-import { extractCompositeIdNumbers, extractReqNumber } from "../../../../../src/common/skills/agentdev-artifact-validation/scripts/lib/frontmatter.ts";
-import { reqNumberFromFilename } from "../../../../../src/common/skills/agentdev-artifact-validation/scripts/lib/fs-helpers.ts";
-import { checkSingleFile } from "../../../../../src/common/skills/agentdev-artifact-validation/scripts/src/check-frontmatter-consistency.ts";
-import { DEFAULT_ID_PATTERN } from "../../../../../src/common/skills/agentdev-artifact-validation/scripts/src/check-req-row-existence.ts";
-import { currentRequirementLineIds } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/requirements.ts";
-import { parseDeclarations } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/declarations.ts";
-import { parseSidecar } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/sidecar.ts";
-import { parseVerificationPolicy } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/verification_scope.ts";
-import { buildInventory } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/inventory.ts";
-import { isReqRowId, REQ_ROW_ID_LIST_PATTERN } from "../../../../../src/common/skills/agentdev-workflow-case-open/scripts/lib/definition-traceability-gate.ts";
-import { readSharedAreaRegistration } from "../../../../../src/common/skills/agentdev-workflow-case-open/scripts/lib/shared_area_registration.ts";
-import { runValidateInputOnly, validateInput } from "../../../../../src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts";
+import { formatCompositeId, extractAllCompositeIds, nextRowNumber } from "../../../../skills/agentdev-req-file-manager/scripts/src/alloc-composite-id.ts";
+import { extractCompositeIdNumbers as readAllocated } from "../../../../skills/agentdev-req-file-manager/scripts/lib/frontmatter.ts";
+import { extractCompositeIdNumbers, extractReqNumber } from "../../../../skills/agentdev-artifact-validation/scripts/lib/frontmatter.ts";
+import { reqNumberFromFilename } from "../../../../skills/agentdev-artifact-validation/scripts/lib/fs-helpers.ts";
+import { checkSingleFile } from "../../../../skills/agentdev-artifact-validation/scripts/src/check-frontmatter-consistency.ts";
+import { DEFAULT_ID_PATTERN } from "../../../../skills/agentdev-artifact-validation/scripts/src/check-req-row-existence.ts";
+import { currentRequirementLineIds } from "../../../../skills/agentdev-traceability/scripts/lib/requirements.ts";
+import { parseDeclarations } from "../../../../skills/agentdev-traceability/scripts/lib/declarations.ts";
+import { parseSidecar } from "../../../../skills/agentdev-traceability/scripts/lib/sidecar.ts";
+import { parseVerificationPolicy } from "../../../../skills/agentdev-traceability/scripts/lib/verification_scope.ts";
+import { buildInventory } from "../../../../skills/agentdev-traceability/scripts/lib/inventory.ts";
+import { isReqRowId, REQ_ROW_ID_LIST_PATTERN } from "../../../../skills/agentdev-workflow-case-open/scripts/lib/definition-traceability-gate.ts";
+import { readSharedAreaRegistration } from "../../../../skills/agentdev-workflow-case-open/scripts/lib/shared_area_registration.ts";
+import { runValidateInputOnly, validateInput } from "../../../../skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts";
 import { countReqRequirementLines } from "../generate_indexes.ts";
-import { extractCurrentReqRefs } from "../current_refs.ts";
+import { extractCurrentReqRefs } from "../../lib/current_refs.ts";
 
 // 前提ディレクトリの自動作成（worktree 等 .agentdev 未整備環境での mkdtempSync ENOENT fail を解消する）。
 // 後片付け契約は現行のまま: rmSync 対象は mkdtempSync 自己生成物に限定し、親 .agentdev/tmp は削除しない。
@@ -121,16 +121,20 @@ describe("TS-007/008 allocation and consumer round-trip", () => {
     mkdirSync(join(fixture, "docs/guides"), { recursive: true });
     writeFileSync(join(fixture, "docs/requirements/REQ-12345.md"), "---\nid: REQ-12345\n---\n| REQ-12345-001 | fixture |\n", "utf8");
     writeFileSync(join(fixture, "docs/guides/citations.md"), "REQ-12345-001 REQ-12345-002 REQ-12345-0012 REQ-0063-0123", "utf8");
-    const script = join(process.cwd(), ".opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts");
-    const result = spawnSync(process.execPath, [script, "--root", fixture, "--profile", "source", "--json"], { encoding: "utf8", maxBuffer: 10_000_000 });
+    // 検証エンジン（cli.ts）は未追跡検査のために git リポジトリを前提とする。
+    spawnSync("git", ["init", "--quiet"], { cwd: fixture });
+    const script = join(process.cwd(), "src/common/skills/repo-agentdev-integrity/scripts/cli.ts");
+    const result = spawnSync(process.execPath, [script, "--root", fixture, "--rule", "IR-067", "--json"], { encoding: "utf8", maxBuffer: 10_000_000 });
     expect(result.error).toBeUndefined();
     expect(result.stdout).not.toBe("");
-    const report: { results: readonly { check: string; evidence?: string }[] } = JSON.parse(result.stdout);
-    const ids = report.results.filter((r) => r.check === "referenced-req-row-existence").map((r) => r.evidence);
-    expect(ids).toContain("REQ-12345-002");
-    expect(ids).toContain("REQ-12345-0012");
-    expect(ids).not.toContain("REQ-12345-001");
-    expect(ids).not.toContain("REQ-0063-0123");
+    const report: { results: readonly { ruleId: string; violations: readonly { message: string }[] }[] } = JSON.parse(result.stdout);
+    const messages = report.results
+      .filter((r) => r.ruleId === "IR-067")
+      .flatMap((r) => r.violations.map((v) => v.message));
+    expect(messages.some((m) => m.includes("REQ-12345-002"))).toBe(true);
+    expect(messages.some((m) => m.includes("REQ-12345-0012"))).toBe(true);
+    expect(messages.some((m) => m.includes("REQ-12345-001") && !m.includes("REQ-12345-0012"))).toBe(false);
+    expect(messages.some((m) => m.includes("REQ-0063-0123"))).toBe(false);
   });
 
 });

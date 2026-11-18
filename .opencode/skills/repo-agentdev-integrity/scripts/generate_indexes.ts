@@ -1,4 +1,4 @@
-// ADF-COVERS(implementation): REQ-010-011, REQ-059-002, REQ-059-003, REQ-047-013, REQ-122-001
+// ADF-COVERS(implementation): REQ-010-011, REQ-059-002, REQ-059-003, REQ-047-013, REQ-122-001, REQ-122-003, REQ-122-006
 // ADF-COVERS(verification): REQ-103-022, REQ-103-024, REQ-103-025
 /**
  * Index auto-generation script (SC-002 Phase C, IR-061).
@@ -21,7 +21,7 @@ import {
   EXIT_ERROR,
   parseArgs,
   findRepoRoot,
-} from "./cli_utils.ts";
+} from "../lib/cli_utils.ts";
 
 const path = require("path") as typeof import("path");
 const fs = require("fs") as typeof import("fs");
@@ -68,14 +68,12 @@ export function isAutogenEndLine(line: string): boolean {
  */
 export function extractAutogenBeginId(line: string): string | null {
   const match = line.match(AUTOGEN_BEGIN_LINE_RE);
-  return match ? match[1] : null;
+  return match ? (match[1] ?? null) : null;
 }
 
-// catalog 内の AUTOGEN ブロック ID（IR-045 欠番を挟む2ブロック構成）。
-export const CATALOG_PRE_BLOCK_ID = "catalog-ir-entries-pre-045";
-export const CATALOG_POST_BLOCK_ID = "catalog-ir-entries-post-045";
-// IR-045 は削除済み（ファイル不在）。catalog では人手編集領域として削除注記を残置。
-const IR045_GAP_ID = 45;
+// catalog 内の AUTOGEN ブロック ID（レジストリ単一ソース。DEC-065 決定3 により
+// rules/index.ts のレジストリから生成する単一ブロック構成へ再編）。
+export const CATALOG_BLOCK_ID = "catalog-ir-entries";
 
 // rule-ownership 内の AUTOGEN ブロック ID（IR 別関連マッピング appendix）。
 export const RULE_OWNERSHIP_BLOCK_ID = "rule-ownership-ir-crossref";
@@ -142,7 +140,7 @@ export function replaceSkillProjectionManifestSkills(
   let firstEntry = -1;
   let lastEntry = -1;
   for (let i = skillsIdx + 1; i < lines.length; i++) {
-    if (/^\s*-\s+\S/.test(lines[i])) {
+    if (/^\s*-\s+\S/.test(lines[i] ?? "")) {
       if (firstEntry === -1) firstEntry = i;
       lastEntry = i;
       continue;
@@ -188,10 +186,10 @@ export function buildReqToIrIndex(infos: IrInfo[]): Map<string, string[]> {
       const fileLevel = /^(REQ-\d+)(?:-\d+)?(?=\s|$)/.exec(id);
       if (!fileLevel) continue;
       const reqId = fileLevel[1];
-      let set = reqToIrs.get(reqId);
+      let set = reqToIrs.get(reqId!);
       if (!set) {
         set = new Set<string>();
-        reqToIrs.set(reqId, set);
+        reqToIrs.set(reqId!, set);
       }
       set.add(info.id);
     }
@@ -253,7 +251,7 @@ function parseFrontmatter(
 ): Record<string, string | string[]> | null {
   const parts = content.split("---");
   if (parts.length < 3) return null;
-  const yaml = parts[1].trim();
+  const yaml = parts[1]!.trim();
   const result: Record<string, string | string[]> = {};
   const lines = yaml.split("\n");
   let currentKey: string | null = null;
@@ -379,7 +377,7 @@ function extractIrInfo(fullPath: string, relPath: string): IrInfo | null {
   let title = "";
   const h1Match = content.match(/^#\s+(.+)$/m);
   if (h1Match) {
-    const h1 = h1Match[1].trim();
+    const h1 = h1Match[1]!.trim();
     const colonIdx = h1.indexOf(":");
     if (colonIdx !== -1) {
       title = h1.slice(colonIdx + 1).trim();
@@ -424,7 +422,7 @@ function extractIrInfo(fullPath: string, relPath: string): IrInfo | null {
  * 本文の Field/Value Markdown 表から指定 field の list 値を抽出する。
  * 形式: `| related_req | [REQ-0108-001, REQ-0101] |` → ["REQ-0108-001", "REQ-0101"]
  */
-function parseBodyTableArray(content: string, field: string): string[] {
+export function parseBodyTableArray(content: string, field: string): string[] {
   const lines = content.split("\n");
   for (const line of lines) {
     const trimmed = line.trim();
@@ -434,7 +432,7 @@ function parseBodyTableArray(content: string, field: string): string[] {
       new RegExp(`^\\|\\s*${field}\\s*\\|\\s*(.+?)\\s*\\|$`, "i"),
     );
     if (!match) continue;
-    let value = match[1].trim();
+    let value = match[1]!.trim();
     if (value.startsWith("[") && value.endsWith("]")) {
       value = value.slice(1, -1);
     }
@@ -484,6 +482,17 @@ function formatCatalogLine(info: IrInfo): string {
 }
 
 /**
+ * rules/index.ts のレジストリから catalog の AUTOGEN ブロック本文を生成する
+ * （DEC-065 決定3: カタログ自動生成の単一ソース = rules レジストリ）。
+ * IR-075 は Wave-4 でルール登録されるため、登録前は 24 構成となる。
+ */
+export function generateCatalogEntries(
+  rules: readonly { id: string; title: string; slug: string }[],
+): string[] {
+  return rules.map((rule) => `- [${rule.id}: ${rule.title}](rules/IR-${rule.id.slice(3)}-${rule.slug}.md)`);
+}
+
+/**
  * catalog の AUTOGEN ブロック2件（pre/post IR-045）向けにエントリ群を分割生成する。
  * 戻り値: { pre: IR-001..IR-044, post: IR-046..IR-NNN }
  */
@@ -493,12 +502,12 @@ export function generateCatalogBlocks(
   const pre: string[] = [];
   const post: string[] = [];
   for (const info of infos) {
-    if (info.num < IR045_GAP_ID) {
+    if (info.num < 45) {
       pre.push(formatCatalogLine(info));
-    } else if (info.num > IR045_GAP_ID) {
+    } else if (info.num > 45) {
       post.push(formatCatalogLine(info));
     }
-    // info.num === IR045_GAP_ID はファイル不在のため対象外。
+    // info.num === 45 はファイル不在のため対象外。
   }
   return { pre, post };
 }
@@ -552,13 +561,13 @@ export function findAutogenBlocks(content: string): AutogenBlock[] {
   let i = 0;
   while (i < lines.length) {
     const line = lines[i];
-    const beginId = extractAutogenBeginId(line);
+    const beginId = extractAutogenBeginId(line!);
     if (beginId !== null) {
       const startLine = i;
       const body: string[] = [];
       let j = i + 1;
-      while (j < lines.length && !isAutogenEndLine(lines[j])) {
-        body.push(lines[j]);
+      while (j < lines.length && !isAutogenEndLine(lines[j]!)) {
+        body.push(lines[j]!);
         j++;
       }
       if (j >= lines.length) {
@@ -595,19 +604,19 @@ export function replaceAutogenBlock(
   let replaced = false;
   while (i < lines.length) {
     const line = lines[i];
-    if (extractAutogenBeginId(line) === id && !replaced) {
+    if (extractAutogenBeginId(line!) === id && !replaced) {
       // 開始マーカー → newBody → 終了マーカーへ置換。
-      out.push(line);
+      out.push(line!);
       for (const bodyLine of newBody) {
         out.push(bodyLine);
       }
       // 終了マーカーまで進める。
       let j = i + 1;
-      while (j < lines.length && !isAutogenEndLine(lines[j])) {
+      while (j < lines.length && !isAutogenEndLine(lines[j]!)) {
         j++;
       }
       if (j < lines.length) {
-        out.push(lines[j]);
+        out.push(lines[j]!);
         i = j + 1;
         replaced = true;
       } else {
@@ -616,7 +625,7 @@ export function replaceAutogenBlock(
         replaced = true;
       }
     } else {
-      out.push(line);
+      out.push(line!);
       i++;
     }
   }
@@ -725,7 +734,7 @@ function extractDecisionInfo(
   if (!title) {
     const h1Match = content.match(/^#\s+(.+)$/m);
     if (h1Match) {
-      const h1 = h1Match[1].trim();
+      const h1 = h1Match[1]!.trim();
       const colonIdx = h1.indexOf(":");
       title = colonIdx !== -1 ? h1.slice(colonIdx + 1).trim() : h1;
     }
@@ -797,7 +806,7 @@ function extractReqInfo(
   }
   if (!title) {
     const h1Match = content.match(/^#\s+(.+)$/m);
-    if (h1Match) title = h1Match[1].trim();
+    if (h1Match) title = h1Match[1]!.trim();
   }
 
   return { id, num, title, filename, relPath };
@@ -1027,7 +1036,7 @@ export function extractRelatedReqNotes(
     if (!rowMatch) continue;
     const cells = line.split("|").map((c) => c.trim());
     if (cells.length >= 4) {
-      notes[rowMatch[1]] = cells[3];
+      notes[rowMatch[1]!] = cells[3]!;
     }
   }
   return notes;
@@ -1217,9 +1226,9 @@ export function countDesignBodyLines(content: string): number {
   const lines = content.split("\n");
   let start = 0;
   // frontmatter を読み飛ばす。
-  if (lines.length > 0 && lines[0].trim() === "---") {
+  if (lines.length > 0 && lines[0]!.trim() === "---") {
     let i = 1;
-    while (i < lines.length && lines[i].trim() !== "---") i++;
+    while (i < lines.length && lines[i]!.trim() !== "---") i++;
     start = i + 1;
   }
   let bodyCount = 0;
@@ -1228,37 +1237,37 @@ export function countDesignBodyLines(content: string): number {
   for (let i = start; i < lines.length; i++) {
     const line = lines[i];
     if (inAutogen) {
-      if (isAutogenEndLine(line)) {
+      if (isAutogenEndLine(line!)) {
         inAutogen = false;
       }
       continue;
     }
     if (inComment) {
-      const endIdx = line.indexOf("-->");
+      const endIdx = line!.indexOf("-->");
       if (endIdx >= 0) {
         inComment = false;
-        const after = line.slice(endIdx + 3);
+        const after = line!.slice(endIdx + 3);
         if (after.trim().length > 0) bodyCount++;
       }
       continue;
     }
     // AUTOGEN 開始マーカー（行全体一致）は AUTOGEN ブロックとして処理。
     // backtick 囲み等の部分一致は isAutogenBeginLine で自動的に除外される。
-    if (isAutogenBeginLine(line)) {
+    if (isAutogenBeginLine(line!)) {
       inAutogen = true;
       continue;
     }
-    const startIdx = line.indexOf("<!--");
+    const startIdx = line!.indexOf("<!--");
     if (startIdx >= 0) {
-      const endIdx = line.indexOf("-->", startIdx + 4);
+      const endIdx = line!.indexOf("-->", startIdx + 4);
       if (endIdx >= 0) {
         // 単一行コメント: 前後の本文を残置。
-        const combined = (line.slice(0, startIdx) + line.slice(endIdx + 3));
+        const combined = (line!.slice(0, startIdx) + line!.slice(endIdx + 3));
         if (combined.trim().length > 0) bodyCount++;
       } else {
         // 複数行コメント開始: 開始より前の本文を残置。
         inComment = true;
-        const before = line.slice(0, startIdx);
+        const before = line!.slice(0, startIdx);
         if (before.trim().length > 0) bodyCount++;
       }
     } else {
@@ -1389,7 +1398,7 @@ export function deriveMeasureDateFromLastCommit(
     }
     const match = out.trim().match(/^(\d{4}-\d{2}-\d{2})T/);
     if (!match) continue;
-    if (latest === null || match[1] > latest) latest = match[1];
+    if (latest === null || match[1]! > latest) latest = match[1]!;
   }
   return latest;
 }
@@ -1623,9 +1632,14 @@ RELATED:
   });
 
   // integrity 系の生成ブロックは rules dir が存在する場合のみ生成する。
-  const { pre: catalogPre, post: catalogPost } = hasIntegrityStructure
-    ? generateCatalogBlocks(infos)
-    : { pre: [], post: [] };
+  // カタログは rules レジストリから生成する（DEC-065 決定3 単一ソース）。
+  // rules レジストリはカタログ生成源（DEC-065 決定3）。main 実行時の遅延 import
+  // により、rules/index.ts ↔ generate_indexes.ts の静的循環 import を避ける
+  // （ir-061.ts が generate_indexes.ts を静的 import するため）。
+  const { rules: registryRules } = await import("../rules/index.ts");
+  const catalogEntries = hasIntegrityStructure
+    ? generateCatalogEntries(registryRules)
+    : [];
   const ruleOwnershipLines = hasIntegrityStructure
     ? generateRuleOwnershipAppendix(infos)
     : [];
@@ -1640,33 +1654,21 @@ RELATED:
       process.exit(EXIT_ERROR);
     }
     let catalogUpdated = catalogOriginal;
-    const catalogPreBlocks = findAutogenBlocks(catalogOriginal).filter(
-      (b) => b.id === CATALOG_PRE_BLOCK_ID,
+    const catalogBlocks = findAutogenBlocks(catalogOriginal).filter(
+      (b) => b.id === CATALOG_BLOCK_ID,
     );
-    const catalogPostBlocks = findAutogenBlocks(catalogOriginal).filter(
-      (b) => b.id === CATALOG_POST_BLOCK_ID,
-    );
-    if (catalogPreBlocks.length === 0 && catalogPostBlocks.length === 0) {
+    if (catalogBlocks.length === 0) {
       console.error(
         `[generate_indexes] catalog AUTOGEN markers not found. ` +
-          `Expected ids: ${CATALOG_PRE_BLOCK_ID}, ${CATALOG_POST_BLOCK_ID}`,
+          `Expected id: ${CATALOG_BLOCK_ID}`,
       );
       process.exit(EXIT_ERROR);
     }
-    if (catalogPreBlocks.length > 0) {
-      catalogUpdated = replaceAutogenBlock(
-        catalogUpdated,
-        CATALOG_PRE_BLOCK_ID,
-        catalogPre,
-      );
-    }
-    if (catalogPostBlocks.length > 0) {
-      catalogUpdated = replaceAutogenBlock(
-        catalogUpdated,
-        CATALOG_POST_BLOCK_ID,
-        catalogPost,
-      );
-    }
+    catalogUpdated = replaceAutogenBlock(
+      catalogUpdated,
+      CATALOG_BLOCK_ID,
+      catalogEntries,
+    );
     if (catalogUpdated !== catalogOriginal) {
       updates.push({ file: catalogPath, content: catalogUpdated });
     }
@@ -1827,7 +1829,7 @@ RELATED:
       decisionReadmeUpdated = replaceAutogenBlock(
         decisionReadmeUpdated,
         blockId,
-        decisionReadmeReplacements[blockId],
+        decisionReadmeReplacements[blockId]!,
       );
     }
     if (decisionReadmeUpdated !== decisionReadmeOriginal) {
@@ -1873,7 +1875,7 @@ RELATED:
       reqReadmeUpdated = replaceAutogenBlock(
         reqReadmeUpdated,
         blockId,
-        reqReadmeReplacements[blockId],
+        reqReadmeReplacements[blockId]!,
       );
     }
     if (reqReadmeUpdated !== reqReadmeOriginal) {
@@ -1944,7 +1946,7 @@ RELATED:
       docsReadmeUpdated = replaceAutogenBlock(
         docsReadmeUpdated,
         blockId,
-        docsReadmeReplacements[blockId],
+        docsReadmeReplacements[blockId]!,
       );
     }
     if (docsReadmeUpdated !== docsReadmeOriginal) {
@@ -1958,10 +1960,10 @@ RELATED:
         `[generate_indexes] dry-run: ${infos.length} IR files collected`,
       );
       console.log(
-        `[generate_indexes] catalog pre-block: ${catalogPre.length} entries`,
+        `[generate_indexes] catalog entries: ${catalogEntries.length} entries`,
       );
       console.log(
-        `[generate_indexes] catalog post-block: ${catalogPost.length} entries`,
+        `[generate_indexes] catalog source: rules registry (single source),`,
       );
       console.log(
         `[generate_indexes] rule-ownership appendix: ${ruleOwnershipLines.length} rows (incl. header)`,

@@ -2,10 +2,10 @@
 title: 索引類自動生成整合性
 status: accepted
 created: 2026-08-20
-updated: 2026-11-18
+updated: "2026-11-18"
 detection_method_class: machine-check
-implementation_path: [.opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts, .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts, .opencode/skills/repo-agentdev-integrity/scripts/check_autogen_freshness.ts]
-verification_path: [.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts, .opencode/skills/repo-agentdev-integrity/scripts/check_autogen_freshness.test.ts]
+implementation_path: [src/common/skills/repo-agentdev-integrity/rules/ir-061.ts, src/common/skills/repo-agentdev-integrity/scripts/generate_indexes.ts, src/common/skills/repo-agentdev-integrity/scripts/check_autogen_freshness.ts]
+verification_path: [src/common/skills/repo-agentdev-integrity/scripts/rules/rules.test.ts, src/common/skills/repo-agentdev-integrity/scripts/tests/check_autogen_freshness.test.ts, src/common/skills/repo-agentdev-integrity/scripts/tests/generate_indexes.test.ts]
 ---
 
 # IR-061: 索引類自動生成整合性
@@ -42,6 +42,6 @@ strict（再現可能な機械的パターンマッチングで判定可能）
 ## 関連
 
 - SC-002 Design: `docs/designs/integrity/index-auto-generation.md`
-- 生成スクリプト: `.opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts`
+- 生成スクリプト: `src/common/skills/repo-agentdev-integrity/scripts/generate_indexes.ts`
 - 関連 REQ: REQ-010（docs-check）
 - 関連 IR: IR-004（REQ index）。IR-038・IR-039・IR-042 は DEC-065 により廃止済み。

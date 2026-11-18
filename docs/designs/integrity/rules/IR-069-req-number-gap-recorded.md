@@ -4,8 +4,8 @@ status: accepted
 created: 2026-09-17
 updated: "2026-11-18"
 detection_method_class: machine-check
-implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
-verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts
+implementation_path: src/common/skills/repo-agentdev-integrity/rules/ir-069.ts
+verification_path: src/common/skills/repo-agentdev-integrity/scripts/rules/rules.test.ts
 ---
 
 # IR-069: req-number-gap-recorded

@@ -1,0 +1,311 @@
+// Tests for the manifest builder.
+//
+// The manifest builder produces the four canonical manifest projections
+// defined in docs/specs/integrity/distribution-boundary.md §58-67:
+// source, link, archive, archive-installed. Each manifest entry records
+// path + SHA-256 + size. The builder consumes the candidate tree's git
+// tree entries and classifies each entry into the projection(s) it
+// belongs to. Source has two internal subsets (runtime, bootstrap) and
+// archive has one extra subset (archive-extra); these subsets are not
+// public projection labels.
+
+// ADF-COVERS(verification): REQ-050-011
+// ADF-COVERS(verification): REQ-052-006, REQ-052-007
+
+import { describe, expect, test } from "bun:test";
+import {
+  buildSourceManifest,
+  buildLinkManifest,
+  buildArchiveManifest,
+  buildArchiveInstalledManifest,
+  isRequiredRuntimePath,
+  isRequiredBootstrapPath,
+  classifySourceSubset,
+  type ManifestEntryInput,
+} from "./manifest.ts";
+import { manifestEntryEquals, diffManifests } from "./manifest-diff.ts";
+
+function entry(path: string, sha: string, size: number): ManifestEntryInput {
+  return { path, sha256: sha, size };
+}
+
+describe("manifest / isRequiredRuntimePath", () => {
+  test("accepts commands/agentdev/**", () => {
+    expect(isRequiredRuntimePath("src/common/commands/agentdev/case-run.md")).toBe(true);
+    expect(isRequiredRuntimePath("src/common/commands/agentdev/sub/x.md")).toBe(true);
+  });
+  test("accepts skills/agentdev-*/**", () => {
+    expect(isRequiredRuntimePath("src/common/skills/agentdev-foo/SKILL.md")).toBe(true);
+    expect(isRequiredRuntimePath("src/common/skills/agentdev-bar/references/x.md")).toBe(true);
+  });
+  test("accepts skills/japanese-tech-writing/**", () => {
+    expect(isRequiredRuntimePath("src/common/skills/japanese-tech-writing/SKILL.md")).toBe(true);
+  });
+  test("accepts tools/agentdev-*/** and plugins/agentdev-*/** (REQ-052 distribution kinds)", () => {
+    expect(isRequiredRuntimePath("src/common/tools/agentdev-gh/index.ts")).toBe(true);
+    expect(isRequiredRuntimePath("src/common/tools/agentdev-gh/tests/engine-fail-closed.test.ts")).toBe(true);
+    expect(isRequiredRuntimePath("src/opencode/plugins/agentdev-gh-write-guard/plugin.ts")).toBe(true);
+    expect(isRequiredRuntimePath("src/opencode/plugins/agentdev-gh-write-guard/lib/guard-config.ts")).toBe(true);
+  });
+  test("rejects unrelated commands", () => {
+    expect(isRequiredRuntimePath("src/opencode/commands/repo/x.md")).toBe(false);
+    expect(isRequiredRuntimePath("src/common/commands/agentdev-other/x.md")).toBe(false);
+  });
+  test("rejects unrelated skills", () => {
+    expect(isRequiredRuntimePath("src/opencode/skills/repo-integrity/SKILL.md")).toBe(false);
+  });
+  test("rejects non-agentdev tools/plugins entries (repo-local, REQ-052-006)", () => {
+    expect(isRequiredRuntimePath("src/opencode/tools/local-tool/index.ts")).toBe(false);
+    expect(isRequiredRuntimePath("src/opencode/plugins/local-guard/plugin.ts")).toBe(false);
+  });
+  test("includes tests, fixtures, README, package.json, tsconfig, lockfiles, and metadata", () => {
+    expect(isRequiredRuntimePath("src/common/skills/agentdev-foo/scripts/x.test.ts")).toBe(true);
+  });
+});
+
+describe("manifest / isRequiredBootstrapPath", () => {
+  test("accepts the public entry and its runtime dependency modules (REQ-050-011)", () => {
+    expect(isRequiredBootstrapPath("scripts/install.ps1")).toBe(true);
+    expect(isRequiredBootstrapPath("scripts/consumer/common.ps1")).toBe(true);
+    expect(isRequiredBootstrapPath("scripts/consumer/install-sync-common.ps1")).toBe(true);
+    expect(isRequiredBootstrapPath("scripts/consumer/distribution-exclusion.ps1")).toBe(true);
+  });
+  test("rejects unrelated scripts", () => {
+    expect(isRequiredBootstrapPath("scripts/self/release/trusted-distribution-gate.ps1")).toBe(false);
+    expect(isRequiredBootstrapPath("scripts/self/maintenance/apply-mechanical-replacement.ps1")).toBe(false);
+  });
+});
+
+describe("manifest / classifySourceSubset", () => {
+  test("runtime for src/opencode/** paths", () => {
+    expect(classifySourceSubset("src/common/commands/agentdev/x.md")).toBe("runtime");
+    expect(classifySourceSubset("src/common/skills/agentdev-foo/SKILL.md")).toBe("runtime");
+  });
+  test("bootstrap for the public entry and its dependency modules", () => {
+    expect(classifySourceSubset("scripts/install.ps1")).toBe("bootstrap");
+    expect(classifySourceSubset("scripts/consumer/common.ps1")).toBe("bootstrap");
+    expect(classifySourceSubset("scripts/consumer/install-sync-common.ps1")).toBe("bootstrap");
+    expect(classifySourceSubset("scripts/consumer/distribution-exclusion.ps1")).toBe("bootstrap");
+  });
+  test("archive-extra for the archive installer original and README-INSTALL", () => {
+    expect(classifySourceSubset("scripts/consumer/archive/install.ps1")).toBe("archive-extra");
+    expect(classifySourceSubset("README-INSTALL.md")).toBe("archive-extra");
+    // The exclusion canon travels in the consumer archive via packager
+    // staging but classifies as bootstrap (bootstrap wins over archive-extra);
+    // it must never be double-listed in ARCHIVE_EXTRA_REQUIRED.
+    expect(classifySourceSubset("scripts/consumer/distribution-exclusion.ps1")).not.toBe("archive-extra");
+  });
+  test("null for unrelated paths", () => {
+    expect(classifySourceSubset("docs/specs/foo.md")).toBeNull();
+    expect(classifySourceSubset("README.md")).toBeNull();
+  });
+});
+
+describe("manifest / buildSourceManifest", () => {
+  test("includes runtime + bootstrap entries", () => {
+    const inputs: ManifestEntryInput[] = [
+      entry("src/common/commands/agentdev/case-run.md", "a".repeat(64), 10),
+      entry("src/common/skills/agentdev-foo/SKILL.md", "b".repeat(64), 20),
+      entry("src/common/skills/japanese-tech-writing/SKILL.md", "c".repeat(64), 30),
+      entry("scripts/install.ps1", "d".repeat(64), 40),
+      entry("scripts/consumer/common.ps1", "e".repeat(64), 50),
+      entry("scripts/consumer/install-sync-common.ps1", "0".repeat(64), 55),
+      entry("scripts/consumer/distribution-exclusion.ps1", "1".repeat(64), 56),
+      entry("README.md", "f".repeat(64), 60),
+    ];
+    const m = buildSourceManifest(inputs);
+    expect(m.projection).toBe("source");
+    expect(m.entries.map((e) => e.path).sort()).toEqual([
+      "scripts/consumer/common.ps1",
+      "scripts/consumer/distribution-exclusion.ps1",
+      "scripts/consumer/install-sync-common.ps1",
+      "scripts/install.ps1",
+      "src/common/commands/agentdev/case-run.md",
+      "src/common/skills/agentdev-foo/SKILL.md",
+      "src/common/skills/japanese-tech-writing/SKILL.md",
+    ]);
+  });
+
+  test("rejects zero-target manifest (no entries)", () => {
+    expect(() => buildSourceManifest([])).toThrow();
+  });
+
+  // 空経路の fail-closed（loadAndClassify の blobs が空で届いた場合）:
+  // runtime エントリのみで必須 bootstrap スクリプトが欠ける候補ツリーは
+  // "missing required bootstrap script" で拒否され、空の source manifest
+  // が黙って成立する経路を残さない。
+  test("rejects when required bootstrap scripts are missing (empty-path guard)", () => {
+    const runtimeOnly: ManifestEntryInput[] = [
+      entry("src/common/skills/agentdev-foo/SKILL.md", "a".repeat(64), 20),
+    ];
+    expect(() => buildSourceManifest(runtimeOnly)).toThrow(/missing required bootstrap script/);
+  });
+
+  test("rejects invalid sha256", () => {
+    const inputs: ManifestEntryInput[] = [
+      entry("src/common/skills/agentdev-foo/SKILL.md", "short", 1),
+    ];
+    expect(() => buildSourceManifest(inputs)).toThrow();
+  });
+});
+
+describe("manifest / buildLinkManifest", () => {
+  test("maps source runtime entries to .opencode/** with identical digests", () => {
+    const runtime = [
+      entry("src/common/commands/agentdev/case-run.md", "a".repeat(64), 10),
+      entry("src/common/skills/agentdev-foo/SKILL.md", "b".repeat(64), 20),
+      entry("src/common/skills/japanese-tech-writing/SKILL.md", "c".repeat(64), 30),
+      entry("src/common/tools/agentdev-gh/index.ts", "0".repeat(64), 15),
+      entry("src/opencode/plugins/agentdev-gh-write-guard/plugin.ts", "1".repeat(64), 25),
+    ];
+    const m = buildLinkManifest(runtime);
+    expect(m.entries.map((e) => e.path).sort()).toEqual([
+      ".opencode/commands/agentdev/case-run.md",
+      ".opencode/plugins/agentdev-gh-write-guard/plugin.ts",
+      ".opencode/skills/agentdev-foo/SKILL.md",
+      ".opencode/skills/japanese-tech-writing/SKILL.md",
+      ".opencode/tools/agentdev-gh/index.ts",
+    ]);
+    // Identical digests required.
+    for (const e of m.entries) {
+      const original = runtime.find((r) => r.sha256 === e.sha256);
+      expect(original).toBeDefined();
+    }
+  });
+
+  // 空経路の fail-closed: bootstrap エントリのみで runtime が空の候補ツリーは
+  // source manifest としては成立するが、link（runtime の .opencode 写像）が
+  // "zero target entries" で拒否され、空の link manifest が黙って成立する
+  // 経路を残さない。
+  test("rejects zero target entries (runtime-empty candidate tree)", () => {
+    expect(() => buildLinkManifest([])).toThrow(/zero target entries/);
+  });
+
+  // repo-local plugin（consumer 配布対象外・独立監査リスト）は consumer 配布
+  // 3投影の監査期待から除外され、source projection の原本監査には残る。
+  test("excludes repo-local plugins from the link expectation", () => {
+    const runtime = [
+      entry("src/common/skills/agentdev-foo/SKILL.md", "a".repeat(64), 10),
+      entry("src/opencode/plugins/agentdev-distribution-boundary-guard/plugin.ts", "b".repeat(64), 20),
+    ];
+    const m = buildLinkManifest(runtime);
+    expect(m.entries.map((e) => e.path)).toEqual([
+      ".opencode/skills/agentdev-foo/SKILL.md",
+    ]);
+    const source = buildSourceManifest([
+      ...runtime,
+      entry("scripts/install.ps1", "d".repeat(64), 40),
+      entry("scripts/consumer/common.ps1", "e".repeat(64), 50),
+      entry("scripts/consumer/install-sync-common.ps1", "0".repeat(64), 55),
+      entry("scripts/consumer/distribution-exclusion.ps1", "1".repeat(64), 56),
+    ]);
+    expect(source.entries.map((e) => e.path)).toContain(
+      "src/opencode/plugins/agentdev-distribution-boundary-guard/plugin.ts",
+    );
+  });
+});
+
+describe("manifest / buildArchiveManifest", () => {
+  test("archive = source-runtime + archive installer original + README-INSTALL.md", () => {
+    const runtime = [
+      entry("src/common/commands/agentdev/case-run.md", "a".repeat(64), 10),
+      entry("src/common/skills/agentdev-foo/SKILL.md", "b".repeat(64), 20),
+    ];
+    const extras: ManifestEntryInput[] = [
+      entry("scripts/consumer/archive/install.ps1", "d".repeat(64), 40),
+      entry("README-INSTALL.md", "e".repeat(64), 50),
+    ];
+    const m = buildArchiveManifest(runtime, extras);
+    expect(m.entries.map((e) => e.path).sort()).toEqual([
+      "README-INSTALL.md",
+      "scripts/consumer/archive/install.ps1",
+      "src/common/commands/agentdev/case-run.md",
+      "src/common/skills/agentdev-foo/SKILL.md",
+    ]);
+  });
+
+  test("rejects when the archive installer original is missing", () => {
+    const runtime = [
+      entry("src/common/commands/agentdev/case-run.md", "a".repeat(64), 10),
+    ];
+    expect(() => buildArchiveManifest(runtime, [])).toThrow();
+  });
+});
+
+describe("manifest / buildArchiveInstalledManifest", () => {
+  test("maps source runtime entries to .opencode/** deterministically", () => {
+    const runtime = [
+      entry("src/common/commands/agentdev/case-run.md", "a".repeat(64), 10),
+      entry("src/common/skills/agentdev-foo/SKILL.md", "b".repeat(64), 20),
+    ];
+    const m = buildArchiveInstalledManifest(runtime);
+    expect(m.entries.map((e) => e.path).sort()).toEqual([
+      ".opencode/commands/agentdev/case-run.md",
+      ".opencode/skills/agentdev-foo/SKILL.md",
+    ]);
+  });
+
+  test("projection label is archive-installed (regression for parent defect #7)", () => {
+    // Previous implementation returned buildLinkManifest() whose projection
+    // label was 'link'. Manifest identity MUST match its constructor name.
+    const runtime = [
+      entry("src/common/commands/agentdev/case-run.md", "a".repeat(64), 10),
+    ];
+    const m = buildArchiveInstalledManifest(runtime);
+    expect(m.projection).toBe("archive-installed");
+  });
+
+  test("rejects zero target entries", () => {
+    expect(() => buildArchiveInstalledManifest([])).toThrow();
+  });
+});
+
+describe("manifest / manifestEntryEquals", () => {
+  test("equal when all fields match", () => {
+    const a = entry("a.md", "x".repeat(64), 5);
+    const b = entry("a.md", "x".repeat(64), 5);
+    expect(manifestEntryEquals(a, b)).toBe(true);
+  });
+  test("unequal on size differ", () => {
+    const a = entry("a.md", "x".repeat(64), 5);
+    const b = entry("a.md", "x".repeat(64), 6);
+    expect(manifestEntryEquals(a, b)).toBe(false);
+  });
+});
+
+describe("manifest / diffManifests", () => {
+  test("returns empty diff for identical manifests", () => {
+    const entries = [
+      entry("a.md", "x".repeat(64), 5),
+      entry("b.md", "y".repeat(64), 6),
+    ];
+    const diff = diffManifests(entries, entries);
+    expect(diff.extra).toEqual([]);
+    expect(diff.missing).toEqual([]);
+    expect(diff.digest_mismatches).toEqual([]);
+  });
+  test("detects extra entry in actual", () => {
+    const expected = [entry("a.md", "x".repeat(64), 5)];
+    const actual = [
+      entry("a.md", "x".repeat(64), 5),
+      entry("b.md", "y".repeat(64), 6),
+    ];
+    const diff = diffManifests(expected, actual);
+    expect(diff.extra.map((e) => e.path)).toEqual(["b.md"]);
+  });
+  test("detects missing entry in actual", () => {
+    const expected = [
+      entry("a.md", "x".repeat(64), 5),
+      entry("b.md", "y".repeat(64), 6),
+    ];
+    const actual = [entry("a.md", "x".repeat(64), 5)];
+    const diff = diffManifests(expected, actual);
+    expect(diff.missing.map((e) => e.path)).toEqual(["b.md"]);
+  });
+  test("detects digest mismatch", () => {
+    const expected = [entry("a.md", "x".repeat(64), 5)];
+    const actual = [entry("a.md", "z".repeat(64), 5)];
+    const diff = diffManifests(expected, actual);
+    expect(diff.digest_mismatches.map((e) => e.path)).toEqual(["a.md"]);
+  });
+});

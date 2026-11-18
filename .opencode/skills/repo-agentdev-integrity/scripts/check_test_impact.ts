@@ -24,12 +24,12 @@ import {
   EXIT_OK,
   EXIT_ERROR,
   findRepoRoot,
-} from "./cli_utils.ts";
+} from "../lib/cli_utils.ts";
 
 const path = require("path") as typeof import("path");
 const fs = require("fs") as typeof import("fs");
 
-const SCRIPT_NAME = "check_test_impact.ts";
+const SCRIPT_NAME: string = "check_test_impact.ts"; void SCRIPT_NAME;
 const DESCRIPTION = "Test impact detection gate for Design changes (REQ-019)";
 const USAGE =
   "bun run check_test_impact.ts [--base-ref <git-ref> | --files <path...>] [--test-glob <pattern>] [--json] [--root <path>]";
@@ -141,8 +141,8 @@ function parseArgs(args: string[]): ParsedArgs {
       i++;
     } else if (a === "--files") {
       i++;
-      while (i < args.length && !args[i].startsWith("--")) {
-        for (const token of args[i].split(",")) {
+      while (i < args.length && !args[i]!.startsWith("--")) {
+        for (const token of args[i]!.split(",")) {
           const trimmed = token.trim();
           if (trimmed.length > 0) parsed.files.push(trimmed);
         }
@@ -245,7 +245,7 @@ function gitNameStatus(
     const line = out.split("\n").find((l) => l.trim().length > 0);
     if (!line) return { status: null };
     const statusCode = line.split("\t")[0];
-    if (statusCode.startsWith("R") || statusCode.startsWith("C")) return { status: "R" };
+    if (statusCode!.startsWith("R") || statusCode!.startsWith("C")) return { status: "R" };
     if (statusCode === "A") return { status: "A" };
     if (statusCode === "D") return { status: "D" };
     if (statusCode === "M") return { status: "M" };
@@ -423,7 +423,7 @@ function findReferencesInTest(
     const lineNumber = i + 1;
     // 1. Design 相対パス（full-path）参照
     for (const [specPath, sc] of fullPathSet) {
-      if (line.includes(specPath)) {
+      if (line!.includes(specPath)) {
         const key = `${sc.relPath}|full-path|${lineNumber}`;
         if (!seen.has(key)) {
           seen.add(key);
@@ -431,7 +431,7 @@ function findReferencesInTest(
             spec_rel_path: sc.relPath,
             test_path: testRel,
             reference_kind: "full-path",
-            reference_snippet: truncate(line.trim(), 120),
+            reference_snippet: truncate(line!.trim(), 120),
             reference_line: lineNumber,
           });
         }
@@ -440,7 +440,7 @@ function findReferencesInTest(
     // 2. Design basename 参照（汎用名称は stoplist で除外、full-path は別途照合）
     for (const [basename, scs] of basenameSet) {
       if (BASENAME_STOPLIST.has(basename)) continue;
-      if (line.includes(basename)) {
+      if (line!.includes(basename)) {
         for (const sc of scs) {
           const key = `${sc.relPath}|basename|${lineNumber}`;
           if (!seen.has(key)) {
@@ -449,7 +449,7 @@ function findReferencesInTest(
               spec_rel_path: sc.relPath,
               test_path: testRel,
               reference_kind: "basename",
-              reference_snippet: truncate(line.trim(), 120),
+              reference_snippet: truncate(line!.trim(), 120),
               reference_line: lineNumber,
             });
           }
@@ -459,8 +459,8 @@ function findReferencesInTest(
     // 3. REQ ID 参照
     let m: RegExpExecArray | null;
     const reqRe = new RegExp(REQ_ID_PATTERN);
-    while ((m = reqRe.exec(line)) !== null) {
-      const scs = reqIdSet.get(m[1]);
+    while ((m = reqRe.exec(line!)) !== null) {
+      const scs = reqIdSet.get(m[1]!);
       if (scs) {
         for (const sc of scs) {
           const key = `${sc.relPath}|req-id|${lineNumber}|${m[1]}`;
@@ -470,7 +470,7 @@ function findReferencesInTest(
               spec_rel_path: sc.relPath,
               test_path: testRel,
               reference_kind: "req-id",
-              reference_snippet: truncate(line.trim(), 120),
+              reference_snippet: truncate(line!.trim(), 120),
               reference_line: lineNumber,
             });
           }
@@ -479,8 +479,8 @@ function findReferencesInTest(
     }
     // 4. ADR ID 参照
     const adrRe = new RegExp(ADR_ID_PATTERN);
-    while ((m = adrRe.exec(line)) !== null) {
-      const scs = adrIdSet.get(m[1]);
+    while ((m = adrRe.exec(line!)) !== null) {
+      const scs = adrIdSet.get(m[1]!);
       if (scs) {
         for (const sc of scs) {
           const key = `${sc.relPath}|adr-id|${lineNumber}|${m[1]}`;
@@ -490,7 +490,7 @@ function findReferencesInTest(
               spec_rel_path: sc.relPath,
               test_path: testRel,
               reference_kind: "adr-id",
-              reference_snippet: truncate(line.trim(), 120),
+              reference_snippet: truncate(line!.trim(), 120),
               reference_line: lineNumber,
             });
           }

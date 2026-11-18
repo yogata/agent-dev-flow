@@ -338,7 +338,7 @@ export function requireReqIdList(
   return reqIds.join(",");
 }
 
-/** workflow 値付き integrity gate（check_changed_docs 等の下位契約）を既知入力型から固定生成する。 */
+/** workflow 値付き integrity gate（検証エンジン cli.ts --workflow〔targeted docs guard〕等の下位契約）を既知入力型から固定生成する。 */
 export function buildKnownWorkflowIntegrityGateSpec(input: KnownWorkflowGateInput): GateCommandSpec {
   if (!input.allowedWorkflowValues.includes(input.workflow)) {
     fail(`workflow value is rejected by the subordinate checker contract (allowed: ${input.allowedWorkflowValues.join(", ")}): ${input.workflow}`);

@@ -17,10 +17,10 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { mkdirSync, rmSync, writeFileSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { parseDerivationsConfig, resolveDerivationsFromRoot, deriveFromManualDeclarations } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/derivations.ts";
-import { scanCorpus } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/corpus.ts";
-import { runChecks } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/check.ts";
-import { resolveVerificationPolicyFromRoot } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/verification_scope.ts";
+import { parseDerivationsConfig, resolveDerivationsFromRoot, deriveFromManualDeclarations } from "../../../../skills/agentdev-traceability/scripts/lib/derivations.ts";
+import { scanCorpus } from "../../../../skills/agentdev-traceability/scripts/lib/corpus.ts";
+import { runChecks } from "../../../../skills/agentdev-traceability/scripts/lib/check.ts";
+import { resolveVerificationPolicyFromRoot } from "../../../../skills/agentdev-traceability/scripts/lib/verification_scope.ts";
 
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `trace-deriv-${crypto.randomUUID().slice(0, 8)}`;

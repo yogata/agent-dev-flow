@@ -10,7 +10,7 @@ import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-const REPO_ROOT = join(import.meta.dir, "..", "..", "..", "..", "..");
+const REPO_ROOT = join(import.meta.dir, "..", "..", "..", "..", "..", "..");
 const PHASE_DIR = join(REPO_ROOT, ".agentdev", "phase");
 const PHASE_README = join(PHASE_DIR, "README.md");
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");

@@ -1,17 +1,27 @@
 component: repo-agentdev-integrity
 implementation:
-  .opencode/skills/repo-agentdev-integrity/data/skill-projection-manifest.yaml:
+  src/common/skills/repo-agentdev-integrity/data/skill-projection-manifest.yaml:
     - REQ-010-079
-  .opencode/skills/repo-agentdev-integrity/scripts/trusted-distribution-gate/README.md:
+    - REQ-122-005
+  src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/README.md:
     - REQ-120-001
-  .opencode/skills/repo-agentdev-integrity/scripts/trusted-distribution-gate/archive-zip.ts:
+  src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/archive-zip.ts:
     - REQ-009-045
-  .opencode/skills/repo-agentdev-integrity/scripts/trusted-distribution-gate/boundary-scan-scope.ts:
+  src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/boundary-scan-scope.ts:
     - REQ-029-002
-  .opencode/skills/repo-agentdev-integrity/scripts/trusted-distribution-gate/boundary-runner.ts:
+  src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/boundary-runner.ts:
     - REQ-029-002
+  src/common/skills/repo-agentdev-integrity/engine/targeted-gate.ts:
+    - REQ-122-003
+    - REQ-122-005
+  src/common/skills/repo-agentdev-integrity/engine/context.ts:
+    - REQ-122-006
+  src/common/skills/repo-agentdev-integrity/scripts/cli.ts:
+    - REQ-122-006
+  src/common/skills/repo-agentdev-integrity/rules/index.ts:
+    - REQ-122-003
 verification:
-  .opencode/skills/repo-agentdev-integrity/scripts/traceability_sidecar_duplicate_key.test.ts:
+  src/common/skills/repo-agentdev-integrity/scripts/rules/untracked-residue.test.ts:
+    - REQ-010-084
+  src/common/skills/repo-agentdev-integrity/scripts/rules/rules.test.ts:
     - REQ-117-006
-  .opencode/skills/repo-agentdev-integrity/scripts/trusted-distribution-gate/boundary-scan-scope.test.ts:
-    - REQ-029-002

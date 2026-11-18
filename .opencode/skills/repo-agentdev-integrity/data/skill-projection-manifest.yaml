@@ -92,3 +92,10 @@ third_party_skills:
   - explainer-book
   - first-reader
   - yomiyasu
+
+copy_projections:
+  # repo-agentdev-integrity は copy 投影（DEC-065 決定3、REQ-002-020 限定例外）。
+  # canonical は src/common/skills/ 側正本、projection は .opencode/skills/ 側コピー。
+  # 内容整合は IR-016、実在突合は IR-068 が検査する。
+  - canonical: src/common/skills/repo-agentdev-integrity
+    projection: .opencode/skills/repo-agentdev-integrity

@@ -2,7 +2,7 @@
 title: validator 分割基準
 status: accepted
 created: 2026-07-07
-updated: 2026-11-13
+updated: "2026-11-18"
 ---
 
 # validator 分割基準
@@ -11,7 +11,7 @@ updated: 2026-11-13
 
 ## 目的
 
-check_changed_docs.ts の validator を分割する基準を実装詳細Design として文書化する（targeted-docs-guard-implementation.md Phase 6）。
+targeted docs guard（旧 check_changed_docs.ts。現行実装は検証エンジン cli.ts --workflow モードの engine targeted-gate）の validator を分割する基準を実装詳細Design として文書化する（targeted-docs-guard-implementation.md Phase 6）。
 内部 validator 構成表は [references/validator-internal-config.md](references/validator-internal-config.md) へ分離した。
 
 ## validator の責務境界
@@ -36,8 +36,8 @@ check_changed_docs.ts の validator を分割する基準を実装詳細Design �
 1 つの validator が複数の異なる検査カテゴリ（strict と heuristic、document-drift と broken-reference 等）を混在させることを避ける。
 severity が異なる検査を同一 validator に混在させる場合は、出力時の severity 上書き可能性をレビューする。
 
-## check_changed_docs.ts の validator 構成
+## targeted docs guard の validator 構成
 
-check_changed_docs.ts の内部 validator 構成（changed file resolver、workflow profile resolver、coupled file resolver、targeted check runner、JSON/text reporter）は [references/validator-internal-config.md](references/validator-internal-config.md) へ分離した。
+targeted docs guard（engine targeted-gate）の内部 validator 構成（changed file resolver、workflow profile resolver、coupled file resolver、targeted check runner、JSON/text reporter）は [references/validator-internal-config.md](references/validator-internal-config.md) へ分離した。
 各 validator は独立してテスト可能であり、他 validator への実行時依存を持たない。
 reporter は [integrity-contracts.md](integrity-contracts.md) TargetedDocsReport 型契約に従う。

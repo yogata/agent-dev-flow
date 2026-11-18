@@ -4,8 +4,8 @@ status: accepted
 created: 2026-08-22
 updated: "2026-11-18"
 detection_method_class: machine-check
-implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
-verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts
+implementation_path: [src/common/skills/repo-agentdev-integrity/rules/ir-068.ts, src/common/skills/repo-agentdev-integrity/rules/projection-manifest.ts]
+verification_path: src/common/skills/repo-agentdev-integrity/scripts/rules/rules.test.ts
 ---
 
 # IR-068: skill-projection-manifest
@@ -17,7 +17,7 @@ verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integr
 | severity | strict（manifest ↔ src、投影突合ともに strict。manifest スキーマ警告は heuristic） |
 | category | document-drift（投影乖離の stale junction 側は obsolete-structure） |
 | detection_method | `check_integrity.ts`（`checkSkillProjectionManifest`）による3方向集合比較。(1) manifest ↔ src/common/skills ディレクトリ列挙（データ鮮度）、(2) src ↔ .opencode/skills 投影（junction 環境のみ）。投影比較は `.opencode/skills` に非 repo-* エントリが存在する場合のみ実施し、不在環境（git worktree、junction 未伝播、REQ-018）では info で skip する（worktree 誤検出防止、`isInsideWorktree` と同一の構造的制約に対する junction 実在検出による fallback）。投影エントリは解決可能（実体ディレクトリとして解決できる junction を含む）と解決不能（リンク先欠損の stale junction、ディレクトリ以外の混入物）に分類し、解決不能エントリは projection-broken として検出する（F-01 の stale junction 3 件はリンク先欠損のため listDirs 経由の集合比較には現れず、エントリ単位の解決判定で検出する） |
-| affected_artifacts | [src/common/skills/*, .opencode/skills/*, .opencode/skills/repo-agentdev-integrity/data/skill-projection-manifest.yaml] |
+| affected_artifacts | [src/common/skills/*, .opencode/skills/*, src/common/skills/repo-agentdev-integrity/data/skill-projection-manifest.yaml, .opencode/skills/repo-agentdev-integrity/data/skill-projection-manifest.yaml] |
 | related_req | [REQ-010-068, REQ-018-002] |
 | related_design | [../../local/runtime-package-boundary.md, ../checker-execution-contracts.md, ../integrity-rule-catalog.md] |
 | gate_level | full-audit（source profile でも投影比較は junction 実在時のみ実施。installed profile では常時） |

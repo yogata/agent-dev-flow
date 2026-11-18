@@ -27,7 +27,7 @@ bash から Windows バイナリへパスを渡す実行全般で、次の変異
 
 ## 適用対象
 
-- `--root` を受け取る checker 全般（check_distribution_boundary.ts、check_changed_docs.ts、check_knowledge_docs.ts、agentdev-traceability の coverage / impact / check 等）
+- `--root` を受け取る checker 全般（check_distribution_boundary.ts、cli.ts --workflow（targeted docs guard）、check_knowledge_docs.ts、agentdev-traceability の coverage / impact / check 等）
 - worktree を検査対象とする main root 実体起動の読取系 checker 実行
 - bash と Windows バイナリを連結する全経路（検証・機械工程・委譲での bun install・bun run・退避リダイレクト等）
 

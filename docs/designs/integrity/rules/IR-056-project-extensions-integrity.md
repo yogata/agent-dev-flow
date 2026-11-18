@@ -2,10 +2,10 @@
 title: "IR-056: project-extensions-integrity"
 status: accepted
 created: 2026-08-20
-updated: 2026-10-03
+updated: "2026-11-18"
 detection_method_class: machine-check
-implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_extensions.ts
-verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_extensions.test.ts
+implementation_path: [src/common/skills/repo-agentdev-integrity/rules/ir-056.ts, src/common/skills/repo-agentdev-integrity/lib/extensions-integrity.ts]
+verification_path: src/common/skills/repo-agentdev-integrity/scripts/rules/rules.test.ts
 ---
 
 # IR-056: project-extensions-integrity

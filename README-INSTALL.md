@@ -124,8 +124,7 @@ installer（`scripts/install.ps1`）は宣言済み Skill が `.opencode/skills/
 配布物の整合性は、host 側（agent-dev-flow リポジトリ）の `repo-agentdev-integrity` スキルが提供する `check_integrity.ts --profile installed` で検査する。archive 自体には checker を同梱しない（archive 自己完結と検査実行の分離）。正の仕様は `<integrity-contracts>` Design「実行プロファイル分離（source/installed/release）」である。
 
 ```powershell
-bun run <host>/.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts `
-    --profile installed `
+bun run <host>/src/common/skills/repo-agentdev-integrity/scripts/cli.ts `
     --root <repoRoot>
 ```
 

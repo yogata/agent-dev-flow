@@ -2,10 +2,10 @@
 title: "IR-003: Active/廃止 REQ ID 重複"
 status: accepted
 created: 2026-08-20
-updated: 2026-10-22
+updated: "2026-11-18"
 detection_method_class: machine-check
-implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
-verification_path: .opencode/skills/repo-agentdev-integrity/scripts/commands_structure.test.ts
+implementation_path: src/common/skills/repo-agentdev-integrity/rules/ir-003.ts
+verification_path: [src/common/skills/repo-agentdev-integrity/scripts/rules/rules.test.ts, src/common/skills/repo-agentdev-integrity/scripts/tests/commands_structure.test.ts]
 ---
 
 # IR-003: Active/廃止 REQ ID 重複

@@ -25,7 +25,7 @@ import {
   EXIT_NG,
   EXIT_ERROR,
   findRepoRoot,
-} from "./cli_utils.ts";
+} from "../lib/cli_utils.ts";
 import {
   findAutogenBlocks,
   collectIrFiles,
@@ -34,7 +34,7 @@ import {
   collectReqFiles,
   collectRetiredReqFiles,
   collectReqMetrics,
-  generateCatalogBlocks,
+  generateCatalogEntries,
   generateRuleOwnershipAppendix,
   generateDecisionBaselineCaption,
   generateDecisionBaselineTable,
@@ -46,8 +46,7 @@ import {
   generateReqMetricsTable,
   generateReadmeReqSummaryCount,
   deriveReqMetricsMeasureDate,
-  CATALOG_PRE_BLOCK_ID,
-  CATALOG_POST_BLOCK_ID,
+  CATALOG_BLOCK_ID,
   RULE_OWNERSHIP_BLOCK_ID,
   DECISION_BASELINE_COUNT_BLOCK_ID,
   DECISION_BASELINE_TABLE_BLOCK_ID,
@@ -63,6 +62,7 @@ import {
   README_REQ_SUMMARY_COUNT_BLOCK_ID,
   README_REQ_SUMMARY_TABLE_BLOCK_ID,
 } from "./generate_indexes.ts";
+import { rules as registryRules } from "../rules/index.ts";
 
 const path = require("path") as typeof import("path");
 const fs = require("fs") as typeof import("fs");
@@ -194,8 +194,8 @@ export function classifyStaleness(
   }
 
   // 2. 同行の値が異なる場合。種別は表の意味構造から判定。
-  const cur = currentBody[mismatchIndex];
-  const exp = expectedBody[mismatchIndex];
+  const cur = currentBody[mismatchIndex] ?? "";
+  const exp = expectedBody[mismatchIndex] ?? "";
   const curCells = parseTableRow(cur);
   const expCells = parseTableRow(exp);
 
@@ -258,7 +258,7 @@ interface BlockTarget {
  * 対象索引ファイルとその AUTOGEN block 期待値を構築する。
  * generate_indexes.ts と同一の生成関数を呼び出すことで「検査と生成の論理的同一性」を保証する。
  */
-function buildBlockTargets(root: string): BlockTarget[] {
+export function buildBlockTargets(root: string): BlockTarget[] {
   const targets: BlockTarget[] = [];
 
   const rulesDir = path.join(root, "docs", "designs", "integrity", "rules");
@@ -285,16 +285,15 @@ function buildBlockTargets(root: string): BlockTarget[] {
   const reqHealthMetricsPath = path.join(qualityDir, "req-health-metrics.md");
   const docsReadmePath = path.join(root, "docs", "README.md");
 
-  // catalog（pre/post IR-045 gap 2ブロック）。IR ファイルが存在しない場合は対象外。
+  // catalog（レジストリ単一ソースの単一 AUTOGEN ブロック。DEC-065 決定3）。
+  // rules dir 不在の場合は integrity 系ブロックを対象外。
   if (fs.existsSync(rulesDir)) {
     const infos = collectIrFiles(rulesDir);
     if (infos.length > 0) {
-      const { pre, post } = generateCatalogBlocks(infos);
-      targets.push({ file: catalogPath, blockId: CATALOG_PRE_BLOCK_ID, expected: pre });
       targets.push({
         file: catalogPath,
-        blockId: CATALOG_POST_BLOCK_ID,
-        expected: post,
+        blockId: CATALOG_BLOCK_ID,
+        expected: generateCatalogEntries(registryRules),
       });
       const ruleOwnershipLines = generateRuleOwnershipAppendix(infos);
       targets.push({
@@ -427,7 +426,7 @@ interface FileScanContext {
   blocks: ReturnType<typeof findAutogenBlocks>;
 }
 
-function scanBlocks(
+export function scanBlocks(
   targets: BlockTarget[],
   root: string,
 ): { findings: FreshnessFinding[]; skipped: FreshnessReport["skipped"]; filesScanned: Set<string> } {
@@ -548,7 +547,7 @@ function formatText(report: FreshnessReport): string {
       "```",
     );
     lines.push(
-      "bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts",
+      "bun run src/common/skills/repo-agentdev-integrity/scripts/generate_indexes.ts",
     );
     lines.push("```");
     lines.push("");

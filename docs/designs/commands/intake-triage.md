@@ -2,6 +2,7 @@
 title: intake-triage Design
 status: draft
 created: 2026-11-18
+updated: "2026-11-18"
 ---
 
 <!-- ADF-COVERS(design): REQ-122-013（intake-triage コマンドの公開契約と3ルート自動振り分けの実行契約。REQ-116 型の covers 宣言） -->

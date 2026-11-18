@@ -2,10 +2,10 @@
 title: "IR-059: distribution-reference-boundary"
 status: accepted
 created: 2026-08-20
-updated: 2026-10-22
+updated: "2026-11-18"
 detection_method_class: machine-check
-implementation_path: [.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary-patterns.ts, .opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary_cli.ts]
-verification_path: [.opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary.test.ts, .opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.test.ts]
+implementation_path: [src/common/skills/repo-agentdev-integrity/rules/ir-059.ts, src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/check_distribution_boundary.ts]
+verification_path: [src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/check_distribution_boundary.test.ts, src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/distribution-boundary.test.ts]
 ---
 
 # IR-059: distribution-reference-boundary

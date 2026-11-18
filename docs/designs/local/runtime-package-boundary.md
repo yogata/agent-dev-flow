@@ -491,7 +491,7 @@ wrong target 検出、再作成ロジックは LocalMode と通常版 install �
 | スキル | 区分 | 備考 |
 |--------|------|------|
 | `agentdev-*` 全 27 件 | 配布物依存 | `src/common/skills/` 配下、`agentdev-*` グロブで自動 junction |
-| `repo-agentdev-integrity` | repo-local 専用 | `/repo/docs-check` 実行スキル。REQ-001 の `repo-*` carve-out 対象。検証スクリプトを呼び出す command は DEC-006 により3 command（`docs-check`, `inspect-skills`, `inspect-promote`）へ正規化済み。これらが `repo-agentdev-integrity/scripts/*.ts` を呼び出すが、当該参照は consumer 環境で実行時欠落する別課題（本 Design の対象外） |
+| `repo-agentdev-integrity` | repo-local 専用 | `/repo/docs-check` 実行スキル。REQ-001 の `repo-*` carve-out 対象。検証エンジン（cli.ts）の正本は `src/common/skills/repo-agentdev-integrity/` 配下に配置し、`.opencode/skills/repo-agentdev-integrity/` は copy 投影として git 管理する（DEC-065 決定3、REQ-002-020 の限定例外。IR-016 copy 投影整合、IR-068 copy_projections 登録突合で検査）。checker を呼び出す command は DEC-006 により repo-local command（`docs-check` 等）へ正規化済み |
 
 ## v4 adapter 境界への接続
 

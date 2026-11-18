@@ -19,12 +19,12 @@ import {
   DEFAULT_EXCLUDE_DIRS,
   DEFAULT_EXCLUDE_DIR_PATHS,
   scanCorpus,
-} from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/corpus.ts";
-import { parseDeclarations } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/declarations.ts";
-import { coverageByRequirement, impactByArtifact } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/query.ts";
-import { runChecks } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/check.ts";
-import { currentRequirementLineIds } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/requirements.ts";
-import { findRepoRoot } from "../cli_utils.ts";
+} from "../../../../skills/agentdev-traceability/scripts/lib/corpus.ts";
+import { parseDeclarations } from "../../../../skills/agentdev-traceability/scripts/lib/declarations.ts";
+import { coverageByRequirement, impactByArtifact } from "../../../../skills/agentdev-traceability/scripts/lib/query.ts";
+import { runChecks } from "../../../../skills/agentdev-traceability/scripts/lib/check.ts";
+import { currentRequirementLineIds } from "../../../../skills/agentdev-traceability/scripts/lib/requirements.ts";
+import { findRepoRoot } from "../../lib/cli_utils.ts";
 
 const SCRIPT_DIR = import.meta.dir;
 const REPO_ROOT = findRepoRoot(SCRIPT_DIR);

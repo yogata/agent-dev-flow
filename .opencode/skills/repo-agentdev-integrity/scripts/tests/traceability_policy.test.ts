@@ -10,14 +10,14 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { scanCorpus } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/corpus.ts";
-import { runChecks } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/check.ts";
+import { scanCorpus } from "../../../../skills/agentdev-traceability/scripts/lib/corpus.ts";
+import { runChecks } from "../../../../skills/agentdev-traceability/scripts/lib/check.ts";
 import {
   DEFAULT_POLICY_FILE,
   parseVerificationPolicy,
   resolveVerificationPolicyFromRoot,
-} from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/verification_scope.ts";
-import { findRepoRoot } from "../cli_utils.ts";
+} from "../../../../skills/agentdev-traceability/scripts/lib/verification_scope.ts";
+import { findRepoRoot } from "../../lib/cli_utils.ts";
 
 const SCRIPT_DIR = import.meta.dir;
 const REPO_ROOT = findRepoRoot(SCRIPT_DIR);

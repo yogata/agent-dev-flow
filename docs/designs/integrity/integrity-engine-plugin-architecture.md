@@ -2,6 +2,7 @@
 title: 検証エンジン プラグインアーキテクチャ Design
 status: draft
 created: 2026-11-18
+updated: "2026-11-18"
 ---
 
 <!-- ADF-COVERS(design): REQ-122-001, REQ-122-002, REQ-122-003, REQ-122-005, REQ-122-006, REQ-122-007, REQ-122-011（検証エンジンのプラグイン型アーキテクチャ・ルール構成・保持検査能力の実行契約。REQ-116 型の covers 宣言） -->

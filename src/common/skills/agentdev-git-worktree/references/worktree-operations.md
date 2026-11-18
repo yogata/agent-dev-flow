@@ -214,8 +214,8 @@ worktree 内から `.opencode/skills/agentdev-*` 配下の script を直接実�
 実行手順例（代表検査。`<worktree 絶対パス>` は検査対象 worktree の root に置換する）:
 
 ```bash
-# targeted docs guard（--root 対応、--files 併用）
-bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts --workflow case-run --root <worktree 絶対パス> --files src/common/skills/agentdev-git-worktree/references/worktree-operations.md --json
+# targeted docs guard（--root 対応、--files 併用。検証エンジン cli.ts の --workflow モード）
+bun run .opencode/skills/repo-agentdev-integrity/scripts/cli.ts --workflow case-run --root <worktree 絶対パス> --files src/common/skills/agentdev-git-worktree/references/worktree-operations.md --json
 
 # traceability check（--root 必須。--req は対象要件行 ID のカンマ区切り個別指定のみ。.. 範囲構文は非対応）
 bun src/common/skills/agentdev-traceability/scripts/src/check.ts --root <worktree 絶対パス> --req REQ-{NNNN}-{MMM}

@@ -476,7 +476,7 @@ function New-MechanicalStepProbeInput {
                 commitMessage = 'probe'
                 traceabilityReqIds = @($probeReqId)
                 generateIndexesGate = @{ name = 'generate_indexes'; command = 'bun'; args = @($traceChecker); cwd = $RepoRoot }
-                checkIntegrityGate = @{ name = 'check_integrity'; command = 'bun'; args = @($traceChecker, '--profile', 'source'); cwd = $RepoRoot }
+                checkIntegrityGate = @{ name = 'check_integrity'; command = 'bun'; args = @('run', (Join-Path $RepoRoot 'src/common/skills/repo-agentdev-integrity/scripts/cli.ts'), '--root', $RepoRoot); cwd = $RepoRoot }
                 traceabilityGate = @{ name = 'traceability-check'; command = 'bun'; args = @($traceChecker, '--root', $RepoRoot, '--req', $probeReqId); cwd = $RepoRoot }
             }
         }
