@@ -12,7 +12,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-const repoRoot = join(import.meta.dir, "..", "..", "..", "..", "..");
+const repoRoot = join(import.meta.dir, "..", "..", "..", "..", "..", "..");
 
 function read(...parts: string[]): string {
   return readFileSync(join(repoRoot, ...parts), "utf8");

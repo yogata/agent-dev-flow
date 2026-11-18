@@ -20,7 +20,7 @@ import { expect, test, describe, spyOn, afterEach } from "bun:test";
 import { tmpdir } from "node:os";
 import * as fs from "node:fs";
 import { join } from "node:path";
-import { DEFAULT_DETECTOR_CONFIG } from "../../../../../.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts";
+import { DEFAULT_DETECTOR_CONFIG } from "../../../../../src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/distribution-boundary.ts";
 import {
   evaluateWriteContent,
   evaluateEdit,

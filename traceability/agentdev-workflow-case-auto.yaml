@@ -116,5 +116,5 @@ verification:
     - REQ-034-040
     - REQ-035-017
     - REQ-041-017
-  .opencode/skills/repo-agentdev-integrity/scripts/agreement_change_acknowledgment.test.ts:
+  src/common/skills/repo-agentdev-integrity/scripts/tests/agreement_change_acknowledgment.test.ts:
     - REQ-101-009

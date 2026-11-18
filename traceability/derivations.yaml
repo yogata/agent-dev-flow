@@ -12,4 +12,6 @@ test-verifications:
   # 導出根拠がないテスト（import 先に対応宣言がない・対応 REQ が空）は導出せず、
   # 手動付与対象として sidecar 宣言のまま残る。
   tests-dirs:
-  - .opencode/skills/repo-agentdev-integrity/scripts/tests
+  - src/common/skills/repo-agentdev-integrity/scripts/tests
+  - src/common/skills/repo-agentdev-integrity/scripts/rules
+  - src/common/skills/repo-agentdev-integrity/trusted-distribution-gate

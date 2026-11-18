@@ -2,10 +2,10 @@
 title: "IR-070: design-frontmatter-required-keys"
 status: accepted
 created: 2026-09-20
-updated: 2026-11-18
+updated: "2026-11-18"
 detection_method_class: machine-check
-implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_design_frontmatter.ts
-verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_design_frontmatter.test.ts
+implementation_path: src/common/skills/repo-agentdev-integrity/rules/ir-070.ts
+verification_path: src/common/skills/repo-agentdev-integrity/scripts/rules/rules.test.ts
 ---
 
 # IR-070: design-frontmatter-required-keys
@@ -55,4 +55,4 @@ baseline による既知違反の免除管理・delta 運用は撤廃済みで�
 - [integrity-rule-catalog.md](../integrity-rule-catalog.md)
 - [checker-execution-contracts.md](../checker-execution-contracts.md)（Design frontmatter 必須キー検証観点の正典・checker 共通実行契約）
 - [../../foundations/patterns.md](../../foundations/patterns.md)（Design frontmatter 形式: status は draft / accepted）
-- `check_knowledge_docs.ts`（repo-local: `.opencode/skills/repo-agentdev-integrity/scripts/check_knowledge_docs.ts`。同一検出基準の参照元・共有純関数の所有者）
+- frontmatter 境界抽出・ISO 日付妥当性判定は旧 `check_knowledge_docs.ts`（REQ-056-010 の Knowledge frontmatter 検査）と同一の検出基準を `src/common/skills/repo-agentdev-integrity/rules/ir-070.ts` 内へ移設した（旧 checker は AG-007 で削除。検出基準の単一所有は ir-070.ts 実装内）

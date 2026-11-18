@@ -58,14 +58,14 @@ Design 状態評価（棚卸し制、STEP-3-2）を実行する。PR 本文の `
 
 変更ファイルと連動ファイルに対し targeted docs guard を実行（case-close はマージ後 main 環境で実行されるため `--files` を使用）。
 
-- **実行コマンド**: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_changed_docs.ts --workflow case-close --files <PR 変更ファイル一覧> --json`
+- **実行コマンド**: `bun run .opencode/skills/<integrity-detector-skill>/scripts/cli.ts --workflow case-close --files <PR 変更ファイル一覧> --json`
 - **`<PR 変更ファイル一覧>`**: space 区切り推奨、comma 区切り、混在も可
 - **PowerShell での複数パス指定**: 配列変数経由（`$files = @('a.md','b.md')` を `--files $files` で渡す）または個別渡しとし、引用符まとめ渡し（`--files "a.md b.md"`）は使用しない
-- **モード使い分けの標準**: `--base-ref` によるコミット済み差分ベースの検出はコミット後・push 前の実行に限定し、コミット前の worktree 上での検証は untracked ファイルを含む `--files` による明示指定を標準とする（case-close はマージ後 main 環境で実行されるため `--files` を使用）
+- **モード使い分けの標準**: `--base-ref` によるコミット済み差分ベースの検出はコミット後・push 前の実行に限定し、コミット前の worktree 上での検証は untracked ファイルを含む `--files` による明示指定を標準とする（case-close はマージ後 main 環境で実行されるため `--files` を使用）。Git 列挙失敗は空成功ではなく終了コード 2（error）として表面化する
 - **JSON 出力の `failures`**: strict severity が含まれる場合はマージを停止し対象ファイルを修正して再実行
 - **`full_docs_check_recommended`**: true の場合は全体監査（self-hosting リポジトリ限定の自己監査コマンド）の実行をユーザーに提案
 - **draft → accepted 等の Design status 変更時**: `spec_readme_update_required` を STEP-3-2 Design 確定フローに反映
-- **`files_checked` 空時の確認**: targeted docs guard の JSON 出力で `files_checked` が空の場合、検査見逃しリスクとして扱い、`warnings` 配列の警告を確認、`--files` 指定の妥当性と検査対象 root の解決（配置先起点の誤リポジトリ検査でないこと）を確認、`files_checked` の内容と検査対象変更ファイルの一致を確認、必要に応じて再実行または手動確認、空の理由が正当であることを確認してから続行する
+- **`files_checked` 空時の確認**: targeted docs guard の JSON 出力で `files_checked` が空の場合（TARGET-EMPTY、strict FAILURE）、検査見逃しリスクとして扱い、`warnings` 配列の警告を確認、`--files` 指定の妥当性と検査対象 root の解決（配置先起点の誤リポジトリ検査でないこと）を確認、`files_checked` の内容と PR 変更ファイルの一致および `unchecked_reasons`（not-found・out-of-profile）の内容を確認、必要に応じて再実行または手動確認、空の理由が正当であることを確認してから続行する。検証エンジンの終了コード単独で合格を判定しない
 
 #### knowledge README 列挙整合検査（check_knowledge_docs.ts）
 
@@ -92,7 +92,7 @@ PR 変更ファイルが `--profile source` の配布 command/skill ソース面
 adapter が bypass されても最終 gate で停止する。
 trigger 条件は detector の `--profile source` が分類する配布ソース面を基準とする（case-run command STEP-S5 と同一。junction 領域は git 非追跡のため PR 差分に現れず、junction を trigger にすると gate が不発になる）
 
-- **実行コマンド**: `bun run .opencode/skills/<integrity-detector-skill>/scripts/check_distribution_boundary.ts --profile source --json`
+- **実行コマンド**: `bun run .opencode/skills/<integrity-detector-skill>/trusted-distribution-gate/check_distribution_boundary.ts --profile source --json`
 - **検査対象**: PR HEAD の worktree（マージ前の実際の PR ブランチ内容）を検査する。現在の main 状態ではなく、PR で提案されている実際の変更内容を検査対象とする（Oracle finding 5: inspect PR head before merge）
 - **`--profile source`**: case-close は PR マージ前に実行され、配布ソース面を検査するため `source` を使用する（junction は原本への鏡像）
 - **検査エラーの扱い**: 読込不能、未分類エントリ、adapter 起動失敗は全て gate-not-passed として扱う。clean として通過させない。違反時はマージを停止し、違反内容と原因分類を報告する。修正は正規所有工程へ任せ、人間判断への引き上げ条件に該当する場合のみユーザー判断へ
@@ -123,7 +123,7 @@ STEP-3 の最終検証は、当該 Case の変更内容、依存関係、リス�
 
 **実行結果の解析と保存証跡の関係**: 実行済み full suite・checker の件数、失敗明細、サマリーの表示変更は、保存済み証跡（退避ファイル、PR 本文検証差分セクション、SSoT コメント）の読み戻しで行う。同一情報の取得だけを目的とした full suite や checker の再実行をしない。再実行の正当理由（変更後検証、環境変更、失敗由来分類、非決定的失敗の再現確認、必須独立検査、証跡欠落）と証跡の必須要素（標準出力、標準エラー、終了コード、版、検査範囲、実行環境）の正は `agentdev-quality-gates` スキル Design「QG-4 検証証拠の再利用と再実行条件」節が所有し、本 reference は再規定しない。close の最終検証（検証義務に基づき選択された必要な試験・検査、配布物変更を含む case の3検査結果確認、QG-4 checker 実測）を origin/main 取り込み済み・マージ直前の branch HEAD で実行する既存契約は維持し、case-run の保存結果だけによる省略を行わない。省略を行わない対象は選択された必要検証範囲の実行義務であり、検証義務がリポジトリ全体の試験を要求する case ではリポジトリ全体の試験の実行義務である。保存出力の欠落、切断、タイムアウト、検査範囲欠落を完全な合格証拠として扱わない。
 
-- **実行コマンド**: `bun test ./.opencode/skills/<integrity-detector-skill>/scripts/`。`./` prefix 付きで対象ディレクトリを明示指定する（必須ステップ）
+- **実行コマンド**: `bun test ./src/`。`./` prefix 付きで対象ディレクトリを明示指定する（必須ステップ）
 - **timeout 明示指定**: bun test フル suite 全体実行を含む検証の実行指示は、実行 timeout を明示指定する。全体実行の実測所要時間は既定 timeout を超え得るため、**300〜600 秒の指定を標準**とする。timeout 未指定（既定値での打ち切り）で全体実行を打ち切った結果を fail 証跡として扱わない
 - **N/M 件数突合**: 実行結果の「Ran N tests across M files」の N/M 件数突合を実施する（必須ステップ）。直前実績と比較して件数が急減していないかの妥当性を検証する。固定値の期待値化は行わない
 - **stdout・stderr 分離退避の常時付与**: stderr 出力ランナー（bun test 等の検証ランナー）を含む検証の実行には、stdout と stderr の分離退避（stdout.log / stderr.log の分離ファイル退避）を常時付与する。分離退避の接続点は stderr 出力ランナーの検証実行（script 外の直接実行）である。機械工程 script 呼び出し自体のリダイレクトラップは現行 runner（spawnSync 既定の stdio pipe）が bun test の stderr を内部捕捉するため証跡成立手段にならない
@@ -137,12 +137,12 @@ STEP-3 の最終検証は、当該 Case の変更内容、依存関係、リス�
 baseline（NG baseline・BaselineFile・恒久免除レジストリ）の更新と provenance 規約は baseline 機構の撤廃（docs-check 要件の baseline 撤廃行群、Epic #4126 Phase 4）に伴い廃止済みである。検出違反は免除せず対象側の直接修正で解消し、参照是正系 ACT（旧パス→新パスの参照解消等）は当該変更の Case 内で完結させる。
 ## case-close が使用する検査ツール
 
-- `check_changed_docs.ts`（`--workflow case-close`、`--files <PR 変更ファイル一覧>`、targeted docs guard で実行）
+- `cli.ts --workflow case-close`（`--files <PR 変更ファイル一覧>`、targeted docs guard で実行）
 - `check_knowledge_docs.ts`（`--root <検査対象 root>`、docs/knowledge/README.md 変更を含む場合に実行。targeted docs guard が docs/knowledge/** を対象外とするため knowledge README 列挙整合の正規担当）
 - `check_extensions.ts`（配布物パターンのいずれかを変更した場合に実行）
 - `check_distribution_boundary.ts`（`--profile source`、PR 変更ファイルが配布 command/skill ソース面に含まれる場合に実行）
 - `check_autogen_freshness.ts`（AUTOGEN 鮮度 gate。squash merge を伴う境界 close 時に実行）
-- `bun test ./.opencode/skills/<integrity-detector-skill>/scripts/`（full integrity suite 実行、QG-4 合格基準による検証で実行）
+- `bun test ./src/`（full integrity suite 実行、QG-4 合格基準による検証で実行）
 - test_strategy（QG-4 完了条件確認）
 
 **checker コマンドの実行経路（安定実行経路）**: stdout 証跡（機械可読レポート）を要する checker の実行は、モジュール import 経由（`node --experimental-strip-types`）を標準経路とする。bun run 等の CLI 経由で実行する場合は、Windows + bun 環境で process.exit の終了タイミングにより stdout レポートが失われることがあるため、process.exit 前に stdout の flush を保証する終了手順を例外経路として用いる。契約は checker 実行契約（checker 実行契約と検出基盤規則 Design）「安定実行経路」節を参照する。
@@ -181,7 +181,7 @@ baseline（NG baseline・BaselineFile・恒久免除レジストリ）の更新�
 ## 関連 Capability Skill
 
 - `agentdev-design-file-manager`: Design status 昇格、design-lifecycle-application
-- integrity checker skill（self-hosting リポジトリ限定）: check_changed_docs.ts、check_extensions.ts
+- integrity checker skill（self-hosting リポジトリ限定）: cli.ts --workflow による targeted docs guard、check_extensions.ts
 - `agentdev-project-extensions`: document-model Design extension 経由（Document Classification Policy）
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）

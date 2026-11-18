@@ -2,6 +2,7 @@
 title: ローカル検証ゲート Design
 status: draft
 created: 2026-11-18
+updated: "2026-11-18"
 ---
 
 <!-- ADF-COVERS(design): REQ-122-008, REQ-122-009, REQ-122-010, REQ-122-015（ローカル検証ゲートと最終検証の実行契約。REQ-116 型の covers 宣言） -->

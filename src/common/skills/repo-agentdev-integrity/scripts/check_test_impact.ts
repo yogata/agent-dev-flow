@@ -1,0 +1,682 @@
+// ADF-COVERS(implementation): REQ-010-008
+// ADF-COVERS(implementation): REQ-019-001, REQ-019-002
+// ADF-COVERS(implementation): REQ-019-003
+/**
+ * check_test_impact.ts — Test impact detection gate (REQ-019).
+ *
+ * リファクタリング PR で Design 変更に連動する周辺テストの陳腐化を検出する。
+ * 変更 Design ファイルを抽出し、当該 Design を参照するテストファイルのうち
+ * 同一 PR で未変更のものを「陳腐化候補」として報告する。
+ * REQ-019-003 追加契機: 宣言的データ・config（extension yaml、plugin 追加対象設定、
+ * 判断境界文言、配布物文言）を期待値に持つテストの同期漏れを検出対象に含める。
+ *
+ * 処理層 (5層):
+ *   1. changed file resolver    — --files / --base-ref から変更ファイルを特定
+ *   2. spec change classifier   — 変更ファイルを Design/REQ/ADR 変更と宣言的データ・config 変更へ分類
+ *   3. test file discovery       — test-glob で走査対象テストファイルを発見
+ *   4. reference scanner         — 各テストファイルから Design 参照と宣言的データ参照を抽出
+ *   5. staleness evaluator       — 参照テストが同一 PR で変更されたか評価
+ *
+ * CLI 詳細は docs/designs/integrity/test-impact-detection-gate.md「チェッカー実装契約」節参照。
+ */
+
+import {
+  EXIT_OK,
+  EXIT_ERROR,
+  findRepoRoot,
+} from "../lib/cli_utils.ts";
+
+const path = require("path") as typeof import("path");
+const fs = require("fs") as typeof import("fs");
+
+const SCRIPT_NAME: string = "check_test_impact.ts"; void SCRIPT_NAME;
+const DESCRIPTION = "Test impact detection gate for Design changes (REQ-019)";
+const USAGE =
+  "bun run check_test_impact.ts [--base-ref <git-ref> | --files <path...>] [--test-glob <pattern>] [--json] [--root <path>]";
+const DEFAULT_TEST_GLOB = "**/*.test.ts";
+
+// Design 系ファイルのパス分類。docs/designs/**、docs/requirements/REQ-*、docs/decisions/DEC-* を対象とする
+// （Issue #2383 (c): docs/adr/ は DEC-009 移行で廃止済みのため docs/decisions/ へ整合）。
+const Design_PATH_PATTERNS = [
+  /^docs\/designs\/.*\.md$/,
+  /^docs\/requirements\/REQ-.*\.md$/,
+  /^docs\/decisions\/DEC-.*\.md$/,
+];
+
+// 宣言的データ・config のパス分類（REQ-019-003）。この配下を期待値に持つテストの
+// 同期漏れを検出契機に含める。区分対応:
+// - extension yaml: Project Extensions 宣言（.agentdev/extensions/**）
+// - plugin 追加対象設定: textlint guard plugin の追加対象設定 yaml（.agentdev/config/plugins/**）
+// - 判断境界文言・配布物文言: prh 辞書（agentdev-textlint-guard rules/**）
+// docs 系（Design_PATH_PATTERNS）と重複する場合は Design を優先する。
+const DECLARATIVE_PATH_PATTERNS = [
+  /^\.agentdev\/extensions\/.*\.ya?ml$/,
+  /^\.agentdev\/config\/plugins\/.*\.ya?ml$/,
+  /^src\/opencode\/plugins\/agentdev-textlint-guard\/rules\/.*\.ya?ml$/,
+];
+
+// 走査除外ディレクトリ。SCAN_EXCLUDE_DIRS は相対パス先頭一致、
+// SCAN_EXCLUDE_ANY_DEPTH_DIRS はパス区切りで区切られた任意階層のディレクトリ名一致。
+// ビルド成果物、外部依存、worktree、retired を除く
+// （Issue #2383 (c): node_modules は src/opencode/skills/*/scripts 配下等
+// 任意階層に出現するためセグメント一致で除外。旧 docs/adr/retired/ は
+// docs/decisions/retired/ へ整合）。
+const SCAN_EXCLUDE_DIRS = [
+  ".worktrees/",
+  ".agentdev-plugin/",
+  ".git/",
+  "docs/requirements/retired/",
+  "docs/decisions/retired/",
+];
+
+// 任意階層の同名ディレクトリを除外する（依存パッケージのテスト混入防止、PR 2357 観測）。
+const SCAN_EXCLUDE_ANY_DEPTH_DIRS = ["node_modules"];
+
+// basename 照合の停止リスト。汎用名称は basename 単独では照合しない
+// （full-path 照合は継続して有効）。REQ/ADR ID 照合にも影響しない。
+const BASENAME_STOPLIST = new Set([
+  "README.md",
+  "_template.md",
+  "CHANGELOG.md",
+  "LICENSE",
+  "package.json",
+  "tsconfig.json",
+]);
+
+// REQ/ADR ID 抽出用正規表現。REQ は桁数上限なし（受理上限撤廃 Decision）。
+const REQ_ID_PATTERN = /\b(REQ-\d+)\b/g;
+const ADR_ID_PATTERN = /\b(ADR-\d{3})\b/g;
+
+type SpecLifecycle = "added" | "deleted" | "renamed" | "modified" | "unknown";
+type ReferenceKind = "full-path" | "basename" | "req-id" | "adr-id";
+type SpecCategory = "design" | "declarative";
+
+interface TestImpactFinding {
+  spec_path: string;
+  spec_lifecycle: SpecLifecycle;
+  test_path: string;
+  reference_kind: ReferenceKind;
+  reference_snippet: string;
+  reference_line: number;
+}
+
+interface TestImpactReport {
+  base_ref: string | null;
+  files_declared: string[];
+  spec_changes: string[];        // Design 変更一覧（既存契約を維持）
+  declarative_changes: string[]; // 宣言的データ・config 変更一覧（REQ-019-003 追加）
+  tests_scanned: number;
+  stale_candidates: TestImpactFinding[];
+  declarative_stale_candidates: TestImpactFinding[];
+  warnings: string[];
+}
+
+interface ParsedArgs {
+  files: string[];
+  baseRef: string | null;
+  testGlob: string;
+  json: boolean;
+  help: boolean;
+  root?: string;
+}
+
+function parseArgs(args: string[]): ParsedArgs {
+  const parsed: ParsedArgs = {
+    files: [],
+    baseRef: null,
+    testGlob: DEFAULT_TEST_GLOB,
+    json: false,
+    help: false,
+  };
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (a === "--help" || a === "-h") {
+      parsed.help = true;
+    } else if (a === "--json") {
+      parsed.json = true;
+    } else if (a === "--base-ref") {
+      const v = args[i + 1];
+      if (!v) throw new Error("--base-ref requires a value");
+      parsed.baseRef = v;
+      i++;
+    } else if (a === "--files") {
+      i++;
+      while (i < args.length && !args[i]!.startsWith("--")) {
+        for (const token of args[i]!.split(",")) {
+          const trimmed = token.trim();
+          if (trimmed.length > 0) parsed.files.push(trimmed);
+        }
+        i++;
+      }
+      i--;
+    } else if (a === "--test-glob") {
+      const v = args[i + 1];
+      if (!v) throw new Error("--test-glob requires a value");
+      parsed.testGlob = v;
+      i++;
+    } else if (a === "--root") {
+      const v = args[i + 1];
+      if (!v) throw new Error("--root requires a value");
+      parsed.root = v;
+      i++;
+    } else {
+      throw new Error(`Unknown argument: ${a}`);
+    }
+  }
+  return parsed;
+}
+
+function printHelp(): void {
+  console.error(`usage: ${USAGE}`);
+  console.error("");
+  console.error(`description: ${DESCRIPTION}`);
+  console.error("");
+  console.error("options:");
+  console.error("  --base-ref <ref>     git base ref to compute changed files; for worktree env (pre-merge, case-run). mutually exclusive with --files");
+  console.error("  --files <path...>    changed files (space-separated recommended; comma-separated also accepted); for main env (post-merge, case-close). mutually exclusive with --base-ref");
+  console.error(`  --test-glob <pat>    test file glob (default: ${DEFAULT_TEST_GLOB})`);
+  console.error("  --json               emit JSON report (default: text)");
+  console.error("  --root <path>        explicit repository root (worktree/CI support)");
+}
+
+// ─── Layer 1: changed file resolver ────────────────────────────────────────
+
+function resolveChangedFiles(
+  root: string,
+  files: string[],
+  baseRef: string | null,
+): string[] {
+  if (files.length > 0) {
+    return files
+      .map((f) => (path.isAbsolute(f) ? f : path.resolve(root, f)))
+      .filter((f) => fs.existsSync(f));
+  }
+  if (baseRef) {
+    const { execSync } = require("child_process") as typeof import("child_process");
+    try {
+      const out = execSync(
+        `git diff --name-only ${baseRef}...HEAD`,
+        { cwd: root, encoding: "utf-8" },
+      ) as string;
+      return out
+        .split("\n")
+        .map((l) => l.trim())
+        .filter((l) => l.length > 0)
+        .map((rel) => path.join(root, rel.replace(/\//g, path.sep)));
+    } catch (e) {
+      throw new Error(
+        `git diff against --base-ref ${baseRef} failed: ${e instanceof Error ? e.message : String(e)}`,
+      );
+    }
+  }
+  return [];
+}
+
+// ─── Layer 2: spec change classifier ───────────────────────────────────────
+
+function isSpecPath(relPath: string): boolean {
+  return Design_PATH_PATTERNS.some((p) => p.test(relPath));
+}
+
+function isDeclarativePath(relPath: string): boolean {
+  return DECLARATIVE_PATH_PATTERNS.some((p) => p.test(relPath));
+}
+
+interface SpecChange {
+  relPath: string;
+  lifecycle: SpecLifecycle;
+  basename: string;
+  reqIds: string[]; // 変更 Design から抽出した REQ-NNN（REQ ファイル自身の ID 等）
+  adrIds: string[]; // 変更 Design から抽出した ADR-NNN
+  category: SpecCategory; // design = docs 系（既存契約）、declarative = 宣言的データ・config（REQ-019-003）
+}
+
+function gitNameStatus(
+  root: string,
+  rel: string,
+  baseRef: string | null,
+): { status: "A" | "D" | "R" | "M" | null } {
+  const { execSync } = require("child_process") as typeof import("child_process");
+  try {
+    const diffCmd = baseRef
+      ? `git diff --name-status --diff-filter=ADRMCR ${baseRef}...HEAD -- "${rel}"`
+      : `git diff --name-status --diff-filter=ADRMCR HEAD -- "${rel}"`;
+    const out = execSync(diffCmd, { cwd: root, encoding: "utf-8" }) as string;
+    const line = out.split("\n").find((l) => l.trim().length > 0);
+    if (!line) return { status: null };
+    const statusCode = line.split("\t")[0];
+    if (statusCode!.startsWith("R") || statusCode!.startsWith("C")) return { status: "R" };
+    if (statusCode === "A") return { status: "A" };
+    if (statusCode === "D") return { status: "D" };
+    if (statusCode === "M") return { status: "M" };
+    return { status: null };
+  } catch {
+    return { status: null };
+  }
+}
+
+function classifySpecChanges(
+  root: string,
+  changedFiles: string[],
+  baseRef: string | null,
+): SpecChange[] {
+  const result: SpecChange[] = [];
+  for (const absPath of changedFiles) {
+    const rel = path.relative(root, absPath).replace(/\\/g, "/");
+    const isDesign = isSpecPath(rel);
+    if (!isDesign && !isDeclarativePath(rel)) continue;
+    const status = gitNameStatus(root, rel, baseRef);
+    let lifecycle: SpecLifecycle = "unknown";
+    if (status.status === "A") lifecycle = "added";
+    else if (status.status === "D") lifecycle = "deleted";
+    else if (status.status === "R") lifecycle = "renamed";
+    else if (status.status === "M") lifecycle = "modified";
+    // 伝播対象 ID は「ファイル自身の ID」のみ。
+    // REQ/ADR ファイル名由来の ID のみを採用し、Design 本文の ADR/REQ 言及は伝播させない
+    // （Design が ADR-001 を言及しても ADR-001 変更ではなく、過検出になるため）。
+    // REQ ファイル名の抽出は桁数上限なし（受理上限撤廃 Decision）。固定幅だと
+    // 増桁した REQ ファイル名から接頭部の部分一致抽出が起きるため、
+    // basename 全体を照合する。
+    const reqIds: string[] = [];
+    const adrIds: string[] = [];
+    const reqFileMatch = path.basename(rel).match(/^REQ-(\d+)\.md$/);
+    if (reqFileMatch && reqFileMatch[1] !== undefined) reqIds.push(`REQ-${reqFileMatch[1]}`);
+    const adrFileMatch = rel.match(/ADR-(\d{3})/);
+    if (adrFileMatch) adrIds.push(`ADR-${adrFileMatch[1]}`);
+    result.push({
+      relPath: rel,
+      lifecycle,
+      basename: path.basename(rel),
+      reqIds,
+      adrIds,
+      category: isDesign ? "design" : "declarative",
+    });
+  }
+  return result;
+}
+
+// ─── Layer 3: test file discovery ───────────────────────────────────────────
+
+function shouldExclude(relPath: string): boolean {
+  const segments = relPath.split("/");
+  if (segments.some((s) => SCAN_EXCLUDE_ANY_DEPTH_DIRS.includes(s))) return true;
+  return SCAN_EXCLUDE_DIRS.some((d) => relPath.startsWith(d));
+}
+
+// node:fs glob のワイルドカードはドット始まりディレクトリを列挙できないため、
+// リポジトリルート直下の隠しディレクトリ（.opencode 等）はトップレベルを
+// 単一階層 readdir で発見し、その内側を cwd 直指定の glob で列挙する。
+function patternForHiddenRoot(testGlob: string, hiddenDir: string): string | null {
+  if (testGlob.startsWith(`${hiddenDir}/`)) return testGlob.slice(hiddenDir.length + 1);
+  if (testGlob.startsWith("**/")) return testGlob;
+  return null;
+}
+
+export function discoverTestFiles(root: string, testGlob: string): string[] {
+  const relMatches = new Set<string>();
+
+  let standardMatches: string[] = [];
+  try {
+    standardMatches = fs.globSync(testGlob, { cwd: root }) as string[];
+  } catch (error) {
+    // ルート欠落（ENOENT）は空扱い。それ以外の走査エラーは握り潰さない
+    // （部分走査による不完全な tests_scanned を出さない）。
+    if (!(error instanceof Error && "code" in error && error.code === "ENOENT")) throw error;
+    standardMatches = [];
+  }
+  // 旧パターン解釈では "**/" 先頭パターンは必ず / を含む相対パスのみマッチする
+  // （リポジトリルート直下のファイルは対象外）。標準 API の受理範囲拡張を
+  // 公開仕様として追加しないため、この制約を明示的に維持する。
+  const requiresSeparator = testGlob.startsWith("**/");
+  for (const match of standardMatches) {
+    const rel = match.replace(/\\/g, "/");
+    if (requiresSeparator && !rel.includes("/")) continue;
+    relMatches.add(rel);
+  }
+
+  let topEntries: import("fs").Dirent[] = [];
+  try {
+    topEntries = fs.readdirSync(root, { withFileTypes: true }) as import("fs").Dirent[];
+  } catch {
+    topEntries = [];
+  }
+  for (const ent of topEntries) {
+    if (!ent.isDirectory() || !ent.name.startsWith(".")) continue;
+    const pattern = patternForHiddenRoot(testGlob, ent.name);
+    if (pattern === null) continue;
+    let hiddenMatches: string[] = [];
+    try {
+      hiddenMatches = fs.globSync(pattern, { cwd: path.join(root, ent.name) }) as string[];
+    } catch (error) {
+      if (!(error instanceof Error && "code" in error && error.code === "ENOENT")) throw error;
+      hiddenMatches = [];
+    }
+    for (const match of hiddenMatches) {
+      relMatches.add(`${ent.name}/${match.replace(/\\/g, "/")}`);
+    }
+  }
+
+  const results: string[] = [];
+  for (const rel of [...relMatches].sort()) {
+    if (shouldExclude(rel)) continue;
+    const abs = path.join(root, ...rel.split("/"));
+    let isFile = false;
+    try {
+      isFile = fs.lstatSync(abs).isFile();
+    } catch {
+      continue;
+    }
+    if (isFile) results.push(abs);
+  }
+  return results;
+}
+
+// ─── Layer 4: reference scanner ─────────────────────────────────────────────
+
+interface ReferenceHit {
+  spec_rel_path: string;
+  test_path: string;
+  reference_kind: ReferenceKind;
+  reference_snippet: string;
+  reference_line: number;
+}
+
+function findReferencesInTest(
+  root: string,
+  testAbsPath: string,
+  specChanges: SpecChange[],
+): ReferenceHit[] {
+  let content: string;
+  try {
+    content = fs.readFileSync(testAbsPath, "utf-8") as string;
+  } catch {
+    return [];
+  }
+  const testRel = path.relative(root, testAbsPath).replace(/\\/g, "/");
+  const lines = content.split("\n");
+  const hits: ReferenceHit[] = [];
+  const seen = new Set<string>(); // (spec_path, kind, line) 重複抑止
+
+  const fullPathSet = new Map<string, SpecChange>();
+  const basenameSet = new Map<string, SpecChange[]>();
+  const reqIdSet = new Map<string, SpecChange[]>();
+  const adrIdSet = new Map<string, SpecChange[]>();
+  for (const sc of specChanges) {
+    fullPathSet.set(sc.relPath, sc);
+    const arr1 = basenameSet.get(sc.basename) ?? [];
+    arr1.push(sc);
+    basenameSet.set(sc.basename, arr1);
+    for (const id of sc.reqIds) {
+      const arr = reqIdSet.get(id) ?? [];
+      arr.push(sc);
+      reqIdSet.set(id, arr);
+    }
+    for (const id of sc.adrIds) {
+      const arr = adrIdSet.get(id) ?? [];
+      arr.push(sc);
+      adrIdSet.set(id, arr);
+    }
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const lineNumber = i + 1;
+    // 1. Design 相対パス（full-path）参照
+    for (const [specPath, sc] of fullPathSet) {
+      if (line!.includes(specPath)) {
+        const key = `${sc.relPath}|full-path|${lineNumber}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          hits.push({
+            spec_rel_path: sc.relPath,
+            test_path: testRel,
+            reference_kind: "full-path",
+            reference_snippet: truncate(line!.trim(), 120),
+            reference_line: lineNumber,
+          });
+        }
+      }
+    }
+    // 2. Design basename 参照（汎用名称は stoplist で除外、full-path は別途照合）
+    for (const [basename, scs] of basenameSet) {
+      if (BASENAME_STOPLIST.has(basename)) continue;
+      if (line!.includes(basename)) {
+        for (const sc of scs) {
+          const key = `${sc.relPath}|basename|${lineNumber}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            hits.push({
+              spec_rel_path: sc.relPath,
+              test_path: testRel,
+              reference_kind: "basename",
+              reference_snippet: truncate(line!.trim(), 120),
+              reference_line: lineNumber,
+            });
+          }
+        }
+      }
+    }
+    // 3. REQ ID 参照
+    let m: RegExpExecArray | null;
+    const reqRe = new RegExp(REQ_ID_PATTERN);
+    while ((m = reqRe.exec(line!)) !== null) {
+      const scs = reqIdSet.get(m[1]!);
+      if (scs) {
+        for (const sc of scs) {
+          const key = `${sc.relPath}|req-id|${lineNumber}|${m[1]}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            hits.push({
+              spec_rel_path: sc.relPath,
+              test_path: testRel,
+              reference_kind: "req-id",
+              reference_snippet: truncate(line!.trim(), 120),
+              reference_line: lineNumber,
+            });
+          }
+        }
+      }
+    }
+    // 4. ADR ID 参照
+    const adrRe = new RegExp(ADR_ID_PATTERN);
+    while ((m = adrRe.exec(line!)) !== null) {
+      const scs = adrIdSet.get(m[1]!);
+      if (scs) {
+        for (const sc of scs) {
+          const key = `${sc.relPath}|adr-id|${lineNumber}|${m[1]}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            hits.push({
+              spec_rel_path: sc.relPath,
+              test_path: testRel,
+              reference_kind: "adr-id",
+              reference_snippet: truncate(line!.trim(), 120),
+              reference_line: lineNumber,
+            });
+          }
+        }
+      }
+    }
+  }
+  return hits;
+}
+
+function truncate(s: string, n: number): string {
+  return s.length <= n ? s : s.slice(0, n - 1) + "…";
+}
+
+// ─── Layer 5: staleness evaluator ───────────────────────────────────────────
+
+function evaluateStaleness(
+  root: string,
+  specChanges: SpecChange[],
+  testFiles: string[],
+  changedRelFiles: Set<string>,
+): {
+  findings: TestImpactFinding[];
+  declarativeFindings: TestImpactFinding[];
+  warnings: string[];
+} {
+  const findings: TestImpactFinding[] = [];
+  const declarativeFindings: TestImpactFinding[] = [];
+  const warnings: string[] = [];
+  let designReferenceHits = 0;
+  let declarativeReferenceHits = 0;
+  const lifecycleByPath = new Map<string, SpecLifecycle>();
+  const categoryByPath = new Map<string, SpecCategory>();
+  for (const sc of specChanges) {
+    lifecycleByPath.set(sc.relPath, sc.lifecycle);
+    categoryByPath.set(sc.relPath, sc.category);
+  }
+  for (const testAbs of testFiles) {
+    const hits = findReferencesInTest(root, testAbs, specChanges);
+    const testRel = path.relative(root, testAbs).replace(/\\/g, "/");
+    // 同一 PR で変更済みのテストは陳腐化候補から除外（参照ヒット件数は集計に含める）
+    if (changedRelFiles.has(testRel)) {
+      designReferenceHits += hits.filter(
+        (h) => categoryByPath.get(h.spec_rel_path) !== "declarative",
+      ).length;
+      declarativeReferenceHits += hits.filter(
+        (h) => categoryByPath.get(h.spec_rel_path) === "declarative",
+      ).length;
+      continue;
+    }
+    for (const hit of hits) {
+      const finding: TestImpactFinding = {
+        spec_path: hit.spec_rel_path,
+        spec_lifecycle: lifecycleByPath.get(hit.spec_rel_path) ?? "unknown",
+        test_path: hit.test_path,
+        reference_kind: hit.reference_kind,
+        reference_snippet: hit.reference_snippet,
+        reference_line: hit.reference_line,
+      };
+      if (categoryByPath.get(hit.spec_rel_path) === "declarative") {
+        declarativeReferenceHits++;
+        declarativeFindings.push(finding);
+      } else {
+        designReferenceHits++;
+        findings.push(finding);
+      }
+    }
+  }
+  // silent pass 回避: Design 変更あり、かつ Design 参照ヒット 0 件の場合は警告
+  const designChanges = specChanges.filter((sc) => sc.category === "design");
+  if (designChanges.length > 0 && designReferenceHits === 0 && testFiles.length > 0) {
+    warnings.push(
+      `Design 変更 ${designChanges.length} 件を検出したが、走査したテストファイルから Design 参照を検出できなかった。test-glob の設定、参照形式、除外ディレクトリを確認すること。`,
+    );
+  }
+  // silent pass 回避（REQ-019-003）: 宣言的データ・config 変更あり、かつ参照ヒット 0 件の場合は警告
+  const declarativeChanges = specChanges.filter((sc) => sc.category === "declarative");
+  if (declarativeChanges.length > 0 && declarativeReferenceHits === 0 && testFiles.length > 0) {
+    warnings.push(
+      `宣言的データ・config 変更 ${declarativeChanges.length} 件を検出したが、走査したテストファイルから宣言的データ参照を検出できなかった。test-glob の設定、参照形式、除外ディレクトリを確認すること。`,
+    );
+  }
+  return { findings, declarativeFindings, warnings };
+}
+
+// ─── Reporter ───────────────────────────────────────────────────────────────
+
+function emitJson(report: TestImpactReport): void {
+  console.log(JSON.stringify(report, null, 2));
+}
+
+function emitText(report: TestImpactReport): void {
+  console.log(`Test Impact Detection Gate — REQ-019`);
+  console.log(`base_ref: ${report.base_ref ?? "(none)"}`);
+  console.log(`files_declared: ${report.files_declared.length}`);
+  console.log(`spec_changes: ${report.spec_changes.length}`);
+  for (const s of report.spec_changes) console.log(`  ${s}`);
+  console.log(`declarative_changes: ${report.declarative_changes.length}`);
+  for (const s of report.declarative_changes) console.log(`  ${s}`);
+  console.log(`tests_scanned: ${report.tests_scanned}`);
+  console.log(`stale_candidates: ${report.stale_candidates.length}`);
+  for (const f of report.stale_candidates) {
+    console.log(
+      `  [${f.reference_kind}] ${f.test_path}:${f.reference_line} -> ${f.spec_path} (${f.spec_lifecycle})`,
+    );
+    console.log(`    ${f.reference_snippet}`);
+  }
+  console.log(`declarative_stale_candidates: ${report.declarative_stale_candidates.length}`);
+  for (const f of report.declarative_stale_candidates) {
+    console.log(
+      `  [${f.reference_kind}] ${f.test_path}:${f.reference_line} -> ${f.spec_path} (${f.spec_lifecycle})`,
+    );
+    console.log(`    ${f.reference_snippet}`);
+  }
+  console.log(`warnings: ${report.warnings.length}`);
+  for (const w of report.warnings) console.log(`  ${w}`);
+}
+
+// ─── Main ───────────────────────────────────────────────────────────────────
+
+function main(): void {
+  const args = process.argv.slice(2);
+  let parsed: ParsedArgs;
+  try {
+    parsed = parseArgs(args);
+  } catch (e) {
+    console.error(`[test_impact] ${e instanceof Error ? e.message : String(e)}`);
+    process.exit(EXIT_ERROR);
+  }
+
+  if (parsed.help) {
+    printHelp();
+    process.exit(EXIT_OK);
+  }
+
+  if (parsed.files.length === 0 && !parsed.baseRef) {
+    console.error("[test_impact] either --files or --base-ref is required");
+    printHelp();
+    process.exit(EXIT_ERROR);
+  }
+
+  const scriptDir =
+    (typeof import.meta !== "undefined" && (import.meta as any).dir) ||
+    __dirname ||
+    process.cwd();
+  const root = findRepoRoot(scriptDir, { explicitRoot: parsed.root });
+
+  const changedFiles = resolveChangedFiles(root, parsed.files, parsed.baseRef);
+  const changedRelSet = new Set(
+    changedFiles.map((f) => path.relative(root, f).replace(/\\/g, "/")),
+  );
+
+  const specChanges = classifySpecChanges(root, changedFiles, parsed.baseRef);
+  const testFiles = discoverTestFiles(root, parsed.testGlob);
+
+  const { findings, declarativeFindings, warnings } = evaluateStaleness(
+    root,
+    specChanges,
+    testFiles,
+    changedRelSet,
+  );
+
+  const report: TestImpactReport = {
+    base_ref: parsed.baseRef,
+    files_declared: parsed.files,
+    spec_changes: specChanges
+      .filter((s) => s.category === "design")
+      .map((s) => s.relPath),
+    declarative_changes: specChanges
+      .filter((s) => s.category === "declarative")
+      .map((s) => s.relPath),
+    tests_scanned: testFiles.length,
+    stale_candidates: findings,
+    declarative_stale_candidates: declarativeFindings,
+    warnings,
+  };
+
+  if (parsed.json) {
+    emitJson(report);
+  } else {
+    emitText(report);
+  }
+
+  process.exit(EXIT_OK);
+}
+
+if (import.meta.main) {
+  main();
+}

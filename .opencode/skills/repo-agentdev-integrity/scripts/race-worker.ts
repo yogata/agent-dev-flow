@@ -60,7 +60,8 @@ if (!fs.existsSync(goFile)) {
 const digest = crypto.createHash("sha256").update(fs.readFileSync(stagedZip)).digest("hex");
 
 // Call the real publish-hard-link helper
-const REPO_ROOT = path.resolve(__dirname, "..", "..", "..", "..");
+//（scripts/ からの repo root は 5 つ上: src/common/skills/repo-agentdev-integrity/scripts）
+const REPO_ROOT = path.resolve(__dirname, "..", "..", "..", "..", "..");
 const PUBLISHER = path.join(REPO_ROOT, "scripts", "self", "release", "publish-hard-link.ts");
 
 const r = spawnSync("bun", ["run", PUBLISHER, stagedZip, finalZip, digest], {

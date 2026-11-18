@@ -2,10 +2,10 @@
 title: skill/command パス参照実在
 status: accepted
 created: 2026-08-20
-updated: 2026-10-05
+updated: "2026-11-18"
 detection_method_class: machine-check
-implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
-verification_path: .opencode/skills/repo-agentdev-integrity/scripts/check_reference_paths.test.ts
+implementation_path: [src/common/skills/repo-agentdev-integrity/rules/ir-062.ts, src/common/skills/repo-agentdev-integrity/rules/reference-path-core.ts]
+verification_path: src/common/skills/repo-agentdev-integrity/scripts/rules/rules.test.ts
 ---
 
 # IR-062: skill/command パス参照実在
@@ -76,7 +76,7 @@ strict（参照切れは broken-reference として即時修正対象）
 
 ## 関連
 
-- 検出器: `.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts`（`checkScriptTemplateReferencePaths`）
-- 回帰テスト: `.opencode/skills/repo-agentdev-integrity/scripts/check_reference_paths.test.ts`
+- 検出器: `src/common/skills/repo-agentdev-integrity/rules/`（`checkScriptTemplateReferencePaths`）
+- 回帰テスト: `src/common/skills/repo-agentdev-integrity/scripts/rules/rules.test.ts`
 - 実体化テンプレート: `src/common/skills/agentdev-workflow-templates/templates/case-open/`（standard.md、epic.md、multi-req-epic.md）
 - 関連 REQ: REQ-010（docs-check）。旧 REQ-028-012（新規 IR 登録 gate、retired）

@@ -13,11 +13,11 @@
 import { afterAll, describe, expect, it } from "bun:test";
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { scanCorpus } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/corpus.ts";
-import { runChecks } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/check.ts";
-import { resolveVerificationPolicyFromRoot } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/verification_scope.ts";
+import { scanCorpus } from "../../../../skills/agentdev-traceability/scripts/lib/corpus.ts";
+import { runChecks } from "../../../../skills/agentdev-traceability/scripts/lib/check.ts";
+import { resolveVerificationPolicyFromRoot } from "../../../../skills/agentdev-traceability/scripts/lib/verification_scope.ts";
 
-const REPO_ROOT = join(import.meta.dir, "..", "..", "..", "..", "..");
+const REPO_ROOT = join(import.meta.dir, "..", "..", "..", "..", "..", "..");
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `stage-gate-${crypto.randomUUID().slice(0, 8)}`;
 const BASE_ROOT = join(TEMP_BASE, RUN_ID);

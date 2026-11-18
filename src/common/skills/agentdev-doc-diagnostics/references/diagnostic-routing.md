@@ -53,7 +53,7 @@ severity、confidence、NG 分類は本スキルの共通契約へ正規化す�
 
 ### 5. knowledge 変更の検証ルーティング
 
-targeted docs guard（`check_changed_docs.ts`）は docs/knowledge/** を検査対象外とする。knowledge README（docs/knowledge/README.md）の知識文書列挙と実ファイルの過不足（README 列挙整合）の検証は、knowledge README 列挙整合 checker（`check_knowledge_docs.ts`）が正規担当である。
+targeted docs guard（検証エンジン cli.ts --workflow モード）は docs/knowledge/** を検査対象外とする。knowledge README（docs/knowledge/README.md）の知識文書列挙と実ファイルの過不足（README 列挙整合）の検証は、knowledge README 列挙整合 checker（`check_knowledge_docs.ts`）が正規担当である。
 
 docs/knowledge/** を変更する Case の検証ルーティングは次の分担とする:
 

@@ -17,13 +17,13 @@ import * as path from "node:path";
 import {
   AGENTDEV_GH_OPERATION_SPECS,
   runAgentdevGhOperation,
-} from "../../../../../src/common/tools/agentdev-gh/index.ts";
-import { buildGhToolEnv, type GhToolEnv } from "../../../../../src/common/tools/agentdev-gh/engine.ts";
+} from "../../../../tools/agentdev-gh/index.ts";
+import { buildGhToolEnv, type GhToolEnv } from "../../../../tools/agentdev-gh/engine.ts";
 import {
   GH_TOOL_OPERATIONS,
   GH_TOOL_OPERATION_CATALOG,
-} from "../../../../../src/common/tools/agentdev-gh/contracts.ts";
-import type { GhRunner, GhRunnerReply, GhRunnerRequest } from "../../../../../src/common/tools/agentdev-gh/runner.ts";
+} from "../../../../tools/agentdev-gh/contracts.ts";
+import type { GhRunner, GhRunnerReply, GhRunnerRequest } from "../../../../tools/agentdev-gh/runner.ts";
 import {
   buildTrackingLabels,
   deriveCloseReason,
@@ -31,7 +31,7 @@ import {
   stripTrackingLabels,
   TRACKING_ROLE_LABEL,
   TRACKING_STATES,
-} from "../../../../../src/common/tools/agentdev-gh/tracking-schema.ts";
+} from "../../../../tools/agentdev-gh/tracking-schema.ts";
 import {
   createLocalRunner,
   validateLocalIssue,
@@ -39,7 +39,7 @@ import {
   localStatusValues,
   localTerminalStatuses,
   type LocalIssueFrontmatter,
-} from "../../../../../src/common/tools/agentdev-gh/local/runner-local.ts";
+} from "../../../../tools/agentdev-gh/local/runner-local.ts";
 
 const TEMP_BASE = path.join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `issue-tracking-2437-${crypto.randomUUID().slice(0, 8)}`;

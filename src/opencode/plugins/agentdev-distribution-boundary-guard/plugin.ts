@@ -1,7 +1,7 @@
 // Distribution boundary guard plugin — Stage B orchestrator.
 //
 // Wires the canonical side-effect-free detector
-// (../../../../.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts)
+// (../../../../src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/distribution-boundary.ts)
 // into OpenCode's tool.execute.before hook for the write, edit, and
 // apply_patch tools. When a write would introduce a producer-internal
 // reference (concrete ADR/REQ/DEC ID, concrete docs path, producer-repo
@@ -47,7 +47,7 @@ import {
   DEFAULT_REPOSITORY_IDENTITY,
   type Projection,
   type RepositoryIdentity,
-} from "../../../../.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts";
+} from "../../../../src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/distribution-boundary.ts";
 import {
   parseApplyPatchArgs as parserParseApplyPatchArgs,
   parseApplyPatchText,

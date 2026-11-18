@@ -9,10 +9,10 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { buildInventory } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/inventory.ts";
-import { scanCorpus } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/corpus.ts";
-import { runChecks } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/check.ts";
-import { currentRequirementLineIds } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/requirements.ts";
+import { buildInventory } from "../../../../skills/agentdev-traceability/scripts/lib/inventory.ts";
+import { scanCorpus } from "../../../../skills/agentdev-traceability/scripts/lib/corpus.ts";
+import { runChecks } from "../../../../skills/agentdev-traceability/scripts/lib/check.ts";
+import { currentRequirementLineIds } from "../../../../skills/agentdev-traceability/scripts/lib/requirements.ts";
 
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `trace-inventory-${crypto.randomUUID().slice(0, 8)}`;

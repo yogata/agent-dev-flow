@@ -17,7 +17,7 @@ Phase 1-6 実装計画、report フィールド一覧、完了済み移行作業
 
 ## CLI 引数
 
-check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移管）。
+検証エンジン cli.ts --workflow（targeted docs guard モード）が受け付ける CLI 引数（v2:REQ-0158-004 より移管）。
 
 | 引数 | 必須 | 値 | 説明 |
 |------|------|-----|------|
@@ -36,9 +36,9 @@ check_changed_docs.ts が受け付ける CLI 引数（v2:REQ-0158-004 より移�
 
 - モード使い分け: `--base-ref` によるコミット済み差分ベースの変更ファイル検出はコミット後・push 前の実行に限定し、コミット前（worktree 上での検証）は untracked ファイルを含む `--files` による明示指定を標準とする。`--files` と `--base-ref` の誤用による誤 pass・誤 FAILURE を防ぐため、起動時に対象ファイルが検出できる見込みを確認してから実行する
 - 検査対象 root の解決: worktree を検査対象とする場合は、検査 skill を host 側配置を起点として起動し、検査対象 worktree の絶対パスを `--root` で明示指定する。配置先起点の誤リポジトリ検査は検査見逃しとして扱う
-- 起動手段: `bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts` により起動する（スクリプト契約の共通 CLI 契約に従う）
+- 起動手段: `bun run src/common/skills/repo-agentdev-integrity/scripts/cli.ts --workflow <name>（--files または --base-ref による明示対象指定）` により起動する（スクリプト契約の共通 CLI 契約に従う）。本モードは検証エンジンの明示対象経路（targeted docs guard）であり、汎用差分実行 `--changed`（対象外のみ即時 Exit 0、REQ-122-006）とは独立に維持される。engine の終了コード単独で workflow の受入を決定せず、files_checked 空・不一致の fail-closed 判定はワークフロー側が行う（REQ-010-076、REQ-032-023）
 - PowerShell での引数形式: 複数パスの引数は引用符でまとめて1文字列として渡さず、配列変数経由（`$files = @("a.md","b.md"); --files $files`）または個別渡しとする。`--files "a.md b.md"` 形式の引用符まとめ渡しは split 失敗の恐れがあるため使用しない
-- USAGE 文言: check_changed_docs.ts の `--help` 出力および guard 実行手続 references は上記使い分け・起動手段・引数形式を明記する
+- USAGE 文言: cli.ts --workflow モードの `--help` 出力および guard 実行手続 references は上記使い分け・起動手段・引数形式を明記する
 
 ## workflow 別検査項目
 
@@ -94,7 +94,7 @@ case-close では保存工程より広めに以下を確認する。
 
 case-run プロファイルは docs/** 変更ファイルを対象とし、Definition 保存 / Design 保存向けプロファイルと同等の docs 整合性検査ルールセット（obsolete-spec-path, legacy-local-generation-vocab, doc-type-responsibility 等）を適用する。
 case-run プロファイル固有の追加ルールとして `full_docs_check_recommended` 判定は持たない（case-close の責務）。
-appliesTo は `docs/designs/**`, `docs/requirements/**`, `docs/decisions/**`, `docs/guides/**`, `docs/knowledge/**`, `traceability/**`, `AGENTS.md`, `README.md` 等、docs 配下・トレーサビリティ配下および文書整合性に関連するファイルを対象とする。`docs/knowledge/**` と traceability（`traceability/**`）の appliesTo 追加を主方式とし、checker 実装（check_changed_docs.ts の case-run プロファイル appliesTo）の更新と同時に適用する。
+appliesTo は `docs/designs/**`, `docs/requirements/**`, `docs/decisions/**`, `docs/guides/**`, `docs/knowledge/**`, `traceability/**`, `AGENTS.md`, `README.md` 等、docs 配下・トレーサビリティ配下および文書整合性に関連するファイルを対象とする。`docs/knowledge/**` と traceability（`traceability/**`）の appliesTo 追加を主方式とし、checker 実装（engine targeted-gate の case-run プロファイル appliesTo）の更新と同時に適用する。
 case-run プロファイルの対象範囲は、case-run で変更され得る docs 領域と traceability 領域を単一プロファイルで網羅し、REQ-010-077 の「対象範囲網羅 or 代替検査指定明記」を恒常充足する（CR-001 裁定。対象拡大を主方式とする判断）。`docs/knowledge/**`・traceability を含む case-run 変更で `files_checked` 空（TARGET-EMPTY）を恒常運用として発生させないこと。選定基準は、fail-closed 意味論の維持、検査見逃しゼロ、false-clean の発生なしである。
 
 <!-- ADF-COVERS(design): REQ-010-077 -->
@@ -103,7 +103,7 @@ case-run プロファイルの対象範囲は、case-run で変更され得る d
 `docs/knowledge/**`・traceability 変更は appliesTo 対象内のため case-run プロファイル単独実行で検査される。appliesTo 対象外の領域を含む実行単位では、代替検査として docs-check profile（`--workflow docs-check --files <変更ファイル群>`。appliesTo: true 全件）を `--files` 明示指定で実行する運用を併記する。
 TARGET-EMPTY 検知条件と確認手順（REQ-010-076・REQ-032-023 準拠の運用補強）: `files_checked` 空（TARGET-EMPTY）は FAILURE として検知される。TARGET-EMPTY 検出時は (1) 指定した `--files` の実在と実行 workflow プロファイルの appliesTo への該当有無を確認し、(2) appliesTo 対象外領域の変更を含む場合は代替検査指定（docs-check profile の `--files` 明示指定実行）へ切替えて再実行し、(3) それでも空となる場合は検査対象の指定誤りまたは対象領域の適用漏れとして実行単位の検証計画を是正する。確認なく合格扱いにしない。
 本 Design の case-run 向け検査節の記載（workflow プロファイル対象範囲の運用明記、`docs/knowledge/**`・traceability 変更時の TARGET-EMPTY 恒常化禁止、guard 対象外領域の配布依存境界 gate との検査責務分担明示）が REQ-010-077 を実装する。
-配布 skill（`src/opencode/skills/**`）のみを変更する case-run において guard の `files_checked` が空となる場合、配布物検査の責務は配布依存境界 gate（check_distribution_boundary。case-run STEP-S5 / case-close STEP-3 共用 detector、case-close 側は `--files` 明示指定に対応）が担う。guard（check_changed_docs）は docs 変更の検査責務に限定する。この責務分担は case-run 側の配布物検査契約（TS-007 系）と矛盾しない。
+配布 skill（`src/opencode/skills/**`）のみを変更する case-run において guard の `files_checked` が空となる場合、配布物検査の責務は配布依存境界 gate（check_distribution_boundary。case-run STEP-S5 / case-close STEP-3 共用 detector、case-close 側は `--files` 明示指定に対応）が担う。guard（cli.ts --workflow）は docs 変更の検査責務に限定する。この責務分担は case-run 側の配布物検査契約（TS-007 系）と矛盾しない。
 
 ## full_docs_check_recommended 条件
 
@@ -158,7 +158,7 @@ TargetedDocsReport 型契約の原本は [integrity-contracts.md](integrity-cont
 空の理由（`--files` 指定の不備、`--base-ref` の実行タイミング違反（コミット前実行）、検査対象 root の誤解決、PR 変更ファイル取得の失敗、検査対象パスの誤り等）の確認を促す内容とする（Phase 3、REQ-010-012 連動）。
 
 <!-- ADF-COVERS(implementation): REQ-010-076 -->
-本 Design の check_changed_docs 実装詳細（files_checked が空の場合を検査見逃しとして扱い、
+本 Design の targeted docs guard（engine targeted-gate）実装詳細（files_checked が空の場合を検査見逃しとして扱い、
 確認なく合格扱いとしない。検証モード問わず）が REQ-010-076 を実装する。
 配布物のみの変更で実現された実装の ADF-COVERS 宣言は、docs 配下の正規成果物
 （該当実装を規定する Design）へ付与する。配布物本体への宣言付与は行わない。

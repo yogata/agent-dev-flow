@@ -9,7 +9,7 @@ import { describe, expect, it } from "bun:test";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-const REPO_ROOT = join(import.meta.dir, "..", "..", "..", "..", "..");
+const REPO_ROOT = join(import.meta.dir, "..", "..", "..", "..", "..", "..");
 
 function read(rel: string): string {
   return readFileSync(join(REPO_ROOT, rel), "utf-8");

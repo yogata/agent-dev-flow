@@ -98,7 +98,7 @@ v5 有限実行モード（case-auto workflow 実装本体「v5 有限実行モ�
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 - `agentdev-workflow-templates`: 工程記録コメントテンプレート（記録種別別3種）の選定と様式
 - `agentdev-traceability`: トレーサビリティ能力（coverage、check。委譲内の対応関係確認と PR 作成前検査。fail-open）
-- integrity checker skill（リポジトリ固有・配布対象外）: check_changed_docs.ts（targeted docs guard）、check_extensions.ts（Project Extensions の構造・配置・ID・参照パス・委譲先 Skill・旧機構残存・上書き意図の検査）、check_distribution_boundary.ts（配布依存境界、source / link 両 profile）、generate_indexes.ts（AUTOGEN 索引再生成）
+- integrity checker skill（リポジトリ固有・配布対象外）: cli.ts --workflow モード（targeted docs guard）、check_extensions.ts（Project Extensions の構造・配置・ID・参照パス・委譲先 Skill・旧機構残存・上書き意図の検査）、check_distribution_boundary.ts（配布依存境界、source / link 両 profile）、generate_indexes.ts（AUTOGEN 索引再生成）
 - 検証用一時資材の後片付け責任（検証に伴う一時資材の取扱いと後片付け責任 Design）: STEP-S4 委譲の作成・利用・回収の義務接続と、STEP-S5 委譲結果受領時の後片付けの実施結果・確認根拠・未処理事項の報告受領（「共通制約」の検証用一時資材の節参照）
 
 ## トレーサビリティ能力の利用

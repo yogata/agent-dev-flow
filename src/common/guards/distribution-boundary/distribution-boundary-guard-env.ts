@@ -15,7 +15,7 @@ import {
   type DetectorConfig,
   type Projection,
   type RepositoryIdentity,
-} from "../../../../.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts";
+} from "../../../../src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/distribution-boundary.ts";
 import * as fs from "fs";
 import type { FileReader } from "./distribution-boundary-guard-reconstruction.ts";
 

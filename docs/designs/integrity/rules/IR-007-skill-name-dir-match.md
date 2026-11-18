@@ -2,10 +2,10 @@
 title: "IR-007: Skill frontmatter name ↔ dir"
 status: accepted
 created: 2026-08-20
-updated: 2026-10-22
+updated: "2026-11-18"
 detection_method_class: machine-check
-implementation_path: .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts
-verification_path: .opencode/skills/repo-agentdev-integrity/scripts/lint_skills.test.ts
+implementation_path: src/common/skills/repo-agentdev-integrity/rules/ir-007.ts
+verification_path: [src/common/skills/repo-agentdev-integrity/scripts/rules/rules.test.ts, src/common/skills/repo-agentdev-integrity/scripts/tests/lint_skills.test.ts]
 ---
 
 # IR-007: Skill frontmatter name ↔ dir

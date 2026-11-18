@@ -117,7 +117,7 @@ gate 違反時は両ルートとも PR マージを停止する。
 - `agentdev-conventional-commits`: GitHub auto-close 回避ガイドライン
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 - `agentdev-traceability`: トレーサビリティ能力（check。QG-4 の対応完全性の独立再検査。fail-open）
-- integrity checker skill（リポジトリ固有・配布対象外）: check_changed_docs.ts（targeted docs guard）、check_extensions.ts（project-extensions 整合性検査）
+- integrity checker skill（リポジトリ固有・配布対象外）: cli.ts --workflow モード（targeted docs guard）、check_extensions.ts（project-extensions 整合性検査）
 
 ## トレーサビリティ能力の利用（QG-4 独立再検査）
 

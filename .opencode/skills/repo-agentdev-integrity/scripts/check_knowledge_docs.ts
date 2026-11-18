@@ -40,7 +40,7 @@ import {
   EXIT_ERROR,
   findRepoRoot,
   parseArgs,
-} from "./cli_utils.ts";
+} from "../lib/cli_utils.ts";
 
 const path = require("path") as typeof import("path");
 const fs = require("fs") as typeof import("fs");

@@ -21,8 +21,3 @@ verification:
     - REQ-094-004
   src/opencode/plugins/agentdev-textlint-guard/lib/results.ts:
     - REQ-094-005
-  .opencode/skills/repo-agentdev-integrity/scripts/check_design_frontmatter.ts:
-    - REQ-094-006
-    - REQ-094-010
-  .opencode/skills/repo-agentdev-integrity/scripts/check_content_corruption.ts:
-    - REQ-094-011

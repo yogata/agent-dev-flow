@@ -82,10 +82,10 @@ catalog はスキーマ定義とインデックスを維持する。
 
 IR-059（distribution-reference-boundary）の canonical 参照は REQ-029 と `integrity/distribution-boundary.md` である。配布物参照境界の検出脈絡は REQ-029-001..008 と `integrity/distribution-boundary.md` が所有する。
 
-IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 から `generate_indexes.ts` が自動生成する（SC-002 Phase C、IR-061）。
-直接編集は行わない。
+IR エントリ一覧は rules/index.ts のレジストリから `generate_indexes.ts` が自動生成する（SC-002 Phase C、IR-061、DEC-065 決定3）。
+直接編集は行わない（手編集は再生成により上書きされる）。
 
-<!-- AUTOGEN:BEGIN:id=catalog-ir-entries-pre-045 -->
+<!-- AUTOGEN:BEGIN:id=catalog-ir-entries -->
 - [IR-001: 現行 REQ frontmatter id ↔ ファイル名](rules/IR-001-req-frontmatter-id-filename.md)
 - [IR-002: 現行 REQ 必須 frontmatter fields](rules/IR-002-req-required-frontmatter.md)
 - [IR-003: Active/廃止 REQ ID 重複](rules/IR-003-active-retired-req-id-conflict.md)
@@ -96,6 +96,20 @@ IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 か
 - [IR-016: Source/projection 整合性](rules/IR-016-source-projection-integrity.md)
 - [IR-024: Command README ↔ 実体](rules/IR-024-command-readme-actual.md)
 - [IR-044: REQ/Design 境界違反検出](rules/IR-044-req-spec-boundary-violation-detection.md)
+- [IR-053: gh 直接記述検出](rules/IR-053-gh-direct-invocation-detection.md)
+- [IR-055: runtime-unresolved-reference（配布物内の導入先未解決参照検出）](rules/IR-055-runtime-unresolved-reference.md)
+- [IR-056: project-extensions-integrity](rules/IR-056-project-extensions-integrity.md)
+- [IR-058: distribution-untracked-skill-reference](rules/IR-058-distribution-untracked-skill-reference.md)
+- [IR-059: distribution-reference-boundary](rules/IR-059-distribution-reference-boundary.md)
+- [IR-061: 索引類自動生成整合性](rules/IR-061-index-generation-consistency.md)
+- [IR-062: skill/command パス参照実在](rules/IR-062-reference-path-existence.md)
+- [IR-063: common-policy-identifier-invariant](rules/IR-063-common-policy-identifier-invariant.md)
+- [IR-064: unresolved-placeholder](rules/IR-064-unresolved-placeholder.md)
+- [IR-067: referenced-req-row-existence](rules/IR-067-referenced-req-row-existence.md)
+- [IR-068: skill-projection-manifest](rules/IR-068-skill-projection-manifest.md)
+- [IR-069: req-number-gap-recorded](rules/IR-069-req-number-gap-recorded.md)
+- [IR-070: design-frontmatter-required-keys](rules/IR-070-design-frontmatter-required-keys.md)
+- [IR-071: integrity-rule-related-req-existence](rules/IR-071-integrity-rule-related-req-existence.md)
 <!-- AUTOGEN:END -->
 
 ### IR-019, IR-022, IR-026, IR-036: inspect-docs 移管（retired REQ-028-007（後継は DEC-006/REQ-036 系）、OU-006 Phase 5）
@@ -142,25 +156,8 @@ IR エントリ一覧（IR-001〜IR-044）は `IR-*.md` の frontmatter / H1 か
 > 識別子の再利用禁止は `foundations/numbering-policy.md` が保持し、履歴性は Git で担保する（DEC-013 AG-008）。
 > 上記 8 IR は欠番として維持し、再登録は新規統制追加原則（DEC-001 決定4）の立証を要する。
 
-IR エントリ一覧（IR-046 以降）は `generate_indexes.ts` が自動生成する（SC-002 Phase C、IR-061）。
+IR エントリ一覧は rules/index.ts のレジストリから `generate_indexes.ts` が自動生成する（SC-002 Phase C、IR-061、DEC-065 決定3）。
 直接編集は行わない。
-
-<!-- AUTOGEN:BEGIN:id=catalog-ir-entries-post-045 -->
-- [IR-053: gh 直接記述検出](rules/IR-053-gh-direct-invocation-detection.md)
-- [IR-055: runtime-unresolved-reference（配布物内の導入先未解決参照検出）](rules/IR-055-runtime-unresolved-reference.md)
-- [IR-056: project-extensions-integrity](rules/IR-056-project-extensions-integrity.md)
-- [IR-058: distribution-untracked-skill-reference](rules/IR-058-distribution-untracked-skill-reference.md)
-- [IR-059: distribution-reference-boundary](rules/IR-059-distribution-reference-boundary.md)
-- [IR-061: 索引類自動生成整合性](rules/IR-061-index-generation-consistency.md)
-- [IR-062: skill/command パス参照実在](rules/IR-062-reference-path-existence.md)
-- [IR-063: common-policy-identifier-invariant](rules/IR-063-common-policy-identifier-invariant.md)
-- [IR-064: unresolved-placeholder](rules/IR-064-unresolved-placeholder.md)
-- [IR-067: referenced-req-row-existence](rules/IR-067-referenced-req-row-existence.md)
-- [IR-068: skill-projection-manifest](rules/IR-068-skill-projection-manifest.md)
-- [IR-069: req-number-gap-recorded](rules/IR-069-req-number-gap-recorded.md)
-- [IR-070: design-frontmatter-required-keys](rules/IR-070-design-frontmatter-required-keys.md)
-- [IR-071: integrity-rule-related-req-existence](rules/IR-071-integrity-rule-related-req-existence.md)
-<!-- AUTOGEN:END -->
 
 ### 新規 IR 候補（candidate state、新規 IR 登録 gate 前）
 

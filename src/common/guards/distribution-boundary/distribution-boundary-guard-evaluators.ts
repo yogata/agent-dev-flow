@@ -18,7 +18,7 @@ import {
   classifyContentConfig,
   decideGate,
   type Detection,
-} from "../../../../.opencode/skills/repo-agentdev-integrity/scripts/lib/distribution-boundary.ts";
+} from "../../../../src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/distribution-boundary.ts";
 import {
   parseApplyPatchText,
   type ParsedApplyPatch,

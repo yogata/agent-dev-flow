@@ -32,7 +32,7 @@ updated: "2026-11-18"
 ## checker 共通実行契約
 
 - 起動手段はスクリプト契約（integrity-contracts）に従い bun run で実行する
-- check_extensions.ts の --scenario モードは、変更経路 routing 等の分岐候補探索における標準実行手段とする。
+- 検証エンジン cli.ts（IR-056 として統合）の --scenario モードは、変更経路 routing 等の分岐候補探索における標準実行手段とする。
 実行プロファイルは対象変更（extension、command、skill）の種別に応じて選択する
 - 共通 CLI 契約（--help、--json、--dry-run、exit code 0/1/2、stdout 機械可読出力）に従う
 - CLI 用分割スクリプト（`*_cli.ts` 等）は直接起動時にも検査を実行する top-level エントリポイントを持つことを標準とする。export-only のスクリプトは直接起動で無出力・exit 0 の無検証成功を生むため採用しない。check_distribution_boundary_cli.ts の正規起動経路は check_distribution_boundary.ts 経由（bun run、exit 0/1/2）であることを明示する
@@ -103,7 +103,7 @@ data yaml の新設は、当該 yaml を読み込む消費者実装（checker �
 実装実例（新設時の消費者実装同時確定の参照例）:
 
 - `data/obsolete-vocabulary-map.yaml`: 削除済み（対応する廃止語彙検査の削除と同一 PR で削除。Epic #4126 Phase 4）。data yaml と消費者実装の同一 PR 同時確定契約の適用例は `data/skill-projection-manifest.yaml` の行を参照
-- `data/skill-projection-manifest.yaml`: 消費者は check_integrity.ts の IR-068 skill-projection-manifest
+- `data/skill-projection-manifest.yaml`: 消費者は検証エンジン cli.ts（旧 check_integrity.ts は rules レジストリへ分割統合、DEC-065 決定3）の IR-068 skill-projection-manifest
   検査（src 側スキル集合と投影スキル集合の突合）。manifest と src のスキル集合不一致は strict fail で
   検出する。worktree（junction 未伝播）では投影比較を info で skip する
 
@@ -161,7 +161,7 @@ docs-check は、手動管理の索引一覧（docs/README.md ガイド一覧を
 
 - docs/README.md のガイド一覧は docs/guides/ 配下の実ガイドファイル一覧と一致すること（一覧と実ファイルの差分なし）
 - docs/knowledge/README.md「現在の知識文書」一覧は docs/knowledge/ 配下の実知識文書一覧と一致し、件数表記は実ファイル数と一致すること
-- knowledge README 列挙整合の正規検査経路は check_knowledge_docs.ts とし、docs/README.md ガイド一覧等の手動管理索引は README 突合系検査の組合せで整合を検査する。手動管理の一覧更新漏れ（実ファイルの追加・削除に対する一覧の追随漏れ）は本整合検査の検出対象とする
+- knowledge README 列挙整合の正規検査経路は check_knowledge_docs.ts（src/common/skills/repo-agentdev-integrity/scripts/ へ移行維持） とし、docs/README.md ガイド一覧等の手動管理索引は README 突合系検査の組合せで整合を検査する。手動管理の一覧更新漏れ（実ファイルの追加・削除に対する一覧の追随漏れ）は本整合検査の検出対象とする
 
 ## baseline provenance 実行契約の撤廃（REQ-010-074/079）
 

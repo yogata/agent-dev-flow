@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": [
+      "ES2022"
+    ],
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  },
+  "include": [
+    "../engine/**/*.ts",
+    "../rules/**/*.ts",
+    "../lib/minimal-yaml.ts",
+    "../lib/current_refs.ts",
+    "../lib/builtin-checks.ts",
+    "../lib/cli_utils.ts",
+    "../lib/glob_walk.ts",
+    "../lib/workflow_trigger.ts",
+    "./cli.ts",
+    "./generate_indexes.ts",
+    "./check_autogen_freshness.ts",
+    "./check_test_impact.ts",
+    "./lint_skills.ts",
+    "./race-worker.ts",
+    "./rules/**/*.ts"
+  ]
+}

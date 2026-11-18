@@ -29,6 +29,8 @@ ADF 共通原本（src/common/）とホスト別接続領域（src/opencode/、s
 
 ## 投影モデルと installer 対象選択
 
+投影の形態は junction 投影（`src/common/skills/agentdev-*` → `.opencode/skills/agentdev-*`）と copy 投影（repo-local 正本の実ファイルコピー）の2系統がある。copy 投影は repo-local・配布対象外の正本（repo-agentdev-integrity 等、`repo-*` carve-out 対象）に適用し、正本と投影の両方を git 管理する。copy 投影の整合は IR-016（ファイル集合・内容一致）と IR-068（skill-projection-manifest.yaml の copy_projections 登録突合）が検査する（DEC-065 決定3、REQ-002-020 の限定例外）。
+
 - installer（scripts/install.ps1、scripts/self-sync.ps1）は単一公開入口と check/dry-run/apply を維持し、配置対象ホスト（OpenCode のみ、Senpi のみ、両方）を選択可能とする。新規導入は両方を推奨し、既存導入の更新は現在の配置対象を維持し、明示指定により変更する。
 - 共通原本への投影は同一 ADF 版に整合させる。ホスト別の管理範囲を分離し、片方の更新・除去は他方を壊さない。repo-local 資産（third-party Skill 配置、.agentdev/extensions/**）とユーザー設定（AGENTS.md の harness 選定記述等）を書込み対象から保護する。再実行は冪等とし、不要な登録を増やさない。
 - CLI 未導入でも配置可能とし、配置検査と実行環境の診断を区別する。OmO 版は診断・互換確認にのみ使用する。

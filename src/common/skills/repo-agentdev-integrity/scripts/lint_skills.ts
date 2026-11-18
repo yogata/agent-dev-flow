@@ -1,0 +1,778 @@
+// ADF-COVERS(verification): REQ-002-013, REQ-002-014, REQ-002-015, REQ-002-018, REQ-050-016
+// ADF-COVERS(implementation): REQ-010-082
+/**
+ * Skill structure linter for AgentDevFlow.
+ * Validates all skill directories under .opencode/skills/ for structural
+ * correctness and naming conventions.
+ *
+ * Checks:
+ *   Structure: SKILL.md existence, directory name vs frontmatter name
+ *   Content: description, USE FOR, DO NOT USE FOR, See Also references
+ *   References: resource subdirectories, SKILL.md bloat
+ *   Namespace: agentdev- prefix
+ *   AG-005 (RU-0018 / Issue #2179): skill 記述基準 層1〜2 machine checks
+ *     (description length 600/1024, marker words / internal IDs in
+ *     description, USE FOR double keeping, workflow trigger item,
+ *     references TOC for >300-line files, aggregate description budget warn)
+ */
+import {
+  EXIT_OK,
+  EXIT_ERROR,
+  parseArgs,
+  printHelp,
+  ok,
+  ng,
+  warn,
+  info,
+  computeSummary,
+  formatJsonReport,
+  formatMarkdownReport,
+  determineExitCode,
+  findRepoRoot,
+  DEFAULT_PROFILE,
+} from "../lib/cli_utils.ts";
+import type { CheckResult, ScanSummary, IntegrityReport } from "../lib/cli_utils.ts";
+import { globWalkRel } from "../lib/glob_walk.ts";
+import {
+  WORKFLOW_TRIGGER_ITEM,
+  WORKFLOW_TRIGGER_ITEM_FULL_FORM,
+  listCommandBoundWorkflowSkills,
+  parseSkillFrontMatterFields,
+} from "../lib/workflow_trigger.ts";
+
+const SCRIPT_NAME = "lint_skills.ts";
+const SCRIPT_DESCRIPTION = "Skill structure linter for AgentDevFlow";
+const SCRIPT_USAGE =
+  "bun run .opencode/skills/repo-agentdev-integrity/scripts/lint_skills.ts [--help] [--json] [--dry-run] [--root <path>]";
+
+const fs = require("fs");
+const path = require("path");
+
+interface FrontMatter {
+  name: string;
+  description: string;
+}
+
+function parseFrontMatter(content: string): FrontMatter | null {
+  const fields = parseSkillFrontMatterFields(content);
+  if (!fields || !fields.name) return null;
+  return {
+    name: fields.name,
+    description: fields.description || "",
+  };
+}
+
+function stripAgentdevPrefix(name: string): string {
+  return name.startsWith("agentdev-") ? name.slice("agentdev-".length) : name;
+}
+
+function extractSeeAlsoReferences(content: string): string[] {
+  const refs: string[] = [];
+  const seeAlsoMatch = content.match(/## See Also([\s\S]*?)$/);
+  if (!seeAlsoMatch) return refs;
+  const section = seeAlsoMatch[1]!;
+  const boldPattern = /\*\*(agentdev-[a-z0-9-]+)\*\*/g;
+  let match: RegExpExecArray | null;
+  while ((match = boldPattern.exec(section)) !== null) {
+    refs.push(match[1]!);
+  }
+  const linkPattern = /\[(agentdev-[a-z0-9-]+)\]\([^)]*\)/g;
+  while ((match = linkPattern.exec(section)) !== null) {
+    refs.push(match[1]!);
+  }
+  return [...new Set(refs)];
+}
+
+// ===== AG-005 (RU-0018 / Issue #2179): skill 記述基準 層1〜2 machine checks =====
+//
+// Canonical owners (Design is authoritative; this linter is the detection view):
+//   - docs/designs/skills/agentdev-skill-authoring.md「機械検査（本 Design 検証観点への追加）」
+//   - docs/designs/authoring/command-file-format.md「機械検査対象」
+//
+// 検証不通過 (hard): description 1024 超過 / 単体 600 超過 / USE FOR 二重保持 /
+//   description 内マーカー語・内部 ID / 簡潔トリガー項欠落（AG-004、command-bound
+//   Workflow Skill のみ肯定検証）/ 300 行超 references の目次欠落。
+// warn: 集約予算（平均 350×N、N = src/common/skills 配下の SKILL.md 実ファイル数）。
+//
+// baseline による grandfathering は撤廃済み（baseline 運用の撤廃）。検出された
+// 違反は免除せず、対象側の直接修正で解消する。
+
+const AG005_CATEGORY = "AG-005";
+const DESC_INDIVIDUAL_LIMIT = 600;
+const DESC_SPEC_LIMIT = 1024;
+const DESC_AVERAGE_BUDGET = 350;
+const REFERENCES_TOC_LINE_LIMIT = 300;
+// soft guard マーカー語（AG-001）。簡潔トリガー項の「単独起動」はマーカー語ではない。
+const DESC_MARKER_WORD_RE = /soft guard|直接起動/i;
+// 内部 ID（REQ-/ADR-/DEC-/IR-/RU-/TS-/AG- + 数字）
+const DESC_INTERNAL_ID_RE = /\b(?:REQ|ADR|DEC|IR|RU|TS|AG)-\d+/i;
+const BODY_USE_FOR_HEADING_RE = /^##\s+(?:USE FOR|DO NOT USE FOR)\s*$/gm;
+const DESC_USE_FOR_RE = /USE FOR/i;
+// WORKFLOW_TRIGGER_ITEM（簡潔トリガー項の検出語）と対象集合導出の正本は
+// lib/workflow_trigger.ts（B3-5b 統合名簿。check_workflow_preventive.ts と共有）。
+const TOC_HEADING_RE = /^#{1,3}\s*(?:目次|Table of Contents)\s*$/mi;
+const TOC_ANCHOR_RE = /\]\(#/g;
+const TOC_ANCHOR_MIN_LINKS = 5;
+
+function lintDescriptionAg005(
+  dirName: string,
+  frontMatter: FrontMatter | null,
+  content: string,
+  workflowBound: Set<string>,
+): CheckResult[] {
+  const results: CheckResult[] = [];
+  const desc = frontMatter?.description ?? "";
+  const parts = content.split("---");
+  const body = parts.length >= 3 ? parts.slice(2).join("---") : "";
+
+  if (frontMatter && desc.length > 0) {
+    const len = desc.length;
+    if (len > DESC_SPEC_LIMIT) {
+      results.push(
+        ng(
+          AG005_CATEGORY,
+          "description length 1024",
+          `description is ${len} chars, exceeding the OpenCode spec limit ${DESC_SPEC_LIMIT} (検証不通過の安全線, RU-0018 層1)`,
+          dirName,
+          undefined,
+          { evidence: `${len} chars`, expected: `<= ${DESC_SPEC_LIMIT}` },
+        ),
+      );
+    } else if (len > DESC_INDIVIDUAL_LIMIT) {
+      results.push(
+        ng(
+          AG005_CATEGORY,
+          "description length 600",
+          `description is ${len} chars, exceeding the individual limit ${DESC_INDIVIDUAL_LIMIT} (検証不通過, RU-0018 層1)`,
+          dirName,
+          undefined,
+          { evidence: `${len} chars`, expected: `<= ${DESC_INDIVIDUAL_LIMIT}` },
+        ),
+      );
+    } else {
+      results.push(
+        ok(
+          AG005_CATEGORY,
+          "description length 600",
+          `${dirName} description is ${len} chars (within ${DESC_INDIVIDUAL_LIMIT})`,
+          dirName,
+        ),
+      );
+    }
+
+    const marker = desc.match(DESC_MARKER_WORD_RE);
+    if (marker) {
+      results.push(
+        ng(
+          AG005_CATEGORY,
+          "description marker word",
+          `description contains the soft guard marker word "${marker[0]}" (marker words belong to the body or authoritative docs, RU-0018 層1)`,
+          dirName,
+          undefined,
+          {
+            evidence: marker[0],
+            expected: "no soft guard marker word in description",
+          },
+        ),
+      );
+    } else {
+      results.push(
+        ok(
+          AG005_CATEGORY,
+          "description marker word",
+          `${dirName} description has no soft guard marker word`,
+          dirName,
+        ),
+      );
+    }
+
+    const ids = desc.match(new RegExp(DESC_INTERNAL_ID_RE.source, "gi"));
+    if (ids) {
+      const unique = [...new Set(ids)];
+      results.push(
+        ng(
+          AG005_CATEGORY,
+          "description internal ID",
+          `description contains internal ID(s): ${unique.join(", ")} (internal IDs belong to the body or authoritative docs, RU-0018 層1)`,
+          dirName,
+          undefined,
+          {
+            evidence: unique.join(", "),
+            expected: "no internal ID in description",
+          },
+        ),
+      );
+    } else {
+      results.push(
+        ok(
+          AG005_CATEGORY,
+          "description internal ID",
+          `${dirName} description has no internal ID`,
+          dirName,
+        ),
+      );
+    }
+  }
+
+  // USE FOR 二重保持: トリガーは frontmatter description の単一所属とする（RU-0018 層2）。
+  const descDeclaresUseFor = DESC_USE_FOR_RE.test(desc);
+  const bodySections = body.match(BODY_USE_FOR_HEADING_RE) ?? [];
+  if (descDeclaresUseFor && bodySections.length > 0) {
+    results.push(
+      ng(
+        AG005_CATEGORY,
+        "USE FOR double keeping",
+        `description declares USE FOR triggers and the body also keeps ${bodySections.length} USE FOR section heading(s) (${bodySections.map((s) => s.trim()).join(", ")}); keep triggers in the description only (RU-0018 層2)`,
+        dirName,
+      ),
+    );
+  } else {
+    results.push(
+      ok(
+        AG005_CATEGORY,
+        "USE FOR double keeping",
+        `${dirName} keeps USE FOR triggers in a single place`,
+        dirName,
+      ),
+    );
+  }
+
+  // AG-004 簡潔トリガー項の肯定検証（command-bound Workflow Skill のみ）。
+  if (workflowBound.has(dirName)) {
+    if (desc.includes(WORKFLOW_TRIGGER_ITEM)) {
+      results.push(
+        ok(
+          AG005_CATEGORY,
+          "workflow trigger item",
+          `${dirName} description declares the concise trigger item (${WORKFLOW_TRIGGER_ITEM})`,
+          dirName,
+        ),
+      );
+    } else {
+      results.push(
+        ng(
+          AG005_CATEGORY,
+          "workflow trigger item",
+          `Workflow Skill description lacks the concise trigger item "${WORKFLOW_TRIGGER_ITEM_FULL_FORM}" in DO NOT USE FOR (AG-004)`,
+          dirName,
+        ),
+      );
+    }
+  }
+
+  return results;
+}
+
+export function collectReferenceMarkdownFiles(refsDir: string): string[] {
+  if (!fs.existsSync(refsDir)) return [];
+  return globWalkRel(refsDir, { extensions: [".md"], filesOnly: true }).map((rel) =>
+    path.join(refsDir, ...rel.split("/")),
+  );
+}
+
+function lintReferencesTocAg005(skillDir: string, dirName: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  const refsDir = path.join(skillDir, "references");
+  if (!fs.existsSync(refsDir)) return results;
+  const files: string[] = collectReferenceMarkdownFiles(refsDir);
+  for (const refPath of files.sort()) {
+    const text = fs.readFileSync(refPath, "utf-8");
+    const lineCount = text.split(/\r?\n/).length;
+    if (lineCount <= REFERENCES_TOC_LINE_LIMIT) continue;
+    const rel = path.relative(skillDir, refPath).replace(/\\/g, "/");
+    const hasToc =
+      TOC_HEADING_RE.test(text) ||
+      (text.match(TOC_ANCHOR_RE) ?? []).length >= TOC_ANCHOR_MIN_LINKS;
+    if (hasToc) {
+      results.push(
+        ok(
+          AG005_CATEGORY,
+          "references TOC",
+          `${dirName}/${rel} has ${lineCount} lines and a table of contents`,
+          `${dirName}/${rel}`,
+        ),
+      );
+    } else {
+      results.push(
+        ng(
+          AG005_CATEGORY,
+          "references TOC",
+          `references file exceeds ${REFERENCES_TOC_LINE_LIMIT} lines (${lineCount}) without a table of contents (目次) (RU-0018 層2)`,
+          `${dirName}/${rel}`,
+          undefined,
+          {
+            evidence: `${lineCount} lines`,
+            expected: `<= ${REFERENCES_TOC_LINE_LIMIT} lines or a TOC`,
+          },
+        ),
+      );
+    }
+  }
+  return results;
+}
+
+function aggregateBudgetResultAg005(
+  totalChars: number,
+  n: number,
+): CheckResult {
+  const budget = DESC_AVERAGE_BUDGET * n;
+  const avg = n > 0 ? Math.round((totalChars / n) * 10) / 10 : 0;
+  if (n > 0 && totalChars > budget) {
+    return warn(
+      AG005_CATEGORY,
+      "description aggregate budget",
+      `aggregate description budget exceeded: total ${totalChars} chars across N=${n} SKILL.md files (avg ${avg}) > ${DESC_AVERAGE_BUDGET}*${n}=${budget} (warn, 傾向管理, RU-0018 層1)`,
+    );
+  }
+  return ok(
+    AG005_CATEGORY,
+    "description aggregate budget",
+    `aggregate description budget within limit: total ${totalChars} chars across N=${n} SKILL.md files (avg ${avg} <= ${DESC_AVERAGE_BUDGET})`,
+  );
+}
+
+// ===== NG/warning 区別 summary と実行環境差記録（REQ-010-082 / AG-012）=====
+//
+// summary 出力に検証不通過（NG）と傾向管理（warning）の区別を明示し、warning
+// 存在時の運用（集約予算の漸進回収、git 管理外ローカルユーザースキルの環境差
+// 記録）を note として出力する。determineExitCode の warning 駆動 exit 1 は
+// 変更しない（warning の無視・抑制による隠蔽を行わない）。
+//
+// git 管理外ローカルユーザースキル: main root の projection（.opencode/skills）
+// は gitignore の `.opencode/skills/*` 除外対象であり、`repo-*/`（tracked 例外的）と
+// junction 先 src/common/skills 配下に存在するスキルのみ管理対象。distributed
+// layout（projection 走査 かつ src/common/skills 存在）でこの条件に当てはまらない
+// スキルは main root 実行時のみ検出される環境差として記録する（無視は行わず、
+// 走査対象を維持する）。
+
+const LOCAL_SKILL_ENV_LABEL =
+  "[実行環境差: git 管理外ローカルスキル (main root 実行時のみ検出)]";
+
+function listGitUnmanagedLocalSkills(
+  repoRoot: string,
+  skillsDir: string,
+): Set<string> {
+  const local = new Set<string>();
+  const projectionSkillsDir = path.join(repoRoot, ".opencode", "skills");
+  const sourceSkillsDir = path.join(repoRoot, "src", "common", "skills");
+  if (skillsDir !== projectionSkillsDir) return local;
+  if (!fs.existsSync(sourceSkillsDir)) return local;
+  for (const sd of listSkillDirs(projectionSkillsDir)) {
+    if (sd.name.startsWith("repo-")) continue;
+    if (fs.existsSync(path.join(sourceSkillsDir, sd.name))) continue;
+    local.add(sd.name);
+  }
+  return local;
+}
+
+function annotateLocalSkillFindings(
+  results: CheckResult[],
+  localSkills: Set<string>,
+): void {
+  if (localSkills.size === 0) return;
+  for (const r of results) {
+    if (r.level !== "ng" && r.level !== "warning") continue;
+    if (!r.file || !localSkills.has(r.file)) continue;
+    if (r.message.startsWith(LOCAL_SKILL_ENV_LABEL)) continue;
+    r.message = `${LOCAL_SKILL_ENV_LABEL} ${r.message}`;
+  }
+}
+
+function buildSummaryNotes(
+  localWarningCount: number,
+  localSkillNames: string[],
+  aggregateBudgetWarning: boolean,
+): string[] {
+  const notes: string[] = [
+    "NG は検証不通過、Warning は傾向管理として区別して報告する（REQ-010-082）。Warning 存在時も無視・抑制による隠蔽は行わず、Warning も exit code 1 を駆動する。",
+  ];
+  if (aggregateBudgetWarning) {
+    notes.push(
+      "description 集約予算超過（warning）の解消は、次回 skill 変更時の top 層からの description 削減による漸進回収とする（REQ-010-082 の運用方針。一括削減は行わない）。",
+    );
+  }
+  if (localWarningCount > 0) {
+    notes.push(
+      `git 管理外ローカルユーザースキル起因の warning: ${localWarningCount} 件（${localSkillNames.join(", ")}。main root 実行時のみ検出の実行環境差。無視は行わず、走査対象を維持する）。`,
+    );
+  }
+  return notes;
+}
+
+function lintSkill(
+  skillDir: string,
+  dirName: string,
+  allDirNames: Set<string>,
+): CheckResult[] {
+  const results: CheckResult[] = [];
+  const skillMdPath = path.join(skillDir, "SKILL.md");
+
+  if (!fs.existsSync(skillMdPath)) {
+    results.push(
+      ng(
+        "Structure",
+        "SKILL.md existence",
+        `SKILL.md not found in ${dirName}`,
+        dirName,
+      ),
+    );
+    return results;
+  }
+  results.push(
+    ok("Structure", "SKILL.md existence", `${dirName}/SKILL.md exists`),
+  );
+
+  const content = fs.readFileSync(skillMdPath, "utf-8");
+  const frontMatter = parseFrontMatter(content);
+
+  if (frontMatter) {
+    const fmStripped = stripAgentdevPrefix(frontMatter.name);
+    const dirStripped = stripAgentdevPrefix(dirName);
+    if (fmStripped !== dirStripped) {
+      results.push(
+        warn(
+          "Structure",
+          "Directory naming vs frontmatter name",
+          `Directory "${dirName}" does not match frontmatter name "${frontMatter.name}"`,
+          dirName,
+        ),
+      );
+    } else {
+      results.push(
+        ok(
+          "Structure",
+          "Directory naming vs frontmatter name",
+          `${dirName} matches frontmatter`,
+        ),
+      );
+    }
+  } else {
+    results.push(
+      warn(
+        "Structure",
+        "Directory naming vs frontmatter name",
+        `Could not parse frontmatter in ${dirName}/SKILL.md`,
+        dirName,
+      ),
+    );
+  }
+
+  if (frontMatter && frontMatter.description.length > 0) {
+    results.push(
+      ok("Content", "Description presence", `${dirName} has description`),
+    );
+  } else {
+    results.push(
+      ng(
+        "Content",
+        "Description presence",
+        `Missing or empty description in ${dirName}/SKILL.md frontmatter`,
+        dirName,
+      ),
+    );
+  }
+
+  // Trigger Convention (REQ-0103-097, agentdev-skill-authoring): USE FOR /
+  // DO NOT USE FOR are declared in the frontmatter `description` field, not as
+  // markdown sections. Validate the frontmatter block accordingly.
+  const fmBlock = content.split("---")[1] || "";
+
+  if (/USE FOR/i.test(fmBlock)) {
+    results.push(
+      ok("Content", "USE FOR trigger", `${dirName} declares USE FOR`),
+    );
+  } else {
+    results.push(
+      warn(
+        "Content",
+        "USE FOR trigger",
+        `Missing USE FOR trigger in ${dirName}/SKILL.md frontmatter description`,
+        dirName,
+      ),
+    );
+  }
+
+  if (/DO NOT USE FOR/i.test(fmBlock)) {
+    results.push(
+      ok(
+        "Content",
+        "DO NOT USE FOR trigger",
+        `${dirName} declares DO NOT USE FOR`,
+      ),
+    );
+  } else {
+    results.push(
+      warn(
+        "Content",
+        "DO NOT USE FOR trigger",
+        `Missing DO NOT USE FOR trigger in ${dirName}/SKILL.md frontmatter description`,
+        dirName,
+      ),
+    );
+  }
+
+  const seeAlsoRefs = extractSeeAlsoReferences(content);
+  if (seeAlsoRefs.length > 0) {
+    const brokenRefs = seeAlsoRefs.filter((ref) => !allDirNames.has(ref));
+    if (brokenRefs.length > 0) {
+      for (const broken of brokenRefs) {
+        results.push(
+          ng(
+            "Content",
+            "See Also references",
+            `Broken reference to "${broken}" in See Also section`,
+            dirName,
+          ),
+        );
+      }
+    } else {
+      results.push(
+        ok(
+          "Content",
+          "See Also references",
+          `${dirName} See Also references all valid`,
+        ),
+      );
+    }
+  } else {
+    results.push(
+      ok(
+        "Content",
+        "See Also references",
+        `${dirName} has no See Also references to check`,
+      ),
+    );
+  }
+
+  // Detect self-referential resource file paths (the skill referencing a file in
+  // its OWN scripts/references/templates subdir). The leading negative
+  // lookbehind excludes cross-skill paths (.opencode/skills/agentdev-X/... or
+  // .../agentdev-X/templates/) and bare concept mentions, so only genuine
+  // self-claims are validated. Placeholder paths with {...} are skipped.
+  // Mirrors SCRIPT_TEMPLATE_REF_PATTERNS in check_integrity.ts.
+  const selfResourceRe =
+    /(?<![.\w/-])(scripts\/[^\s"')\]}]+\.ts|references\/[^\s"')\]}]+\.md|templates\/[^\s"')\]}]+\.md)/g;
+  const resourceSubdirs = new Set<string>();
+  let resMatch: RegExpExecArray | null;
+  selfResourceRe.lastIndex = 0;
+  while ((resMatch = selfResourceRe.exec(content)) !== null) {
+    if (resMatch[0].includes("{")) continue;
+    resourceSubdirs.add(resMatch[0].split("/")[0] + "/");
+  }
+  const mentionedResources = [...resourceSubdirs];
+
+  if (mentionedResources.length > 0) {
+    let allExist = true;
+    for (const res of mentionedResources) {
+      const resPath = path.join(skillDir, res.replace("/", path.sep));
+      if (!fs.existsSync(resPath)) {
+        results.push(
+          warn(
+            "References",
+            "Resource references",
+            `Referenced subdirectory "${res}" not found in ${dirName}`,
+            dirName,
+          ),
+        );
+        allExist = false;
+      }
+    }
+    if (allExist) {
+      results.push(
+        ok(
+          "References",
+          "Resource references",
+          `${dirName} referenced resources all exist`,
+        ),
+      );
+    }
+  } else {
+    results.push(
+      ok(
+        "References",
+        "Resource references",
+        `${dirName} has no resource references to check`,
+      ),
+    );
+  }
+
+  const lineCount = content.split("\n").length;
+  if (lineCount > 500) {
+    results.push(
+      warn(
+        "References",
+        "SKILL.md bloat",
+        `SKILL.md has ${lineCount} lines (exceeds 500 line threshold)`,
+        dirName,
+      ),
+    );
+  } else {
+    results.push(
+      ok(
+        "References",
+        "SKILL.md bloat",
+        `${dirName}/SKILL.md has ${lineCount} lines (within 500 line limit)`,
+      ),
+    );
+  }
+
+  if (dirName.startsWith("agentdev-")) {
+    results.push(
+      ok("Namespace", "agentdev- prefix", `${dirName} uses agentdev- prefix`),
+    );
+  } else {
+    results.push(
+      info(
+        "Namespace",
+        "agentdev- prefix",
+        `${dirName} does not use agentdev- prefix`,
+        dirName,
+      ),
+    );
+  }
+
+  return results;
+}
+
+function listSkillDirs(
+  skillsDir: string,
+): { name: string; fullPath: string }[] {
+  const entries = fs.readdirSync(skillsDir, { withFileTypes: true });
+  return entries
+    .filter(
+      (e: { isDirectory: () => boolean; name: string }) => {
+        if (e.isDirectory()) return true;
+        // Windows junctions: isDirectory() returns false (libuv reparse point
+        // behavior). statSync follows the link so junctioned agentdev-* skills
+        // are seen. Mirrors listDirs() in check_integrity.ts (#779).
+        try {
+          return fs.statSync(path.join(skillsDir, e.name)).isDirectory();
+        } catch {
+          return false;
+        }
+      },
+    )
+    .filter((e: { name: string }) => e.name !== "README.md")
+    .map((e: { name: string }) => ({
+      name: e.name,
+      fullPath: path.join(skillsDir, e.name),
+    }));
+}
+
+function main(): void {
+  const args = process.argv.slice(2);
+  const options = parseArgs(args);
+
+  if (options.help) {
+    printHelp(SCRIPT_NAME, SCRIPT_DESCRIPTION, SCRIPT_USAGE);
+    process.exit(EXIT_OK);
+  }
+
+  const repoRoot = findRepoRoot(import.meta.dir, {
+    explicitRoot: options.root,
+  });
+  const projectionSkillsDir = path.join(repoRoot, ".opencode", "skills");
+  const sourceSkillsDir = path.join(repoRoot, "src", "common", "skills");
+  // worktree junction 未設定環境では projection に配布スキルが存在しないため src/common/ へ
+  // fallback する（REQ-018-001。skills_structure.test.ts と同一の sentinel 基準）。
+  // sentinel・src とも無い環境（テスト fixture）は projection を維持する。
+  const skillsDir = fs.existsSync(
+    path.join(projectionSkillsDir, "agentdev-workflow-templates"),
+  )
+    ? projectionSkillsDir
+    : fs.existsSync(sourceSkillsDir)
+      ? sourceSkillsDir
+      : projectionSkillsDir;
+  if (!fs.existsSync(skillsDir)) {
+    console.error(`Skills directory not found: ${skillsDir}`);
+    process.exit(EXIT_ERROR);
+  }
+
+  const skillDirs = listSkillDirs(skillsDir);
+
+  if (options.dryRun) {
+    console.log("Skills to be checked:");
+    for (const sd of skillDirs) {
+      console.log(`  ${sd.name}`);
+    }
+    console.log(`Total: ${skillDirs.length} skill directories`);
+    console.log(
+      `AG-005 scan dir: ${fs.existsSync(sourceSkillsDir) ? sourceSkillsDir : skillsDir}`,
+    );
+    process.exit(EXIT_OK);
+  }
+
+  const allDirNames = new Set(skillDirs.map((sd) => sd.name));
+  const allResults: CheckResult[] = [];
+  for (const sd of skillDirs) {
+    const results = lintSkill(sd.fullPath, sd.name, allDirNames);
+    allResults.push(...results);
+  }
+
+  // AG-005 は配布 SoT（src/common/skills）を対象に測定する（N = SKILL.md 実ファイル数、
+  // RU-0018 層1）。projection スキャンと対象が乖離する環境（main repo junction 有無）で
+  // も同一結果となるよう、src が存在する場合は src を、無い場合は fixture の skillsDir
+  // を用いる。
+  const agScanDir = fs.existsSync(sourceSkillsDir) ? sourceSkillsDir : skillsDir;
+  const workflowBound = listCommandBoundWorkflowSkills(repoRoot);
+  let agTotalChars = 0;
+  let agSkillCount = 0;
+  if (fs.existsSync(agScanDir)) {
+    for (const sd of listSkillDirs(agScanDir)) {
+      const skillMdPath = path.join(sd.fullPath, "SKILL.md");
+      if (!fs.existsSync(skillMdPath)) continue;
+      agSkillCount++;
+      const content = fs.readFileSync(skillMdPath, "utf-8");
+      const frontMatter = parseFrontMatter(content);
+      if (frontMatter && frontMatter.description.length > 0) {
+        agTotalChars += frontMatter.description.length;
+      }
+      allResults.push(
+        ...lintDescriptionAg005(sd.name, frontMatter, content, workflowBound),
+      );
+      allResults.push(...lintReferencesTocAg005(sd.fullPath, sd.name));
+    }
+  }
+  allResults.push(aggregateBudgetResultAg005(agTotalChars, agSkillCount));
+
+  const localSkillSet = listGitUnmanagedLocalSkills(repoRoot, skillsDir);
+  annotateLocalSkillFindings(allResults, localSkillSet);
+  const localWarningResults = allResults.filter(
+    (r): r is CheckResult & { file: string } =>
+      r.level === "warning" &&
+      typeof r.file === "string" &&
+      localSkillSet.has(r.file),
+  );
+  const localWarningNames = [
+    ...new Set(localWarningResults.map((r) => r.file)),
+  ].sort();
+  const aggregateBudgetWarning = allResults.some(
+    (r) => r.check === "description aggregate budget" && r.level === "warning",
+  );
+
+  const summary: ScanSummary = computeSummary(allResults);
+  const report: IntegrityReport = {
+    timestamp: new Date().toISOString(),
+    script: SCRIPT_NAME,
+    profile: DEFAULT_PROFILE,
+    scanned: { skills: skillDirs.length, ag005_skills: agSkillCount },
+    summary,
+    summaryNotes: buildSummaryNotes(
+      localWarningResults.length,
+      localWarningNames,
+      aggregateBudgetWarning,
+    ),
+    results: allResults,
+  };
+
+  if (options.json) {
+    console.log(formatJsonReport(report));
+  } else {
+    console.log(formatMarkdownReport(report));
+  }
+  process.exit(determineExitCode(summary));
+}
+
+if (import.meta.main) {
+  main();
+}

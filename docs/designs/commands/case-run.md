@@ -227,11 +227,12 @@ changed-path routing と配布依存境界の検出経路は共有境界 adapter
 ### 実行コマンド
 
 ```
-bun run .opencode/skills/repo-agentdev-integrity/scripts/check_changed_docs.ts \
+bun run .opencode/skills/repo-agentdev-integrity/scripts/cli.ts \
   --workflow case-run --base-ref origin/main --json
 ```
 
 変更ファイルは worktree 内の git diff から取得する（`--base-ref origin/main` または `--files <changed-paths>`）。
+targeted docs guard は検証エンジン cli.ts の `--workflow` モード（明示対象指定）であり、`files_checked`・`unchecked_reasons`（not-found / out-of-profile）・更新要否フラグを報告する。files_checked と検査対象変更ファイルの一致確認を workflow 側で行い、engine の終了コード単独で受入を判定しない。
 case-run プロファイル固有の追加ルールとして full_docs_check_recommended 判定は持たない（case-close の責務）。
 
 ### 検出結果の記録と連携
@@ -319,7 +320,7 @@ case-run の実行担当（委譲内サブエージェント）が、実装作�
 
 case-run が使用する検査ツール（[integrity-contracts.md](../integrity/integrity-contracts.md)「Workflow × 使用ツールマトリックス」参照）:
 
-- check_changed_docs.ts（--workflow case-run）: PR 対象ファイルに docs/** 変更を含む場合、委譲前に実行（[docs/** 変更時の targeted docs guard（REQ-031-011）](#docs-変更時の-targeted-docs-guardREQ-031-011) 参照）
+- cli.ts --workflow case-run（targeted docs guard）: PR 対象ファイルに docs/** 変更を含む場合、委譲前に実行（[docs/** 変更時の targeted docs guard（REQ-031-011）](#docs-変更時の-targeted-docs-guardREQ-031-011) 参照）
 - check_integrity.ts（全体監査）: PR 対象ファイルに docs/** 変更を含む case では commit 前に full 実行し、base 既知違反と新規違反を分離して新規違反 0 件を確認する（「docs 変更を含む case での commit 前 full check_integrity 工程」参照）
 - check_extensions.ts（IR-056）: `src/common/commands/agentdev/**/*.md`, `src/common/skills/agentdev-*/SKILL.md`, `src/common/skills/agentdev-*/references/**/*.md`, `.agentdev/extensions/**` のいずれかを変更した場合に実行
 - test_strategy: Issue 完了条件検証（REQ-031-008/030）

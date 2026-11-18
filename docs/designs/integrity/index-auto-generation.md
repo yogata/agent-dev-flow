@@ -191,7 +191,7 @@ catalog は欠番 IR-045（削除済み、ファイル不在）を挟む2ブロ�
 本 Design が定義する機構は現在以下の契約で稼働している。
 
 1. **現在 AUTOGEN されている領域**: frontmatter 由来で機械生成される件数、一覧、ステータス別ビュー等。
-生成スクリプト `.opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts` が存在し、AUTOGEN ブロック（HTML コメント形式 `<!-- AUTOGEN:BEGIN:id=xxx --> ... <!-- AUTOGEN:END -->`）で囲まれた領域を上書きする。
+生成スクリプト `src/common/skills/repo-agentdev-integrity/scripts/generate_indexes.ts` が存在し、AUTOGEN ブロック（HTML コメント形式 `<!-- AUTOGEN:BEGIN:id=xxx --> ... <!-- AUTOGEN:END -->`）で囲まれた領域を上書きする。
 docs-check 既存資産（cli_utils.ts, check_integrity.ts の parseFrontmatter, readText, listFiles 等）を再利用する。
 2. **現在人手管理されている領域**: 導出規則が未確定、混合領域、人手判断を含む領域。
 後述「現在人手管理領域の3領域」参照。

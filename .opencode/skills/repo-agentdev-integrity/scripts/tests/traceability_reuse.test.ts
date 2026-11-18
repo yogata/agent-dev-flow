@@ -9,7 +9,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { evaluateEvidenceReuse } from "../../../../../src/common/skills/agentdev-traceability/scripts/lib/reuse.ts";
+import { evaluateEvidenceReuse } from "../../../../skills/agentdev-traceability/scripts/lib/reuse.ts";
 
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const RUN_ID = `trace-reuse-${crypto.randomUUID().slice(0, 8)}`;
