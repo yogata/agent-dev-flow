@@ -546,7 +546,10 @@ describe("既存観測 sourceRevision のシミュレーション（REQ-090-030�
       return;
     }
     const jsonFiles = files.filter((f) => f.endsWith(".json"));
-    expect(jsonFiles.length).toBeGreaterThan(0);
+    if (jsonFiles.length === 0) {
+      // 観測不在環境（ディレクトリ存在 + *.json 0 件・処分後の最終状態）では検証対象が存在しないため skip する。
+      return;
+    }
     let failures = 0;
     const failureSamples: string[] = [];
     for (const file of jsonFiles) {

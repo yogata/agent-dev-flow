@@ -1,4 +1,4 @@
-component: req-109-v5-migration-boundary
+component: req-109-migration-boundary
 # REQ-109(ADF v5 移行と互換性の境界)の implementation 対応。
 # REQ-109 は判断・規範行群であり、判断面の正の恒久実体として DEC-056(判断記録・accepted)と
 # design-principles.md「## 0. 実験前提の3原則(最上位ルール)」節(AGENTS.md が正規参照点とする

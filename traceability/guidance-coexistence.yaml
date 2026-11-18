@@ -1,4 +1,4 @@
-component: v51-guidance-coexistence
+component: guidance-coexistence
 verification:
   README.md:
     - REQ-111-013

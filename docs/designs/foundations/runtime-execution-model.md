@@ -26,11 +26,11 @@ tag・branch の lifecycle role 別サブ表:
 
 | lifecycle role | 権威 |
 |---|---|
-| baseline anchor tag（v3-baseline 等） | 移行境界で合意された作成のみ許可。移動しない |
-| release tag（vX.Y.Z） | cutover 手順内でのみ作成。既存 tag は一切移動しない |
-| rc tag（v4.0.0-rc.N） | cutover sequence 内でのみ作成（それ以前の作成は違反） |
+| baseline anchor tag | 過去の移行境界で合意された作成のみ許可。一切移動しない |
+| release tag（vX.Y.Z） | リリース手順内でのみ作成。既存 tag は一切移動しない |
+| rc tag（vX.Y.0-rc.N） | リリース候補の確定手順内でのみ作成（それ以前の作成は違反） |
 | Case branch（definition/issue-* 等） | Case 実行内で作成。削除は自 Case が作成した branch に限定 |
-| 統合 branch（main、v4-dev） | merge は各段階の統合基準に従う（v4 段階は v4-dev） |
+| 統合 branch（main） | merge は各段階の統合基準に従う |
 
 ## 直列化単位表
 
