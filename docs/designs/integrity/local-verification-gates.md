@@ -40,6 +40,9 @@ git rev-parse --show-toplevel を起点とする（worktree 環境対応）。
   件数を advisory として表示し、ブロック条件としない。check.ts の実行エラー（終了コード 1）と JSON 解析不能は
   ブロックする（fail-closed）。
 - Step 3: bun test "$REPO_ROOT/.opencode/skills/repo-agentdev-integrity/scripts/"（実行形態は REQ-060 に従う）。
+  git push がフックへ渡す GIT_DIR・GIT_WORK_TREE・GIT_INDEX_FILE・GIT_QUARANTINE_PATH 等の環境変数は、
+  テストスイートが生成するネスト git フィクスチャの操作（init・commit・push を含む）を外側の実リポジトリへ
+  横取りして破壊するため、Step 3 の実行時のみ無効化する（Step 1・2 は実リポジトリ自身の検査のため維持する）。
 
 ## セットアップ（scripts/setup-hooks.ts）
 

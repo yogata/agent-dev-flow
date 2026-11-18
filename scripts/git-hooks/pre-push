@@ -94,7 +94,12 @@ if ! printf '%s' "$TRACE_REPORT" | bun -e '
 fi
 
 echo "[pre-push] Step 3/3: 検証エンジンのテストスイート（bun test、REQ-060 実行形態）を実行します。"
-if ! (cd "$REPO_ROOT" && bun test "$ENGINE_TEST_TARGET"); then
+# git push はフックへ GIT_DIR・GIT_WORK_TREE・GIT_INDEX_FILE 等の環境変数をエクスポートする。
+# テストスイートはネストした git リポジトリのフィクスチャを生成して init・commit・push を実行するため、
+# これらの変数が残っているとフィクスチャの git 操作が外側の実リポジトリ（とそのリモート）へ横取りされ、
+# ブランチ・設定・リモートを破壊する。Step 3 の実行時のみこれらを無効化する
+# （Step 1・2 は実リポジトリ自身を検査するため無効化しない）。
+if ! (cd "$REPO_ROOT" && env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE -u GIT_QUARANTINE_PATH -u GIT_OBJECT_DIRECTORY -u GIT_ALTERNATE_OBJECT_DIRECTORIES -u GIT_PREFIX bun test "$ENGINE_TEST_TARGET"); then
   fail_with_guidance
 fi
 

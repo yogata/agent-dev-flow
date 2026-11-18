@@ -73,7 +73,18 @@ test("REQ-122-009: pre-push は cli.ts 全量実行・トレーサビリティ�
 test("REQ-122-009: pre-push の bun test 実行形態はリポジトリルート cwd と ./ 付き相対パス（REQ-060）に従う", () => {
   const content = fs.readFileSync(PRE_PUSH_PATH, "utf-8");
   expect(content).toMatch(/ENGINE_TEST_TARGET="\.\/\./);
-  expect(content).toMatch(/cd "\$REPO_ROOT" && bun test "\$ENGINE_TEST_TARGET"/);
+  expect(content).toMatch(/cd "\$REPO_ROOT" && env -u GIT_DIR [^\n]*bun test "\$ENGINE_TEST_TARGET"/);
+});
+
+test("REQ-122-009: pre-push Step 3 はフック環境変数（GIT_DIR 等）を無効化してテストスイートを実行する", () => {
+  const content = fs.readFileSync(PRE_PUSH_PATH, "utf-8");
+  // git push がフックへ渡す GIT_* 環境変数が残ると、テストスイートのネスト git フィクスチャの操作が
+  // 外側の実リポジトリへ横取りされ、ブランチ・設定・リモートが破壊される。無効化を必須とする。
+  expect(content).toMatch(/env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE/);
+  expect(content).toContain("-u GIT_QUARANTINE_PATH");
+  expect(content).toContain("-u GIT_OBJECT_DIRECTORY");
+  expect(content).toContain("-u GIT_ALTERNATE_OBJECT_DIRECTORIES");
+  expect(content).toContain("-u GIT_PREFIX");
 });
 
 test("REQ-122-009: pre-push Step 2 は corpus 完全性（missing-*）を advisory・fail-open として層別し、構造検査 fail はブロックする", () => {
