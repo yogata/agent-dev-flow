@@ -12,7 +12,6 @@
 // Legacy installed/release values are accepted as aliases for
 // link/archive-installed so existing invocations continue to work.
 
-import type { BoundaryFailure, BoundaryReport } from "./lib/distribution-boundary-types.ts";
 import type { Projection } from "./lib/distribution-boundary.ts";
 import { checkDistributionRules } from "./lib/distribution-boundary-rules.ts";
 import { checkDistributionBoundary } from "./check_distribution_boundary.ts";
