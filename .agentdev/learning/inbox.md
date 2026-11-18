@@ -133,3 +133,35 @@
 - **想定反映先**: req-define の組立検査手順（assemble-draft-section）・src/common/skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts（validateEditLineStructure の契約参照）
 - **関連**: Issue #4138・PR #4139
 - **タグ**: `#機械工程` `#組立`
+
+## 連結コマンドの後段は前段の終了コードで必ずガードする（git stash push 失敗後の pop 誤実行）
+
+- **問題事象**: `git stash push` が pathspec 不一致で失敗した後も連結された後段の `git stash pop` が実行され、リポジトリに既存の別 stash エントリ（本作業と無関係）を worktree へ適用して一時的にコンフリクトを生じさせた。worktree への復元（reset・restore・stash 由来残留ファイル削除）で収束し、既存 stash エントリ自体は保持されたまま
+- **発生局面**: 実装（Epic #4138 Wave-1 子 Issue #4142 OU-003 case-run。PR #4146）
+- **検知方法**: 後段 pop による意図しない適用（stash 由来の残留ファイルとコンフリクト）の検出と worktree 状態の実確認
+- **根本原因**: 連結コマンドの後段（pop）を前段（push）の成否でガードしていなかった。前段の終了コードを無視した連結実行
+- **自律対応内容**: worktree への復元（reset・restore・stash 由来残留ファイル削除）で収束させ、既存 stash エントリの保持を確認した
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 同一連結内の後段コマンドは前段の終了コードで必ずガードする。state を操作するコマンド（stash・checkout・reset 等）を連結する場合、前段失敗時の後段実行は無関係な state を破壊し得る
+- **再発条件**: 失敗し得る前段コマンドと破壊的後段コマンドを連結実行した場合
+- **予防策候補**: 連結コマンド実行の委譲契約に「前段終了コードによる後段ガード（終了コード検査・前段失敗時の後段停止）」の前置規律を追加する
+- **想定反映先**: case-run 委譲契約（コマンド連結実行の規律）
+- **関連**: Issue #4142・PR #4146
+- **タグ**: `#git` `#コマンド連結`
+
+## worktree 内の検証用証跡退避は IR-073 untracked residue として検出される（検査実行と証跡退避の同居不可）
+
+- **問題事象**: worktree 内で check_integrity を実行する際、検証用の一時ファイル（.tmp-*.txt 等）を worktree 配下へ退避すると、その退避ファイル自体が IR-073 untracked residue として検出され、check_integrity が exit 1 となった
+- **発生局面**: 実装（Epic #4138 Wave-2 子 Issue #4144 OU-005 case-run・検証 (3) 初回実行。PR #4149）
+- **検知方法**: check_integrity の IR-073（untracked residue）NG 検出・exit 1
+- **根本原因**: 検査実行対象の worktree 内へ検証用退避ファイルを置く運用が、untracked 残存検出の対象と重複していた
+- **自律対応内容**: 退避ファイルを削除して再実行（fix-and-reverify）で解消・検査 (7) で IR-073 NG 0 件を再確認
+- **ユーザー確認有無**: なし
+- **Decision/REQ/spec影響**: なし
+- **横展開観点**: 検査実行と証跡退避は同一 worktree 内で同居できない。退避は worktree 外（TEMP 等の標準一時領域）へ出すか、検査実行前に回収する運用が正規形。baseline 明記: 本記録の計測前提は main HEAD 743af97d6（PR #4149 マージ後）・2026-11-18・check_integrity 実測（処分直後 IR-073 由来 NG 0 件・PR #4149 検証差分 (7)）を対象とする
+- **再発条件**: worktree 内実行の検査で worktree 配下へ検証用退避ファイルを置いた場合
+- **予防策候補**: 検証コマンドの stdout 証跡退避形式の退避先を worktree 外へ固定する運用を checker 実行契約へ明記する
+- **想定反映先**: checker-execution-contracts Design（証跡退避先の運用）・検証コマンドの stdout 証跡退避形式規定
+- **関連**: Issue #4144・PR #4149・Epic #4138 記録コメント 6966053814
+- **タグ**: `#IR-073` `#証跡退避`
