@@ -8,7 +8,7 @@ integrity-check の検出結果を3水準に分類し、それぞれの意味と
 
 | 層 | 担当 | 責務 | 検出方式 |
 |----|------|------|----------|
-| 機械検出層 | docs-check（`/repo/docs-check`、`check_integrity.ts`） | 機械的・再現可能な整合性検査（存在・参照・frontmatter・index・namespace 残存・パターンマッチ） | 正規表現・構造解析・存在確認（REQ-0108-056/254/261/262） |
+| 機械検出層 | docs-check（`/repo/docs-check`、検証エンジン cli.ts） | 機械的・再現可能な整合性検査（存在・参照・frontmatter・index・namespace 残存・パターンマッチ） | 正規表現・構造解析・存在確認（REQ-0108-056/254/261/262） |
 | 意味診断層 | inspect-docs / inspect-skills | 意味判断・文脈解釈・推論を要する検出（境界違反の文脈免除、REQ 間整合、技術判断不在等） | LLM 推論・意味解析 |
 | 査読層 | textlint 共通基盤（文章表層品質）＋ inspect 系診断（文意品質） | 文書品質・日本語表現・文意整合（IR-045 相当） | textlint 規則による機械検査 + inspect 系の意味品質診断（REQ-053-001/006） |
 

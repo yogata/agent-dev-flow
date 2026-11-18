@@ -6,7 +6,7 @@
 // REQ-021-011〜022 の割り当て文言の存在を検証する。
 
 import { describe, expect, it } from "bun:test";
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const REPO_ROOT = join(import.meta.dir, "..", "..", "..", "..", "..", "..");
@@ -88,6 +88,21 @@ describe("REQ-021-021: 診断・レビュー系工程の agentdev-traceability �
 });
 
 describe("REQ-021-011〜022 の割り当て文言の存在", () => {
+  // Wave-4（REQ-122-012）で Design が骨格＋references/ 構造へ分割されたため、
+  // 検査対象を Design 本体＋同 references/ 配下の詳細ファイルへ拡張する（文言の意味保存）。
+  function readWithReferences(rel: string): string {
+    const main = read(rel);
+    const refDir = join(REPO_ROOT, rel.replace(/\.md$/, ""), "references");
+    let acc = main;
+    if (existsSync(refDir)) {
+      for (const f of readdirSync(refDir).sort()) {
+        if (f.endsWith(".md")) {
+          acc += "\n" + readFileSync(join(refDir, f), "utf-8");
+        }
+      }
+    }
+    return acc;
+  }
   const phraseChecks: ReadonlyArray<{ req: string; file: string; phrases: readonly string[] }> = [
     {
       req: "REQ-021-011",
@@ -181,7 +196,7 @@ describe("REQ-021-011〜022 の割り当て文言の存在", () => {
   ];
 
   it.each(phraseChecks)("%s: %s", ({ file, phrases }) => {
-    const content = read(file);
+    const content = readWithReferences(file);
     for (const phrase of phrases) {
       expect(content.includes(phrase)).toBe(true);
     }

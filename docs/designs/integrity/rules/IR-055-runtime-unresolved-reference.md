@@ -22,7 +22,7 @@ verification_path: src/common/skills/repo-agentdev-integrity/scripts/rules/rules
 | related_design | [integrity-rule-catalog.md, integrity-contracts.md] |
 | gate_level | full-audit, delta-guard, impact-guard |
 | false_positive_risk | 中。code block 内部、template placeholder（`{xxx}`）、vocabulary-registry.md 等の正当使用例外パスは exemption 対象とする。`integrity-rule-catalog.md` 自身のルール記述も exemption 対象とする。exemption 設計を誤ると true positive が誤って免除される |
-| regression_test | check_integrity.test.ts。各検出パターン（REQ-NNNN、REQ-NNNN-NNN、DEC-NNN、residual ADR-NNNN、`src/opencode/`、`docs/designs/`、`docs/guides/`、`/repo/*`、`repo-*`、本体 docs URL、line number 付き参照）を含む fixture で検出されること、exemption 対象が報告されないことを検証する |
+| regression_test | `scripts/rules/rules.test.ts`（ir055 インメモリケース）。各検出パターン（REQ-NNNN、REQ-NNNN-NNN、DEC-NNN、residual ADR-NNNN、`src/opencode/`、`docs/designs/`、`docs/guides/`、`/repo/*`、`repo-*`、本体 docs URL、line number 付き参照）を含む fixture で検出されること、exemption 対象が報告されないことを検証する |
 | finding_route | intake（既知違反の段階解消は別途処理） |
 | triage_action | 新規検出時は対象ファイル側の直接修正で解消する（baseline による免除管理は撤廃済み。REQ-010-074/079）。既存違反の段階解消は docs-check report / intake / backlog 経由で処理する |
 | last_verified | 2026-09-27 |
@@ -30,7 +30,7 @@ verification_path: src/common/skills/repo-agentdev-integrity/scripts/rules/rules
 ## IR-055 検出パターンと severity（REQ-029-003）
 
 検出パターンごとの severity 分類を規定する。
-本節が Design 詳細の原本であり、docs-check 実装（`check_integrity.ts`）は本節に従う。
+本節が Design 詳細の原本であり、docs-check 実装（`src/common/skills/repo-agentdev-integrity/rules/ir-055.ts`）は本節に従う。
 
 ### strict（原則違反、即 NG）
 

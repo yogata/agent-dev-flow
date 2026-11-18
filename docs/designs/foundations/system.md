@@ -4,7 +4,7 @@ status: accepted
 created: 2026-08-20
 updated: 2026-11-18
 ---
-<!-- ADF-COVERS(implementation): REQ-001-033 -->
+<!-- ADF-COVERS(implementation): REQ-001-033, REQ-122-014 -->
 <!-- ADF-COVERS(implementation): REQ-002-009, REQ-002-010, REQ-002-012 -->
 <!-- ADF-COVERS(implementation): REQ-034-007 -->
 <!-- ADF-COVERS(design): REQ-032-029, REQ-009-052 -->
@@ -173,7 +173,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **並列性**: Epic Wave クローズ STEP-E4 で各子 Issue の PR マージ・クローズ・完了条件評価・Capture回収・コンフリクト解消準備を「準並列化」（REQ）。
 - **resume**: HEAD commit hash（squash merge 後）、PR mergeable 状態、Issue OPEN/CLOSED 状態、Epic ステータステーブル、Design status、学びinbox/intake inbox。
 - **durable state**: マージコミット、クローズ済みIssue、削除済みローカルブランチ/worktree、`.agentdev/learning/inbox/`、`.agentdev/intake/inbox/`、Design status（draft→accepted）、Epic Issue ステータステーブル。
-- **Harness依存**: GitHub I/O（Custom Tool `agentdev_gh` 経由。merge、mergeable ポーリング、close、ラベル）、git（pull --ff-only / rebase / reset / checkout 隔離worktreeのみ）、worktree 操作、subagent 起動（learning-capture）、タイムスタンプ、bash による check_changed_docs.ts / check_extensions.ts、拡張読込。
+- **Harness依存**: GitHub I/O（Custom Tool `agentdev_gh` 経由。merge、mergeable ポーリング、close、ラベル）、git（pull --ff-only / rebase / reset / checkout 隔離worktreeのみ）、worktree 操作、subagent 起動（learning-capture）、タイムスタンプ、bash による検証エンジン cli.ts（targeted docs guard・IR-056 等の検査）、拡張読込。
 - **Capability依存**: `agentdev-quality-gates`（QG-4 Final Acceptance Gate）、`agentdev-git-worktree`（重複チェック/rebaseパス/同期リスク検出/先行commit）、`agentdev-epic-tracker`（STEP-E1〜E6）、`agentdev-design-file-manager`（design-lifecycle-application、STEP-3）、`agentdev-workflow-templates`、`agentdev-learning-capture`、`agentdev-learning-pipeline`（deferred）、`agentdev-intake-pipeline`、`agentdev-workflow-orchestration`（capture境界）、`agentdev-project-extensions`、`repo-agentdev-integrity`（cli.ts --workflow（targeted docs guard）/ check_extensions.ts）。
 - **内部workflow候補**: PRマージworkflow（STEP-4、コンフリクト解消 Level 1）、QG-4 達成判定workflow（STEP-2 + 観点8 + 完了条件チェックボックス）、Design確定workflow（STEP-3）、Capture回収workflow（STEP-6、PR本文→intake/learning分離）、Epic Wave クローズworkflow（STEP-E1〜E6）。Level 1 コンフリクト解消と Design status 昇格判断は Capability Skill 候補。
 

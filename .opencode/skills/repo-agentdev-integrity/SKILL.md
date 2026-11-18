@@ -1,13 +1,13 @@
 ---
 name: repo-agentdev-integrity
-description: Repo-local integrity validation for agent-dev-flow self-hosting artifacts. Provides the plugin-based verification engine (cli.ts with --changed/--emit-intake/--rule/--json and the --workflow targeted docs guard) for REQ/Decision/Design/skill/command consistency, index auto-generation, and the trusted distribution gate. USE FOR: running integrity checks on agent-dev-flow repo artifacts, validating REQ frontmatter and cross-references, differential verification of staged changes, explicit-target changed-docs verification for save/run/close workflows, auto-ticketing warnings to intake inbox, regenerating index AUTOGEN blocks. DO NOT USE FOR: semantic content evaluation, user approval decisions, requirement analysis, or ADR necessity judgment.
+description: Repo-local integrity validation for agent-dev-flow self-hosting artifacts. Plugin-based verification engine (cli.ts: --changed/--emit-intake/--rule/--workflow) for REQ/Decision/Design/skill/command consistency, index auto-generation, and the trusted distribution gate. USE FOR: running integrity checks, validating frontmatter and cross-references, differential verification of staged changes, changed-docs verification for workflows, auto-ticketing warnings, regenerating index AUTOGEN blocks. DO NOT USE FOR: semantic content evaluation, user approval, requirement analysis, ADR necessity judgment.
 ---
 
 # repo-agentdev-integrity
 
 agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検査を集約する repo-local skill。AgentDevFlow の配布対象外であり、consumer project では利用しない。検証エンジンの正本は `src/common/skills/repo-agentdev-integrity/` 配下に配置し、`.opencode/skills/repo-agentdev-integrity/` は copy 投影として管理する（DEC-065 決定3、REQ-002-020 の限定例外）。
 
-## USE FOR
+## 主要な用途
 
 - agent-dev-flow repo artifact（REQ、Decision、Design、skill、command）の整合性検査（残存24 IR ルール、integrity-rule-catalog.md が正）
 - 差分実行（`--changed`）: ステージング変更に対応するルールのみ実行し、対象外のみの変更は即時 Exit 0
@@ -17,7 +17,7 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 - 配布依存境界の検査（IR-059、`--profile source` 相当の trusted-distribution-gate 実行）
 - 検出結果の Markdown / JSON レポート生成
 
-## DO NOT USE FOR
+## 対象外
 
 - ドキュメント内容の意味的妥当性判定（→ `agentdev-req-analysis`、`agentdev-decision-guidelines`）
 - ユーザー承認が必要かどうかの判断（→ 各コマンドの skill）

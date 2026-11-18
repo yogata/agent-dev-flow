@@ -11,7 +11,7 @@
 #
 # 同期条件: src/common/skills/ へのスキル追加・削除・リネームは skills: セクションへ
 # 自動追随する（generate_indexes.ts が配置列挙から再生成する。B3-3。手動更新を要しない）。
-# manifest ↔ src の不一致は check_integrity.ts
+# manifest ↔ src の不一致は検証エンジン cli.ts
 # （IR-068 skill-projection-manifest）が strict fail として検出する。
 # 投影比較は junction 環境（.opencode/skills に非 repo-* ディレクトリが存在する場合）
 # のみ実施し、worktree（junction 未伝播、REQ-018）では info で skip する。

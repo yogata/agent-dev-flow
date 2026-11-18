@@ -44,4 +44,4 @@ bun install && bun run build:engine
 配布コマンドの索引。
 詳細な選び方は上表の[コマンド選択](docs/guides/command-selection.md)、各コマンドの入出力は[コマンドリファレンス](src/common/commands/agentdev/README.md)を参照する。
 
-`/agentdev/req-define`、`/agentdev/backlog-auto`、`/agentdev/case-auto`、`/agentdev/intake-capture`、`/agentdev/intake-from-github`、`/agentdev/intake-promote`、`/agentdev/learning-promote`、`/agentdev/backlog-review`、`/agentdev/inspect-docs`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote`、`/agentdev/issue`、`/agentdev/third-party-sync`、`/agentdev/phase-tasks-create`、`/agentdev/phase-tasks-update`、`/agentdev/phase-artifacts-update`、`/agentdev/phase-review`、`/agentdev/phase-transition`
+`/agentdev/req-define`、`/agentdev/backlog-auto`、`/agentdev/case-auto`、`/agentdev/intake-capture`、`/agentdev/intake-from-github`、`/agentdev/intake-triage`、`/agentdev/intake-promote`、`/agentdev/learning-promote`、`/agentdev/backlog-review`、`/agentdev/inspect-docs`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote`、`/agentdev/issue`、`/agentdev/third-party-sync`、`/agentdev/phase-tasks-create`、`/agentdev/phase-tasks-update`、`/agentdev/phase-artifacts-update`、`/agentdev/phase-review`、`/agentdev/phase-transition`

@@ -5,7 +5,7 @@ created: 2026-08-15
 updated: "2026-11-18"
 ---
 <!-- ADF-COVERS(design): REQ-010-009 -->
-<!-- ADF-COVERS(implementation): REQ-002-035 -->
+<!-- ADF-COVERS(implementation): REQ-002-035, REQ-122-014 -->
 <!-- ADF-COVERS(implementation): REQ-010-062 -->
 <!-- ADF-COVERS(implementation): REQ-010-010 -->
 <!-- ADF-COVERS(design): REQ-018-004 -->
@@ -36,7 +36,7 @@ updated: "2026-11-18"
 実行プロファイルは対象変更（extension、command、skill）の種別に応じて選択する
 - 共通 CLI 契約（--help、--json、--dry-run、exit code 0/1/2、stdout 機械可読出力）に従う
 - CLI 用分割スクリプト（`*_cli.ts` 等）は直接起動時にも検査を実行する top-level エントリポイントを持つことを標準とする。export-only のスクリプトは直接起動で無出力・exit 0 の無検証成功を生むため採用しない。check_distribution_boundary_cli.ts の正規起動経路は check_distribution_boundary.ts 経由（bun run、exit 0/1/2）であることを明示する
-- integrity 規則を機械検査する checker（check_integrity、専用検査器、lint 系検査を含む）の出力は、適用した規則の識別子（IR ID）を必ず含める。出力から当該規則文書（rules/IR-NNN-*.md）へ機械的に対応できることを checker 実行契約の一部とする（B3-1、REQ-047-011）
+- integrity 規則を機械検査する checker（検証エンジン cli.ts、専用検査器、lint 系検査を含む）の出力は、適用した規則の識別子（IR ID）を必ず含める。出力から当該規則文書（rules/IR-NNN-*.md）へ機械的に対応できることを checker 実行契約の一部とする（B3-1、REQ-047-011）
 
 ## パターンマッチ・網羅検査設計の標準規約
 
@@ -66,7 +66,7 @@ checker の新規実装・修正時に適用するパターンマッチと網羅
 - 監査記録・AUTOGEN に対する免除: 監査記録（audits/ 配下の Report）と AUTOGEN ブロックは、歴史記録・機械生成領域として該当検出の免除対象とする
 - AUTOGEN retired 参照行領域の免除: AUTOGEN ブロック内の retired 参照行（機械生成領域として生成された索引行）は、retired 成果物残存検出の免除対象とする方針とする。機械生成領域への手動是正要求を行わない
 - em-dash 導入時のゲート方針: em-dash（—）を配布文書へ導入する場合は、意図しない異言語文字・記号の混入を検出する既存 checker の許容更新（導入対象の明示）を同一 PR で行うことを方針とする。checker 実装自体の変更は別 Case の責務であり、本 Design は方針のみを所有する
-- check_integrity の typecheck 対象外範囲: check_integrity（docs-check）の typecheck 対象は現行の対象範囲に限定し、配布 skill scripts 全体への対象拡張は行わない（対象拡張は本方針の対象外）。対象範囲の拡張判断は別途設計判断を要する
+- 検証エンジン cli.ts（docs-check）の typecheck 対象外範囲: 検証エンジン cli.ts の typecheck 対象は現行の対象範囲に限定し、配布 skill scripts 全体への対象拡張は行わない（対象拡張は本方針の対象外）。対象範囲の拡張判断は別途設計判断を要する
 - traceability corpus の走査対象方針: traceability corpus の一次走査対象は、リポジトリ top-level `traceability/` 配下の YAML ファイル（component / package 単位 sidecar、`policy.yaml`）とする。sidecar と policy.yaml は対応関係と検証スコープの正規情報源であり、走査対象へ追加する拡張子は `.yaml` / `.yml` である。
 - 走査対象外の例外: inline declaration（producer-only artifact の ADF-COVERS 宣言行）の走査対象拡張子は現行の `.md`、`.ts` を維持する。
 - 完全性判定の根拠: inline declaration は producer-only serialization であり、対応関係の完全性判定は sidecar を正規情報源として行うため、inline 走査の拡張子制限が完全性判定を制限しない
@@ -236,9 +236,9 @@ bun test 実行のタイムアウトは標準 300 秒、上限 600 秒とする�
 
 bun test の pass は型整合を保証しない。配布物（.ts・型定義を含む成果物）を変更する場合は、bun test に加えて typecheck（tsc --noEmit、対象 package 配下 cwd）を併用して型不整合の検出漏れを防ぐ。型定義変更を伴う変更では、当該変更と同一変更単位で型参照側の追随を確認する。併用指針の観点記録は docs/knowledge/structure-migration-followup-checklist.md が参照先である。
 
-### check_integrity テストスイート内の結果共有契約
+### 検証エンジン テストスイート内の結果共有契約（旧 checker 時代の記録）
 
-check_integrity.test.ts の回帰試験群は、同一テスト実行内で対象ルート・実効引数・入力状態（固定データ、宣言的定義等）が同じ検査について検査器起動を1回に集約し、その結果を複数の確認で共有できる。本契約はテストスイートの実行形態に関する内部契約であり、検査ルール、検出能力、既存の確認内容、最終品質ゲートを変更しない。
+旧 checker 時代の `check_integrity.test.ts` の回帰試験群が成り立たせていた契約である（Wave-2 のテスト統合により現行は `scripts/rules/`・`scripts/tests/` 配下のテスト群へ再構成済み）:同一テスト実行内で対象ルート・実効引数・入力状態（固定データ、宣言的定義等）が同じ検査について検査器起動を1回に集約し、その結果を複数の確認で共有できる。本契約はテストスイートの実行形態に関する内部契約であり、検査ルール、検出能力、既存の確認内容、最終品質ゲートを変更しない。
 
 - 結果共有は既存の準備処理（beforeAll 等）と明示的な結果変数で構成し、実行をまたぐ永続キャッシュや汎用キャッシュ基盤を作らない
 - 実リポジトリ回帰の4確認は1回の検査結果を共有する。個々のテスト名と確認内容を維持して失敗箇所を識別でき、共有結果を各テストが変更して他の確認を汚染しない

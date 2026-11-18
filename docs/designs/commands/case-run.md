@@ -5,7 +5,7 @@ created: 2026-06-21
 updated: "2026-11-18"
 ---
 
-<!-- ADF-COVERS(implementation): REQ-021-015, REQ-021-016, REQ-021-017, REQ-021-019, REQ-021-020, REQ-021-022, REQ-035-002 -->
+<!-- ADF-COVERS(implementation): REQ-021-015, REQ-021-016, REQ-021-017, REQ-021-019, REQ-021-020, REQ-021-022, REQ-035-002, REQ-122-012, REQ-122-014 -->
 <!-- ADF-COVERS(implementation): REQ-119-004 -->
 <!-- ADF-COVERS(design): REQ-021-015, REQ-021-016, REQ-031-006, REQ-031-015, REQ-031-016, REQ-031-027, REQ-031-033, REQ-031-034, REQ-031-035, REQ-035-012, REQ-035-021 -->
 <!-- ADF-COVERS(design): REQ-031-036（委譲指示規律の docs 配下パス抽象化参照設計） -->
@@ -19,6 +19,8 @@ updated: "2026-11-18"
 <!-- ADF-COVERS(implementation): REQ-104-009, REQ-104-010, REQ-104-011, REQ-104-012（採用規約の解決の実行経路接続節） -->
 
 # case-run Design
+
+本 Design は骨格（公開契約と制御フロー）と references/ 詳細仕様の2層構成である。gate 意味論・検査手順・検証記録・委譲モデルの詳細は references/case-run/ 配下へ分離している。通常経路で全 reference を無条件読込せず、必要な条件に応じて遅延読み込みする。
 
 本 Design が定義する case-run は公開 command ではなく内部 lifecycle 段階である。公開 UX は要求入口（req-define、backlog-auto）と標準実行コマンド case-auto へ収斂しており、本段階は case-auto の orchestration から駆動される。case-auto によるインライン実行の内部段階である点を含む。本 Design は内部 lifecycle 段階の契約を定める正規文書である。
 ## 目的
@@ -104,276 +106,37 @@ Workflow Skill は常に単一 Issue 実行（single workflow）として動作�
 
 ### case-run gate 意味論（前置 gate と最終 gate）
 
-- 前置 gate 群（委譲の STEP-S3 相当、子Issue ごとの Epic Wave 委譲にも同一契約で適用）: worktree precondition gate、QG-3 前置 staleness check、docs/** 変更時の targeted docs guard、配布依存境界 事前 gate、AUTOGEN 索引再生成 前置 gate（S3-6）を適用する。AUTOGEN 索引再生成 前置 gate は、PR 対象ファイルに AUTOGEN 生成元文書（REQ、Decision、Design 実ファイル群）の変更を含む場合、AUTOGEN 索引の再生成を委譲に先行して強制する
-- 配布依存境界の最終変更経路 gate（S5-1）: result が `completed-pr` の場合、クリーンアップに進む前に、実装後の実際の worktree HEAD に対して最終 gate を行う（実行担当サブエージェントが追加した変更も含めて検査する）。本 gate は src 側（原本）と `.opencode` 側（投影）の双方反映検証を要求する
-- tmp 残存確認: 正常終了を前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないことをクリーンアップ工程で確認する。workflow 側で生成した `.agentdev/tmp/` 一時ファイルは当該実行内で削除し、Custom Tool 由来の一時ファイルは Tool が操作ごとに自動削除する
-
-#### 並列兄弟 branch 実差分交差確認（commit・push 前置）
-
-同一 Wave 内で兄弟 Issue が並列実行中の子 Issue は、commit・push の前、委譲先の実行担当サブエージェントが commit・push する直前（commit 前 3 検査と同一位置）に、実差分交差確認を実施する。case-run の前置 gate 群（STEP-S3）は委譲開始前に実行されるため当該時点では自 branch の変更ファイルが存在せず、実施位置にはならない（前置 gate での実施を前提した記述にしない）。
-
-対象は、並列実行中の兄弟 branch の変更ファイル集合（merge-base 起点の git diff --name-only で取得。パスは正規化して比較）と自 branch の変更ファイル集合の交差である。
-
-交差検出時はエラーではなく競合リスク情報として警告を投入者（case-auto 配下では親判断解決）へ提示し、調整決定（マージ順序・所有正当）を調整記録として実行記録へ残し、case-close の Level 1 rebase 担当契約へ引き継ぐ。単独実行（兄弟 Issue なし）の場合は発動条件不成立としてスキップする。兄弟 branch の状態が取得不能な場合は検査省略とせず取得不能として報告する（検出不能は交差なしを意味しない）。
-
-宣言ベースの Wave 重複前置検出（case-ready Design「v3 epic-wave-model Design からの吸収」節、REQ-061-019・REQ-035-012）とは補完関係にあり置換しない。交差未検出であっても宣言ベース前置検出の結果を無効化しない。
-
-#### 配布物変更時の commit 前3検査工程
-
-配布物（配布 command / skill / template / script）への実装反映を含む case では、commit 前に次の3検査を実行する（実行順を含めて以下のとおりとする）。
-1. 配布依存境界検査（check_distribution_boundary.ts）
-2. IR-055 検査（runtime-unresolved-reference）
-3. traceability 検査（宣言整合）
-突合は検出違反を全件新規扱いで行う（baseline による既知違反の区別・免除は撤廃済み、REQ-010-074/079）。
-全件を修正し、再検証で違反 0 件を確認してから commit する（fix-and-reverify）。
-違反の無断削除・隠蔽を行わない。
-
-#### verify-only closure の検証実行と SSoT コメント記録工程
-
-verify-only closure（PR も carrier commit も存在しない Issue 完了。検証のみで完了する
-maintenance case を含む）では、変更が存在しないため commit 前3検査の発火条件
-（配布物変更を含む case）が成立しない。この場合でも検証完了の恒久証跡を残すため、
-次のとおり実行する。本工程は case 2769 で確立した運用の明文化であり、
-「検証完了のために carrier commit を作成する」代替案は case 2769 で却下済みの作業仮定に基づき採用しない。
-
-1. verify-only closure の判定: execution contract で検証のみと事前確定された case、
-   または実行の結果変更不要が確定した case のいずれかを正規の判定点とする。
-   判定根拠を Issue コメント（SSoT コメント）に残す
-2. 3検査の実行: 配布依存境界検査（check_distribution_boundary.ts）、IR-055 検査
-   （runtime-unresolved-reference）、traceability 検査（宣言整合）を通常 case と同一の手順・
-   同一の水準（base 既知違反と新規違反の分離突合、新規違反 0 件確認）で実行する。
-   checker コマンドの実行経路と stdout 退避形式は checker 実行契約
-   （安定実行経路: モジュール import 経由、spawnSync による status/stdout 分離取得、
-   fs.writeFileSync の UTF-8 明示書き出し）に従う
-3. 必要な検証の実行: 正規契約（execution contract の test strategy 等）から導出した検証義務に基づく
-   必要な検証を実行する。検証義務がリポジトリ全体の試験を要求する場合、または試験範囲を安全に
-   限定できない場合は full integrity suite（bun test 全件）を実行し、
-   「Ran N tests across M files」の N/M 件数突合と直前実績との件数急減なし確認を行う
-   （case-close 最終検証の合格基準と同水準）。変更が存在しないことのみを理由に必要な検証を省略しない
-4. SSoT コメントへの記録: 実行コマンド列（実行 cwd、実行形態を含み、そのまま再実行手順として
-   機能する形式）と結果（3検査の new_delta 0・新規違反 0 件、実行した検証の pass/fail 件数）、
-   および実行する検証と実行しない検証の範囲とその根拠を Issue コメントに記録する。
-   verify-only closure では PR が存在しないため
-   PR 本文を記録先に使わない
-5. チャネル分離: SSoT コメントは検証証跡チャネルであり、capture（intake/learning 候補）
-   チャネルではない。REQ-031-014 の capture 引き継ぎ経路（PR 本文限定）は変更しない。
-   検証中に発見した本筋外の検出事項は既存の intake 起票経路で扱う
-
-#### docs 変更を含む case での commit 前 full check_integrity 工程
-
-PR 対象ファイルに docs/** 変更を含む case では、commit 前に check_integrity を full 実行し、
-検出違反を全件新規扱いで違反 0 件を確認する（fix-and-reverify。baseline 既知違反の区別は撤廃済み）。
-これにより integrity 由来の違反（reference-path-existence 等）の検出を case-run に前段化し、
-case-close 最終 gate（QG-4）での初検出・blocked を防ぐ。
-違反の無断削除・隠蔽を行わない（「配布物変更時の commit 前3検査工程」と同一の扱い）。
-targeted docs guard（PR 単位の targeted 検査）は維持する。
-
+詳細は references/gate-semantics.md を参照（遅延読み込み）。
 ### Epic Wave 実行モードの廃止（Wave 実行制御の case-auto 移転）
 
-Epic Wave 実行モード（case-run #epic）は実行契約から廃止された（REQ-031-015、DEC-041）。
-Wave 構成の読み取り、現在 Wave 判定、fan-out/fan-in、子 Issue 並列起動の制御は case-auto の orchestration stage 3 が単一所有する。case-run は与えられた単一 Issue の実装を単一委譲で実行し、case-run 経由で case-auto の管理外の実行枠（独立実行枠）を生成できない。
-同一 Wave 内の子 Issue 間の変更対象ファイル重複の実行時検出は case-auto の stage 3 実行制御が所有する（REQ-034-043）。case-run は委譲された単一 Issue の実行において、当該 Issue に関連する重複解消方針（変更対象分割・重複許容時の担当とマージ順序）を参照して実行し、変更対象集合が取得不能な場合は比較を省略せず検出不能として報告する責務を維持する（REQ-031-027）。
-
+詳細は references/gate-semantics.md を参照（遅延読み込み）。
 ### クリーンアップフェーズ
 
-- worktree クリーンアップ確認 + 完了報告
-  - 未コミット変更あり: 報告してユーザーの指示に従う。自動的な破棄、コミットは行わない
-  - 未コミット変更なし: 完了報告へ。runtime workspace のクリーンアップは harness の責務であり、case-run は関与しない（REQ-002-002）
-
+詳細は references/gate-semantics.md を参照（遅延読み込み）。
 ## 所有関係と委譲
 
-- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、case-auto の orchestration による Workflow Skill load 時に本 Design が読み込まれる（DEC-010。第4段以降は command 定義の実行時投影ではなく直接読込）。
-- workflow 実装本体は Workflow Skill（`agentdev-workflow-case-run`）が所有し、本 Design は内部手順、STEP 構成、reference 構成を複製しない。
-- case-run の Workflow Skill は、単一 Issue 実行（single workflow）のみを所有する（REQ-031-015、DEC-041）。かつて single workflow と epic-wave workflow の2 workflow 構成に分離されていた構造は、Epic Wave 実行モード（case-run #epic）の実行契約廃止により single workflow へ収斂した。旧 epic-wave workflow が所有していた実行契約差異6軸（target cardinality、parallelism、fan-out・fan-in、child task recovery、partial result、Wave-level completion）の実行契約は case-auto orchestration stage 3 へ移転済みであり、Workflow Skill は保持しない（`<workflows/workflow-skill-model>` Design「1:N 分割基準の適用実例（case-run）」参照）。
-- Workflow Skill の単独起動防止（soft guard）は、case-auto orchestration の委譲制御と Workflow Skill description の DO NOT USE FOR トリガーにより実効する。case-auto が case-run をインライン実行する場合も同一の Workflow Skill を正規情報源として読み込む。
-- Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
-
+詳細は references/supporting-sections.md を参照（遅延読み込み）。
 ## QG-3 前置 staleness check 手順（新規セクション）
 
-case-run は実装作業開始前に QG-3 本体とは独立した前置検査として staleness check を実行する（REQ-031-009〜034）。
-本検査は QG-3 deviation 分類（spec-bug 等）運用を変更せず、deviation 発生前の予防層として位置づける。
-
-### 検証項目
-
-- **ファイルパス現行存在確認**: Issue 本文が参照するファイルパス（command 定義、Design、template 等）が現行リポジトリに存在するか確認する。Issue 作成時点から移動、改名、削除されたパスを検出対象とする
-- **検査結果件数再計測**: Issue 本文の事前状態セクションが列挙する検査結果件数（NG 件数、IR 違反件数等）を再計測し、Issue 本文記載値と比較する。件数は変動しやすい実測値スナップショットであるため、差異の有無のみを判定材料とする
-
-### 差異検出時のアクション
-
-差異を検出した場合、case-run は以下を実施する:
-
-1. PR 本文の `## Findings / Capture候補` セクションに `### stale-reference` 小見出しで差異内容（対象パス、Issue 本文記載値、現行値）を記録する
-2. blocked として報告し、Root Case 指定による正規再開経路に従う（REQ-031-010）。Issue 本文の参照パス・件数の更新が必要な場合は case-ready / case-revise 経由で実施する
-3. case-run 単独では Issue 本文を書き換えない（Issue 本文更新は case-ready / case-revise の責務）
-
-### QG-3 本体との関係
-
-staleness check は QG-3 本体（PR 作成直前の実装充足・乖離ゲート）とは独立した前置検査である。
-QG-3 が実装結果に対するゲートであるのに対し、staleness check は実装開始前の入力妥当性検査である。
-両者は順序依存を持たず、staleness check で差異を検出しても QG-3 本体の実施要否には影響しない。
-
+詳細は references/qg3-and-docs-guard.md を参照（遅延読み込み）。
 ## docs/** 変更時の targeted docs guard（REQ-031-011）
 
-case-run は PR 対象ファイルに docs/** 変更を含む場合、実行担当サブエージェント起動の委譲前に targeted docs guard を実行する（REQ-031-011）。
-本検査は QG-3 本体・QG-3 前置 staleness check とは独立した前置 docs 整合性検査であり、3つの検査は順序依存を持たず、それぞれの実施要否に影響しない（REQ-031-012 準拠）。
-
-changed-path routing と配布依存境界の検出経路は共有境界 adapter へ接続する（DEC-014）。
-最終 gate 基底は REQ-010-012 を再利用し、検査エラー（検査対象欠落、読込不能、未分類エントリ、adapter 起動失敗）は gate-not-passed として扱い、clean として通過させない（DEC-014 決定5、`integrity/distribution-boundary.md`「検査エラーの意味」）。
-
-### 実行条件
-
-- PR 対象ファイルに docs/** 変更を含む場合に実行する。docs/** 変更を含まない PR（コードのみ、SCRIPT のみ等）ではスキップする（REQ-031-005 の QG-3 限定原則を維持、docs全体grep ではなく変更ファイル限定の targeted 検査）
-
-### 実行コマンド
-
-```
-bun run .opencode/skills/repo-agentdev-integrity/scripts/cli.ts \
-  --workflow case-run --base-ref origin/main --json
-```
-
-変更ファイルは worktree 内の git diff から取得する（`--base-ref origin/main` または `--files <changed-paths>`）。
-targeted docs guard は検証エンジン cli.ts の `--workflow` モード（明示対象指定）であり、`files_checked`・`unchecked_reasons`（not-found / out-of-profile）・更新要否フラグを報告する。files_checked と検査対象変更ファイルの一致確認を workflow 側で行い、engine の終了コード単独で受入を判定しない。
-case-run プロファイル固有の追加ルールとして full_docs_check_recommended 判定は持たない（case-close の責務）。
-
-### 検出結果の記録と連携
-
-- 検出結果（failures の strict severity）は PR 本文の `## Findings / Capture候補` セクションに `### docs-integrity` 小見出しで記録する
-- blocked として報告し、Root Case 指定による正規再開経路に従う（case-run 単独では Issue 本文を書き換えない、REQ-031-010 準拠）
-
+詳細は references/qg3-and-docs-guard.md を参照（遅延読み込み）。
 ## verification-only PR（実装差分なし、検証のみ）
 
-case-run は実行担当サブエージェント委譲の結果、実装差分0件・検証のみで完了する PR（**verification-only PR**）を生成する場合がある。
-本節は verification-only PR の判定条件、PR 本文の根拠欄記入規則、GitHub の空 PR 取り扱い、case-close への引継ぎ注意事項を定める。
-要件の SSoT は REQ-010-012（保存工程と完了工程での変更ファイル限定検査と工程停止）。
-
-PR テンプレート（pr_desc.md）と Issue 本文構造は workflow-templates（[agentdev-workflow-templates.md](../skills/agentdev-workflow-templates.md)）の責務である。
-pr_desc.md への verify-only 根拠欄追加は workflow-templates Design の変更として位置付ける。
-
-### 定義
-
-verification-only PR は以下を全て満たす PR とする（REQ-010-012）。
-
-- PR の変更ファイル数が0件（pr_changed_files の変更ファイル一覧が空と確認される）
-- Issue の受け入れ基準が検証のみで充足された（既存実装・既存文書が要件を満たしており、追加実装を要しなかった）
-- 検証結果が PR 本文の verify-only 根拠欄に evidence として記録されている
-
-実行担当サブエージェントは verification-only で完了した場合も `completed-pr` を返し、PR URL を委譲 result に含める（`blocked` / `failed` にはしない）。
-
-### verify-only 根拠欄の記入規則
-
-case-run は verify-only PR 作成時に pr_desc.md の verify-only 根拠欄へ、実装差分を含まない理由、根拠成果物または commit、検証対象、検証結果を記入する。
-根拠は姉妹実装PRだけでなく、実装PR、先行 commit、main 反映済み commit、既存成果物、検証のみで完結する理由を許容する。
-「実装内容」欄は空欄にせず、「実装差分なし」と理由を記録する。
-
-### GitHub の空 PR 許容
-
-GitHub は空 PR（変更ファイル0件）の squash merge を許可し、空 commit を生成する（commit 2b34f8b0 で実証）。
-case-run は空 PR の作成・マージを GitHub の挙動に依存して実行する。
-squash merge で生成された空 commit は履歴に残り、pr_merge（squash merge）の通常フローに従う。
-
-### case-close 引継ぎ注意事項
-
-verification-only PR は case-close の targeted docs guard で files_checked が空になるため、次の注意事項を case-close へ引き継ぐ。
-
-- PR 本文の verify-only 根拠欄に「実装差分を含まない理由」「根拠成果物または commit」「検証対象」「検証結果」が記録されていること（[case-close.md](case-close.md)「targeted docs guard」節の files_checked 空確認〔REQ-032-023 実装宣言〕参照）
-- case-close は files_checked 空を検出した場合、REQ-010-012 に基づき verification-only 判定ステップを経て PASS 処理する（false-clean 3層防御との相互作用は case-close Design 参照）
-- case-run 側は PR 作成までを責務とし、verification-only 判定自体は case-close が行う（単一書き手: case-close、REQ-011 完了条件チェックボックス専任責務）
-
+詳細は references/verify-only-pr.md を参照（遅延読み込み）。
 ## トレーサビリティ能力の利用
 
-case-run の実行担当（委譲内サブエージェント）は、対象要件について `agentdev-traceability` の coverage で既存の対応関係を確認しながら、実際に要件を実現する成果物へ implementation 対応を、実際に要件を検証する恒常的な検証手段へ verification 対応を作成・更新する（REQ-021-015）。
-対応宣言の作成先は成果物の配布境界で決定する。consumer distribution closure に含まれる配布対象成果物（command、skill、template、runtime script 等）の対応関係は、repository top-level の `traceability/` 配下の component / package 単位 sidecar へ作成・更新する。producer 側の開発管理成果物（docs/designs/** 等の正規成果物）の対応関係は、inline `ADF-COVERS` 宣言または sidecar へ作成・更新でき、sidecar と inline declaration は同じ論理的な対応関係へ正規化される。
-対応宣言の表記仕様、sidecar の作成・更新方法は `agentdev-traceability` Design が正規所有する。
-
-- 単に変更されたファイルであることを理由に、そのファイルを要件へ自動的に対応付けない
-- 実行担当は PR 作成前に対象要件について check を実行し、Design 対応欠落、implementation 対応欠落、policy が required と判定する要件行の verification 対応欠落、verification policy の不正、sidecar / inline declaration の構文不正、同一論理関係の不整合な重複を検出対象として検査する（REQ-021-016）
-- check の不合格が承認済み対象範囲内で修正可能な場合は、修正して再検証する
-- 要件変更、対象範囲拡大、追加設計判断、外部依存解消が必要な場合は反復を停止し、blocked として必要な判断事項を報告する（REQ-021-017）。証拠源にかかわらず既存 scope を超える変更を自律拡大しない
-- verification 対応は「何が要件を検証するか」という検証手段との恒常的な対応関係であり、「今回その検証を実行して合格したか」という実行結果は Issue, PR, QG 側で扱う。特定時点の検証結果を対応宣言として保存しない（REQ-021-019）
-- 中断後の再実行では、sidecar と正規成果物に保存済みの対応関係を再利用し、同じ対応宣言を重複生成しない（REQ-021-020）
-- agentdev-traceability の不在、実行失敗、空結果、候補過多だけを理由として workflow を停止しない（fail-open）。README 索引、正規成果物の直接読取、`rg` 等の独立探索手段で継続し、正規成果物そのものの異常とトレーサビリティ機能側の異常を区別する
-
+詳細は references/traceability-usage.md を参照（遅延読み込み）。
 ## 配布物本体 ADF-COVERS 宣言の除去可否判定（cleanup 判定）
 
-<!-- ADF-COVERS(implementation): REQ-021-030 -->
-<!-- ADF-COVERS(design): REQ-021-030 -->
-本節の coverage 突合の運用詳細（役割フィルタ、producer 側パス認定、sidecar と inline の同一扱い、除去後の後置検査）が REQ-021-030 を実装する。
-
-case-run の実行担当（委譲内サブエージェント）が、実装作業で配布物本体に残存する ADF-COVERS 宣言の除去を扱う場合、配布物本体の ADF-COVERS 宣言は producer 側のトレーサビリティ metadata であり、対応関係の移行先（docs 配下の正規成果物の inline 宣言、または repository top-level の `traceability/` 配下の sidecar）が成立していることを条件に除去する。single workflow（STEP-S4 の委譲）に同じ条件を適用する。
-
-- 除去可否判定の coverage 突合では、coverage 出力から implementation 役割かつ producer 側パス（docs/ 配下の正規成果物の inline 宣言、または repository top-level の `traceability/` 配下 sidecar の登録分）の対応関係を集約済み実装対応として認定する。coverage は sidecar と inline declaration を同じ論理的な対応関係として返すため、突合は対応関係の表現形式を区別せずに行う。役割フィルタの適用は必須であり、design 役割・verification 役割の対応関係は集約済み実装対応として扱わない
-- 対象要件について implementation 役割かつ producer 側パスの対応が確認できない配布物本体の宣言は除去可と判定せず、対応関係の移行先（sidecar または producer 側正規成果物）を成立させた上で除去する
-- 除去を実行した場合は、除去後に traceability check を実行し、implementation 対応の対応関係が維持されていること（新規 missing-implementation 0 件）を後置検査として確認する
-- coverage は役割付き対応関係を全件返却するため、役割とパスの解釈は呼出側の責務で行う（agentdev-traceability の運用規約参照）
-
-判定基準の中核は要件行が所有し、本節は coverage 突合の運用詳細のみを定めて重複定義しない。
-
+詳細は references/traceability-usage.md を参照（遅延読み込み）。
 ## 参照する横断 Design
 
-- [workflows/lifecycle-state-machine.md](../workflows/lifecycle-state-machine.md)（Pattern Taxonomy（manager-orchestrator）の後継）
-- [workflows/delegation-contracts.md](../workflows/delegation-contracts.md)（controlled_case_execution 委譲）
-- [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（intake / learning capture（PR 本文記録のみ））
-- [workflows/lifecycle-state-machine.md](../workflows/lifecycle-state-machine.md)（子Issue 状態 enum〔durable state enum・階層合成〕。Epic Wave 実行モデルの運用契約は本 Design「v3 epic-wave-model Design からの吸収」節）
-- [quality-gate-model.md](../quality/quality-gate-model.md)（QG-3（実行担当サブエージェント責務））
-
-### case-run が使用する検査ツール
-
-case-run が使用する検査ツール（[integrity-contracts.md](../integrity/integrity-contracts.md)「Workflow × 使用ツールマトリックス」参照）:
-
-- cli.ts --workflow case-run（targeted docs guard）: PR 対象ファイルに docs/** 変更を含む場合、委譲前に実行（[docs/** 変更時の targeted docs guard（REQ-031-011）](#docs-変更時の-targeted-docs-guardREQ-031-011) 参照）
-- check_integrity.ts（全体監査）: PR 対象ファイルに docs/** 変更を含む case では commit 前に full 実行し、base 既知違反と新規違反を分離して新規違反 0 件を確認する（「docs 変更を含む case での commit 前 full check_integrity 工程」参照）
-- check_extensions.ts（IR-056）: `src/common/commands/agentdev/**/*.md`, `src/common/skills/agentdev-*/SKILL.md`, `src/common/skills/agentdev-*/references/**/*.md`, `.agentdev/extensions/**` のいずれかを変更した場合に実行
-- test_strategy: Issue 完了条件検証（REQ-031-008/030）
-- textlint 品質基盤（用途選択入口）: 文章品質検査の起動は、工程スクリプトが正規契約から用途（書込み前検査、通常最終検査、必須独立検査、結果表示）を決定的に選択して入口を起動し、完結した結果（用途、対象範囲、対象状態、完了状態、合否、実規則実行数と再利用数を含む）を受理して進行を判定する。LLM が毎回の検査範囲・目的・再利用可否を選択しない。同じ判定を各呼出元で再実装しない
-
-case-run は check_integrity.ts（全体監査）を、docs 変更を含む case での commit 前検査として条件付きで使用する（base 既知違反と新規違反の分離、新規違反 0 件確認）。targeted docs guard（PR 単位の targeted 検査）は維持する。docs 変更を含まない case での全体監査は /repo/docs-check の責務である。
-
-※上記は全て肯定表現である（REQ-010-002, REQ-010-003 準拠）。
-
+詳細は references/traceability-usage.md を参照（遅延読み込み）。
 ## execution contract 消費境界（新規セクション）
 
-case-run は REQ-017 に定義される実行契約（対象範囲、実現方針、完了条件）を消費境界として扱う。
-
-### 契約消費原則
-
-- case-run は Issue に確定済みの対象範囲、実現方針、完了条件（検証方法・合格条件を含む）を実行契約として扱う
-- 完了条件の不足、曖昧さ、矛盾、実現不能を検出した場合は自律補完せず blocked とする
-- 完了条件の検証方法を新規設計せず、記録済み項目を実行する
-- 必須品質検証の適用要否を再判断せず、完了条件へ統合済みの検証を実行する
-
-### runtime-only 判断の維持
-
-次は case-run の安全検査として維持し、実行契約確定へ移管しない。
-- worktree 状態確認（REQ-031-002）
-- QG-3 前置 staleness check（REQ-031-009）
-- 実 diff 検査
-- 実装結果、test 実行結果
-
-### blocked 遷移と Issue 更新の取扱い
-
-次の場合、case-run は blocked とし、blocker 詳細を Issue コメントへ SSoT として記録する（Issue 本文更新は case-ready / case-revise の責務、再開は Root Case 指定による正規再開経路に従う）。
-- 完了条件の不足、曖昧さ、矛盾、実現不能の検出
-- scope-affecting impact candidate の発見（既存 scope 内を超える変更が必要）
-- 関連 Decision への適合確認で新たな拘束 Decision の必要性が判明した場合
-- 完了条件の検証に必要な品質検査の追加変更が必要な場合
-- Issue metadata、構造、実態の矛盾検出時
-- 本質的な指摘事項の一般化した修正範囲が Issue の対象範囲、完了条件、受け入れ条件、REQ、Decision、Design、必須品質条件の変更を必要とする場合（REQ-031-019）
-
-### 完了条件チェックボックスの非更新
-
-case-run および実行担当サブエージェントは検証結果と証拠を報告し、完了条件チェックボックスを更新しない。達成済み項目の確定（`[ ]` → `[x]`）は case-close だけが条件と証拠を照合して行う（REQ-032-001）。
-
-### 結果状態遷移と検証証拠
-
-結果状態は result 契約の既存4状態（completed-pr / blocked / failed / delegation-unavailable）を維持したまま、本質的な指摘事項の扱いを次のように適用する。
-
-- 本質的な指摘事項が未解消の場合、Findings 等への記録だけを理由として completed-pr にしない。Issue の対象範囲内で修正可能な場合は修正および欠陥類型単位の検証が成功した後にのみ completed-pr を許可する（REQ-031-022）。
-- Issue / REQ / Decision / Design / 完了条件の品質検査の変更が必要な場合は blocked とする（REQ-031-019）。
-- 利用可能な情報を十分に調査しても安全な修正範囲を正当化できる根本原因または欠陥類型を確立できない場合は、局所的な推測修正によって completed-pr へ進まず failed とする（REQ-031-023）。
-- 本質的な指摘事項を欠陥類型単位で修正して completed-pr とする場合、対象となった本質的な指摘事項、特定した根本原因または欠陥類型、採用した修正範囲、実施した欠陥類型単位の検証、検証結果の5点を、既存の PR 本文または品質ゲート完了報告から確認できるようにする。新しい正規成果物種別を追加しない（REQ-007-005）。
-
-修正単位の整理、検証対象選定、同一根本原因の再分類を含む欠陥類型単位の修正・検証契約の詳細は `agentdev-case-run-execution-adapter` Design「欠陥類型を修正単位とする契約」節を正とする。
-
+詳細は references/execution-contract-consumption.md を参照（遅延読み込み）。
 ## 採用規約の解決の実行経路接続（REQ-104）
 
 本節は case-run（単一 Issue 実行）と ADF v5 採用規約機構（REQ-104）の接続を所有する。採用規約の解決の構造（解決手順、移行期デフォルトとの接続、判定規則）の正は v5 採用規約機構 Design「解決手順」「移行期デフォルトとの接続」「未採用参照例を欠落と誤判定しない判定規則」各節であり、本 Design は重複定義しない。
@@ -386,8 +149,7 @@ case-run および実行担当サブエージェントは検証結果と証拠�
 
 ## 作業用 worktree 作成元と PR base（REQ-031-024 の実行詳細）
 
-作業用 worktree の作成元と PR の base は main を参照する（REQ-031-024）。
-
+詳細は references/supporting-sections.md を参照（遅延読み込み）。
 ## 対象外
 
 - 壁打ち（構造的実行フェーズ、実装は 実行担当サブエージェント経由）
@@ -416,71 +178,13 @@ case-run および実行担当サブエージェントは検証結果と証拠�
 
 ## case-auto 並列委譲モデル（REQ-034-027、REQ-031-015）
 
-case-run は与えられた単一 Issue を実行担当サブエージェントへ委譲1件で実行し（並列委譲なし）、同一 Wave 内子Issue の並列委譲制御は case-auto の orchestration stage 3 が単一所有する（REQ-031-015、REQ-034-027、DEC-041）。
-本節の旧記述（case-run による最大 5 件並列委譲）は廃止され、並列起動の共有 active Issue task 枠の制御は case-auto Design「複数 execution_unit 並列 orchestration」節が所有する。
-case-run は入力として与えられた単一 Issue を実行し、case-run 経由で case-auto の管理外の実行枠を生成できない（REQ-031-015）。
-
+詳細は references/parallel-and-observability.md を参照（遅延読み込み）。
 ## L2 タイムスタンプ計測
 
-case-run は実行担当サブエージェント委譲の起動直前、直後にタイムスタンプを記録し、実行担当サブエージェント実行時間および worktree 設定/クリーンアップ時間を result に含める（REQ-003-009、REQ-031-017）。
-
-計測対象は以下のフェーズ前後とする。
-各フェーズは Workflow Skill（`agentdev-workflow-case-run`）の L2 タイムスタンプ計測ポイントと対応する（内部手順番号によらず、下記フェーズ前後で計測する）。
-
-- worktree 設定（設定開始、完了）
-- 委譲（起動直前、直後）
-- worktree クリーンアップ（開始、完了）
-
-検証（test strategy 項目の test-fix ループ、QG-3）は委譲範囲内で実行担当サブエージェントが実行する責務分担（REQ-031-008/030）であり、case-run 本体から独立した L2 計測ポイントではない。
-検証時間は委譲の起動直前、直後のタイムスタンプに含まれる。
-
-記録された L2 タイムスタンプは case-auto の工程別壁時計時間報告（REQ-003-008）の入力として消費される。
-L3（委譲先内部メトリクス）は対象外とする（REQ-003-010）。
-
+詳細は references/parallel-and-observability.md を参照（遅延読み込み）。
 ## Phase 0 commit スコープ設計運用
 
-Phase 0（枝PR作成フェーズ）の case-run 委譲内で実行担当サブエージェントが作成する commit に適用するスコープ設計運用を規定する。
-Phase 0 全体の commit 構成（定義層で確定した REQ/Decision/Design のコミット、枝PR 作成）は case-auto Design（`docs/designs/commands/case-auto.md`）の同名節を正とし、本節は case-run 委譲内の commit スコープに焦点を当てる。
-case-auto Design と整合する内容を維持する（OU-013b / OU-013a）。
-
-### 孫 Issue 間 Design スコープ交差時の扱い
-
-Phase 0 で複数孫 Issue（Epic Wave 内の子Issue、または並列 execution_unit 内の個別 Issue）の実装が同一 Design ファイルに触れる場合の扱いを以下で規定する。
-
-**Design 本文修正の非許容**: 実行担当サブエージェントは test strategy が `on_failure: fix-and-reverify` を指示する場合でも、case-run 委譲内で Design 本文（`docs/designs/**`）を修正しない。
-Phase 0 の Design 成果物は Definition 保存（case-ready / case-revise の Capability Skill 委譲）工程で確定済みであり、case-run 委譲内で再修正すると定義層の一貫性が損なわれる。
-Design 修正が必要と判明した場合は `record-in-findings` で PR 本文の `## Design確定候補` セクションへ記録し、case-close の docs 検証における Design 確定チェックへ引き継ぐ（`agentdev-case-run-execution-adapter` SKILL の Design確定候補配置契約に従う）。
-
-**target_area の重複判定と並列制御**:
-
-- 同一 Design ファイルの異なる target_area を複数孫 Issue が編集する場合: git diff が競合しないため並列マージを許容する。並列判定軸は REQ-034-013 の連結成分ベースに従い、ファイル衝突（L2）は並列許容、PR マージコンフリクトは後続 PR の rebase で解決する
-- 同一 Design ファイルの同一 target_area を複数孫 Issue が編集する場合: case-open 構成生成時に必須依存（depends_on）として連結させ、直列化する。Wave 構成で同一 Wave へ割り当てない
-
-case-run は case-open が生成した Wave 構成と depends_on を前提として受け取り、委譲内で並列制御を新たに判定しない。
-
-### ドメイン state 更新と成果物変更の同一コミット混在
-
-case-run 委譲内で作成する commit の構成運用を規定する。
-原則として **2分割運用** を採用し、実行担当サブエージェントはドメイン state 更新と成果物変更を同一コミットへ混在させない。
-
-**対象ディレクトリ**:
-
-- 成果物変更: `docs/`、`src/opencode/`、`src/common/tools/agentdev-gh/local/` 等、配布対象の永続状態
-- ドメイン state 更新: `.agentdev/` 配下（intake、learning、drafts、cases 等のケース固有の一時状態）
-
-**2分割運用の理由**:
-
-- 永続性の違い: 成果物は配布対象の永続状態、ドメイン state はケース固有の一時状態。同一コミットに混在すると revert、cherry-pick の単位が曖昧になる
-- レビュー単位の分離: 成果物変更は Design 品質査読の対象、ドメイン state はキャプチャ境界（intake/learning）の対象。査読観点が異なるため分離する
-- capture 境界の遵守: `.agentdev/intake/`、`.agentdev/learning/` の直接編集は case-run 委譲内では禁止（委譲内の capture 対象外制約、`agentdev-case-run-execution-adapter` SKILL）。実行担当サブエージェントは PR 本文の `## Findings / Capture候補` へ記録し、case-close が intake/learning pipeline へ引き継ぐ。よって case-run 委譲内でドメイン state をコミットへ含めることは原則として発生しない
-
-**例外**: `.agentdev/drafts/` の削除（Definition 保存（case-ready / case-revise の内部責務）完了後のクリーンアップ）は、成果物変更とは独立したクリーンアップコミットとして扱う。
-本運用が禁止する同一コミット混在には該当しない。
-当該クリーンアップは Definition 保存（case-ready / case-revise の内部責務）工程の責務であり、Phase 0 の case-run 委譲内では発生しない。
-
-**commit 分割手順**: 実行担当サブエージェントは成果物変更を先にコミットする。
-ドメイン state に触れる必要がある場合は別コミットへ分離するが、前述の通り case-run 委譲内では原則として `.agentdev/` 配下を編集せず、PR 本文経由で case-close へ引き継ぐ。
-
+詳細は references/parallel-and-observability.md を参照（遅延読み込み）。
 ## 停止状態
 
 - result が blocked の場合（回答可能な blocker。詳細は Issue コメント SSoT。ユーザー判断待ちとして停止、Root Case 指定による正規再開経路）。
@@ -492,12 +196,21 @@ case-run 委譲内で作成する commit の構成運用を規定する。
 
 ## 検証義務と検証手段の分離と検証基準の実装由来生成禁止（REQ-017-022、RU-20261004-08）
 
-実行担当サブエージェント委譲と証拠生成における受け入れ義務保存の実行時投影。
+詳細は references/supporting-sections.md を参照（遅延読み込み）。
+## reference 選択表
 
-- 委譲 prompt は、完了条件ごとの検証義務（何を証明する必要があるか、どの範囲で成立する必要があるか、いかなる反例が存在すれば不合格か）を、具体的な検証手段（テスト、検索、実行等）と分離して実行担当へ渡す。テストまたは checker の成功だけでは、当該検査が検証義務を十分に観測していることを立証しない限り達成証拠としない。
-- 実行担当が検査対象、期待結果、除外条件を実装結果だけから生成することを委譲契約上禁止する。一意に導出可能な対象集合等は決定的処理で導出し、意味判断が必要な部分は既存 ADF 判断アーキテクチャ（決定的処理、閉じた意味評価、開いた推論）に従う。「実装と同時に作成したテストが実装と同じ範囲を検査対象から漏らし green となる」シナリオを回帰試験で拒否する。
-- 合意済み条件が要求する観測能力を、実装担当、委譲プロンプト生成側、Verifier のいずれも自律的に弱化しない。検証手段を変更する場合は元の検証義務に対して同等以上の観測能力と未証明範囲の不増を確認する。runtime・実ホスト・実経路での成立を要求する条件を、同等性未確認の静的構造検査、単体テスト、スタブ結果のみで達成扱いしない。
-- 実行担当は、現在の完了条件を否定する反例を検出した場合に申告する。反例を intake、learning、後続 Issue、Findings 等へ分類しただけでは元条件の達成扱いとならないことを委譲契約へ明示する。
+通常経路で全 reference を無条件読込しない。必要な条件に応じて読む reference を選択する。
+
+| 条件 | 読む reference |
+|---|---|
+| case-run gate 意味論（前置 gate と最終 gate）と Epic Wave 実行モードの廃止 の詳細が必要な場合 | references/gate-semantics.md |
+| 所有関係と委譲・作業用 worktree 作成元と PR base・検証義務と検証手段の分離・v3 epic-wave-model 吸収 の詳細が必要な場合 | references/supporting-sections.md |
+| QG-3 前置 staleness check と targeted docs guard の詳細が必要な場合 | references/qg3-and-docs-guard.md |
+| verification-only PR（実装差分なし、検証のみ） の詳細が必要な場合 | references/verify-only-pr.md |
+| トレーサビリティ能力の利用・cleanup 判定・参照する横断 Design と検査ツール の詳細が必要な場合 | references/traceability-usage.md |
+| execution contract 消費境界 の詳細が必要な場合 | references/execution-contract-consumption.md |
+| case-auto 並列委譲モデル・L2 タイムスタンプ計測・Phase 0 commit スコープ設計運用 の詳細が必要な場合 | references/parallel-and-observability.md |
+| adversarial-review 挿入境界（case-run: adapter 委譲内） の詳細が必要な場合 | references/adversarial-review-insertion.md |
 
 ## See Also
 
@@ -518,85 +231,10 @@ case-run 委譲内で作成する commit の構成運用を規定する。
 
 ## adversarial-review 挿入境界（case-run: adapter 委譲内）
 
-本節は case-run における adversarial-review caller integration（REQ-015-010、adapter 委譲内）の挿入境界を正典として所有する（REQ-014-011）。
-共通 caller integration 契約の正規所有者は adversarial-review Design であり（REQ-014-003）、本節は case-run の adapter 委譲内固有の挿入位置、発動条件、実装方針限定、blocked 遷移のみを所有する。
-adversarial-review 自身の振る舞い契約、再 review 条件、停止条件は adversarial-review Design を正とし、本節で再定義しない。
-実装方針形成、review 呼出、結果反映の内部手続きの正規所有者は `agentdev-case-run-execution-adapter` Design「adversarial-review 統合（実装方針→review→結果反映）」節とし、本節は参照する。
-
-### 挿入境界と構造（REQ-015-001）
-
-case-run の adapter 委譲内統合は他の6呼出元（req-define、inspect-promote、intake-promote、learning-promote、backlog-review、case-open）と異なり、review 挿入境界を case-run 本体の処理段階へ直接挿入しない。
-代わりに、実行担当サブエージェント起動における adapter 委譲の内部に review 挿入境界を設ける。
-発動条件判定と review 呼出の分離（REQ-015-001）は adapter 委譲内で達成され、case-run 本体は review 発動の有無を判定しない。
-本節は委譲境界を case-run 呼出の正典として一意に特定し、Workflow Skill（`agentdev-workflow-case-run`）の委譲起動手順が実行時実装先となる。
-
-| 段階 | 対応処理 | 役割 |
-|---|---|---|
-| 委譲 | case-run 実行担当サブエージェント起動 | adapter skill 経由で委譲を起動し、委譲 prompt 内で実行 command を指定する。実装方針の生成、review、結果反映は委譲内へ委ねる |
-| 発動条件判定 | adapter 委譲内（実装方針形成完了後、最初の実装変更前） | skip 条件の該当を実行担当サブエージェントが判定する |
-| review 呼出 | adapter 委譲内（発動条件該当時、最初の実装変更前） | 実行担当サブエージェントが adversarial-review を起動し、実装方針を審議対象へ渡す |
-| 結果反映 | adapter 委譲内（review 完了後、最初の実装変更前） | accepted finding を実装方針へ反映する。反映後、意味内容変更時は必要な既存検証を再実行する |
-| result 返却 | case-run 実行担当サブエージェント result 処理 | result 契約（completed-pr / blocked / failed / delegation-unavailable）で case-run 本体へ返却 |
-
-### case-run 本体は実装方針を生成・審査しない（REQ-015-010）
-
-case-run 本体（全フェーズの orchestration）は実装方針の生成、審査、review を行わない（REQ-015-010）。
-実装方針の形成、adversarial-review 呼出、結果反映は委譲内で agentdev-case-run-execution-adapter の委譲契約に従い、最初の実装変更前に実施する。
-case-run 本体が実装方針を生成、保持、審査するステップを新設しない。
-委譲 result（4状態）のみで adapter 委譲内の結果を受領する。
-
-### 実装方針限定（REQ-015-010）
-
-adapter 委譲内で形成する実装方針は、既確定 Issue 本文、REQ、Decision、Design を実現する内部選択（関数配置、命名、データ構造の選択、実装の並び順等）に限定する（REQ-015-010）。
-実装方針は既確定文書へ矛盾しない内部選択の範囲内で review 審議対象となる。
-実装方針が既確定 Issue/REQ/Decision/Design の変更、追加、撤回を必要とする場合、実行担当サブエージェントは実装を開始せず blocked へ遷移する。
-
-### blocked 遷移（REQ-015-010、REQ-015-011）
-
-adapter 委譲内で次のいずれかに該当する場合、実行担当サブエージェントは result を `blocked` として case-run へ返却する（REQ-015-010、REQ-015-011）。
-
-- 実装方針が既確定 Issue/REQ/Decision/Design の変更、追加、撤回を必要とする（REQ-015-010）
-- 要件、仕様に問題（欠落、矛盾、曖昧さ、実現不可能な条件等）を検出した（REQ-015-011）
-- adversarial-review 審議で unresolved な本質的争点またはユーザー判断事項が残り、実装の最初の変更（不可逆処理）へ進めない（REQ-014-009）
-
-blocked 詳細本文は Issue コメントに SSoT として記録され、case-run の result 処理で扱われる。
-実行担当サブエージェントは要件、仕様問題を検出した場合、勝手に仕様変更、REQ 黙示変更、Decision 再解釈を行わず、必ず blocked 経路へ入る（REQ-015-011、REQ 黙示変更禁止制約）。
-
-### 発動条件（REQ-015-002、REQ-015-003）
-
-case-run は adversarial-review を原則実行する（default-on、REQ-015-002）。
-発動条件判定は adapter 委譲内で実行担当サブエージェントが行う。
-ユーザー明示指定は通常発動の必須条件ではなく、実装方針の意味的決定が存在する場合に発動する。
-case-run 本体は発動条件の有無を判定、伝達しない。
-
-- **skip 条件**: adapter 委譲内で実装方針が自明（既確定 Design の機械的反映、単一ファイル編集等）で、実装方針の意味的決定（関数配置、命名、データ構造選択）が存在しない場合、adversarial-review を省略して従来フローを継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
-
-### 従来フロー維持（REQ-015-003）
-
-skip 条件該当時、呼出失敗時（REQ-014-010）のいずれの場合も、case-run の従来フロー（全フェーズ）を維持する（REQ-015-003）。
-review 挿入境界は case-run 本体の既存処理段階を追加、削除、並べ替えせず、委譲内での発動条件判定と review 呼出の分離のみを追加する。
-委譲 result が `completed-pr` の場合、従来どおり result 処理で PR 番号を受領しクリーンアップフェーズへ進む。
-
-### 戻り先と反映責務
-
-accepted finding の実装方針への反映は adapter 委譲内の実行担当サブエージェント責務である（REQ-014-006）。
-adversarial-review は finding を提示し、合意候補を形成するが、実装方針、実装ファイル、PR 本文への反映を自身では行わない。
-反映後に実装方針の意味内容が変更された場合、adapter 委譲内で必要な既存検証（REQ/Decision/Design 整合性再確認、targeted docs guard、QG-3 等）を行い、意味内容変更から新たな本質的争点が生じ得る場合のみ adapter 委譲内で再 review を発動できる（REQ-014-007）。
-unresolved な本質的争点またはユーザー判断事項が残る場合、実装の最初の変更（不可逆処理）へ進まず blocked へ遷移する（REQ-014-009、前述「blocked 遷移」節）。
-
-### 正規所有者マトリックス参照
-
-本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、`agentdev-case-run-execution-adapter` Design「adversarial-review 統合（実装方針→review→結果反映）」節との間で意味の重複、矛盾を生じない。
-case-run command 固有の挿入境界（委譲内実施、委譲起動位置、実装方針限定、blocked 遷移）のみを本節が所有し、実装方針形成、review 呼出、結果反映の内部手続きの詳細は `agentdev-case-run-execution-adapter` Design を正とする。
-
-
+詳細は references/adversarial-review-insertion.md を参照（遅延読み込み）。
 ## v3 epic-wave-model Design からの吸収
 
-v3 epic-wave-model Design が所有していた case-run Epic Wave 実行モデル、Epic 検出ルール、Wave 解析プロトコルのうち case-run 実行側の運用契約は本 Design の規定へ吸収された。Epic Wave 実行モード（case-run #epic）の実行契約は廃止され、Wave 実行制御は case-auto の orchestration stage 3 が単一所有する（REQ-031-015、DEC-041）。REQ-035-012（同一 Wave 内の子 Issue 間の変更対象ファイル重複の前置検出を Wave 構成時の情報収集として維持し、検出結果を実行・統合時の競合リスク情報として用いる。コンフリクト解消モデルと execution_unit 間並列可否の判定軸の維持、mergeable 作成時状態のみで Wave の安全性を判断しないこと）の implementation 側の正規所有者は本 Design である（sidecar `traceability/agentdev-workflow-case-run.yaml`）。構成判断側の重複前置検出契約は case-ready Design「v3 epic-wave-model Design からの吸収」節が所有する。旧 Design は削除済みであり、対応関係の記録は Git 履歴で担保する（REQ-103-020）。
-
-- Epic 検出ルール: Epic 入力の受理は case-auto 経由の正規呼出へ限定され、case-run 自身は常に単一 Issue を処理する。Epic は複数 execution unit の協調管理が必要な変更であり、規模（scale）から独立した概念である
-- Wave 解析プロトコル: Wave 構成の読み取りと現在 Wave の子 Issue 状態判定（pending/completed/blocked/failed/delegation-unavailable から実行可能な Wave を判定）は case-auto の orchestration stage 3 が所有する。Wave 状態は永続化せず子 Issue 状態から導出する（REQ-035-005、lifecycle-state-machine 階層合成）。case-run は委譲された単一 Issue の重複解消方針の参照と検出不能報告の責務を維持する（REQ-031-027）
-
+詳細は references/supporting-sections.md を参照（遅延読み込み）。
 ## 重要変更の通知と結果説明
 
 実行担当サブエージェントへの委譲契約に、重要変更の識別と報告を含める。委譲先が実行中に重要変更を判明した場合は、その内容と影響を親側へ報告させ、その時点で未反映の重要変更は正規反映前に、判明時点ですでに反映済みの内容は反映済みである事実を区別して、利用者へ追加通知する。

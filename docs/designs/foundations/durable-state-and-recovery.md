@@ -6,7 +6,7 @@ updated: 2026-11-18
 ---
 <!-- ADF-COVERS(design): REQ-090-006 -->
 <!-- ADF-COVERS(design): REQ-103-011（REQ-103 の評価再実行・再開経路の設計対応面） -->
-<!-- ADF-COVERS(implementation): REQ-001-034, REQ-001-043, REQ-008-001, REQ-008-002, REQ-008-004, REQ-008-005, REQ-008-006, REQ-008-007, REQ-008-009, REQ-008-012, REQ-008-014 -->
+<!-- ADF-COVERS(implementation): REQ-001-034, REQ-001-043, REQ-008-001, REQ-008-002, REQ-008-004, REQ-008-005, REQ-008-006, REQ-008-007, REQ-008-009, REQ-008-012, REQ-008-014, REQ-122-014 -->
 <!-- ADF-COVERS(implementation): REQ-002-036, REQ-005-002, REQ-005-003, REQ-005-004, REQ-005-024, REQ-048-001, REQ-048-002, REQ-048-003, REQ-048-004, REQ-048-005 -->
 
 # ADF durable state と再構成・恢復（配置表・権威移行・部分失敗調整）
@@ -93,4 +93,4 @@ workflow-contracts Design から移行した契約（REQ-048-001〜005 被覆）
 - textlint 系 checker: hard findings の集合を JSON 形式で実測退避する（対象ファイル数・violation 数・内訳の機械的再構成が可能な形式）。
 - traceability 系 checker: summary（pass/fail 計数）と 9 種の検出分類をすべて列挙する（0 件の分類も省略しない）。
 
-上記要素は検証差分記録の必須構成であり、checker 出力側の契約（check_integrity 等）と区分を保って相互参照する。件数突合系 gate の個別実行記録と証跡退避（case-close 検証差分）は本節の記録契約に従って完結する。
+上記要素は検証差分記録の必須構成であり、checker 出力側の契約（検証エンジン cli.ts 等）と区分を保って相互参照する。件数突合系 gate の個別実行記録と証跡退避（case-close 検証差分）は本節の記録契約に従って完結する。

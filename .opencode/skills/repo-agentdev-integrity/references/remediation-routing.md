@@ -14,7 +14,7 @@ docs-check / docs-review の finding を適切な是正ルートに振り分け�
 |-------------|----------|---------|
 | 機械的修正可能な不整合 | 対象ファイルの直接修正 | frontmatter 修正、リンク修正、index 同期 |
 | 語彙の不整合 | vocabulary-registry.md 更新 | 旧語彙 → 正規語彙の対照表更新 + 検出パターン同期 |
-| docs 日本語表現・文意整合違反（IR-045） | 対象ファイルの直接修正 → inspect-docs（意味判断が必要な場合） | 英字混じり抽象用語の日本語説明併記、`read-only` 系表現の許可/禁止操作への分解、具体許可操作への置換 |
+| docs 日本語表現・文意整合違反（旧 IR-045 観点・廃止済み。意味診断層〔inspect-docs・textlint 相当〕へ委譲） | 対象ファイルの直接修正 → inspect-docs（意味判断が必要な場合） | 英字混じり抽象用語の日本語説明併記、`read-only` 系表現の許可/禁止操作への分解、具体許可操作への置換 |
 | gate-level 不整合 | gate-levels.md 更新 | 検査カテゴリ・根拠 REQ の追加・修正 |
 | fixture 追加が必要なパターン | regression fixture 追加 | テスト fixture ディレクトリに代表パターンを追加 |
 | source / projection 不整合 | source / projection 修正 | `src/` 側ソースと `.opencode/` 側投影の同期 |
@@ -34,7 +34,7 @@ docs-check の finding のうち、意味判断が必要なもの（heuristic / 
 | 要件変更が必要（実装済み） | RU 化 → `/agentdev/req-define` | REQ 変更を RU として backlog に登録し req-define で処理 |
 | 実装のみが逸脱している場合 | case workflow へ戻し | REQ / Design の変更は不要とし case-run で修正（実装修正は case-run 契約） |
 | 再現可能な検査に落とせるもの | docs-check rule 追加 | 意味レビュー結果を機械的検査ルール / fixture に変換（REQ-0115-026） |
-| 再発防止の知見 | learning / backlog | `.agentdev/learning/inbox.md` または intake inbox へ保存 |
+| 再発防止の知見 | learning / backlog | `.agentdev/learning/inbox/` または intake inbox へ保存 |
 
 ### docs-review → docs-check Rule フィードバック
 

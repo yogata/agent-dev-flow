@@ -2,5 +2,16 @@ component: scripts-git-hooks
 implementation:
   scripts/git-hooks/pre-commit:
     - REQ-122-008
+    - REQ-122-015
   scripts/git-hooks/pre-push:
     - REQ-122-009
+    - REQ-122-015
+    - REQ-122-016
+verification:
+  scripts/git-hooks/pre-commit:
+    - REQ-122-011
+    - REQ-122-012
+  scripts/git-hooks/pre-push:
+    - REQ-122-014
+    - REQ-122-015
+    - REQ-122-016

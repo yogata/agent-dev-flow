@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ADF-COVERS(implementation): REQ-122-008
+# ADF-COVERS(implementation): REQ-122-008, REQ-122-015
 # pre-commit — 決定論的ローカル検証ゲート（DEC-066 決定1、ACT-DESIGN-002「pre-commit」実行契約）。
 # シェル本体は薄いラッパー。実処理は検証エンジン（bun 実行）と正規投影スクリプトへ委譲する。
 # REPO_ROOT は git rev-parse --show-toplevel 起点（worktree 環境対応）。

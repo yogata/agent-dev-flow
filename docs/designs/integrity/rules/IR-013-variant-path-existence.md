@@ -22,7 +22,7 @@ verification_path: src/common/skills/repo-agentdev-integrity/scripts/rules/rules
 | related_design | [integrity-contracts.md] |
 | gate_level | full-audit, delta-guard |
 | false_positive_risk | 低。backtick で囲まれたパス成分はコード書式として扱い、パス解決の前に除去するため、backtick 起因の偽陽性は発生しない（REQ-036-008） |
-| regression_test | check_integrity.test.ts（IR-013 専用 fixture 試験） |
+| regression_test | `scripts/rules/rules.test.ts`（ir013 インメモリケース） |
 | finding_route | intake |
 | triage_action | 種別（variant）を作成または参照を修正 |
 | last_verified | 2026-11-16 |

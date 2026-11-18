@@ -6,6 +6,7 @@ description: "case-run external execution adapter. USE FOR: connecting case-run 
 
 # case-run 外部実行アダプター（External Execution Adapter）
 
+本スキルは骨格（制御フロー）と references/ 詳細仕様の2層構成である。実行手順の詳細規律、用語境界、回復手順、STEP model 連携は references/ 配下へ分離している。通常経路で全 reference を無条件読込せず、必要な条件に応じて遅延読み込みする。
 case-run が1 Issue 単位（または1 Wave 単位）の実装作業を実行担当サブエージェントへ接続する際のアダプタープロトコル（adapter protocol）を定義する知識ベースである。
 adapter skill 経由での委譲起動、委譲 prompt 内で実行 command を指定する委譲に基づく。
 対象を case-run に限定する。
@@ -47,15 +48,7 @@ case-run (orchestration)
 
 ## external execution boundary と harness execution mechanism
 
-本 adapter skill は external execution boundary への委譲契約を使用し、harness execution mechanism を ADF 規範所有対象外として扱う。
-
-| 区分 | 内容 | 正規所有者 |
-|---|---|---|
-| external execution boundary | 外部バックエンド接続（実行担当サブエージェント起動、result 受領、PR URL 受領）。adapter skill 経由の委譲契約、result 4状態契約、worktree 隔離、Findings / Design確定候補の PR 本文引き継ぎを含む | I/O 境界 Design。case-run は I/O 境界 Design へ委譲し、自身は所有しない |
-| harness execution mechanism | agent 起動 API、background task、並列実行、context 管理、timeout、retry、queue、heartbeat | harness 責務（ADF 規範所有対象外）。AGENTS.md および `references/harness-delegation.md` に配置 |
-
-harness execution mechanism は本 SKILL の規範対象外とし、`references/harness-delegation.md` へ集約する。
-用語の正規定義と所有者は responsibility-boundary-purification Design「case 実行責務の 4 用語と所有者」を SSoT とする。
+本 adapter skill は external execution boundary への委譲契約を使用し、harness execution mechanism を ADF 規範所有対象外として扱う。区分と正規所有者の一覧、外部成果物（PR URL 受領・中間成果物非依存）の取扱いの詳細は [references/execution-boundary-terms.md](references/execution-boundary-terms.md) を参照（遅延読み込み）。用語の正規定義と所有者は responsibility-boundary-purification Design「case 実行責務の 4 用語と所有者」を SSoT とする。
 
 ## 実行担当サブエージェントの責務
 
@@ -63,22 +56,18 @@ harness execution mechanism は本 SKILL の規範対象外とし、`references/
 
 1. **Issue 読込**: 対象 Issue 本文、受け入れ基準を読み込む。実行 command が Issue を success criteria に分解する
 2. **context 再確認**: Decision/ REQ/ Design/ docs/ repository context を再確認し、実装が既存の決定事項に矛盾しないことを担保する。
-Issue 本文の Execution Contract セクションに投影された実現面の変更方針（realization_actions 由来）は既確定契約として消費し、実現責務・変更意図・検証方針を再決定せず、その範囲内の内部実装方針だけを決定する（実現面投影契約）。
-消費する既確定契約と実装対象が依拠する正規成果物（REQ、Decision、Design）の採用状態は、利用者の明示判断または有効な正規決定という既存の採用基準に照合して扱う。作業の継続指示、エージェントによる提案や具体化の存在、形式的に受理された採用指定を、利用者に留保された仕様判断の採用根拠として扱わない。明示採用された範囲を超えて関連する別候補や未決の設計事項を一括して確定せず、採用対象・内容・範囲が一意に解決できない部分は確認対象として保留する。委譲 prompt の構造化文脈に採用根拠の識別情報が伴わない確定事項を、それ自体を根拠に正式採用済みとして扱わず、正規成果物の実読取で採用根拠を照合してから消費する。照合で採用根拠の不足が判明した場合は、自律補完せず blocker 処理（4.）または result 契約の `blocked` として判断事項を報告する。
-実行契約に未決判断に依存する部分（保留）と依存しない部分の区別が含まれる場合は、依存する部分を保留し（不足している判断と対象範囲を実装対象から分離して扱う）、依存しない部分は他の実行条件を満たす限り実装を継続する（未決事項の存在だけを理由に依存しない作業を停止しない）。利用者が明示的に許可した試作は、正式採用・正規成果物の確定・本番適用と区別して実施し、試作の実施、成果物の存在、試験の成功を当該候補の正式採用や未決事項の解決として扱わない。未決の設計候補について試作として実施するには利用者の明示的な指示または許可を要し、明示的な指示・許可がない試作を開始しない（明示的な指示・許可がない限り、当該部分は未決判断に依存する実装として保留する）。
-トレーサビリティ能力（`agentdev-traceability` の coverage）を、対象要件と正規成果物の既存の対応関係確認に利用できる。
-問い合わせ結果は候補提供であり最終判断としない、新規の依存関係、実行構成、Wave 構成、実行順序の設計には使用しない、機能の不在、実行失敗、空結果、候補過多の場合は README 索引、正規成果物の直接読取、`rg` 等の代替探索で継続する（fail-open）
+context 再確認の詳細規律（実現面投影契約、採用根拠の実読取照合、未決判断の保留と試作の区別、トレーサビリティ能力の利用限界と fail-open 代替探索）は [references/execution-procedure-details.md](references/execution-procedure-details.md)「context 再確認の詳細規律」を参照（遅延読み込み）。
+
 3. **実装、検証、PR 作成**: 実行 command に従い evidence-backed に実装を実行し、品質ゲートを通して `agentdev_gh` の pr_create 操作で PR を作成する。
 実際に要件を実現する成果物へ実装対応を、実際に要件を検証する恒常的な検証手段へ検証対応を、対応先の配置層に応じて sidecar（配布対象成果物）または inline（producer 側文書）により明示する（単に変更されたファイルであることを理由に、そのファイルを要件へ自動的に対応付けない）。
-新規配布物（配布 command、skill、template、runtime script 等の consumer distribution closure 対象成果物）の作成を含む委譲では、委譲 prompt に作成時の予防観点として引き渡された配布物本文の記述規約に従う: 配布物の本文・コメントへ producer 側トレーサビリティ metadata（inline ADF-COVERS 宣言、要件行 ID、Decision ID 等の concrete ID）を直書きせず、対応関係は repository top-level の `traceability/` 配下 sidecar へ登録する。この引き渡しは作成時予防であり、配布依存境界 checker（事前書き込み gate・最終 gate）による事後検知と両面運用で両立し、検知機構の代替にも検知機構の変更にもしない。配布物を作成しない委譲では、producer 側成果物の対応宣言は inline 宣言または sidecar のいずれかでよい（作成先は成果物の配布境界で決定する）。
+対応宣言の配置層判定と、新規配布物を作成する委譲での作成時予防としての配布物記述規約（producer 側トレーサビリティ metadata の直書き禁止と traceability/ sidecar 登録）の詳細は [references/execution-procedure-details.md](references/execution-procedure-details.md)「対応宣言と配布物記述規約」を参照（遅延読み込み）。
 PR 本文には実行識別情報セクション（対象 Case、実行単位、委譲単位識別子）を記録する。形式は `agentdev-workflow-templates` の実行識別情報セクション規約に従い、委譲 prompt の委譲識別情報ブロックから `adf_delegation` へ転記する。
 PR 本文には検証差分セクション（実行工程、検証種別、検証結果、finding 差分の5分類: 新規、修正済み、既出、撤回、無効）を記録する。形式は `agentdev-workflow-templates` の検証差分セクション規約に従い、実施した各検証（test strategy 項目検証、品質ゲート等）ごとに実行工程 case-run の行として記録する。
-各検証行には、実施した検証の観測証跡（標準出力・標準エラーの退避先、終了コード、版、検査範囲、実行環境のうち検証種別ごとに適用される必須要素）を含める。証跡の必須要素と再実行条件の正は `agentdev-quality-gates` スキル Design「QG-4 検証証拠の再利用と再実行条件」節が所有し、本スキルは保持経路（PR 本文の検証差分セクション、verify-only closure では SSoT コメント）のみを扱う。観測証跡の保持は result 契約（4状態）の拡張ではなく、PR 本文・Issue コメントの永続チャネル経由で行う。一時 session 通信（子 task 応答等）を証跡の受領経路としない。
+各検証行の観測証跡（退避先、終了コード、版、検査範囲、実行環境）の必須要素と保持経路の詳細は [references/execution-procedure-details.md](references/execution-procedure-details.md)「検証証跡の保持経路」を参照（遅延読み込み）。
 PR 作成前に `agentdev-traceability` の check を実行し、対象要件について次の9検出項目（check の findings 種別）を検査する: `malformed-declarations`（対応宣言の形式・構文違反）、`unknown-roles`（未知の成果物役割）、`unknown-req-refs`（存在しない要件行への参照）、`invalid-artifact-paths`（存在しない・取得不能な artifact パス）、`missing-design`（Design 対応の欠落）、`missing-implementation`（実装対応の欠落）、`missing-verification`（policy が required と判定する要件行の検証対応の欠落。required 行のみ計上）、`policy-invalid`（検証スコープポリシーの不正）、`duplicate-inconsistencies`（同一論理関係の不整合な重複）。Decision 対応の欠落は検出対象に含めない。check の不合格が承認済み対象範囲内で修正可能な場合は修正して再検証し、要件変更、対象範囲拡大、追加設計判断、外部依存解消が必要な場合は blocked として判断事項を報告する。
 ハーネスの plan artifact 等の中間成果物は解釈せず、PR URL で最終結果を受領する。
-コミット前に `git status --porcelain` で tsconfig 系ファイル（tsconfig*.json）の変更を検出した場合は、意図した変更と TypeScript コンパイラによるメタデータ書き戻し（`--noEmit` 指定でも incremental / project references 構成で発生し得る）の区別を確認する警告として扱う。検出時の処置は確認を促すことに限定し、自動破棄、自動 checkout を行わない。
-本チェックは配布物側 case-run 手順として独立しており、本プロジェクト側の `repo:guard:tsconfig`（bun install 起因の書き換え検出）とは別個に維持する。
-CI typecheck job での `git diff --exit-code` 検証は検討候補として記録する（本手順では実施しない）。
+コミット前の tsconfig 系ファイル（tsconfig*.json）変更検出時は、意図した変更と TypeScript コンパイラによるメタデータ書き戻しの区別を確認する警告として扱う（自動破棄・自動 checkout は行わない）。詳細は [references/execution-procedure-details.md](references/execution-procedure-details.md)「tsconfig 系変更の書き戻し警告」を参照（遅延読み込み）。
+
 実装完了後、test strategy 項目の test-fix ループ（後述）を実行する
 4. **blocker 処理**: 回答可能な blocker（Decision/REQ/Design/docs/Issue本文で回答できるもの）は自律的に実行 command 内で再評価できる
 5. **result 返却**: 後述の result 契約に従い case-run へ返却する
@@ -88,13 +77,13 @@ CI typecheck job での `git diff --exit-code` 検証は検討候補として記
 実行担当サブエージェントは、取りまとめ（case-run）が記録契機に応じて記録コメント投稿と本文進行状況・結果セクション更新を行うための報告を行う。記録反映（Issue 本文・コメントへの書込み）は取りまとめの責務であり、実行担当は Issue 本文・コメントへの記録反映を行わない。
 
 - **報告要素**: 事実・結果、停止（再開条件を含む）、判断変更の影響対象を含める。取りまとめは報告を受けて記録へ構造化・反映する
-- **重要変更の識別と報告**: 実行担当サブエージェントは、実装・検証中に既存の正規成果物や既存前提への重要変更、外部仕様・互換性・データ・セキュリティへの重要な影響、進行中の別作業への重大な影響、当初想定からの重大な変更を、判明した時点でその内容と影響とともに取りまとめへ報告する。識別は変更の意味と影響に基づく判断であり、変更ファイル数やキーワードだけの機械判定に置き換えない。報告対象には、その時点で未反映の重要変更と、判明時点ですでに反映済みの内容（反映済みである事実を区別して説明する）の双方を含める。委譲された裁量の範囲内の重要変更は、報告後に追加承認なしで実行を継続する。利用者に留保された判断が必要な場合は、result 契約の `blocked` として判断事項を報告する。既存の合意内容との照合、差分・影響評価、必要な更新・再検証を通知で代替しない
+- **重要変更の識別と報告**: 実装・検証中に判明した既存正規成果物や既存前提への重要変更、外部仕様・互換性・データ・セキュリティへの重要な影響、進行中の別作業への重大な影響、当初想定からの重大な変更を、内容と影響とともに判明した時点で報告する。利用者に留保された判断が必要な場合は `blocked` として判断事項を報告する。詳細は [references/recovery-and-step-model.md](references/recovery-and-step-model.md)「実行担当の報告契約の詳細」を参照（遅延読み込み）
 - **委譲要求と実着手の区別**: 委譲起動（委譲要求）は実着手と同一視されない。実装着手の事実を報告するのは実行担当の責務であり、取りまとめの着手記録はその報告を契機に行われる
 - **工程終了を待たない途中報告**: 工程終了（result 確定）を待たず、確定した停止・判断待ち・判断変更影響を報告できる。途中報告は取りまとめが受領時点で対応する記録契機の反映（停止等）に使われる。途中報告は result 契約（4状態）の最終確定値を代替せず、result は確定時に必ず返却する
-- **検証用一時資材の作成報告**: 委譲内で検証用remote、clone、bare repository、退避ログ、補助スクリプト、専用server・process等の検証用一時資材を作成する場合、許可された範囲（既存の配置規則と権限に従う標準的な一時領域への作業専用領域、リポジトリ内の作業領域、許可された外部環境）で作成・利用し、利用終了時に安全条件（当該作業が作成した専用資材であることの確認、回収対象範囲の特定、正式な成果物・必要な証拠・他の作業や利用者が管理する資材の保護、既存の副作用・承認境界への適合）が成立する範囲で回収する。継続利用する資材は引継ぎ事項として報告する。後片付けの実施結果、確認根拠、未処理事項（未回収・確認不能・引継ぎ）を既存の報告経路で委譲元の実行処理へ報告する。必要な副作用が許可範囲を超える場合は既存の停止・判断経路を利用し、許可範囲を独断で拡張しない（様式の正は delegation-contracts Design「検証用一時資材の作成・報告義務」節、安全条件と配置規則の詳細は検証に伴う一時資材の取扱いと後片付け責任 Design「一時資材の配置・利用・回収」節）
+- **検証用一時資材の作成報告**: 検証用一時資材は許可された範囲で作成・利用し、利用終了時に安全条件が成立する範囲で回収する。継続利用する資材は引継ぎ事項として報告する。詳細は [references/recovery-and-step-model.md](references/recovery-and-step-model.md)「実行担当の報告契約の詳細」を参照（遅延読み込み）
 - **result 契約との独立性**: 本報告契約は result 4状態（completed-pr / blocked / failed / delegation-unavailable）の追加・変更を行わない。報告は result の生成・受領に付随する情報であり、result 契約（最小契約）は維持する
 
-物理削除を伴う docs-chore 系の委譲では、削除対象に対する extensions、templates 等の実行時設定からの参照を追随確認する。削除対象の参照先を事前確認し、残存参照を検出した場合は委譲スコープ内で解消する。解消に別 OU の対象範囲拡大・新規の意思決定が必要な場合は blocked として報告する（原本は `<workflows/references/execution-unit-construction>` Design「docs-chore OUの削除起因参照追随」節。根拠事例: E6-2〔Epic #2984 コメント記録〕、Case #2979）。
+物理削除を伴う docs-chore 系の委譲では、削除対象への extensions・templates 等の実行時設定からの参照を追随確認する（原本は `<workflows/references/execution-unit-construction>` Design「docs-chore OUの削除起因参照追随」節）。詳細は [references/execution-procedure-details.md](references/execution-procedure-details.md)「docs-chore 委譲の削除起因参照追随」を参照（遅延読み込み）。
 
 ## test strategy 項目の test-fix ループ（REQ）
 
@@ -143,15 +132,7 @@ case-run（受領側）は、委譲結果の受領時に最終ゲートとして
 
 ## background 委譲の起動消失の回復手順
 
-case-run は background 委譲の起動直後消失を検知した場合、委譲先の会話応答（一時コンテキスト）に依存せず、durable state で実行の帰属を確認して回復する:
-
-1. **帰属確認（durable state）**: 次の永続状態で委譲先の実行の帰属を確認する
-   - worktree の git status・commit（実行中の変更や commit の有無）
-   - PR の存在（`completed-pr` の証跡）
-   - Issue コメント（blocked / failed の SSoT）
-2. **実行未試行と判定した場合**: 同期実行によらず background での再委譲（親 orchestration が所有する起動間隔契約に従う）を行う（実行未試行のため result 状態は付かない。委譲起動不能時の `delegation-unavailable` とは区別する）。background 再委譲の起動失敗が継続する場合は、Design が所有する再試行計上契約に基づき delegation-unavailable として再開可能な停止報告へ確定する
-3. **実行中断と判定した場合**: 継続の判断（継続指示または再委譲）も当該 durable state に基づく。git status の残留変更と PR 有無を根拠とし、会話コンテキストの推定で判断しない
-4. **再委譲形態限定**: 再委譲は staggered background とし、委譲方式を同期実行へ切替えない。実行並列制御（共有 active Issue task 枠）は case-auto orchestration stage 3 が単一所有する契約に従う
+background 委譲の起動直後消失を検知した場合は、委譲先の会話応答（一時コンテキスト）に依存せず、durable state（worktree の git status・commit、PR の存在、Issue コメント）で実行の帰属を確認して回復する。帰属確認・実行未試行と実行中断の判定・再委譲形態限定（staggered background）の詳細は [references/recovery-and-step-model.md](references/recovery-and-step-model.md)「background 委譲の起動消失の回復手順」を参照（遅延読み込み）。
 
 ## 責務境界（非対象）
 
@@ -192,28 +173,9 @@ capture 境界の詳細は `agentdev-workflow-orchestration` を参照。
 `## Findings / Capture候補` とは別セクションとし、混在させない。
 実行担当サブエージェントが記録し、case-close STEP-3 の Design 確定チェックの入力となる。
 
-## 外部成果物の取扱い
+## STEP model 連携
 
-外部実行基盤の結果は **PR URL** で受領する（透明）。
-plan artifact 等の中間成果物の内部構造には依存しない。
-実行担当サブエージェントは中間成果物の内部構造に依存した処理、検証を行わず、result 契約（4状態）のみで接合する。
-AgentDevFlow の永続状態は既存の draft/ Issue/ PR/ REQ/ Decision/ Design に限定し、中間成果物を永続状態として扱わない。
-
-## STEP model 連携（workflow STEP 契約・STEP resume point と会話記憶非依存）
-
-本スキルは Capability Skill として、case-run Workflow Skill の `execute` STEP（`agentdev-workflow-orchestration` 参照）から委譲起動される（`<workflows/workflow-skill-model>` Design）。
-本スキル自身は case-run workflow の STEP を所有せず、委譲契約（4状態 result）で case-run 側 STEP へ接合する。
-
-### 委譲コンテキストと Input Resolution
-
-委譲起動時に case-run から引き渡される worktree root、ブランチ名、Issue 番号、実行 command 指定は、永続状態の優先順位（`<foundations/durable-state-and-recovery>` Design）に従い、case-run `execute` STEP の入力解決（Input Resolution）で解決された入力である。
-実行担当サブエージェントは委譲内で Issue 本文、REQ/Decision/Design を SSoT 再構成（最上位優先）で再取得・再検証し、自然言語の前STEP result のみに依存しない。
-
-### 委譲内シーケンスと result 接合
-
-実行担当サブエージェントの責務（Issue 読込、context 再確認、実装・検証・PR 作成、blocker 処理、result 返却）は adapter 委譲内の内部シーケンスであり、case-run 側からは result 4状態（`completed-pr` / `blocked` / `failed` / `delegation-unavailable`）のみで観測される。
-内部シーケンスの STEP 遷移を case-run workflow の STEP model へ投影せず、PR URL（成功時）または Issue コメント（blocked/failed時）を SSoT として扱う。
-STEP reference 8 要素は `<foundations/durable-state-and-recovery>` Design 参照。
+本スキルは Capability Skill として、case-run Workflow Skill の `execute` STEP（`agentdev-workflow-orchestration` 参照）から委譲起動される（`<workflows/workflow-skill-model>` Design）。本スキル自身は case-run workflow の STEP を所有せず、委譲契約（4状態 result）で case-run 側 STEP へ接合する。委譲コンテキストと Input Resolution、委譲内シーケンスと result 接合の詳細は [references/recovery-and-step-model.md](references/recovery-and-step-model.md)「STEP model 連携」を参照（遅延読み込み）。
 
 ## 委譲抽象IF
 
@@ -221,16 +183,13 @@ STEP reference 8 要素は `<foundations/durable-state-and-recovery>` Design 参
 - 委譲起動方式の具体的な実装（実行担当サブエージェント起動、委譲 prompt 構築、evidence 確認、result 受領、timeout/ retry、category 設計）は `references/harness-delegation.md` 参照
 - 実行担当サブエージェントが利用不可の場合は委譲起動失敗として検知される（後述「委譲起動不能時の取扱い」および references/harness-delegation.md「委譲起動失敗、異常終了時事後処理」参照）
 - Issue 本文に req-define 壁打ち合意の実行計画方向性（参考情報）が含まれ得る。実行担当サブエージェントはこれを参考情報として扱い、束縛されない
-- **内蔵ツール使用規律**: 実行担当サブエージェントのファイル検索・内容検索・ディレクトリ列挙は実行基盤の内蔵ツール（ファイル検索、内容検索、読み取り）を使用し、bash 内蔵コマンド（grep、ls 等）を標準手順としない。bash 実行が本来必要な処理（script 呼び出し、git 操作等）と、機能不在・実行失敗時の fail-open 代替探索は本規律の対象外とする（workflow-skill-model Design「workflow skill 本文における内蔵ツール使用規律」節）
+- **内蔵ツール使用規律**: 実行担当サブエージェントのファイル検索・内容検索・ディレクトリ列挙は実行基盤の内蔵ツールを標準手順とする。詳細は [references/execution-procedure-details.md](references/execution-procedure-details.md)「内蔵ツール使用規律」を参照（遅延読み込み）
 
 ## 委譲起動不能時の取扱い
 
 委譲起動不能時（実行担当サブエージェント型が不許可、起動 API 異常等）は、result 契約の `delegation-unavailable` を返し、Issue を `pending` に戻して case-run を停止する（委譲契約 Design「委譲種別」注記）。
 
-インラインフォールバック（case-run が自ら実装・検証を実行する逐次パス）は harness 固有の実行制御として配布 Design および本 SKILL から除外する。
-委譲起動手段、能力検出、インライン代替の有無は harness execution mechanism に属し、harness の責務として AGENTS.md および `references/harness-delegation.md` に配置する（委譲契約 Design「委譲種別」注記）。
-
-`references/harness-delegation.md`「委譲起動失敗、異常終了時事後処理」は**委譲起動後**の異常終了に対する事後処理であり、本節の委譲起動不能（事前判定）とは対象段階が異なる。
+インラインフォールバック（case-run が自ら実装・検証を実行する逐次パス）は harness 固有の実行制御として配布 Design および本 SKILL から除外する。委譲起動手段、能力検出、インライン代替の有無は harness execution mechanism に属し、harness の責務として AGENTS.md および `references/harness-delegation.md` に配置する（委譲契約 Design「委譲種別」注記）。委譲起動後の異常終了の事後処理との対象段階の区別は [references/recovery-and-step-model.md](references/recovery-and-step-model.md)「委譲起動後の異常終了との対象段階の区別」を参照（遅延読み込み）。
 
 ## reference選択表
 
@@ -243,6 +202,9 @@ STEP reference 8 要素は `<foundations/durable-state-and-recovery>` Design 参
 | 委譲プロトコルと category 設計（`writing` category と発火スキルの相互作用、`unspecified-high` 推奨根拠、category 選定ガイドライン、MUST NOT DO 必須化）が必要な場合 | [references/harness-delegation.md](references/harness-delegation.md) |
 | 委譲起動失敗、異常終了時の事後処理（worktree git status 確認、変更残留時の分類、残留箇所の grep 検出、手動修正または PR 化）が必要な場合 | [references/harness-delegation.md](references/harness-delegation.md) |
 | adapter 委譲内 adversarial-review 統合（実装方針形成、review 呼出、結果反映、blocked 遷移の実行時詳細手順、候補判断基準、呼出失敗時の取扱い）が必要な場合 | [references/adversarial-review-integration.md](references/adversarial-review-integration.md) |
+| context 再確認・対応宣言・検証証跡・tsconfig 警告・docs-chore 参照追随・内蔵ツール規律の実行手順詳細が必要な場合 | [references/execution-procedure-details.md](references/execution-procedure-details.md) |
+| external execution boundary と harness execution mechanism の用語境界、外部成果物の取扱いが必要な場合 | [references/execution-boundary-terms.md](references/execution-boundary-terms.md) |
+| 報告契約の詳細、background 委譲の回復手順、STEP model 連携が必要な場合 | [references/recovery-and-step-model.md](references/recovery-and-step-model.md) |
 
 ## adversarial-review 統合（case-run: adapter 委譲内）
 

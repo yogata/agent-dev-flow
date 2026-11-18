@@ -4,7 +4,7 @@ status: accepted
 created: 2026-06-26
 updated: "2026-11-18"
 ---
-<!-- ADF-COVERS(implementation): REQ-001-027 -->
+<!-- ADF-COVERS(implementation): REQ-001-027, REQ-122-012 -->
 
 # Design 健全性メトリクス
 
@@ -61,6 +61,7 @@ Design 計測例（全 Design の行数・status・ドメイン分類の表）�
 - **document-model.md**: ドメイン分類の定義元。本 Design のドメイン分類適合判定が参照する
 - **draft Design 放置管理**: docs/designs/README.md status 列追跡と case-close の Design 確定工程で管理する（旧 draft 放置検出ルールは Epic #4126 Phase 4 で削除済み）。本 Design の放置期間閾値と連動する
 - **REQ-001**: Design status 追跡と draft 放置検出。本 Design の放置期間メトリクスと連動する
+- **ir-file-size（IR-075）との閾値関係**: ir-file-size は src/common 配布物正本（`src/common/commands/agentdev/**/*.md`、`src/common/skills/agentdev-*/SKILL.md`）への機械強制であり、YAML Frontmatter 込み総行数 250 行超過を違反とする（`**/references/**/*.md` は除外）。本 Design の行数シグナルは docs/designs/ 配下の Design 文書に対する案内値であり、ir-file-size の検出対象外である。両者は対象と強制力が異なる別メトリクスであり、本 Design のシグナル閾値を ir-file-size の機械強制閾値と同値に揃えることや、本 Design による docs 側 Design の機械強制を行うことではない
 
 ## 機械化境界
 

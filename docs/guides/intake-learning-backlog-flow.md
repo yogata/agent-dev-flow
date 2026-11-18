@@ -41,6 +41,7 @@ inbox/ → promoted/（採用 item の inbox 元ファイルは削除）
 |----------|------|------|
 | ユーザー手動入力 | `/agentdev/intake-capture` | `inbox/` |
 | クローズ済み Issue/PR | `/agentdev/intake-from-github` | `inbox/` |
+| `inbox/` | `/agentdev/intake-triage` | 処理結果サマリー（Route A 修正 / Route B 破棄 / Route C `req-units/` への RU 生成、残件 0 件） |
 | `inbox/` | `/agentdev/intake-promote` | `promoted/`（inbox 元ファイルは削除） |
 
 ### 各ディレクトリの役割

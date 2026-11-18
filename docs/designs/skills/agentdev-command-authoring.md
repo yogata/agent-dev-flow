@@ -35,7 +35,7 @@ OpenCode コマンド定義（`.opencode/commands/`）の品質基準とベス�
 
 - Command は公開 API、入出力、Steps に徹する
 - 詳細は Skill へ、決定的処理は Script へ
-- 行数上限 150行
+- 行数上限 250行（ir-file-size・機械検査値）。骨格目標は 150〜200 行、200行超で `references/` 分割検討
 
 ## 対象外
 
@@ -48,7 +48,7 @@ OpenCode コマンド定義（`.opencode/commands/`）の品質基準とベス�
 
 - DoD 項目の充足
 - Frontmatter 純粋性（`description` 単一）
-- 行数（150行上限）
+- 行数（250行上限〔ir-file-size〕。骨格目標 150〜200 行）
 - 参照先実ファイル存在確認（command 本文から workflow 節・テンプレート・完了一覧等へのパス参照が実ファイルを指すこと。参照のみが存在し実ファイルが不存在する状態を査読で検出する）
 
 ## See Also

@@ -4,7 +4,7 @@ status: accepted
 created: 2026-08-20
 updated: 2026-10-26
 ---
-<!-- ADF-COVERS(implementation): REQ-001-008, REQ-001-010, REQ-001-011, REQ-001-012, REQ-001-013, REQ-001-014, REQ-001-015, REQ-001-016, REQ-001-030, REQ-001-046, REQ-001-047, REQ-056-001 -->
+<!-- ADF-COVERS(implementation): REQ-001-008, REQ-001-010, REQ-001-011, REQ-001-012, REQ-001-013, REQ-001-014, REQ-001-015, REQ-001-016, REQ-001-030, REQ-001-046, REQ-001-047, REQ-056-001, REQ-122-014 -->
 <!-- ADF-COVERS(implementation): REQ-059-001 -->
 <!-- ADF-COVERS(design): REQ-059-001, REQ-059-004, REQ-059-005 -->
 
@@ -34,7 +34,7 @@ updated: {YYYY-MM-DD}
 
 - 許可フィールドは`id`、`title`、`created`、`updated`だけとする。
 - `id`は`REQ-{NNN}`、要件行IDは`REQ-{NNN}-{MMM}`形式とする。表示のゼロ埋めは最小幅（切詰めしない）であり、受理検査に桁数上限を設けない。
-- REQ 本文を変更する際は frontmatter `updated` を変更日へ進行させる。機械検査（check_integrity の updated 鮮度突合）がこれを検証する。
+- REQ 本文を変更する際は frontmatter `updated` を変更日へ進行させる。frontmatter 管理規約として運用する（旧 updated 鮮度突合機械検査〔IR-072〕は DEC-065 により廃止済み）。
 
 ### REQ セクション構成
 

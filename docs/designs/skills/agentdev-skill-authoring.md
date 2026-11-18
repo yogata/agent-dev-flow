@@ -4,7 +4,7 @@ status: accepted
 created: 2026-06-21
 updated: 2026-11-18
 ---
-<!-- ADF-COVERS(implementation): REQ-002-013, REQ-002-014, REQ-002-015 -->
+<!-- ADF-COVERS(implementation): REQ-002-013, REQ-002-014, REQ-002-015, REQ-122-012 -->
 <!-- ADF-COVERS(verification): REQ-002-004 -->
 
 # `agentdev-skill-authoring` Design
@@ -77,7 +77,7 @@ skill 執筆ガイダンスは、配布物への実行手順・例示を fenced 
 
 ## 検証観点
 
-- 行数制限（500行上限、400行超で `references/` 推奨）
+- 行数制限（250行上限〔ir-file-size・YAML Frontmatter 込み総行数・references/ 除外〕。骨格は 150〜200 行目標、200行超で `references/` 推奨）
 - トークン予算
 - トリガー精度（USE FOR / DO NOT USE FOR）
 - 構造チェック

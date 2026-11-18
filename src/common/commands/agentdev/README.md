@@ -27,6 +27,7 @@ REQ/Decision/Design の保存は内部 lifecycle の case-ready（初回確定�
 | `/agentdev/backlog-auto` | 要求蓄積入口: なし（durable state から解決） | 検出事項、採用済み成果物、`RU-*.md`（backlog整理サイクル一巡）、一気通貫の実行結果報告（全体完了判定結果、リリース結果または保留理由） | RU がある場合: `/agentdev/req-define` → `/agentdev/case-auto` が一気通貫実行として自動接続される（利用者判断境界は維持。手動の `/agentdev/req-define` 起動も従来どおり利用可能） |
 | `/agentdev/intake-capture` | ユーザー手動入力 | `inbox/` item | `/agentdev/intake-promote` |
 | `/agentdev/intake-from-github` | クローズ済み Case Issue/PR | `inbox/` item | `/agentdev/intake-promote` |
+| `/agentdev/intake-triage` | なし（`inbox/` item を durable state から解決） | 処理結果サマリー（Route A 解決件数、Route B 破棄件数、Route C 昇格件数、残件 0 件）、Route C の `RU-*.md` | 残件 0 件の確認。Route C の RU は `/agentdev/backlog-review` 以降の経路で処理 |
 | `/agentdev/intake-promote` | `inbox/` item | `promoted/` 成果物 | `/agentdev/backlog-review` |
 | `/agentdev/issue` | 自然言語による課題管理の指示 | 追跡Issue の作成・更新・検索・参照（Tool 操作契約経由） | 継続利用または完了 |
 | `/agentdev/third-party-sync` | 対象 Skill 名（省略時は全件）、dry-run 指定 | 取得結果報告: 対象一覧、取得成否、配置パス、管理外衝突の検出状況（Tool 操作契約経由） | 継続利用または完了 |
@@ -44,6 +45,7 @@ REQ/Decision/Design の保存は内部 lifecycle の case-ready（初回確定�
 - [backlog-review.md](./backlog-review.md)
 - [intake-capture.md](./intake-capture.md)
 - [intake-from-github.md](./intake-from-github.md)
+- [intake-triage.md](./intake-triage.md)
 - [intake-promote.md](./intake-promote.md)
 - [issue.md](./issue.md)
 - [third-party-sync.md](./third-party-sync.md)

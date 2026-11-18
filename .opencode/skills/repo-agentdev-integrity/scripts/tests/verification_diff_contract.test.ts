@@ -188,7 +188,11 @@ describe("REQ-048-008: 工程間比較の可能性", () => {
 
   it("templates スキルの工程間比較規則が case-run と case-close の記録先を定める", () => {
     const skill = readSourceSkill(
-      path.join("agentdev-workflow-templates", "SKILL.md"),
+      path.join(
+        "agentdev-workflow-templates",
+        "references",
+        "verification-diff-section.md",
+      ),
     );
     expect(skill.includes("工程ごとに行を並べ")).toBe(true);
     expect(skill.includes("実行工程: case-run")).toBe(true);
@@ -216,10 +220,14 @@ describe("REQ-048-016: 記録先は既存テンプレートと既存正規情報
 
   it("templates スキルは検証差分セクション規約と5分類定義を持つ", () => {
     const skill = readSourceSkill(
-      path.join("agentdev-workflow-templates", "SKILL.md"),
+      path.join(
+        "agentdev-workflow-templates",
+        "references",
+        "verification-diff-section.md",
+      ),
     );
-    expect(skill.includes("### 検証差分セクション")).toBe(true);
-    expect(skill.includes("#### finding 差分の5分類")).toBe(true);
+    expect(skill.includes("# 検証差分セクション（PR テンプレート形式）")).toBe(true);
+    expect(skill.includes("## finding 差分の5分類")).toBe(true);
     for (const cls of FINDING_DIFF_CLASSES) {
       expect(skill.includes(cls)).toBe(true);
     }
@@ -242,7 +250,11 @@ describe("REQ-048-016: Findings セクションとの共存（置換しない）
 
   it("templates スキルは共存規則を正規所有する", () => {
     const skill = readSourceSkill(
-      path.join("agentdev-workflow-templates", "SKILL.md"),
+      path.join(
+        "agentdev-workflow-templates",
+        "references",
+        "verification-diff-section.md",
+      ),
     );
     expect(
       skill.includes("Findings セクション（intake / learning 小見出し）を置換せず共存"),
@@ -253,7 +265,11 @@ describe("REQ-048-016: Findings セクションとの共存（置換しない）
 describe("REQ-048-008: 審議中 finding 状態と修正証跡の所有境界を変更しない", () => {
   it("templates スキルは対論型レビューの審議中 finding 状態と品質ゲート完了報告の修正証跡の所有境界非変更を明記する", () => {
     const skill = readSourceSkill(
-      path.join("agentdev-workflow-templates", "SKILL.md"),
+      path.join(
+        "agentdev-workflow-templates",
+        "references",
+        "verification-diff-section.md",
+      ),
     );
     expect(skill.includes("審議中 finding 状態の追跡")).toBe(true);
     expect(skill.includes("欠陥類型単位の修正証跡")).toBe(true);

@@ -4,7 +4,7 @@ status: accepted
 created: 2026-07-19
 updated: "2026-11-18"
 ---
-<!-- ADF-COVERS(implementation): REQ-001-026, REQ-001-028 -->
+<!-- ADF-COVERS(implementation): REQ-001-026, REQ-001-028, REQ-122-014 -->
 <!-- ADF-COVERS(implementation): REQ-010-011 -->
 <!-- ADF-COVERS(implementation): REQ-059-002, REQ-059-003 -->
 <!-- ADF-COVERS(design): REQ-059-002, REQ-059-003 -->
@@ -35,7 +35,7 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 | `docs/designs/README.md`のDesign一覧・status列 | 現行実装に従う混合管理 | Design frontmatterと人手管理列 |
 | integrity rule catalogとrule ownershipのAUTOGENブロック | 自動生成 | 個別IR文書 |
 | REQ/Designメトリクス計測例 | 自動生成 | 対象文書の計測結果 |
-| `docs/README.md`・`docs/requirements/README.md` 等の散文言 REQ 件数記述（AUTOGEN ブロック外の自然文） | 人手管理（検出誘導付き） | 人手更新。REQ 新設・廃止時の乖離は `check_integrity.ts` の req-range-staleness（IR-042）が検出し、triage 案内文が手動更新を強制 |
+| `docs/README.md`・`docs/requirements/README.md` 等の散文言 REQ 件数記述（AUTOGEN ブロック外の自然文） | 人手管理（検出誘導付き） | 人手更新。REQ 新設・廃止時の乖離は triage 案内文が手動更新を強制する（旧 req-range-staleness〔IR-042〕は DEC-065 により廃止済み） |
 
 管理区分を変更する場合は、本Design、生成実装、検査実装を同時に整合させる。
 
@@ -44,7 +44,7 @@ README 群、索引類、件数表明を実ファイルの frontmatter から再
 `docs/README.md`（「現行要件はN件である。」等）と `docs/requirements/README.md`（「現在の要件判断では、以下N件を第一参照先とする。」等）の AUTOGEN ブロック外の自然文に含まれる REQ 件数表記は、本 Design の自動生成対象とせず人手管理領域とする。
 
 - generate_indexes.ts への組み込み（パターン限定の機械置換）は行わない。prose 文面のパターン固定は REQ-094 の文章表現品質基準と矛盾するためである
-- REQ 新設・廃止時に AUTOGEN 行（`readme-req-summary-count` 等）と散文言の件数が乖離した場合、`check_integrity.ts` の req-range-staleness（IR-042）が NG を検出し、その triage 案内文（固定表記を実際の REQ ファイル数に更新）が手動更新を強制する
+- REQ 新設・廃止時に AUTOGEN 行（`readme-req-summary-count` 等）と散文言の件数が乖離した場合、旧 req-range-staleness（IR-042）は DEC-065 により廃止済みであるため、AUTOGEN 行と散文言の件数乖離は triage 案内文（固定表記を実際の REQ ファイル数に更新）が手動更新を強制する
 - この構造により、REQ 新設時に AUTOGEN 行と散文言が同時に更新されるか、検出による案内で手動更新が強制される（Case #3312/#3315/#3314 で再発した REQ 件数乖離の構造的防止）
 ## 生成規則
 
@@ -87,7 +87,7 @@ AUTOGEN 計測ブロック（`req-metrics-measurement-example`、`spec-metrics-m
 
 ### 一致の検証
 
-自動生成の実行有無にかかわらず、docs-check（`check_integrity.ts`、IR-061）が索引類と実ファイルの整合性を検証する。
+自動生成の実行有無にかかわらず、docs-check（検証エンジン cli.ts、IR-061）が索引類と実ファイルの整合性を検証する。
 不整合を検出した場合、生成スクリプトの再実行または人手修正を促す。
 
 ### AUTOGEN block ID 命名パターン
@@ -168,8 +168,8 @@ Design 健全性メトリクス（`design-health-metrics.md`「Design 計測例�
 1索引ファイル内で人手編集領域を挟むため、同一セクションに複数の AUTOGEN ブロックを分割して配置することを許容する。
 代表例は catalog（`integrity-rule-catalog.md`）の IR エントリ一覧である。
 
-catalog は欠番 IR-045（削除済み、ファイル不在）を挟む2ブロック構成とする。
-人手編集領域（IR-045 削除注記）を中間に残置するため、自動生成領域を `catalog-ir-entries-pre-045`（IR-001〜IR-044）と `catalog-ir-entries-post-045`（IR-046 以降。IR-046 は欠番。Epic #4126 Phase 4 で削除済み）の2ブロックへ分割する。
+catalog は欠番 IR-045（削除済み、ファイル不在）の欠番注記節を、rules/index.ts レジストリから生成する単一 AUTOGEN ブロック（`catalog-ir-entries`〔DEC-065 決定3〕）のブロック外手動領域へ残置する構成とする。
+旧契約では人手編集領域（IR-045 削除注記）を中間に残置するため自動生成領域を `catalog-ir-entries-pre-045` と `catalog-ir-entries-post-045` の2ブロックへ分割していた（IR-046 は欠番。Epic #4126 Phase 4 で削除済み）。現行契約（DEC-065 決定3）は rules/index.ts レジストリからの単一 AUTOGEN ブロック（`catalog-ir-entries`）であり、欠番注記節はブロック外の手動領域へ残置する。
 生成スクリプトは各ブロックを独立して上書きし、中間の人手編集領域を保持する。
 
 一般則: 欠番、注記、章導入等の人手編集領域を自動生成領域の中間に配置する必要がある場合、自動生成領域を複数ブロックへ分割することを許容する。
@@ -192,7 +192,7 @@ catalog は欠番 IR-045（削除済み、ファイル不在）を挟む2ブロ�
 
 1. **現在 AUTOGEN されている領域**: frontmatter 由来で機械生成される件数、一覧、ステータス別ビュー等。
 生成スクリプト `src/common/skills/repo-agentdev-integrity/scripts/generate_indexes.ts` が存在し、AUTOGEN ブロック（HTML コメント形式 `<!-- AUTOGEN:BEGIN:id=xxx --> ... <!-- AUTOGEN:END -->`）で囲まれた領域を上書きする。
-docs-check 既存資産（cli_utils.ts, check_integrity.ts の parseFrontmatter, readText, listFiles 等）を再利用する。
+検証エンジン既存資産（lib/cli_utils.ts・lib/minimal-yaml.ts・engine/context.ts 等の共通実装）を再利用する。
 2. **現在人手管理されている領域**: 導出規則が未確定、混合領域、人手判断を含む領域。
 後述「現在人手管理領域の3領域」参照。
 3. **各領域の正規情報源**: frontmatter、各文書本文のセクション構造、宣言等。
@@ -284,4 +284,4 @@ AUTOGEN計測日はgenerate_indexesの最終commitから導出し、git logの%c
 
 - 関連 REQ: REQ-001（文書・REQ 管理基準）、REQ-001（Design status 追跡と draft 放置検出）
 - 関連 Design: `docs/designs/foundations/numbering-policy.md`（採番管理）、`docs/designs/integrity/integrity-rule-catalog.md`（整合性ルールカタログ）、`docs/designs/integrity/integrity-contracts.md`（整合性契約）
-- 検査契約: IR-061（index generation consistencyency）、IR-042（hardcoded req count）
+- 検査契約: IR-061（index generation consistency）

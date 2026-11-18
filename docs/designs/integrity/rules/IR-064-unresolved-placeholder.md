@@ -16,13 +16,13 @@ verification_path: src/common/skills/repo-agentdev-integrity/scripts/rules/rules
 | description | 実行時配布対象（`src/common/commands/agentdev/**/*.md`、`src/common/skills/agentdev-*/**/*.md`）に残る未解決プレースホルダーを検出する。(a) TODO/FIXME/XXX/HACK の bare トークン（strict）、(b) ID 系プレースホルダー（`REQ-{NNNN}`、`DEC-{N}` 等）の本文裸出力（heuristic）。正規テンプレート内の意図的なプレースホルダーは対象種別と許容条件に従い誤検出しない（REQ-010-065） |
 | severity | strict（TODO 系）/ heuristic（ID プレースホルダー裸出力） |
 | category | document-drift |
-| detection_method | `check_integrity.ts` による行単位走査。TODO 系は `\b(TODO\|FIXME\|XXX\|HACK)\b`、ID 系は `\b(?:REQ\|DEC\|ADR\|AG\|QG\|IR\|RU\|TS\|OU\|AC\|CR\|EC\|SC\|ACT\|DD\|DESIGN\|RD\|SPEC\|WS\|GMT)-\{[^}]*\}`（文書 ID 系接頭辞の限定列挙。Wave 1 監査観点V5 と同じ限定方針） |
+| detection_method | `src/common/skills/repo-agentdev-integrity/rules/ir-064.ts` による行単位走査。TODO 系は `\b(TODO\|FIXME\|XXX\|HACK)\b`、ID 系は `\b(?:REQ\|DEC\|ADR\|AG\|QG\|IR\|RU\|TS\|OU\|AC\|CR\|EC\|SC\|ACT\|DD\|DESIGN\|RD\|SPEC\|WS\|GMT)-\{[^}]*\}`（文書 ID 系接頭辞の限定列挙。Wave 1 監査観点V5 と同じ限定方針） |
 | affected_artifacts | [src/common/commands/agentdev/**/*.md, src/common/skills/agentdev-*/**/*.md] |
 | related_req | [REQ-010-065, REQ-010-068] |
 | related_design | [../integrity-rule-catalog.md] |
 | gate_level | full-audit |
 | false_positive_risk | 低〜中。許容条件（下表）で様式例示を除外する。ID 接頭辞の限定列挙により `UTF-{N}` 等の非 ID 様式（文字コード表記）は検出しない。裸出力の様式確定（backtick 包囲の義務化等）は未確定のため heuristic とし、baseline で既知を管理する |
-| regression_test | `check_integrity.test.ts` describe "IR-064 unresolved-placeholder"。正常例・違反例・境界例・許容例・再現例（観点V5 パターン）の 5 種 fixture |
+| regression_test | `scripts/rules/rules.test.ts`（該当 IR インメモリケース。旧 checker での describe 名は "IR-064 unresolved-placeholder"。正常例・違反例・境界例・許容例・再現例（観点V5 パターン）の 5 種 fixture |
 | finding_route | intake |
 | triage_action | TODO 系の新規検出は即時是正（解決または非配布文書への移動）。ID プレースホルダー裸出力の新規検出は backtick・括弧への整形容式化または具体 ID 解決。既知 48 件は NG baseline（provenance `issue-2372-ir064-initial-baseline`）で管理 |
 | last_verified | 2026-08-22 |
