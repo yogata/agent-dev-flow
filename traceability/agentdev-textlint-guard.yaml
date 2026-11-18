@@ -18,6 +18,9 @@ implementation:
   src/opencode/plugins/agentdev-textlint-guard/lib/engine-bundle.ts:
     - REQ-010-071
     - REQ-029-012
+  src/opencode/plugins/agentdev-textlint-guard/gate.ts:
+    - REQ-010-074
+    - REQ-010-075
   src/opencode/plugins/agentdev-textlint-guard/lib/rules.ts:
     - REQ-010-068
   src/opencode/plugins/agentdev-textlint-guard/package.json:
