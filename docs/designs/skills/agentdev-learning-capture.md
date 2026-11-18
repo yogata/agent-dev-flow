@@ -5,6 +5,7 @@ created: 2026-06-21
 updated: 2026-11-18
 ---
 <!-- ADF-COVERS(implementation): REQ-038-001 -->
+<!-- ADF-COVERS(design): REQ-122-004（learning inbox の1トピック1ファイル構造スキーマ。本文は ## 提供する判断、操作 節） -->
 
 # `agentdev-learning-capture` Design
 
@@ -20,9 +21,14 @@ updated: 2026-11-18
 ## 提供する判断、操作
 
 - 自律的検知、抽出
-- 13フィールド形式でのエントリ生成（問題事象、発生局面、検知方法、根本原因、自律対応内容、ユーザー確認有無、Decision/REQ/spec 影響、横展開観点、再発条件、予防策候補、想定反映先、関連、タグ）
+- 1トピック1ファイル形式での learning item 生成: 保存先は .agentdev/learning/inbox/YYYY-MM-DD-<slug>.md
+  （命名規則と YAML Frontmatter スキーマ〔id: learn-YYYYMMDD-<slug>、created_at: YYYY-MM-DD、source、
+  status: inbox〕は .agentdev/intake/inbox/ と同一構造とする）。ファイル本文は13フィールド形式
+  （問題事象、発生局面、検知方法、根本原因、自律対応内容、ユーザー確認有無、Decision/REQ/spec 影響、
+  横展開観点、再発条件、予防策候補、想定反映先、関連、タグ）を保持する
 - Split Rule（learning vs intake 分離）
-- 閾値チェック（15件以上で promote 提案）
+- 閾値チェック（inbox ディレクトリ内の item 15件以上で promote 提案）
+
 
 ## 参照する references
 

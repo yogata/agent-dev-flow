@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-010-071, REQ-010-083, REQ-053-012
+// ADF-COVERS(verification): REQ-010-071, REQ-010-083
 /**
  * Regression tests for check_content_corruption.ts (REQ-010-071).
  *

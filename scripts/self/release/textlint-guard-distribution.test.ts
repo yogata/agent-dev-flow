@@ -24,7 +24,6 @@
 //   - install/self-sync generic enumeration covers the new plugin with no
 //     special-case branching and no repo-local exclusion entry
 
-// ADF-COVERS(verification): REQ-053-025
 // ADF-COVERS(verification): REQ-052-006, REQ-052-007
 // ADF-COVERS(verification): REQ-050-002, REQ-050-004
 

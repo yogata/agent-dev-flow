@@ -10,5 +10,3 @@ implementation:
     - REQ-048-015
   docs/reports/req-053-textlint-wave4-src-correction.md:
     - REQ-053-002
-  docs/reports/req-053-textlint-wave5-final-verification.md:
-    - REQ-053-021

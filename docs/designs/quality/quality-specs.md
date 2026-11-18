@@ -5,6 +5,7 @@ created: 2026-08-20
 updated: 2026-11-18
 ---
 <!-- ADF-COVERS(implementation): REQ-007-006, REQ-007-007, REQ-007-008, REQ-007-009 -->
+<!-- ADF-COVERS(design): REQ-122-011, REQ-122-012（コマンド・スキル本文・コマンド Design 文書の行数上限と references/ 分離の品質仕様。本文は ## 文書品質ルール 節） -->
 
 # 品質仕様
 
@@ -22,11 +23,17 @@ AgentDevFlow の品質基準、検証ルールを定義する。
 
 ## 文書品質ルール
 
-以下の文書品質ルールの原本 Design として機能する（rule-ownership.md Domain 3, 4, 20 参照）:
+以下の文書品質ルールの原本 Design として機能する（rule-ownership.md 参照）:
 
-- Command 行数上限: 100行目標、150行上限、200行以内（200行超は分割対象）
-- Skill 行数上限: 200行超で分割候補報告
+- 行数上限: コマンド定義本文（src/**/commands/*.md と投影）、SKILL.md 本文（src/**/skills/*/SKILL.md と投影）、
+  コマンド Design 文書（docs/designs/commands/*.md、_template.md を除く）は YAML Frontmatter を含む総行数
+  250 行以内であること（8,192 bytes は目安の併記とし、バイト数のみの超過は違反としない）
+- 上限超過の解消手段: メインファイルは制御フロー骨格（150〜200行目標）とし、詳細仕様・判定マトリクス・
+  委譲プロンプトテンプレート・異常系手順は references/<name>/ 配下へ分離する（段階的開示。
+  **/references/**/*.md は行数上限の対象外）
+- 検出手順・エラーメッセージ形式の機械検査仕様は IR-075（ir-file-size）ルール定義が所有する
 - 執筆完了基準（Authoring DoD）: 行数、Steps、共通化、正規パス（`canonical path`）
+
 
 ## 必須シナリオ（10シナリオ）
 

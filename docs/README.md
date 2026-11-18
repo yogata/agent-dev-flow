@@ -22,10 +22,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 78件、廃止済み: 20件
+現行 REQ: 79件、廃止済み: 20件
 <!-- AUTOGEN:END -->
 
-現行要件は78件である。
+現行要件は79件である。
 REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）による意図的予約欠番であり、実体は存在しない（[採番管理](designs/foundations/numbering-policy.md) 参照）。
 REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却枠であり、意図的予約欠番として維持する。
 REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全 revert）由来の廃止識別子であり、再利用しない。次の新規 REQ 番号は採番時点で REQ 実ファイル一覧と既知欠番レジストリから決定的採番スクリプト（alloc-req-number.ts）により決定する（[採番管理](designs/foundations/numbering-policy.md) 参照）。
@@ -112,6 +112,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [REQ-118](requirements/REQ-118.md) | 検証に伴う一時資材の取扱いと後片付け責任 |
 | [REQ-119](requirements/REQ-119.md) | backlog 一式 20261107T161204JST の整合是正と機械工程堅牢化（6 作業単位） |
 | [REQ-120](requirements/REQ-120.md) | ADF 全体簡素化 C-α2 小修正（配布ゲート README 集約・evidence 拡張子規則・状態表約束範囲） |
+| [REQ-122](requirements/REQ-122.md) | 整合性検証体制の刷新（IR 減量・検証エンジン分割・ローカル Git Hook ゲート・巨大コマンド分割・自動トリアージ）（16 作業単位） |
 <!-- AUTOGEN:END -->
 
 - [要件インデックス](requirements/README.md)
@@ -149,7 +150,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-025](decisions/DEC-025.md) | プロジェクト知識を Capability Skill から分離し、独立した正規知識層として管理する |
 | [DEC-026](decisions/DEC-026.md) | 実現面変更方針の構造化ハンドオフ（realization_actions） |
 | [DEC-027](decisions/DEC-027.md) | 観測ベース統制縮小評価ループ |
-| [DEC-028](decisions/DEC-028.md) | 文章表層品質の共通実行基盤（superseded by DEC-047〔「配布前に依存を解決した成果物を供給し、導入先での追加パッケージ取得を必要としない」条項は DEC-047 が textlint guard 依存実体の配布供給の範囲で部分置換。DEC-016 維持宣言と他の決定は維持（status: accepted 維持）〕） |
+| [DEC-028](decisions/DEC-028.md) | 文章表層品質の共通実行基盤（superseded by DEC-047〔「配布前に依存を解決した成果物を供給し、導入先での追加パッケージ取得を必要としない」条項は DEC-047 が textlint guard 依存実体の配布供給の範囲で部分置換。DEC-016 維持宣言と他の決定は維持（status: accepted 維持）。本体リポジトリにおける共通自動検査運用の終了は新規 Decision（整合性検証体制の中核化）が部分置換する（Plugin 製品としての決定は維持）〕） |
 | [DEC-029](decisions/DEC-029.md) | 公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入（superseded by DEC-033） |
 | [DEC-030](decisions/DEC-030.md) | トレーサビリティ標準機能への一般化と producer / consumer 境界の確立（superseded by DEC-037） |
 | [DEC-031](decisions/DEC-031.md) | ADF v4 Standard Operating Model の採用とプロセス・実装の責務分離 |
@@ -186,6 +187,8 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-062](decisions/DEC-062.md) | 要件ID桁数の受理上限撤廃と表示ゼロ埋め・受理検証の分離 |
 | [DEC-063](decisions/DEC-063.md) | 分割③ CI 日次定期実行（cron schedule）の撤去 |
 | [DEC-064](decisions/DEC-064.md) | 実験前提の恒久運用原則の採用と移行完了後レガシー資産の扱い境界 |
+| [DEC-065](decisions/DEC-065.md) | 整合性検証体制の中核化（IR 24+IR-075 体系・プラグイン型検証エンジン・src 正本化） |
+| [DEC-066](decisions/DEC-066.md) | ローカル Git Hook による決定論的検証ゲート（CI 非依存） |
 <!-- AUTOGEN:END -->
 
 ## 設計（Design）

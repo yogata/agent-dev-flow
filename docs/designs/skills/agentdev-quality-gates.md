@@ -6,7 +6,6 @@ updated: 2026-11-18
 ---
 <!-- ADF-COVERS(implementation): REQ-007-001, REQ-007-003, REQ-007-004, REQ-007-005, REQ-060-005 -->
 <!-- ADF-COVERS(design): REQ-007-014, REQ-007-015 -->
-<!-- ADF-COVERS(design): REQ-053-045, REQ-053-047（QG-4 検証証拠の再利用と再実行条件節が検査基盤内部実行形態と工程証跡再実行条件の境界 design 実体） -->
 
 # `agentdev-quality-gates` Design
 

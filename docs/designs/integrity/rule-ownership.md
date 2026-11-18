@@ -163,7 +163,7 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-056 | project-extensions-integrity | REQ-002 | `foundations/project-extensions.md`, `integrity-rule-catalog.md` |
 | IR-058 | distribution-untracked-skill-reference | REQ-002-001, REQ-002-002, REQ-002-003 | ../integrity/integrity-rule-catalog.md, ../local/runtime-package-boundary.md |
 | IR-059 | distribution-reference-boundary | REQ-029 | `distribution-boundary.md`, `foundations/project-extensions.md`, `integrity-rule-catalog.md` |
-| IR-060 | forbidden Japanese word detection | REQ-053-001, REQ-053-035, REQ-036-023, REQ-010-071 | ../../quality/textlint-quality-runtime.md, ../../responsibilities/document-type-responsibilities.md, ../integrity-rule-catalog.md |
+| IR-060 | forbidden Japanese word detection | REQ-053-001, REQ-036-023, REQ-010-071 | ../../quality/textlint-quality-runtime.md, ../../responsibilities/document-type-responsibilities.md, ../integrity-rule-catalog.md |
 | IR-061 | 索引類自動生成整合性 | - | - |
 | IR-062 | skill/command パス参照実在 | REQ-010 | integrity-contracts.md, agentdev-skill-authoring.md, agentdev-command-authoring.md |
 | IR-063 | common-policy-identifier-invariant | REQ-051-005, REQ-051-006, REQ-010-064, REQ-010-068 | ../integrity-rule-catalog.md, ../../authoring/command-file-format.md |

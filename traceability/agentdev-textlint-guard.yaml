@@ -1,3 +1,6 @@
+# REQ-053 全面改訂（REQ-122、Case #4150）により廃止された要件行（REQ-053-004/006/011/012/016/021/022/024/025/026/027/028/031/032/035/039/041/042/043/044/045/046/047/048）への対応宣言を除去した。
+# 削除行の宣言・policy 追随は REQ-122 の Definition 変更（REQ-010-081/085 削除を含む）と同一の変更として実施した。
+# agentdev-textlint-guard Plugin 本体（src/opencode/plugins/agentdev-textlint-guard/）は配布資産として維持する（CR-007、RD-003）。
 component: agentdev-textlint-guard
 implementation:
   README-INSTALL.md:
@@ -12,83 +15,14 @@ implementation:
     - REQ-099-020
   src/opencode/plugins/agentdev-textlint-guard/.gitignore:
     - REQ-029-012
-  src/opencode/plugins/agentdev-textlint-guard/README.md:
-    - REQ-053-044
-    - REQ-053-047
-  src/opencode/plugins/agentdev-textlint-guard/gate.ts:
-    - REQ-010-074
-    - REQ-010-075
-    - REQ-053-016
-    - REQ-053-022
-    - REQ-053-031
-    - REQ-053-032
-    - REQ-053-041
-    - REQ-053-045
-    - REQ-053-047
-  src/opencode/plugins/agentdev-textlint-guard/lib/config.ts:
-    - REQ-053-025
-    - REQ-053-027
-  src/opencode/plugins/agentdev-textlint-guard/lib/edit-semantics.ts:
-    - REQ-053-025
-    - REQ-053-026
-    - REQ-053-027
   src/opencode/plugins/agentdev-textlint-guard/lib/engine-bundle.ts:
     - REQ-010-071
     - REQ-029-012
-  src/opencode/plugins/agentdev-textlint-guard/lib/hash.ts:
-    - REQ-053-042
-  src/opencode/plugins/agentdev-textlint-guard/lib/identity.ts:
-    - REQ-053-042
-  src/opencode/plugins/agentdev-textlint-guard/lib/inspect.ts:
-    - REQ-053-004
-    - REQ-053-024
-    - REQ-053-025
-    - REQ-053-026
-    - REQ-053-027
-    - REQ-053-028
-    - REQ-053-031
-    - REQ-053-032
-    - REQ-053-041
-    - REQ-053-043
-  src/opencode/plugins/agentdev-textlint-guard/lib/project.ts:
-    - REQ-053-025
-    - REQ-053-027
-  src/opencode/plugins/agentdev-textlint-guard/lib/reconstruct.ts:
-    - REQ-053-025
-    - REQ-053-026
-    - REQ-053-027
-  src/opencode/plugins/agentdev-textlint-guard/lib/results.ts:
-    - REQ-053-025
-    - REQ-053-026
-    - REQ-053-027
-    - REQ-053-028
-    - REQ-053-031
-  src/opencode/plugins/agentdev-textlint-guard/lib/result-store.ts:
-    - REQ-053-043
-    - REQ-053-044
+  src/opencode/plugins/agentdev-textlint-guard/gate.ts:
+    - REQ-010-074
+    - REQ-010-075
   src/opencode/plugins/agentdev-textlint-guard/lib/rules.ts:
     - REQ-010-068
-    - REQ-053-004
-    - REQ-053-024
-    - REQ-053-025
-  src/opencode/plugins/agentdev-textlint-guard/lib/runs.ts:
-    - REQ-053-041
-    - REQ-053-042
-    - REQ-053-046
-    - REQ-053-047
-  src/opencode/plugins/agentdev-textlint-guard/lib/targets.ts:
-    - REQ-053-025
-    - REQ-053-026
-    - REQ-053-032
-    - REQ-053-039
-  src/opencode/plugins/agentdev-textlint-guard/lib/terminology.ts:
-    - REQ-053-004
-    - REQ-053-024
-  src/opencode/plugins/agentdev-textlint-guard/lib/workers/lint-worker.ts:
-    - REQ-053-045
-    - REQ-053-048
-  src/opencode/plugins/agentdev-textlint-guard/lib/workers/pool.ts:
-    - REQ-053-048
   src/opencode/plugins/agentdev-textlint-guard/package.json:
     - REQ-029-012
   src/opencode/plugins/agentdev-textlint-guard/plugin.ts:
@@ -96,68 +30,16 @@ implementation:
     - REQ-052-004
     - REQ-052-006
     - REQ-052-007
-    - REQ-053-025
-    - REQ-053-026
-    - REQ-053-027
-    - REQ-053-028
-    - REQ-053-031
-    - REQ-053-041
 verification:
-  src/opencode/plugins/agentdev-textlint-guard/tests/config.test.ts:
-    - REQ-053-025
-    - REQ-053-027
-  src/opencode/plugins/agentdev-textlint-guard/tests/edit-semantics.test.ts:
-    - REQ-053-025
-    - REQ-053-027
   src/opencode/plugins/agentdev-textlint-guard/tests/engine-bundle.test.ts:
     - REQ-010-071
     - REQ-029-012
   src/opencode/plugins/agentdev-textlint-guard/tests/gate.test.ts:
     - REQ-010-075
     - REQ-052-002
-    - REQ-053-031
-    - REQ-053-032
-    - REQ-053-039
-  src/opencode/plugins/agentdev-textlint-guard/tests/identity.test.ts:
-    - REQ-053-042
-  src/opencode/plugins/agentdev-textlint-guard/tests/inspect.test.ts:
-    - REQ-053-025
-    - REQ-053-028
-    - REQ-053-031
-  src/opencode/plugins/agentdev-textlint-guard/tests/parallel.test.ts:
-    - REQ-053-048
-  src/opencode/plugins/agentdev-textlint-guard/tests/pipeline-integration.test.ts:
-    - REQ-053-045
-    - REQ-053-046
-    - REQ-053-047
   src/opencode/plugins/agentdev-textlint-guard/tests/plugin.test.ts:
     - REQ-052-002
     - REQ-052-004
-    - REQ-053-025
-    - REQ-053-026
-    - REQ-053-027
-    - REQ-053-028
-  src/opencode/plugins/agentdev-textlint-guard/tests/quality-consistency.test.ts:
-    - REQ-053-041
-    - REQ-053-048
-  src/opencode/plugins/agentdev-textlint-guard/tests/reconstruct.test.ts:
-    - REQ-053-025
-    - REQ-053-027
-  src/opencode/plugins/agentdev-textlint-guard/tests/result-store.test.ts:
-    - REQ-053-043
-    - REQ-053-044
-  src/opencode/plugins/agentdev-textlint-guard/tests/runs.test.ts:
-    - REQ-053-041
-    - REQ-053-045
-    - REQ-053-046
-    - REQ-053-047
   src/opencode/plugins/agentdev-textlint-guard/tests/standard-dictionary.test.ts:
     - REQ-010-068
     - REQ-010-071
-  src/opencode/plugins/agentdev-textlint-guard/tests/targets.test.ts:
-    - REQ-053-026
-    - REQ-053-032
-    - REQ-053-039
-  src/opencode/plugins/agentdev-textlint-guard/tests/terminology.test.ts:
-    - REQ-053-004
-    - REQ-053-024
