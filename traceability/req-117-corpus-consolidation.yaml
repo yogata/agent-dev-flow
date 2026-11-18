@@ -1,0 +1,53 @@
+component: req-117-corpus-consolidation
+# REQ-117(docs 整合・検査体系と機械工程の堅牢化・15 作業単位)の implementation 対応のうち、
+# 既存 sidecar・inline 宣言を持たない実体パスのみを本 sidecar で宣言する。
+# 実体パスが既に inline ADF-COVERS 宣言または既存 sidecar 宣言を所有する行は、
+# トレーサビリティ検査の単一情報源制約(duplicate-inconsistencies)に従い、
+# 既存情報源側へ REQ を追加したREQ-117-002 は agentdev-workflow-req-define.yaml /
+# agentdev-design-file-manager.yaml / agentdev-req-file-manager.yaml、REQ-117-008 は 6 skill
+# sidecar、REQ-117-012 は case-open/case-ready sidecar、REQ-117-013 は
+# agentdev-workflow-case-run.yaml、REQ-117-005 verification は agentdev-traceability.yaml、
+# REQ-117-009 verification は agentdev-backlog-integration.yaml、REQ-117-010 verification は
+# case-open/case-ready/case-close sidecar)、または REQ-117-003・REQ-117-005・REQ-010-085・
+# REQ-032-045 のように登録経路を持たない行は policy.yaml へ区分拡張宣言付きで登録した。
+# 行ごとの実体確認(実在・実装担当)は Case #4143・DEL-4143-1 で実施(2026-11-18)。
+implementation:
+  # REQ-117-001: docs 正規成果物の機械的修正 4 件(REQ-108 表統合・REQ-060 用語現行化・
+  # REQ-010 行順序回復・numbering-policy 参照 ID 化)。commit a20d58d27(#3867)。
+  # REQ-060.md は japanese-terminology-correction.yaml、numbering-policy.md は inline 宣言が
+  # 既存のため、本 sidecar では REQ-108.md・REQ-010.md を宣言する。
+  docs/requirements/REQ-108.md:
+    - REQ-117-001
+  docs/requirements/REQ-010.md:
+    - REQ-117-001
+  # REQ-117-002: inline コードフェンス破損修正・複製整合。commit 706e7ae9d(#3877)・
+  # d89006524(#3886)。REQ-004.md を宣言(他の修正実体は既存情報源側へ追加済み)。
+  docs/requirements/REQ-004.md:
+    - REQ-117-002
+  # REQ-117-004: main root 未追跡残存の確定処置。commit cef070890(#3878)。
+  .gitignore:
+    - REQ-117-004
+  src/common/tools/agentdev-gh/tests/runner-cli.test.ts:
+    - REQ-117-004
+  # REQ-117-007: case-run scripts 配下の tsconfig.json・package.json 実追加と
+  # 型検査基盤構成。commit dae06b725(#3881)。
+  src/common/skills/agentdev-workflow-case-run/scripts/tsconfig.json:
+    - REQ-117-007
+  src/common/skills/agentdev-workflow-case-run/scripts/package.json:
+    - REQ-117-007
+  # REQ-117-009: REQ-039-007 行への履歴検査成功/検査不能境界の明示的文言追記。
+  # commit f3c082398(#3824)が行を追加し、コミット 0 境界文言を含む現行文言が実在。
+  docs/requirements/REQ-039.md:
+    - REQ-117-009
+  # REQ-117-010: 機械工程 script の入力検証専用入口仕様の scripts 契約への定義。
+  # commit fa821f58b(#3882)。install.ps1 は installer-host-projection.yaml に追加済み。
+  src/common/skills/agentdev-workflow-case-run/scripts/README.md:
+    - REQ-117-010
+  # REQ-117-014: 受理記述の DEC-062 現行化に対応する受理検査実装。
+  # agentdev-req-file-manager.md Design は inline 宣言が既存のため、本 sidecar では
+  # 形式妥当性のみの受理を恒常実現する alloc-composite-id.ts を宣言する。
+  src/common/skills/agentdev-req-file-manager/scripts/src/alloc-composite-id.ts:
+    - REQ-117-014
+  # REQ-117-015: DEC-062 受理例示表記の非意味文言整理。commit a20d58d27(#3867)。
+  docs/decisions/DEC-062.md:
+    - REQ-117-015

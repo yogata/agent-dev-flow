@@ -23,6 +23,7 @@ implementation:
   - REQ-110-039
   - REQ-110-040
   - REQ-110-041
+  - REQ-117-008
   src/common/skills/agentdev-phase-theme-collaboration/templates/phase-readme.md:
   - REQ-106-016
   - REQ-111-025

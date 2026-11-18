@@ -919,6 +919,27 @@ verification:
   - REQ-120-001
   - REQ-120-002
   - REQ-120-003
+  # 区分C 追加（2026-11-18、Case #4143・DEL-4143-1 の AG-004(3) が宣言した区分運用の拡張:
+  # 恒常 checker を所有しない契約行の登録区分の明示的追加・無断拡張ではない）:
+  # 2026-11-11 の checker 簡素化（Wave-1・#4136）で docs-check・check_content_corruption・
+  # check_integrity IR・lint_skills の恒常 checker 群が削除され、これらの行の恒常検証手段は
+  # 現行リポジトリに存在しない。各人は Case #3866 実行時の一回限りの機械照合（TS-001〜015 の
+  # 実施記録・REQ-113 緑化実証・突合確認）で検証済みであり、responsibility-boundaries.md の
+  # REQ-096 系 policy optional 登録（恒続的な検証対象を持たない行の区分明示）と同一判断の前例に
+  # 従う。恒常 checker の再設置が将来の別要求として発生した場合の再評価対象。
+  - REQ-010-085
+  - REQ-032-045
+  - REQ-113-001
+  - REQ-113-002
+  - REQ-117-001
+  - REQ-117-002
+  - REQ-117-003
+  - REQ-117-004
+  - REQ-117-007
+  - REQ-117-008
+  - REQ-117-012
+  - REQ-117-014
+  - REQ-117-015
 
 design:
   default: required
@@ -1672,3 +1693,33 @@ implementation:
   - REQ-088-004
   - REQ-088-005
   - REQ-088-007
+  # 区分拡張（2026-11-18、Case #4143・DEL-4143-1 の AG-004(3) が宣言した区分運用の拡張:
+  # 実装宣言先として有効な登録経路を持ち得ない行の登録区分の明示的追加・無断拡張ではない）。
+  # 理由別記録:
+  # - REQ-103-028: 実装実体が git tag baseline-v4-canonical-convergence-20261007
+  #   （git tag -l で実在確認済み）でありファイル実体を持ち得ない。実在記録実体への宣言探索
+  #   （design-principles.md 3原則・DEC-056（baseline tag を移行の比較基準として参照するのみ）・
+  #   docs/reports/req-103-ac-judgment-wave3.md（恒久管理しない一回限り判定記録）・
+  #   REQ-103.md 自身（要件文書で実装でない））は全て失敗。verification は既存の
+  #   req-103-wave3-verification.yaml と policy verification optional（区分A 登録済み）が対応。
+  # - REQ-117-003: 実装実体は IR-044 分離移管先 9 Design（commit a20d58d27・#3867・現行実在）だが
+  #   9 Design すべてが inline ADF-COVERS 宣言を所有し、単一情報源制約（duplicate-inconsistencies）
+  #   により sidecar からの宣言が競合矛盾を生じ、inline 追記は Case #4143 の委譲契約
+  #   （traceability/ 配下のみ編集）で禁止のため宣言登録経路を持たない。OU-002 の inline 宣言
+  #   追記の確定後に inline 宣言へ移管する前提の暫定登録。
+  # - REQ-117-005: 実装実体は covers 区分外達成義務行の解消宣言が置かれた 3 文書
+  #   （docs/designs/README.md・responsibility-boundaries.md・runtime-package-boundary.md 冒頭
+  #   ADF-COVERS・現行実在）だが 3 文書すべてが inline 宣言を所有し REQ-117-003 と同一の理由で
+  #   宣言登録経路を持たない（verification は agentdev-traceability.yaml の check.ts 宣言で解消）。
+  #   OU-002 の inline 宣言追記の確定後に inline 宣言へ移管する前提の暫定登録。
+  # - REQ-010-085: 実装実体は integrity-contracts.md「frontmatter updated 鮮度債務」節の運用規約
+  #   （REQ-010-085 が所有する旨を明記・現行実在）だが同節の inline 宣言が既存のため REQ-117-003 と
+  #   同一の理由で宣言登録経路を持たない。OU-002 の inline 宣言追記の確定後に移管する前提の暫定登録。
+  # - REQ-032-045: 実装実体は case-close.md Design「一時資産の後片付けの評価」項の規律条項
+  #   （(REQ-032-045) 参照付き・現行実在）だが inline 宣言が既存のため REQ-117-003 と同一の理由で
+  #   宣言登録経路を持たない。OU-002 の inline 宣言追記の確定後に移管する前提の暫定登録。
+  - REQ-010-085
+  - REQ-032-045
+  - REQ-103-028
+  - REQ-117-003
+  - REQ-117-005

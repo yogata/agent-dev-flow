@@ -17,6 +17,7 @@ implementation:
     - REQ-058-006
     - REQ-058-008
     - REQ-058-012
+    - REQ-117-010
   scripts/self-sync.ps1:
     - REQ-099-010
     - REQ-099-011

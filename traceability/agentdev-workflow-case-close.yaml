@@ -91,6 +91,7 @@ verification:
   src/common/skills/agentdev-workflow-case-close/scripts/tests/close-validate-input.test.ts:
     - REQ-009-053
     - REQ-030-032
+    - REQ-117-010
   src/common/skills/agentdev-workflow-case-close/scripts/tests/close_mechanical_steps.test.ts:
     - REQ-029-014
     - REQ-029-015

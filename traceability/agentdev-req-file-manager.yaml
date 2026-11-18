@@ -8,6 +8,7 @@ design:
 implementation:
   src/common/skills/agentdev-req-file-manager/scripts/src/alloc-req-number.ts:
     - REQ-001-071
+    - REQ-117-002
   src/common/skills/agentdev-req-file-manager/references/matching-and-merge.md:
     - REQ-004-069
     - REQ-004-070

@@ -65,6 +65,7 @@ implementation:
     - REQ-004-066
     - REQ-004-067
     - REQ-004-068
+    - REQ-117-002
   src/common/skills/agentdev-workflow-req-define/SKILL.md:
     - REQ-005-029
     - REQ-021-012

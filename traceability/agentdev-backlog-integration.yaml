@@ -5,3 +5,4 @@ implementation:
 verification:
   src/common/skills/agentdev-backlog-integration/tests/ru-numbering-history.test.ts:
     - REQ-039-007
+    - REQ-117-009

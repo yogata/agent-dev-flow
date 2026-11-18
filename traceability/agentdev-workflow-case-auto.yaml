@@ -42,6 +42,7 @@ implementation:
     - REQ-111-018
     - REQ-111-035
     - REQ-003-031
+    - REQ-117-008
   src/common/skills/agentdev-workflow-case-auto/scripts/src/records-report.ts:
     - REQ-034-021
     - REQ-101-008

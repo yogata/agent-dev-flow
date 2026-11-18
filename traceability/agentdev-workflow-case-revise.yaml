@@ -11,6 +11,7 @@ implementation:
     - REQ-062-008
     - REQ-101-009
     - REQ-108-005
+    - REQ-117-008
   src/common/skills/agentdev-workflow-case-revise/references/definition-revision.md:
     - REQ-062-010
     - REQ-083-001

@@ -128,6 +128,7 @@ implementation:
     - REQ-094-006
     - REQ-094-010
     - REQ-094-011
+    - REQ-117-001
   docs/requirements/REQ-082.md:
     - REQ-094-001
     - REQ-094-002
