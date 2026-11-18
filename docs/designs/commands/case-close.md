@@ -5,7 +5,7 @@ created: 2026-06-21
 updated: "2026-11-18"
 ---
 
-<!-- ADF-COVERS(implementation): REQ-021-018, REQ-021-019, REQ-021-022, REQ-021-025 -->
+<!-- ADF-COVERS(implementation): REQ-021-018, REQ-021-019, REQ-021-022, REQ-021-025, REQ-122-012 -->
 <!-- ADF-COVERS(design): REQ-021-018, REQ-021-025, REQ-021-027 -->
 <!-- ADF-COVERS(design): REQ-032-007, REQ-032-013 -->
 <!-- ADF-COVERS(design): REQ-032-001, REQ-032-002, REQ-032-003, REQ-032-004, REQ-032-005, REQ-032-006, REQ-032-008, REQ-032-009, REQ-032-010, REQ-032-011, REQ-032-012, REQ-032-014, REQ-032-015, REQ-032-016, REQ-032-017, REQ-032-018, REQ-032-019, REQ-032-020, REQ-032-021, REQ-032-022, REQ-032-023, REQ-032-024, REQ-032-025, REQ-032-026, REQ-032-027 -->
@@ -23,6 +23,8 @@ updated: "2026-11-18"
 <!-- ADF-COVERS(design): REQ-032-047, REQ-032-048（QG-4 最終受け入れの検証義務に基づく試験範囲選択と最終受け入れ判定の design 実体） -->
 
 # case-close Design
+
+本 Design は骨格（公開契約と制御フロー）と references/ 詳細仕様の2層構成である。クローズ手順の詳細・検査手順・評価規則の詳細は references/case-close/ 配下へ分離している。通常経路で全 reference を無条件読込せず、必要な条件に応じて遅延読み込みする。
 
 本 Design が定義する case-close は公開 command ではなく内部 lifecycle 段階である。公開 UX は要求入口（req-define、backlog-auto）と標準実行コマンド case-auto へ収斂しており、本段階は case-auto の orchestration から駆動される。本 Design は内部 lifecycle 段階の契約を定める正規文書である。
 ## 目的
@@ -94,107 +96,16 @@ worktree を削除する前に、未追跡ファイルだけを対象とする c
 
 ### Epic Wave クローズ（REQ-032-015〜022）
 
-- Epic Issue 本文読込（実行構成表（`| Wave | Issue | 前提 | 状態 |`）を解析）
-- 現在 Wave 特定（実行構成の未完了状態（pending / blocked / failed）の子 Issue が属する Wave のうち Wave 番号昇順で最も若い Wave。未完了がいない場合は次 Wave）
-- PR作成済み子Issue 特定（現在 Wave 内の PR 作成済み子 Issue）
-- 各子Issue のクローズ処理を準並列化する（REQ-032-015）
-  - 並列実行: PR情報取得、PR変更ファイル取得、Issue本文読取、PR本文読取、完了条件チェック事前評価、capture候補抽出、Design確定候補確認、worktree/branch削除前チェック
-  - 直列集約: squash merge、main pull&hash確認、Epic 実行構成の状態更新、.agentdev永続化commit&push、ローカル branch/worktree 最終削除
-  - rebase による機械的コンフリクト解消は停止条件外（REQ-003-006 Level1）。解消不能時は case-auto へエスカレーション（REQ-031-004、REQ-003-002 Level2/3）
-- Epic 実行構成の状態更新（per-Epic の単一書き手による排他制御（DEC-039、REQ-035-001））。状態列は4値のみ（`pending` → `completed` 等）。PR 番号・URL は状態列に付記せず、子 Issue の結果と PR 自体から取得する
-
+詳細は references/close-procedures.md を参照（遅延読み込み）。
 ### Epic Issue 完了条件チェックボックス最終評価・更新
 
-Epic 実行構成の状態更新の後、最終 Wave 判定の前に実施する。
-Epic Issue 本文の `## 完了条件` セクションを読み込み、全完了条件を QG-4 に従い評価・更新する（完了条件チェックボックス評価の case-close 専任責務（REQ-032-001）、Epic Wave 経路への明示適用、`POL-completion-checkbox-single-writer`）。達成済み判定は条件と証拠の照合による（REQ-032-001）。
-
-#### 評価対象スコープ（QG-4 観点8）
-
-- **中間 Wave**: 当該 Wave でマージされた PR の対象範囲に属する完了条件のみ `[ ]` → `[x]` とする（PR 対象範囲）。他 Wave の完了条件は `[ ]` のまま残す。
-- **最終 Wave**: Epic Issue の全完了条件を評価する（全体評価スコープ）。実装完了している完了条件を `[ ]` → `[x]` に更新する。
-
-#### 再読込 VERIFY
-
-更新後に Epic Issue 本文を再読込し、対象完了条件の `- [ ]` が0件であることを確認する（最大2回）。
-
-- 1回目の再読込で `- [ ]` が0件なら最終 Wave 判定へ進む。
-- 1回目で `- [ ]` が残る場合は更新を再試行し、再度再読込（2回目）。
-- 2回目でも `- [ ]` が残る場合は構造化エラーで停止する（後述「未達項目残存時の停止」）。
-
-#### 未達項目残存時の停止
-
-最終 Wave で実装完了していない完了条件（`- [ ]`）が残る場合、case-close は構造化エラーで停止する（未達項目残存時停止の Epic Wave 経路への明示適用）。
-中間 Wave で他 Wave の完了条件が `[ ]` のまま残ることは停止条件ではない（対象外 Wave の完了条件は評価対象外のため）。
-
-停止時の出力には以下を含める:
-- 残存する未達完了条件の一覧
-- 対応する子Issue の状態（completed / blocked / failed）
-- 再開は Root Case 指定である旨（工程別の再開コマンドは提示しない）
-
-- 最終 Wave 判定（全子Issue completed なら Epic クローズ）。それ以外は残 Wave 通知
-
+詳細は references/close-procedures.md を参照（遅延読み込み）。
 ### 単一 Issue クローズ（従来フロー、後方互換）
 
-- 重複ファイルチェック（`git status --short` と PR 変更ファイル一覧取得（Custom Tool `agentdev_gh` の pr_changed_files）で重複検出）
-- 前提確認（達成判定、完了ゲート（QG-4）に従い完了条件チェックボックスを最終評価、更新）。`[x]` 反映事後確認（再読込 VERIFY、最大2回）。未達項目残存時は構造化エラー停止
-- docs/ 検証（機能追加固有検証（REQ作成、インデックス、spec更新、Decision）、関連ドキュメント整合性確認、README 索引整合性）
-  - close 時 Design / commands / skills 更新漏れの局所確認
-  - Design 確定フロー（v2:ADR-0123 Decision #4, REQ-001-015）（対象 REQ に基づく draft Design 棚卸し列挙と、PR 本文 `## Design確定候補` セクションの申告候補（補助入力）の統合による全件評価、確定判断（(a) 昇格 / (b) case-revise 再起動提案（case-ready の Design 保存内部責務で反映）/ (c) 見送り）。申告の有無に関わらず棚卸し列挙を実行する）
-  - AUTOGEN block 索引再生成差分検出（project extension checks 経由）。docs/ 検証の後、generate_indexes.ts --dry-run を実行し AUTOGEN block の再生成差分を検出する。本検証は case-close の手順を直接編集せず、Workflow Skill extension（.agentdev/extensions/skills/agentdev-workflow-case-close.yaml）の checks セクション経由で導入する（project-extensions Design 準拠）。case-close は dry-run/差分検査で停止し、直接編集・commit しない。差分がある場合は case-run へ差戻し、再生成（実 commit）は case-run が行う。複数 PR 跨ぎでの AUTOGEN block 再生成漏れを防止する。Epic Wave クローズ経路では Epic Issue 完了条件チェックボックス最終評価の前段に同等の dry-run/diff による索引健全性検証を適用する（Epic Issue クローズ時の索引検証は case_open_hints 参照）
-- PRマージ（squash merge（Custom Tool `agentdev_gh` の pr_merge、リトライ最大5回、フォールバック手順）、対応記録コメント追記）
-  - squash merge 前の mergeable UNKNOWN ポーリング（REQ-031-017）（Custom Tool `agentdev_gh` の pr_mergeable で mergeable 状態を取得し、UNKNOWN の場合は最大60秒・10秒間隔でポーリング待機。上限超過時はマージ中止・構造化エラー停止。CONFLICTING 遷移時はコンフリクト解消 rebase パスへ分岐）
-  - Squash merge 後のローカル先行 commit 検出、処理（REQ-003-005）（`git log origin/{branch}..HEAD --oneline` で検出、内容重複確認後に `git reset --hard origin/{branch}` で reset（`agentdev-git-worktree` の squash merge 後分岐ハンドリング手順参照））
-  - コンフリクト解消 rebase パス（REQ-003-001/002、REQ-031-003/025）（squash merge 失敗時）。squash merge がコンフリクトで失敗した場合、`git rebase` による機械的解消を試みる。rebase が自動解決した場合は再マージ（PR マージへ戻る）。rebase 自体がコンフリクトを発生した場合は実装変更を行わず case-auto へエスカレーションし停止する（コンフリクト解消モデル Level 1、`docs/designs/commands/case-auto.md` コンフリクト解消モデル Level 2/3 参照）
-- Post-merge 完了条件検証項目の反映確認（CI 通過等）
-- Issueクローズ（Custom Tool `agentdev_gh` の issue_close、reason: completed）
-- ローカルブランチ、worktree削除（`agentdev-git-worktree` 手順）。未コミット変更検出、共有作業ツリーでの `git checkout .` 禁止（1-writer 検知規律は REQ-030-017）
-- 親Epic Issue更新（`agentdev-epic-tracker`、Epic 自動クローズ判定）
-- 実行前同期（`git pull --ff-only`、hash 検証）
-  - git main 同期リスク事前検出、代替同期手順選択（REQ-031-008）（`git pull --ff-only` 直前に worktree 状態（dirty tree）・並列実行による ref lock 競合・非 main ブランチ占有の3リスクを事前検出。検出時に安全な代替同期手順（直列化待機、`git fetch origin main:main` による非チェックアウト同期）を選択。`agentdev-git-worktree` の git main 同期リスク事前検出プロシージャ参照）
-- 学びの検知、抽出（`agentdev-learning-capture`、ユーザーに学び有無を問わない（エージェント自律）、Capture 回収（PR 本文から intake/learning を分離））
-- ドメイン状態永続化（`.agentdev/` 配下を commit/push（learning と intake を同一 commit））
-- 完了報告（結果状態の分離報告（GitHub側、`.agentdev`、ローカルブランチ削除））
-
+詳細は references/close-procedures.md を参照（遅延読み込み）。
 ### 最終検証の実行（検証義務に基づく試験範囲選択）と tmp 残存確認
 
-- 最終検証の試験範囲選択（QG-4 合格基準。REQ-032-047）: 当該 Case の変更内容、依存関係、リスク、受け入れ条件および正規契約から導出される検証義務から、必要な試験・検査の範囲を決定して実行する。変更ファイルに直接対応する試験に加え、影響を受ける関連機能および共通基盤の試験を評価対象に含める。試験範囲を安全に限定する根拠が不足する場合、および利用者または正規契約がリポジトリ全体の試験を明示要求する場合は、リポジトリ全体の試験を正規の方法で実行する。execution contract または test strategy で確定・合意済みの検証方法を選択の判断だけでは縮小しない（REQ-032-037 の降格禁止を維持）。試験範囲の選択根拠および除外根拠の記録は完了条件照合（REQ-032-031/033/034）の対象とし、試験範囲の判定は REQ-096 の判断アーキテクチャに従う
-- リポジトリ全体の試験を実行する場合の bun test 実行形態: 3 cwd 分割正規形に従う（① integrity suite、② src 側 skill script テスト、③ repo ルート系 guard テストの3分割。各実行の cwd はリポジトリルートに統一、`./` prefix 付きの対象ディレクトリ明示指定、分割② 前の依存パッケージ前置、N/M 件数突合、固定値の期待値化なし、カレントディレクトリトリビアな実行の禁止）。実行形態契約の正は agentdev-quality-gates Design「full integrity suite 合格基準（QG-4）における bun test 実行形態契約」と同スキル references/qg-4-final-acceptance.md が所有する
-- 配布物変更を含む case の3検査結果確認: case-close の最終 gate で配布物変更を含む case を検証する場合、配布依存境界・IR-055・traceability の3検査の実行結果（case-run での commit 前実行記録）を確認する。case-run で3検査が実行されていない配布物変更を検出した場合は、検査を実行して新規違反 0 件を確認してからマージに進む。検出違反の全件突合を省略せず、違反の無断削除・隠蔽を受け入れない（baseline による既知違反の区別は撤廃済み、REQ-010-074/079）
-- tmp 残存確認: 単一 Issue ルートの正常終了を前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないことをクリーンアップ工程で確認する。Epic Wave ルートでは、当該 Wave スコープの一時成果物（draft、RU、検出事項等の未消化ドメイン状態）の残留と `.agentdev/tmp/` 一時ファイルの残存がないことを確認し、残留時は当該 Wave を完了扱いにしない
-- 一時資材の後片付けの評価: 完了判定工程は、当該 Case 実行に伴う一時資材の後片付けの成立を、実行担当が作業記録経路へ返した実施結果、確認根拠、未処理事項と提示された証拠に基づいて評価する。評価範囲は一時資材の共通取扱い契約（REQ-118）と実行契約に反映された条件から導出し（REQ-032-043）、実行したという申告だけを成立根拠にせず、確認可能な具体的な資材については提示された証拠が回収または引継ぎを実際に立証しているかを評価する。必須の後片付けが未完了・確認不能である場合、既知の残存、回収失敗、証拠不足、引継ぎ不成立を検出した場合は完了扱いとせず、検証の成功と後片付けの未達を区別して報告する（REQ-032-044）。ただし ADF が管理・観測していない任意の資材の不存在を機械的に完全証明することを終了の条件にしない。remote 上の対象の不存在判定は HTTP 404 単独で行わず、認証・可視性・対象 ID を確認しても判断できない場合は終了を拒否する（REQ-032-045）
-
-#### 保存済み検証証跡の解析と再実行条件の適用
-
-- 検証結果の件数、失敗明細、サマリーの表示変更は、保存済み証跡（退避ファイル、PR 本文検証差分セクション、SSoT コメント）から行う。同一情報の取得だけを目的とした full suite や checker の再実行をしない（REQ-007-014）
-- 再実行の正当理由（変更後検証、環境変更、失敗由来分類、非決定的失敗の再現確認、必須独立検査、証跡欠落）と証跡の必須要素の正は agentdev-quality-gates Design「QG-4 検証証拠の再利用と再実行条件」が所有し、本 Design は再規定しない
-- close の最終検証（正規契約から導出した検証義務に基づき選択された必要な試験・検査、配布物変更を含む case の3検査結果確認、QG-4 checker 実測）は origin/main 取り込み済み・マージ直前の branch HEAD で実行する既存契約を維持し、case-run の保存結果だけによる省略を行わない。省略を行わない対象は選択された必要検証範囲の実行義務であり、検証義務がリポジトリ全体の試験を要求する case ではリポジトリ全体の試験の実行義務である。verify-only closure の SSoT コメント参照判定も維持する
-- textlint 共通基盤によるファイル単位結果の再利用（同一性条件付きの規則実行省略）は検査基盤内部の実行形態であり、close の最終検査の実行義務の省略を構成しない。close の最終検査は対象全件の列挙・全文取得と現在入力との照合を伴う検査基盤の実行を毎回行い、その内部で同一性が機械検証できた対象の規則実行省略が許容される
-
-#### traceability の門の対象 REQ 行 0 件案件の正規経路と前提の検証順序（REQ-030-032）
-
-traceability の門の、対象 REQ 行が0件の案件の正規の経路と、前提の検証の順序を Design へ反映する。
-
-- 対象 REQ 行が0件の案件の case-close 機械工程における正規の経路は、全体の実行と main の baseline との対照による悪化 0 件の機械証明とする（2026-11-16 の Case #4113 で手で書いた wrapper と同等の役割を正規の実装として提供し、手で書く wrapper を不要にする）。既知の欠落は main の baseline と識別子の集合で完全一致するかぎり不合格の原因にしない。新規の違反を検出する力は維持する（正例・反例の双方で確認する）
-- 機械工程の各 phase で、案件の構成と入力の前提の検証を実行する検証の起動より先に実行し、前提が満たされない失敗が早い段階で確定する順序にする。実行する検査の総数は減らさない（検査の省略ではなく、失敗を検出する順序の是正）
-
-#### verify-only closure の QG-4 達成判定（SSoT コメント参照）
-
-verify-only closure（PR も carrier commit も存在しない Issue 完了）の QG-4 達成判定では、
-case-run が記録した SSoT コメント（Issue コメント）を実行コマンド列・検証結果の
-判定根拠として参照する。PR が存在しないため PR 本文の検証差分セクションは存在せず、
-SSoT コメントが検証証跡の恒久記録の正となる。
-
-- 参照手順: SSoT コメントから (1) 3検査（配布依存境界・IR-055・traceability）の実行記録と
-  新規違反 0 件確認、(2) 実行した検証の N/M 件数突合と直前実績比較（検証義務がリポジトリ全体の試験を
-  要求する場合は integrity suite 全件）、(3) 実行コマンド列の
-  再実行可能性（実行 cwd・実行形態の記載）、(4) 実行する検証と実行しない検証の範囲およびその根拠の記載を確認する
-- 完了抑止: SSoT コメントが存在しない verify-only closure、または SSoT コメントに
-  検証結果の記載が欠落している場合は QG-4 不合格として完了扱いにしない
-- capture 回収の N/A: verify-only closure では PR 本文が存在しないため
-  capture 回収（REQ-032-005 の PR 本文入力源）は N/A とする。SSoT コメントを
-  capture 入力源として扱わない（SSoT コメントは検証証跡チャネルであり
-  capture チャネルではない）
-
+詳細は references/close-procedures.md を参照（遅延読み込み）。
 ## 所有関係と委譲
 
 - public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、case-auto の orchestration による Workflow Skill load 時に本 Design が読み込まれる（DEC-010。第4段以降は command 定義の実行時投影ではなく直接読込）。
@@ -225,25 +136,7 @@ case-run 側の事前検査とは独立に実施する。検証手段との対�
 
 ## targeted docs guard (v2:REQ-0158-003)
 
-case-close 工程で targeted docs guard を実行する。
-対象は PR で変更されたファイルと連動ファイル（`docs/README.md`、`docs/designs/README.md`）。
-
-changed-path routing と配布依存境界の検出経路は共有境界 adapter へ接続する（DEC-014）。
-最終 gate 基底は REQ-010-012 を再利用し、検査エラー（検査対象欠落、読込不能、未分類エントリ、adapter 起動失敗）は gate-not-passed として扱い、clean として通過させない（DEC-014 決定5、`integrity/distribution-boundary.md`「検査エラーの意味」）。
-
-- 実行タイミング: docs/ 検証の一部。変更ファイル対象の targeted docs guard を実行し、draft→accepted 等の Design status 変更時の `docs/designs/README.md` 同期、Issue/PR で宣言した文書更新対象と実変更ファイルの対応、旧Design直下パス混入検出、local版旧生成方式語彙混入検出、full docs-check 実行要否判定を行う
-- 実行コマンド: `bun run .opencode/skills/repo-agentdev-integrity/scripts/cli.ts --workflow case-close --files <PR 変更ファイル一覧> --json`。PR 変更ファイル一覧は Custom Tool `agentdev_gh`（pr_changed_files）で取得する（case-close はマージ後 main 環境で実行されるため `--files` を使用。`--base-ref` は worktree 環境（マージ前、case-run 等）向け）
-- `full_docs_check_recommended` が true の場合: case-close 完了判定の追加確認として扱う。integrity rule 追加・削除・大幅変更、docs/designs の大規模移動・改名、repo-agentdev-integrity の検査スコープ変更、文書分類・責務境界の基準変更を検出した場合は `/repo/docs-check`（全体監査）の実行を推奨する
-- 失敗時: 検査対象文書（PR 変更ファイル、`docs/designs/README.md`、`docs/README.md`）を修正して再実行する
-
-JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`unchecked_reasons`、`failures`、`warnings`、`doc_map_update_required`、`spec_readme_update_required`、`requirements_readme_update_required`、`full_docs_check_recommended` を含む。
-`failure` は `rule_id`、`severity`、`file`、`line`、`message`、`expected` を持つ。
-`unchecked_reasons` は入力から除外されたパスと理由（not-found / out-of-profile）を持ち、`files_checked` と PR 変更ファイルの一致確認（不一致の検出）に使用する。
-
-<!-- ADF-COVERS(implementation): REQ-032-023 -->
-本 Design の検査実行結果突合（files_checked が空または検査対象変更ファイルと不一致の場合を
-検査見逃しとして扱い、確認なく合格扱いとしない）が REQ-032-023 を実装する。
-
+詳細は references/targeted-docs-guard.md を参照（遅延読み込み）。
 ## 対象外
 
 - 未マージPRのクローズ
@@ -282,96 +175,23 @@ JSON 出力は `workflow`、`files_checked`、`coupled_files_checked`、`uncheck
 
 ## Design 状態評価の棚卸し制（STEP-3 拡張）
 
-本節の追加に伴い、既存の申告制記述（docs-and-design-promotion.md STEP-3-2 の
-「セクション不存在・空の場合はスキップ」、case-close Design の Design 確定フロー欄の
-PR 本文読取記述、design-lifecycle-application.md の旧昇格条件文言「実装が Design 内容を
-検証済み」）は本契約へ書き換える（adversarial-review F3）。
-
-### 棚卸し列挙手順
-
-1. 当該 Case の対象 REQ を特定する（Issue 本文の REQ 参照から導出。行レベルの導出は
-   現行の正規記録先に存在しないため、REQ ファイル単位の近似列挙を許容する。
-   行レベルの正規記録先が確定した場合は行レベル判定へ昇格する）（adversarial-review F2）
-2. docs/designs/** の正規成果物から、当該 REQ を implementation 役割の対応宣言で
-   カバーし frontmatter status が draft の Design を逆算列挙する（projection 配下は対象外）
-3. PR 本文「Design 確定候補」セクションの申告候補を列挙結果へ統合する（重複は 1 件にまとめ、
-   二重処理しない）。申告は補助入力であり、申告の不在を理由に棚卸しを省略しない
-4. 列挙結果が 0 件の場合は 0 件確認を記録して Design 状態評価を正常完了する
-
-<!-- ADF-COVERS(implementation): REQ-021-030 -->
-集約突合時の coverage 参照における役割解釈（REQ-021-030）: `agentdev-traceability` の coverage は役割付き対応関係を全件返却するため、呼出側が役割解釈を行う。coverage は sidecar と inline declaration を同じ論理的な対応関係へ正規化して返すため、列挙・集約突合は対応関係の表現形式を区別せずに行う。列挙・集約突合の対象として数えるのは implementation 役割かつ docs/ 配下（docs/designs/** の正規成果物）パスの対応関係のみとし、役割フィルタと docs/ パスフィルタの適用を必須とする。design 役割・verification 役割の対応関係や docs/ 配下以外のパスの対応関係は列挙・突合対象に含めない。
-
-列挙の限界: 列挙は ADF-COVERS 宣言に基づく近似であり、宣言を持たない draft Design は
-漏れ得る（宣言付与は artifact-responsibilities Design の宣言段階的付与の記述に従い、棚卸しが宣言を要求しない）。
-漏れの補完経路は PR 申告の補助入力、inspect-docs の Design DRIFT 診断、宣言付与慣行の
-継続である。本棚卸しに完全性保証を持たせない（adversarial-review F1）。
-
-### 評価と記録
-
-- 各候補について、当該 Case の実装・検証結果と Design の現在構造との整合を確認し、
-  昇格（draft → accepted、designs/README.md status 列の同時更新）または見送りを確定する。
-  整合確認の証拠は STEP-3-1（docs 検証・局所確認）の「Design 本文と実装の最終矛盾確認」
-  結果に基づき、根拠を対応記録コメントへ残す（adversarial-review F3）
-- 判定器（agentdev-artifact-semantics finalize）の finalized 判定は、対応宣言・検証資料の
-  実在と対応の成立という構造的成立の判定であり確定操作を伴わない。昇格判断は本棚卸し制の
-  評価手順（実装・検証結果と Design の現在構造との整合確認）で行い、finalized: true だけを
-  根拠に accepted へ昇格しない。構造的成立と、上流との内容整合および必要な検証が実際に
-  成立していること（検証実態）を区別して評価する。Design の確定状態の反映は本確定フロー
-  （正規の確定経路）でのみ行い、権限外の状態変更を行わない
-- 見送り時は見送り理由と再評価契機を当該 Case の Issue への対応記録コメント（検証差分節）へ記録し、現在 Design 本文へ作業履歴として新規保存しない（REQ-032-025、REQ-001-003、REQ-001-015）。新規の一時成果物種別・新規ドメイン状態は作らない。再評価契機を持つ未解決の見送り事項は追跡Issue として育成できる。再実行時の冪等認定（REQ-032-026）の参照先は対応記録コメントの既存見送り記録であり、契約切替前に Design 本体へ保存済みの見送り記録は純化除去時に対応記録コメントへ移設し、冪等認定の参照対象が消失しないようにする
-- 見送り（評価実施・確定不可）と未評価（評価未実施）を区別して記録する
-
-### 完了ゲートと適用範囲
-
-- 全候補が昇格または見送りのいずれかの評価結果を持つことを case-close 完了条件へ含める。
-  評価結果のない候補が残る場合、単一 Issue ルート（STEP-3）と Epic Wave ルート（E4）の
-  両方で完了扱いにしない
-- Epic Wave ルートでは、各子 Issue の棚卸し列挙を Wave 内で集約し、同一 draft Design の
-  評価は直列集約段で一元実行する（子 Issue 並列評価による二重評価・競合評価
-  〔片昇格と片見送りの混在〕・見送り記録の二重生成を防止する）
-  （adversarial-review F4）
-- 再実行時は accepted 済み Design を評価対象から除外し、同一 Case 再実行では既存の
-  見送り記録を評価結果として認定して重複する記録を生成しない（adversarial-review F5）
-
+詳細は references/design-inventory-and-final-eval.md を参照（遅延読み込み）。
 ## 完了条件単位の最終評価と非循環証拠（REQ-032-031〜038、RU-20261004-08）
 
-QG-4 最終完了判定における受け入れ義務保存の実行時投影。
-
-- 完了条件評価は、実装 diff または case-run の自己申告だけを最終基準とせず、根拠となる正規契約から評価範囲、期待結果、反例条件、許容される除外を導出または照合する。導出の判断方法（決定的処理、閉じた意味評価、開いた推論）は REQ-096 の3分類に従う。
-- 完了条件単位の評価区分 pass / fail / blocked / not applicable を区別する。not applicable は当該条件が評価対象に適用されないことを正規契約から説明できる場合だけ許可し、未投影、未実装、未検証、証拠不足、検証不能、予定変更対象外、実行担当の責務外判断を根拠にしない。適用性判断の根拠を追跡可能に保持する。
-- 各完了条件に対応付けられた証拠がその条件の意味命題を実際に立証していることを確認する。条件ID・名称の一致、テスト名の類似、関連ファイルの検査といった形式的一致だけを達成証拠としない。
-- 「残存0件」「全経路」「すべて整合」「漏れなし」等の全称・不存在条件では、正規契約から導出した評価範囲を対象に反例探索を行う。廃止対象が別名、隠し保存、別経路に残っている状態での「残存0件」を拒否する。
-- Issue closed、PR merged、Child completed、Wave 完了、QG pass、完了条件チェック済み等の工程状態を、成立前提である機能・品質・契約条件の証明へ循環利用しない。ただし工程状態自体が明示的な完了条件である場合は当該条件に限り直接証拠として利用できる。
-- 現在の完了条件を否定する反例 finding を intake、learning、後続 Issue、Findings、別途確認等へ分類しただけでは当該条件を達成扱いにしない。反例を元条件から切り離すには、正規な要件変更、対象範囲変更またはあらかじめ定められた項目固有処置を要する。
-- 合意済み検証方法を別手段へ変更する場合は、元の検証義務に対して同等以上の観測能力と未証明範囲の不増を確認する。runtime または実ホスト・実経路での成立を要求する条件を、同等性未確認の静的構造検査、単体テスト、スタブ結果のみで pass にしない。
-- 終了対象が負う必須完了条件に fail、blocked、未判定、未投影、証拠不足、検証不能、意味不一致、未解決反例が1件でも存在する場合は close せず、必須未達を Gate 全体の warn 等で通過させない。Epic では最終 Wave で親の横断義務を含む Epic 全体の完了条件を評価する。
-- 完了条件から根拠正規契約、検証義務、評価範囲、検証手段、取得した証拠と対象成果物の状態、除外根拠、判定までの主要関係を、既存証拠チャネル（Issue、PR、QG 結果、コメント等）から追跡可能に保持する。追跡不能な「独立検証済み」記録だけでは完全な最終受け入れ証拠としない。
-- 判定対象（母集団）の取得: 受入評価の母集団は終了対象の正規完了条件から導出する。単一・子 Issue は Issue 本文の完了条件チェックボックス、Epic は Epic Issue の完了条件と実行構成表、親横断義務は Epic / Root の最終終了時の評価対象とする。実行担当の報告は母集団の正ではなく正規条件との照合対象であり、報告から必須条件を削除・重複化しても受入側は正規条件から欠落を検出でき、対象外項目の混入で欠落を隠せない。
-- 母集団の空状態の区別: 条件の取得失敗、必須条件が存在するのに判定対象が空、正規契約上の完了条件なしの3状態を区別する。前二者は終了を拒否し、後者は根拠を記録して既存契約どおり処遇する。空の判定入力や grounds の欠如（`grounds: {}` 等）を許可の根拠にしない。
-- 申告と受入の分離: 実行担当の合格申告は申告として扱い、受入側は正規条件と実行証拠を照合して部分証拠または根拠不足の場合は拒否できる。意味対応の真偽値の設定だけを証明とせず、判断根拠と証拠の対応を確認できる。
-- 終了操作への接続: 受入評価の拒否・未確定の結果は、完了遷移と終了操作（STEP-5 の issue_close、E1〜E6 の Epic 終了・Wave クローズ）へ進めない。拒否理由と未成立条件を既存証拠チャネルへ記録し、修正・再検証へ戻す。評価結果の消費は規則文・関数の戻り値ではなく実際の呼出経路で確認する。
-
+詳細は references/design-inventory-and-final-eval.md を参照（遅延読み込み）。
 ## 機械工程の script 呼び出し契約（RU-0162）
 
-case-close の機械工程（mergeable ポーリング、squash merge 前後のローカル状態検査、Epic 実行構成表の解析と状態更新、完了条件チェックボックス評価の機械的抽出、AUTOGEN 再生成差分検出、full integrity suite の起動と結果集約、契約状態記録・未追跡残存検査、終了判定記録（`.agentdev/close-acceptance/`）の書出し・無効化と終了後回収、worktree/branch クリーンアップ）は、工程別 script 1 回の呼び出しに束ねる。GitHub I/O（pr_merge、issue_close、Issue 本文更新）は Custom Tool agentdev_gh の境界を維持する。
+詳細は references/script-invocation.md を参照（遅延読み込み）。
+## reference 選択表
 
-- 入力 JSON / 報告 JSON / 終了コードの契約、品質ゲートの script 内実行（省略禁止）、final-acceptance.ts・inspect_cross_dependencies.ts と同じ作り（反復可能な機械処理に限り agentdev-artifact-validation 所有の共有 lib を supported lib interface 経由で利用できる。工程固有のゲート選択・順序・実行条件・結果解釈は各工程の Design が所有し続け、横断的な共通基盤を新設しない）、意味判断（警告の重要度評価、Design 確定判断、未達判定の確定）のモデル担当は、case-open Design「機械工程の script 呼び出し契約（RU-0162）」節と同一の規律に従う
-- post-merge の worktree/branch クリーンアップは、main working tree 構成（worktreeRoot == repoRoot・Epic 最終close等）では worktree とその checkout ブランチが削除対象外（REQ-118-005）であるため適用対象外として pass を記録し、worktree remove と branch 残存検知を実行しない。cleanup.removeWorktree: false 指定時も worktree 削除を発行しない。通常 worktree 構成は従来どおり削除と残存検知を行い、残存時の要判断警告を維持する。明示指定された removeBranch の削除失敗はいずれの構成でも回収失敗として扱う
-- 報告 JSON にはマージ・検証・クリーンアップの各結果、差分、警告、提案するコメント本文を含める
-- workflow skill 参照文面は script 呼び出しと報告 JSON 解釈へ置き換えて短縮する
-- 完了条件チェックボックス評価の機械的抽出（close_mechanical_steps.ts の抽出フェーズ）は、受入評価（final-acceptance.ts への入力）の母集団導出を兼ねる。抽出結果（正規完了条件の一覧とその取得成否）を受入評価入力へ渡し、報告 JSON に母集団と判定の対応を含める。抽出失敗は評価の blockers 扱いとし、空の判定入力を「条件なし」へ変換しない
-- final-acceptance.ts（evaluateFinalAcceptance）は完了条件単位評価の機械評価部品として、判定入力（verdicts・crossObligations）の構造検査と必須未達・根拠欠落の検出を担う。証拠の意味対応評価（証拠が条件の意味命題を立証しているか）はモデルが担当し、機械部品の通過だけで完了を確定しない
-- 受入評価の拒否・未確定の結果（closeAllowed 相当の判定とその根拠）は報告 JSON を通じて終了操作の実行抑制として消費される。STEP-5 の issue_close 実行と E1〜E6 の Epic 終了は、受入評価の許可を前提条件として扱い、拒否結果を保持したまま終了操作を実行しない
-- gate 証跡保持要件: 機械工程の品質ゲート（full integrity suite 等）のうち stderr 出力ランナー（bun test 等）を含む検証は、当該ランナーの検証実行（script 外の直接実行）に stdout と stderr の分離退避を常時付与する。機械工程 script 呼び出し自体のリダイレクトラップは現行 runner が stderr を内部捕捉するため証跡成立手段にならない。件数突合系 gate の受理根拠は stderr 退避ファイル（件数サマリーの出力先）に置き、検証差分には既存の検証差分記録規約（agentdev-workflow-templates）に従い保存先・終了コード・checker の版・検査範囲・実行環境を記録する。報告 JSON の保持構造への依存（stdout のみ保持等）を証跡の成立根拠にしない
+通常経路で全 reference を無条件読込しない。必要な条件に応じて読む reference を選択する。
 
-### QG-4 機械受理基準と機械判定経路の対応（RU-0226）
-
-機械工程の full integrity suite 判定と QG-4 最終受入規範（agentdev-quality-gates の references/qg-4-final-acceptance.md）の機械受理基準との対応は本節が単一所有する。機械受理基準の記録様式の定義は QG-4 規範が正であり、本節は対応関係のみを記述し様式を再掲しない。
-
-- 機械受理基準と機械判定経路の対応: 受理条件5（fail 全件の由来分類、由来不明 0）と受理条件7（pre-existing fail の baseline 再現確認記録）を満たす検証結果記録は、full integrity suite に fail 件数が残存していても規範が合格として認める受理経路である。機械工程は当該記録の存在・形式を機械受理基準の10項目の記録完備で検証し、終了操作許可の判定に反映する。受理条件8の「非ゼロ終了・timeout 打ち切り・切断した実行結果を pass 証拠として扱わない」は、由来分類記録を欠く生の実行結果単独を pass 証拠としない意味として適用する
-- 拒否経路の背反防止: 受入評価の拒否（closeAllowed 相当）と機械工程の exitCategory による拒否の2系統は、同一入力に対して同一の判定結果へ収束すること。機械受理基準を満たす記録で分類済みの fail が残る場合、機械工程の当該 step は規範の判定に従い、機械受理基準の記録欠落、由来不明 fail の残存、未登録の既知欠陥を合格の根拠にする場合は fail-closed として終了操作を拒否する
-- 終了コードの非変換: 機械工程は検証ランナーの非ゼロ終了コードを成功へ変換しない。終了コードは受理条件8の記録として保持し、分類記録の検証は終了コードの変換ではなく独立の判定層として重ねる
-- 既知欠陥登録経路の対応: checker NG の登録は provenance 付き NG baseline（契約の正は checker 実行契約 Design「baseline 退避物と BaselineFile の役割分離と合否判定基準」節と integrity 契約 Design「NG baseline 運用手順」）とする。bun test suite fail の登録様式は文言統合とする（ユーザー判断 2026-10-15・判断記録 CR-003/CR-004）: 機械受理基準の記録一式（受理条件5の由来分類記録・受理条件7の baseline 再現確認記録・provenance・件数記録）を登録様式と定義し、恒久台帳は新設せず、既存の PR 本文検証差分が当該記録一式の登録として機能する。整合方向は機械工程側の修正（implementation-first）に確定済みであり、機械工程は当該記録一式の存在・形式を機械受理基準の10項目の記録完備で検証して終了操作許可の判定に反映する。未登録の既知欠陥を合格の根拠にする結果の拒否は維持する
+| 条件 | 読む reference |
+|---|---|
+| クローズ手順の詳細（Epic Wave クローズ・チェックボックス最終評価・単一 Issue クローズ・最終検証） の詳細が必要な場合 | references/close-procedures.md |
+| targeted docs guard (v2:REQ-0158-003) の詳細が必要な場合 | references/targeted-docs-guard.md |
+| Design 状態評価の棚卸し制と完了条件単位の最終評価 の詳細が必要な場合 | references/design-inventory-and-final-eval.md |
+| 機械工程の script 呼び出し契約 の詳細が必要な場合 | references/script-invocation.md |
 
 ## See Also
 

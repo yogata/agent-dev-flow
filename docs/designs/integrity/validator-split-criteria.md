@@ -20,7 +20,7 @@ targeted docs guard（旧 check_changed_docs.ts。現行実装は検証エンジ
 検査関心が異なる場合は別 validator へ分割する。
 検査関心と IR ルールの対応は 1:1 を要求せず、1 validator が複数の IR ルールを包括カバーしてよい（REQ-010-009）。
 
-- Workflow Skill 構造検査（「単独起動」禁止等）の正本を1箇所に寄せ、check_workflow_preventive.ts と lint_skills.ts が独立保持する同一検査の重複を解消する（B3-5b）。大規模検査器（check_integrity）と専用検査器の責務境界を確定する
+- Workflow Skill 構造検査（「単独起動」禁止等）の正本を1箇所に寄せ、check_workflow_preventive.ts と lint_skills.ts が独立保持する同一検査の重複を解消する（B3-5b。解消済み: check_workflow_preventive.ts は Wave-2 の検証エンジン再構築で削除され、Workflow Skill 構造検査は lint_skills.ts が単一保持する）。大規模検査器（旧 check_integrity・現行検証エンジン cli.ts）と専用検査器の責務境界を確定する
 - 統合対象として削除する検査と、判定段階が異なるため意図的に残す検査を名簿として区別し、残す根拠を記録する
 - Workflow Skill 構造検査の正本所在は `.opencode/skills/repo-agentdev-integrity/scripts/lib/workflow_trigger.ts` 冒頭の統合名簿と正本共有モジュールである（B3-5b・Epic #4026）。名簿と実態の一致は `lib/workflow_trigger.test.ts` が機械検証する
 

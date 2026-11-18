@@ -16,13 +16,13 @@ verification_path: src/common/skills/repo-agentdev-integrity/scripts/rules/rules
 | description | 配布物（command・skill・template）の共通ポリシー意味識別子（`POL-`）について、registry に定義された識別子への解決（未定義参照なし）、registry 内の重複定義なし、registry 外定義なし、および廃止済み Gxx 表記の配布物残存なしを検証する（REQ-051-005、REQ-010-064） |
 | severity | strict |
 | category | document-drift |
-| detection_method | `check_integrity.ts` による registry 定義行抽出（`^[-*]\s+\*\*(POL-[a-z0-9-]+)\*\*`）と配布物本文抽出（`\bPOL-[a-z0-9-]+\b`、`\bG\d{2}\b`）の突合。未定義参照（evidence `undefined-reference:POL-*`）、重複定義（`duplicate-definition:POL-*`）、registry 外定義（`definition-outside-registry:POL-*`）、廃止済み Gxx 表記残存（`residual-gxx:Gxx`）を検出する |
+| detection_method | `src/common/skills/repo-agentdev-integrity/rules/ir-063.ts` による registry 定義行抽出（`^[-*]\s+\*\*(POL-[a-z0-9-]+)\*\*`）と配布物本文抽出（`\bPOL-[a-z0-9-]+\b`、`\bG\d{2}\b`）の突合。未定義参照（evidence `undefined-reference:POL-*`）、重複定義（`duplicate-definition:POL-*`）、registry 外定義（`definition-outside-registry:POL-*`）、廃止済み Gxx 表記残存（`residual-gxx:Gxx`）を検出する |
 | affected_artifacts | [src/common/commands/agentdev/**, src/common/skills/agentdev-*/**] |
 | related_req | [REQ-051-005, REQ-051-006, REQ-010-064, REQ-010-068] |
 | related_design | [../integrity-rule-catalog.md, ../../authoring/command-file-format.md] |
 | gate_level | full-audit |
 | false_positive_risk | 低。registry ファイル自身は様式例示を含む定義の実体であるため参照検査の対象外とする。`\bG\d{2}\b` は `AG-005` 等の別名前空間に一致しない |
-| regression_test | `check_integrity.test.ts` describe "IR-063 common-policy-identifier-invariant"。正常例・違反例・境界例・許容例・再現例（Issue #2429 移行前に配布 command へ残存していた旧 Gxx 定義行様式）の 5 種 fixture |
+| regression_test | `scripts/rules/rules.test.ts`（該当 IR インメモリケース。旧 checker での describe 名は "IR-063 common-policy-identifier-invariant"。正常例・違反例・境界例・許容例・再現例（Issue #2429 移行前に配布 command へ残存していた旧 Gxx 定義行様式）の 5 種 fixture |
 | finding_route | intake |
 | triage_action | 新規検出時は是正（registry 定義の追加、または識別子参照・Gxx 表記の除去）。Gxx 連番制度は廃止済みのため再採番による是正は行わない |
 | last_verified | 2026-08-24 |

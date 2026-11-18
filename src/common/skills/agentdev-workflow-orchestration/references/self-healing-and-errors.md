@@ -67,7 +67,7 @@ CI/CD失敗を検出した場合、実装フェーズへループバックし自
 
 ### worktree 環境での `source-projection-sync` 失敗（Windows + ジャンクション環境固有）
 
-整合性検査（`check_integrity.ts`）を worktree（`.worktrees/{N}`）内で実行した際、`source-projection-sync`が失敗する既知のパターン。
+整合性検査（検証エンジン cli.ts）を worktree（`.worktrees/{N}`）内で実行した際、`source-projection-sync`が失敗する既知のパターン。
 
 | 項目 | 内容 |
 |------|------|

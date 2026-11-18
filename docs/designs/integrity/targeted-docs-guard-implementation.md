@@ -98,7 +98,7 @@ appliesTo は `docs/designs/**`, `docs/requirements/**`, `docs/decisions/**`, `d
 case-run プロファイルの対象範囲は、case-run で変更され得る docs 領域と traceability 領域を単一プロファイルで網羅し、REQ-010-077 の「対象範囲網羅 or 代替検査指定明記」を恒常充足する（CR-001 裁定。対象拡大を主方式とする判断）。`docs/knowledge/**`・traceability を含む case-run 変更で `files_checked` 空（TARGET-EMPTY）を恒常運用として発生させないこと。選定基準は、fail-closed 意味論の維持、検査見逃しゼロ、false-clean の発生なしである。
 
 <!-- ADF-COVERS(design): REQ-010-077 -->
-<!-- ADF-COVERS(implementation): REQ-010-077 -->
+<!-- ADF-COVERS(implementation): REQ-010-077, REQ-122-014 -->
 選定の適用結果（REQ-010-077、case 実行 RA-001 による確定 → CR-001 再裁定）: 主方式を appliesTo 対象拡大（`docs/knowledge/**`・traceability 追加）とし、guard 対象外領域を含む実行単位での代替検査指定の運用を併記して明記する。
 `docs/knowledge/**`・traceability 変更は appliesTo 対象内のため case-run プロファイル単独実行で検査される。appliesTo 対象外の領域を含む実行単位では、代替検査として docs-check profile（`--workflow docs-check --files <変更ファイル群>`。appliesTo: true 全件）を `--files` 明示指定で実行する運用を併記する。
 TARGET-EMPTY 検知条件と確認手順（REQ-010-076・REQ-032-023 準拠の運用補強）: `files_checked` 空（TARGET-EMPTY）は FAILURE として検知される。TARGET-EMPTY 検出時は (1) 指定した `--files` の実在と実行 workflow プロファイルの appliesTo への該当有無を確認し、(2) appliesTo 対象外領域の変更を含む場合は代替検査指定（docs-check profile の `--files` 明示指定実行）へ切替えて再実行し、(3) それでも空となる場合は検査対象の指定誤りまたは対象領域の適用漏れとして実行単位の検証計画を是正する。確認なく合格扱いにしない。
@@ -184,7 +184,7 @@ TargetedDocsReport 型契約の原本は [integrity-contracts.md](integrity-cont
 
 ## skill rename 対称性検査観点
 
-check_skill_rename_symmetry が実施する検査契約。REQ-010-063 と同一の検査契約を反映する。
+旧 check_skill_rename_symmetry checker が実施していた検査契約。REQ-010-063 と同一の検査契約を反映する。
 
 - 恒常検査は frontmatter id と物理 path の整合（SKILL.md frontmatter name ↔ Skill ディレクトリ名、
   Design frontmatter 識別子 ↔ Design ファイルの物理 path）に限定する。不一致は warn または error として報告する
@@ -196,7 +196,7 @@ check_skill_rename_symmetry が実施する検査契約。REQ-010-063 と同一�
 
 ### 実装
 
-`.opencode/skills/repo-agentdev-integrity/scripts/check_skill_rename_symmetry.ts` が上記契約を反映して deterministic に実行する。
+上記契約を反映した専用 checker（`check_skill_rename_symmetry.ts`）は 2026-11-18 の検証エンジン再構築（DEC-065・Wave-2）で削除済みである。本節は検査契約の記録を保持し、現行の検証エンジン rules レジストリには含まれない。
 対象は配布 skill `agentdev-*`（`src/opencode/skills/` 配下）とし、repo-local skill (`repo-agentdev-*`) および `agentdev-` prefix を持たない skill は対象外（REQ-002 配布物境界）。
 `status: superseded` の Design に対応する skill dir 欠落は許容し、`status: draft` の場合は warning とする（既存の例外処理の維持）。
 

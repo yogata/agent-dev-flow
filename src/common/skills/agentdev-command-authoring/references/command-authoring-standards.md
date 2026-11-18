@@ -24,10 +24,10 @@ Command定義（`.opencode/commands/`）の行数目安、Steps数目安、書�
 
 | 行数 | 判定 | アクション |
 |------|------|-----------|
-| ≤100行 | ✅ 目標 | なし |
-| 101〜150行 | ⚠️ 分割検討 | Skill reference/ Script への切り出しを評価 |
-| 151〜200行 | 🔶 分割推奨 | 具体的な切り出し計画を立案 |
-| >200行 | ❌ 必須検討 | orchestration skill/ reference/ script への切り出しが必須 |
+| ≤150行 | ✅ 目標 | なし |
+| 151〜200行 | ⚠️ 分割検討 | Skill reference/ Script への切り出しを評価 |
+| 201〜250行 | 🔶 分割推奨 | 具体的な切り出し計画を立案 |
+| >250行 | ❌ 必須抽出 | orchestration skill/ reference/ script への切り出しが必須（ir-file-size による機械検査違反。YAML Frontmatter 込み総行数 250 行超過） |
 
 ### カウント対象
 
@@ -316,7 +316,7 @@ Command作成、改定時に確認する項目:
 
 ### サイズ確認
 
-- [ ] 総行数が150行以内か（超過する場合は分割計画が存在するか）
+- [ ] 総行数が250行以内か（機械検査上限。超過する場合は抽出必須。150〜200行目標の分割計画が存在するか）
 - [ ] Stepsが5〜12個か
 - [ ] frontmatterが description 単一か（dev メタデータ禁止: agent/ pattern/ workflow_route/ branch_type/ labels）
 

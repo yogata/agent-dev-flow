@@ -12,7 +12,7 @@
 // 解決できない部分の保留を、各適用箇所で保持していることを pin する。
 
 import { describe, expect, test } from "bun:test";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 // repoRoot 解決は main root と worktree の両方で動作する階層数非固定の探索とする
@@ -34,10 +34,22 @@ function resolveRepoRoot(fromDir: string): string {
 const repoRoot = resolveRepoRoot(import.meta.dir);
 
 function readSkill(rel: string): string {
-  return readFileSync(
-    join(repoRoot, "src", "common", "skills", ...rel.split("/")),
-    "utf8",
-  );
+  const absolute = join(repoRoot, "src", "common", "skills", ...rel.split("/"));
+  const base = readFileSync(absolute, "utf8");
+  // SKILL 分割後、詳細規律文言の正は references/ 配下にあるため、本体に
+  // references/ 配下の Markdown（決定的な名前順）を連結した文字列を検査対象にする。
+  const refsRoot = join(dirname(absolute), "references");
+  if (!existsSync(refsRoot)) return base;
+  const parts: string[] = [base];
+  const walk = (dir: string): void => {
+    for (const entry of readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      const child = join(dir, entry.name);
+      if (entry.isDirectory()) walk(child);
+      else if (entry.name.endsWith(".md")) parts.push(readFileSync(child, "utf8"));
+    }
+  };
+  walk(refsRoot);
+  return parts.join("\n");
 }
 
 const caseOpenSkill = readSkill("agentdev-workflow-case-open/SKILL.md");

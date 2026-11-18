@@ -6,6 +6,7 @@ description: Manages Issue/PR description and comment templates, selection rules
 
 # Issue テンプレート管理スキル
 
+本スキルは骨格（制御フロー）と references/ 詳細仕様の2層構成である。本文はテンプレート一覧・選定ルール・共通ルールを保持し、セクション形式の詳細仕様は references/ 配下へ分離している。通常経路で全 reference を無条件読込せず、必要な条件に応じて遅延読み込みする。
 agentdev系コマンドで使用するIssue/PR本文、コメントテンプレートの管理、選定ルール、セクション規約を提供する。
 テンプレートは Read tool で読み込み、変数部分を置換して使用する。
 
@@ -55,18 +56,7 @@ Case Issue の工程記録（記録様式の正は workflows/issue-lifecycle-rec
 
 着手・引き渡し・再開は記録契機ではない。これらの契機でコメントを生成せず、進行状況の開始日時（初回実着手）と本文・PR で工程移行を表現する。
 
-#### 基本項目と選定ルール
-
-- 記録コメントの基本項目は 記録種別、対象工程、事実・結果、理由・根拠、次の行動、関連合意・成果物 とする。「理由・根拠」「関連合意・成果物」は非該当時に省略でき、必須項目は該当データがない場合も「該当なし」を記載しセクション自体は残す
-- 種別別必須項目は上表のとおり。検証証拠には判定根拠が必須であり、検証詳細自体は重複記載せず成果物を参照する
-- 投稿主体: 実行担当は報告のみを行い、記録コメントの投稿と本文進行状況・結果セクションの更新は取りまとめが実行する。実行の申告だけで完了扱いにしない
-- 投稿前の必須項目検証は記録コメント検証スクリプト（`agentdev-workflow-case-run/scripts/record-comments.ts`、決定的処理）で行う。検証不備の本文は投稿しない
-- 既存の対応記録コメントテンプレート（`issue_comment_feature_implementation.md`、`issue_comment_bug_record.md`）と共存する。対応記録コメントは work_type 別の詳細対応記録と検証差分セクションの置き場所であり、検証証拠コメントとの間で検証詳細を重複記載しない
-
-#### セクション仕様
-
-- 各テンプレートは基本セクションに種別別必須セクションを追加した構造とし、セクション見出しは `## ` 直下で統一する
-- `<!-- 【必須】 -->` マーカー付きセクションは省略不可。種別別必須セクションの本文が空または「該当なし」の場合は検証不備として投稿を抑止する
+記録コメントの基本項目・選定ルール・セクション仕様の詳細は [references/record-comments-and-criteria.md](references/record-comments-and-criteria.md) を参照（遅延読み込み）。
 
 ### case-open テンプレート（Root Case 用）
 
@@ -111,125 +101,29 @@ Case Issue の工程記録（記録様式の正は workflows/issue-lifecycle-rec
 
 ### 実行識別情報セクション（PR テンプレート形式）
 
-PR 本文テンプレートに、ADF 実行の識別情報を構造化して記録する「実行識別情報」セクションを定義する。
-Issue 本文には本セクションを設けない（実行単位・委譲単位・Case・GitHub Issue・PR・ADF 成果物は Issue 番号、親Epic 参照、実行構成表、Refs 行等の canonical 成果物関係から相関でき、本文へ一覧化しない）。
-記録先割当と意味集合は durable-state-and-recovery Design「ADF 実行識別情報の記録契約」節が正規所有し、本スキルはテンプレートセクション形式を提供する。
-
-#### 対象テンプレートと記録内容
-
-| テンプレート | 記録する識別情報 |
-|---|---|
-| `templates/case-revise/amendment-pr.md` | 対象 Case、実行単位 |
-| `pr_desc.md` | 対象 Case、実行単位、委譲単位識別子 |
-
-#### セクション仕様
-
-- セクション見出しは「実行識別情報」とし、`<!-- 【必須】 -->` マーカー付きの必須セクションとする
-- セクション本文は `adf_` 接頭辞付きの key-value 行（`- adf_{key}: {value}`）で構成する
-- 機械的解析は本セクション内の key-value 行を正とし、自由文中に偶然出現する ID に依存しない
-- 実行単位の識別は execution_unit 構成の既存定義に接続し、flow 種別（standard / epic）を記録する。対象 Issue 番号は Issue 番号、Parent 行、Refs 行等の canonical 成果物関係から導出し、重複記録しない
-- 委譲単位識別子は `DEL-{N}-{seq}` 形式（N = Issue 番号、seq = 同一 Issue への委譲連番）とし、ADF が発行する識別子を正規手段とする
-- harness 側識別子（OpenCode session ID 等）は任意キー `adf_harness_ref` に限定し、取得可能な場合の付加情報としてのみ記録する。必須契約としない
-- 識別情報の一部が取得不能な場合は「N/A」と記録し、workflow を停止しない
-- 値の記録は識別子中心で行う（Issue 番号、PR 番号、commit SHA、REQ/Decision/Design の識別子等）
-
-#### key 一覧
-
-| key | 対象 | 意味 |
-|---|---|---|
-| `adf_case` | Issue / PR | 対象 Case の Issue 番号（#N）。Standard flow では本 Issue、Epic flow では親 Epic Issue、PR では関連Issue の番号 |
-| `adf_execution_unit` | Issue / PR | 実行単位の flow 種別（standard / epic）。対象 Issue 番号は canonical 成果物関係（Issue 番号、Parent 行、Refs 行）から導出する |
-| `adf_delegation` | PR | 委譲単位識別子（DEL-{N}-{seq}）。委譲 prompt から転記 |
-| `adf_harness_ref` | Issue / PR | 任意。harness 側識別子。取得可能な場合のみ |
-
-#### 配置規則と適用範囲
-
-- PR テンプレートでは「概要」セクションの直後に配置する
-- 本セクションは新規作成の PR にのみ適用し、既存 PR への遡及適用は行わない
+PR 本文テンプレートに、ADF 実行の識別情報を構造化して記録する「実行識別情報」セクションを定義する。対象テンプレートは `templates/case-revise/amendment-pr.md` と `pr_desc.md` であり、PR テンプレートでは「概要」セクションの直後に配置する。Issue 本文には本セクションを設けない。
+key 一覧（`adf_case`、`adf_execution_unit`、`adf_delegation`、`adf_harness_ref`）とセクション仕様の詳細は [references/execution-identity-section.md](references/execution-identity-section.md) を参照（遅延読み込み）。
 
 ### 検証差分セクション（PR テンプレート形式）
 
-PR 本文テンプレートに、検証の構造化記録を行う「検証差分」セクションを定義する。
-記録先割当と意味集合は durable-state-and-recovery Design「ADF 実行識別情報の記録契約」節（PR 本文: 検証種別と検証結果）が正規所有し、本スキルはテンプレートセクション形式を提供する。
-
-#### 対象テンプレートと記録内容
-
-| テンプレート | 記録する検証情報 |
-|---|---|
-| `pr_desc.md` | 実行工程、検証種別、検証結果、finding 差分（新規、修正済み、既出、撤回、無効） |
-
-#### セクション仕様
-
-- セクション見出しは「検証差分」とし、`<!-- 【必須】 -->` マーカー付きの必須セクションとする
-- セクション本文はテーブル形式とし、1行に1検証を記録する
-- 列構成は 実行工程 / 検証種別 / 検証結果 / 新規 / 修正済み / 既出 / 撤回 / 無効 の8列とする
-- 実行工程には検証を実施した ADF 工程（case-run、case-close、レビュー等）を記録する
-- PR 単位の実行結果（result 契約の4状態）は canonical 成果物関係から判別する（PR の存在が completed-pr、blocked / failed / delegation-unavailable は Issue コメント SSoT）。本セクションは検証単位の実行結果（検証結果）を記録する
-- finding の特定は要約と参照（セクション名、Issue コメント、PR 本文内位置等）で行う
-- 各分類に該当する finding がない場合は「該当なし」と記載する
-
-#### finding 差分の5分類
-
-| 分類 | 意味 |
-|---|---|
-| 新規 | 前段階の同種検証で検出されていなかった finding。前段階の同種検証が存在しない初回検証では、検出された全 finding を新規として記録する |
-| 修正済み | 前段階で検出済みの finding が当該検証時点で修正されたことを確認したもの |
-| 既出 | 前段階で検出済みで、当該検証でも未解決のまま再検出されたもの |
-| 撤回 | 起票側または審議の結果として撤回されたもの（「撤回または無効となった finding」の内訳） |
-| 無効 | 誤検出、検証対象外等により無効と判定されたもの（「撤回または無効となった finding」の内訳） |
-
-#### 工程間比較規則
-
-- 同じ種類の検証が複数工程で行われた場合は、工程ごとに行を並べる。各行の finding 分類を前段階の行と読み比べることで、後続検証が追加価値を持ったかを後から判定できる
-- case-run の検証行は実行担当サブエージェントが PR 作成時に PR 本文へ記録する（実行工程: case-run）
-- case-close の検証行（QG-4 完了条件評価、docs 検証、配布依存境界 最終 gate、トレーサビリティ独立再検査等）は対応記録コメントへ本セクションと同一形式で記録する（実行工程: case-close）。前段階（case-run）の PR 本文記録との差分で各 finding を分類する
-
-#### 検証証跡の必須要素
-
-件数突合系の gate は、種類ごとに実行する。各実行の `stdout` と `stderr` を分けて保存し、検証差分には保存先、終了コード、checker の版、検査範囲、実行環境を記録する。checker 固有の追加要件は durable-state-and-recovery Design「ADF 実行識別情報の記録契約」節に従う。
-
-#### 共存と所有境界
-
-- 本セクションは case-run の PR 本文 Findings セクション（intake / learning 小見出し）を置換せず共存する。検証で発見した intake / learning 候補は Findings セクションへ記録し、本セクションには検証種別・検証結果・finding 差分を記録する
-- 対論型レビュー（adversarial-review）の審議中 finding 状態の追跡と、品質ゲート完了報告における欠陥類型単位の修正証跡の所有境界を変更しない。本セクションはこれらの記録を代替しない
-- 本セクションは新規作成の PR にのみ適用し、既存 PR への遡及適用は行わない
-
-#### 配置規則
-
-- PR テンプレートでは「品質メトリクス」セクションの直後、「Findings/ Capture候補」セクションの前に配置する
-
-### review_dispositions の消費（Issue 本文への転記廃止）
-
-case-open / case-ready は draft-data の `review_dispositions` を Issue 本文へ全件転記しない。
-
-- 採用内容（accepted disposition）は実行契約の該当章（対象範囲、実現方針、完了条件の検証方法）へ反映する
-- 必要な採否理由（後から判断根拠を確認する必要があるもの）だけをコメントへ残す
-- review_dispositions の構造（id、disposition、reason_code、reason、evidence）の正は既存の正規所有先（artifact-contracts Design「req_draft 出力構造」節）のままとし、本変更でスキーマを変更しない。Issue 本文へ転記用の同型セクションを定義しない
+PR 本文テンプレートに、検証の構造化記録を行う「検証差分」セクションを定義する。対象テンプレートは `pr_desc.md` のみであり、PR テンプレートでは「品質メトリクス」セクションの直後、「Findings/ Capture候補」セクションの前に配置する。検証証跡の必須要素は件数突合系 gate ごとの stdout/stderr 退避・終了コード・checker 版・検査範囲・実行環境の記録である。
+列構成、finding 差分の5分類（新規、修正済み、既出、撤回、無効）、工程間比較規則、共存と所有境界の詳細は [references/verification-diff-section.md](references/verification-diff-section.md) を参照（遅延読み込み）。
 
 ### Case Issue 工程記録テンプレート（進行状況・結果セクション）
 
-Case Issue 本文テンプレートに、工程記録の「進行状況」「結果」セクションを定義する。
-セクション名・順序・項目様式の正は `workflows/issue-lifecycle-records` Design（Case Issue 工程記録モデル）であり、本節はテンプレート投影のセクション形式を提供する。
+Case Issue 本文テンプレートに、工程記録の「進行状況」「結果」セクションを定義する。「進行状況」は正規状態と開始日時・終了日時を key-value 行で保持する常設必須セクションであり、「結果」は完了・中止確定時にのみ作成する非常設セクションである。case-open / case-ready は draft-data の `review_dispositions` を Issue 本文へ全件転記しない。
+対象テンプレート別の常設・条件付きセクション表、セクション仕様、review_dispositions の消費規則の詳細は [references/issue-progress-sections.md](references/issue-progress-sections.md) を参照（遅延読み込み）。
 
-#### 対象テンプレートと配置
+### reference 選択表
 
-| テンプレート | 常設セクション | 条件付きセクション |
-|---|---|---|
-| `templates/case-open/root-case.md` | 目的、対象範囲・対象外、完了条件、進行状況 | 実現方針、結果（該当時のみ追加。章を常設しない） |
-| `templates/case-ready/root-case.md` | 目的、対象範囲・対象外、完了条件、進行状況 | 実現方針、結果（該当時のみ追加。章を常設しない） |
-| `issue_desc_feature.md` / `issue_desc_bug.md` | 目的、対象範囲・対象外、完了条件、進行状況 | 実現方針、結果（該当時のみ追加） |
-| `issue_desc_epic.md` | 目的、対象範囲・対象外、実行構成、完了条件、進行状況 | 実現方針、結果（該当時のみ追加） |
-| `issue_desc_child.md` | 親Epic: #N（冒頭行）、目的、対象範囲・対象外、完了条件、進行状況 | 実現方針、結果（該当時のみ追加） |
+通常経路で全 reference を無条件読込しない。必要な条件に応じて読む reference を選択する。
 
-#### セクション仕様
-
-- セクション見出しは「進行状況」「結果」とし、進行状況は `<!-- 【必須】 -->` マーカー付きの必須セクションとする。結果は完了・中止確定時にのみ作成する非常設セクションであり、起票時の本文には含めない
-- 「進行状況」は 正規状態（Root Case のみ。open、ready、running、blocked、review、closed、cancelled の7値域。値の正は workflows/lifecycle-state-machine Design）と 開始日時・終了日時 を key-value 行（`- {key}: {value}`）で保持する。Child Issue は開始日時・終了日時のみを保持する（子状態は親 Epic の実行構成表が所有する）
-- 表示用の進行状態4値、現在工程、担当役割、次の行動、最新記録参照、停止・待機理由は保存しない
-- 「結果」は 成果物 と 残件の扱い を key-value 行で保持する。終了状態は進行状況の正規状態が正であり、重複保存しない
-- 開始日時は初めて実装または検証に実着手した時刻（case-run で設定）であり、停止・再開で上書きしない。終了日時は Root Case は完了または中止確定時、Child は completed 確定時にのみ設定する
-- 完了判定は case-close 等の判定主体が完了条件と証拠を照合して確定し、実行の申告だけで完了扱いにしない。case-run は完了条件チェックボックスを更新しない
-- 本セクションは新規作成 Issue にのみ適用し、既存 Issue への遡及適用は行わない
+| 条件 | 読む reference |
+|---|---|
+| PR 本文の実行識別情報セクションの key 一覧・セクション仕様・配置規則が必要な場合 | [references/execution-identity-section.md](references/execution-identity-section.md) |
+| PR 本文の検証差分セクションの列構成・5分類・工程間比較規則が必要な場合 | [references/verification-diff-section.md](references/verification-diff-section.md) |
+| Case Issue 本文の進行状況・結果セクション様式や review_dispositions の消費規則が必要な場合 | [references/issue-progress-sections.md](references/issue-progress-sections.md) |
+| 工程記録コメントの基本項目・セクション仕様や完了条件書き方ガイドが必要な場合 | [references/record-comments-and-criteria.md](references/record-comments-and-criteria.md) |
 
 ### テンプレートパス
 
@@ -291,12 +185,7 @@ work_type 判定基準と固有ルールは `agentdev-workflow-lifecycle` を参
 
 ## 完了条件書き方ガイド
 
-関数削除を要求する完了条件の書き方標準である。
-共用関数の包括的削除による破壊的変更を防止する（PR #1140 / #1139 Epic #1138 由来）。
-
-- 関数削除を要求する完了条件は対象スコープ（例: 「from checkX」「整合性ルール由来の context exemption」）を明記すること
-- 関数名列挙による完全削除の代用を禁止する。共用関数、cross-cutting helper は複数 checker から参照される可能性があり、定義削除前に全使用箇所を確認すること
-- 完了条件の checkbox は「対象スコープの明示」と「全使用箇所の確認証拠」を含むこと
+関数削除を要求する完了条件の書き方標準は [references/record-comments-and-criteria.md](references/record-comments-and-criteria.md)「完了条件書き方ガイド」を参照（遅延読み込み）。
 
 ## See Also
 

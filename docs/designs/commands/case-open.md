@@ -5,7 +5,7 @@ created: 2026-06-21
 updated: "2026-11-18"
 ---
 
-<!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-004, REQ-030-005, REQ-030-006, REQ-030-007, REQ-030-008, REQ-030-009, REQ-030-010, REQ-030-011, REQ-030-015 -->
+<!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-004, REQ-030-005, REQ-030-006, REQ-030-007, REQ-030-008, REQ-030-009, REQ-030-010, REQ-030-011, REQ-030-015, REQ-122-012 -->
 <!-- ADF-COVERS(implementation): REQ-015-009 -->
 <!-- ADF-COVERS(implementation): REQ-021-014, REQ-021-024 -->
 <!-- ADF-COVERS(implementation): REQ-035-006, REQ-035-008 -->
@@ -20,6 +20,8 @@ updated: "2026-11-18"
 <!-- ADF-COVERS(design): REQ-029-017 -->
 
 # case-open Design
+
+本 Design は骨格（公開契約と制御フロー）と references/ 詳細仕様の2層構成である。機械工程・Definition Package 確立手順・adversarial-review 挿入境界の詳細は references/case-open/ 配下へ分離している。通常経路で全 reference を無条件読込せず、必要な条件に応じて遅延読み込みする。
 
 本 Design が定義する case-open は公開 command ではなく内部 lifecycle 段階である。公開 UX は要求入口（req-define、backlog-auto）と標準実行コマンド case-auto へ収斂しており、本段階は case-auto の orchestration から駆動される。本 Design は内部 lifecycle 段階の契約を定める正規文書である。
 ## 目的
@@ -76,52 +78,10 @@ adversarial-review は Root Case 本文候補と Definition Package 構成案確
 
 ### 機械工程の script 呼び出し契約（RU-0162）
 
-case-open STEP-4（実変更判定と設計PR作成）の機械工程（専用 worktree 作成、Definition branch 作成、REQ 行編集、generate_indexes、check_integrity、traceability check、明示パス指定 stage・commit まで）は、工程別 script 1 回の呼び出しに束ねる。script はローカル決定的処理のみを担当し、GitHub I/O（Issue/PR 作成・マージ・クローズ）は Custom Tool agentdev_gh の境界を維持し、script 内で直接実行しない。
-
-- 入力 JSON: 対象 draft パス、Root Case 識別子、Definition branch 名など所定の入力一式を渡す
-- 報告 JSON: 実行結果（各処理の成否）、差分、警告、提案する Issue/PR 本文を stdout へ返す。提案本文の採否と報告内容の意味レビューはモデルが担当する
-- 終了コード: 成功は 0、要判断・失敗は非 0 を区別する。script は処理を省略せず、失敗時は途中結果とともに非 0 で終了する
-- 計測日収束（REQ-117-011）: check_integrity 報告の計測日不整合・req-updated-freshness NG を trigger 条件として、frontmatter updated 追随と generate_indexes 再実行を script 内の measurement-convergence step で補正 commit まで完結する。対象抽出は req-updated-freshness 報告の REQ ファイル名のみ形式（docs/requirements/ プレフィックスなしのファイル名のみ報告）とプレフィックス付き形式の双方を捕捉し、NG 報告対象と補正適用対象の差分検査（補正漏れの fail-closed 検出）を step に含める。trigger 条件が満たされない場合は本 step を生成せず、既存の一巡実行の挙動は変化しない。手動 contingency は本 step の失敗時救済として維持する
-- 既存の品質ゲート（check_integrity、traceability check、generate_indexes 差分検出）は script 内で実行し、省略しない
-- traceability gate を有効にする入力では、判定対象 REQ 集合（traceabilityReqIds）の存在と有効性を gate 実行前に検証する（REQ-030-028）。欠落・空・不整合入力は fail-closed で報告し、空配列への暗黙正規化で入力不備を隠蔽しない
-- REQ 追加を伴う Definition Package 生成時は、docs/README.md 手動管理区間の件数記述の照合を初回の変更・検証範囲に含め（REQ-030-029）、REQ 行数由来の派生物が stage paths に事前包含できない場合は既存の事後突合 contingency 手順に従う
-- script の実装は inspect_cross_dependencies.ts と同じ作りに従う。ゲート実行体の解決と可用性検査、引数検査、--validate-input 相当の入力検査実行など反復可能な機械処理に限り、agentdev-artifact-validation が所有する共有 lib（supported lib interface 経由）を利用できる。工程固有のゲート選択・順序・実行条件・結果解釈は各工程の Design が所有し続け、横断的な共通基盤を新設しない
-- 意味判断（停止判断、deviation 分類、adversarial review、警告の重要度評価）はモデルが担当し続け、script は機械的に確定した手順のみを実行する
-- workflow skill 参照文面（references/*.md）は、LLM が bash コマンドを逐次実行する指示から script 呼び出しと報告 JSON 解釈へ置き換えて短縮する
-- 本契約は Definition 編集（DefinitionEdit による対象パス + 旧文完全一致置換）の script 適用について規定するものであり、新規 REQ/Decision ファイルの worktree 内前置作成（agentdev-git-worktree 標準手順 type=definition による前置作成、node writeFileSync による UTF-8 明示配置）を排除しない。前置作成済みファイルは script の冪等再利用（branch 確認済み worktree 再利用）と整合して扱う。前置作成の具体的手順は配布 reference（definition-pr-and-idempotency.md）の STEP-4 手順が所有する
-- DefinitionEdit の入力 JSON 組立後、各編集の newText の行構造（oldText から newText への行区切りの保全）を、oldText 末尾の行末改行の有無に依存しない方法で機械検証する事前確認を script 入力検証として経る。行区切りの連結など事前確認に不合格の編集を含む入力は fail-closed で拒否する。当該確認は適用後の verbatim 包含突合（REQ-030-027）を代替しない（REQ-030-030）
-#### artifact_actions 適用後の verbatim 包含突合（REQ-030-027）
-
-script 呼び出しによる Definition 適用の後、設計PR作成の前に、モデル側の受入検査として適用後成果物への突合を実行する。
-
-- 突合対象は、当該 Case の draft の artifact_actions のうち適用済みと扱う全 action の content とする。追記・置換の各 edit について、適用後ファイルを直接読み、合意済み content の各段落・各行が逐語的に存在することを機械的検索で確認する
-- 節見出しだけが適用され本文段落が欠落している状態、置換により既存記述が黙示的に欠落している状態は突合不成立とする
-- 突合不成立が判明した場合は設計PRを作成せず停止する（fail-closed）。欠落の再適用は DefinitionEdit の旧文完全一致契約の範囲で行い、冪等再実行の手順（適用済み工程の確認と不足分のみの再適用）と非競合とする
-- 突合成立後の PR 本文の検証記録は、適用後成果物への突合結果を根拠として記録する。適用予定内容の記述を適用済みの証拠として記録しない
-- verbatim 適用を主張する検証記録には、適用後成果物への包含突合（または edit 単位の再現確認）を伴う規律を、同型の適用系操作全般へ適用する
-
-#### 機械工程 script の実行前提の解決（REQ-029-014〜016）
-
-機械工程 script は producer 側の採番・構成の前提（REQ 行IDの桁数・書式、producer 固有ツールの存在、パス引数の環境形式）を埋め込み値として要求しない。実行前提は workflow 側で Project Extensions（`.agentdev/extensions/`）等のプロジェクト固有値から解決し、script へは明示入力として渡す。script 側の既定値に producer 前提を保持しない。
-
-- REQ 行IDの書式検証は桁数を固定しない許容書式（traceability checker 契約と同じ REQ-{NNNN}-{MMM} 形式）で行い、存在と有効性の検証（REQ-030-028 の規律）と組み合わせる
-- producer 固有のゲート（generate_indexes、check_integrity、traceability-check 等）を必須とする場合、script は当該ゲート実行体の配布先での存在を検査してから起動する。欠落時は fail-closed で報告し、正規の代替経路（証跡化、手動相当手順、対照実行による悪化ゼロ件の機械証明）への切替を報告 JSON に含める。代替経路の履行なしに検査を省略して成功扱いとしない
-- 横断依存検査（inspect_cross_dependencies.ts）の `--root` 等のパス引数は、Windows と Unix 系 shell のパス形式の違い（Git Bash の `/c/...` 形式等）を検出または正規化して受け付ける。正規化不能な形式は検査不能（detection_unavailable）として通過させず、形式エラーとして報告し、形式の違いだけで検出不能とならない
-- 本節の規律は case-ready、case-close の機械工程 script 呼び出しにも同一に適用される（各 Design の既有の同一規律参照を維持する）
-
-#### 対象 REQ 行が0件の案件の正規の入力構成と前提の検証の順序（REQ-029-017）
-
-機械工程の入力構成と前提の検証の順序（全試験の前に案件の構成・入力の検証）を Design へ反映する。
-
-- 対象 REQ 行が0件の案件（Decision のみの作成・変更など）を正当な案件の構成として扱う。機械工程の入力検証に、REQ 行の変更を伴わない案件の正規の入力構成（対象の集合が空であることを明示したうえでの、全体を対象とする検査の mode）を加える。既存の代替経路（REQ-029-014〜016）は救済として維持し、正規の入力構成の追加をもって廃止しない
-- 検査の前提を、高価な全試験の前に確認する。機械工程の各 phase で、案件の構成と入力の前提の検証を全試験の起動より先に実行し、前提が満たされない失敗が早い段階で確定する順序にする。実行する検査の総数は減らさない（検査の省略ではなく、失敗を検出する順序の是正）
-
+詳細は references/script-invocation.md を参照（遅延読み込み）。
 ### 検査入力と実行証拠の接続
 
-REQ-030-025/026の実現は既存の工程別実行器・入力型・下位検査契約を再利用する。標準出力と標準エラーは全文を保持し、終了コード、対象版、実行条件（実行コマンド、引数、作業ディレクトリ、指定された実行上限と検査設定）と対応付けて、一回の検査の報告として保存・消費する。末尾抜粋や集計要約だけで原結果を代替しない。既存の実行記録を用い、終了コードや証拠の再取得のみを目的とする同一条件の全再実行を行わない。
-
-既知の検査入力は既存入力型と下位コマンドの契約から固定生成し、必須項目、対象、パス、許容値、必須引数を高価な検査の前に検証する。形状検査だけでなく不正workflow値等の下位引数も拒否する。兄弟実行器と結果消費の規律をそろえ、単一Case専用処理や任意コマンドの汎用解釈器を作らない。既存の計測日二段収束・派生物処理とcommit境界・版変更後の必要検査はそのまま維持する。
-
+詳細は references/script-invocation.md を参照（遅延読み込み）。
 ## 所有関係と委譲
 
 - public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、case-auto の orchestration による Workflow Skill load 時に本 Design が読み込まれる（DEC-010。第4段以降は command 定義の実行時投影ではなく直接読込）。
@@ -131,56 +91,13 @@ REQ-030-025/026の実現は既存の工程別実行器・入力型・下位検�
 
 ## Definition Package と冪等再実行（REQ-030-010）
 
-- Definition Package の構成、設計PR / 設計修正PRの lifecycle、canonical Definition の判定、冪等キーは case-open / case-ready Design が正規所有する（v4）。
-- case-open は再実行時、既存 Root Case および既存設計PRを冪等キーで検出し、再利用する。重複生成しない（REQ-030-010）。
-- 不足分だけを処理する。Root Case が存在し設計PRが存在しない場合は PR 生成のみを実行し、Root Case が存在しない場合は Root Case 確立から実行する。両者とも存在する場合は新規生成を行わない。
-- 設計PRは canonical Definition に実変更がある場合のみ作成する。canonical との差分が空の場合（bugfix / maintenance / docs_chore 等の実変更なし Case）は作成しない（REQ-030-002）。実変更判定が不能な場合は PR を作成せず停止し、判定不能の理由を報告する。
-
-### 並行 case-open の作業隔離規律（REQ-030-017）
-
-並行して case-open を実行する場合の作業隔離規律を Definition branch 作成・PR 作成の運用手順へ定める:
-
-- **Case 専用 worktree の前置**: 並行 case-open を実行する場合、各 Case は専用 worktree（`.worktrees/{N}-definition`）で作業する。作成手順は agentdev-git-worktree 標準手順（type=definition）に従い、本 Design は作成手順を複製しない。作業隔離要件（作成元 origin/main HEAD・スタック構造禁止・1-writer 侵害検知・merge-base 起点差分検査）の所有は本 Design が維持する。共有 working tree での Definition 変更作業を行わない。
-- **Definition branch の origin/main HEAD からの独立作成**: Definition branch は origin/main HEAD から独立して作成し、兄弟 Case の Definition commit を含むスタック構造を作らない。branch 命名（REQ-083）は既存規定のまま、本規律は branch 作成元と作業隔離を定める。
-- **PR 作成前の自 Case 差分検査**: PR 作成前に merge-base と diff --stat により差分が自 Case 分のみであることを検査する。兄弟 Case の commit を含むスタック構造を検出した場合は、隔離 worktree での差分再構成（origin/main HEAD からの branch 再作成と明示パスによる変更の再適用）で救済してから PR を作成する。
-- **明示パス指定ステージ**: ステージは明示パス指定で行い、スイープ操作（`git add -A` 等）は行わない。
-- **1-writer 前提侵害の検知と早期断念**: `git status` により worktree 1-writer 前提の侵害（in-scope 外の書込み混入）を検知した場合は直ちに停止する（早期断念）。
-
-### 検証スコープポリシー追随工程（REQ-030-015）
-
-REQ 行追加を伴う Definition Package の生成時、検証スコープポリシー（`traceability/policy.yaml`）更新の追随要否を確認し、必要なポリシー更新を Definition に含める。ポリシー編集は設計PRの構成要素として扱い、直接適用しない。
-
-### 横断依存検査（STEP-5、REQ-030-012〜014）
-
-- STEP-5 冪等確認の実行時、draft の artifact_actions と未クローズ Case 群の変更対象成果物を機械的に比較し、2 以上の Case 間で同一パスが重複する場合、警告として投入者に提示する。共通契約は case-open / case-ready Design が正規所有する（v4）。
-- 検出源は draft の artifact_actions と未クローズ Case 群の宣言に限定し、合意済み宣言以外の一般的な変更影響探索・依存関係探索を行わない（REQ-021-014、REQ-030-013）。
-- Epic を構成する投入では同一投入内（Epic 配下 Wave 内）の変更対象ファイル重複検出を case-ready の前置検出（REQ-035-012）へ委譲し、二重検査としない。Epic をまたぐ Case 間の重複のみを検出対象とする（REQ-030-014）。
-- 警告は Root Case の確立を自動阻止せず、警告の提示記録を完了報告へ含める。
-
-### 意味変更行の design 対応事前確認
-
-Definition Package の生成・転記（STEP-2 / STEP-3）は、対象要件行のうち既存行の意味変更を含む場合、
-agentdev-traceability の coverage --req による当該行の design 対応有無の事前確認を実施する。
-事前確認で design 対応が欠落する意味変更行を検出した場合は、当該行の design 対応を
-artifact_actions（artifact: design）へ組込んだ上で合意を完了する。事前確認を省略した Case は
-case-ready の lifecycle gate completeness（fail-closed）で停止し得る。プロジェクトの採用した
-工程・成果物規約が要求する設計根拠対応の欠落ゲート（missing-design、REQ-021-024）への
-予防手順として位置づける。
-
+詳細は references/definition-package.md を参照（遅延読み込み）。
 ## review_dispositions の消費
 
-case-open は draft の `review_dispositions` を読み取り、採用済みの内容が artifact_actions へ反映されていることを確認する。Root Case 本文への全件転記と「レビュー判断」セクションを生成しない。判断理由の記録が必要な採否（reject とその理由等）のみ、必要に応じて Issue コメントへ残す。
-
-`review_dispositions` を持たない旧ドラフトを case-open は入力として拒否しない（DEC-003 準拠）。
-
+詳細は references/definition-package.md を参照（遅延読み込み）。
 ## Case Issue 本文の元追跡Issue参照形式
 
-追跡Issueから生成 Case への参照を関係追跡の正とし、Case Issue（Root Case を含む）の本文に元追跡Issueへの逆参照を記録しない（REQ-049-005「追跡Issueと生成された Case Issue の関係は後から追跡できること」の一方向実現）。
-
-- **記載しない形式**: Case Issue 本文冒頭の `Tracking: #N` 行を記録しない。旧形式の当該行を新規 Issue で生成せず、旧形式を恒久的に読み続ける互換層を残さない
-- **追跡Issue側との対応**: 追跡Issue側の本文標準構造（関連 Case Issue への参照セクション）のみに関係を保持する。論理スキーマの正は agentdev-issue-tracking Design が一元管理し、本節は Case Issue 側の非記載のみを定める
-- **`親Epic: #N` との区別**: `親Epic: #N` は Epic Issue と子 Issue の階層関係を表す形式であり、元追跡Issue参照の用途には使用しない
-
+詳細は references/definition-package.md を参照（遅延読み込み）。
 ## トレーサビリティ能力の利用
 
 case-open は、上流工程（req-define）で確定した対象要件と実行契約を Issue へ引き継ぐ（REQ-021-014）。
@@ -240,68 +157,19 @@ case-open が使用する検査ツール（[integrity-contracts.md](../integrity
 
 ## adversarial-review 挿入境界（case-open）
 
-本節は case-open への adversarial-review caller integration（REQ-015-009）の挿入境界を case-open 固有の側面で所有する。
-共通 caller integration 契約（任意性、QG/HITL 非代替、副作用禁止、accepted finding 反映責務、再 review 条件と停止条件、呼出失敗時取扱い）は [adversarial-review Design](../skills/agentdev-adversarial-review.md)「adversarial-review caller integration 共通契約」節が正であり、本節は case-open 固有の挿入位置、発動条件、変更影響別再実行ルール、最初の副作用との順序のみを規定する（REQ-014-011）。
-
-### 挿入位置（REQ-015-009）
-
-review 挿入位置は「Root Case 本文候補と Definition Package 構成案確定後・最初の GitHub Issue 作成（Root Case 作成）前」である。
-REQ-030 への縮小に伴い、かつて case-open が構成していた execution structure（Epic / Wave / Issue 構成）と完了条件（QG-2 検証）の配置は case-ready に確定している（QG-2 の配置の正は quality-gate-model Design と agentdev-quality-gates の QG-2 reference の配置の表。2026-11-17 の利用者判断）。そのため review 対象は case-open が現に構成する2者である。
-
-### 発動条件判定 Step（REQ-015-001、REQ-015-002、REQ-015-003）
-
-発動条件判定と review 呼出を分離する（REQ-015-001）。
-発動条件判定 Step は default-on 原則（REQ-015-002、REQ-014-013）と skip 条件（REQ-015-003）を評価する。
-
-- **default-on（原則実行）**: case-open は adversarial-review を原則実行する。Root Case 本文候補、Definition Package 構成案のいずれかに意味的決定が存在する場合に発動する。
-- **skip 条件**: Root Case 本文候補が合意済み入力（draft-data）の機械的投影のみで新しい意味的決定を含まない場合、adversarial-review を省略して Root Case 作成へ進める（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
-- **明示指定時の取扱い**: ユーザーが review の実施を明示的に指示した場合は、通常のユーザー指示としてその場で実行する。専用の検出、専用フラグ、Issue 本文への専用保存、後工程への専用伝播、skip 条件の専用上書き処理を持たない（REQ-015-002）。
-
-### review 呼出 Step（REQ-015-001）
-
-発動条件判定 Step で発動と判定された場合、review 呼出 Step で adversarial-review を呼び出す（REQ-015-001）。
-
-- **委譲契約**: adversarial-review は `semantic_review`（書き込み禁止型）として適用する（[delegation-contracts Design](../workflows/delegation-contracts.md)「adversarial-review との委譲契約接続」節）。adversarial-review 自身は対象ファイル、Issue、PR、git 操作を行わない（REQ-014-004）。
-- **review 対象**: Root Case 本文候補、Definition Package 構成案の2者。
-- **採用後戻り先**: Root Case 本文候補に関わる finding は本文候補生成へ戻し再評価する。Definition Package 構成案に関わる finding は構成案評価へ戻す。accepted finding の対象候補への反映は case-open（呼出元）の責務である（REQ-014-006）。
-- **unresolved 時の取扱い**: 未解決のユーザー判断事項が残る場合、Root Case 作成へ進まない（REQ-014-009）。工程委譲起源であるため、既存 status（pass/warn/fail/partial）に unresolved 判断事項を付加し、case-auto 経由時は user-decision-required 停止理由分類として伝播する（REQ-014-012、[lifecycle-state-machine Design](../workflows/lifecycle-state-machine.md)「adversarial-review 由来の停止信号」節）。
-- **呼出失敗時**: adversarial-review の呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止し、利用不能を報告した上で従来フローと既存 QG/HITL を維持する（REQ-014-010）。
-
-### 変更影響別の再実行ルール（REQ-014-007）
-
-review の結果反映で review 対象の意味内容が変更された場合（REQ-014-007）、変更影響範囲に応じて次の4パターンのいずれかを実行する。
-
-| 変更影響 | 再実行対象 | 根拠 |
-|---|---|---|
-| Root Case 本文候補のみ変更 | 本文候補の再生成 | 本文候補の意味内容を最新化する |
-| Definition Package 構成案のみ変更 | 構成案の再評価 | 構成案の意味内容を最新化する |
-| 両方が変更 | 本文候補の再生成と構成案の再評価 | 両方を再実行する |
-| 意味内容変更なし | 再実行不要 | review 対象の意味内容に変更がないため、Root Case 作成へ進む |
-
-4パターンのいずれかを完了した後、意味内容変更から新たな本質的争点が生じ得る場合のみ再 review を発動できる（REQ-014-007）。
-同一 finding を新証拠・新前提・異なる failure condition・未評価範囲なしに再起票しない。
-再 review の停止条件（REQ-014-008）を満たした場合、Root Case 作成へ進む。
-
-### 最初の副作用（Root Case 作成）との順序
-
-review は最初の GitHub Issue 作成呼び出し（Root Case 作成）より前に実行する。
-Root Case 作成が case-open の最初の副作用（GitHub API 呼び出しによる Issue レコード生成）であるため、review は最初の副作用の前に挿入される。
-review の結果、Root Case 本文候補、Definition Package 構成案のいずれかが変更された場合は、変更影響別の再実行ルールに従い、Root Case 作成前に反映を完了する。
-
-### 正規所有者マトリックス参照
-
-本節と adversarial-review Design「adversarial-review caller integration 共通契約」節（REQ-014-011）、delegation-contracts Design「adversarial-review との委譲契約接続」節、lifecycle-state-machine Design との間で意味の重複、矛盾を生じない。
-case-open command 固有の挿入境界（発動条件、挿入構造、変更影響別再実行ルール、順序）のみを本節が所有し、共通 caller integration 契約、adversarial-review 自身の振る舞い契約、再 review 条件と停止条件の詳細は各正規所有者 Design を正とする。
-
+詳細は references/adversarial-review-insertion.md を参照（遅延読み込み）。
 ## 受け入れ義務保存の投影（REQ-030-019〜021、RU-20261004-08）
 
-Definition Package 生成・確定における受け入れ義務保存の実行時投影。
+詳細は references/definition-package.md を参照（遅延読み込み）。
+## reference 選択表
 
-- Definition Package の生成時、合意済み入力（RU・要件doc）の必須受け入れ義務（目的、対象範囲、禁止、対象外、受け入れ条件、必須検証義務）について、投影後の成果物だけの自己整合確認ではなく、最新の合意済み入力との照合で忠実性と投影完全性を確認する。欠落・縮小・反転を検出した場合は Root Case の確定・実行へ進まない。
-- 義務対応の確認は対応先の存在確認に留まらず、元の義務の意味、評価範囲、禁止事項の保持を確認する。対応先のない義務は非該当（not applicable）として扱わず、投影不完全として処置する。
-- 必要情報と確認根拠を Definition Package へ保持した後は、当該成果物を下流の検証基準とする。
-- Definition 確定後に投影不備が判明した場合は、消費済み入力で実行契約を非公式に補完せず、正規の訂正経路（req-define 再合意を経る case-revise 等）での修復へ差し戻す。
-- 偽陽性回帰シナリオ「元の合意から正規契約への投影に欠落・反転があるが、投影後の契約と実装・検査が自己整合していることを理由に通過する」を、実経路に接続した決定的回帰試験で拒否する。
+通常経路で全 reference を無条件読込しない。必要な条件に応じて読む reference を選択する。
+
+| 条件 | 読む reference |
+|---|---|
+| 機械工程の script 呼び出し契約と検査入力の接続 の詳細が必要な場合 | references/script-invocation.md |
+| Definition Package と冪等再実行・review_dispositions の消費・元追跡Issue参照形式・受け入れ義務保存の投影 の詳細が必要な場合 | references/definition-package.md |
+| adversarial-review 挿入境界（case-open） の詳細が必要な場合 | references/adversarial-review-insertion.md |
 
 ## See Also
 

@@ -40,7 +40,7 @@ strict（参照切れは broken-reference として即時修正対象）
 | description | skill/command reference 内の templates/ 等へのパス参照が実ファイルを指すこと（ネストサブディレクトリ参照を含む） |
 | severity | strict |
 | category | broken-reference |
-| detection_method | `checkScriptTemplateReferencePaths`（check_integrity.ts）によるパス抽出と存在確認 |
+| detection_method | `checkReferencePaths`（`src/common/skills/repo-agentdev-integrity/rules/reference-path-core.ts`・`src/common/skills/repo-agentdev-integrity/rules/ir-062.ts`）によるパス抽出と存在確認 |
 | affected_artifacts | [commands, skills, templates, scripts, references] |
 | related_req | [REQ-010] |
 | related_design | [integrity-contracts.md, agentdev-skill-authoring.md, agentdev-command-authoring.md] |
@@ -55,16 +55,16 @@ strict（参照切れは broken-reference として即時修正対象）
 
 1. canonical basis: REQ-010、`agentdev-skill-authoring.md`/`agentdev-command-authoring.md` の検証観点（参照先実ファイル存在確認。旧 REQ-028-012 は retired）
 2. invariant: skill/command reference のパス参照は実ファイルを指す
-3. executable detector: `checkScriptTemplateReferencePaths`（check_integrity.ts。他検出との共有 detector）
+3. executable detector: `checkReferencePaths`（`src/common/skills/repo-agentdev-integrity/rules/reference-path-core.ts`。他検出との共有 detector）
 4. regression test: `check_reference_paths.test.ts`（正常/異常 fixture を同一ケースで保持）
-5. execution route: docs-check（`/repo/docs-check` → check_integrity.ts、full-audit / delta-guard で到達可能）
+5. execution route: docs-check（`/repo/docs-check` → 検証エンジン cli.ts、full-audit / --changed で到達可能）
 6. finding route: intake（`/agentdev/intake-capture`）
 7. 他 IR 非包含: IR-008（SKILL.md の references/ 実在）、IR-013（completion-reports/ 種別パス）、IR-055（docs パス系の導入先未解決参照）はいずれも本 invariant と独立
 8. severity / gate_level 実行可能性: strict / full-audit + delta-guard により機械判定で完結する
 
 ## (b) hard governance 追加 gate の充足（blocking strict IR）
 
-本 IR は従来から `check_integrity.ts` が実装し docs-check を blocking してきた `reference-path-existence` 検出の catalog 登録（正典化）であり、新規検出統制の新設ではない。DEC-001 決定4 の7条件は次のとおり充足する:
+本 IR は従来から docs-check が blocking 検査として実装してきた `reference-path-existence` 検出の catalog 登録（正典化）であり、新規検出統制の新設ではない。DEC-001 決定4 の7条件は次のとおり充足する:
 
 1. 既存統制と重複しない（既存 IR 群は本 invariant を包含しない。未登録検出の正典化である）
 2. 既存統制を置換しない（既存 IR の廃止を伴わない）

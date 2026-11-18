@@ -53,6 +53,7 @@ implementation:
     - REQ-118-001
     - REQ-118-002
     - REQ-118-004
+    - REQ-122-014
   src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md:
     - REQ-083-001
     - REQ-030-017
@@ -64,6 +65,7 @@ implementation:
     - REQ-061-046
     - REQ-017-024
     - REQ-117-012
+    - REQ-122-014
   src/common/skills/agentdev-workflow-case-open/references/root-case-and-definition-package.md:
     - REQ-030-015
     - REQ-030-017

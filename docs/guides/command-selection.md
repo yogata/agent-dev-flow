@@ -16,7 +16,8 @@
 | 再合意済み Definition の変更を既存 Case に反映 | `/agentdev/case-auto`（例外経路 case-revise → case-ready を駆動） | Amendment と再確定済み Definition |
 | 具体的な作業候補を収集したい | `/agentdev/intake-capture` | inbox 項目 |
 | クローズ済み Case Issue/PR から残課題を抽出したい | `/agentdev/intake-from-github` | inbox 項目 |
-| inbox に項目がある | `/agentdev/intake-promote` | 採用済み / archive |
+| inbox に項目がある | `/agentdev/intake-triage` | 処理結果サマリー（Route A 修正 / Route B 破棄 / Route C `RU-*.md`、残件 0 件） |
+| inbox に項目がある（review・分類を経る場合） | `/agentdev/intake-promote` | 採用済み / archive |
 | 再発防止知見を蓄積したい | `learning-capture`（スキル） | inbox/ エントリ |
 | inbox/ にエントリがある | `/agentdev/learning-promote` | 採用済み成果物 |
 | 採用済み成果物（intake/learning/inspect）がある | `/agentdev/backlog-review` | `RU-*.md` |

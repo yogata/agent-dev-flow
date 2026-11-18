@@ -4,7 +4,7 @@ status: accepted
 created: 2026-06-21
 updated: "2026-11-18"
 ---
-<!-- ADF-COVERS(implementation): REQ-003-005 -->
+<!-- ADF-COVERS(implementation): REQ-003-005, REQ-122-014 -->
 <!-- ADF-COVERS(implementation): REQ-006-105, REQ-006-106, REQ-006-107, REQ-006-108, REQ-006-109, REQ-006-111 -->
 <!-- ADF-COVERS(implementation): REQ-037-008, REQ-037-009, REQ-037-010 -->
 <!-- ADF-COVERS(design): REQ-031-012 -->
@@ -73,7 +73,7 @@ PR 本文の capture 関連セクションは以下を分離する:
 
 ### CaptureBoundary 検査の例外判定規則
 
-CaptureBoundary 検査（`check_integrity.ts` の `command-capture-duty`）は、上記 capture 責務表を起点とした一般規則で例外を判定する。
+CaptureBoundary の判定は、上記 capture 責務表を起点とした一般規則で例外を判定する（旧 `command-capture-duty` 専用 checker は DEC-065 による検証エンジン再構築で削除済み。capture 境界の判定は本 Design の責務表を正とし、専用機械検査は保持しない）。
 command ごとの固定例外リストは持たない。
 
 判定規則は次のとおり。

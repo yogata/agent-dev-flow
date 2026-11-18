@@ -359,7 +359,7 @@ describe("Definition merge-time re-measurement and machine-step order agreement"
 
   test("machine-step procedure order matches the committed-HEAD execution order", () => {
     expect(openPrDoc).toContain(
-      "明示パス指定 stage・commit、`check_integrity`、traceability check まで",
+      "明示パス指定 stage・commit、`検証エンジン cli.ts（--changed）`、traceability check まで",
     );
     expect(openPrDoc).toContain("commit 済み HEAD に対して実行する");
   });

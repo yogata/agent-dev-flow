@@ -15,13 +15,13 @@ verification_path: src/common/skills/repo-agentdev-integrity/scripts/rules/rules
 | description | 現行 REQ 要件行の主たる文意がスキーマフィールド、enum 値一覧、テストデータ詳細（fixture detail）、チェッカー個別ルール、誤検知（false positive）抑制方式、Step 番号直接参照、Phase 番号、内部アルゴリズム、具体的な作業履歴のいずれかである場合、当該 Design 詳細の混入を検出すること（REQ-001-002、REQ-001-003、REQ-001-067、REQ-001-068, REQ-001-049）。Step 番号直接参照は現行 REQ の記述制約（REQ-001-049）に違反する Design 詳細混入の代表例であり、検出シグナル、exemption 条件の詳細は下位セクション「IR-044 Step 番号直接参照検出」に配置する。exemption は META 規則行（機械的行構造マッチ）のみとし、文脈解釈を要する免除は inspect-docs へ委譲する（REQ-010-002, REQ-010-012）。詳細は下位セクション「IR-044 exemption 条件」 |
 | severity | heuristic |
 | category | canonical-conflict |
-| detection_method | 現行 REQ 要件行から Design 詳細キーワード（スキーマ、enum、テストデータ、チェッカー個別ルール、FP 抑制、Step 番号直接参照、Phase 番号、内部アルゴリズム、作業履歴）をパターンマッチで検出。Step 番号直接参照は `Step N`、`ステップ N`、`手順 N`（N は数字、範囲表現 `N-M` 含む）の正規表現パターンで検出する（実装: `check_integrity.ts` の `IR044_SIGNAL_PATTERNS` Step number エントリ）。検出後、META 規則行 exemption（REQ-NNNN-MMM 形式 + enum/format 等の列挙パターンを行構造で機械判定、REQ-010-012）のみを適用する。文脈解釈を要する免除（否定文脈、委譲文脈、メタスコープルール文脈、振る舞い述語文脈、安定契約パターン）は実施せず inspect-docs へ委譲する（REQ-010-002） |
+| detection_method | 現行 REQ 要件行から Design 詳細キーワード（スキーマ、enum、テストデータ、チェッカー個別ルール、FP 抑制、Step 番号直接参照、Phase 番号、内部アルゴリズム、作業履歴）をパターンマッチで検出。Step 番号直接参照は `Step N`、`ステップ N`、`手順 N`（N は数字、範囲表現 `N-M` 含む）の正規表現パターンで検出する（実装: `src/common/skills/repo-agentdev-integrity/rules/ir-044.ts` の Step number 検出パターン）。検出後、META 規則行 exemption（REQ-NNNN-MMM 形式 + enum/format 等の列挙パターンを行構造で機械判定、REQ-010-012）のみを適用する。文脈解釈を要する免除（否定文脈、委譲文脈、メタスコープルール文脈、振る舞い述語文脈、安定契約パターン）は実施せず inspect-docs へ委譲する（REQ-010-002） |
 | affected_artifacts | [現行 REQ] |
 | related_req | [REQ-001-002, REQ-001-003, REQ-001-067, REQ-001-068, REQ-010-002, REQ-010-012, REQ-001-049] |
 | related_design | [integrity-contracts.md, document-model.md] |
 | gate_level | full-audit |
 | false_positive_risk | 高。文脈解釈を要する免除（否定文脈、委譲文脈、メタスコープルール文脈、振る舞い述語文脈、安定契約パターン）は docs-check では実施せず inspect-docs へ委譲したため（REQ-010-002）、純粋なパターンマッチの false positive は inspect-docs での意味的再評価で事後処理する。META 規則行 exemption は行構造の機械判定に限定し、件数・内容を規定する Design 詳細列挙行は免除しない（REQ-010-012）。Step 番号直接参照パターンは数字を伴わない「Step 番号」「ステップ番号」語句を検出対象とせず、REQ-001-049 自身（原則宣言の META 規則行）を誤検知しない。これは語句「番号」と数字リテラルの機械的区別により保証し、文脈免除には依存しない。既知の true positive が META exemption により誤って免除されないことを回帰テストで検証する |
-| regression_test | `scripts/check_integrity.test.ts` の IR-044 正規スイート（v2:REQ-9001〜v2:REQ-9013）が真陽性保護と exemption 境界を検証する。Step 番号直接参照の true positive として v2:REQ-9005（`Step 3`）、v2:REQ-9008（`手順 4`）を含み、META 規則行 exemption（v2:REQ-9006/9012/9013）、REQ-001-049 META 規則行の誤検知非検出（v2:REQ-9009）、振る舞い述語 exemption（v2:REQ-9011/v2:REQ-9010 guard）を追加固定する（retired REQ-028-009 準拠） |
+| regression_test | `scripts/rules/rules.test.ts` の ir044 インメモリケース（IR-044 正規スイート。旧 fixture 名 v2:REQ-9001〜v2:REQ-9013 は履歴）が真陽性保護と exemption 境界を検証する。Step 番号直接参照の true positive として v2:REQ-9005（`Step 3`）、v2:REQ-9008（`手順 4`）を含み、META 規則行 exemption（v2:REQ-9006/9012/9013）、REQ-001-049 META 規則行の誤検知非検出（v2:REQ-9009）、振る舞い述語 exemption（v2:REQ-9011/v2:REQ-9010 guard）を追加固定する（retired REQ-028-009 準拠） |
 | finding_route | req-define |
 | triage_action | 該当要件行の詳細を Design、ルールカタログ、コマンドリファレンス、スキルリファレンス、テスト文書のいずれかに移管し、REQ 側は外部契約、状態要件の要約に置き換える。Step 番号直接参照の triage は機能名・段階名参照への置換とする（REQ-001-049）。文脈免除の境界判定は inspect-docs が担う |
 | last_verified | 2026-06-28 |
@@ -38,7 +38,7 @@ REQ/Design 責務範囲を規定する META 規則行（enum/format/schema 等 D
 検出パターン拡張により新たに META 規則行として機械免除可能と確定した件は、本表の判定基準へ反映する。
 個別 REQ-ID をホワイトリストとして列挙せず、行構造パターンを拡張し、件数・内容を規定する行は引き続き免除しない（REQ-010-012）。
 
-実装（`check_integrity.ts` `isMetaRuleLine()`）は次の4パターンで META 規則行を機械判定する。いずれも `hasCountOrContentRule`（件数・内容規定）を含む行は予防的ガード句（REQ-036-001）により免除を拒否する:
+実装（`src/common/skills/repo-agentdev-integrity/rules/ir-044.ts`）は次の4パターンで META 規則行を機械判定する。いずれも `hasCountOrContentRule`（件数・内容規定）を含む行は予防的ガード句（REQ-036-001）により免除を拒否する:
 
 | パターン | 判定根拠 | 適用例（#1335 で META 規則行と確定した REQ） |
 |---------|---------|----------------------------------------------|
@@ -89,7 +89,7 @@ REQ-001-049 が宣言する「現行 REQ の要件行は command 定義または
 
 **検出パターン（機械判定）**:
 
-Step 番号直接参照は次の正規表現パターンで検出する（実装: `check_integrity.ts` の `IR044_SIGNAL_PATTERNS` Step number エントリ）。
+Step 番号直接参照は次の正規表現パターンで検出する（実装: `src/common/skills/repo-agentdev-integrity/rules/ir-044.ts` の Step number 検出パターン）。
 
 | パターン | 正規表現 | 検出例 |
 |---------|---------|--------|
@@ -126,7 +126,7 @@ REQ 要件行が Design 詳細（Step 番号）へ依存すると Design↔comma
 
 **回帰テスト**:
 
-`scripts/check_integrity.test.ts` の IR-044 正規スイートが次を検証する。
+`scripts/rules/rules.test.ts` の ir044 インメモリケースが次を検証する。
 
 - `Step 3` 形式の true positive 検出（v2:REQ-9005）
 - `手順 N` 形式の true positive 検出（v2:REQ-9008）

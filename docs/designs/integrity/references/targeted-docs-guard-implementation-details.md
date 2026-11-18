@@ -12,13 +12,13 @@ updated: "2026-11-18"
 
 ## Phase1-6 実装計画
 
-check_changed_docs.ts 中心の変更文書限定検査契約を Phase 1-6 で成熟させる。
+旧 check_changed_docs.ts（現行 targeted docs guard）中心の変更文書限定検査契約を Phase 1-6 で成熟させた。
 コマンドと checker の責務分担（コマンドが対象確定、checker が検査実行）、評価対象はフォーマット検査に限定（意味評価しない）を基本方針とする。
  checker 実装は旧 check_changed_docs.ts から検証エンジン cli.ts --workflow モード（engine targeted-gate）へ移行済みである。
 
 ### Phase 1: Design 配置
 
-- check_changed_docs.ts の変更文書限定検査契約は、挙動Design（entry/対象解決/profile/validator 呼出/report 契約/exit code）、カタログ Design（TargetedDocsReport 型定義、workflow profile 定義）、実装詳細Design（validator内部アルゴリズム、分割基準）に配置されること。
+- 旧 check_changed_docs.ts（現行 targeted docs guard）の変更文書限定検査契約は、挙動Design（entry/対象解決/profile/validator 呼出/report 契約/exit code）、カタログ Design（TargetedDocsReport 型定義、workflow profile 定義）、実装詳細Design（validator内部アルゴリズム、分割基準）に配置されること。
 - 個別判定条件は IR-*.md に配置されること。
 
 ### Phase 2: report 契約固定
@@ -91,7 +91,7 @@ TargetedDocsReport 型契約の原本は `docs/designs/integrity/integrity-contr
 
 ## repo-agentdev-integrity の docs/designs/**/*.md 再帰対応（完了済み）
 
-check_integrity.ts 側の対応（v2:REQ-0158 より移管、完了済み）。
+旧 check_integrity.ts 側の対応（v2:REQ-0158 より移管、完了済み）。
 
 - `collectAllArtifactPaths`、`checkSpecReadmeIndexSync`、`checkUpdateNotesInDocs`、`scanned.Specs`、Design inventory 生成・照合処理を `docs/designs/*.md`（直下）から `docs/designs/**/*.md`（再帰）へ更新した。
 - Design本文の検査では `docs/designs/README.md` を除外する。

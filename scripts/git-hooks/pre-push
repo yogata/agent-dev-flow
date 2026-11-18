@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ADF-COVERS(implementation): REQ-122-009
+# ADF-COVERS(implementation): REQ-122-009, REQ-122-015, REQ-122-016
 # pre-push — 全量検証ゲート（DEC-066 決定2、ACT-DESIGN-002「pre-push」実行契約）。
 # シェル本体は薄いラッパー。実処理は検証エンジン（bun 実行）とトレーサビリティ checker へ委譲する。
 # REPO_ROOT は git rev-parse --show-toplevel 起点（worktree 環境対応）。
