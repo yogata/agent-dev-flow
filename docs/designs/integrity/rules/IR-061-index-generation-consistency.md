@@ -2,7 +2,7 @@
 title: 索引類自動生成整合性
 status: accepted
 created: 2026-08-20
-updated: 2026-08-22
+updated: 2026-11-18
 detection_method_class: machine-check
 implementation_path: [.opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts, .opencode/skills/repo-agentdev-integrity/scripts/check_integrity.ts, .opencode/skills/repo-agentdev-integrity/scripts/check_autogen_freshness.ts]
 verification_path: [.opencode/skills/repo-agentdev-integrity/scripts/check_integrity.test.ts, .opencode/skills/repo-agentdev-integrity/scripts/check_autogen_freshness.test.ts]
