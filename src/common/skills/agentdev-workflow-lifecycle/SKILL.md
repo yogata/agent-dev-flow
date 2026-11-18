@@ -24,7 +24,7 @@ agentdev系コマンドのフェーズ定義、SSoT遷移、work_type 判定基�
 
 | 宣言的定義 | SSoT 配置 | 利用 STEP |
 |---|---|---|
-| work_type 判定基準 | 本スキル + `<workflows/standard-lifecycle>` Design「work_type / scale / Epic / Wave の v4 意味モデル」節 | case-open / case-run `prepare` STEP |
+| work_type 判定基準 | 本スキル + `<workflows/standard-lifecycle>` Design「work_type / scale / Epic / Wave の意味モデル」節 | case-open / case-run `prepare` STEP |
 | scale 判定基準 | 本スキル | req-define / case-open `prepare` STEP |
 | SSoT 遷移定義 | 本スキル | 全 workflow の STEP transition |
 | 上位への引き継ぎ判定 | 本スキル（`references/upstream-handoff.md`） | 全 workflow の `prepare` STEP |
@@ -42,7 +42,7 @@ Issue/PR をスキップする直接完了経路は存在しない。
 
 workflow_route（direct_case 等）は work_type 固定分類ではなく、Definition 構成（artifact_actions の有無等）から導出される値である。
 `direct_case` は Definition 保存工程を別入口で実行しないことを指し、Issue/PR を経由しないことを指さない。
-導出表の正は `<foundations/design-principles>` Design「実行経路の導出（Definition 構成一次）」節であり、`<workflows/standard-lifecycle>` Design「work_type / scale / Epic / Wave の v4 意味モデル」節に整合する。
+導出表の正は `<foundations/design-principles>` Design「実行経路の導出（Definition 構成一次）」節であり、`<workflows/standard-lifecycle>` Design「work_type / scale / Epic / Wave の意味モデル」節に整合する。
 
 ### 経路一覧
 

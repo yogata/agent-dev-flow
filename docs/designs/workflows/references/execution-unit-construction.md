@@ -86,5 +86,5 @@ REQ/Design で固定するのは不変の方針（依存強度3レベル定義�
 
 ## See Also
 
-- [../standard-lifecycle.md](../standard-lifecycle.md)（語彙定義: work_type / scale / Epic / Wave の v4 意味モデル）
+- [../standard-lifecycle.md](../standard-lifecycle.md)（語彙定義: work_type / scale / Epic / Wave の意味モデル）
 - `docs/designs/commands/case-ready.md`（適用主体 command Design。Epic/Wave 構成判断の正規所有者は case-ready。REQ-061-007）

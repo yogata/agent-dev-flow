@@ -8033,10 +8033,11 @@ function checkSkillSeeAlsoReference(skillsDir: string, root: string): CheckResul
   return results;
 }
 
-// ─── IR-063 / IR-064 / IR-065 / IR-066 (Issue #2372, REQ-010-064..067) ──────
+// ─── IR-063 / IR-064 (Issue #2372, REQ-010-064..065) ──────
 // Wave 1 監査（AUDIT-REQ-045-CONSISTENCY）と Wave 2 正規化
 // （NORMALIZATION-REQ-046）後の状態を機械検査で固定する新規検査クラス群。
-// 検出シグナル・許容条件の詳細は docs/designs/integrity/rules/IR-063..066 が所有する。
+// 検出シグナル・許容条件の詳細は docs/designs/integrity/rules/IR-063..064 が所有する。
+// 旧 IR-065/IR-066（REQ-010-066/067）は Epic #4126 Phase 4 で削除済みである。
 
 // IR-063 (REQ-051-005, REQ-010-064): ガードレール識別体系検査。
 // Gxx 連番検査（開始番号・欠番・重複・未定義参照）は廃止済み（REQ-051、DEC-022 決定7）。

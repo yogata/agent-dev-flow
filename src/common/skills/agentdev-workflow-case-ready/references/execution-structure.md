@@ -1,7 +1,7 @@
 # 実行構造確定（STEP-5）
 
 execution contract 確定後の Standard / Epic 確定、Child Issue / Wave / 依存構造の生成、構成検証の実行時詳細である。
-OU / Epic / Wave / Issue 階層の語彙意味の正規所有は standard-lifecycle Design「work_type / scale / Epic / Wave の v4 意味モデル」節、連結成分アルゴリズムと 3軸判断モデルの正規所有は case-open Design（運用主体。機械的判定手順は execution_unit 構成アルゴリズム参照）である。
+OU / Epic / Wave / Issue 階層の語彙意味の正規所有は standard-lifecycle Design「work_type / scale / Epic / Wave の意味モデル」節、連結成分アルゴリズムと 3軸判断モデルの正規所有は case-open Design（運用主体。機械的判定手順は execution_unit 構成アルゴリズム参照）である。
 
 ## Standard / Epic 確定
 

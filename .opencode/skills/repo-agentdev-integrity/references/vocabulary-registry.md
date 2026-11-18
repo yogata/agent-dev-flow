@@ -277,7 +277,7 @@ docs 日本語表現・文意整合検査（IR-045, REQ-0140）の検出対象�
 | `迁移` | 移行 | なし | 中国語簡体字由来の別字形誤記 | なし | 可（default-prh.yml 登録済み。docs 内残存 0 を Case #3839 で実測） | 不要 | 不要 |
 | `查読` | 査読 | なし | 「査読」の別字形誤記 | 既知不備センチネル S-05 の検出対象語定義行（prose-quality-sentinel-checks.md） | 可（散文中の誤字表記 → 査読）。prh 未登録: センチネル定義行との恒常衝突を避ける（Case #3839 で docs 内本文の残存 0 を実測、センチネル定義 1 箇所のみ残存） | 不要 | 不要 |
 | `partial success` | 部分成功 | なし | 契約語。初出に日本語併記して使用 | 契約語としての定着用法（部分成功の扱いを定める Design 記述等） | 不可（初出併記で対応。Case #3839 実施） | 要 | 不要 |
-| `known finding` | 既知の指摘事項 | なし | 検査契約語。初出に日本語併記して使用 | baseline 検査契約（known finding / 新規 finding の区分） | 不可（契約区分の原表記と併記の使い分け） | 要 | 不要 |
+| `known finding` | 既知の指摘事項 | なし | 検査契約語。初出に日本語併記して使用 | docs-check 検査契約（known finding / 新規 finding の区分、REQ-010-074） | 不可（契約区分の原表記と併記の使い分け） | 要 | 不要 |
 | `bug report` | 不具合報告 | なし | 一般名詞的用法は不具合報告と初出併記 | 要求入力区分（REQ-004-001） | 不可（入力区分の列挙語との区別） | 要 | 不要 |
 | `timeout` | タイムアウト | タイムアウト | 一般説明ではタイムアウト。失敗種別・検出区分の列挙値は原表記 | 失敗種別列挙（障害時契約の状態値等） | 不可（列挙値との区別） | 要 | 不要 |
 | `dispatch` | 起動 | なし | 一般説明では「起動（dispatch）」と初出併記 | dispatch 宣言等の tool 契約識別子 | 不可（識別子用法との区別） | 要 | 不要 |
@@ -309,7 +309,7 @@ docs-check の機械化原則徹底（REQ-0108-056/254/261/262）に基づき、
 | `fixture` | テストデータ/検査データ | 専門カタカナ語 | 対象外（正規使用） | テスト手法概念。REQ/Design 両域で正規使用 |
 | `variant` | 種別/バリエーション/形式 | 専門カタカナ語 | 対象外（正規使用） | 種別分類のドメイン概念。REQ/Design 両域で正規使用 |
 | `provider` | 提供元 | 専門カタカナ語 | 対象外（正規使用） | 提供元分類のドメイン概念。REQ/Design 両域で正規使用 |
-| `baseline` | 基準 | 専門カタカナ語 | 対象外（正規使用） | baseline_status 等の基準概念。REQ/Design 両域で正規使用 |
+| `baseline` | 基準 | 専門カタカナ語 | 対象外（正規使用） | 基準・対照基準の一般名詞的用法（`baseline_status` は DEC-013 で削除済み IR 属性）。REQ/Design 両域で正規使用 |
 | `finding` | 検出事項 | 専門カタカナ語 | 対象外（正規使用） | inspect-* 検出結果単位のドメイン概念。REQ/Design 両域で正規使用 |
 | `promoted artifact` | 採用済み成果物 | 専門カタカナ語 | 対象外（正規使用） | intake/learning/inspect pipeline 成果物単位のドメイン概念。REQ/Design 両域で正規使用 |
 | `self-hosting` | 本体リポジトリ | 複合技術語（普通名詞明記） | 対象外（正規使用） | 配布基盤アーキテクチャ概念。REQ/Design 両域で正規使用 |
@@ -355,18 +355,16 @@ exemption: code block 内部、template placeholder（`{xxx}`）、`vocabulary-r
 
 baseline による既知/新規の区別（段階導入運用）は撤廃済みである（REQ-010-074/079、Epic #4126 Phase 4）。検出違反は全件を厳格度どおりに報告し（strict→ng、heuristic→warning）、免除せず対象側の直接修正で即時解消する。
 
-前置確認運用（REQ-057-024）: 配布物 Markdown を変更する変更は、マージの前置確認で IR-055 既知 delta の鮮度を確認し、鮮度を欠く場合は baseline の再生成（`--update-ir055-baseline`）または該当表現の解消のいずれかを行うこと。
+## 廃止語彙・旧パス対照（語彙整備の正規対照）
 
-## IR-065/IR-066 廃止語彙・旧パス検出対照（REQ-010-066/067）
-
-IR-065（廃止語彙の現行使用検出）と IR-066（旧パス・削除済み名称検出）の検出語彙対照（Issue #2372）。検出シグナル（正規表現）は `check_integrity.ts` が、許容条件の運用データ（existence_probe、exemption_files、否定文脈語）は `data/obsolete-vocabulary-map.yaml` が所有する。詳細は [rules/IR-065-obsolete-vocabulary-current-use.md](../../../../docs/designs/integrity/rules/IR-065-obsolete-vocabulary-current-use.md) と [rules/IR-066-legacy-path-removed-name.md](../../../../docs/designs/integrity/rules/IR-066-legacy-path-removed-name.md) 参照。
+旧 IR-065（廃止語彙の現行使用検出）・IR-066（旧パス・削除済み名称検出）の検出語彙対照（Issue #2372）。IR-065/IR-066 の検査、ルール定義（`rules/IR-065-*`・`rules/IR-066-*`）、運用データ `data/obsolete-vocabulary-map.yaml` は Epic #4126 Phase 4 で削除済みである（語彙レジストリ Design「旧語彙除去の検証経路」節）。本節の対照表は語彙整備の正規対照として維持し、旧語彙の出現は IR-055 runtime-unresolved-reference 検出と「検出パターン縮小」節の手動補完で扱う。
 
 | 旧語彙 | 現行語彙 | IR | 備考 |
 |--------|----------|----|------|
 | bare `ADR-NNN` | `DEC-NNN` / `v2:ADR-NNNN`（歴史識別子） | IR-065 | v2: プレフィックス付きは許容 |
 | `docs/adr/` | `docs/decisions/` | IR-065 | DEC-009 移行済み |
 | `（ADR）` 注記 | （Design 名）等の正規根拠参照、または注記削除 | IR-065 | strict。Wave 2 #2371 で解消済み |
-| `REQ/ADR/` 種別列挙 | `REQ/Decision/` | IR-065 | 既知 34 件は NG baseline 管理 |
+| `REQ/ADR/` 種別列挙 | `REQ/Decision/` | IR-065 | 既知 34 件は現行 docs で解消済み（baseline 免除管理は撤廃済み、検出違反は全件報告） |
 | `Artifact Graph` | 最小トレーサビリティモデル（TIM） | IR-065 | DEC-017 で廃止 |
 | `DOC-MAP` | `docs/designs/README.md` 索引 | IR-065 | REQ-013 廃止済み |
 | `docs/specs/` | `docs/designs/` | IR-066 | ドメイン分割移行済み |
@@ -385,15 +383,15 @@ IR-065（廃止語彙の現行使用検出）と IR-066（旧パス・削除済�
 ## メンテナンス
 
 - 新規語彙の追加・旧語彙の変更は docs-check（/repo/docs-check）の検出パターンと同期すること
-- REQ-0108-055 に基づき、検査ルール変更時は regression fixture を追加すること
+- 検査ルール変更時は regression test を追加すること（integrity-contracts.md「8 項目存在条件」の regression test 存在要件）
 - 用語選択基準の区別軸データ（上記）の変更は、プロジェクト prh 辞書（`.agentdev/config/plugins/agentdev-textlint-guard-prh.yml`）と同期すること。⑤固定置換可否が「可」の語のみを辞書へ登録し、登録時は DEC-028 の限定例外（文脈非依存性と誤検出ゼロの実測立証）を満たすこと。⑥文脈判断要否が「要」の語を辞書へ登録しないこと（REQ-094-009）
 - 本レジストリは `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` を正（canonical）とする。repo-agentdev-integrity は repo-local スキル（配布対象外）であるため src 側配置と投射の対象外である（語彙レジストリ Design「配置と連携」節の配置基準に整合）
 
 ## v4 概念語彙（意味参照）
 
-v4 概念語彙の正規定義は `docs/designs/workflows/standard-lifecycle.md`「work_type / scale / Epic / Wave の v4 意味モデル」節（L13-21）を参照する。概念再定義であり改名でないため、旧語彙→新語彙の対照行は作成しない（消費する検出規則が存在しない）。
+v4 概念語彙の正規定義は `docs/designs/workflows/standard-lifecycle.md`「work_type / scale / Epic / Wave の意味モデル」節を参照する。概念再定義であり改名でないため、旧語彙→新語彙の対照行は作成しない（消費する検出規則が存在しない）。
 
-| 概念語彙 | 意味参照（standard-lifecycle「work_type / scale / Epic / Wave の v4 意味モデル」節） |
+| 概念語彙 | 意味参照（standard-lifecycle「work_type / scale / Epic / Wave の意味モデル」節） |
 |---|---|
 | work_type | 変更の性質。workflow route を直接決定する責務から分離する |
 | scale | 変更・実行・協調の規模。特定 work_type に限定しない |

@@ -127,7 +127,7 @@ Decision 受理、execution contract と実行構造の確定、lifecycle gate �
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
 - **`<foundations/durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **case-open / case-ready Design**: Definition Package、設計PR lifecycle、canonical Definition 判定、冪等キー
-- **`<workflows/standard-lifecycle>` Design**: work_type / scale / Epic / Wave の v4 意味モデル（OU / Epic / Wave / Issue 階層の語彙）
+- **`<workflows/standard-lifecycle>` Design**: work_type / scale / Epic / Wave の意味モデル（OU / Epic / Wave / Issue 階層の語彙）
 - **`<workflows/issue-title-policy>` Design**: Epic 確定時の Root Case 接頭辞更新（`Epic: 主題`）と子 Issue タイトル（`[Epic #<親番号>] Wave-N: 主題`。`Task:` 接頭辞は廃止）の書式の単一参照点
 - **case-open / case-ready Design**: execution_unit 構成（連結成分・3軸判断の機械的判定手順を含む）と Wave 構成・Wave 重複前置検出
 - **Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則の Decision**: 責務3層分化の採用記録（docs/decisions/ 配下）

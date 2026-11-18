@@ -158,12 +158,6 @@ export const ALLOWED_USAGE: AllowedUsageEntry[] = [
       "検出対象外（code block（``` 囲み）内）の説明で ``` 記法を例示（例示由来）",
   },
   {
-    file: "docs/designs/integrity/rules/IR-066-legacy-path-removed-name.md",
-    rule_id: "stale-reference",
-    rationale:
-      "REQ-0108-NNN 旧ナンバリング検出ルール自体が旧形式を実例として列挙するルール定義（例示由来）",
-  },
-  {
     file: "docs/designs/integrity/rules/IR-069-req-number-gap-recorded.md",
     rule_id: "stale-reference",
     rationale:
