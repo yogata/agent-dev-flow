@@ -26,7 +26,7 @@
 # （docs/designs/local/third-party-skill-management.md）。
 
 schema_version: 1
-generated_at: 2026-11-18
+generated_at: 2026-11-19
 
 skills:
   - agentdev-adopted-conventions
@@ -73,6 +73,7 @@ skills:
   - agentdev-workflow-intake-capture
   - agentdev-workflow-intake-from-github
   - agentdev-workflow-intake-promote
+  - agentdev-workflow-intake-triage
   - agentdev-workflow-issue
   - agentdev-workflow-learning-promote
   - agentdev-workflow-lifecycle

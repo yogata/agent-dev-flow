@@ -34,7 +34,7 @@
 // ADF-COVERS(verification): REQ-030-003, REQ-030-008
 
 import { describe, expect, test } from "bun:test";
-import { readFileSync } from "fs";
+import { existsSync, readFileSync, readdirSync } from "fs";
 import * as path from "path";
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
@@ -55,6 +55,25 @@ const REQ_REL = "docs/requirements/REQ-017.md";
 
 function read(rel: string): string {
   return readFileSync(path.join(REPO_ROOT, rel), "utf-8");
+}
+
+function readSkillWithReferences(rel: string): string {
+  const absolute = path.join(REPO_ROOT, rel);
+  const base = readFileSync(absolute, "utf-8");
+  // SKILL 分割後、詳細規律文言の正は references/ 配下にあるため、
+  // 本体に references/ 配下の Markdown（決定的な名前順）を連結して検査対象にする。
+  const refsRoot = path.join(path.dirname(absolute), "references");
+  if (!existsSync(refsRoot)) return base;
+  const parts: string[] = [base];
+  const walk = (dir: string): void => {
+    for (const entry of readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      const child = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(child);
+      else if (entry.name.endsWith(".md")) parts.push(readFileSync(child, "utf-8"));
+    }
+  };
+  walk(refsRoot);
+  return parts.join("\n");
 }
 
 describe("projection chain source (req-draft template)", () => {
@@ -120,7 +139,7 @@ describe("case-ready projection responsibility (REQ-017-017)", () => {
 
 describe("case-run execution adapter consumption contract (REQ-017-017)", () => {
   // Case #2981（DEC-033）: the contract moved to the execution adapter skill.
-  const doc = read(CASE_RUN_ADAPTER_REL);
+  const doc = readSkillWithReferences(CASE_RUN_ADAPTER_REL);
 
   test("consumes the projected realization policy as a settled contract", () => {
     expect(doc).toMatch(/実現面投影契約/);

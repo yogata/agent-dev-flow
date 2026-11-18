@@ -16,7 +16,7 @@
 //     artifacts.
 
 import { describe, expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import * as path from "path";
 
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
@@ -35,6 +35,25 @@ const DESIGN_HEADING =
 
 function read(rel: string): string {
   return readFileSync(path.join(REPO_ROOT, rel), "utf-8");
+}
+
+function readDesignWithReferences(rel: string): string {
+  const absolute = path.join(REPO_ROOT, rel);
+  const base = readFileSync(absolute, "utf-8");
+  // Design 分割後、詳細規律文言の正は references/<name>/ 配下にあるため、
+  // 本体に references/ 配下の Markdown（決定的な名前順）を連結して検査対象にする。
+  const refsRoot = path.join(path.dirname(absolute), path.basename(rel, ".md"), "references");
+  if (!existsSync(refsRoot)) return base;
+  const parts: string[] = [base];
+  const walk = (dir: string): void => {
+    for (const entry of readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      const child = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(child);
+      else if (entry.name.endsWith(".md")) parts.push(readFileSync(child, "utf-8"));
+    }
+  };
+  walk(refsRoot);
+  return parts.join("\n");
 }
 
 function sectionBetween(
@@ -163,7 +182,7 @@ describe("REQ-035-021 の SKILL.md 制御平面参照", () => {
 });
 
 describe("REQ-035-021 の case-run Design 手順節（正）", () => {
-  const design = read(DESIGN_REL);
+  const design = readDesignWithReferences(DESIGN_REL);
   const designSection = sectionBetween(design, DESIGN_HEADING, "\n#### ");
 
   test("Design 手順節が存在し3点の記述がある", () => {

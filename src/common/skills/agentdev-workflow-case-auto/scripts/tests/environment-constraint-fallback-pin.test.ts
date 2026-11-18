@@ -40,10 +40,22 @@ function readSkillFile(): string {
 }
 
 function readCaseAutoDesign(): string {
-  return fs.readFileSync(
-    path.join(REPO_ROOT, "docs", "designs", "commands", "case-auto.md"),
-    "utf-8",
-  );
+  const absolute = path.join(REPO_ROOT, "docs", "designs", "commands", "case-auto.md");
+  const base = fs.readFileSync(absolute, "utf-8");
+  // Design 分割後、詳細規律文言の正は references/<name>/ 配下にあるため、
+  // 本体に references/ 配下の Markdown（決定的な名前順）を連結して検査対象にする。
+  const refsRoot = path.join(path.dirname(absolute), "case-auto", "references");
+  if (!fs.existsSync(refsRoot)) return base;
+  const parts: string[] = [base];
+  const walk = (dir: string): void => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      const child = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(child);
+      else if (entry.name.endsWith(".md")) parts.push(fs.readFileSync(child, "utf-8"));
+    }
+  };
+  walk(refsRoot);
+  return parts.join("\n");
 }
 
 describe("環境制約時の直接書込みフォールバックの実現面 pin", () => {
