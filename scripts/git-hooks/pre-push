@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# ADF-COVERS(implementation): REQ-122-009
+# pre-push — 全量検証ゲート（DEC-066 決定2、ACT-DESIGN-002「pre-push」実行契約）。
+# シェル本体は薄いラッパー。実処理は検証エンジン（bun 実行）とトレーサビリティ checker へ委譲する。
+# REPO_ROOT は git rev-parse --show-toplevel 起点（worktree 環境対応）。
+# 失敗時は非ゼロ終了で push を物理ブロックし、--no-verify 緊急バイパスを案内する。
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+# 検証エンジンの配置解決: source 側ツリー（SoT パス）を第一候補とし、
+# .opencode/ 投影先へフォールバックする（worktree では .opencode/skills/ の
+# agentdev-* junction が未再作成のため、worktree-operations.md「SoT パス起点実行」に従う）。
+if [ -f "$REPO_ROOT/src/common/skills/repo-agentdev-integrity/scripts/cli.ts" ]; then
+  INTEGRITY_DIR="$REPO_ROOT/src/common/skills/repo-agentdev-integrity/scripts"
+else
+  INTEGRITY_DIR="$REPO_ROOT/.opencode/skills/repo-agentdev-integrity/scripts"
+fi
+CLI="$INTEGRITY_DIR/cli.ts"
+TRACEABILITY_CHECK="$REPO_ROOT/src/common/skills/agentdev-traceability/scripts/src/check.ts"
+# REQ-060 bun test 実行形態: リポジトリルート cwd で `./` 付き相対パスを指定する。
+# テスト対象も SoT パス第一候補・.opencode フォールバック（上記 INTEGRITY_DIR と同一解決）。
+if [ -f "$REPO_ROOT/src/common/skills/repo-agentdev-integrity/scripts/cli.ts" ]; then
+  ENGINE_TEST_TARGET="./src/common/skills/repo-agentdev-integrity/scripts"
+else
+  ENGINE_TEST_TARGET="./.opencode/skills/repo-agentdev-integrity/scripts"
+fi
+
+fail_with_guidance() {
+  echo "" >&2
+  echo "[pre-push] 全量検証ゲートが失敗したため、この push を物理ブロックしました。" >&2
+  echo "  対応方法:" >&2
+  echo "  - 全量整合性チェック: bun run \"$CLI\" --root \"$REPO_ROOT\" で違反内容を確認して修正する" >&2
+  echo "  - トレーサビリティ検証: bun run \"$TRACEABILITY_CHECK\" --root \"$REPO_ROOT\" で fail 項目を確認して対応する" >&2
+  echo "  - 検証エンジンのテストスイート: cd \"$REPO_ROOT\" && bun test \"$ENGINE_TEST_TARGET\" で不合格テストを確認して修正する" >&2
+  echo "  緊急時のバイパス: git push --no-verify" >&2
+  exit 1
+}
+
+echo "[pre-push] Step 1/3: 全量整合性チェック（cli.ts 全量実行）を実行します。"
+if ! (cd "$REPO_ROOT" && bun run "$CLI" --root "$REPO_ROOT"); then
+  fail_with_guidance
+fi
+
+echo "[pre-push] Step 2/3: トレーサビリティ検証（check.ts 全体スコープ）を実行します。"
+if ! (cd "$REPO_ROOT" && bun run "$TRACEABILITY_CHECK" --root "$REPO_ROOT"); then
+  fail_with_guidance
+fi
+
+echo "[pre-push] Step 3/3: 検証エンジンのテストスイート（bun test、REQ-060 実行形態）を実行します。"
+if ! (cd "$REPO_ROOT" && bun test "$ENGINE_TEST_TARGET"); then
+  fail_with_guidance
+fi
+
+echo "[pre-push] すべての全量検証ゲートを通過しました。"
+exit 0

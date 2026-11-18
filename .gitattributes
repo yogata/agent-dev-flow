@@ -21,6 +21,9 @@
 *.bat text eol=crlf
 *.cmd text eol=crlf
 
+# Git hooks（Git-for-Windows bash で実行されるため LF 固定。CRLF 混入による実行エラー防止）
+scripts/git-hooks/* text eol=lf
+
 # Binary files
 *.png binary
 *.jpg binary
