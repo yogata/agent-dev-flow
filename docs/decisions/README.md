@@ -10,7 +10,7 @@
 DEC-018 は欠番であり、対応する Decision ファイルは存在しない。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は54件、提案中の Decision は2件である。
+現行の承認済み Decision は56件、提案中の Decision は0件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -79,8 +79,8 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 | DEC-062 | 要件ID桁数の受理上限撤廃と表示ゼロ埋め・受理検証の分離 | accepted | 2026-10-26 |
 | DEC-063 | 分割③ CI 日次定期実行（cron schedule）の撤去 | accepted | 2026-11-16 |
 | DEC-064 | 実験前提の恒久運用原則の採用と移行完了後レガシー資産の扱い境界 | accepted | 2026-11-17 |
-| DEC-065 | 整合性検証体制の中核化（IR 24+IR-075 体系・プラグイン型検証エンジン・src 正本化） | proposed | 2026-11-18 |
-| DEC-066 | ローカル Git Hook による決定論的検証ゲート（CI 非依存） | proposed | 2026-11-18 |
+| DEC-065 | 整合性検証体制の中核化（IR 24+IR-075 体系・プラグイン型検証エンジン・src 正本化） | accepted | 2026-11-18 |
+| DEC-066 | ローカル Git Hook による決定論的検証ゲート（CI 非依存） | accepted | 2026-11-18 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -147,13 +147,13 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 - [DEC-062](DEC-062.md)（要件ID桁数の受理上限撤廃と表示ゼロ埋め・受理検証の分離）
 - [DEC-063](DEC-063.md)（分割③ CI 日次定期実行（cron schedule）の撤去）
 - [DEC-064](DEC-064.md)（実験前提の恒久運用原則の採用と移行完了後レガシー資産の扱い境界）
+- [DEC-065](DEC-065.md)（整合性検証体制の中核化（IR 24+IR-075 体系・プラグイン型検証エンジン・src 正本化））
+- [DEC-066](DEC-066.md)（ローカル Git Hook による決定論的検証ゲート（CI 非依存））
 <!-- AUTOGEN:END -->
 
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
-- [DEC-065](DEC-065.md)（整合性検証体制の中核化（IR 24+IR-075 体系・プラグイン型検証エンジン・src 正本化））
-- [DEC-066](DEC-066.md)（ローカル Git Hook による決定論的検証ゲート（CI 非依存））
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
