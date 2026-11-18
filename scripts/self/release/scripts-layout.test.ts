@@ -1,10 +1,11 @@
 // Layout and contract tests for the scripts/ public entry boundary
 // (REQ-050). Pins the structural contract that case-run TS-001 verifies
 // manually, as a permanent regression guard:
-//   - scripts/ top level holds exactly the two public entries
-//     (install.ps1, self-sync.ps1) plus the internal directories
-//     (consumer/, self/) — nothing else (REQ-050-001, REQ-050-007,
-//     REQ-050-008, REQ-050-009)
+//   - scripts/ top level holds exactly the three public entries
+//     (install.ps1, self-sync.ps1, setup-hooks.ts; REQ-050-001 as
+//     modernized by DEC-066 decision 3) plus the internal directories
+//     (consumer/, git-hooks/, self/) — nothing else (REQ-050-001,
+//     REQ-050-007, REQ-050-008, REQ-050-009)
 //   - both entries offer the three modes via ValidateSet (REQ-050-002,
 //     REQ-050-003)
 //   - install.ps1 -Mode check keeps the legacy check-script capabilities
@@ -26,8 +27,8 @@ import * as path from "path";
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 const SCRIPTS_DIR = path.join(REPO_ROOT, "scripts");
 
-const PUBLIC_ENTRIES = ["install.ps1", "self-sync.ps1"] as const;
-const INTERNAL_DIRS = ["consumer", "self"] as const;
+const PUBLIC_ENTRIES = ["install.ps1", "self-sync.ps1", "setup-hooks.ts"] as const;
+const INTERNAL_DIRS = ["consumer", "git-hooks", "self"] as const;
 const RETIRED_ENTRIES = [
   "install-consumer-opencode.ps1",
   "check-consumer-opencode.ps1",
@@ -70,7 +71,7 @@ function executableLines(text: string): string[] {
 }
 
 describe("scripts layout / public entry boundary (REQ-050-001, REQ-050-007, REQ-050-008, REQ-050-009)", () => {
-  test("scripts/ top level contains only the two public entries and the internal dirs", () => {
+  test("scripts/ top level contains only the three public entries and the internal dirs", () => {
     const entries = fs.readdirSync(SCRIPTS_DIR, { withFileTypes: true });
     const files = entries.filter((e) => e.isFile()).map((e) => e.name).sort();
     const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name).sort();
