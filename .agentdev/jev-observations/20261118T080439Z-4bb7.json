@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261118T080439Z-4bb7",
+  "workflow": "case-ready",
+  "evaluationKind": "wave-composition",
+  "subject": "Case #4150 Epic 化後の Wave 構成判断（並列可否と重複時処置）",
+  "sourceRevision": "2620c322ead45b010a54f47be42ff51b8f78a244",
+  "durationMs": 633,
+  "inputTokens": 1393,
+  "inputs": {
+    "requestDigest": "690621fe93c726db8ec1b8f457f645901aa37afaca7e339d85a265b80693f897"
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q-parallel",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.03,
+        "false": 0.97
+      }
+    },
+    {
+      "questionId": "q-duplicate-handling",
+      "questionForm": "choice",
+      "value": "重複許容（衝突解消の担当とマージ順序の事前記録を含む）",
+      "probabilityDistribution": {
+        "変更対象分割": 0.14,
+        "重複許容（衝突解消の担当とマージ順序の事前記録を含む）": 0.86
+      }
+    }
+  ],
+  "confidence": 0.72,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q-parallel",
+        "value": false
+      },
+      {
+        "questionId": "q-duplicate-handling",
+        "value": "重複許容（衝突解消の担当とマージ順序の事前記録を含む）"
+      }
+    ]
+  }
+}
