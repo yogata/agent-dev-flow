@@ -1,0 +1,6 @@
+component: scripts-git-hooks
+implementation:
+  scripts/git-hooks/pre-commit:
+    - REQ-122-008
+  scripts/git-hooks/pre-push:
+    - REQ-122-009
