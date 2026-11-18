@@ -13,7 +13,7 @@ about: case-open Root Case flow 完了報告テンプレート
  - Definition Package を生成し Root Case へ関連付け
  - 設計PR: {作成済み: #{pr_N}（実変更あり） / 不作成（実変更なし）}
  Capture結果: {該当なし省略可 / 以下capture 成果物がある場合のみ}
-  - パス: {.agentdev/intake/inbox/*.md または .agentdev/learning/inbox.md への相対パス}
+  - パス: {.agentdev/intake/inbox/*.md または .agentdev/learning/inbox/ への相対パス}
   - 分類: {intake/learning}
   - 保存結果: {成功/失敗（理由）}
 検証結果: ✅ OK

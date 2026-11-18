@@ -196,7 +196,7 @@ docs-check 既存資産（cli_utils.ts, check_integrity.ts の parseFrontmatter,
 2. **現在人手管理されている領域**: 導出規則が未確定、混合領域、人手判断を含む領域。
 後述「現在人手管理領域の3領域」参照。
 3. **各領域の正規情報源**: frontmatter、各文書本文のセクション構造、宣言等。
-4. **人手管理領域に対する整合性確認方法**: docs-check（IR-061、IR-038、IR-039、IR-042）による検出、人手レビュー等。
+4. **人手管理領域に対する整合性確認方法**: docs-check（IR-061）による検出、人手レビュー等。
 5. **Decision frontmatter の supersede_note 由来の部分置換注記生成**: superseded Decision で frontmatter に `supersede_note` フィールドが存在する場合、decision 系 AUTOGEN ブロック（decision-status 表・superseded セクション）の該当 Decision 行へ部分置換注記を併記して生成する。`superseded_by` と `supersede_note` の両 frontmatter フィールドをデータ源とし、status 表・superseded セクション間で同一注記を出力する（DEC-040 部分置換〔決定4 のみ DEC-044 置換・決定1〜3 維持〕の README 反映。CR-004 裁定の generator 経由反映）。
    注記の具体形式は `〔superseded by DEC-MMM。<supersede_note>〕`（`supersede_note` の内容をそのまま展開）とする。配置は status 表（decision-baseline-table）ではタイトルセル内のタイトル直後、superseded セクションでは bullet 行末とし、両ビューで同一文字列を付与する。
    `supersede_note` 未宣言（全体置換等）の場合は注記を付与しない。`supersede_note` が空値・空白のみの場合は部分置換注記を出力しない（空括弧・区切り文字のみの出力を禁止する）。`supersede_note` が YAML ブロックスカラ（`|`）形式の場合も改行を含む内容全体を正規展開して注記へ用いる。
@@ -284,4 +284,4 @@ AUTOGEN計測日はgenerate_indexesの最終commitから導出し、git logの%c
 
 - 関連 REQ: REQ-001（文書・REQ 管理基準）、REQ-001（Design status 追跡と draft 放置検出）
 - 関連 Design: `docs/designs/foundations/numbering-policy.md`（採番管理）、`docs/designs/integrity/integrity-rule-catalog.md`（整合性ルールカタログ）、`docs/designs/integrity/integrity-contracts.md`（整合性契約）
-- 検査契約: IR-061（index generation consistency）、IR-038（Decision-index-consistency）、IR-039（index REQ title consistency）、IR-042（hardcoded req count）
+- 検査契約: IR-061（index generation consistencyency）、IR-042（hardcoded req count）

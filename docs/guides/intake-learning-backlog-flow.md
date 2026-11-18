@@ -62,22 +62,22 @@ inbox/ → promoted/（採用 item の inbox 元ファイルは削除）
 ### 状態遷移
 
 ```
-inbox.md + deferred.md → promoted/
+inbox/ + deferred/ → promoted/
 ```
 
 ### コマンド/スキル
 
 | 前工程の生成物 | コマンド | 出力 |
 |----------|------|------|
-| 観測（case-run 中等） | `learning-capture`（スキル） | `inbox.md` |
-| `inbox.md` + `deferred.md` | `/agentdev/learning-promote` | `promoted/` |
+| 観測（case-run 中等） | `learning-capture`（スキル） | `inbox/` |
+| `inbox/` + `deferred/` | `/agentdev/learning-promote` | `promoted/` |
 
 ### 各成果物の役割
 
 | 成果物 | 役割 |
 |--------|------|
-| `inbox.md` | 未整理の Learning エントリを受け溜めるキュー。`learning-capture` で蓄積し、採用判断成功後にクリアされる |
-| `deferred.md` | 分類済みエントリの蓄積（継続的に再評価される living pool）。未処分、保留中、再評価対象を保持する |
+| `inbox/` | 未整理の Learning エントリを受け溜めるキュー（1トピック1ファイル）。`learning-capture` で蓄積し、採用判断完了後に処理済みファイルが削除される |
+| `deferred/` | 分類済みエントリの蓄積（継続的に再評価される living pool）。未処分、保留中、再評価対象を保持する |
 | `evaluation-report.md` | 採用判断の内部フェーズで生成される一時成果物（非公開） |
 | `promoted/` | 昇華判定済み成果物の配置先。フラット構造 |
 

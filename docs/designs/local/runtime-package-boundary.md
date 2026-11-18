@@ -315,7 +315,7 @@ repo-local Plugin（REQ-002-045）の配布・投影については次のとお�
 - repo-local Plugin の原本配置原則は `src/opencode/plugins/<agentdev-name>/` 配下である。consumer 配布系全経路（`scripts/install.ps1`、`scripts/consumer/` 配下の archive installer、`scripts/self/release/package-release-archive.ps1`）は repo-local 配布除外を実装し、3ファイルの列挙条件を同期する義務を持つ。
 - `scripts/self-sync.ps1` は repo-local Plugin を除外しない（自己ホスト投影を維持する）。理由は、consumer 配布と自己ホスト投影が非対称であるためである。repo-local Plugin は REQ-052-006 により consumer への配布対象外である一方、自己ホスト環境では Plugin を利用可能にする必要がある。自己ホスト投影は canonical チェックアウト内部の source → projection 構成（`.opencode/plugins/` への junction と depth-1 loader shim 生成）であり、consumer への配布ではないため、配布除外機構の適用対象外である。
 - 除外機構の実現方式は明示的除外リスト等とする。REQ-002-011 の repo-* prefix 方式を plugin に採用しない（shim 名が repo-*.ts になり、stale shim 検出フィルタ等の波及修正が増えるため）。
-- textlint 検査基盤の保存済みファイル単位結果（実行時データ）は配布対象外とし、投影・同期の対象にも含めない。保存先、容量上限、寿命は品質基盤 Design（textlint-quality-runtime.md「ファイル単位結果の再利用と同一性条件」節）が所有する。
+- textlint 検査基盤の保存済みファイル単位結果（実行時データ）は配布対象外とし、投影・同期の対象にも含めない（保存先・容量上限・寿命の規定は textlint-quality-runtime.md の廃止に伴い、Plugin 本体 src/opencode/plugins/agentdev-textlint-guard の実装仕様が所有する。DEC-065）。
 
 配布境界 checker の repo-local モデル: 配布境界 checker は consumer 配布系と自己ホスト投影の非対称（上記のとおり）を repo-local モデルとして前提とする。detector の列挙条件（除外対象の検出箇所一覧）は repo-local Plugin の原本配置原則（`src/opencode/plugins/<agentdev-name>/`）と同期を維持し、列挙の乖離が観測された場合は個別特例の追加ではなく検査側の一般化で解消する方針とする。
 - 将来 repo-local Plugin が複数化した時点で、マーカー方式（package.json マーカーフィールド等）への拡張条件を判断する。

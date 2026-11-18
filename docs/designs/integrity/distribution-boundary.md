@@ -84,7 +84,7 @@ REQ-029-004 が許容する generic および template 参照は、producer 内�
 
 ## baseline 運用の撤廃と residual 参照の処遇区分（REQ-010-074/079、Epic #4126 Phase 4）
 
-baseline（IR-059 baseline、NG baseline）による既知違反の免除管理・delta 運用、および個別承認例外（exemptions.json）は撤廃済みである（IR-055・IR-059 の検出器自体は存続。IR-073 と同一の扱い）。
+baseline（IR-059 baseline、NG baseline）による既知違反の免除管理・delta 運用、および個別承認例外（exemptions.json）は撤廃済みである（IR-055・IR-059 の検出器自体は存続。IR-073 のルール登録は DEC-065 により終了済み）。
 検出された concrete-id 等の違反は免除せず、検出エントリごとに次の処遇区分で直接修正する。
 
 - **表現是正区分**: 文面が自己完結しており、出典参照の除去または一般化表現への置換で consumer 解決不能性が解消できる参照。配布物本文の記述規則に従い是正する

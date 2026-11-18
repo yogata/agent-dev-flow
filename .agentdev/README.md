@@ -10,8 +10,8 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-001�
 |------|------|----------|------------------------|---------------------|
 | `intake/inbox/*.md` | raw item | `intake-capture`, `intake-from-github` | `intake-promote` | `intake-promote` の分類確定後に削除（採用 item は promoted/ へ保存、却下 item は即時削除） |
 | `intake/promoted/*.md` | promoted artifact | `intake-promote`, `inspect-promote`(--auto) | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
-| `learning/inbox.md` | 未整理エントリ | `learning-capture`（skill） | `learning-promote` | `learning-promote` 成功後にクリア |
-| `learning/deferred.md` | 分類済み living pool | `learning-promote` | `learning-promote` | 多状態 living pool。staged/rejected/duplicate は promote 時 prune、deferred/未処理/再評価対象は保持 |
+| `learning/inbox/*.md` | 未整理エントリ（1トピック1ファイル、命名 YYYY-MM-DD-<slug>.md、frontmatter 4フィールド id/created_at/source/status） | `learning-capture`（skill） | `learning-promote` | `learning-promote` 成功後に処理済みファイルを削除 |
+| `learning/deferred/*.md` | 分類済み living pool（1トピック1ファイル、status で状態区分。スキーマは inbox と同一） | `learning-promote` | `learning-promote` | 多状態 living pool。staged/rejected/duplicate は promote 時 prune、deferred/未処理/再評価対象は保持 |
 | `learning/evaluation-report.md` | 境界 artifact | `learning-promote` | `learning-promote` | 毎回上書き |
 | `learning/promoted/*.md` | promoted artifact | `learning-promote` | `backlog-review` | `backlog-review` による RU 化成功後に削除 |
 | `backlog/req-units/RU-*.md` | RU（Requirement Unit） | `backlog-review`, session-sourced | `req-define`, `case-open` | `case-ready` 成功後に削除（blocked / failed / 中断時は保持。REQ-008-010, REQ-008-011） |
@@ -47,9 +47,9 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-001�
 │   ├── inbox/           ← intake-capture / intake-from-github が raw item を保存
 │   └── promoted/        ← intake-promote が派生 artifact を出力（フラット）
 ├── learning/
-│   ├── inbox.md         ← learning-capture が生学びを追記
+│   ├── inbox/           ← learning-capture が生学びを1トピック1ファイルで保存
 │   ├── evaluation-report.md ← learning-promote が評価レポートを生成
-│   ├── deferred.md      ← 分類済み learning entry の living pool
+│   ├── deferred/         ← 分類済み learning entry の living pool（1トピック1ファイル）
 │   └── promoted/        ← learning-promote が promoted artifact を出力（フラット）
 ├── backlog/
 │   └── req-units/       ← backlog-review が RU を生成

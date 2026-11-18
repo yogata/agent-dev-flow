@@ -96,7 +96,7 @@ agentdev-traceability の coverage, impact, check を一般文書探索、構造
 - REQ ファイル保存（Definition 保存内部責務）
 - GitHub Issue 作成（case-auto が駆動する内部 lifecycle の case-open 段階の責務）
 - 採用済み成果物の単純コピー（パススルー）（REQ-008）
-- `.agentdev/intake/inbox/`, `.agentdev/learning/inbox.md`, `.agentdev/learning/deferred.md` の更新
+- `.agentdev/intake/inbox/`, `.agentdev/learning/inbox/`, `.agentdev/learning/deferred/` の更新
 - 矛盾検出時の自動解決
 - RU 生成失敗成果物の削除
 - depends_on への採用済み成果物パス指定（RU-ID のみ許容）

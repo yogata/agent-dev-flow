@@ -67,7 +67,7 @@ function preMergeInput(overrides: Partial<CloseMechanicalInput> = {}): CloseMech
     integrityGates: [gate("check_integrity"), gate("check_autogen_freshness")],
     textlintGate: gate("textlint-final-check"),
     contractStateCheck: {
-      contractStatePaths: [".agentdev/jev-observations", ".agentdev/learning/inbox.md"],
+      contractStatePaths: [".agentdev/jev-observations", ".agentdev/learning/inbox/"],
       approvalEntries: [],
     },
     verificationScope: {
@@ -467,7 +467,7 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
       "--porcelain",
       "--",
       ".agentdev/jev-observations",
-      ".agentdev/learning/inbox.md",
+      ".agentdev/learning/inbox/",
     ]);
     const untrackedCall = runner.calls.find(
       (c) => c.command === "git" && c.args[0] === "ls-files" && !c.args.includes("-i"),
@@ -527,7 +527,7 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
       preMergeInput({
         acceptanceVerdicts: [soundPass(CID1)],
         contractStateCheck: {
-          contractStatePaths: [".agentdev/jev-observations", ".agentdev/learning/inbox.md"],
+          contractStatePaths: [".agentdev/jev-observations", ".agentdev/learning/inbox/"],
           approvalEntries: [],
           humanConfirmedPaths: [
             { path: "stray.txt", basis: "対応記録コメントで本 Case 由来・起票済みと確認" },
@@ -558,7 +558,7 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
       preMergeInput({
         acceptanceVerdicts: [soundPass(CID1)],
         contractStateCheck: {
-          contractStatePaths: [".agentdev/jev-observations", ".agentdev/learning/inbox.md"],
+          contractStatePaths: [".agentdev/jev-observations", ".agentdev/learning/inbox/"],
           approvalEntries: ["sandbox"],
         },
       }),

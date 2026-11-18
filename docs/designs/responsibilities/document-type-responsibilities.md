@@ -374,8 +374,6 @@ ADF の正式なモデル名・成果物名（Decision、Design、Case、Epic、
 | 層 | 実体 | 所有内容 |
 |---|---|---|
 | 政策表 | 本 Design 用語政策節 | 4分類定義、訳語表、英字許容リスト |
-| 機械検出実体 | repo-local 語彙レジストリ実体（`.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md`） | 語ごとの区別軸データ。政策表を由来参照する単方向構造 |
-| prh 機械辞書 | プロジェクト用語辞書（`.agentdev/config/plugins/agentdev-textlint-guard-prh.yml`） | 固定置換可と判定された語のみ。配布物 default-prh.yml は言語違反クラスに限定 |
 
 prh 機械辞書への新語登録は、文脈非依存性と誤検出ゼロの実測立証を前提とする（DEC-028 の限定例外）。実測立証は case 実行側のフェーズで行う。
 
@@ -384,7 +382,6 @@ prh 機械辞書への新語登録は、文脈非依存性と誤検出ゼロの�
 ### 関連参照
 
 - 用語選択基準の正規 REQ: REQ-094（4分類要約、対象語管理、固定置換限定の REQ 側所有）
-- 語彙レジストリ Design: [../authoring/vocabulary-registry.md](../authoring/vocabulary-registry.md)（用語選択基準の区別軸契約、実体対照表の配置基準）
 
 ### 横断検索における経路識別子の検出基準
 

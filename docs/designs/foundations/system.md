@@ -34,8 +34,8 @@ AgentDevFlow（`/agentdev/*` コマンド体系）は req/case、intake、learni
 | `/agentdev/intake-capture` | intake | 手動入力 | `inbox/` item | [commands/intake-capture.md](../commands/intake-capture.md) |
 | `/agentdev/intake-from-github` | intake | クローズ済み Issue/PR | `inbox/` item | [commands/intake-from-github.md](../commands/intake-from-github.md) |
 | `/agentdev/intake-promote` | intake | inbox item | `promoted/` 成果物 | [commands/intake-promote.md](../commands/intake-promote.md) |
-| `agentdev-learning-capture`（スキル） | learning（キャプチャ層） | エージェント主体での学び検知 | `.agentdev/learning/inbox.md` | [skills/agentdev-learning-capture.md](../skills/agentdev-learning-capture.md) |
-| `/agentdev/learning-promote` | learning（昇華層） | `inbox.md` + `deferred.md` | `promoted/` 成果物 | [commands/learning-promote.md](../commands/learning-promote.md) |
+| `agentdev-learning-capture`（スキル） | learning（キャプチャ層） | エージェント主体での学び検知 | `.agentdev/learning/inbox/` | [skills/agentdev-learning-capture.md](../skills/agentdev-learning-capture.md) |
+| `/agentdev/learning-promote` | learning（昇華層） | `inbox/` + `deferred/` | `promoted/` 成果物 | [commands/learning-promote.md](../commands/learning-promote.md) |
 | `/agentdev/backlog-review` | backlog 層 | `promoted/` 成果物 | `RU-*.md` | [commands/backlog-review.md](../commands/backlog-review.md) |
 | `/agentdev/backlog-auto` | backlog | なし（durable state から解決） | 検出事項、採用済み成果物、`RU-*.md` | [commands/backlog-auto.md](../commands/backlog-auto.md) |
 | `/agentdev/inspect-docs` | inspect | docs 全体スキャン | 検出事項 | [commands/inspect-docs.md](../commands/inspect-docs.md) |
@@ -172,7 +172,7 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 - **HITL**: docs/ 更新なし警告、targeted docs guard strict 違反停止、IR-056 違反停止、QG-4 未達チェックボックス停止（完了条件評価専任責務）、Design確定候補の見送り判断、Capture回収の分離。
 - **並列性**: Epic Wave クローズ STEP-E4 で各子 Issue の PR マージ・クローズ・完了条件評価・Capture回収・コンフリクト解消準備を「準並列化」（REQ）。
 - **resume**: HEAD commit hash（squash merge 後）、PR mergeable 状態、Issue OPEN/CLOSED 状態、Epic ステータステーブル、Design status、学びinbox/intake inbox。
-- **durable state**: マージコミット、クローズ済みIssue、削除済みローカルブランチ/worktree、`.agentdev/learning/inbox.md`、`.agentdev/intake/inbox/`、Design status（draft→accepted）、Epic Issue ステータステーブル。
+- **durable state**: マージコミット、クローズ済みIssue、削除済みローカルブランチ/worktree、`.agentdev/learning/inbox/`、`.agentdev/intake/inbox/`、Design status（draft→accepted）、Epic Issue ステータステーブル。
 - **Harness依存**: GitHub I/O（Custom Tool `agentdev_gh` 経由。merge、mergeable ポーリング、close、ラベル）、git（pull --ff-only / rebase / reset / checkout 隔離worktreeのみ）、worktree 操作、subagent 起動（learning-capture）、タイムスタンプ、bash による check_changed_docs.ts / check_extensions.ts、拡張読込。
 - **Capability依存**: `agentdev-quality-gates`（QG-4 Final Acceptance Gate）、`agentdev-git-worktree`（重複チェック/rebaseパス/同期リスク検出/先行commit）、`agentdev-epic-tracker`（STEP-E1〜E6）、`agentdev-design-file-manager`（design-lifecycle-application、STEP-3）、`agentdev-workflow-templates`、`agentdev-learning-capture`、`agentdev-learning-pipeline`（deferred）、`agentdev-intake-pipeline`、`agentdev-workflow-orchestration`（capture境界）、`agentdev-project-extensions`、`repo-agentdev-integrity`（check_changed_docs.ts / check_extensions.ts）。
 - **内部workflow候補**: PRマージworkflow（STEP-4、コンフリクト解消 Level 1）、QG-4 達成判定workflow（STEP-2 + 観点8 + 完了条件チェックボックス）、Design確定workflow（STEP-3）、Capture回収workflow（STEP-6、PR本文→intake/learning分離）、Epic Wave クローズworkflow（STEP-E1〜E6）。Level 1 コンフリクト解消と Design status 昇格判断は Capability Skill 候補。
@@ -235,14 +235,14 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 
 ### `/agentdev/learning-promote`
 
-- **公開契約**: `.agentdev/learning/inbox.md`（必須）+ `deferred.md`（任意） → `.agentdev/learning/promoted/{category}-{name}.md` + evaluation-report.md + deferred.md 追記 + inbox.md クリア。`.opencode/` 直接反映禁止、必ず backlog-review 経由。
+- **公開契約**: `.agentdev/learning/inbox/`（必須）+ `deferred/`（任意） → `.agentdev/learning/promoted/{category}-{name}.md` + evaluation-report.md + deferred/ への移動 + 処理済み inbox ファイルの削除。`.opencode/` 直接反映禁止、必ず backlog-review 経由。
 - **主要処理段階**: STEP-1 入力読込・正規化（inbox + deferred）→ STEP-2 評価（問題クラス分類・8軸評価・evaluation-report生成）→ STEP-3 判定（廃棄判定 11カテゴリ+duplicate、昇華可能性評価、既存対策確認）→ STEP-4 review（adversarial-review、発動条件判定 / review 呼出、evaluation-report 戻しループ）→ STEP-5 判定確定（自律確定・HITL 承認）→ STEP-6 永続化（採用済み成果物生成・deferred移動・昇華時prune・commit/push、原子的）→ STEP-7 完了報告。
 - **分岐**: inbox 空、エントリ0件、廃棄判定13パターン、昇華可能性（無条件自動REQ化禁止）、living pool 維持（deferred）、adversarial-review skip（1件重複確実/inbox空）、evaluation-report 戻しループ（STEP-4、review 反映時）、prune 対象/非対象、git pull/push 失敗停止。
-- **副作用**: `.agentdev/learning/promoted/` 保存、`.agentdev/learning/evaluation-report.md` 生成/更新、`.agentdev/learning/deferred.md` 追記（原子的操作）、`.agentdev/learning/inbox.md` クリア、prune、`.agentdev/learning/` 配下 commit/push（明示パス、`chore(agentdev): promote learning findings`）。`.opencode/` 直接書込禁止、case-run への直接受け渡し禁止（backlog-review 経由のみ）。
+- **副作用**: `.agentdev/learning/promoted/` 保存、`.agentdev/learning/evaluation-report.md` 生成/更新、`.agentdev/learning/deferred/` への移動（原子的操作）、処理済み `.agentdev/learning/inbox/` ファイルの削除、prune、`.agentdev/learning/` 配下 commit/push（明示パス、`chore(agentdev): promote learning findings`）。`.opencode/` 直接書込禁止、case-run への直接受け渡し禁止（backlog-review 経由のみ）。
 - **HITL**: STEP-5 判定結果確認・修正・承認（判断確定 REQ）、STEP-6 prune は STEP-5 承認と同時に承認済み（自動実行 REQ）、破壊的変更の明示承認、adversarial-review unresolved 判断事項。
 - **並列性**: 持たない（inbox エントリを順次評価、原子的操作で inbox/deferred を一括処理）。
-- **resume**: inbox.md エントリ、deferred.md living pool、evaluation-report.md、廃棄判定結果、ユーザー承認状態。
-- **durable state**: `.agentdev/learning/promoted/*.md`、`evaluation-report.md`、`deferred.md`、`inbox.md`（ヘッダーのみクリア）、commit hash。
+- **resume**: inbox/ エントリ、deferred/ living pool、evaluation-report.md、廃棄判定結果、ユーザー承認状態。
+- **durable state**: `.agentdev/learning/promoted/*.md`、`evaluation-report.md`、`deferred/`、`inbox/`（処理済みファイルの削除）、commit hash。
 - **Harness依存**: LLM 推論（8軸評価・廃棄判定）、subagent 起動（`agentdev-adversarial-review`）、git（pull/commit/push、並列実行安全ステージング）、原子的ファイル操作、拡張読込。
 - **Capability依存**: `agentdev-learning-pipeline`（8軸評価/廃棄判定/既存対策照合）、`agentdev-learning-capture`（参照）、`agentdev-git-worktree`、`agentdev-adversarial-review`、`agentdev-project-extensions`。
 - **内部workflow候補**: 正規化/評価workflow（STEP-1〜2 + 8軸スコアリング）、廃棄判定+昇華可能性評価workflow（STEP-3）、HITL+prune+永続化workflow（STEP-5〜6）。8軸評価ロジックと廃棄判定カテゴリは Capability Skill 候補（`agentdev-learning-pipeline` が所有）。
@@ -265,12 +265,12 @@ Command 定義を権威情報源とする旧表現は、workflow 実装の権威
 
 - **公開契約**: 引数なし → backlog 整理サイクル（inspect-docs → 昇格3系統 → backlog-review）を1回起動で実行し RU 生成まで一巡。backlog-driven の要求入口（整理結果は req-define → case-auto へ接続）。子ワークフロー内部の分類、評価、昇格、RU 生成ロジックは再実装しない。
 - **主要処理段階**: STEP-1 開始時刻記録・進行状態初期化（durable state 再構成）→ STEP-2 stage 1 inspect-docs 単独直列 → STEP-3 stage 2 昇格3系統（learning-promote / intake-promote / inspect-promote、競合処理の直列化）→ STEP-4 fan-in 判定 → STEP-5 stage 3 backlog-review → STEP-6 完了報告（工程別結果、停止理由、再開コマンド提示）。
-- **分岐**: stage 1 停止経路（inspect-docs blocked/failed で下流非開始）、fan-in 判定（全系統正常完了 or 対象なし終了で開始可、1系統でも blocked・failed・未完了で開始不可）、系統別結果状態の読み替え（対象なし終了を正常扱い、learning-promote の inbox.md 不在を対象なし扱い）、部分停止時の独立系統継続、新規 promoted 0件でも backlog-review 実行、inspect-promote --auto 非有効化。
+- **分岐**: stage 1 停止経路（inspect-docs blocked/failed で下流非開始）、fan-in 判定（全系統正常完了 or 対象なし終了で開始可、1系統でも blocked・failed・未完了で開始不可）、系統別結果状態の読み替え（対象なし終了を正常扱い、learning-promote の inbox/ 不在を対象なし扱い）、部分停止時の独立系統継続、新規 promoted 0件でも backlog-review 実行、inspect-promote --auto 非有効化。
 - **副作用**: 各子コマンドの既存副作用のみ（`.agentdev/` 配下の成果物作成・削除、git commit/push、ユーザー対話）。backlog-auto 自身は新規副作用を追加しない。capture 系コマンド、inspect-skills、req-define、Issue/PR 作成の自動起動はしない。
 - **HITL**: 各子ワークフローの既存 HITL 境界を維持（新規判断境界を追加しない）。複数系統が判断待ちの場合はユーザー対話を直列化し系統識別付きで表示。
 - **並列性**: orchestration stage 構成（stage 1 単独直列 / stage 2 昇格3系統は系統相互の先行依存なし、競合 Git 操作・共有成果物書き込み・ユーザー対話のみ直列化 / stage 3 単独）。並行実行を利用できない場合は順次インターリーブ。部分停止時も独立系統は連鎖停止しない。
 - **resume**: `backlog_auto_started_at`、stage 別完了状態、stage 2 系統別結果状態、直列化キュー実行記録。各系統内の再開は子ワークフローの既存 STEP model 再開契約に委譲。inspect-docs は中断時先頭再実行。
-- **durable state**: 各子コマンドの durable state（learning は inbox.md/deferred.md/evaluation-report.md/promoted/、intake は inbox//promoted/、inspect は inbox//promoted//auto-promote-log、backlog-review は promoted/ 残存と `RU-*.md` 実ファイル）から工程進行を再構成。
+- **durable state**: 各子コマンドの durable state（learning は inbox//deferred//evaluation-report.md/promoted/、intake は inbox//promoted/、inspect は inbox//promoted//auto-promote-log、backlog-review は promoted/ 残存と `RU-*.md` 実ファイル）から工程進行を再構成。
 - **Harness依存**: stage 2 の系統並行実行機構（利用できない場合は順次インターリーブ）、ユーザー対話の直列化表示、タイムスタンプ計測、拡張読込。
 - **Capability依存**: `agentdev-project-extensions`。子ワークフロー依存の Capability Skill（`agentdev-learning-pipeline`、`agentdev-intake-pipeline`、`agentdev-backlog-integration` 等）は各子 Workflow Skill 経由で継承。
 - **内部workflow候補**: orchestration workflow（stage 実行 + 直列化キュー + fan-in 判定 + 停止伝播）。Workflow Skill（`agentdev-workflow-backlog-auto`）として実装済み。

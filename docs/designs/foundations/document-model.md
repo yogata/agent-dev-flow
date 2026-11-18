@@ -297,7 +297,7 @@ retired REQ・Decision への言及の保持・置換は次の基準で判定す
 
 判定材料は、言及先が当該文書の意思決定の根拠として当時の文脈で引用されているかである。保持基準の要件上の定義は REQ-059（related_reqs 宣言契約）が所有し、本節が詳細基準を所有する。
 
-保持基準違反の検出は、誤検知（歴史的説明の保持対象）を判定材料なしに機械検出できないため、docs-check（IR-015）への自動検出追加は行わず、inspect-docs 意味診断による順守確認に委ねる。
+保持基準違反の検出は、誤検知（歴史的説明の保持対象）を判定材料なしに機械検出できないため、docs-check への自動検出追加は行わず、inspect-docs 意味診断による順守確認に委ねる。
 
 ### Decision ライフサイクル詳細
 
@@ -602,10 +602,10 @@ agent-dev-flow リポジトリの docs/designs/ 直下の基盤Designは、既�
 |---|---|---|
 | foundations/ | 基盤モデル、システム構成、文書フォーマット、設計原則 | numbering-policy.md, system.md, document-model.md, decision-lifecycle.md, patterns.md, design-principles.md, project-extensions.md, harness-separation-model.md, operating-model.md, runtime-execution-model.md |
 | responsibilities/ | 文書種別責務、成果物責任、アーティファクト契約、REQ影響マップ | document-type-responsibilities.md, artifact-responsibilities.md, artifact-contracts.md, req-impact-map.md |
-| quality/ | 品質仕様、品質ゲート、健全性メトリクス（REQ/Design 双方向） | quality-specs.md, quality-gate-model.md, req-health-metrics.md, design-health-metrics.md, textlint-quality-runtime.md |
+| quality/ | 品質仕様、品質ゲート、健全性メトリクス（REQ/Design 双方向） | quality-specs.md, quality-gate-model.md, req-health-metrics.md, design-health-metrics.md |
 | integrity/ | 整合性契約、整合性ルールカタログ、ルール所有権、配布物整合性 | integrity-contracts.md, integrity-rule-catalog.md, rule-ownership.md, docs-spec-rebuild-integrity.md, checker-execution-contracts.md |
 | local/ | ローカル版 Design 群（実行時パッケージ境界、link mode、Case ファイル） | runtime-package-boundary.md, local-case-file.md, install-script-usability.md, third-party-skill-management.md |
-| authoring/ | コマンドファイル執筆規約 | command-file-format.md, vocabulary-registry.md |
+| authoring/ | 執筆規約（2026-11-18 時点で配下 Design なし。DEC-065 により command-file-format.md・vocabulary-registry.md を廃止） | - |
 
 ### 特例配置ファイル
 

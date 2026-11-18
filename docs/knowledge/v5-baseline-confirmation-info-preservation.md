@@ -51,8 +51,8 @@ v5.0.0 を再出発点とする基準点確認と、移行前の未処理情報�
 |---|---|---|---|---|
 | `.agentdev/intake/inbox/` | 5件（2026-10-08 case-3549 配布境界 baseline 旧パス DEC-003 エントリ resolved1、2026-10-09 case-3560 並列 Wave 実差分交差確認、同 case-3560 prepare_definition_pr create 対応、同 case-3565 case-open SKILL 旧語彙、2026-10-10 case-3585 write-guard と lint 用一時ファイル） | 未処理 raw item（consumer: intake-promote） | 保存対象 | 本文と根拠参照（Issue/PR 番号）を実在のまま保持。分類確定後の削除は intake-promote の正規経路のみ |
 | `.agentdev/intake/promoted/` | 空（.gitkeep のみ） | 正規消費済み（promote → backlog-review の lifecycle） | 空確認（欠落なし） | git 履歴に promote と消費の往復実績（eef19d68・50606d6d 等） |
-| `.agentdev/learning/inbox.md` | 21エントリ（`##` 見出し実測。2026-10-08〜10 の case-3548〜3585 由来） | 未整理（consumer: learning-promote） | 保存対象 | 全エントリが13フィールド形式で処理状態・関連参照を保持 |
-| `.agentdev/learning/deferred.md` | 182エントリ（`##` 見出し 186件 − 構造ヘッダー4件） | 分類済み living pool（deferred・未処理・再評価対象。REQ-003-006/007 により prune 禁止） | 保存対象 | 処分判定付きエントリも状態値を保持し、次回 learning-promote で再評価される |
+| `.agentdev/learning/inbox.md`（2026-11-18 移行済み: 1トピック1ファイル構造の learning/inbox/ へ移行。REQ-122-004） | 21エントリ（`##` 見出し実測。2026-10-08〜10 の case-3548〜3585 由来） | 未整理（consumer: learning-promote） | 保存対象 | 全エントリが13フィールド形式で処理状態・関連参照を保持 |
+| `.agentdev/learning/deferred.md`（2026-11-18 移行済み: 1トピック1ファイル構造の learning/deferred/ へ移行。REQ-122-004） | 182エントリ（`##` 見出し 186件 − 構造ヘッダー4件） | 分類済み living pool（deferred・未処理・再評価対象。REQ-003-006/007 により prune 禁止） | 保存対象 | 処分判定付きエントリも状態値を保持し、次回 learning-promote で再評価される |
 | `.agentdev/learning/evaluation-report.md` | 実在（2026-10-08 backlog-auto stage 2 learning 系統 run の報告） | 境界 artifact（毎回上書き） | 保存対象（現行版） | 直近 run の記録。上書き lifecycle 自体が正 |
 | `.agentdev/learning/promoted/` | 空（.gitkeep のみ） | 正規消費済み（2026-10-08 run の promote 9単位は backlog-review 経路へ） | 空確認（欠落なし） | git 履歴に promote（f549e506 等）と消費実績 |
 | `.agentdev/backlog/req-units/` | 空（.gitkeep のみ） | 正規消費済み（先行RU案6件は case-ready Form Zero で消費。commit 21d57083 で追加、93e35440 で削除） | 空確認（欠落なし） | RU 原文は commit 21d57083 から取得可能（TS-002 の取得経路） |

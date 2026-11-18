@@ -40,7 +40,7 @@ Case 確立後の Definition 変更も本コマンドで再合意し、再合意
 - 利用者が要件確定のみを求めた場合は、要件doc（draft）の確定をもって本コマンドの実行を完了とし、後続実装・Issue・PR を一律に要求しない。case-auto 起動は利用者の判断で行う（要件確定のみの単独工程の独立完了。実行基準の正は workflow 実装本体の既存実行契約と repository top-level `traceability/` 配下 sidecar を参照）
 - 要件そのものの人間判断と、合意済み要件を具体化する委譲された裁量を分離する。人間に留保された判断（新しい目的、価値、優先順位、対象範囲、外部契約、受け入れ条件の確定を要するもの）はユーザーとの壁打ち対話で確定し、合意済み要件の draft-data への構造化、関連文書の探索、テンプレート準拠の整形等は委譲された裁量として処理する
 - docs/ の参照は、明示入力ファイル・`docs/requirements/**` の参照・変更影響候補抽出と Decision 判断に必要な限定探索の3経路に限定する
-- inbox.md、deferred.md、採用済み成果物（promoted）は backlog-review による RU 化を経由して参照する
+- inbox/、deferred/、採用済み成果物（promoted）は backlog-review による RU 化を経由して参照する
 - 関連ドキュメントはコマンドが特定し、ユーザーへの個別ファイル列挙の依頼は省く
 - チェックボックスは測定可能で一意にする（`agentdev-req-analysis` 品質基準）
 - 要件doc 構造は req-draft.md テンプレート（構造化 `draft-data` 形式）に従う
