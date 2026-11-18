@@ -148,7 +148,7 @@ IR エントリ一覧は rules/index.ts のレジストリから `generate_index
 | IR-009 | 旧 namespace 残存 | 削除（欠番） | Epic #4126 Phase 4（レガシー移行資産の完全削除） |
 | IR-014 | reference/ 残存検出 | 削除（欠番） | 同上（Skill frontmatter 検査の obsolete reference/ 判定も同時に削除） |
 | IR-021 | 廃止済み skill 参照検出 | 削除（欠番） | 同上 |
-| IR-046 | consumer-generated リポジトリ種別誤検知防止 | 削除（欠番） | 同上（IR-047/048 は存続） |
+| IR-046 | consumer-generated リポジトリ種別誤検知防止 | 削除（欠番） | 同上（IR-047/048 は本節の記録時点で存続。REQ-122 Wave-1 の IR 減量〔DEC-065・56→24〕で両ルールは削除済み・現行レジストリ非登録） |
 | IR-054 | draft Design 放置検出 | 削除（欠番） | 同上（Design status 追跡と case-close Design 確定で代替） |
 | IR-057 | obsolete-spec-path-after-domain-split | 削除（欠番） | 同上（targeted docs guard の IR-057 validator も同時に削除） |
 | IR-065 | obsolete-vocabulary-current-use | 削除（欠番） | 同上（vocabulary-registry の対照表運用は存続） |
