@@ -4,7 +4,6 @@ status: accepted
 created: 2026-06-21
 updated: 2026-11-18
 ---
-<!-- ADF-COVERS(implementation): REQ-053-011 -->
 
 # `agentdev-command-authoring` Design
 

@@ -18,7 +18,6 @@ updated: 2026-11-13
 <!-- ADF-COVERS(design): REQ-002-047 -->
 <!-- ADF-COVERS(design): REQ-050-009 -->
 <!-- ADF-COVERS(design): REQ-091-001, REQ-091-002, REQ-091-003, REQ-091-004, REQ-091-005 -->
-<!-- ADF-COVERS(design): REQ-053-044（repo-local Plugin の配布・投影契約節が保存済みファイル単位結果の配布・投影除外 design 実体） -->
 <!-- ADF-COVERS(design): REQ-050-002, REQ-050-003, REQ-050-005, REQ-050-015, REQ-058-001, REQ-058-004, REQ-058-005, REQ-058-006, REQ-058-008, REQ-058-012（ジャンクション状態の判定と自己修復節が両公開入口・両ホスト・全モードの正本一致検査の design 実体） -->
 <!-- ADF-COVERS(design): REQ-112-001, REQ-112-002, REQ-112-003（local ツール package の tsconfig 参照共有と typecheck 検査契約節が design 実体） -->
 <!-- ADF-COVERS(design): REQ-113-001, REQ-113-002（local ツール package の tsconfig 参照共有と typecheck 検査契約節が design 実体） -->

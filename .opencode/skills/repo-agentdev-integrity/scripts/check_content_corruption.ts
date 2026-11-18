@@ -1,4 +1,4 @@
-// ADF-COVERS(implementation): REQ-010-071, REQ-010-083, REQ-053-012
+// ADF-COVERS(implementation): REQ-010-071, REQ-010-083
 // check_content_corruption.ts
 //
 // Deterministic content corruption checker (REQ-010-071). Scans the bodies of

@@ -18,7 +18,6 @@ updated: "2026-11-18"
 <!-- ADF-COVERS(design): REQ-021-030 -->
 <!-- ADF-COVERS(design): REQ-032-029 -->
 <!-- ADF-COVERS(design): REQ-032-031, REQ-032-032, REQ-032-033, REQ-032-034, REQ-032-035, REQ-032-036, REQ-032-037, REQ-032-038, REQ-032-039 -->
-<!-- ADF-COVERS(design): REQ-053-045, REQ-053-046（保存済み検証証跡の解析と再実行条件の適用節が close 最終検査実行義務境界の design 実体） -->
 <!-- ADF-COVERS(design): REQ-032-040, REQ-032-041（QG-4 file-level split 標準化と bun 版更新時再検証の実行構成設計） -->
 <!-- ADF-COVERS(design): REQ-030-032 -->
 <!-- ADF-COVERS(design): REQ-032-047, REQ-032-048（QG-4 最終受け入れの検証義務に基づく試験範囲選択と最終受け入れ判定の design 実体） -->

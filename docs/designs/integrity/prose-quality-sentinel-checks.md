@@ -5,7 +5,6 @@ created: "2026-09-03"
 updated: "2026-10-04"
 ---
 
-<!-- ADF-COVERS(design): REQ-053-022 -->
 <!-- ADF-COVERS(implementation): REQ-053-023 -->
 <!-- ADF-COVERS(verification): REQ-053-023 -->
 
