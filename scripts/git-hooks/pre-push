@@ -41,8 +41,55 @@ if ! (cd "$REPO_ROOT" && bun run "$CLI" --root "$REPO_ROOT"); then
   fail_with_guidance
 fi
 
-echo "[pre-push] Step 2/3: トレーサビリティ検証（check.ts 全体スコープ）を実行します。"
-if ! (cd "$REPO_ROOT" && bun run "$TRACEABILITY_CHECK" --root "$REPO_ROOT"); then
+echo "[pre-push] Step 2/3: トレーサビリティ検証（check.ts 全体スコープ・corpus 完全性は advisory）を実行します。"
+# トレーサビリティ検証の検査 fail を traceability-model Design の二層規定（corpus completeness は
+# advisory・fail-open・lifecycle gate の判定に使用しない、REQ-021-031）に従い層別する:
+#   - lifecycle 構造検査（宣言形式・参照整合・重複・links 整合・policy 正当性等）: fail なら push を物理ブロック
+#   - corpus 完全性（missing-design / missing-implementation / missing-verification）: 件数を
+#     advisory として表示し、ブロック条件としない（到達目標・fail-open）
+# check.ts の実行エラー（終了コード 1）と JSON 解析不能はブロックする（fail-closed）。
+TRACE_STDERR="$(mktemp)"
+set +e
+TRACE_REPORT="$(cd "$REPO_ROOT" && bun run "$TRACEABILITY_CHECK" --root "$REPO_ROOT" 2>"$TRACE_STDERR")"
+TRACE_EXIT=$?
+set -e
+if [ "$TRACE_EXIT" -eq 1 ]; then
+  echo "[pre-push] トレーサビリティ検証の実行に失敗しました（終了コード 1）。stderr:" >&2
+  cat "$TRACE_STDERR" >&2 || true
+  rm -f "$TRACE_STDERR"
+  fail_with_guidance
+fi
+rm -f "$TRACE_STDERR"
+if [ -z "$TRACE_REPORT" ]; then
+  echo "[pre-push] トレーサビリティ検証の JSON 出力を取得できませんでした。" >&2
+  fail_with_guidance
+fi
+if ! printf '%s' "$TRACE_REPORT" | bun -e '
+  const corpusCompleteness = new Set(["missing-design", "missing-implementation", "missing-verification"]);
+  Bun.stdin.text().then((text) => {
+    const report = JSON.parse(text);
+    const checks = (report && report.checks) || {};
+    const hard = [];
+    const advisory = [];
+    for (const [name, check] of Object.entries(checks)) {
+      const count = check && Array.isArray(check.findings) ? check.findings.length : 0;
+      if (count === 0) continue;
+      if (corpusCompleteness.has(name)) advisory.push(name + ": " + count + " 件");
+      else hard.push(name + ": " + count + " 件");
+    }
+    for (const line of advisory) {
+      console.log("[pre-push]   corpus 完全性 advisory（fail-open・ブロック対象外）: " + line);
+    }
+    if (hard.length > 0) {
+      for (const line of hard) console.error("[pre-push]   トレーサビリティ構造検査 fail: " + line);
+      process.exit(1);
+    }
+  }).catch((err) => {
+    console.error("[pre-push]   トレーサビリティ検証結果の JSON 解析に失敗しました: " + err);
+    process.exit(1);
+  });
+'; then
+  echo "[pre-push] トレーサビリティ構造検査に fail があるか、結果を解析できません。修正してから push してください。" >&2
   fail_with_guidance
 fi
 

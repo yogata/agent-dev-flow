@@ -2,7 +2,7 @@
 title: ローカル検証ゲート Design
 status: draft
 created: 2026-11-18
-updated: "2026-11-18"
+updated: "2026-11-19"
 ---
 
 <!-- ADF-COVERS(design): REQ-122-008, REQ-122-009, REQ-122-010, REQ-122-015（ローカル検証ゲートと最終検証の実行契約。REQ-116 型の covers 宣言） -->
@@ -32,7 +32,13 @@ git rev-parse --show-toplevel を起点とする（worktree 環境対応）。
 
 - Step 1: cli.ts 全量実行（全24+IR-075 ルールをリポジトリ全体へ適用）。
 - Step 2: トレーサビリティ検証（bun run "$REPO_ROOT/src/common/skills/agentdev-traceability/scripts/src/check.ts"
-  または投影先スクリプト）。
+  または投影先スクリプト）。check.ts の検査 fail を traceability-model Design の二層規定に従い層別する:
+  lifecycle 構造検査（malformed-declarations・unknown-roles・unknown-req-refs・invalid-artifact-paths・
+  policy-invalid・duplicate-inconsistencies・malformed-links・dangling-links・derived-declaration-conflicts）
+  は fail-closed とし push を物理ブロックする。corpus 完全性（missing-design・missing-implementation・
+  missing-verification）は advisory・fail-open（lifecycle gate の判定に使用しない、REQ-021-031）とし、
+  件数を advisory として表示し、ブロック条件としない。check.ts の実行エラー（終了コード 1）と JSON 解析不能は
+  ブロックする（fail-closed）。
 - Step 3: bun test "$REPO_ROOT/.opencode/skills/repo-agentdev-integrity/scripts/"（実行形態は REQ-060 に従う）。
 
 ## セットアップ（scripts/setup-hooks.ts）

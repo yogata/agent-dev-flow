@@ -76,6 +76,17 @@ test("REQ-122-009: pre-push の bun test 実行形態はリポジトリルート
   expect(content).toMatch(/cd "\$REPO_ROOT" && bun test "\$ENGINE_TEST_TARGET"/);
 });
 
+test("REQ-122-009: pre-push Step 2 は corpus 完全性（missing-*）を advisory・fail-open として層別し、構造検査 fail はブロックする", () => {
+  const content = fs.readFileSync(PRE_PUSH_PATH, "utf-8");
+  expect(content).toContain("missing-design");
+  expect(content).toContain("missing-implementation");
+  expect(content).toContain("missing-verification");
+  expect(content).toContain("advisory");
+  expect(content).toMatch(/構造検査 fail/);
+  // check.ts の実行エラー（終了コード 1）は fail-closed でブロックする
+  expect(content).toMatch(/TRACE_EXIT" -eq 1/);
+});
+
 test("REQ-122-010: setup-hooks.ts が存在し core.hooksPath 冪等設定・実行権限付与・.gitattributes 追記を実装する", () => {
   expect(fs.existsSync(SETUP_HOOKS_PATH)).toBe(true);
   const content = fs.readFileSync(SETUP_HOOKS_PATH, "utf-8");
