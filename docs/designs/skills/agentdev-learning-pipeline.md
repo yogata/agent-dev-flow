@@ -27,7 +27,7 @@ Learning pipeline（capture → promote）の共通知識。
 - evaluation-report スキーマ
 - prune 方針（昇華時必須）
 - 処分区分（11処分区分 + duplicate）
-- artifact lifecycle（inbox → deferred → promoted）。`deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である
+- artifact lifecycle（inbox → deferred → promoted）。`deferred/` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である
 - 構造改善先分類（学びの反映先評価。REQ-038-005）
 
 ## 構造改善先分類
@@ -97,7 +97,7 @@ review 候補は learning-promote command Design「発動条件判定 Step」が
 #### 呼出タイミング
 
 呼出タイミングは候補確定直後であり、Phase 5 へ進む前である。
-review 対象は evaluation-report.md のみとし、handoff.md、promoted/、deferred.md への反映前とする。
+review 対象は evaluation-report.md のみとし、handoff.md、promoted/、deferred/ への反映前とする。
 この順序により、accepted finding の反映結果が evaluation-report.md へ集約され、後続の不可逆処理（Phase 6 deferred 移動、prune、commit/push）へ混入しない。
 
 呼出失敗時（スキル不在、起動異常、timeout 等）は silent skip を禁止する（REQ-014-010）。

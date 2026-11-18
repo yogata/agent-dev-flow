@@ -61,7 +61,7 @@ PR 本文の capture 関連セクションは以下を分離する:
 | req-define | 非関与 | 非関与 | - |
 | case-ready / case-revise | REQ 再構成 intake に加え自工程 deviation capture（Definition 保存 / Design 保存の内部責務実行時） | 自工程 deviation capture | Split Rule で分類、Skill 委譲で保存（REQ-006-106 / REQ-006-107） |
 | case-open | 自工程 deviation capture | 自工程 deviation capture | case-close への委譲を廃止（`REQ-006-105..111` への集約、旧 `REQ-006-021` は retired） |
-| case-run | PR 本文記録のみ（直接 inbox 変更禁止） | PR 本文記録のみ（直接 inbox.md 変更禁止） | 実行担当サブエージェント経由 |
+| case-run | PR 本文記録のみ（直接 inbox 変更禁止） | PR 本文記録のみ（直接 inbox/ 変更禁止） | 実行担当サブエージェント経由 |
 | case-close | PR 本文から回収 + 自工程 deviation capture | PR 本文から回収 + 自工程 deviation capture | Epic 横断回収含む（REQ-006-105） |
 | case-auto | 各工程の保存結果参照と件数集計のみ | 各工程の保存結果参照と件数集計のみ | capture 本文の再分類・再保存は行わない（REQ-006-108） |
 | intake-* | 各コマンド責務（各 command Design 参照） | - | - |
@@ -82,7 +82,7 @@ command ごとの固定例外リストは持たない。
 - capture 責務表の intake または learning 列が具体的な責務記述（PR 本文記録、回収、自工程 deviation capture、REQ 再構成 intake 生成等）である command は、`capture-boundaries` 参照を個別に持ち、対応する capture 導線を実装する。
 
 例外の根拠は本 capture 責務表である。
-同表は case-auto の intake、learning をともに「各工程の保存結果参照と件数集計のみ」と定義し、case-auto 自身は inbox、inbox.md の直接生成を行わない設計を示す。
+同表は case-auto の intake、learning をともに「各工程の保存結果参照と件数集計のみ」と定義し、case-auto 自身は inbox、inbox/ の直接生成を行わない設計を示す。
 v2:ADR-0127（case-auto 構成工程の委譲）と v2:ADR-0137（case-run インライン実行）が、case-auto を統合委譲起点とする現行設計を裏付ける。
 
 ## 工程別 capture 責務
@@ -107,7 +107,7 @@ command は `intake-capture` 等の他 command を呼び出さない。
 
 | 種別 | 委譲先 Skill | 役割 |
 |---|---|---|
-| learning | `agentdev-learning-capture` skill | 失敗、回避、修正、判断ミスの知見抽出と `inbox.md` エントリ生成 |
+| learning | `agentdev-learning-capture` skill | 失敗、回避、修正、判断ミスの知見抽出と `inbox/` エントリ生成 |
 | intake | `agentdev-intake-pipeline` skill | 作業候補、不整合、規約違反の item 生成操作 |
 
 git 永続化（commit、push）は呼出元 command が担う。
@@ -127,7 +127,7 @@ Epic Issue 本文（実行構成表）の書き込みは per-Epic の単一書�
 
 記載内容:
 
-- 保存先パス（`.agentdev/intake/inbox/*.md`、`.agentdev/learning/inbox.md`）
+- 保存先パス（`.agentdev/intake/inbox/*.md`、`.agentdev/learning/inbox/`）
 - 分類（intake / learning）
 - 保存結果（成功/失敗、件数、コミットハッシュ等）
 

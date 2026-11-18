@@ -20,7 +20,7 @@
 
 ### Input Resolution
 
-1. SSoT 再構成: 各子コマンドの durable state（learning は `.agentdev/learning/` 配下の `inbox.md` / `deferred.md` / `evaluation-report.md` / `promoted/`、intake は `.agentdev/intake/inbox/` と `.agentdev/intake/promoted/`、inspect は `.agentdev/inspect/inbox/` と `.agentdev/inspect/promoted/`、backlog-review は各 `promoted/` と `.agentdev/backlog/req-units/`）
+1. SSoT 再構成: 各子コマンドの durable state（learning は `.agentdev/learning/` 配下の `inbox/` / `deferred/` / `evaluation-report.md` / `promoted/`、intake は `.agentdev/intake/inbox/` と `.agentdev/intake/promoted/`、inspect は `.agentdev/inspect/inbox/` と `.agentdev/inspect/promoted/`、backlog-review は各 `promoted/` と `.agentdev/backlog/req-units/`）
 2. identifier 保持: なし
 3. 最小 scalar: `backlog_auto_started_at`（JST）
 4. runtime artifact: なし
@@ -39,7 +39,7 @@ STEP-6（完了報告）での所要時間算出の基準として使用する�
 | 工程 | 再構成に使う durable state | 判定 |
 |---|---|---|
 | stage 1（inspect-docs） | 下流工程の進行痕跡、直近実行の完了証跡（`.agentdev/inspect/inbox/` の検出事項ファイル群または検出事項なし完了） | 下流工程に進行痕跡がある、または完了証跡が確定できる場合は完了。確定できない場合は未完了扱いで先頭から再実行 |
-| stage 2 learning 系統 | `inbox.md`（ヘッダーのみへのクリア）、`evaluation-report.md`、`promoted/`、`deferred.md` | 系統内の再開点の再構成は `agentdev-workflow-learning-promote` の既存 STEP model 再開契約に委譲 |
+| stage 2 learning 系統 | `inbox/`（処理済みファイルの削除）、`evaluation-report.md`、`promoted/`、`deferred/` | 系統内の再開点の再構成は `agentdev-workflow-learning-promote` の既存 STEP model 再開契約に委譲 |
 | stage 2 intake 系統 | `.agentdev/intake/inbox/` と `.agentdev/intake/promoted/` の実ファイル状態、分類確定状態 | `agentdev-workflow-intake-promote` の既存再開契約に委譲 |
 | stage 2 inspect 系統 | `.agentdev/inspect/inbox/`、`.agentdev/inspect/promoted/`、auto-promote-log | `agentdev-workflow-inspect-promote` の既存再開契約に委譲 |
 | stage 3（backlog-review） | 各 `promoted/` 残存成果物、`.agentdev/backlog/req-units/` の `RU-*.md` 実ファイルと frontmatter | `agentdev-workflow-backlog-review` の既存再開契約に委譲 |
@@ -205,7 +205,7 @@ learning-promote、intake-promote、inspect-promote の3系統を、系統相互
 
 | 系統 | 正常完了 | 対象なし終了 | blocked / failed |
 |---|---|---|---|
-| learning-promote | HITL 承認を経た永続化と完了報告の受領 | `inbox.md` に未処理エントリなし。`inbox.md` 不在時の子コマンドのエラー報告（`agentdev-learning-capture` 案内）も、処理対象が存在しないことを意味するため対象なし終了として扱い、案内内容は完了報告に付記する | 子コマンドの blocked / failed 報告 |
+| learning-promote | HITL 承認を経た永続化と完了報告の受領 | `inbox/` に未処理エントリなし。`inbox/` 不在時の子コマンドのエラー報告（`agentdev-learning-capture` 案内）も、処理対象が存在しないことを意味するため対象なし終了として扱い、案内内容は完了報告に付記する | 子コマンドの blocked / failed 報告 |
 | intake-promote | 分類確定と永続化の完了報告の受領 | `.agentdev/intake/inbox/` に item なし | 同上 |
 | inspect-promote | 分類確定と処理実行の完了報告の受領 | `.agentdev/inspect/inbox/` に検出事項なし（子ワークフロー STEP-1 の「対象なし」終了と同一判定） | 同上 |
 

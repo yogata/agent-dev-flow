@@ -561,7 +561,7 @@ req-define は、既存の明示的な対応関係（`agentdev-traceability` の
 - `.agentdev/drafts/**` 以外のファイル作成、編集
 - ユーザー明示入力ファイルの変更、削除、RU 削除
 - `docs/` 配下の広範な探索（例外: 明示入力ファイル、`docs/requirements/**` 参照、変更影響候補抽出の限定探索）
-- `inbox.md` / `deferred.md` 直接ロード
+- `inbox/` / `deferred/` 直接ロード
 - 採用済み成果物の直読み
 - `git` コマンド実行
 - Issue 階層決定（case-open 責務）

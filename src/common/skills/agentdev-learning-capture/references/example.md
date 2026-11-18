@@ -65,7 +65,7 @@ SKILL.md 本文では実観測原則、 trigger、禁止事項、 split rule の
 
 ### Step 3: ユーザー通知
 
-> 以下の学びを `.agentdev/learning/inbox.md` に追加しました：
+> 以下の学びを `.agentdev/learning/inbox/` に追加しました：
 >
 > ## CI lint失敗: コミットメッセージのConventional Commits規約違反
 >
@@ -74,7 +74,7 @@ SKILL.md 本文では実観測原則、 trigger、禁止事項、 split rule の
 
 ### Step 4: 学びの追加
 
-エージェントが直接 `.agentdev/learning/inbox.md` に13フィールド形式で追記する（ユーザー承認不要）。
+エージェントが直接 `.agentdev/learning/inbox/` に13フィールド形式で追記する（ユーザー承認不要）。
 
 ---
 
@@ -108,7 +108,7 @@ SKILL.md 本文では実観測原則、 trigger、禁止事項、 split rule の
 
 ### Step 3: ユーザー通知
 
-> 以下の学びを `.agentdev/learning/inbox.md` に追加しました：
+> 以下の学びを `.agentdev/learning/inbox/` に追加しました：
 >
 > ## Windows環境でのgit worktree削除時のPermission deniedリトライ
 >
@@ -147,7 +147,7 @@ SKILL.md 本文では実観測原則、 trigger、禁止事項、 split rule の
 
 ### Step 3: ユーザー通知
 
-> 実装中に仕様矛盾を発見し、学びを `.agentdev/learning/inbox.md` に追加しました：
+> 実装中に仕様矛盾を発見し、学びを `.agentdev/learning/inbox/` に追加しました：
 >
 > （全13フィールド表示）
 
@@ -157,7 +157,7 @@ SKILL.md 本文では実観測原則、 trigger、禁止事項、 split rule の
 
 ### Layer 1: Capture フェーズ（学びの記録）
 
-エージェントが13フィールド形式で `.agentdev/learning/inbox.md` に直接追記：
+エージェントが13フィールド形式で `.agentdev/learning/inbox/` に直接追記：
 
 ```markdown
 ## CI lint失敗: コミットメッセージのConventional Commits規約違反
@@ -223,9 +223,9 @@ SKILL.md 本文では実観測原則、 trigger、禁止事項、 split rule の
 
 ### Step 3: 学びの通知
 
-**エージェントが**抽出した学びを `.agentdev/learning/inbox.md` に追記した後、追記内容をユーザーに通知する。承認や却下は求めない:
+**エージェントが**抽出した学びを `.agentdev/learning/inbox/` に追記した後、追記内容をユーザーに通知する。承認や却下は求めない:
 
-> 以下の学びを `.agentdev/learning/inbox.md` に追加しました：
+> 以下の学びを `.agentdev/learning/inbox/` に追加しました：
 >
 > [13フィールド形式の学びエントリを表示]
 

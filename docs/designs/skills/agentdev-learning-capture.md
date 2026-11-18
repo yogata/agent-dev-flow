@@ -11,7 +11,7 @@ updated: 2026-11-18
 
 ## 目的
 
-エージェントが自律的に検知、回避、修正した問題から学びを抽出し、ユーザー承認なしで `.agentdev/learning/inbox.md` に蓄積する。
+エージェントが自律的に検知、回避、修正した問題から学びを抽出し、ユーザー承認なしで `.agentdev/learning/inbox/` に蓄積する。
 
 ## 適用対象
 
@@ -37,7 +37,7 @@ updated: 2026-11-18
 
 ## 現在の動作
 
-- ユーザー承認なしで `inbox.md` に追記
+- ユーザー承認なしで `inbox/` に追記
 - git 永続化は呼出元 command（case-ready / case-revise / case-open / case-close）の責務（後述「呼出元 command 契約」参照）
 - 実観測ベース（実際に検知、回避、修正した問題のみ）
 
@@ -60,7 +60,7 @@ command は他 command を直接呼び出さず、Skill へ一方向に委譲す
 ### 本スキルの責務（呼出元に対する提供）
 
 - 実観測ベースで learning 該当分を判定する（[capture-boundaries.md](../workflows/capture-boundaries.md) Split Rule 準拠）
-- 13フィールド形式で `inbox.md` エントリを生成、追記する
+- 13フィールド形式で `inbox/` エントリを生成、追記する
 - extraction（知見の分類、抽出）を担う
 
 ### 呼出元 command の責務（本スキルが委譲しないもの）

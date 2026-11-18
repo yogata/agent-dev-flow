@@ -29,7 +29,6 @@ updated: "2026-11-18"
 | ドメイン状態 | `.agentdev/` | - | - | Intake / Learning / Backlog / Integrity 永続状態 |
 | リポジトリローカル Command | `.opencode/commands/repo/` | - | - | 本体リポジトリ専用コマンド（REQ-001）。AgentDevFlow 配布対象外。原本、配置先同期対象外 |
 | リポジトリローカル Skill | `.opencode/skills/repo-*/` | - | - | 本体リポジトリ専用スキル（REQ-001）。AgentDevFlow 配布対象外。原本、配置先同期対象外 |
-| リポジトリローカルレジストリ | `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` | - | - | リポジトリローカル語彙レジストリ。`.agentdev/` には配置しない（REQ-001） |
 
 ### 操作 skill 正規所有者台帳
 

@@ -1,15 +1,5 @@
 component: ra002-designs-batch-correction
 implementation:
-  docs/designs/authoring/vocabulary-registry.md:
-    - REQ-094-002
-    - REQ-094-003
-    - REQ-094-006
-  docs/designs/authoring/command-file-format.md:
-    - REQ-094-001
-    - REQ-094-004
-    - REQ-094-005
-    - REQ-094-010
-    - REQ-094-011
   docs/designs/foundations/references/concrete-abstraction.md:
     - REQ-094-001
     - REQ-094-004

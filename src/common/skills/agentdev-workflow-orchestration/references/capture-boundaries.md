@@ -18,7 +18,7 @@ AgentDevFlow コマンド群における Intake/ Learning キャプチャの責�
 再発防止に向けた知見、判断基準、運用ルール。
 
 - **性質**: 予防策、判断ミスの分析、手順漏レの気づきなど、汎用的な知見
-- **保存先**: `.agentdev/learning/inbox.md`（learning-capture スキル経由のみ）
+- **保存先**: `.agentdev/learning/inbox/`（learning-capture スキル経由のみ）
 - **後続ルート**: `/agentdev/learning-promote` → `/agentdev/backlog-review` → RU
 
 ## 分割ルール（観測の分割）
@@ -80,7 +80,7 @@ AgentDevFlow コマンド群における Intake/ Learning キャプチャの責�
 
 | コマンド | キャプチャ関与 | 詳細 |
 |----------|-------------|------|
-| case-run | **記録のみ** | 本筋外の検出事項を PR 本文に記録。`.agentdev/intake/inbox/` と `.agentdev/learning/inbox.md` の直接変更は禁止 |
+| case-run | **記録のみ** | 本筋外の検出事項を PR 本文に記録。`.agentdev/intake/inbox/` と `.agentdev/learning/inbox/` の直接変更は禁止 |
 | case-close | **回収、保存** | PR 本文から Intake/ Learning を分離回収。自身の実観測も分割ルールに基づいて保存。ユーザーに「学びがあるか」質問禁止 |
 | Definition 保存内部責務（case-ready / case-revise） | **原則非関与** | 通常はキャプチャを行わない。例外: REQ 再構成 Intake（`.agentdev/intake/inbox/req-restructure/**`）のみ生成可能 |
 | case-open | **非関与** | Intake/ Learning キャプチャを行わない |

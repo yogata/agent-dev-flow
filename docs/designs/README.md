@@ -209,7 +209,6 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | quality/quality-specs.md | accepted | 品質仕様 | 品質基準、検証ルール |
 | quality/req-health-metrics.md | accepted | REQ 健全性メトリクス | REQ 肥大化、関心ズレ検出の定量閾値 |
 | quality/design-health-metrics.md | accepted | Design 健全性メトリクス | Design 肥大化、放置、ドメイン分類適合の定量閾値 |
-| quality/textlint-quality-runtime.md | accepted | textlint 品質基盤 | 文章表層品質の共通実行基盤（プロジェクト解決、設定読込み、対象解決、規則構成、文章検査、結果整形）。書込み前検査と最終検査の共通化、Plugin と単独実行入口の2入口 |
 | quality/quality-gate-model.md | accepted | ADF Quality / Verification / Evidence / Gate モデル | Quality Policy / Verification Obligation / Verifier / Evidence / Gate の 5 概念分解、Gate = 状態遷移 predicate 契約、standard lifecycle からの Gate 再導出手順、Verifier 分類の定義、統制種別必要性の正規節（REQ-103-018） |
 
 #### integrity/（整合性契約、ルール）
@@ -230,8 +229,6 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | integrity/autogen-freshness-gate.md | accepted | AUTOGEN ブロック鮮度検出 gate | AUTOGEN ブロック（design-health-metrics.md 等）の鮮度検出、rename/status 変更時の再生成必要性判定、不合格時の処置 |
 | integrity/test-impact-detection-gate.md | accepted | テスト影響範囲検出 gate | リファクタリング PR で Design 変更に連動する周辺テストの陳腐化検出。変更 Design を参照し同一 PR で未更新のテストを陳腐化候補として報告、不合格時の処置契約（REQ-019） |
 | integrity/checker-execution-contracts.md | accepted | checker 実行契約と検出基盤規則 | checker 共通実行契約、検出対象除外規定、宣言的データ YAML の schema 原則、detector 命名規約 |
-| integrity/content-corruption-checker.md | accepted | 決定的破損検査クラス | 配布 command・skill 全体の決定的破損検査（Markdown 構造破損、制御文字混入、不正な Unicode 文字、意図しない異言語文字、既知形式の参照残骸）の検査クラス契約、検出シグナル、検出平面、許容例列挙（REQ-010-071、REQ-010-083） |
-| integrity/prose-quality-sentinel-checks.md | accepted | 既知不備センチネル検査 | 配布 command・skill の既知不備 14 項目のセンチネル検査カタログ、確定一致/列挙後確認の 2 段検出方式、対象集合、合格条件、決定的破損検査クラスとの関係 |
 | integrity/integrity-engine-plugin-architecture.md | draft | 検証エンジン プラグインアーキテクチャ | repo-agentdev-integrity 検証エンジンのプラグイン型アーキテクチャ、共有コンテキストキャッシュ、差分実行、自動起票、カタログ自動生成の契約 |
 | integrity/local-verification-gates.md | draft | ローカル検証ゲート | バージョン管理された Git Hook による決定論的ローカル検証ゲート（pre-commit/pre-push/setup-hooks）の実行契約 |
 
@@ -246,10 +243,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 
 #### authoring/（執筆規約）
 
-| Design | status | タイトル | 責務 |
-|------|--------|---------|------|
-| authoring/command-file-format.md | accepted | コマンドファイルフォーマット規約 | command 定義ファイルの Markdown 構成標準。本文構造・見出し構成・Step 表現・記述形式を扱い、`foundations/patterns.md`（共通文書モデル規約）と責務分離。authoring/ は REQ/Design/SKILL/guide 執筆規約の集約先として将来拡張余地あり（即時統合・authoring/ 削除は行わない） |
-| authoring/vocabulary-registry.md | accepted | 語彙レジストリ | 語彙対照表の配置基準、連携契約、IR-045 文意品質検出対象語の移管状態、IR-050/IR-051/IR-044 協調契約（ACT-DESIGN-007、retired REQ-028-007（後継は DEC-006/REQ-036 系）、DEC-013 適用） |
+2026-11-18 時点で配下 Design なし（command-file-format.md・vocabulary-registry.md は DEC-065 により廃止。執筆規約は quality-specs.md・agentdev-skill-authoring/agentdev-command-authoring の各 Design が所有する）。
 
 > 上記分類は段階的に適用する。
 > 既存直下Designの移送は inspect/backlog 経由で個別に行い、一括移送しない。

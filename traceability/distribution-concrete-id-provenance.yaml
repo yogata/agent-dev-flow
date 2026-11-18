@@ -471,7 +471,6 @@ links:
     src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md:
       - docs/requirements/REQ-021.md
       - docs/requirements/REQ-061.md
-      - docs/designs/integrity/rules/IR-072-req-updated-freshness.md
     src/common/skills/agentdev-case-run-execution-adapter/SKILL.md:
       - docs/decisions/DEC-011.md
       - docs/requirements/REQ-005.md
@@ -638,8 +637,6 @@ links:
       - docs/requirements/REQ-096.md
     src/common/skills/agentdev-inspect-skills/SKILL.md:
       - docs/designs/integrity/rules/IR-007-skill-name-dir-match.md
-      - docs/designs/integrity/rules/IR-050-load-skills-command-mis-specification.md
-      - docs/designs/integrity/rules/IR-051-executor-skill-notation-misrecognition.md
       - docs/designs/integrity/rules/IR-053-gh-direct-invocation-detection.md
       - docs/requirements/REQ-036.md
     src/common/skills/agentdev-learning-pipeline/SKILL.md:

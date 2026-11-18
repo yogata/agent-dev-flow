@@ -69,7 +69,7 @@ STEP 番号は既存 STEP（STEP-1〜6）の契約を維持したままの追加
 
 ### 再開プロトコル（resume protocol）
 
-- 再開点は永続状態から再構成する: `backlog_auto_started_at`、stage 1 の完了証跡（直近 inspect-docs 実行の検出事項ファイル群または検出事項なし完了）、stage 2 系統別の永続状態（learning は `inbox.md` / `deferred.md` / `evaluation-report.md` / `promoted/`、intake は `inbox/` と `promoted/` の実ファイル状態、inspect は `inbox/` と `promoted/` と auto-promote-log）、stage 3 の永続状態（各 `promoted/` 残存成果物、`.agentdev/backlog/req-units/` の `RU-*.md` 実ファイル）、stage 4〜7 の set-state（一式識別子、義務スナップショット、対応表、基準点情報、stage 別進捗、リリース状態）
+- 再開点は永続状態から再構成する: `backlog_auto_started_at`、stage 1 の完了証跡（直近 inspect-docs 実行の検出事項ファイル群または検出事項なし完了）、stage 2 系統別の永続状態（learning は `inbox/` / `deferred/` / `evaluation-report.md` / `promoted/`、intake は `inbox/` と `promoted/` の実ファイル状態、inspect は `inbox/` と `promoted/` と auto-promote-log）、stage 3 の永続状態（各 `promoted/` 残存成果物、`.agentdev/backlog/req-units/` の `RU-*.md` 実ファイル）、stage 4〜7 の set-state（一式識別子、義務スナップショット、対応表、基準点情報、stage 別進捗、リリース状態）
 - 完了済み工程を重複実行せず、未完了工程を完了済みと誤認しない。確定不能な工程は未完了として扱う
 - RU 生成後・要件定義後・Issue 生成後・実行中のいずれで中断しても、set-state から同じ一式の対象と進捗を復元し、未完了部分から再開する。stage 5 の実行再開は case-auto 単独の再開入口契約（Root Case 指定の再開）を利用する
 - backlog-auto の再実行は set-state から完遂済み Case を検出し、全体完了判定（stage 6）以降の段階から再開する。実装を再実行しない

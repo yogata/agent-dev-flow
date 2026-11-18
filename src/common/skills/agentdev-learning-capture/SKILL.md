@@ -5,7 +5,7 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 # `agentdev-learning-capture`
 
-会話中にエージェントが自律的に検知、回避、修正した問題から学びを抽出し、ユーザー承認なしで自律的に `.agentdev/learning/inbox.md` に蓄積するスキルである。
+会話中にエージェントが自律的に検知、回避、修正した問題から学びを抽出し、ユーザー承認なしで自律的に `.agentdev/learning/inbox/` に蓄積するスキルである。
 
 ## 入力
 
@@ -13,17 +13,17 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 ## 出力
 
-- `.agentdev/learning/inbox.md` への13フィールド形式エントリ追記、ユーザーへの追記通知
+- `.agentdev/learning/inbox/` への1トピック1ファイル形式エントリ保存、ユーザーへの保存通知
 
 ## 副作用
 
-- `.agentdev/learning/inbox.md` の作成（未存在時）、追記を行う
+- `.agentdev/learning/inbox/` 配下への1トピック1ファイル（`YYYY-MM-DD-<slug>.md`）の保存を行う
 - **git永続化（commit/push）は呼出元コマンドの責務**。本スキル内で `git add`/ `git commit`/ `git push` を実行してはならない
-- `deferred.md` は参照・作成しない（`/agentdev/learning-promote` のみが管理）
+- `deferred/` は参照・作成しない（`/agentdev/learning-promote` のみが管理）
 
 ## 常に守る不変条件
 
-- **エージェント主体**: エージェントが学びを検知、抽出し、ユーザー承認なしで自律的に inbox.md に蓄積する。蓄積後に内容を通知するが、承認や却下は求めない
+- **エージェント主体**: エージェントが学びを検知、抽出し、ユーザー承認なしで自律的に inbox/ に蓄積する。蓄積後に内容を通知するが、承認や却下は求めない
 - **実観測ベース**: エージェントが実際に観測した事象に基づいて学び候補を抽出する。推測のみのエントリは保存しない。品質評価は保留し下流（promote）に委ねる。重複は気にしない（統合は promote が行う）
 - **13フィールド完備**: 基準テンプレート（`references/capture-entry-template.md`）に従い全13フィールドを必ず含める。推論でフォーマットを組み立てず、テンプレートから取得する
 - **Decision/REQ/spec反映判断を行わない**: 影響の記録まで。実際のDecision/REQ/spec更新、昇格判断は別スキルの責務
@@ -46,8 +46,8 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 ## Prerequisites
 
-学びの保存先: `.agentdev/learning/inbox.md`（最新の学び。常にここに追加）。
-inbox.mdが存在しない場合、エージェントは当該ファイルを作成してから追記する。
+学びの保存先: `.agentdev/learning/inbox/`（最新の学び。常にここに追加）。
+学び1件ごとに `.agentdev/learning/inbox/` 配下へ1ファイル（`YYYY-MM-DD-<slug>.md`、frontmatter 4フィールド `id`/`created_at`/`source`/`status`、本文は13フィールド形式）として保存する。
 
 ## 禁止事項
 
@@ -55,7 +55,7 @@ inbox.mdが存在しない場合、エージェントは当該ファイルを作
 - **ユーザーに学びの内容の入力を促さない**（「学びの内容を入力してください」「学びを教えてください」等の要求は禁止。エージェントが学びを生成して提示する）
 - **Decision/REQ/spec反映判断を行わない**（影響の記録まで。実際のDecision/REQ/spec更新は別スキルの責務）
 - **昇格判断を行わない**（学びをスキルやコマンドに昇格すべきかの判断は `/agentdev/learning-promote` の責務）
-- **複雑なロジックを使わない**（シンプルなテキスト追記のみ）
+- **複雑なロジックを使わない**（シンプルな1ファイル書き出しのみ）
 - **intake item を作成しない**（学びの抽出過程で具体的な修正対象が残る場合は、intake workflow（`/agentdev/intake-capture`）に委ねる。learning capture は intake item を作成しない）
 
 ## 観測の分割ルール（split rule）
@@ -65,7 +65,7 @@ inbox.mdが存在しない場合、エージェントは当該ファイルを作
 | 内容の性質 | 向け先 | 理由 |
 |---|---|---|
 | 具体的な修正対象（積み残し作業候補、バグ、設定不備等） | intake item（`/agentdev/intake-capture`） | 具体的作業は intake workflow が管理 |
-| 再発防止知見（予防策、判断基準、運用ルール等） | learning item（`inbox.md`） | 知見の蓄積、昇華は learning pipeline が管理 |
+| 再発防止知見（予防策、判断基準、運用ルール等） | learning item（`inbox/` 1ファイル） | 知見の蓄積、昇華は learning pipeline が管理 |
 | 両方含まれる | 両方に分割してそれぞれ出力 | 1観測 = 最大1 learning item + 1 intake item |
 
 learning は「改善提案そのもの」ではなく「改善提案へ昇華されうる再発防止知見」である。

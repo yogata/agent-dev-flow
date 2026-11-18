@@ -12,14 +12,14 @@ updated: 2026-11-18
 
 ## 目的
 
-inbox.md から正規化、分類、8軸評価、廃棄判定、既存対策確認、HITL 承認を経て採用済み成果物を生成する。
+inbox/ から正規化、分類、8軸評価、廃棄判定、既存対策確認、HITL 承認を経て採用済み成果物を生成する。
 `.opencode/` 直接反映は禁止。
 backlog-review 経由で RU 化する。
 
 **昇華可能性評価、無条件の自動 REQ 化禁止（学習昇格契約は REQ-038 系）**: 各問題クラスについて恒久契約（REQ/Decision/Design）への昇華可能性を評価し、昇華可能な知見のみ `promoted/` へ出力する。
 無条件の自動REQ化は禁止し、学びは backlog-review → req-define → case-auto（内部 lifecycle の case-open / case-ready 段階）の昇華経路を経て初めて REQ 化される。
-昇華不能な知見は `deferred.md` の living pool で維持する。
-`deferred.md` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である。
+昇華不能な知見は `deferred/` の living pool で維持する。
+`deferred/` は deferred カテゴリ（11廃棄判定カテゴリの1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である。
 
 ## 変更種別分類
 
@@ -53,21 +53,21 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
 
 - **HITL は「判断の確定」に限定**（REQ-003-003）: 判定結果の提示でのユーザー承認のみが HITL 対象。承認後の保存、移動、prune、commit/push は自動実行する。
 - **判断確定後の自動実行**（REQ-003-004）: ユーザー承認後、git pull / 採用済み成果物生成 / deferred 移動 / prune / commit-push は追加確認なしで自動実行する。
-- **破壊的変更の明示承認維持**（REQ-003-005）: inbox.md 全体の強制クリア、大量エントリの一括削除等の破壊的操作は、判定結果承認とは別に明示的な承認を求める。
+- **破壊的変更の明示承認維持**（REQ-003-005）: inbox 配下ファイルの一括削除、大量エントリの一括削除等の破壊的操作は、判定結果承認とは別に明示的な承認を求める。
 - **prune 自動実行条件**（REQ-003-006）: staged（採用済み成果物に根拠保存済み）/ rejected / duplicate のエントリは、ユーザー承認と同時に prune 承認済みとみなし追加確認なしで削除する。
 - **prune 非対象**（REQ-003-007）: deferred / 未処理のエントリは必ず残す。誤削除防止のため auto-prune 対象から除外する。
 
 ## 入力
 
-- `.agentdev/learning/inbox.md`（必須、未処理学びエントリ）
-- `.agentdev/learning/deferred.md`（任意、過去エントリ参照）
+- `.agentdev/learning/inbox/`（必須、未処理学びエントリ）
+- `.agentdev/learning/deferred/`（任意、過去エントリ参照）
 
 ## 出力
 
 - `.agentdev/learning/evaluation-report.md`（8軸評価レポート）
 - `.agentdev/learning/promoted/{category}-{name}.md`（採用済み成果物、フラット構造）
-- `.agentdev/learning/deferred.md`（inbox 移動分追記）
-- `.agentdev/learning/inbox.md`（ヘッダーのみクリア）
+- `.agentdev/learning/deferred/`（inbox 移動分追記）
+- `.agentdev/learning/inbox/`（処理済みエントリファイルの削除）
 
 ## 副作用
 
@@ -81,13 +81,13 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
 6 フェーズ構成。
 各フェーズの詳細手順は Workflow Skill（`agentdev-workflow-learning-promote`）が正規情報源である。
 
-- フェーズ1 inbox スキャン: inbox.md 読込。deferred.md はインデックススキャン → 候補エントリ本文読込の2フェーズで読み込む。候補0件・候補に上がらないエントリ・判定曖昧時は deferred.md 全面読みへフォールバックする。突合スコープは deferred プールサイズに依存しない
+- フェーズ1 inbox スキャン: inbox/ 読込。deferred/ はインデックススキャン → 候補エントリ本文読込の2フェーズで読み込む。候補0件・候補に上がらないエントリ・判定曖昧時は deferred/ 全面読みへフォールバックする。突合スコープは deferred プールサイズに依存しない
 - フェーズ2-5 Normalize→Classify→Evaluate→Dispose→HITL:
   - 正規化（inbox は全面、deferred は候補本文のみ）
   - 問題クラス分類
   - 8軸評価
   - evaluation-report 生成
-  - 廃棄判定（11カテゴリ + duplicate）+ 昇華可能性評価（現行は REQ-038 系）。無条件の自動 REQ 化を禁止し、昇華不能な知見は `deferred.md` の living pool で維持する
+  - 廃棄判定（11カテゴリ + duplicate）+ 昇華可能性評価（現行は REQ-038 系）。無条件の自動 REQ 化を禁止し、昇華不能な知見は `deferred/` の living pool で維持する
   - 既存対策確認（既存対策優先、新規 X 化より既存 X へ反映）
   - 結果提示
   - ユーザー承認（判定、prune にユーザー承認必須）
@@ -183,8 +183,8 @@ learning-promote は adversarial-review を原則実行する（default-on、REQ
 #### skip 条件（REQ-015-002、REQ-015-003）
 
 - **skip 条件**: 次のいずれかに該当する場合、adversarial-review を省略して従来フローを継続できる（REQ-015-003）。skip 判断のためだけの新規 HITL、承認点は追加しない。
-  - inbox.md エントリが1件のみで既存対策との重複が確実（新規性なし、廃棄判定確定）の場合
-  - inbox.md 空（処理対象なし、inbox スキャンで終了）の場合
+  - inbox/ エントリが1件のみで既存対策との重複が確実（新規性なし、廃棄判定確定）の場合
+  - inbox/ 空（処理対象なし、inbox スキャンで終了）の場合
 
 adversarial-review を新規必須工程、QG、承認ゲートとして扱わない。
 skip 条件該当時は従来フローを維持する（REQ-015-003）。

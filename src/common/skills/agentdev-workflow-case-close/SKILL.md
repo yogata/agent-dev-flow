@@ -29,7 +29,7 @@ case-close command は公開 interface（入出力契約・ガードレール）
 - PR squash merge、Issue close、Issue コメント追加、Epic Issue 本文ステータステーブル更新（Custom Tool `agentdev_gh` 経由、case-close 単一書き手）
 - worktree/ ローカルブランチ削除（remote ブランチは GitHub の deleteBranchOnMerge 自動削除に委譲し、case-close は実行しない）
 - Design `status` frontmatter 昇格（draft → accepted、棚卸し制の Design 状態評価（STEP-3-2）で実装・検証との整合確認を通過した対象 Design）
-- `.agentdev/learning/inbox.md`、`.agentdev/intake/inbox/` への Capture 回収、`.agentdev/` 配下 commit/push
+- `.agentdev/learning/inbox/`、`.agentdev/intake/inbox/` への Capture 回収、`.agentdev/` 配下 commit/push
 - 当該 Workflow Skill は worktree root 配下以外を編集しない（case-close command の worktree 隔離に従う）
 
 ## 制御平面（STEP 一覧）

@@ -253,7 +253,6 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 - [REQ 健全性メトリクス](designs/quality/req-health-metrics.md)
 - [Design 健全性メトリクス](designs/quality/design-health-metrics.md)
 - [ADF v4 Quality / Verification / Evidence / Gate モデル](designs/quality/quality-gate-model.md)
-- [textlint 品質基盤](designs/quality/textlint-quality-runtime.md)
 
 #### integrity/（整合性契約、ルール）
 
@@ -269,8 +268,6 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 - [AUTOGEN ブロック鮮度検出 gate](designs/integrity/autogen-freshness-gate.md)
 - [テスト影響範囲検出 gate](designs/integrity/test-impact-detection-gate.md)
 - [checker 実行契約と検出基盤規則](designs/integrity/checker-execution-contracts.md)
-- [決定的破損検査クラス](designs/integrity/content-corruption-checker.md)
-- [既知不備センチネル検査](designs/integrity/prose-quality-sentinel-checks.md)
 
 #### local/（ローカル版 Design）
 
@@ -281,8 +278,7 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 
 #### authoring/（執筆規約）
 
-- [コマンドファイルフォーマット規約](designs/authoring/command-file-format.md)
-- [語彙レジストリ](designs/authoring/vocabulary-registry.md)
+2026-11-18 時点で配下 Design なし（command-file-format.md・vocabulary-registry.md は DEC-065 により廃止。執筆規約は [品質仕様](designs/quality/quality-specs.md) が所有する）。
 
 ## 知識（Knowledge）
 

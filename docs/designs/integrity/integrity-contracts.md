@@ -219,7 +219,7 @@ detector 不在、部分実装、test 不在、到達不能、finding 未接続�
 
 baseline による既知/新規分類（旧 finding-baseline 分類）、恒久免除レジストリ（baselines/exemptions.json）、NG baseline・IR-055 baseline による免除管理・delta 運用は撤廃済みである。
 検出違反は全件を新規扱いで報告し、免除せず対象ファイル側の直接修正で即時解消する（REQ-010-079、REQ-010-082、REQ-010-084）。
-IR-055・IR-059 の検出器自体は存続する（baseline 運用のみ撤廃。IR-073 と同一の扱い）。
+IR-055・IR-059 の検出器自体は存続する（baseline 運用のみ撤廃済み）。
 
 ## 新規 IR 登録 gate（retired REQ-028-012 から移管、TS-020）
 
@@ -284,12 +284,6 @@ retired REQ-028-006 の詳細運用は別途 Definition 保存（case-ready / ca
 ### 旧 obsolete-spec-path ルール（削除済み）
 
 旧 obsolete-spec-path ルール（obsolete-spec-path-after-domain-split）は Epic #4126 Phase 4（OU-004）で削除された。一時移行検査 registry の Phase 3 §7.2 判定（現状維持＝恒久 IR 扱い）は撤廃後の実態に従うものではない。
-
-## IR-050 / IR-051 適用条件（REQ-010-006/007）
-
-IR-050（load_skills 誤指定検出）、IR-051（実行主体 skill 表記誤認検出）は、語彙レジストリ（`.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md`）の存在確認、必要語彙の補充後に適用する。
-IR-051 の「一定文字距離内」は語彙レジストリで確定された具体閾値（文字数、行数）を使用する。
-閾値未確定時は heuristic として報告するが auto-promote 対象外とする。
 
 ## reference-path-existence 検出における backtick 囲みパスの扱い（REQ-010-009）
 

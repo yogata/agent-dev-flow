@@ -63,7 +63,7 @@ backlog-auto command の workflow 実装本体。
 |---|---|
 | 正常完了（promote 採用 0 件を含む） | 正常完了 |
 | 対象なし終了（inbox 不在等） | 対象なし終了 |
-| learning-promote の inbox.md 不在時の子コマンドエラー報告 | 対象なし終了へ読み替える（障害扱いしない） |
+| learning-promote の inbox/ 不在時の子コマンドエラー報告 | 対象なし終了へ読み替える（障害扱いしない） |
 | blocked（user-decision-required 含む） | blocked |
 | failed（実行失敗、external failure） | failed |
 | 未完了（タイムアウト、中断） | 未完了 |

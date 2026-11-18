@@ -17,7 +17,7 @@ case-ready 完了
  - Root Case を ready へ遷移
  - draft / RU 削除: {削除済み / 保持（{理由}）}
  Capture結果: {該当なし省略可 / 以下capture 成果物がある場合のみ}
-  - パス: {.agentdev/intake/inbox/*.md または .agentdev/learning/inbox.md への相対パス}
+  - パス: {.agentdev/intake/inbox/*.md または .agentdev/learning/inbox/ への相対パス}
   - 分類: {intake/learning}
   - 保存結果: {成功/失敗（理由）}
 検証結果: OK

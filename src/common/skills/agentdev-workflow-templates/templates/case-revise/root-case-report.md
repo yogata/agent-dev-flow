@@ -13,7 +13,7 @@ case-revise 完了
  - Case 関連 Issue 本文更新: {更新済み / 該当なし（テンプレート構造と必須セクション維持）}
  - execution contract / execution structure の再確定は case-ready へ引き継ぎ（case-revise 専用の Case 状態は追加しない）
  Capture結果: {該当なし省略可 / 以下capture 成果物がある場合のみ}
-  - パス: {.agentdev/intake/inbox/*.md または .agentdev/learning/inbox.md への相対パス}
+  - パス: {.agentdev/intake/inbox/*.md または .agentdev/learning/inbox/ への相対パス}
   - 分類: {intake/learning}
   - 保存結果: {成功/失敗（理由）}
 検証結果: OK

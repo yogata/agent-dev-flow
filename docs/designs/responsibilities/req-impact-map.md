@@ -26,19 +26,14 @@ updated: "2026-11-18"
 <!-- AUTOGEN:BEGIN:id=req-impact-map-req-ir-crossref -->
 | REQ | タイトル | 影響する Rule IDs |
 |-----|---------|------------------|
-| [REQ-001](../../requirements/REQ-001.md) | 文書体系と持続可能な基準構造 | IR-001, IR-024, IR-025, IR-027, IR-037, IR-038, IR-039, IR-040, IR-041, IR-042, IR-043, IR-044 |
-| [REQ-002](../../requirements/REQ-002.md) | 配布成果物の責務境界 | IR-006, IR-056, IR-058 |
-| [REQ-003](../../requirements/REQ-003.md) | 委譲時の判断・承認・副作用境界 | IR-030, IR-031, IR-032, IR-033 |
-| [REQ-009](../../requirements/REQ-009.md) | 配布基盤と導入モデル | IR-048 |
-| [REQ-010](../../requirements/REQ-010.md) | 自己監査コマンド（docs-check） | IR-001, IR-002, IR-003, IR-004, IR-005, IR-007, IR-010, IR-012, IR-015, IR-018, IR-024, IR-034, IR-035, IR-039, IR-044, IR-049, IR-050, IR-051, IR-052, IR-060, IR-062, IR-063, IR-064, IR-067, IR-068, IR-069, IR-070, IR-072, IR-073 |
+| [REQ-001](../../requirements/REQ-001.md) | 文書体系と持続可能な基準構造 | IR-001, IR-024, IR-044 |
+| [REQ-002](../../requirements/REQ-002.md) | 配布成果物の責務境界 | IR-056, IR-058 |
+| [REQ-010](../../requirements/REQ-010.md) | 自己監査コマンド（docs-check） | IR-001, IR-002, IR-003, IR-004, IR-007, IR-024, IR-044, IR-062, IR-063, IR-064, IR-067, IR-068, IR-069, IR-070 |
 | [REQ-011](../../requirements/REQ-011.md) | I/O境界と外部連携手段 | IR-053 |
 | [REQ-018](../../requirements/REQ-018.md) | worktree 構造的制約とテスト fallback | IR-068 |
 | [REQ-029](../../requirements/REQ-029.md) | 配布依存境界 | IR-055, IR-059 |
-| [REQ-036](../../requirements/REQ-036.md) | 検出と診断コマンド群（inspect 系） | IR-008, IR-013, IR-060 |
-| [REQ-039](../../requirements/REQ-039.md) | バックログ統合（backlog-review） | IR-006 |
-| [REQ-047](../../requirements/REQ-047.md) | 規則所有権の一方向化 | IR-074 |
+| [REQ-036](../../requirements/REQ-036.md) | 検出と診断コマンド群（inspect 系） | IR-008, IR-013 |
 | [REQ-051](../../requirements/REQ-051.md) | ガードレール識別体系と機械検査の再編 | IR-063, IR-071 |
-| [REQ-053](../../requirements/REQ-053.md) | 文書と配布物の文章品質契約 | IR-051, IR-060 |
 <!-- AUTOGEN:END -->
 
 ## 要件行影響（Requirement-Line Impact）
