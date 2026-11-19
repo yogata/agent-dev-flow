@@ -16,11 +16,10 @@ context:
 rules:
   - id: yomiyasu-application-before-write
     when: >-
-      docs/** の日本語文章を変更する場合と、GitHub 文章（Issue/PR タイトル・本文、説明・レビュー・完了コメント。委譲先能力スキル経由の書込みを含む）を agentdev_gh へ渡す場合に適用する。yomiyasu 推敲の適用手順（編集前読込、推敲タイミング、同梱 lint の実行経路）、適用済みの判定、停止条件、記録様式、推敲の保護条件、書込み guard の拒否対象・許可対象と拒否後の回復（迂回禁止）の規律は、`agentdev-workflow-lifecycle` スキル「文章品質・書込み規約」節を正本として参照する。規則本文を複製しない。Definition PR のマージ前に適用を確認し、不足時はマージを行わず対象文章の修正へ差し戻す
+      利用者が yomiyasu 推敲の適用を明示的に指示した場合にのみ適用する（通常フローでは発動しない opt-in 運用。明示指示のない docs/** の日本語文章変更と GitHub 文章〔Issue/PR タイトル・本文、説明・レビュー・完了コメント。委譲先能力スキル経由の書込みを含む〕の agentdev_gh への書込みには自動適用しない）。yomiyasu 推敲の適用手順（編集前読込、推敲タイミング、同梱 lint の実行経路）、適用済みの判定、停止条件、記録様式、推敲の保護条件、書込み guard の拒否対象・許可対象と拒否後の回復（迂回禁止）の規律は、`agentdev-workflow-lifecycle` スキル「文章品質・書込み規約」節を正本として参照する。規則本文を複製しない。Definition PR のマージ前に適用を確認し、不足時はマージを行わず対象文章の修正へ差し戻す
     skill: yomiyasu
 checks: []
 acceptance_gates:
   - Definition の保存・確定結果と execution structure が Issue に反映されていること
   - drafts と RU の残存を case-auto の cleanup gate が検証できること
-  - Definition PR の差分に docs/** の日本語文章変更を含む場合、当該変更文章への yomiyasu 適用記録（対象・実施結果・保持した指摘理由）が PR 上に存在すること。不足時はマージを行わず対象文章の修正へ差し戻すこと
 must_not: []

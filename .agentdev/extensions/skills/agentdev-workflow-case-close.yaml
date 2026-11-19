@@ -34,7 +34,7 @@ rules:
     skill: agentdev-traceability
   - id: yomiyasu-application-before-write
     when: >-
-      docs/** の日本語文章を変更する場合と、GitHub 文章（Issue/PR タイトル・本文、説明・レビュー・完了コメント。委譲先能力スキル経由の書込みを含む）を agentdev_gh へ渡す場合に適用する。yomiyasu 推敲の適用手順（編集前読込、推敲タイミング、同梱 lint の実行経路）、適用済みの判定、停止条件、記録様式、推敲の保護条件、書込み guard の拒否対象・許可対象と拒否後の回復（迂回禁止）の規律は、`agentdev-workflow-lifecycle` スキル「文章品質・書込み規約」節を正本として参照する。規則本文を複製しない。実装 PR のマージ前に適用を確認し、不足時は case-run へ差し戻す
+      利用者が yomiyasu 推敲の適用を明示的に指示した場合にのみ適用する（通常フローでは発動しない opt-in 運用。明示指示のない docs/** の日本語文章変更と GitHub 文章〔Issue/PR タイトル・本文、説明・レビュー・完了コメント。委譲先能力スキル経由の書込みを含む〕の agentdev_gh への書込みには自動適用しない）。yomiyasu 推敲の適用手順（編集前読込、推敲タイミング、同梱 lint の実行経路）、適用済みの判定、停止条件、記録様式、推敲の保護条件、書込み guard の拒否対象・許可対象と拒否後の回復（迂回禁止）の規律は、`agentdev-workflow-lifecycle` スキル「文章品質・書込み規約」節を正本として参照する。規則本文を複製しない。実装 PR のマージ前に適用を確認し、不足時は case-run へ差し戻す
     skill: yomiyasu
 
 checks:
@@ -45,6 +45,5 @@ checks:
 acceptance_gates:
   - 完了した Issue/PR の成果物が docs/requirements/, docs/decisions/, docs/designs/ のいずれかに存在すること
   - PR 対象ファイルに src/opencode/commands/** または src/opencode/skills/** の変更を含む場合、当該変更ファイルが配布物参照境界（IR-059）に違反しないこと
-  - 実装 PR の差分に docs/** の日本語文章変更を含む場合、当該変更文章への yomiyasu 適用記録が PR 上に存在すること。不足時は case-run へ差し戻すこと
 
 must_not: []

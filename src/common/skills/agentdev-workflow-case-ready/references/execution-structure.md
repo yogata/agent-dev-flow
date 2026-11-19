@@ -65,11 +65,11 @@ OU / Epic / Wave / Issue 階層の語彙意味の正規所有は standard-lifecy
 
 ## Jev 評価経路（Jev 先行評価の実運用組込み要件、Jev 先行評価採用の Decision）
 
-Epic/Wave 構成判断は case-ready が所有する正規判断である。本 Workflow が所有する3判断単位（Standard / Epic 確定、Wave 構成判断、既存オープン Issue とのスコープ重複判定）は、いずれも基本判断経路（Jev 先行評価 → LLM 推論 → LLM 最終判断）の逐次経路で処理する。confidence による LLM 推論の機械的省略・Jev 結果の直接確定は行わず、最終判断は常に reasoning model（LLM 推論）が下す。
+Epic/Wave 構成判断は case-ready が所有する正規判断である。本 Workflow の通常実行では Jev 先行評価を実行しない。本 Workflow が所有する3判断単位（Standard / Epic 確定、Wave 構成判断、既存オープン Issue とのスコープ重複判定）は、いずれも LLM 推論 → LLM 最終判断で処理する。Jev 先行評価（当該評価の観測の `.agentdev/jev-observations/` への永続化と最終判断の観測反映を含む逐次経路）は、利用者が当該実行に対して Jev 評価を明示的に指示した場合にのみ各判断単位の前段として実行する（opt-in）。confidence による LLM 推論の機械的省略・Jev 結果の直接確定は行わず、最終判断は常に reasoning model（LLM 推論）が下す。
 
 ### 基本判断経路（逐次経路）
 
-閉じた意味判断ごとに、次の逐次経路を実行する。Jev は最終判断者ではなく、後段の LLM 推論への追加情報として扱う。
+閉じた意味判断ごとに、次の逐次経路を、利用者が Jev 評価を明示的に指示した場合にのみ実行する（明示指示がない場合は LLM 推論・LLM 最終判断のみで処理し、`.agentdev/jev-observations/` への観測 JSON を生成しない）。Jev は最終判断者ではなく、後段の LLM 推論への追加情報として扱う。
 
 1. **Jev 先行評価**: Custom Tool `agentdev_jev` の `evaluate` に、本 Workflow が構成した閉じた判断入力（state、指示、基準、質問群。日本語。repository 全文を渡さない）を渡す。判断入力には機械的事実（operation_units 依存グラフ、連結成分の計算結果）を state に含める。evaluator 成功後・LLM 推論へ進む前に、当該評価の観測（1 semantic evaluation = 1 observation）が `.agentdev/jev-observations/` へ永続化される
 2. **LLM 推論**: Jev 結果・候補別確率分布・取得できた confidence を情報として含み、従来の判断材料（operation_units 依存グラフ、3軸判断の判定結果、Wave 重複前置検出の結果、既存オープン Issue の検出結果）も参照して推論する。Jev 結果だけで判断しない
