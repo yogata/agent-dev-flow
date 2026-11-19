@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261119T035244Z-6a97",
+  "workflow": "req-define",
+  "evaluationKind": "existing-req-matching",
+  "subject": "RU-0303（仮説に基づく既存統制変更原則の確立と実測必須条件の解除）の既存REQ照合判断",
+  "sourceRevision": "10717a352074267ab68590266f3e5faac2ffdb3c",
+  "durationMs": 221,
+  "inputTokens": 1686,
+  "inputs": {
+    "requestDigest": "1022549b3c8184cbfd5d310abf26f2d14cd625da722255f7414bc433e3ec1fbb",
+    "references": [
+      {
+        "digest": "da999a87fac906110ba7b0e34f6dbb5a9569a8c286abb22dda077d9b668ad379",
+        "label": "RU-0303 入力RU",
+        "path": ".agentdev/backlog/req-units/RU-0303.md"
+      },
+      {
+        "digest": "38865d892b130f38ef19ae368cb4430d80189b1f0f7424ac27263291089f8b48",
+        "label": "REQ-048 照合対象REQ",
+        "path": "docs/requirements/REQ-048.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-req-operation",
+      "questionForm": "choice",
+      "value": "UPDATE（既存REQの目的節・要件行の意味変更を含む更新）",
+      "probabilityDistribution": {
+        "CREATE（新規REQファイル作成）": 0,
+        "APPEND（既存REQへの要件行追記）": 0,
+        "UPDATE（既存REQの目的節・要件行の意味変更を含む更新）": 0.95,
+        "REQ操作なし（REQファイルへの操作不要）": 0.01,
+        "保留（所有先を一意に決定できない。操作分類を確定せず候補と不足を報告）": 0.04
+      }
+    },
+    {
+      "questionId": "q2-confirmation-needed",
+      "questionForm": "boolean",
+      "value": false,
+      "probabilityDistribution": {
+        "true": 0.12,
+        "false": 0.88
+      }
+    },
+    {
+      "questionId": "q3-ru06-req092-like",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.77,
+        "false": 0.22999999999999998
+      }
+    }
+  ],
+  "confidence": 0.94,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-req-operation",
+        "value": "UPDATE（既存REQの目的節・要件行の意味変更を含む更新）"
+      },
+      {
+        "questionId": "q2-confirmation-needed",
+        "value": false
+      },
+      {
+        "questionId": "q3-ru06-req092-like",
+        "value": true
+      }
+    ]
+  }
+}

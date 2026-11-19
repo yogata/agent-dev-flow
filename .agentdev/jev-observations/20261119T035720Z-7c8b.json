@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 2,
+  "observationId": "20261119T035720Z-7c8b",
+  "workflow": "req-define",
+  "evaluationKind": "final-classification-design-separation",
+  "subject": "RU-0303 要件展開の最終分類・Design 分離（8記述単位）",
+  "sourceRevision": "10717a352074267ab68590266f3e5faac2ffdb3c",
+  "durationMs": 857,
+  "inputTokens": 2389,
+  "inputs": {
+    "requestDigest": "78c9771b31457ac3cdefaf69e7484fd64a23c8f9daa8b827a6eeb07f8526bc5b",
+    "references": [
+      {
+        "digest": "da999a87fac906110ba7b0e34f6dbb5a9569a8c286abb22dda077d9b668ad379",
+        "label": "RU-0303 入力RU",
+        "path": ".agentdev/backlog/req-units/RU-0303.md"
+      }
+    ]
+  },
+  "identity": {
+    "resolvedModel": "jev-1.13.0"
+  },
+  "results": [
+    {
+      "questionId": "q1-ag001-place",
+      "questionForm": "choice",
+      "value": "REQ行（REQ-048 改訂本文）",
+      "probabilityDistribution": {
+        "REQ行（REQ-048 改訂本文）": 0.59,
+        "Design行（既存 Design の整合更新本文）": 0.09,
+        "両方（REQ 行と Design 行の両方へ保存が必要）": 0.32
+      }
+    },
+    {
+      "questionId": "q2-ag004-005-place",
+      "questionForm": "choice",
+      "value": "Decision操作（Decision への保存操作。REQ行・Design行のいずれでもない）",
+      "probabilityDistribution": {
+        "REQ行（REQ-048 改訂本文）": 0.01,
+        "Design行（既存 Design の整合更新本文）": 0.06,
+        "Decision操作（Decision への保存操作。REQ行・Design行のいずれでもない）": 0.93
+      }
+    },
+    {
+      "questionId": "q3-ag008-place",
+      "questionForm": "choice",
+      "value": "Design行（design-principles 原則3の整合説明更新など既存 Design の整合更新）",
+      "probabilityDistribution": {
+        "REQ行（REQ-048 改訂本文）": 0,
+        "Design行（design-principles 原則3の整合説明更新など既存 Design の整合更新）": 0.99,
+        "Decision操作（Decision への保存操作）": 0.01,
+        "REQ行とDesign行の両方": 0
+      }
+    },
+    {
+      "questionId": "q4-separation-needed",
+      "questionForm": "boolean",
+      "value": true,
+      "probabilityDistribution": {
+        "true": 0.88,
+        "false": 0.12
+      }
+    }
+  ],
+  "confidence": 0.38,
+  "finalResult": {
+    "results": [
+      {
+        "questionId": "q1-ag001-place",
+        "value": "REQ行（REQ-048 改訂本文）"
+      },
+      {
+        "questionId": "q2-ag004-005-place",
+        "value": "Decision操作（Decision への保存操作。REQ行・Design行のいずれでもない）"
+      },
+      {
+        "questionId": "q3-ag008-place",
+        "value": "Design行（design-principles 原則3の整合説明更新など既存 Design の整合更新）"
+      },
+      {
+        "questionId": "q4-separation-needed",
+        "value": true
+      }
+    ]
+  }
+}
