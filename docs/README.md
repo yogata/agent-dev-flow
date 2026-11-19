@@ -149,7 +149,7 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-024](decisions/DEC-024.md) | 変更誘発境界リスク分析の導入と検証契約への投影 |
 | [DEC-025](decisions/DEC-025.md) | プロジェクト知識を Capability Skill から分離し、独立した正規知識層として管理する |
 | [DEC-026](decisions/DEC-026.md) | 実現面変更方針の構造化ハンドオフ（realization_actions） |
-| [DEC-027](decisions/DEC-027.md) | 観測ベース統制縮小評価ループ |
+| [DEC-027](decisions/DEC-027.md) | 観測ベース統制縮小評価ループ（superseded by DEC-067〔決定1のうち改善サイクル（Execute → Observe → Measure → Candidate → Experiment → KEEP / NARROW / MERGE / DOWNGRADE / DELETE）を唯一の必須経路とする扱い、決定3のうち経験的な冗長性の縮小に事前実測（Baseline と Guardrail の設定と実測）を前置きする要求、決定4のうち基準測定（Baseline）と観測結果（Observation）をすべての変更で必須とする扱いは新規 Decision「仮説に基づく既存統制変更原則」が部分置換。決定1のうち機構の追加量を成果としない評価姿勢、決定2（便益と費用の両面からの評価）、決定3前半（構造的・経験的冗長性の区別と、構造的冗長性を性能実験を待たず縮小候補として評価できる扱い）、決定4の実験契約（1 experiment = 1 major structural change、混在禁止）、決定5、決定6は維持（status: accepted 維持）〕） |
 | [DEC-028](decisions/DEC-028.md) | 文章表層品質の共通実行基盤（superseded by DEC-047〔「配布前に依存を解決した成果物を供給し、導入先での追加パッケージ取得を必要としない」条項は DEC-047 が textlint guard 依存実体の配布供給の範囲で部分置換。DEC-016 維持宣言と他の決定は維持（status: accepted 維持）。本体リポジトリにおける共通自動検査運用の終了は新規 Decision（整合性検証体制の中核化）が部分置換する（Plugin 製品としての決定は維持）〕） |
 | [DEC-029](decisions/DEC-029.md) | 公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入（superseded by DEC-033） |
 | [DEC-030](decisions/DEC-030.md) | トレーサビリティ標準機能への一般化と producer / consumer 境界の確立（superseded by DEC-037） |
@@ -186,9 +186,10 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-061](decisions/DEC-061.md) | Release 公開操作のカタログ正規化（承認後の workflow 実行経路） |
 | [DEC-062](decisions/DEC-062.md) | 要件ID桁数の受理上限撤廃と表示ゼロ埋め・受理検証の分離 |
 | [DEC-063](decisions/DEC-063.md) | 分割③ CI 日次定期実行（cron schedule）の撤去 |
-| [DEC-064](decisions/DEC-064.md) | 実験前提の恒久運用原則の採用と移行完了後レガシー資産の扱い境界 |
+| [DEC-064](decisions/DEC-064.md) | 実験前提の恒久運用原則の採用と移行完了後レガシー資産の扱い境界（superseded by DEC-067〔決定4のうち DEC-027 の実測必須方式を前提とした整合説明（「DEC-027 の観測ベース評価ループ（実測してから縮小判断）と矛盾しない」）に限り新規 Decision「仮説に基づく既存統制変更原則」が部分置換。決定4のその他の内容（測定待ちによる無期限の保留禁止、deferred 機構と blocked 機構そのものの維持、測定結果の不存在のみを理由とする統制削除の禁止、原則3の狭義解釈）と決定1〜3・5は維持（status: accepted 維持）〕） |
 | [DEC-065](decisions/DEC-065.md) | 整合性検証体制の中核化（IR 24+IR-075 体系・プラグイン型検証エンジン・src 正本化） |
 | [DEC-066](decisions/DEC-066.md) | ローカル Git Hook による決定論的検証ゲート（CI 非依存） |
+| [DEC-067](decisions/DEC-067.md) | 仮説に基づく既存統制変更原則 |
 <!-- AUTOGEN:END -->
 
 ## 設計（Design）
