@@ -179,8 +179,9 @@ artifact_actions:
     content: |
       frontmatter 変更（REQ ファイル管理責務が適用）: updated を保存日に更新する。
 
-      （1）目的節 第2段落の置換（組立検査済み・assembly_evidence ASM-REQ-048-PURPOSE）。変更後全文:
-      ADF の改善では機構の追加量を成果としない。統制・補助機構の変更・統合・降格・削除の判断は、効果の事前実測を必須条件とせず、変更の目的と仮説、対象範囲、維持する条件、問題が判明した際の処置を明確にした上で行えること（仮説に基づく既存統制変更原則）。実測を伴う評価では、ADF が既に持つ実行情報と harness 側の生実行履歴を使って各機構の便益・コスト・重複を評価し、Execute → Observe → Measure → Candidate → Experiment →
+      （1）目的節 第2段落の置換（4行→4行の等行数更新・REQ-030-030 行区切り保全適合・組立検査済み・assembly_evidence ASM-REQ-048-PURPOSE）。変更後全文:
+      ADF の改善では機構の追加量を成果としない。統制・補助機構の変更・統合・降格・削除の判断は、効果の事前実測を必須条件とせず、変更の目的と仮説、対象範囲、維持する条件、問題が判明した際の処置を明確にした上で行えること（仮説に基づく既存統制変更原則）。
+      実測を伴う評価では、ADF が既に持つ実行情報と harness 側の生実行履歴を使って各機構の便益・コスト・重複を評価し、Execute → Observe → Measure → Candidate → Experiment →
       KEEP / NARROW / MERGE / DOWNGRADE / DELETE のサイクルで必要十分な control plane へ収束する。
       観測のために導入した施策自身を恒久的必須契約としない。
 
@@ -352,12 +353,12 @@ assembly_evidence:
   - target_file: docs/requirements/REQ-048.md
     target_content_sha256: 38865d892b130f38ef19ae368cb4430d80189b1f0f7424ac27263291089f8b48
     check_scope: { heading: "## 目的", start_line: 8, end_line: 21 }
-    execution_conditions: { operation: replace, edit_sha256: cb9ae5a83036dd16a1fb7c1debe1ba86bb746d37ac5c808a93495f22ee85f903, expected_old_count: 1 }
+    execution_conditions: { operation: replace, edit_sha256: 7414bb4fef14873522cae95297d7676096609edd64987e12409ee7fa52f0899b, expected_old_count: 1 }
     checker: { name: assemble-draft-section, version: 0.2.0, settings: { heading_match: exact-after-normalization, old_text_count_check: true } }
     result_affecting_references: { heading_match_rule: "search-target-area.ts compatible: normalizeTargetArea + exact match only + code-fence-aware scan", scan_scope: "target section only" }
     checks_summary: { pre: { count: 3, all_ok: true }, post: { count: 3, all_ok: true } }
-    diff_compact: { changed_lines_count: 2, added: 1, removed: 2 }
-    executed_at: "2026-11-19T04:12:55.889Z"
+    diff_compact: { changed_lines_count: 2, added: 2, removed: 2 }
+    executed_at: "2026-11-19T05:41:42.287Z"
   - target_file: docs/requirements/REQ-048.md
     target_content_sha256: 38865d892b130f38ef19ae368cb4430d80189b1f0f7424ac27263291089f8b48
     check_scope: { heading: "## 要件", start_line: 22, end_line: 42 }
@@ -417,3 +418,5 @@ RU-0303（仮説に基づく既存統制変更原則の確立と実測必須条�
 既存REQ照合は Jev 先行評価を適用した（観測 20261119T035244Z-6a97、最終判断 UPDATE・追加確認不要・単一帰属）。要件展開の最終分類・Design 分離にも Jev を適用した（観測 20261119T035720Z-7c8b、REQ行・Decision操作・Design行帰属および design-principles 整合更新の Design 分離）。architecture-advisory の助言（確定事項・推定事項・ユーザー確認事項 UC-1・ブロッカーなし）を分類して採用し、UC-1 は RU 合意からの導出として CR-003 に記録した。
 
 STEP-8 adversarial-review（独立2 stream・convergence audit 実施）の accepted finding を反映した: (1) DEC-027 置換範囲宣言の条文レベル精密化（決定1残余「機構の追加量を成果としない評価姿勢」と決定3前半「構造的冗長性を性能実験を待たず縮小候補として評価できる扱い」を維持列挙に明示。relations・決定6・supersede_note・本文注記の4箇所で統一）、(2) 新 Decision 決定2第3文への明確化要件に基づく適用範囲限定（決定7 の適用外宣言との接続を条文上完結。CR-003 方式の具体化）、(3) TS-001 への既知ヒット裁定表（DEC-064 維持文の両立扱い・注記被覆条項の有効性フィルタ・REQ-048-015 対象外）と照合対象への DEC-064 追加、(4) TS-002 への規範アンカー明記（決定3・DEC-056 検証不足時の成功宣言禁止・QG モデル）、(5) TS-004 への DEC-064 維持文両立確認の明記、(6) TS-007 への delegation-contracts 参照の意味整合確認への精密化、(7) RA-001 への注記生成非対称性（generate_indexes.ts の status-gated 仕様）の明記。partially accepted（反証により本文変更不要）: delegation-contracts.md の REQ-048-012 参照は参照先改訂による条件化が参照経由で届くため Design 側の書き換え不要。assembly_evidence の target_content_sha256 は各編集の独立検査時点における対象ファイル本文のハッシュであり、REQ-048 への3編集が同一値なのは同一現行ファイルを基準とした独立検査のため（連続適用の記録ではない）。ACT-DESIGN-001 content 内の「組立時確定の注記（CR-004）」は現行 design-principles.md 既存注記（前回変更時の整理番号）の verbatim 保存であり、本 draft の conflict_resolutions（CR-001〜003）とは無関係である。unresolved なユーザー判断事項は残っていない。
+
+Case #4162（case-open STEP-4 機械工程）の行構造事前確認（REQ-030-030・fail-closed）による拒否（ACT-REQ-001(1) の置換後全文が旧文4行に対し3行の行統合構成）を受け、停止記録（.agentdev/blocked/case-4162-stage1-stop.md）の再開入口1として ACT-REQ-001(1) を意味維持の行保全4行構成（4行→4行の等行数更新）へ再組立した。調整は行の折返し位置のみであり、文言の変更・省略・追加は行っていない（改行を除去した文字列の完全同一を機械確認済み・318文字）。assembly_evidence を再取得した（ASM-REQ-048-PURPOSE・edit_sha256 更新）。RU-0303 の合意内容・AC-01〜06、他の artifact_actions・agreed_items・test_strategy・conflict_resolutions は一切変更していない。
