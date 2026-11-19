@@ -51,6 +51,7 @@ Root Case 本文候補の生成は preflight 設定検証の警告報告後に�
 2. Root Case のタイトルは合意済みの対象・目的から主題を生成し、`<workflows/issue-title-policy>` Design（Issue タイトル記述規則）の役割別書式に従う（Root Case は Case 接頭辞書式。書式の具体と主題原則は同 Design を参照し、本手順では複製しない）
 3. 実行識別情報セクションを本文へ記録しない（Issue 本文には実行識別情報セクションを設けない。`agentdev-workflow-templates` Design「実行識別情報・検証差分のテンプレートセクション形式」節）
 4. `review_dispositions` は本文へ全件転記しない。採用内容（accepted disposition）は本文の該当章（対象範囲、実現方針、完了条件の検証方法）へ反映し、必要な採否理由だけをコメントへ残す
+4.5. 起票前重複確認（冪等検索の前置）: Root Case の起票（手順 5 の issue_create）に先立って、`agentdev_gh` の issue_list で既存オープン Issue に同一主題の Root Case が存在しないことを確認する。検索は STEP-5 の冪等キー検索と同一の基準（topic_slug + 主題語 + 対象 REQ 番号の複数トークン検索、ヒット 0 件時は主題語 + REQ 番号による二段検証）を起票前に前置して実施する。先行実行・中断再開で既存 Root Case を検出した場合は当該 Issue を正規 Root Case として再利用し、重複起票しない（起票後の STEP-5 検出を待たずに二重起票を排除する）
 5. 曖昧性が残らず Root Case を確立できる場合にのみ、`agentdev_gh` の issue_create で Root Case を作成する（VERIFY）
 6. `agentdev_gh` の issue_create の labels は Tool 契約上の必須フィールドであり、起票時は空配列以上を渡す。付与するラベル値の選択は任意である（検索・整理用ラベル〔work_type 等〕の任意付与契約は値の選択を指し、フィールド存在を免除しない）。起票時の既定付与は設けず、呼出側が都度判断する（検索・整理用ラベルの任意付与契約。正は対象要件定義の該当要件行）。構造・役割ラベルの物理写像は Tool 内部の責務であり本手順の対象外である
 7. Root Case 確立後の状態は open とし、実装開始を許可しない
@@ -106,6 +107,7 @@ Root Case 本文候補の生成は preflight 設定検証の警告報告後に�
 
 - GitHub Issue/PR を使用するリポジトリ種別では、preflight 設定検証が実施済みであり（設定無効・設定照会不能時は区別した警告が報告済みであり、設定理由だけでは後続処理を停止していないこと。実操作の安全性確認不能時は既存の安全契約に従って停止済みであること）、ローカル版ではスキップされていること
 - Root Case 作成前に前提整備の commit（入力 RU・要件doc draft・当該要件定義に伴い生成された git 管理契約の状態記録の未追跡分の明示パス指定 commit。未追跡分がない場合は確認結果の記録）が実施されており、スイープ操作を行っていないこと
+- Root Case 起票前に起票前重複確認（手順 4.5。冪等キー検索と同一基準の前置検索）が実施されており、既存 Root Case 検出時は当該 Issue の再利用が行われていること
 - 最初の docs 編集・GitHub 書込み（Root Case 本文候補の生成を含む）の前に extension rules の前置読込が実施されていること
 - Definition Package の docs 適用前に artifact_actions 適用前検証（採番衝突検査・target 系パス実在検証・可変メタデータ再実測・content 完全性検証・対応宣言集合一致検証）が実施され、差異検出時は適用中止と要件doc・RU への差し戻しが行われていること
 - REQ 行変更・対応宣言の追加・更新・移行を伴う場合は、STEP-3 の対応宣言集合一致前置確認（手順 4.6）が実施され、inline/sidecar 片側逸脱検出時の適用中断と報告が行われていること

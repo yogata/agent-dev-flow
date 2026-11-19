@@ -230,7 +230,7 @@ RU 構成案をユーザーに提示し、明示的な承認を得る。
 
 ## Jev 先行評価の逐次経路（Jev 先行評価の実運用組込み要件、Jev 先行評価採用の Decision）
 
-閉じた意味判断ごとに、次の基本判断経路（逐次経路）を実行できる。Jev は最終判断者ではなく、後段の LLM 推論への追加情報として扱う（Stage 1: 観測可能化）。
+本 Workflow の通常実行では Jev 先行評価を実行しない。Jev 先行評価（当該評価の観測の `.agentdev/jev-observations/` への永続化と最終判断の観測反映を含む逐次経路）は、利用者が当該実行に対して Jev 評価を明示的に指示した場合にのみ実行する（opt-in）。明示指示がない場合は閉じた意味判断を LLM 推論・LLM 最終判断（従来経路と同一の判断基準）のみで処理し、`.agentdev/jev-observations/` への観測 JSON を生成しない。Jev は最終判断者ではなく、後段の LLM 推論への追加情報として扱う（Stage 1: 観測可能化）。
 
 1. **Jev 先行評価**: Custom Tool `agentdev_jev` の `evaluate` に、本 Workflow が構成した閉じた判断入力（state、指示、基準、質問群。日本語。repository 全文を渡さない）を渡す。evaluator 成功後・LLM 推論へ進む前に、当該評価の観測（1 semantic evaluation = 1 observation）が `.agentdev/jev-observations/` へ永続化される
 2. **LLM 推論**: Jev 結果・候補別確率分布・取得できた confidence を情報として含み、従来の判断材料（promoted 実ファイル本文、文書7分類モデル、統合・分割判定基準、docs/knowledge/ 処置契約）も参照して推論する。Jev 結果だけで判断しない
