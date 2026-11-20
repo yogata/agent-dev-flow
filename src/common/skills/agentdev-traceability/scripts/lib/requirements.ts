@@ -1,6 +1,6 @@
 // 現行要件行IDの収集（docs/requirements/REQ-{NNNN}.md の要件テーブル行）。
 //
-// - 現行 REQ は docs/requirements/ 直下の REQ-\d+.md のみ（retired/ 等のサブディレクトリは廃止扱い）
+// - 現行 REQ は docs/requirements/ 直下の REQ-\d+.md のみ（サブディレクトリは対象外）
 // - 要件行は `| REQ-{NNNN}-{MMM} |` 形式のテーブル行として抽出する
 // - 収集順はファイル名順・出現順で決定的とする
 

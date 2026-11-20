@@ -11,7 +11,6 @@ import * as path from "path";
 import {
   CATALOG_BLOCK_ID,
   DECISION_BASELINE_TABLE_BLOCK_ID,
-  DECISION_RETIRED_TABLE_BLOCK_ID,
   findAutogenBlocks,
   generateCatalogEntries,
 } from "../generate_indexes.ts";
@@ -146,17 +145,6 @@ describe("classifyStaleness", () => {
     );
     expect(result.kind).toBe("status_change");
     expect(result.detail).toContain("Decision status changed");
-  });
-
-  test("Decision retired 同行 status 列変化は status_change", () => {
-    const result = classifyStaleness(
-      DECISION_RETIRED_TABLE_BLOCK_ID,
-      ["| DEC-001 | x | accepted |"],
-      ["| DEC-001 | x | superseded |"],
-      0,
-    );
-    expect(result.kind).toBe("status_change");
-    expect(result.detail).toContain("Retired Decision status changed");
   });
 
   test("行長さ同じ・表以外の変化は content_change", () => {

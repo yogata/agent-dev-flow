@@ -18,7 +18,6 @@ import { buildInventory } from "../../../../skills/agentdev-traceability/scripts
 import { isReqRowId, REQ_ROW_ID_LIST_PATTERN } from "../../../../skills/agentdev-workflow-case-open/scripts/lib/definition-traceability-gate.ts";
 import { readSharedAreaRegistration } from "../../../../skills/agentdev-workflow-case-open/scripts/lib/shared_area_registration.ts";
 import { runValidateInputOnly, validateInput } from "../../../../skills/agentdev-workflow-case-open/scripts/src/prepare_definition_pr.ts";
-import { countReqRequirementLines } from "../generate_indexes.ts";
 import { extractCurrentReqRefs } from "../../lib/current_refs.ts";
 
 // 前提ディレクトリの自動作成（worktree 等 .agentdev 未整備環境での mkdtempSync ENOENT fail を解消する）。
@@ -51,7 +50,6 @@ describe("TS-007/008 allocation and consumer round-trip", () => {
       expect(policy.issues).toEqual([]);
       expect(policy.optionalReqIds.has(id)).toBe(true);
       expect(buildInventory(fixtureRoot).discoveredCandidates).not.toContain(`docs/requirements/${reqId}.md`);
-      expect(countReqRequirementLines(body, reqId)).toBe(1);
       expect(checkSingleFile(`${reqId}.md`, body, "req").ok).toBe(true);
       const gate = join(process.cwd(), "src/common/skills/agentdev-traceability/scripts/src/check.ts");
       const command = (name: string, args: string[]) => ({ name, command: "bun", args, cwd: root });

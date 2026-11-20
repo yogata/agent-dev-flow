@@ -14,7 +14,6 @@
  * This test locks the root-cause fix (whole-line matching).
  */
 import { describe, it, expect, afterAll } from "bun:test";
-import { execSync } from "child_process";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
@@ -24,11 +23,8 @@ import {
   extractAutogenBeginId,
   findAutogenBlocks,
   replaceAutogenBlock,
-  countDesignBodyLines,
   deriveMeasureDateFromLastCommit,
-  deriveReqMetricsMeasureDate,
   collectDecisionFiles,
-  collectReqIdContext,
   extractRelatedReqNotes,
   findUndeclaredRelatedReqDecisions,
   formatRelatedReqCell,
@@ -242,86 +238,8 @@ describe("replaceAutogenBlock", () => {
   });
 });
 
-describe("countDesignBodyLines", () => {
-  it("excludes a real AUTOGEN block from the body count", () => {
-    const content = [
-      "---",
-      "title: Test",
-      "---",
-      "# Heading",
-      "",
-      "<!-- AUTOGEN:BEGIN:id=metrics -->",
-      "| col | val |",
-      "|---|---|",
-      "| a | b |",
-      "<!-- AUTOGEN:END -->",
-      "",
-      "After.",
-    ].join("\n");
-
-    const count = countDesignBodyLines(content);
-    expect(count).toBe(4);
-  });
-
-  it("counts a backtick-wrapped marker in prose as a body line (negative)", () => {
-    const content = [
-      "---",
-      "title: Test",
-      "---",
-      "# Heading",
-      "",
-      "AUTOGENブロックは`<!-- AUTOGEN:BEGIN:id=... -->`から対応する`<!-- AUTOGEN:END -->`までを除外する。",
-    ].join("\n");
-
-    const count = countDesignBodyLines(content);
-    expect(count).toBe(3);
-  });
-
-  it("handles mixed prose with backtick markers and a real AUTOGEN block", () => {
-    const content = [
-      "---",
-      "title: Test",
-      "---",
-      "# Design",
-      "",
-      "AUTOGENブロックは`<!-- AUTOGEN:BEGIN:id=... -->`から除外する。",
-      "",
-      "## Metrics",
-      "",
-      "<!-- AUTOGEN:BEGIN:id=spec-metrics -->",
-      "| Design | 行数 |",
-      "|---|---|",
-      "<!-- AUTOGEN:END -->",
-      "",
-      "Footer.",
-    ].join("\n");
-
-    const count = countDesignBodyLines(content);
-    expect(count).toBe(8);
-  });
-});
-
 // ─── 計測日導出（SC-002「計測日導出」、Issue #2211）───────────────────────
-// 対象ドキュメント群の最終コミット日付導出（実行時日付非依存）とメトリクス
-// ファイル自体の導出対象除外を固定する回帰テスト（IR-061 日次再検出の解消）。
-
-const TMP_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), "genidx-measure-date-"));
-
-function commitAllWithDate(root: string, message: string, date: string): void {
-  execSync("git add -A", { cwd: root });
-  execSync(`git commit -q -m "${message}" --no-verify`, {
-    cwd: root,
-    env: {
-      ...process.env,
-      GIT_AUTHOR_DATE: date,
-      GIT_COMMITTER_DATE: date,
-      GIT_AUTHOR_NAME: "test",
-      GIT_AUTHOR_EMAIL: "t@t",
-      GIT_COMMITTER_NAME: "test",
-      GIT_COMMITTER_EMAIL: "t@t",
-    },
-  });
-}
+// 対象ドキュメント群の最終コミット日付導出（実行時日付非依存）を固定する回帰テスト。
 
 describe("deriveMeasureDateFromLastCommit", () => {
   it("returns YYYY-MM-DD for a tracked file with commit history", () => {
@@ -355,38 +273,9 @@ describe("deriveMeasureDateFromLastCommit", () => {
   });
 });
 
-describe("deriveReqMetricsMeasureDate", () => {
-  const root = path.join(TMP_ROOT, "repo");
-  if (!fs.existsSync(root)) {
-    fs.mkdirSync(path.join(root, "docs", "requirements"), {
-      recursive: true,
-    });
-    execSync("git init -q -b main", { cwd: root });
-    fs.writeFileSync(path.join(root, ".gitattributes"), "* text=auto eol=lf\n", "utf-8");
-    execSync('git config user.email "t@t"', { cwd: root });
-    execSync('git config user.name "t"', { cwd: root });
-
-    fs.writeFileSync(
-      path.join(root, "docs", "requirements", "REQ-001.md"),
-      "# req\n",
-    );
-    commitAllWithDate(root, "add REQ-001", "2026-03-03T12:00:00+09:00");
-  }
-
-  it("derives req measure date from the REQ file group last commit", () => {
-    expect(
-      deriveReqMetricsMeasureDate(
-        root,
-        path.join(root, "docs", "requirements"),
-        [{ id: "REQ-001", num: 1, lineCount: 1, signal: "+0", note: "" }],
-      ),
-    ).toBe("2026-03-03");
-  });
-});
-
 // ─── Decision 関連REQ表（REQ-059-001..003）──────────────────────────────────
 // related_reqs 抽出（空宣言と未宣言の区別）、混合領域生成（説明列保持）、
-// retired REQ 注記、未宣言検出を固定する回帰テスト（Issue #2756）。
+// 未宣言検出を固定する回帰テスト（Issue #2756）。
 
 const RR_TMP_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), "genidx-related-req-"));
 
@@ -400,11 +289,8 @@ function writeDecision(dir: string, id: string, fmBody: string): void {
 
 describe("Decision related_reqs collection (REQ-059-001)", () => {
   const decDir = path.join(RR_TMP_ROOT, "decisions");
-  const reqDir = path.join(RR_TMP_ROOT, "requirements");
-  const reqRetiredDir = path.join(reqDir, "retired");
   if (!fs.existsSync(decDir)) {
     fs.mkdirSync(decDir, { recursive: true });
-    fs.mkdirSync(reqRetiredDir, { recursive: true });
     writeDecision(
       decDir,
       "DEC-001",
@@ -420,14 +306,6 @@ describe("Decision related_reqs collection (REQ-059-001)", () => {
       "DEC-003",
       'title: "T3"\nstatus: proposed\ncreated: "2026-01-01"\nupdated: "2026-01-01"',
     );
-    writeDecision(
-      decDir,
-      "DEC-004",
-      'title: "T4"\nstatus: accepted\nrelated_reqs: [REQ-013]\ncreated: "2026-01-01"\nupdated: "2026-01-01"',
-    );
-    fs.writeFileSync(path.join(reqDir, "REQ-002.md"), "# req\n", "utf-8");
-    fs.writeFileSync(path.join(reqDir, "REQ-009.md"), "# req\n", "utf-8");
-    fs.writeFileSync(path.join(reqRetiredDir, "REQ-013.md"), "# req\n", "utf-8");
   }
 
   it("parses a declared list, an empty declaration, and an undeclared field distinctly", () => {
@@ -444,37 +322,30 @@ describe("Decision related_reqs collection (REQ-059-001)", () => {
     expect(undeclared.map((d) => d.id)).toEqual(["DEC-003"]);
   });
 
-  it("formats active, retired-annotated, and empty cells", () => {
-    const ctx = collectReqIdContext(reqDir, reqRetiredDir);
-    expect(formatRelatedReqCell(["REQ-002", "REQ-009"], ctx)).toBe(
+  it("formats declared and empty cells", () => {
+    expect(formatRelatedReqCell(["REQ-002", "REQ-009"])).toBe(
       "[REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md)",
     );
-    expect(formatRelatedReqCell(["REQ-013"], ctx)).toBe(
-      "[REQ-013](../requirements/retired/REQ-013.md)（retired）",
-    );
-    expect(formatRelatedReqCell([], ctx)).toBe("-");
+    expect(formatRelatedReqCell([])).toBe("-");
   });
 
   it("generates a mixed-area table preserving hand-curated note cells", () => {
     const infos = collectDecisionFiles(decDir);
-    const ctx = collectReqIdContext(reqDir, reqRetiredDir);
     const notes = { "DEC-001": "人手判断列" };
-    const table = generateDecisionRelatedReqTable(infos, ctx, notes);
+    const table = generateDecisionRelatedReqTable(infos, notes);
     expect(table[0]).toBe("| Decision | 関連REQ | 説明 |");
     expect(table[2]).toContain("| DEC-001 | [REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md) | 人手判断列 |");
     expect(table[3]).toContain("| DEC-002 | - | - |");
-    expect(table[5]).toContain("[REQ-013](../requirements/retired/REQ-013.md)（retired）");
   });
 
   it("keeps generation idempotent for note cells (no data loss on re-run)", () => {
     const infos = collectDecisionFiles(decDir);
-    const ctx = collectReqIdContext(reqDir, reqRetiredDir);
     const notes = { "DEC-001": "人手判断列" };
-    const first = generateDecisionRelatedReqTable(infos, ctx, notes);
+    const first = generateDecisionRelatedReqTable(infos, notes);
     const secondNotes = extractRelatedReqNotes(
       ["## 関連 REQ", "", ...first, "", "## 次の節", ""].join("\n"),
     );
-    const second = generateDecisionRelatedReqTable(infos, ctx, secondNotes);
+    const second = generateDecisionRelatedReqTable(infos, secondNotes);
     expect(second).toEqual(first);
   });
 });
@@ -698,43 +569,6 @@ describe("supersede_note rendering normalization (Issue #3460, ACT-DESIGN-035)",
   });
 });
 
-describe("retired Decision restore handling (REQ-059-005)", () => {
-  const restoreDecDir = path.join(RR_TMP_ROOT, "restore", "decisions");
-  const restoreRetiredDir = path.join(restoreDecDir, "retired");
-
-  it("excludes retired decisions from collection and undeclared detection, then includes them after restore", () => {
-    fs.mkdirSync(restoreRetiredDir, { recursive: true });
-    writeDecision(
-      restoreRetiredDir,
-      "DEC-009",
-      'title: "T9"\nstatus: accepted\ncreated: "2026-01-01"\nupdated: "2026-01-01"',
-    );
-    const collectIds = () =>
-      collectDecisionFiles(restoreDecDir).map((d) => d.id);
-    const undeclaredIds = () =>
-      findUndeclaredRelatedReqDecisions(collectDecisionFiles(restoreDecDir))
-        .map((d) => d.id);
-
-    expect(collectIds()).not.toContain("DEC-009");
-    expect(undeclaredIds()).toEqual([]);
-
-    fs.renameSync(
-      path.join(restoreRetiredDir, "DEC-009.md"),
-      path.join(restoreDecDir, "DEC-009.md"),
-    );
-
-    expect(collectIds()).toContain("DEC-009");
-    expect(undeclaredIds()).toEqual(["DEC-009"]);
-
-    writeDecision(
-      restoreDecDir,
-      "DEC-010",
-      'title: "T10"\nstatus: accepted\nrelated_reqs: []\ncreated: "2026-01-01"\nupdated: "2026-01-01"',
-    );
-    expect(undeclaredIds()).toEqual(["DEC-009"]);
-  });
-});
-
 describe("doc_decision template related_reqs initial value (REQ-059-004)", () => {
   const repoRoot = findRepoRoot(import.meta.dir);
   const templateCandidates = [
@@ -877,11 +711,11 @@ function irFixture(id: string, relatedReq: string[]): ReturnType<typeof collectI
 describe("buildReqToIrIndex (REQ-047-013, B3-1 逆方向導出)", () => {
   it("collects file-level REQ ids per IR with numeric IR ordering", () => {
     const index = buildReqToIrIndex([
-      irFixture("IR-003", ["REQ-010-003", "REQ-010"]),
+      irFixture("IR-005", ["REQ-010-003", "REQ-010"]),
       irFixture("IR-001", ["REQ-010-001", "REQ-001"]),
     ]);
     expect([...index.keys()].sort()).toEqual(["REQ-001", "REQ-010"]);
-    expect(index.get("REQ-010")).toEqual(["IR-001", "IR-003"]);
+    expect(index.get("REQ-010")).toEqual(["IR-001", "IR-005"]);
   });
 
   it("skips v2 historical refs, annotation cells and non-REQ ids", () => {
@@ -973,7 +807,6 @@ describe("skill-projection-manifest regeneration (REQ-047-013, B3-3)", () => {
 });
 
 afterAll(() => {
-  fs.rmSync(TMP_ROOT, { recursive: true, force: true });
   fs.rmSync(RR_TMP_ROOT, { recursive: true, force: true });
   fs.rmSync(SUP_TMP_ROOT, { recursive: true, force: true });
   fs.rmSync(B31_TMP_ROOT, { recursive: true, force: true });

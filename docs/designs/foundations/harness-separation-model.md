@@ -62,7 +62,7 @@ AgentDevFlow 配布物と harness 実行制御の責務分離モデルを定義�
 - プロジェクトルート `AGENTS.md`: harness 選定、エージェント型指定
 - 各 skill の `references/<topic>.md`: skill 固有の実行制御具体（エージェント型名、起動方法、timeout、並列度、再試行等）
 
-上記 harness 側の実行制御は、`responsibility-boundary-purification.md` が定義する「harness execution mechanism」（agent 起動、background task、並列実行、context 管理）として ADF 規範所有対象外である（REQ-011-018）。
+上記 harness 側の実行制御は、「harness execution mechanism」（agent 起動、background task、並列実行、context 管理）として ADF 規範所有対象外である（REQ-011-018）。
 本 Design は harness execution mechanism の境界宣言のみを所有し、起動 API、並列数、timeout 等の具体は各 skill の `references/` へ集約する。
 external execution boundary（外部バックエンド接続）は REQ-011 が正規所有する（REQ-011-017）。
 
@@ -90,7 +90,7 @@ case-auto の orchestration stage（stage 1 case-open・stage 2 case-ready・sta
 bg task API、実行エージェント選定、実行担当サブエージェント内部の推論、context 管理、再試行、heartbeat、エラー解析は harness 側の所有とする（harness execution mechanism、ADF 規範所有対象外、REQ-011-018）。
 共有状態への書き込み（main push、capture、commit、同一 Epic Issue 本文等）は競合部分のみを局所的に直列化する AgentDevFlow 側の契約（REQ-034-026）とし、bg task API 経由の実行制御は harness 側の責務として維持する。
 
-工程別の所有対象、非所有対象の詳細リストは `docs/designs/responsibilities/responsibility-boundary-purification.md` を正規所有者とする。
+工程別の所有対象、非所有対象の所有権は `docs/designs/workflows/delegation-contracts.md`「case 実行責務の 4 用語と委譲」が正規所有者とする。
 
 ## 参照実装
 
@@ -150,5 +150,4 @@ AgentDevFlow 配布command / Workflow Skill / Design は ToDo を必須機構と
 - v2:ADR-0136（配布物の harness 実行制御分離）: 吸収元。決定本質は charter 決定2 に先駆的適用として含まれる。
 - v2:REQ-0162（配布物の harness 実行制御分離）: 吸収元。原則の SSoT と各要件行（4状態結果契約、配布 docs 制約、ADF 可観測タイムスタンプ境界、ID 除去、パス除去）を本 Design および REQ-002 へ統合した。
 - v2:ADR-0114（case-run 実行責務の外部実行バックエンド委譲）: 吸収元。harness 選定領域に降格された実行制御側の知見を取り込み、result 4状態契約の前身である委譲モデルを本 Design の前段として位置づける。
-- `docs/designs/workflows/delegation-contracts.md`: 委譲契約詳細（delegation envelope、委譲種別、adversarial-review 接続）の正規所有者。result 4 状態は lifecycle-state-machine、authority・副作用は runtime-execution-model が正である。
-- `docs/designs/responsibilities/responsibility-boundary-purification.md`: 工程別（case-auto、case-run、execution adapter、Project Extensions、タイムスタンプ）の所有/非所有リスト詳細。
+- `docs/designs/workflows/delegation-contracts.md`: 委譲契約詳細（delegation envelope、委譲種別、adversarial-review 接続）の正規所有者。result 4 状態は lifecycle-state-machine、authority・副作用は runtime-execution-model、case 実行責務の 4 用語の所有権は同 Design「case 実行責務の 4 用語と委譲」節が正である。

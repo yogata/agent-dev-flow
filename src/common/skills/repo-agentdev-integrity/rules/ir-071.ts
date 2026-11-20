@@ -41,7 +41,6 @@ export const ir071: IntegrityRule = {
   targetGlobs: [
     "docs/designs/integrity/rules/**",
     "docs/requirements/*.md",
-    "docs/requirements/retired/*.md",
   ],
   globalScan: false,
   severity: "strict",
@@ -69,8 +68,8 @@ export const ir071: IntegrityRule = {
           filePath: file.path,
           message: `Phantom related_req '${rawId}' in integrity rule ${irId}: referenced REQ does not exist as a requirement row or file (REQ-051-009, IR-071)`,
           remediationHint: isRowId
-            ? `${rawId} must exist as a requirement row in docs/requirements (current or retired)`
-            : `${rawId} must exist as docs/requirements/${rawId}.md (current or retired)`,
+            ? `${rawId} must exist as a requirement row in docs/requirements`
+            : `${rawId} must exist as docs/requirements/${rawId}.md`,
         });
       }
     }

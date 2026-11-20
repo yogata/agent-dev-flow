@@ -335,14 +335,8 @@ describe("現行要件行の収集", () => {
       "| REQ-901-001 | 例 |",
       "| REQ-901-002 | 例 |",
     ]);
-    writeFixture("docs/requirements/retired/REQ-902.md", [
-      "| ID | 要件 |",
-      "|---|---|",
-      "| REQ-902-001 | 廃止 |",
-    ]);
     const ids = currentRequirementLineIds(ROOT);
     expect(ids).toContain("REQ-901-001");
     expect(ids).toContain("REQ-901-002");
-    expect(ids).not.toContain("REQ-902-001"); // retired/ は対象外
   });
 });

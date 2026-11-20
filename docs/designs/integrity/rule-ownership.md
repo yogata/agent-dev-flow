@@ -17,7 +17,7 @@ updated: "2026-11-18"
 本ファイル（ルールドメイン → canonical REQ/Design）と `../responsibilities/req-impact-map.md`（REQ → 影響するルール/アーティファクト）は逆方向の対応マップである。両者の整合性維持運用:
 
 - IR 別関連マッピング（本ファイルの `rule-ownership-ir-crossref` AUTOGEN ブロック）と req-impact-map の REQ → 影響する Rule IDs（`req-impact-map-req-ir-crossref` AUTOGEN ブロック）は、いずれも IR 文書の frontmatter / Field-Value 表の related_req から `generate_indexes.ts` が自動生成する。新規 IR 追加時は IR 文書の related_req を更新すれば両ブロックが自動追随し、対応行列の手動同期義務はない（「対応表の機械検証への移行（B3-1）」節、REQ-047-013）
-- IR の物理削除時（AG-008、retired REQ-028-008）: IR 文書の物理削除に伴い両 AUTOGEN ブロックから自動除外される。交叉参照は `../responsibilities/req-impact-map.md` の Retired cross-references 節へ再配置する（人手管理を維持する節）
+- IR の削除時: 両 AUTOGEN ブロックから自動で除外される。現行文書の参照も削除する。
 - canonical owner 変更時: 対応する IR 文書の related_req / related_design を更新し、次回の `generate_indexes.ts` 実行で両ブロックへ反映する
 - 新規 REQ 追加、廃止時: REQ README 系の AUTOGEN（docs/requirements/README.md 等）と req-impact-map の導出ビューが実ファイル状態から自動更新される。影響先ルールドメインと rule-ownership.md の整合は IR-061 検査が機械検証する
 
@@ -118,7 +118,6 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 |-------|-------|-------------|--------------|
 | IR-001 | 現行 REQ frontmatter id ↔ ファイル名 | REQ-010-001, REQ-001 | integrity-contracts.md |
 | IR-002 | 現行 REQ 必須 frontmatter fields | REQ-010-001 | integrity-contracts.md |
-| IR-003 | Active/廃止 REQ ID 重複 | REQ-010 | integrity-contracts.md |
 | IR-004 | REQ index ↔ 現行 REQ 一致 | REQ-010-003 | integrity-contracts.md |
 | IR-007 | Skill frontmatter name ↔ dir | REQ-010 | integrity-contracts.md |
 | IR-008 | Skill references/ 存在 | REQ-036-008 | integrity-contracts.md |
@@ -142,7 +141,6 @@ IR-* ファイル（`rules/IR-NNN-*.md`）の frontmatter / Field/Value 表か�
 | IR-075 | ir-file-size | - | - |
 <!-- AUTOGEN:END -->
 
-> **IR-019, IR-022, IR-026, IR-036 について（2026-08-11 移管）**: 4件の意味判断系 IR は docs-check 機械検出層から除外し、inspect/diagnostics 層（inspect-docs workflow、Capability `agentdev-inspect-skills` の診断観点）へ移管した（文意品質の意味診断は docs 横断診断・inspect 系診断が、文章表層品質は textlint 共通基盤が担う。retired REQ-028-007、DEC-006、Phase 3 §5.2）。
 > 詳細は `integrity-rule-catalog.md`「IR-019, IR-022, IR-026, IR-036: inspect-docs 移管」節を参照。
 
 ## 重複ルールの解消状況

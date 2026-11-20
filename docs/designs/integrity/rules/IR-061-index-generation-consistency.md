@@ -21,8 +21,6 @@ SC-002 Design（`docs/designs/integrity/index-auto-generation.md`）が定める
 - `docs/designs/README.md`
 - `docs/designs/integrity/integrity-rule-catalog.md`
 - `docs/designs/integrity/rule-ownership.md`
-- `docs/designs/quality/req-health-metrics.md`
-- `docs/designs/quality/design-health-metrics.md`
 
 ## 検出方法
 

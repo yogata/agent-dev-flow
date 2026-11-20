@@ -1,11 +1,10 @@
 // rules/index.ts — 全ルールのレジストリ（カタログ自動生成の単一ソース）。
 // 契約所有: docs/designs/integrity/integrity-engine-plugin-architecture.md
-// 「カタログ自動生成（単一ソース）」。残存 24 ルール + IR-075（Wave-4 登録・REQ-122-011）。
+// 「カタログ自動生成（単一ソース）」。残存 23 ルール + IR-075（Wave-4 登録・REQ-122-011）。
 
 import type { IntegrityRule } from "../engine/types.ts";
 import { ir001 } from "./ir-001.ts";
 import { ir002 } from "./ir-002.ts";
-import { ir003 } from "./ir-003.ts";
 import { ir004 } from "./ir-004.ts";
 import { ir007 } from "./ir-007.ts";
 import { ir008 } from "./ir-008.ts";
@@ -28,11 +27,10 @@ import { ir070 } from "./ir-070.ts";
 import { ir071 } from "./ir-071.ts";
 import { ir075 } from "./ir-075.ts";
 
-/** 残存 24 コアルール + IR-075 のレジストリ（IR 番号順）。 */
+/** 残存 23 コアルール + IR-075 のレジストリ（IR 番号順）。 */
 export const rules: IntegrityRule[] = [
   ir001,
   ir002,
-  ir003,
   ir004,
   ir007,
   ir008,

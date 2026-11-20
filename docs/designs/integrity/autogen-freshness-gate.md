@@ -8,13 +8,13 @@ updated: "2026-09-21"
 # AUTOGEN ブロック鮮度検出 gate
 
 `/repo/docs-check` は repo-local コマンドであり配布対象外 Design を持たないため、AUTOGEN ブロック鮮度検出 gate を本新規 Design として配置する。
-AUTOGEN ブロックを含む索引ファイル（design-health-metrics.md 等）の陳腐化を検出し、再生成を促す契約を定義する。
+AUTOGEN ブロックを含む索引ファイルの陳腐化を検出し、再生成を促す契約を定義する。
 本 Design は gate の契約を定義し、検出ロジックの実装詳細はスクリプト側が担う（機械化境界、charter 原則）。
 
 ## 検出対象
 
 - AUTOGEN ブロック（`<!-- AUTOGEN:BEGIN:id=xxx -->` 〜 `<!-- AUTOGEN:END -->`）を含む索引ファイル群
-- 代表例: `docs/designs/quality/design-health-metrics.md`（Design 計測例 AUTOGEN ブロック）
+- 代表例: `docs/requirements/README.md`（現行要件一覧）
 - 対象一覧は SC-002（`docs/designs/integrity/index-auto-generation.md`）が定める自動生成対象ファイルと同一
 
 ### 廃止済み成果物を前提とする block ID の棚卸し規定

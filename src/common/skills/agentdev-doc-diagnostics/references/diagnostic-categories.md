@@ -84,7 +84,7 @@ inspect-docs command が実行する docs 横断診断のカテゴリ定義と�
 
 - 複数 REQ を横断比較し、関心の重複、境界の曖昧さを検出する
 - 1 REQ に複数の関心対象、複数成果物種別、複数 command family、複数 lifecycle 段階が混在していないかを走査する
-- 要件行数、関心分類数、成果物種別数の定量閾値は req-health-metrics Design が所有する
+- 要件行数、関心分類数、成果物種別数の定量閾値は `agentdev-req-structure-diagnostics`（SPLIT 定量閾値）が所有する
 
 ### ルーティング先
 

@@ -9,7 +9,7 @@ import type {
 
 export const REQ_ROW_ID_RE = /(?<!v2:)(?<![\w-])REQ-(\d+)-(\d+)(?![\w-])/g;
 
-/** docs/requirements（現行+retired）の REQ テーブル行から行 ID 集合を構築する。 */
+/** docs/requirements の REQ テーブル行から行 ID 集合を構築する。 */
 export function buildReqRowIndex(ctx: IntegrityContext): Set<string> {
   const rows = new Set<string>();
   for (const file of ctx.getFilesByGlob("docs/requirements/**/*.md")) {
@@ -75,8 +75,6 @@ const TARGET_GLOBS = [
 ] as const;
 
 const EXCLUDES = [
-  "docs/requirements/retired/",
-  "docs/decisions/retired/",
   "docs/reports/",
   "src/common/commands/agentdev/templates/",
 ];

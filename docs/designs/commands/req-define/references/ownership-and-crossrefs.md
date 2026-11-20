@@ -21,6 +21,5 @@ updated: "2026-11-19"
 - [workflows/lifecycle-state-machine.md](../workflows/lifecycle-state-machine.md)（フェーズ定義、SSoT 遷移）
 - [workflows/delegation-contracts.md](../workflows/delegation-contracts.md)（extraction / classification 委譲）
 - [workflows/collaboration-loop.md](../workflows/collaboration-loop.md)（ループ統合: RU または明示入力ファイル経由の入力経路。v3 ライフサイクル Design からの吸収記録〔artifact_actions ベース工程分岐の帰属〕）
-- [req-health-metrics.md](../quality/req-health-metrics.md)（SPLIT 予兆計測閾値）
 - [quality-gate-model.md](../quality/quality-gate-model.md)（QG-1）
 - [document-type-responsibilities.md](../responsibilities/document-type-responsibilities.md)（draft body 品質検査）

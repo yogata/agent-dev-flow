@@ -10,7 +10,6 @@ import { checkKnownCorruptionLiterals } from "../../lib/builtin-checks.ts";
 import { detectDuplicateSidecarKeys, parseSidecar } from "../../../../skills/agentdev-traceability/scripts/lib/sidecar.ts";
 import { ir001 } from "../../rules/ir-001.ts";
 import { ir002 } from "../../rules/ir-002.ts";
-import { ir003 } from "../../rules/ir-003.ts";
 import { ir004 } from "../../rules/ir-004.ts";
 import { ir007 } from "../../rules/ir-007.ts";
 import { ir008 } from "../../rules/ir-008.ts";
@@ -253,25 +252,6 @@ describe("IR-002: 現行 REQ 必須 frontmatter fields", () => {
     const violations = ir002.check(ctx);
     expect(violations.length).toBe(1);
     expect(violations[0]?.message).toContain("updated");
-  });
-});
-
-describe("IR-003: Active/廃止 REQ ID 重複", () => {
-  test("異常系: active と retired の両方に存在する ID は違反", () => {
-    const ctx = new MemoryContext("/repo", {
-      "docs/requirements/REQ-001.md": REQ_MD_OK,
-      "docs/requirements/retired/REQ-001.md": REQ_MD_OK,
-    });
-    const violations = ir003.check(ctx);
-    expect(violations.some((v) => v.message.includes("both active and retired"))).toBe(true);
-  });
-
-  test("正常系: retired への歴史文脈参照は違反にならない", () => {
-    const ctx = new MemoryContext("/repo", {
-      "docs/requirements/retired/REQ-090.md": REQ_MD_OK,
-      "docs/guides/charter.md": "# 指針\n\nREQ-090 は retired（廃止）済みである。\n",
-    });
-    expect(ir003.check(ctx)).toEqual([]);
   });
 });
 

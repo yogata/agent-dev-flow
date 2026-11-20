@@ -28,7 +28,7 @@ updated: "2026-11-18"
 |-----|---------|------------------|
 | [REQ-001](../../requirements/REQ-001.md) | 文書体系と持続可能な基準構造 | IR-001, IR-024, IR-044 |
 | [REQ-002](../../requirements/REQ-002.md) | 配布成果物の責務境界 | IR-056, IR-058 |
-| [REQ-010](../../requirements/REQ-010.md) | 自己監査コマンド（docs-check） | IR-001, IR-002, IR-003, IR-004, IR-007, IR-024, IR-044, IR-062, IR-063, IR-064, IR-067, IR-068, IR-070 |
+| [REQ-010](../../requirements/REQ-010.md) | 自己監査コマンド（docs-check） | IR-001, IR-002, IR-004, IR-007, IR-024, IR-044, IR-062, IR-063, IR-064, IR-067, IR-068, IR-070 |
 | [REQ-011](../../requirements/REQ-011.md) | I/O境界と外部連携手段 | IR-053 |
 | [REQ-018](../../requirements/REQ-018.md) | worktree 構造的制約とテスト fallback | IR-068 |
 | [REQ-029](../../requirements/REQ-029.md) | 配布依存境界 | IR-055, IR-059 |
@@ -44,7 +44,6 @@ REQ 全体ではなく要件行粒度で境界基準、検出観点の影響を�
 
 従来の配布依存境界関連の旧行群（`REQ-002-021..026`、`032` 相当。現行 corpus には存在しない行）に紐づいていた影響エントリは MOVE 先（REQ-029-001..008）へ差し替え済みである。
 REQ-002-027 は更新後の意味（実行時依存として使用するパスは導入先環境で解決可能）へ差し替えた。
-旧配布物品質契約行（`REQ-002-028/029/035` 相当、現行 corpus には存在しない行。DEC-014 決定6）は RETIRE 扱いとし、それぞれの検査（構文健全性、責務整合、case-auto.md 段階解消）は既存品質契約（`integrity/docs-spec-rebuild-integrity.md`、`responsibilities/document-type-responsibilities.md`、`quality/req-health-metrics.md`）と Epic 完了条件へ集約した（REQ-007 行は新設しない）。
 詳細は Retired cross-references 節へ追記する。
 
 | 要件行 | 影響するアーティファクト / スキル / コマンド | 経由 |
@@ -80,7 +79,6 @@ DEC-013 AG-008 適用により file-backed tombstone（IR-011 型）を物理削
 ## Retired cross-references
 
 廃止 IR の交叉参照（v2:REQ-NNN 等）を再配置する節。
-AG-008（retired REQ-028-008）に基づき、file-backed tombstone の物理削除時に交叉参照を本節へ移行する。
 各エントリは廃止 IR ID、旧交叉参照、再配置日、後続 REQ 等のメタデータを持つ（Phase 3 §7.3、`docs/reports/integrity/audits/cross-cutting-integration-design-20260811.md`）。
 
 ### IR-011 削除に伴う交叉参照再配置

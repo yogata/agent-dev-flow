@@ -22,7 +22,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 77件、廃止済み: 19件
+REQ: 77件
 <!-- AUTOGEN:END -->
 
 現行要件は79件である。
@@ -234,15 +234,12 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 - [成果物責任表](designs/responsibilities/artifact-responsibilities.md)
 - [アーティファクト契約](designs/responsibilities/artifact-contracts.md)
 - [REQ 影響マップ](designs/responsibilities/req-impact-map.md)
-- [責務境界浄化](designs/responsibilities/responsibility-boundary-purification.md)
 - [Artifact Quality Control Routing](designs/responsibilities/artifact-quality-control-routing.md)
 - [Custom Tool 操作契約](designs/responsibilities/custom-tool-contracts.md)
 
-#### quality/（品質、メトリクス）
+#### quality/（品質）
 
 - [品質仕様](designs/quality/quality-specs.md)
-- [REQ 健全性メトリクス](designs/quality/req-health-metrics.md)
-- [Design 健全性メトリクス](designs/quality/design-health-metrics.md)
 - [ADF v4 Quality / Verification / Evidence / Gate モデル](designs/quality/quality-gate-model.md)
 
 #### integrity/（整合性契約、ルール）

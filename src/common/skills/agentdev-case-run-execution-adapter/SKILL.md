@@ -48,7 +48,7 @@ case-run (orchestration)
 
 ## external execution boundary と harness execution mechanism
 
-本 adapter skill は external execution boundary への委譲契約を使用し、harness execution mechanism を ADF 規範所有対象外として扱う。区分と正規所有者の一覧、外部成果物（PR URL 受領・中間成果物非依存）の取扱いの詳細は [references/execution-boundary-terms.md](references/execution-boundary-terms.md) を参照（遅延読み込み）。用語の正規定義と所有者は responsibility-boundary-purification Design「case 実行責務の 4 用語と所有者」を SSoT とする。
+本 adapter skill は external execution boundary への委譲契約を使用し、harness execution mechanism を ADF 規範所有対象外として扱う。区分と正規所有者の一覧、外部成果物（PR URL 受領・中間成果物非依存）の取扱いの詳細は [references/execution-boundary-terms.md](references/execution-boundary-terms.md) を参照（遅延読み込み）。用語の正規定義と所有者は delegation-contracts Design「case 実行責務の 4 用語と委譲」を SSoT とする。
 
 ## 実行担当サブエージェントの責務
 
@@ -232,6 +232,5 @@ capture 境界の詳細は `agentdev-workflow-orchestration` を参照。
 
 - **agentdev-workflow-orchestration**: サブエージェントプロトコル、capture 境界
 - **agentdev-workflow-templates**: PR 本文、コメント SSoT のテンプレート構造
-- **Design `delegation-contracts.md`**: 委譲契約横断 Design、case 実行責務の 4 用語
-- **Design `responsibility-boundary-purification.md`**: case 実行責務の 4 用語と所有者 SSoT
+- **Design `delegation-contracts.md`**: 委譲契約横断 Design、case 実行責務の 4 用語と所有者 SSoT
 - **references/harness-delegation.md**: 委譲起動、category 設計、異常終了回復の具象実装ノート

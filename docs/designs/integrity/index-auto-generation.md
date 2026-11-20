@@ -109,11 +109,8 @@ AUTOGEN block ID は `{target}-{section}-{subsection}` 形式に従う。
 | `decision-baseline-count`, `decision-baseline-table` | decisions/README.md |
 | `decision-status-accepted` 等（proposed/superseded/deprecated） | decisions/README.md |
 | `decision-status-accepted` 等（superseded 行の部分置換注記） | decisions/README.md |
-| `decision-retired-table` | decisions/README.md |
 | `decision-related-req-table` | decisions/README.md |
-| `req-active-count`, `req-active-table`, `req-retired-table` | requirements/README.md |
-| `req-metrics-measurement-example` | quality/req-health-metrics.md |
-| `spec-metrics-measurement-example` | quality/design-health-metrics.md |
+| `req-active-count`, `req-active-table` | requirements/README.md |
 | `readme-req-summary-count` | README.md |
 | `readme-req-summary-table` | README.md |
 | `readme-decision-summary-table` | README.md（Decision 静的表のデータ行。対象: docs/README.md L87-129 相当の 43 行） |
@@ -136,19 +133,6 @@ rule-ownership appendix は IR 別関連マッピング表を CSV ライクな M
 
 ヘッダー行と分離行は固定（`| IR ID | title | Related REQ | Related Design |` / `|-------|-------|-------------|--------------|`）。
 セル内にパイプ・改行が現れる場合は表構造を保持するためサニタイズする（catalog と同一規則）。
-
-### Design 行数計測の AUTOGEN ブロック除外
-
-Design 健全性メトリクス（`design-health-metrics.md`「Design 計測例」）は Design 本文行数を計測する。
-計測対象 Design 自体に AUTOGEN ブロックが含まれる場合、AUTOGEN ブロックを行数計測対象から除外する。
-
-除外により以下の2要件を両立する。
-
-- Design 健全性: 人手執筆部分の肥大化検出を維持する（AUTOGEN 由来の行数は人手執筆ではない）
-- べき等性: AUTOGEN ブロック自身が計測結果に影響しない。AUTOGEN ブロックのサイズ変動が Design 行数シグナルへ伝播する自己増幅ループを防止する
-
-対象は AUTOGEN ブロック（`<!-- AUTOGEN:BEGIN:id=xxx -->` 〜 `<!-- AUTOGEN:END -->`）のみ。
-一般 HTML コメント（`<!-- ... -->`、複数行可）も同一規則で除外するが、コメント開始/終了と同一行にある本文は除外せず残置する。
 
 ## 人手編集領域と自動生成領域の分離
 
@@ -235,7 +219,6 @@ backtick 文脈判定のような部分一致ロジックは併用しない。
   - `docs/requirements/README.md`
   - `docs/decisions/README.md`
   - `docs/designs/README.md`
-  - `docs/designs/quality/req-health-metrics.md`
   - `docs/designs/integrity/integrity-rule-catalog.md`
   - `docs/designs/integrity/rule-ownership.md`
 - 語彙追随の検証経路の正は vocabulary-registry.md「旧語彙除去の検証経路（REQ-103-022）」節であり、本 Design は索引再生成の機構契約のみを扱う（重複所有しない）
@@ -267,13 +250,7 @@ Decision README 関連REQ表は自動生成（混合領域）へ移行済みで�
   （3領域への更新）を更新し、generate_indexes.ts への生成処理追加、IR-061 系整合検査の
   拡張を同一 Case で実施する
 
-decisions/README.md の関連REQ列は Decision frontmatter の related_reqs から再生成される
-ため後継情報を載せられず（retired REQ リンクは（retired）付きで関連REQ列に残存する）、
-後継・retired の事実は README 説明列（人手判断列）で補記する。
-- retired REQ に関連 Decision が存在する場合、該当 Decision 行の説明列へ後継・retired の
-  事実を補記する（例: DEC-007（過去経緯の履歴記録）（歴史的経緯の記録としての引用）/013/017 の既存補記）
-- 補記の網羅性は retired 発生時・復帰時に確認する。機械検出対象外の運用情報であるため、
-  網羅性確認は retired 登録操作とセットで行う
+- `related_reqs` には現行 REQ を宣言する。
 - 説明列（人手判断列）の編集は AUTOGEN ブロック外で行い、自動生成結果と矛盾させない
 
 ## AUTOGEN計測日の導出基準

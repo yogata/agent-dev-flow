@@ -727,7 +727,7 @@ function extractDecisionInfo(
 }
 
 /**
- * docs/decisions/ 配下の DEC-*.md を収集し、番号順に返す（retired/ 除く）。
+ * docs/decisions/ 配下の DEC-*.md を収集し、番号順に返す。
  */
 export function collectDecisionFiles(decisionsDir: string): DecisionInfo[] {
   const files = listFiles(decisionsDir).filter((f) => /^DEC-\d+\.md$/.test(f));
@@ -735,23 +735,6 @@ export function collectDecisionFiles(decisionsDir: string): DecisionInfo[] {
   for (const f of files) {
     const fullPath = path.join(decisionsDir, f);
     const info = extractDecisionInfo(fullPath, f);
-    if (info) infos.push(info);
-  }
-  infos.sort((a, b) => a.num - b.num);
-  return infos;
-}
-
-/**
- * docs/decisions/retired/ 配下の DEC-*.md を収集し、番号順に返す。
- */
-export function collectRetiredDecisionFiles(
-  retiredDir: string,
-): DecisionInfo[] {
-  const files = listFiles(retiredDir).filter((f) => /^DEC-\d+\.md$/.test(f));
-  const infos: DecisionInfo[] = [];
-  for (const f of files) {
-    const fullPath = path.join(retiredDir, f);
-    const info = extractDecisionInfo(fullPath, `retired/${f}`);
     if (info) infos.push(info);
   }
   infos.sort((a, b) => a.num - b.num);
@@ -785,7 +768,7 @@ function extractReqInfo(
 }
 
 /**
- * docs/requirements/ 配下の REQ-*.md を収集し、番号順に返す（retired/ 除く）。
+ * docs/requirements/ 配下の REQ-*.md を収集し、番号順に返す。
  */
 export function collectReqFiles(reqDir: string): ReqInfo[] {
   const files = listFiles(reqDir).filter((f) => /^REQ-\d+\.md$/.test(f));
@@ -793,21 +776,6 @@ export function collectReqFiles(reqDir: string): ReqInfo[] {
   for (const f of files) {
     const fullPath = path.join(reqDir, f);
     const info = extractReqInfo(fullPath, f);
-    if (info) infos.push(info);
-  }
-  infos.sort((a, b) => a.num - b.num);
-  return infos;
-}
-
-/**
- * docs/requirements/retired/ 配下の REQ-*.md を収集し、番号順に返す。
- */
-export function collectRetiredReqFiles(retiredDir: string): ReqInfo[] {
-  const files = listFiles(retiredDir).filter((f) => /^REQ-\d+\.md$/.test(f));
-  const infos: ReqInfo[] = [];
-  for (const f of files) {
-    const fullPath = path.join(retiredDir, f);
-    const info = extractReqInfo(fullPath, `retired/${f}`);
     if (info) infos.push(info);
   }
   infos.sort((a, b) => a.num - b.num);
@@ -835,7 +803,6 @@ export const DECISION_STATUS_SUPERSEDED_BLOCK_ID =
   "decision-status-superseded";
 export const DECISION_STATUS_DEPRECATED_BLOCK_ID =
   "decision-status-deprecated";
-export const DECISION_RETIRED_TABLE_BLOCK_ID = "decision-retired-table";
 
 // Decision README 関連REQ表（REQ-059-002、REQ-059-003）。
 // 混合領域構成: 生成処理は Decision 列と関連REQ列のみ上書きし、
@@ -926,64 +893,15 @@ export function generateDecisionStatusList(
     });
 }
 
-/**
- * 廃止済み Decision 履歴ビュー表（ヘッダー + retired DEC 行）。3列構成は
- * ADR 系 retired table と同一（retired frontmatter に引き継ぎ先フィールドが無い）。
- */
-export function generateDecisionRetiredTable(
-  retiredDecisions: DecisionInfo[],
-): string[] {
-  const lines: string[] = [];
-  lines.push("| Decision番号 | タイトル | retired時ステータス |");
-  lines.push("|---------|---------|-------------------|");
-  for (const info of retiredDecisions) {
-    lines.push(
-      `| [${info.id}](${info.relPath}) | ${sanitizeTableCell(info.title)} | ${info.status} |`,
-    );
-  }
-  return lines;
-}
-
 // ─── Decision 関連REQ表生成 (REQ-059-002) ──────────────────────────────────
 
-/** REQ 識別子の実在コンテキスト（active と retired の区別）。 */
-export interface ReqLinkContext {
-  active: Set<string>;
-  retired: Set<string>;
-}
-
-export function collectReqIdContext(
-  reqDir: string,
-  reqRetiredDir: string,
-): ReqLinkContext {
-  const ctx: ReqLinkContext = { active: new Set(), retired: new Set() };
-  for (const f of listFiles(reqDir).filter((f) => /^REQ-\d+\.md$/.test(f))) {
-    ctx.active.add(`REQ-${f.slice(4, -3)}`);
-  }
-  for (const f of listFiles(reqRetiredDir).filter((f) => /^REQ-\d+\.md$/.test(f))) {
-    ctx.retired.add(`REQ-${f.slice(4, -3)}`);
-  }
-  return ctx;
-}
-
 /**
- * 関連REQ列のセル（frontmatter related_reqs 由来）。
- * retired REQ（現行配置に存在しない retired/ のみ）は retired/ へリンクし
- * retired-req-link-annotation 契約（check_integrity.ts LinkIntegrity）に従い
- * 同一セル内へ retired 注記を付与する。空宣言は "-"。
+ * 関連REQ列のセル（frontmatter related_reqs 由来）。空宣言は "-"。
  */
-export function formatRelatedReqCell(
-  relatedReqs: string[],
-  ctx: ReqLinkContext,
-): string {
+export function formatRelatedReqCell(relatedReqs: string[]): string {
   if (relatedReqs.length === 0) return "-";
   return relatedReqs
-    .map((reqId) => {
-      if (ctx.retired.has(reqId) && !ctx.active.has(reqId)) {
-        return `[${reqId}](../requirements/retired/${reqId}.md)（retired）`;
-      }
-      return `[${reqId}](../requirements/${reqId}.md)`;
-    })
+    .map((reqId) => `[${reqId}](../requirements/${reqId}.md)`)
     .join(", ");
 }
 
@@ -1031,14 +949,13 @@ export function findUndeclaredRelatedReqDecisions(
  */
 export function generateDecisionRelatedReqTable(
   decisions: DecisionInfo[],
-  ctx: ReqLinkContext,
   notes: Record<string, string>,
 ): string[] {
   const lines: string[] = [];
   lines.push("| Decision | 関連REQ | 説明 |");
   lines.push("|-----|---------|------|");
   for (const info of decisions) {
-    const cell = formatRelatedReqCell(info.relatedReqs ?? [], ctx);
+    const cell = formatRelatedReqCell(info.relatedReqs ?? []);
     const note = sanitizeTableCell(notes[info.id] ?? "-");
     lines.push(`| ${info.id} | ${cell} | ${note} |`);
   }
@@ -1049,7 +966,6 @@ export function generateDecisionRelatedReqTable(
 
 export const REQ_ACTIVE_COUNT_BLOCK_ID = "req-active-count";
 export const REQ_ACTIVE_TABLE_BLOCK_ID = "req-active-table";
-export const REQ_RETIRED_TABLE_BLOCK_ID = "req-retired-table";
 
 /**
  * 現行要件の件数表明キャプション（1行）。
@@ -1080,21 +996,6 @@ export function generateReqActiveTable(
   return lines;
 }
 
-/**
- * 廃止済み要件一覧表（ヘッダー + retired REQ 行）。
- */
-export function generateReqRetiredTable(retiredReqs: ReqInfo[]): string[] {
-  const lines: string[] = [];
-  lines.push("| REQ ID | タイトル |");
-  lines.push("|---|---|");
-  for (const info of retiredReqs) {
-    lines.push(
-      `| [${info.id}](${info.relPath}) | ${sanitizeTableCell(info.title)} |`,
-    );
-  }
-  return lines;
-}
-
 // ─── AG-006候補2: docs/README.md 件数表明 (Phase E 残) ────────────────────────
 
 export const README_REQ_SUMMARY_COUNT_BLOCK_ID = "readme-req-summary-count";
@@ -1102,7 +1003,7 @@ export const README_REQ_SUMMARY_TABLE_BLOCK_ID = "readme-req-summary-table";
 
 /**
  * docs/README.md「要件」セクション冒頭の件数表明 AUTOGEN ブロック本体（1行）。
- * 形式: "現行 REQ: N件、廃止済み: M件"
+ * 形式: "REQ: N件"
  *
  * docs/README.md は入口文書であり、REQ 詳細一覧は docs/requirements/README.md へ誘導する。
  * 件数表明のみを AUTOGEN 化し、続く説明文（範囲、関連 ADR 等）は人手編集領域として残置する
@@ -1110,9 +1011,8 @@ export const README_REQ_SUMMARY_TABLE_BLOCK_ID = "readme-req-summary-table";
  */
 export function generateReadmeReqSummaryCount(args: {
   activeReqCount: number;
-  retiredReqCount: number;
 }): string[] {
-  return [`現行 REQ: ${args.activeReqCount}件、廃止済み: ${args.retiredReqCount}件`];
+  return [`REQ: ${args.activeReqCount}件`];
 }
 
 // ─── AG-005: docs/README.md Decision 静的表生成 ──────────────────────────────
@@ -1150,179 +1050,6 @@ export function generateDocsReadmeDecisionTable(
   return lines;
 }
 
-// ─── AG-006候補5: REQ 健全性メトリクス計測例生成 (Phase C 拡張) ────────
-
-export const REQ_METRICS_BLOCK_ID = "req-metrics-measurement-example";
-
-/** REQ 要件行数シグナル閾値（req-health-metrics.md L42-46 準拠）。 */
-function computeReqLineSignal(lineCount: number): string {
-  if (lineCount >= 81) return "+2";
-  if (lineCount >= 51) return "+1";
-  return "+0";
-}
-
-/**
- * REQ ファイル本文内の要件テーブル行数を計測する。
- * 形式: `| REQ-NNN-MMM | ... |` に一致する行数（req-health-metrics.md L19 準拠）。
- * 行番号部は桁数上限なし（各セグメント最小1桁。受理上限撤廃 Decision）。
- */
-export function countReqRequirementLines(
-  content: string,
-  reqId: string,
-): number {
-  const pattern = new RegExp(`^\\| ${reqId}-\\d+ \\|`);
-  let count = 0;
-  for (const line of content.split("\n")) {
-    if (pattern.test(line)) count++;
-  }
-  return count;
-}
-
-/**
- * Design ファイル本文行数を計測する（design-health-metrics.md 準拠）。
- * frontmatter（先頭 `---`〜`---`）、HTML コメント（`<!--`〜`-->`、複数行可）、
- * AUTOGEN ブロック（`<!-- AUTOGEN:BEGIN:id=xxx -->`〜`<!-- AUTOGEN:END -->`）を除外。
- * AUTOGEN ブロックを除外することで、Design 健全性（人手執筆部分の肥大化検出）と
- * べき等性（AUTOGEN ブロック自身が計測結果に影響しない）を両立する。
- * コメント開始/終了と同一行にある本文は除外せず残置する（コメント自身のみ除去）。
- */
-export function countDesignBodyLines(content: string): number {
-  const lines = content.split("\n");
-  let start = 0;
-  // frontmatter を読み飛ばす。
-  if (lines.length > 0 && lines[0]!.trim() === "---") {
-    let i = 1;
-    while (i < lines.length && lines[i]!.trim() !== "---") i++;
-    start = i + 1;
-  }
-  let bodyCount = 0;
-  let inComment = false;
-  let inAutogen = false;
-  for (let i = start; i < lines.length; i++) {
-    const line = lines[i];
-    if (inAutogen) {
-      if (isAutogenEndLine(line!)) {
-        inAutogen = false;
-      }
-      continue;
-    }
-    if (inComment) {
-      const endIdx = line!.indexOf("-->");
-      if (endIdx >= 0) {
-        inComment = false;
-        const after = line!.slice(endIdx + 3);
-        if (after.trim().length > 0) bodyCount++;
-      }
-      continue;
-    }
-    // AUTOGEN 開始マーカー（行全体一致）は AUTOGEN ブロックとして処理。
-    // backtick 囲み等の部分一致は isAutogenBeginLine で自動的に除外される。
-    if (isAutogenBeginLine(line!)) {
-      inAutogen = true;
-      continue;
-    }
-    const startIdx = line!.indexOf("<!--");
-    if (startIdx >= 0) {
-      const endIdx = line!.indexOf("-->", startIdx + 4);
-      if (endIdx >= 0) {
-        // 単一行コメント: 前後の本文を残置。
-        const combined = (line!.slice(0, startIdx) + line!.slice(endIdx + 3));
-        if (combined.trim().length > 0) bodyCount++;
-      } else {
-        // 複数行コメント開始: 開始より前の本文を残置。
-        inComment = true;
-        const before = line!.slice(0, startIdx);
-        if (before.trim().length > 0) bodyCount++;
-      }
-    } else {
-      bodyCount++;
-    }
-  }
-  return bodyCount;
-}
-
-export interface ReqMetricInfo {
-  /** REQ ID（例: "REQ-0101"）。 */
-  id: string;
-  /** 数値部（ソート用）。 */
-  num: number;
-  /** 要件テーブル行数。 */
-  lineCount: number;
-  /** 行数シグナル（"+0"/"+1"/"+2"）。 */
-  signal: string;
-  /** 備考（混合領域）。 */
-  note: string;
-}
-
-/**
- * 既存の手動記載備考を優先保持するための内部マップ。
- * req-health-metrics.md「現行 REQ の計測例（参照値）」に既出の8件を混合領域として保持。
- * 将来的に備考の追加・修正が必要な場合は本マップを更新する（SC-002 混合領域許容）。
- */
-const REQ_METRICS_HANDCURATED_NOTES: Record<string, string> = {
-  "REQ-0103": "アーティファクト責任分界。肥大化",
-  "REQ-0114": "case-auto。ライフサイクル段階混在で関心シグナル追加",
-  "REQ-0101": "文書、REQ 管理基準",
-  "REQ-0102": "要件定義、保存",
-  "REQ-0112": "ADR ライフサイクル",
-  "REQ-0119": "コマンド、スキル責務分界",
-  "REQ-0108": "docs-check / Validation",
-  "REQ-0136": "REQ/Design/ADR 適正運用自動化",
-};
-
-/**
- * docs/requirements/REQ-*.md を収集し、要件行数・シグナルを算出する。
- * retired/ 配下は対象外。要件行数降順でソート（同値の場合は REQ ID 昇順）。
- */
-export function collectReqMetrics(reqDir: string): ReqMetricInfo[] {
-  const reqInfos = collectReqFiles(reqDir);
-  const metrics: ReqMetricInfo[] = [];
-  for (const info of reqInfos) {
-    const fullPath = path.join(reqDir, info.filename);
-    const content = readText(fullPath);
-    if (content === null) continue;
-    const lineCount = countReqRequirementLines(content, info.id);
-    const signal = computeReqLineSignal(lineCount);
-    const note = REQ_METRICS_HANDCURATED_NOTES[info.id] ?? "";
-    metrics.push({
-      id: info.id,
-      num: info.num,
-      lineCount,
-      signal,
-      note,
-    });
-  }
-  metrics.sort((a, b) => {
-    if (b.lineCount !== a.lineCount) return b.lineCount - a.lineCount;
-    return a.num - b.num;
-  });
-  return metrics;
-}
-
-/**
- * req-health-metrics.md「現行 REQ の計測例（参照値）」AUTOGEN ブロック本体を生成する。
- * 出力形式:
- *   | REQ | 要件行数 | 行数シグナル | 備考 |
- *   |---|---|---|---|
- *   | REQ-NNNN | N | +N | 備考 |
- *   ...
- *   (空行)
- *   計測日: YYYY-MM-DD
- */
-export function generateReqMetricsTable(
-  metrics: ReqMetricInfo[],
-  measureDate: string,
-): string[] {
-  const lines: string[] = [];
-  lines.push("| REQ | 要件行数 | 行数シグナル | 備考 |");
-  lines.push("|---|---|---|---|");
-  for (const m of metrics) {
-    lines.push(`| ${m.id} | ${m.lineCount} | ${m.signal} | ${m.note} |`);
-  }
-  lines.push("");
-  lines.push(`計測日: ${measureDate}。`);
-  return lines;
-}
 /**
  * 対象ドキュメント群の最終コミット日付（YYYY-MM-DD）を導出する（SC-002「計測日導出」）。
  *
@@ -1367,20 +1094,6 @@ export function deriveMeasureDateFromLastCommit(
   return latest;
 }
 
-/**
- * req-metrics 計測日を導出する。対象は REQ メトリクスの計測対象ファイル群
- * （docs/requirements/REQ-*.md、retired は含まない）と同一とする。
- */
-export function deriveReqMetricsMeasureDate(
-  root: string,
-  reqDir: string,
-  metrics: ReqMetricInfo[],
-): string | null {
-  return deriveMeasureDateFromLastCommit(
-    root,
-    metrics.map((m) => path.join(reqDir, `${m.id}.md`)),
-  );
-}
 // ─── main ──────────────────────────────────────────────────────────────────
 
 /**
@@ -1443,18 +1156,16 @@ TARGET FILES (SC-002 Phase C):
     - docs/designs/integrity/integrity-rule-catalog.md (catalog IR entries)
     - docs/designs/integrity/rule-ownership.md (IR cross-reference appendix)
   Wave 2 (AG-008/009, DEC-009):
-    - docs/decisions/README.md (decision-* baseline/status/retired/related-req blocks; skipped when absent)
-    - docs/requirements/README.md (active/retired REQ tables)
-  Wave 3 (AG-006 候補5):
-    - docs/designs/quality/req-health-metrics.md (REQ line count + signal table)
+  - docs/decisions/README.md (decision-* blocks; skipped when absent)
+    - docs/requirements/README.md (active REQ tables)
   Wave 5 (Phase E 残):
     - docs/README.md (REQ count summary + detailed table, readme-req-summary-*)
 
 GENERATION SOURCE:
   - docs/designs/integrity/rules/IR-*.md (frontmatter + body Field/Value table)
-  - docs/decisions/DEC-*.md, docs/decisions/retired/DEC-*.md (frontmatter; DEC-009)
-  - docs/requirements/REQ-*.md, docs/requirements/retired/REQ-*.md (frontmatter, requirement line count)
-  - docs/designs/**/*.md (file count, body line count, frontmatter status)
+  - docs/decisions/DEC-*.md (frontmatter; DEC-009)
+  - docs/requirements/REQ-*.md (frontmatter)
+  - docs/designs/**/*.md (file count, frontmatter status)
 
 RELATED:
   - Design: docs/designs/integrity/index-auto-generation.md (SC-002)
@@ -1497,14 +1208,9 @@ RELATED:
   );
   const sourceSkillsDir = path.join(root, "src", "common", "skills");
   const decisionsDir = path.join(root, "docs", "decisions");
-  const decisionRetiredDir = path.join(decisionsDir, "retired");
   const reqDir = path.join(root, "docs", "requirements");
-  const reqRetiredDir = path.join(reqDir, "retired");
-  const designsDir = path.join(root, "docs", "designs");
   const decisionReadmePath = path.join(decisionsDir, "README.md");
   const reqReadmePath = path.join(reqDir, "README.md");
-  const qualityDir = path.join(designsDir, "quality");
-  const reqHealthMetricsPath = path.join(qualityDir, "req-health-metrics.md");
 
   // IR 管理対象判定: rules dir の存在は check_integrity.ts
   // checkIndexGenerationConsistency（IR-061）が既に使用する同一の存在条件である。
@@ -1535,11 +1241,7 @@ RELATED:
   }
 
   const decisionInfos = collectDecisionFiles(decisionsDir);
-  const decisionRetiredInfos = collectRetiredDecisionFiles(
-    decisionRetiredDir,
-  );
   const reqInfos = collectReqFiles(reqDir);
-  const reqRetiredInfos = collectRetiredReqFiles(reqRetiredDir);
 
   const decisionBaselineCaption = generateDecisionBaselineCaption(
     decisionInfos,
@@ -1561,38 +1263,11 @@ RELATED:
     decisionInfos,
     "deprecated",
   );
-  const decisionRetiredTable = generateDecisionRetiredTable(
-    decisionRetiredInfos,
-  );
   const reqActiveCaption = generateReqActiveCaption(reqInfos);
   const reqActiveTable = generateReqActiveTable(reqInfos);
-  const reqRetiredTable = generateReqRetiredTable(reqRetiredInfos);
-
-  // req-health-metrics の生成源は AUTOGEN 領域が存在する場合のみ計測する
-  // （導入先に計測ブロックが無い場合、git 履歴に依存する計測日導出も行わない）。
-  const reqMetricsOriginal = readText(reqHealthMetricsPath);
-  const reqHealthMetricsReady = reqMetricsOriginal !== null &&
-    findAutogenBlocks(reqMetricsOriginal).some(
-      (b) => b.id === REQ_METRICS_BLOCK_ID,
-    );
-  const reqMetrics = reqHealthMetricsReady ? collectReqMetrics(reqDir) : [];
-  const reqMeasureDate = reqHealthMetricsReady
-    ? deriveReqMetricsMeasureDate(root, reqDir, reqMetrics)
-    : null;
-  if (reqHealthMetricsReady && reqMeasureDate === null) {
-    console.error(
-      `[generate_indexes] measure date derivation failed for docs/requirements/REQ-*.md ` +
-        `(no commit history or git failure)`,
-    );
-    process.exit(EXIT_ERROR);
-  }
-  const reqMetricsTable = reqHealthMetricsReady && reqMeasureDate !== null
-    ? generateReqMetricsTable(reqMetrics, reqMeasureDate)
-    : [];
 
   const readmeReqSummary = generateReadmeReqSummaryCount({
     activeReqCount: reqInfos.length,
-    retiredReqCount: reqRetiredInfos.length,
   });
 
   // integrity 系の生成ブロックは rules dir が存在する場合のみ生成する。
@@ -1754,7 +1429,6 @@ RELATED:
       DECISION_STATUS_PROPOSED_BLOCK_ID,
       DECISION_STATUS_SUPERSEDED_BLOCK_ID,
       DECISION_STATUS_DEPRECATED_BLOCK_ID,
-      DECISION_RETIRED_TABLE_BLOCK_ID,
       DECISION_RELATED_REQ_TABLE_BLOCK_ID,
     ];
     const decisionReadmeMissing = missingAutogenIds(
@@ -1772,10 +1446,8 @@ RELATED:
     // 既存領域の陳腐化を残さない）。replaceAutogenBlock は未検出 block を
     // unchanged で返すため、欠落分は書込み差分にならない。
     const relatedReqNotes = extractRelatedReqNotes(decisionReadmeOriginal);
-    const reqCtx = collectReqIdContext(reqDir, reqRetiredDir);
     const decisionRelatedReqTable = generateDecisionRelatedReqTable(
       decisionInfos,
-      reqCtx,
       relatedReqNotes,
     );
     let decisionReadmeUpdated = decisionReadmeOriginal;
@@ -1786,7 +1458,6 @@ RELATED:
       [DECISION_STATUS_PROPOSED_BLOCK_ID]: decisionStatusProposed,
       [DECISION_STATUS_SUPERSEDED_BLOCK_ID]: decisionStatusSuperseded,
       [DECISION_STATUS_DEPRECATED_BLOCK_ID]: decisionStatusDeprecated,
-      [DECISION_RETIRED_TABLE_BLOCK_ID]: decisionRetiredTable,
       [DECISION_RELATED_REQ_TABLE_BLOCK_ID]: decisionRelatedReqTable,
     };
     for (const blockId of decisionReadmeExpectedIds) {
@@ -1814,7 +1485,6 @@ RELATED:
     const reqReadmeExpectedIds = [
       REQ_ACTIVE_COUNT_BLOCK_ID,
       REQ_ACTIVE_TABLE_BLOCK_ID,
-      REQ_RETIRED_TABLE_BLOCK_ID,
     ];
     const reqReadmeMissing = missingAutogenIds(
       reqReadmeOriginal,
@@ -1833,7 +1503,6 @@ RELATED:
     const reqReadmeReplacements: Record<string, string[]> = {
       [REQ_ACTIVE_COUNT_BLOCK_ID]: reqActiveCaption,
       [REQ_ACTIVE_TABLE_BLOCK_ID]: reqActiveTable,
-      [REQ_RETIRED_TABLE_BLOCK_ID]: reqRetiredTable,
     };
     for (const blockId of reqReadmeExpectedIds) {
       reqReadmeUpdated = replaceAutogenBlock(
@@ -1844,28 +1513,6 @@ RELATED:
     }
     if (reqReadmeUpdated !== reqReadmeOriginal) {
       updates.push({ file: reqReadmePath, content: reqReadmeUpdated });
-    }
-  }
-
-  // req-health-metrics 更新 (AG-006 候補5, Wave 3)
-  if (reqMetricsOriginal === null) {
-    skipOrExit(
-      hasIntegrityStructure,
-      `req-health-metrics not found: ${reqHealthMetricsPath}`,
-    );
-  } else if (!reqHealthMetricsReady) {
-    skipOrExit(
-      hasIntegrityStructure,
-      `req-health-metrics AUTOGEN marker not found. Expected id: ${REQ_METRICS_BLOCK_ID}`,
-    );
-  } else {
-    const reqMetricsUpdated = replaceAutogenBlock(
-      reqMetricsOriginal,
-      REQ_METRICS_BLOCK_ID,
-      reqMetricsTable,
-    );
-    if (reqMetricsUpdated !== reqMetricsOriginal) {
-      updates.push({ file: reqHealthMetricsPath, content: reqMetricsUpdated });
     }
   }
 
@@ -1934,18 +1581,13 @@ RELATED:
       );
     }
     console.log(
-      `[generate_indexes] Decision README: ${decisionInfos.length} active, ${decisionRetiredInfos.length} retired`,
+      `[generate_indexes] Decision README: ${decisionInfos.length} decisions`,
     );
     console.log(
-      `[generate_indexes] REQ README: ${reqInfos.length} active, ${reqRetiredInfos.length} retired`,
+      `[generate_indexes] REQ README: ${reqInfos.length} REQs`,
     );
-    if (reqHealthMetricsReady) {
-      console.log(
-        `[generate_indexes] req-health-metrics: ${reqMetrics.length} REQs (measure date ${reqMeasureDate ?? "-"})`,
-      );
-    }
     console.log(
-      `[generate_indexes] docs/README.md: REQ summary active=${reqInfos.length} retired=${reqRetiredInfos.length}, table=${reqActiveTable.length - 2} rows, Decision table=${decisionInfos.length} rows`,
+      `[generate_indexes] docs/README.md: REQ summary=${reqInfos.length}, table=${reqActiveTable.length - 2} rows, Decision table=${decisionInfos.length} rows`,
     );
     for (const u of updates) {
       console.log(`[generate_indexes] WOULD UPDATE: ${u.file}`);

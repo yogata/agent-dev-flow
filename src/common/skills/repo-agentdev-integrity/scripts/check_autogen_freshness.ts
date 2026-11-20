@@ -30,22 +30,15 @@ import {
   findAutogenBlocks,
   collectIrFiles,
   collectDecisionFiles,
-  collectRetiredDecisionFiles,
   collectReqFiles,
-  collectRetiredReqFiles,
-  collectReqMetrics,
   generateCatalogEntries,
   generateRuleOwnershipAppendix,
   generateDecisionBaselineCaption,
   generateDecisionBaselineTable,
   generateDecisionStatusList,
-  generateDecisionRetiredTable,
   generateReqActiveCaption,
   generateReqActiveTable,
-  generateReqRetiredTable,
-  generateReqMetricsTable,
   generateReadmeReqSummaryCount,
-  deriveReqMetricsMeasureDate,
   CATALOG_BLOCK_ID,
   RULE_OWNERSHIP_BLOCK_ID,
   DECISION_BASELINE_COUNT_BLOCK_ID,
@@ -54,11 +47,8 @@ import {
   DECISION_STATUS_PROPOSED_BLOCK_ID,
   DECISION_STATUS_SUPERSEDED_BLOCK_ID,
   DECISION_STATUS_DEPRECATED_BLOCK_ID,
-  DECISION_RETIRED_TABLE_BLOCK_ID,
   REQ_ACTIVE_COUNT_BLOCK_ID,
   REQ_ACTIVE_TABLE_BLOCK_ID,
-  REQ_RETIRED_TABLE_BLOCK_ID,
-  REQ_METRICS_BLOCK_ID,
   README_REQ_SUMMARY_COUNT_BLOCK_ID,
   README_REQ_SUMMARY_TABLE_BLOCK_ID,
 } from "./generate_indexes.ts";
@@ -166,9 +156,7 @@ export function parseTableRow(line: string): string[] | null {
  * 判定規則（リスト順、最初に該当したものを優先）:
  *   1. 行数の増減 → rename（行の追加・削除 = ファイル追加・削除・rename とみなす）
  *   2. Decision baseline 表の同行異 status 列 → status_change
- *   3. Decision README 表の同行異 status 列 → status_change
- *   4. REQ metrics 表の同行異シグナル/備考列 → content_change（status 列を持たないため）
- *   5. 上記以外の不一致 → content_change
+ *   3. 上記以外の不一致 → content_change
  *
  * 注意: 本判定は「鮮度種別の優先的付与」であり、絶対的分類ではない。
  * 例えば Design rename に伴いDesign行数も変化した場合、行追加・削除を伴えば rename、
@@ -216,22 +204,6 @@ export function classifyStaleness(
         };
       }
     }
-    // Decision retired 表: 列構成 = Decision番号 | タイトル | retired時ステータス
-    // retired時ステータス列（index 2）のみ変化 → status_change
-    if (
-      blockId === DECISION_RETIRED_TABLE_BLOCK_ID &&
-      curCells.length >= 3 &&
-      expCells.length >= 3
-    ) {
-      if (curCells[0] === expCells[0] && curCells[2] !== expCells[2]) {
-        return {
-          kind: "status_change",
-          detail:
-            `Retired Decision status changed without regeneration. id=${curCells[0]}, ` +
-            `status current="${curCells[2]}" expected="${expCells[2]}".`,
-        };
-      }
-    }
   }
 
   // 3. 上記以外の不一致は content_change（行数値、備考、リンク、キャプション等の変化）。
@@ -275,14 +247,9 @@ export function buildBlockTargets(root: string): BlockTarget[] {
     "rule-ownership.md",
   );
   const decisionsDir = path.join(root, "docs", "decisions");
-  const decisionRetiredDir = path.join(decisionsDir, "retired");
   const reqDir = path.join(root, "docs", "requirements");
-  const reqRetiredDir = path.join(reqDir, "retired");
-  const designsDir = path.join(root, "docs", "designs");
   const decisionReadmePath = path.join(decisionsDir, "README.md");
   const reqReadmePath = path.join(reqDir, "README.md");
-  const qualityDir = path.join(designsDir, "quality");
-  const reqHealthMetricsPath = path.join(qualityDir, "req-health-metrics.md");
   const docsReadmePath = path.join(root, "docs", "README.md");
 
   // catalog（レジストリ単一ソースの単一 AUTOGEN ブロック。DEC-065 決定3）。
@@ -304,13 +271,10 @@ export function buildBlockTargets(root: string): BlockTarget[] {
     }
   }
 
-  // Decision README（7ブロック、decision-* block ID）。DEC-009 移行後の現行契約。
+  // Decision README（6ブロック、decision-* block ID）。DEC-009 移行後の現行契約。
   // docs/decisions/ 配下に Decision ファイルが存在しない場合は対象外。
   if (fs.existsSync(decisionsDir)) {
     const decisionInfos = collectDecisionFiles(decisionsDir);
-    const decisionRetiredInfos = fs.existsSync(decisionRetiredDir)
-      ? collectRetiredDecisionFiles(decisionRetiredDir)
-      : [];
     targets.push({
       file: decisionReadmePath,
       blockId: DECISION_BASELINE_COUNT_BLOCK_ID,
@@ -341,19 +305,11 @@ export function buildBlockTargets(root: string): BlockTarget[] {
       blockId: DECISION_STATUS_DEPRECATED_BLOCK_ID,
       expected: generateDecisionStatusList(decisionInfos, "deprecated"),
     });
-    targets.push({
-      file: decisionReadmePath,
-      blockId: DECISION_RETIRED_TABLE_BLOCK_ID,
-      expected: generateDecisionRetiredTable(decisionRetiredInfos),
-    });
   }
 
-  // REQ README（3ブロック）。REQ ファイルが存在しない場合は対象外。
+  // REQ README（2ブロック）。REQ ファイルが存在しない場合は対象外。
   if (fs.existsSync(reqDir)) {
     const reqInfos = collectReqFiles(reqDir);
-    const reqRetiredInfos = fs.existsSync(reqRetiredDir)
-      ? collectRetiredReqFiles(reqRetiredDir)
-      : [];
     targets.push({
       file: reqReadmePath,
       blockId: REQ_ACTIVE_COUNT_BLOCK_ID,
@@ -364,48 +320,19 @@ export function buildBlockTargets(root: string): BlockTarget[] {
       blockId: REQ_ACTIVE_TABLE_BLOCK_ID,
       expected: generateReqActiveTable(reqInfos),
     });
-    targets.push({
-      file: reqReadmePath,
-      blockId: REQ_RETIRED_TABLE_BLOCK_ID,
-      expected: generateReqRetiredTable(reqRetiredInfos),
-    });
   }
 
   // DOC-MAP（docmap-inventory）検査は docs/DOC-MAP.md 廃止（DEC-009、REQ-013）に伴い除去。
 
-  // REQ health-metrics（1ブロック）。計測日は対象ドキュメント群の最終コミット日付（SC-002「計測日導出」）。
-  // Design 計測例（design-health-metrics）は Design 文書への永続化を廃止（Issue #2349、RU-0001 AG-002）。
-  if (fs.existsSync(reqDir)) {
-    const reqMetrics = collectReqMetrics(reqDir);
-    const reqMeasureDate = deriveReqMetricsMeasureDate(
-      root,
-      reqDir,
-      reqMetrics,
-    );
-    if (reqMeasureDate === null) {
-      console.error(
-        `[check_autogen_freshness] measure date derivation failed for docs/requirements/REQ-*.md ` +
-          `(no commit history or git failure)`,
-      );
-      process.exit(EXIT_ERROR);
-    }
-    targets.push({
-      file: reqHealthMetricsPath,
-      blockId: REQ_METRICS_BLOCK_ID,
-      expected: generateReqMetricsTable(reqMetrics, reqMeasureDate),
-    });
-  }
-
   // docs/README.md（2ブロック）。REQ ファイル群が存在しない場合は計測不能のため対象外。
   // readme-req-summary-table は req-active-table と同一生成元・同一構造（REQ-057-018）。
-  if (fs.existsSync(reqDir) && fs.existsSync(reqRetiredDir)) {
+  if (fs.existsSync(reqDir)) {
     const docsReadmeReqInfos = collectReqFiles(reqDir);
     targets.push({
       file: docsReadmePath,
       blockId: README_REQ_SUMMARY_COUNT_BLOCK_ID,
       expected: generateReadmeReqSummaryCount({
         activeReqCount: docsReadmeReqInfos.length,
-        retiredReqCount: collectRetiredReqFiles(reqRetiredDir).length,
       }),
     });
     targets.push({

@@ -382,31 +382,22 @@ function runSpec(runner: MechanicalRunner, spec: GateCommandSpec): CommandResult
 }
 
 /**
- * 計測日収束補正。check_integrity 報告から
- * req-updated-freshness NG（frontmatter updated が commit author date と不一致の
- * 対象ファイル）と index-generation-consistency（req-metrics 計測日 AUTOGEN の 1 日
- * 遅れ）を検出し、(a) generate_indexes 再実行、(b) frontmatter updated を commit
- * author date へ追随させる編集適用、(c) 明示パス指定の補正 commit、を script 内で
- * 完結させる。trigger 条件が満たされない場合は補正 step を生成しない（既存の
- * 一巡実行の挙動を変えない）。計測日のずれを内容変更として扱わない。
+ * frontmatter updated 収束補正。check_integrity 報告から req-updated-freshness NG
+ * （frontmatter updated が commit author date と不一致の対象ファイル）を検出し、
+ * frontmatter updated を commit author date へ追随させる編集適用と明示パス指定の
+ * 補正 commit を script 内で完結させる。trigger 条件が満たされない場合は補正 step
+ * を生成しない（既存の一巡実行の挙動を変えない）。
  */
 export function runMeasurementDateConvergence(
   runner: MechanicalRunner,
-  input: PrepareDefinitionPrInput,
   worktreeCwd: string,
   checkStdout: string,
-  head: string,
 ): { steps: StepRecord[]; warnings: string[] } {
   const steps: StepRecord[] = [];
   const warnings: string[] = [];
 
   const freshnessTargets = extractFreshnessTargets(checkStdout);
-  // trigger 判定は check_integrity 報告詳細行の実出力表記（check id のケバブ表記
-  // index-generation-consistency）と計測日のずれで検出する。category 見出し・
-  // ルーティング表の検査カテゴリ名（キャメル表記）には依存しない。
-  const hasMeasurementDrift = /index-generation-consistency/.test(checkStdout) &&
-    /計測日/.test(checkStdout);
-  if (freshnessTargets.length === 0 && !hasMeasurementDrift) {
+  if (freshnessTargets.length === 0) {
     return { steps, warnings };
   }
 
@@ -455,18 +446,6 @@ export function runMeasurementDateConvergence(
       );
     }
   }
-  if (hasMeasurementDrift) {
-    steps.push({
-      name: "measurement-convergence",
-      status: "pass",
-      detail: {
-        trigger: "req-metrics-measurement-example",
-        plannedAction: "regenerate indexes via generateIndexesGate after freshness commit",
-        head,
-      },
-    });
-  }
-
   if (touchedPaths.length > 0) {
     const add = runner.run({ command: "git", args: ["add", "--", ...touchedPaths], cwd: worktreeCwd });
     if (add.exitCode !== 0) {
@@ -494,27 +473,6 @@ export function runMeasurementDateConvergence(
       status: "pass",
       detail: { stage: "converged", stagedPaths: touchedPaths, commitMessage: message },
     });
-  }
-
-  if (hasMeasurementDrift && input.generateIndexesGate != null) {
-    const gen = runSpec(runner, input.generateIndexesGate);
-    steps.push({
-      name: "measurement-convergence",
-      status: gen.exitCode === 0 ? "pass" : "fail",
-      detail: {
-        action: "generate_indexes rerun",
-        executedCommand: {
-          command: input.generateIndexesGate.command,
-          args: input.generateIndexesGate.args,
-          cwd: input.generateIndexesGate.cwd,
-        },
-        exitCode: gen.exitCode,
-        stderrTail: gen.exitCode === 0 ? "" : gen.stderr.trim().slice(-400),
-      },
-    });
-    if (gen.exitCode !== 0) {
-      warnings.push("measurement convergence generate_indexes rerun failed");
-    }
   }
 
   return { steps, warnings };
@@ -731,14 +689,11 @@ export function runPrepareDefinitionPr(
         },
       });
 
-      // 計測日収束補正。check_integrity 報告の計測日不整合
-      // （req-metrics-measurement-example の index-generation-consistency）と
-      // req-updated-freshness NG を trigger 条件として検出し、
-      // (a) generate_indexes 再実行（req-metrics 計測日 AUTOGEN 更新）と
-      // (b) frontmatter updated の commit author date 追随を明示パス指定の
-      // 補正 commit で script 内完結させる。既存 contingency 手順の機械化であり、
-      // 計測日のずれを内容変更として扱わない。
-      const convergence = runMeasurementDateConvergence(runner, input, worktreeCwd, check.stdout, head);
+      // frontmatter updated 収束補正。check_integrity 報告の req-updated-freshness NG
+      // を trigger 条件として検出し、frontmatter updated の commit author date 追随を
+      // 明示パス指定の補正 commit で script 内完結させる。既存 contingency 手順の
+      // 機械化であり、追随を内容変更として扱わない。
+      const convergence = runMeasurementDateConvergence(runner, worktreeCwd, check.stdout);
       if (convergence.steps.length > 0) {
         steps.push(...convergence.steps);
         warnings.push(...convergence.warnings);

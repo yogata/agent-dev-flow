@@ -15,7 +15,7 @@ title: external execution boundary と harness execution mechanism の用語境�
 
 harness execution mechanism は本 SKILL の規範対象外とし、`references/harness-delegation.md` へ集約する。
 
-用語の正規定義と所有者は responsibility-boundary-purification Design「case 実行責務の 4 用語と所有者」を SSoT とする。
+用語の正規定義と所有者は delegation-contracts Design「case 実行責務の 4 用語と委譲」を SSoT とする。
 
 # 外部成果物の取扱い
 

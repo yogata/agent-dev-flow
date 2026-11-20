@@ -761,7 +761,7 @@ describe("runMeasurementDateConvergence（補正適用と差分検査 fail-close
   test("REQ ファイル名のみ報告形式を捕捉した freshness 補正が対象ファイルの frontmatter updated を commit date へ進める", () => {
     const targetFile = `${worktreeCwd}/${reqTargetRel}`;
     const runner = convergenceRunner({ [targetFile]: "---\ntitle: t\nupdated: \"2026-10-01\"\n---\n\n本文\n" });
-    const { steps } = runMeasurementDateConvergence(runner, input(), worktreeCwd, convergenceCheckStdout, "head-sha");
+    const { steps } = runMeasurementDateConvergence(runner, worktreeCwd, convergenceCheckStdout);
     const step = steps.find((s) => s.name === "measurement-convergence" && s.status === "pass");
     expect(step).toBeDefined();
     expect(step?.detail.frontmatterUpdatedTargets).toEqual([reqTargetRel]);
@@ -771,7 +771,7 @@ describe("runMeasurementDateConvergence（補正適用と差分検査 fail-close
 
   test("NG 報告対象が補正適用対象から漏れた場合（file-missing）に fail step と warning を出力する（fail-closed 差分検査）", () => {
     const runner = convergenceRunner({});
-    const { steps, warnings } = runMeasurementDateConvergence(runner, input(), worktreeCwd, convergenceCheckStdout, "head-sha");
+    const { steps, warnings } = runMeasurementDateConvergence(runner, worktreeCwd, convergenceCheckStdout);
     const step = steps.find((s) => s.name === "measurement-convergence");
     expect(step?.status).toBe("fail");
     expect(step?.detail.unresolvedTargets).toEqual([
@@ -784,7 +784,7 @@ describe("runMeasurementDateConvergence（補正適用と差分検査 fail-close
   test("frontmatter updated が見つからない対象を未解決として検出する（fail-closed 差分検査）", () => {
     const targetFile = `${worktreeCwd}/${reqTargetRel}`;
     const runner = convergenceRunner({ [targetFile]: "# 本文のみ（frontmatter 不在）\n" });
-    const { steps } = runMeasurementDateConvergence(runner, input(), worktreeCwd, convergenceCheckStdout, "head-sha");
+    const { steps } = runMeasurementDateConvergence(runner, worktreeCwd, convergenceCheckStdout);
     const step = steps.find((s) => s.name === "measurement-convergence");
     expect(step?.status).toBe("fail");
     expect(step?.detail.unresolvedTargets).toEqual([
@@ -795,7 +795,7 @@ describe("runMeasurementDateConvergence（補正適用と差分検査 fail-close
   test("updated が既に commit date と一致する対象を収束済みとして記録し fail にしない", () => {
     const targetFile = `${worktreeCwd}/${reqTargetRel}`;
     const runner = convergenceRunner({ [targetFile]: `---\nupdated: "${commitDateToday()}"\n---\n\n本文\n` });
-    const { steps } = runMeasurementDateConvergence(runner, input(), worktreeCwd, convergenceCheckStdout, "head-sha");
+    const { steps } = runMeasurementDateConvergence(runner, worktreeCwd, convergenceCheckStdout);
     const step = steps.find((s) => s.name === "measurement-convergence");
     expect(step?.status).toBe("pass");
     expect(step?.detail.alreadyConvergedTargets).toEqual([reqTargetRel]);
@@ -804,51 +804,16 @@ describe("runMeasurementDateConvergence（補正適用と差分検査 fail-close
   });
 
   // checker 実出力突合: check_integrity の markdown 報告詳細行は check id（ケバブ表記）で
-  // 報告される。計測日ドリフト検出はこの実出力詳細行（index-generation-consistency 行と
-  // 計測日）を捕捉する。category 見出し・ルーティング表のキャメル表記を含まない入力で
+  // 報告される。category 見出し・ルーティング表のキャメル表記を含まない入力で
   // 検証し、詳細行の表記だけで trigger が成立することを機械突合で固定する。
   // 報告詳細行の末尾パス（対象文書の具体パス）は trigger 判定の対象外であるため、
   // エンジン配布ファイルの docs/ 具体パス排除契約（RA-003・TS-004）に従い
   // プレースホルダへ置換して実出力構造を再現する。
-  const measurementDriftNgLine = "- **[NG]** index-generation-consistency: req-metrics-measurement-example AUTOGEN block out of sync. first mismatch at line 84 (current=計測日: 2026-11-07。, expected=計測日: 2026-11-08。). Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002) [IR-061] (<checker-report-target-doc>:174) → route: intake";
   const catalogDriftNgLine = "- **[NG]** index-generation-consistency: catalog pre-045 AUTOGEN block out of sync. first mismatch at line 1 (current=| REQ-001 | 例 |, expected=| REQ-002 | 例 |). Run: bun run .opencode/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061, SC-002) [IR-061] (<checker-report-target-catalog>:24) → route: intake";
 
-  test("checker 実出力詳細行（ケバブ表記 index-generation-consistency）の計測日ドリフトを捕捉して収束 step を生成する", () => {
+  test("req-updated-freshness 以外の AUTOGEN 不整合報告では収束 step を生成しない", () => {
     const runner = convergenceRunner({});
-    const { steps } = runMeasurementDateConvergence(runner, input(), worktreeCwd, measurementDriftNgLine, "head-sha");
-    const triggerStep = steps.find((s) => s.detail.trigger === "req-metrics-measurement-example");
-    expect(triggerStep).toBeDefined();
-    expect(triggerStep?.status).toBe("pass");
-    const rerunStep = steps.find((s) => s.detail.action === "generate_indexes rerun");
-    expect(rerunStep).toBeDefined();
-    expect(rerunStep?.status).toBe("pass");
-    expect(runner.calls.some((c) => c.args.includes("generate_indexes"))).toBe(true);
-  });
-
-  test("freshness NG と計測日ドリフトの同時報告で frontmatter 追従・補正 commit・generate_indexes 再実行を script 内で完結させる", () => {
-    const targetFile = `${worktreeCwd}/${reqTargetRel}`;
-    const runner = convergenceRunner({ [targetFile]: "---\ntitle: t\nupdated: \"2026-10-01\"\n---\n\n本文\n" });
-    const { steps, warnings } = runMeasurementDateConvergence(
-      runner,
-      input(),
-      worktreeCwd,
-      [convergenceCheckStdout, measurementDriftNgLine].join("\n"),
-      "head-sha",
-    );
-    expect(runner.written[targetFile]).toContain(`updated: "${commitDateToday()}"`);
-    expect(runner.calls.some((c) => c.args[0] === "add" && c.args[2] === reqTargetRel)).toBe(true);
-    expect(runner.calls.some((c) => c.args[0] === "commit")).toBe(true);
-    const convergedStep = steps.find((s) => s.detail.stage === "converged");
-    expect(convergedStep?.status).toBe("pass");
-    expect(convergedStep?.detail.stagedPaths).toEqual([reqTargetRel]);
-    const rerunStep = steps.find((s) => s.detail.action === "generate_indexes rerun");
-    expect(rerunStep?.status).toBe("pass");
-    expect(warnings).toHaveLength(0);
-  });
-
-  test("計測日を含まない index-generation-consistency 報告（他の AUTOGEN 不整合）では収束 step を生成しない", () => {
-    const runner = convergenceRunner({});
-    const { steps } = runMeasurementDateConvergence(runner, input(), worktreeCwd, catalogDriftNgLine, "head-sha");
+    const { steps } = runMeasurementDateConvergence(runner, worktreeCwd, catalogDriftNgLine);
     expect(steps).toHaveLength(0);
     expect(Object.keys(runner.written)).toHaveLength(0);
   });

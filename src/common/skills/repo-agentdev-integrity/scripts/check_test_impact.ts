@@ -57,16 +57,13 @@ const DECLARATIVE_PATH_PATTERNS = [
 
 // 走査除外ディレクトリ。SCAN_EXCLUDE_DIRS は相対パス先頭一致、
 // SCAN_EXCLUDE_ANY_DEPTH_DIRS はパス区切りで区切られた任意階層のディレクトリ名一致。
-// ビルド成果物、外部依存、worktree、retired を除く
+// ビルド成果物、外部依存、worktree を除く
 // （Issue #2383 (c): node_modules は src/opencode/skills/*/scripts 配下等
-// 任意階層に出現するためセグメント一致で除外。旧 docs/adr/retired/ は
-// docs/decisions/retired/ へ整合）。
+// 任意階層に出現するためセグメント一致で除外）。
 const SCAN_EXCLUDE_DIRS = [
   ".worktrees/",
   ".agentdev-plugin/",
   ".git/",
-  "docs/requirements/retired/",
-  "docs/decisions/retired/",
 ];
 
 // 任意階層の同名ディレクトリを除外する（依存パッケージのテスト混入防止、PR 2357 観測）。

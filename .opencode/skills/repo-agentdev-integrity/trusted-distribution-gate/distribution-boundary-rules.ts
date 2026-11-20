@@ -16,8 +16,7 @@
 // share the same single load site and the same fail-closed error messages.
 // Self-host detectable concerns implemented here; consumer-environment
 // specific detection is delegated to scripts/install.ps1 (current entry
-// point; the legacy-installer retired-name vocabulary was removed together
-// with the IR-046 detector in Epic #4126 Phase 4).
+// point).
 //
 // Split out of check_distribution_boundary.ts so rule logic lives in a
 // focused module consumed by the orchestrator.

@@ -198,7 +198,7 @@ STEP-6 の構造化 `draft-data` 形式（`# draft-data` fenced YAML block）で
 次コマンド実行を確定の意思表示として扱う。
 
 各副ステップ（複数RU同時入力受付、統合/分離判定、操作単位ごとの出力生成、Epic 規模検出時の記録、Wave 候補/依存関係の記録、OU 構造検証）の詳細、委譲接続点は `agentdev-req-analysis` を参照。
-統合/分離判定では生成ドラフト自身の健全性メトリクス（要件行数、関心分類数、成果物種別数）を計測し、req-health-metrics Design（extension 経由）の閾値で SPLIT シグナルを算出して合意内容に反映する（新規 CREATE ドラフトで要件行数が 51 行超の場合は SPLIT 要否をユーザーへ提案）。
+統合/分離判定では生成ドラフト自身の健全性メトリクス（要件行数、関心分類数、成果物種別数）を計測し、`agentdev-req-structure-diagnostics` の SPLIT 定量閾値で SPLIT シグナルを算出して合意内容に反映する（新規 CREATE ドラフトで要件行数が 51 行超の場合は SPLIT 要否をユーザーへ提案）。
 
 ### Result
 

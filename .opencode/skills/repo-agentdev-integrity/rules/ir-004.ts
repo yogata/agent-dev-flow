@@ -7,20 +7,10 @@ import type {
   RuleViolation,
 } from "../engine/types.ts";
 
-/** README 表から現行（retired 見出し配下を除く）REQ ID 集合を抽出する。 */
+/** README 表から現行 REQ ID 集合を抽出する。 */
 export function extractReadmeTableReqIds(content: string): Set<string> {
   const ids = new Set<string>();
-  let underRetiredHeading = false;
   for (const line of content.split("\n")) {
-    const headingMatch = line.match(/^#{1,6}\s+(.+)$/);
-    if (headingMatch) {
-      underRetiredHeading =
-        /\b(retired|historical)\b|履歴|過去経緯|廃止済み|廃止|retired-no-successor|historical-only/i.test(
-          headingMatch[1]!,
-        );
-      continue;
-    }
-    if (underRetiredHeading) continue;
     const trimmed = line.trim();
     if (!trimmed.startsWith("|")) continue;
     const plainMatch = trimmed.match(/\|\s*(REQ-\d+)\s*\|/);

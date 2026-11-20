@@ -11,7 +11,7 @@
  *     catalog/rule-ownership marked, but REQ README without markers → exit 2
  *     (本体のマーカー喪失 fail-fast は緩和しない).
  * (4) producer shape: rules dir present but no IR-*.md files → exit 2.
- * (5) consumer partial markers (2 of 3 present, stale content): the present
+ * (5) consumer partial markers (count only, stale content): the present
  *     regions regenerate independently and the missing marker stays reported
  *     (PR #3898 regression: whole-file skip kept stale blocks passing).
  * (6) broken producer (rules dir absent, integrity catalog / rule-ownership
@@ -144,10 +144,6 @@ describe("generate_indexes on consumer-shaped repo (rules dir absent)", () => {
       "| [REQ-999](REQ-999.md) | stale row |",
       "<!-- AUTOGEN:END -->",
       "",
-      "<!-- AUTOGEN:BEGIN:id=req-retired-table -->",
-      "_（現行ディレクトリに retired REQ はありません。）_",
-      "<!-- AUTOGEN:END -->",
-      "",
     ].join("\n");
     writeFileSync(reqReadmePath, marked, "utf-8");
 
@@ -162,7 +158,7 @@ describe("generate_indexes on consumer-shaped repo (rules dir absent)", () => {
   });
 
   it("regenerates present regions independently when markers are partial (PR #3898 regression)", () => {
-    // req-retired-table マーカー欠落の consumer README: 既存 2 領域の STALE
+    // req-active-table マーカー欠落の consumer README: 既存領域の STALE
     // 内容を再生成し、欠落マーカーは IR-061 と同一の適用範囲で記録して隠さない。
     const reqReadmePath = join(consumerRoot, "docs", "requirements", "README.md");
     writeFileSync(
@@ -174,12 +170,6 @@ describe("generate_indexes on consumer-shaped repo (rules dir absent)", () => {
         "STALE COUNT",
         "<!-- AUTOGEN:END -->",
         "",
-        "<!-- AUTOGEN:BEGIN:id=req-active-table -->",
-        "| REQ | Title |",
-        "|---|---|",
-        "| [REQ-999](REQ-999.md) | STALE TABLE |",
-        "<!-- AUTOGEN:END -->",
-        "",
       ].join("\n"),
       "utf-8",
     );
@@ -188,14 +178,13 @@ describe("generate_indexes on consumer-shaped repo (rules dir absent)", () => {
 
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain(
-      "REQ README AUTOGEN markers not found: req-retired-table",
+      "REQ README AUTOGEN markers not found: req-active-table",
     );
     expect(result.stdout).toContain("integrity structure absent, skipping");
     expect(result.stdout).toContain("[generate_indexes] updated:");
     const updated = readFileSync(reqReadmePath, "utf-8");
-    expect(updated).toContain("REQ-001");
+    expect(updated).toContain("以下1件");
     expect(updated).not.toContain("STALE COUNT");
-    expect(updated).not.toContain("STALE TABLE");
   });
 });
 
@@ -233,8 +222,8 @@ describe("generate_indexes on producer-shaped repo (rules dir present)", () => {
         "",
       ].join("\n"),
     );
-    // req-health-metrics / docs/README.md は REQ README より後段のため、
-    // 本 test の対象外（欠落のまま到達しない）。
+    // docs/README.md は REQ README より後段のため、本 test の対象外
+    // （欠落のまま到達しない）。
 
     const result = runGenerator(producerRoot);
 

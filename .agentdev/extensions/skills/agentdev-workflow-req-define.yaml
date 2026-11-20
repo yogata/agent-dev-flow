@@ -11,10 +11,6 @@ context:
     paths:
       - docs/designs/foundations/patterns.md
     purpose: frontmatter、ID 体系、命名規則、URL 参照形式の確認
-  - id: must-3
-    paths:
-      - "docs/designs/quality/req-health-metrics.md"
-    purpose: REQ 健全性メトリクス（肥大化、関心ズレ検出）の確認
   - id: req-define-command-spec
     when: 実証Case判定・評価契約の構成要素詳細、実証Issue 入力の入力優先規定、draft-data 実証情報出力形式参照時
     paths:

@@ -91,32 +91,6 @@
 | [REQ-122](REQ-122.md) | 整合性検証体制の刷新（IR 減量・検証エンジン分割・ローカル Git Hook ゲート・巨大コマンド分割・自動トリアージ）（16 作業単位） |
 <!-- AUTOGEN:END -->
 
-## 廃止済み要件
-
-<!-- AUTOGEN:BEGIN:id=req-retired-table -->
-| REQ ID | タイトル |
-|---|---|
-| [REQ-013](retired/REQ-013.md) | DOC-MAP 依存除去 |
-| [REQ-016](retired/REQ-016.md) | adversarial-review caller integration 横断整合 |
-| [REQ-020](retired/REQ-020.md) | Artifact Graph 解析品質と検証 |
-| [REQ-022](retired/REQ-022.md) | Artifact Graph augmentation 配置先正規化 |
-| [REQ-023](retired/REQ-023.md) | Artifact Graph 問い合わせ結果の関係情報拡張 |
-| [REQ-024](retired/REQ-024.md) | Artifact Graph 未解決参照 warning の分類と抽出規則改善 |
-| [REQ-025](retired/REQ-025.md) | IR 検証ルールの Decision 移行残存修復 |
-| [REQ-026](retired/REQ-026.md) | skill rename 対称性検査観点の targeted docs guard 追加 |
-| [REQ-028](retired/REQ-028.md) | IR 体系の実効性監査と存在条件厳格化 |
-| [REQ-033](retired/REQ-033.md) | case-update 実行契約（Issue・要件更新） |
-| [REQ-040](retired/REQ-040.md) | トレーサビリティ高位問い合わせ（Trace Query） |
-| [REQ-042](retired/REQ-042.md) | Case統合先とブランチモデル |
-| [REQ-043](retired/REQ-043.md) | 評価ブランチ実証ワークフロー |
-| [REQ-045](retired/REQ-045.md) | 現行成果物体系の整合性網羅監査 |
-| [REQ-046](retired/REQ-046.md) | 横断正規化後の不変条件 |
-| [REQ-057](retired/REQ-057.md) | docs corpus 整合・現行化バッチ |
-| [REQ-092](retired/REQ-092.md) | agentdev_gh issue_list 呼出側運用規律（labels は追跡Issue論理軸の物理マッピング入力専用） |
-| [REQ-093](retired/REQ-093.md) | agentdev_gh 起動環境障害の予防・診断・回復の恒久化 |
-| [REQ-121](retired/REQ-121.md) | ADF 全体簡素化計画の見送り記録の正規保持 |
-<!-- AUTOGEN:END -->
-
 ## 基準構造
 
 - 現行 REQ: `docs/requirements/REQ-{NNN}.md`

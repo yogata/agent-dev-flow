@@ -24,8 +24,8 @@ Decision は REQ と管理特性を分離し（AG-004）、意味的健全性で
 |---|---|
 | 文書種別基準境界、文書ライフサイクル全体、accepted Decision の意味的不変、編集制約 | `document-model.md` |
 | Decision 関係モデル（relates-to / supersedes / reaffirms）、粒度管理規則、健全性評価モデル | 本 Design |
-| REQ 健全性メトリクス、SPLIT / MERGE / MOVE / DUPLICATE / RETIRE / DRIFT 診断観点 | `../quality/req-health-metrics.md`、`../responsibilities/document-type-responsibilities.md` |
-| Decision ID 形式、採番規則、欠番管理 | `patterns.md`、`numbering-policy.md` |
+| REQ 構造診断の SPLIT / MERGE / MOVE / DUPLICATE / RETIRE / DRIFT 診断観点 | `../responsibilities/document-type-responsibilities.md`、Workflow Skill `agentdev-req-structure-diagnostics` |
+| Decision ID 形式、採番規則 | `patterns.md`、`numbering-policy.md` |
 
 本 Design は Decision 固有の意味境界、関係、粒度、健全性に特化し、REQ 健全性モデルと重複しない（AG-017）。
 
@@ -123,7 +123,6 @@ Decision の粒度健全性を次の5シグナルで評価する。
 
 件数、行数、文字数等の機械的閾値は補助情報として扱い、単独で SPLIT / MERGE を確定しない。
 機械的閾値の超過は詳細評価のトリガーであり、判定そのものではない。
-REQ 健全性メトリクス（`req-health-metrics.md`）の閾値モデルとは独立して運用する（AG-006）。
 
 ## Decision 健全性評価モデル
 
@@ -152,9 +151,9 @@ Decision 健全性評価は REQ 重複・分割モデルと分離し、Decision 
 
 類似性が高く、かつ上記いずれにも該当しない場合は MERGE 候補とするが、自動実行せず人間または LLM の最終判断を経る。
 
-### REQ 健全性モデルとの分離
+### REQ 構造診断との分離
 
-REQ 健全性メトリクス（`req-health-metrics.md`）の SPLIT / MERGE / DUPLICATE 診断観点は REQ 体系に適用する。
+REQ 構造診断（Workflow Skill `agentdev-req-structure-diagnostics`）の SPLIT / MERGE / DUPLICATE 診断観点は REQ 体系に適用する。
 Decision 体系へは本 Design の粒度管理規則、健全性評価モデルを適用する。
 両者は独立して運用し、閾値、判定プロセス、評価対象を共有しない（AG-017）。
 
@@ -182,5 +181,5 @@ Decision 体系へ適用する場合は本 Design の粒度管理規則、健全
 ## 関連情報
 
 - 関連 REQ: REQ-001（文書体系と持続可能な基準構造、要件行 061〜064）
-- 関連 Design: `document-model.md`（文書ライフサイクル、accepted Decision の意味的不変）、`numbering-policy.md`（Decision 採番規則）、`../quality/req-health-metrics.md`（REQ 健全性モデル、本 Design と分離）
+- 関連 Design: `document-model.md`（文書ライフサイクル、accepted Decision の意味的不変）、`numbering-policy.md`（Decision 採番規則）。REQ 構造診断（`agentdev-req-structure-diagnostics` Skill）は本 Design と分離
 - 根拠合意項目: AG-004（REQ と Decision の管理特性分離）、AG-005（Decision 関係モデル）、AG-006（粒度管理の意味的健全性評価）、AG-017（Decision 健全性評価の REQ との分離）

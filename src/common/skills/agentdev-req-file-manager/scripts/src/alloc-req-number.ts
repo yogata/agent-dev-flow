@@ -1,9 +1,9 @@
 /**
  * REQ番号採番スクリプト（「Script 所有権と委譲契約」に基づく本 skill 正規所有）。
  *
- * 既存の REQ ファイル群（retired/ 配下を含む。numbering-policy.md
- * 「新規識別子は、当該種別の現行ファイル群（retired/ を含む）の最大番号に 1 を
- * 加えた値とする」）から最大番号を特定し、その +1 を採番する。
+ * 既存の REQ ファイル群（numbering-policy.md「新規識別子は、当該種別の現行
+ * ファイル群の最大番号に 1 を加えた値とする」）から最大番号を特定し、
+ * その +1 を採番する。
  *
  * I/O:
  *   入力: argv[2] = REQ ディレクトリパス（例: docs/requirements）
@@ -27,28 +27,25 @@ export function formatReqId(n: number): string {
 }
 
 /**
- * 当該種別の現行ファイル群（retired/ を含む）から既存 REQ 番号を収集する
- * （numbering-policy.md「新規識別子は、当該種別の現行ファイル群（retired/ を含む）
- * の最大番号に 1 を加えた値とする」準拠）。
+ * 当該種別の現行ファイル群から既存 REQ 番号を収集する（numbering-policy.md
+ * 「新規識別子は、当該種別の現行ファイル群の最大番号に 1 を加えた値とする」準拠）。
  * 各ファイルはファイル名由来（REQ-NNNN.md）を優先し、ファイル名が形式に合わない
  * 場合は frontmatter id 由来でフォールバックする。
  */
 export function collectExistingReqNumbers(dir: string): number[] {
   const numbers: number[] = [];
-  for (const target of [dir, joinPath(dir, "retired")]) {
-    for (const filename of listMarkdownFiles(target)) {
-      // ファイル名由来
-      const fromName = reqNumberFromFilename(filename);
-      if (fromName !== null) {
-        numbers.push(fromName);
-        continue;
-      }
-      // frontmatter id 由来（ファイル名が REQ-NNNN.md でない場合のフォールバック）
-      const content = readFileContent(joinPath(target, filename));
-      const fm = parseFrontmatterForReq(content);
-      if (fm !== null) {
-        numbers.push(fm);
-      }
+  for (const filename of listMarkdownFiles(dir)) {
+    // ファイル名由来
+    const fromName = reqNumberFromFilename(filename);
+    if (fromName !== null) {
+      numbers.push(fromName);
+      continue;
+    }
+    // frontmatter id 由来（ファイル名が REQ-NNNN.md でない場合のフォールバック）
+    const content = readFileContent(joinPath(dir, filename));
+    const fm = parseFrontmatterForReq(content);
+    if (fm !== null) {
+      numbers.push(fm);
     }
   }
   return numbers;

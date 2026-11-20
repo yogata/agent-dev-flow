@@ -65,7 +65,7 @@ case-run（内部 lifecycle 段階）が QG-1〜QG-3（ローカル検証、CI �
 | Post-Run Capture（実行後キャプチャ） | [workflows/capture-boundaries.md](../workflows/capture-boundaries.md) |
 | 関連ドキュメントの要件達成対象化 | [commands/case-run.md](../commands/case-run.md), [commands/case-close.md](../commands/case-close.md)（実装本体は各 Workflow Skill） |
 | ID 体系（REQ/Decision/IR 桁数） | [patterns.md](patterns.md), [integrity-rule-catalog.md](../integrity/integrity-rule-catalog.md) |
-| REQ 体系基準構造 | [req-health-metrics.md](../quality/req-health-metrics.md), [document-model.md](document-model.md) |
+| REQ 体系基準構造 | [document-model.md](document-model.md) |
 | REQ 分類ゲート | [commands/req-define.md](../commands/req-define.md), [commands/case-ready.md](../commands/case-ready.md)（case-ready 実装本体は Workflow Skill `agentdev-workflow-case-ready`） |
 | Issue テンプレート完了条件セクション | [skills/agentdev-workflow-templates.md](../skills/agentdev-workflow-templates.md), [commands/case-open.md](../commands/case-open.md)（case-open 実装本体は Workflow Skill `agentdev-workflow-case-open`） |
 | .opencode/ ディレクトリ責務、スクリプト配置方針、テスト配布方針 | [runtime-package-boundary.md](../local/runtime-package-boundary.md) |

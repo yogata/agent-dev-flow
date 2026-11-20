@@ -23,14 +23,11 @@ import {
   generateCatalogEntries,
   generateRuleOwnershipAppendix,
   collectDecisionFiles,
-  collectRetiredDecisionFiles,
   findUndeclaredRelatedReqDecisions,
   generateDecisionBaselineCaption,
   generateDecisionBaselineTable,
   generateDecisionStatusList,
-  generateDecisionRetiredTable,
   generateDecisionRelatedReqTable,
-  collectReqIdContext,
   extractRelatedReqNotes,
   DECISION_BASELINE_COUNT_BLOCK_ID,
   DECISION_BASELINE_TABLE_BLOCK_ID,
@@ -38,20 +35,12 @@ import {
   DECISION_STATUS_PROPOSED_BLOCK_ID,
   DECISION_STATUS_SUPERSEDED_BLOCK_ID,
   DECISION_STATUS_DEPRECATED_BLOCK_ID,
-  DECISION_RETIRED_TABLE_BLOCK_ID,
   DECISION_RELATED_REQ_TABLE_BLOCK_ID,
   collectReqFiles,
-  collectRetiredReqFiles,
   generateReqActiveCaption,
   generateReqActiveTable,
-  generateReqRetiredTable,
   REQ_ACTIVE_COUNT_BLOCK_ID,
   REQ_ACTIVE_TABLE_BLOCK_ID,
-  REQ_RETIRED_TABLE_BLOCK_ID,
-  collectReqMetrics,
-  deriveReqMetricsMeasureDate,
-  generateReqMetricsTable,
-  REQ_METRICS_BLOCK_ID,
   generateReadmeReqSummaryCount,
   generateDocsReadmeDecisionTable,
   README_REQ_SUMMARY_COUNT_BLOCK_ID,
@@ -117,7 +106,6 @@ export const ir061: IntegrityRule = {
     "docs/decisions/**",
     "docs/requirements/**",
     "docs/README.md",
-    "docs/designs/quality/req-health-metrics.md",
     "src/common/skills/repo-agentdev-integrity/**",
   ],
   globalScan: true,
@@ -192,15 +180,11 @@ export const ir061: IntegrityRule = {
       }
     }
 
-    // 3. Decision README（8 AUTOGEN blocks、AG-008）。
+    // 3. Decision README（7 AUTOGEN blocks、AG-008）。
     const decisionReadmeFile = ctx.readFile("docs/decisions/README.md");
     if (decisionReadmeFile !== null) {
       const decisionsDir = path.join(repoRoot, "docs", "decisions");
-      const decisionRetiredDir = path.join(decisionsDir, "retired");
-      const reqDir = path.join(repoRoot, "docs", "requirements");
-      const reqRetiredDir = path.join(reqDir, "retired");
       const decisionInfos = collectDecisionFiles(decisionsDir);
-      const decisionRetiredInfos = collectRetiredDecisionFiles(decisionRetiredDir);
       for (const d of findUndeclaredRelatedReqDecisions(decisionInfos)) {
         violations.push({
           ruleId: "IR-061",
@@ -219,12 +203,10 @@ export const ir061: IntegrityRule = {
         { blockId: DECISION_STATUS_PROPOSED_BLOCK_ID, expected: generateDecisionStatusList(decisionInfos, "proposed"), label: "decision-status-proposed" },
         { blockId: DECISION_STATUS_SUPERSEDED_BLOCK_ID, expected: generateDecisionStatusList(decisionInfos, "superseded"), label: "decision-status-superseded" },
         { blockId: DECISION_STATUS_DEPRECATED_BLOCK_ID, expected: generateDecisionStatusList(decisionInfos, "deprecated"), label: "decision-status-deprecated" },
-        { blockId: DECISION_RETIRED_TABLE_BLOCK_ID, expected: generateDecisionRetiredTable(decisionRetiredInfos), label: "decision-retired-table" },
         {
           blockId: DECISION_RELATED_REQ_TABLE_BLOCK_ID,
           expected: generateDecisionRelatedReqTable(
             decisionInfos,
-            collectReqIdContext(reqDir, reqRetiredDir),
             extractRelatedReqNotes(decisionReadmeFile.rawContent),
           ),
           label: "decision-related-req-table",
@@ -233,61 +215,28 @@ export const ir061: IntegrityRule = {
       verifyBlocks(decisionReadmeFile.rawContent, specs, violations);
     }
 
-    // 4. REQ README（3 AUTOGEN blocks、AG-009）。
+    // 4. REQ README（2 AUTOGEN blocks、AG-009）。
     const reqReadmeFile = ctx.readFile("docs/requirements/README.md");
     if (reqReadmeFile !== null) {
       const reqDir = path.join(repoRoot, "docs", "requirements");
-      const reqRetiredDir = path.join(reqDir, "retired");
       const reqInfos = collectReqFiles(reqDir);
-      const reqRetiredInfos = collectRetiredReqFiles(reqRetiredDir);
       const specs: AutogenBlockSpec[] = [
         { blockId: REQ_ACTIVE_COUNT_BLOCK_ID, expected: generateReqActiveCaption(reqInfos), label: "req-active-count" },
         { blockId: REQ_ACTIVE_TABLE_BLOCK_ID, expected: generateReqActiveTable(reqInfos), label: "req-active-table" },
-        { blockId: REQ_RETIRED_TABLE_BLOCK_ID, expected: generateReqRetiredTable(reqRetiredInfos), label: "req-retired-table" },
       ];
       verifyBlocks(reqReadmeFile.rawContent, specs, violations);
     }
 
-    // 5. req-health-metrics（1 AUTOGEN block、AG-006 候補5）。
-    const reqHealthMetricsFile = ctx.readFile("docs/designs/quality/req-health-metrics.md");
-    if (reqHealthMetricsFile !== null) {
-      const reqDir = path.join(repoRoot, "docs", "requirements");
-      const reqMetrics = collectReqMetrics(reqDir);
-      const measureDate = deriveReqMetricsMeasureDate(repoRoot, reqDir, reqMetrics);
-      if (measureDate === null) {
-        violations.push({
-          ruleId: "IR-061",
-          severity: "error",
-          filePath: "docs/designs/quality/req-health-metrics.md",
-          message:
-            `req-metrics measure date derivation failed (no commit history for docs/requirements/REQ-*.md or git failure). ` +
-            `Run: bun run src/common/skills/repo-agentdev-integrity/scripts/generate_indexes.ts (IR-061)`,
-          remediationHint: "regenerate indexes via generate_indexes.ts",
-        });
-      } else {
-        const specs: AutogenBlockSpec[] = [
-          {
-            blockId: REQ_METRICS_BLOCK_ID,
-            expected: generateReqMetricsTable(reqMetrics, measureDate),
-            label: "req-metrics-measurement-example",
-          },
-        ];
-        verifyBlocks(reqHealthMetricsFile.rawContent, specs, violations);
-      }
-    }
-
-    // 6. docs/README.md（req summary count + decision summary table、Wave 5）。
+    // 5. docs/README.md（req summary count + decision summary table、Wave 5）。
     const docsReadmeFile = ctx.readFile("docs/README.md");
     if (docsReadmeFile !== null) {
       const reqDir = path.join(repoRoot, "docs", "requirements");
-      const reqRetiredDir = path.join(reqDir, "retired");
       const decisionsDir = path.join(repoRoot, "docs", "decisions");
       const specs: AutogenBlockSpec[] = [
         {
           blockId: README_REQ_SUMMARY_COUNT_BLOCK_ID,
           expected: generateReadmeReqSummaryCount({
             activeReqCount: collectReqFiles(reqDir).length,
-            retiredReqCount: collectRetiredReqFiles(reqRetiredDir).length,
           }),
           label: "readme-req-summary-count",
         },

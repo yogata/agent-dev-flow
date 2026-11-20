@@ -134,8 +134,6 @@
 #   38 DEC-{N}〔形式例示〕
 # docs/requirements/REQ-012.md (1出現):
 #   23 REQ-{NNNN}-{MMM}〔形式例示〕
-# docs/requirements/retired/REQ-046.md (1出現):
-#   28 DEC-{N}〔履歴保持〕
 # src/common/commands/agentdev/backlog-auto.md (2出現):
 #   42 DEC-{N}→DEC-010; 42 REQ-{NNNN}-{NNN}→REQ-041
 # src/common/commands/agentdev/backlog-review.md (5出現):

@@ -71,7 +71,7 @@ REQ 要件行として残った各行について、Design 分離基準違反の
 ## SPLIT 予兆計算
 
 Step 3-2（既存REQ）および Step 10-2（生成ドラフト）で REQ 健全性メトリクスを計測し、`draft-meta.split-forecast` に SPLIT 予兆を記録する。
-閾値の正は req-health-metrics Design とする。
+閾値の正は `agentdev-req-structure-diagnostics` の SPLIT 定量閾値とする。
 
 ### 計測手順
 
@@ -113,7 +113,7 @@ split-forecast:
     spec_separation: 0
   total: 3
   recommended_action: "SPLIT推奨"
-  thresholds_ref: "req-health-metrics Design"
+  thresholds_ref: "req-structure-review SPLIT 定量閾値"
 ```
 
 推奨アクションが SPLIT 検討（合計2）以上の場合、req-define はユーザーへ SPLIT 要否を提示する。

@@ -141,8 +141,7 @@ GitHub I/O を伴う委譲の Custom Tool 経路: 委譲先サブエージェン
 ## case 実行責務の 4 用語と委譲（REQ-006、REQ-011-017、REQ-011-018）
 
 case 実行に関わる責務は 4 用語へ分解され、各委譲種別は対応する用語の所有権に従う。
-用語の正規定義と所有者は [responsibility-boundary-purification.md](../responsibilities/responsibility-boundary-purification.md)「case 実行責務の 4 用語と所有者」を SSoT とする。
-本節は委譲契約からの参照レベルに留まる。
+本節が用語の正規定義と所有者の SSoT である。
 
 | 用語 | 定義 | 正規所有者 | 関連する委譲種別 |
 |---|---|---|---|
@@ -306,7 +305,7 @@ case-run 委譲時に上位工程（case-auto orchestration・委譲 prompt 生�
 
 - [lifecycle-state-machine.md](lifecycle-state-machine.md)（result 4 状態・resume point の正）
 - [../foundations/runtime-execution-model.md](../foundations/runtime-execution-model.md)（authority 格子・直列化単位・冪等経路の正）
-- [../responsibilities/responsibility-boundary-purification.md](../responsibilities/responsibility-boundary-purification.md)（case 実行責務の 4 用語と所有者 SSoT、external execution boundary / harness execution mechanism の所有権）
+- [../foundations/harness-separation-model.md](../foundations/harness-separation-model.md)（harness execution mechanism の ADF 規範所有対象外）
 - [../commands/case-run.md](../commands/case-run.md)（Epic Wave 実行モデル〔v3 epic-wave-model Design 吸収先〕）
 - v2:ADR-0112（サブエージェント委譲の一般概念）
 - v2:ADR-0127（case-auto の工程委譲）

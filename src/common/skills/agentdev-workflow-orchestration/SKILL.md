@@ -15,7 +15,7 @@ Epic 全体の進行は case-auto が orchestration stage 3 の共有 active Iss
 ### case-run internal lifecycle フェーズ構成
 
 case-run は orchestration stage（case-auto が管理する command 間進行、Case 実行オーケストレーション要件 / case-auto 所有）と区別し、単一 Issue の case-run internal lifecycle（Case 実行オーケストレーション要件 / case-run 所有）として次のフェーズを管理する。
-本節のフェーズは case-run internal lifecycle に属し、orchestration stage とは混同しない（responsibility-boundary-purification Design「case 実行責務の 4 用語と所有者」参照）。
+本節のフェーズは case-run internal lifecycle に属し、orchestration stage とは混同しない（delegation-contracts Design「case 実行責務の 4 用語と委譲」参照）。
 
 | フェーズ | Steps | 再開条件 |
 |----------|-------|----------|

@@ -61,7 +61,7 @@ export interface CheckResult {
   expected?: string;
   route?: FindingRoute;
   finding_level?: FindingLevel;
-  /** Type of artifact: "req", "adr", "skill", "command", "spec", "template", "guide", "docmap", "retired" */
+  /** Type of artifact: "req", "adr", "skill", "command", "spec", "template", "guide", "docmap" */
   artifact_type?: string;
   finding_category?: FindingCategory;
   /**
@@ -449,8 +449,6 @@ export function classifyFindingLevel(
     "broken-section-anchor",
     "broken-req-ref",
     "broken-adr-ref",
-    "active-retired-duplication",
-    "retired-in-active-index",
     "implementation-pattern",
     "pattern-prohibitions",
     "command-map-consistency",
@@ -458,8 +456,6 @@ export function classifyFindingLevel(
     "variant-existence",
     "variant-required-fields",
     "fragment-patterns",
-    "retired-frontmatter-filename",
-    "retired-required-fields",
     "variant-path-existence",
     "variant-registry-registered",
     "skill-name-dir-match",
@@ -623,8 +619,6 @@ export function determineRoute(
 const CHECK_TO_FINDING_CATEGORY: Record<string, FindingCategory> = {
   "frontmatter-filename": "canonical-conflict",
   "required-fields": "canonical-conflict",
-  "retired-frontmatter-filename": "canonical-conflict",
-  "retired-required-fields": "canonical-conflict",
   "skill-name-dir-match": "canonical-conflict",
   "skill-use-for-boundary": "canonical-conflict",
   "cmd-implementation-pattern": "canonical-conflict",
@@ -644,7 +638,6 @@ const CHECK_TO_FINDING_CATEGORY: Record<string, FindingCategory> = {
   "docmap-req-sync": "broken-reference",
   "docmap-spec-sync": "broken-reference",
   "docmap-guide-sync": "broken-reference",
-  "req-retired-index-sync": "broken-reference",
   "adr-req-crossref": "broken-reference",
   "load-skills-existence": "broken-reference",
   "load-skills-consistency": "broken-reference",
@@ -656,8 +649,6 @@ const CHECK_TO_FINDING_CATEGORY: Record<string, FindingCategory> = {
   "broken-section-anchor": "broken-reference",
   "broken-req-ref": "broken-reference",
   "broken-adr-ref": "broken-reference",
-  "active-retired-duplication": "broken-reference",
-  "retired-in-active-index": "broken-reference",
   "reference-path-existence": "broken-reference",
   "runtime-unresolved-reference": "broken-reference",
   "legacy-namespace": "obsolete-structure",
@@ -699,7 +690,6 @@ function classifyArtifactType(category: string): string {
     return "template";
   if (lower.includes("guide")) return "guide";
   if (lower.includes("docmap")) return "docmap";
-  if (lower.includes("retired")) return "retired";
   if (lower.includes("report")) return "report"; // REQ-0108-188
   if (lower.includes("legacy") || lower.includes("namespace")) return "command";
   if (lower.includes("terminology")) return "command";

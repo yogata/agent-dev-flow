@@ -602,7 +602,7 @@ agent-dev-flow リポジトリの docs/designs/ 直下の基盤Designは、既�
 |---|---|---|
 | foundations/ | 基盤モデル、システム構成、文書フォーマット、設計原則 | numbering-policy.md, system.md, document-model.md, decision-lifecycle.md, patterns.md, design-principles.md, project-extensions.md, harness-separation-model.md, operating-model.md, runtime-execution-model.md |
 | responsibilities/ | 文書種別責務、成果物責任、アーティファクト契約、REQ影響マップ | document-type-responsibilities.md, artifact-responsibilities.md, artifact-contracts.md, req-impact-map.md |
-| quality/ | 品質仕様、品質ゲート、健全性メトリクス（REQ/Design 双方向） | quality-specs.md, quality-gate-model.md, req-health-metrics.md, design-health-metrics.md |
+| quality/ | 品質仕様、品質ゲート | quality-specs.md, quality-gate-model.md |
 | integrity/ | 整合性契約、整合性ルールカタログ、ルール所有権、配布物整合性 | integrity-contracts.md, integrity-rule-catalog.md, rule-ownership.md, docs-spec-rebuild-integrity.md, checker-execution-contracts.md |
 | local/ | ローカル版 Design 群（実行時パッケージ境界、link mode、Case ファイル） | runtime-package-boundary.md, local-case-file.md, install-script-usability.md, third-party-skill-management.md |
 | authoring/ | 執筆規約（2026-11-18 時点で配下 Design なし。DEC-065 により command-file-format.md・vocabulary-registry.md を廃止） | - |
@@ -616,13 +616,7 @@ agent-dev-flow リポジトリの docs/designs/ 直下の基盤Designは、既�
 ### 整合性ルールの局所物理分離
 
 integrity-rule-catalog.md の個別ルール（IR-NNN）は integrity/rules/ サブディレクトリに分離する（REQ-001-008, v2:REQ-0155-007）。
-integrity-rule-catalog.md はスキーマ定義とルールインデックスを維持し、各ルールの12フィールド詳細は integrity/rules/IR-NNN-{slug}.md に配置する（DEC-013 適用: `lifecycle_state`、`enforcement_mode`、`baseline_status` 削除、retired REQ-028-009/010 から移管）。
-
-### Design 健全性メトリクス
-
-design-health-metrics.md を quality/ 配下に配置する（REQ-001-007）。
-req-health-metrics.md と対となる Design 健全性の定量メトリクスを定義する。
-内容概念（REQ/Design 健全性の双方向メトリクス）は v2:REQ-0155 で決定された。
+integrity-rule-catalog.md はスキーマと索引を所有し、個別ルールの詳細は integrity/rules/IR-NNN-{slug}.md に置く（DEC-013）。
 
 ### 段階移送方針
 

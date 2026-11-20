@@ -35,7 +35,7 @@ updated: "2026-11-18"
 | triage_action | string | 新規検出時の対応アクション |
 | last_verified | date | 最終検証日 |
 
-### IR 属性モデル（DEC-013 適用、retired REQ-028-009/010 から移管）
+### IR 属性モデル（DEC-013）
 
 DEC-013 AG-009 により、`lifecycle_state`、`enforcement_mode`、`baseline_status` は現行 IR 属性から削除した。
 「現存 IR = 現行 = executable detector」を成立させ、`active+none` の恒久状態を禁止する。
@@ -46,7 +46,7 @@ baseline による既知/新規分類（finding-baseline 分類）と恒久免�
 検出違反は免除せず全件を新規扱いで報告し、対象ファイル側の直接修正で即時解消する。
 本カタログは baseline 分類を再定義しない。
 
-`severity`、`gate_level` は現行 IR に対する独立軸として維持する（REQ-036-022、retired REQ-028-009 決定7）。
+`severity` と `gate_level` は独立した属性とする（REQ-036-022）。
 IR lifecycle の代替とせず、実行可能 detector を持つ現行 IR の実行特性を表す。
 
 > **フィールド数**: 15 field から 12 field へ縮約した（`lifecycle_state`、`enforcement_mode`、`baseline_status` を削除）。
@@ -88,7 +88,6 @@ IR エントリ一覧は rules/index.ts のレジストリから `generate_index
 <!-- AUTOGEN:BEGIN:id=catalog-ir-entries -->
 - [IR-001: 現行 REQ frontmatter id ↔ ファイル名](rules/IR-001-req-frontmatter-id-filename.md)
 - [IR-002: 現行 REQ 必須 frontmatter fields](rules/IR-002-req-required-frontmatter.md)
-- [IR-003: Active/廃止 REQ ID 重複](rules/IR-003-active-retired-req-id-conflict.md)
 - [IR-004: REQ index ↔ 現行 REQ 一致](rules/IR-004-req-index-actual-consistency.md)
 - [IR-007: Skill frontmatter name ↔ dir](rules/IR-007-skill-name-dir-match.md)
 - [IR-008: Skill references/ 存在](rules/IR-008-skill-references-existence.md)
@@ -112,18 +111,14 @@ IR エントリ一覧は rules/index.ts のレジストリから `generate_index
 - [IR-075: ir-file-size](rules/IR-075-ir-file-size.md)
 <!-- AUTOGEN:END -->
 
-### IR-019, IR-022, IR-026, IR-036: inspect-docs 移管（retired REQ-028-007（後継は DEC-006/REQ-036 系）、OU-006 Phase 5）
+### 意味診断の担当
 
-> **docs-check 除外・inspect-docs 移管（2026-08-11）**: 4件の意味判断系 IR を docs-check（機械検出層）から除外し、inspect/diagnostics 層（inspect-docs workflow、Capability `agentdev-inspect-skills` の診断観点）へ移管した。文意品質の意味診断は docs 横断診断・inspect 系診断が、文章表層品質は textlint 共通基盤が担う（retired REQ-028-007（後継は DEC-006/REQ-036 系）、Phase 3 §5.2、§4.3）。
+文意品質は inspect-docs、文章表層品質は textlint が扱う（DEC-006）。
 > 意味判断・文脈判断を必要とする検査は機械検出層が保持せず、意味的診断層が担う（3層検出構造、`integrity-contracts.md`「3層検出構造の責務分担」）。
 > catalog↔実装双方向同期運用手順（REQ-010-003）に従い、当該 IR エントリを物理削除した。
 
 | IR | 旧タイトル | 移管先 | 根拠 |
 |---|---|---|---|
-| IR-019 | Guide 要件定義、契約記述検出 | inspect-docs（Guide 責務侵害観点） | Phase 3 §4.3、retired REQ-028-007 |
-| IR-022 | REQ 内部整合性 | inspect-docs（REQ 内部整合観点） | Phase 3 §4.3、retired REQ-028-007 |
-| IR-026 | ADR 誤分類兆候検出 | inspect-docs（Decision 誤分類観点） | Phase 3 §4.3、retired REQ-028-007 |
-| IR-036 | Decision-work-means-detection | inspect-docs（Decision work-means 観点） | Phase 3 §4.3、retired REQ-028-007 |
 
 > 識別子の再利用禁止は `foundations/numbering-policy.md` が保持し、履歴性は Git で担保する（DEC-013 AG-008）。
 

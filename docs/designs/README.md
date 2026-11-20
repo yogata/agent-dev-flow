@@ -167,7 +167,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 
 | Design | status | タイトル | 責務 |
 |------|--------|---------|------|
-| foundations/numbering-policy.md | accepted | 採番管理 Design | REQ/Decision/IR の識別子採番規則、欠番維持、決定的採番スクリプトとの協調 |
+| foundations/numbering-policy.md | accepted | 採番管理 Design | REQ/Decision/IR の識別子採番規則、決定的採番スクリプトとの協調 |
 | foundations/system.md | accepted | システム仕様 | コマンドシステムの構成定義、運用モデル |
 | foundations/document-model.md | accepted | 文書モデル | REQ/Decision/Design/guides の責務マトリックス、ドメイン別体系化規範 |
 | foundations/decision-lifecycle.md | accepted | Decision Lifecycle | Decision 関係モデル（relates-to / supersedes / reaffirms）、粒度管理規則、健全性評価モデル。document-model.md「Decision ライフサイクル詳細」から参照される詳細を正規所有 |
@@ -176,7 +176,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | foundations/project-extensions.md | accepted | Project Extensions | 実行時プロジェクト固有追加・拡張機構（`.agentdev/extensions/**`）、extension schema、実行時読み込み契約、project-local skill 委譲、配布物具体参照禁止（REQ-002） |
 | foundations/harness-separation-model.md | accepted | harness 分離モデル | 配布物と harness 実行制御の責務分離モデル。配布物の大多数を harness 非依存とし、依存具体を references/ へ集約 |
 | foundations/multi-host-canonical-model.md | accepted | マルチホスト原本モデル（共通原本とホスト別接続の分離） | 共通原本（src/common/）とホスト別接続領域（src/opencode/、src/senpi/）の配置契約、投影モデルと installer 対象選択、バックエンド×ホスト接続構成、guard 編集解釈の分離（REQ-099） |
-| foundations/references/concrete-abstraction.md | accepted | 配布物具体参照の抽象化参照 | 配布物から harness 固有・実装固有の具体を抽象化する手順の参照。harness-separation-model.md、responsibility-boundary-purification.md から参照される |
+| foundations/references/concrete-abstraction.md | accepted | 配布物具体参照の抽象化参照 | 配布物から harness 固有・実装固有の具体を抽象化する手順の参照。harness-separation-model.md から参照される |
 | foundations/operating-model.md | accepted | ADF Operating Model | 現行の目的・適用範囲・標準語彙・プロセス/実装分離原則、三層責務モデル（ADF Runtime / Standard Operating Model / Project Model）、Project Contract の論理ビュー、8 情報寿命モデル、中核文書モデル（REQ/Decision/Design/Implementation/Evidence）の定義 |
 | foundations/responsibility-boundaries.md | accepted | ADF 実装責務境界（意味判断 Skill / 決定的処理 code / Harness adapter / Project Extensions） | 意味判断 Skill / 決定的処理 code / Harness adapter / Project Extensions の実装責務境界（判断方法3分類〔決定的処理・閉じた意味評価・開いた推論〕の分類基準、OpenCode first-class reference harness、semantic extension point）の定義 |
 | foundations/traceability-model.md | accepted | ADF Traceability モデル | Change / Evidence 中心の Traceability モデル（4 問いへの回答能力、永続情報と導出可能情報の分離、global completeness の位置づけ）の定義 |
@@ -192,17 +192,14 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | responsibilities/artifact-responsibilities.md | accepted | 成果物責任表 | 各成果物種別の正規所有者と責務 |
 | responsibilities/artifact-contracts.md | accepted | アーティファクト契約 | Command/Skill/Template/Script の入出力、依存方向 |
 | responsibilities/req-impact-map.md | accepted | REQ 影響マップ | REQ → 影響するルール/アーティファクト の対応表。`integrity/rule-ownership.md`（ルールドメイン → canonical REQ/Design）と逆方向。同期更新が必要なケースあり。配置の原本は req-impact-map.md 冒頭の配置記述であり、`responsibilities/` 残置を現行配置として確定済み（本行は参照導線） |
-| responsibilities/responsibility-boundary-purification.md | accepted | 責務境界浄化: 所有/非所有リスト詳細 | 配布物と harness 実行制御の責務境界（所有/非所有リスト）。原則は harness-separation-model.md を SSoT とし、各工程（case-auto/case-run/adapter/extensions/タイムスタンプ）の詳細を集約。抽象化手順は `foundations/references/concrete-abstraction.md` を参照 |
 | responsibilities/artifact-quality-control-routing.md | accepted | Artifact Quality Control Routing Design | artifact type から必須品質能力を導出する合成規則、能力キー定義、QG-2 投影契約。REQ-017 execution contract の設計記録 |
 | responsibilities/custom-tool-contracts.md | accepted | Custom Tool 操作契約 | Custom Tool の操作契約（入力、出力、保証、失敗時）、ローカル版実装差し替え、迂回防止（REQ-052） |
 
-#### quality/（品質、メトリクス）
+#### quality/（品質）
 
 | Design | status | タイトル | 責務 |
 |------|--------|---------|------|
 | quality/quality-specs.md | accepted | 品質仕様 | 品質基準、検証ルール |
-| quality/req-health-metrics.md | accepted | REQ 健全性メトリクス | REQ 肥大化、関心ズレ検出の定量閾値 |
-| quality/design-health-metrics.md | accepted | Design 健全性メトリクス | Design 肥大化、放置、ドメイン分類適合の定量閾値 |
 | quality/quality-gate-model.md | accepted | ADF Quality / Verification / Evidence / Gate モデル | Quality Policy / Verification Obligation / Verifier / Evidence / Gate の 5 概念分解、Gate = 状態遷移 predicate 契約、standard lifecycle からの Gate 再導出手順、Verifier 分類の定義、統制種別必要性の正規節（REQ-103-018） |
 
 #### integrity/（整合性契約、ルール）
@@ -220,7 +217,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | integrity/distribution-boundary.md | accepted | 配布依存境界 | REQ-029 が宣言する意味境界の検証モデル、分類値、検出パイプライン、projection 契約、事前 gate と最終 gate の契約、archive 公開前検査、安定実装契約（モジュールパス、plugin パス、tool.execute.before フック種別、archive 検査呼び出し点）。DEC-014 多層 enforcement の正規参照先 |
 | integrity/validator-split-criteria.md | accepted | validator 分割基準 | targeted docs guard の validator 分割基準（責務境界、ファイルサイズ上限、関心分離ルール）。内部 validator 構成は `references/validator-internal-config.md` へ分離 |
 | integrity/targeted-docs-guard-implementation.md | accepted | Targeted Docs Guard 実装詳細 | 検証エンジン cli.ts --workflow（targeted docs guard）変更文書限定検査契約（CLI 引数、workflow 別検査項目、判定条件、false-clean 予防）。Phase 1-6 実装計画、report フィールド一覧、完了済み移行作業は `references/targeted-docs-guard-implementation-details.md` へ分離 |
-| integrity/autogen-freshness-gate.md | accepted | AUTOGEN ブロック鮮度検出 gate | AUTOGEN ブロック（design-health-metrics.md 等）の鮮度検出、rename/status 変更時の再生成必要性判定、不合格時の処置 |
+| integrity/autogen-freshness-gate.md | accepted | AUTOGEN ブロック鮮度検出 gate | AUTOGEN ブロックの鮮度検出、rename/status 変更時の再生成必要性判定、不合格時の処置 |
 | integrity/test-impact-detection-gate.md | accepted | テスト影響範囲検出 gate | リファクタリング PR で Design 変更に連動する周辺テストの陳腐化検出。変更 Design を参照し同一 PR で未更新のテストを陳腐化候補として報告、不合格時の処置契約（REQ-019） |
 | integrity/checker-execution-contracts.md | accepted | checker 実行契約と検出基盤規則 | checker 共通実行契約、検出対象除外規定、宣言的データ YAML の schema 原則、detector 命名規約 |
 | integrity/integrity-engine-plugin-architecture.md | accepted | 検証エンジン プラグインアーキテクチャ | repo-agentdev-integrity 検証エンジンのプラグイン型アーキテクチャ、共有コンテキストキャッシュ、差分実行、自動起票、カタログ自動生成の契約 |

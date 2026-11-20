@@ -90,7 +90,7 @@ Design 等に配置すべきと判定された要件行候補が、ドラフト�
 ### 8. SPLIT 予兆の記録
 
 既存 REQ を APPEND/UPDATE 対象とする場合、または生成ドラフトの要件行数が 51 行を超える場合、`draft-meta.split-forecast`（target、metrics、signals、total、recommended_action、thresholds_ref）が記録されているか。
-閾値の正は req-health-metrics Design とする。
+閾値の正は `agentdev-req-structure-diagnostics` の SPLIT 定量閾値とする。
 
 - **fail**: 記録すべき SPLIT 予兆（要件行数 51+、関心分類数 2+、成果物種別数 3+ のいずれか）があるのに `draft-meta.split-forecast` が未記録。
 - **warn**: split-forecast は記録されているが推奨アクション（SPLIT 検討、SPLIT 推奨）に対するユーザー応答が未確認。
