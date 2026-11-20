@@ -27,7 +27,6 @@ import { ir063 } from "../../rules/ir-063.ts";
 import { ir064 } from "../../rules/ir-064.ts";
 import { ir067 } from "../../rules/ir-067.ts";
 import { ir068 } from "../../rules/ir-068.ts";
-import { ir069 } from "../../rules/ir-069.ts";
 import { ir070 } from "../../rules/ir-070.ts";
 import { ir071 } from "../../rules/ir-071.ts";
 
@@ -552,31 +551,6 @@ describe("IR-068: skill-projection-manifest", () => {
       ["src/common/skills", ".opencode/skills"],
     );
     expect(ir068.check(ctx)).toEqual([]);
-  });
-});
-
-describe("IR-069: req-number-gap-recorded", () => {
-  test("異常系: 無記録欠番は違反", () => {
-    const ctx = new MemoryContext("/repo", {
-      "docs/requirements/REQ-001.md": REQ_MD_OK,
-      "docs/requirements/REQ-003.md": REQ_MD_OK.replace("REQ-001", "REQ-003"),
-      "docs/requirements/REQ-004.md": REQ_MD_OK.replace("REQ-001", "REQ-004"),
-      "docs/requirements/README.md": "# 要件\n",
-      "docs/README.md": "# docs\n",
-    });
-    const violations = ir069.check(ctx);
-    expect(violations.some((v) => v.message.includes("REQ-002"))).toBe(true);
-  });
-
-  test("正常系: 欠番明記行がある場合は違反 0", () => {
-    const ctx = new MemoryContext("/repo", {
-      "docs/requirements/REQ-001.md": REQ_MD_OK,
-      "docs/requirements/REQ-003.md": REQ_MD_OK.replace("REQ-001", "REQ-003"),
-      "docs/requirements/REQ-004.md": REQ_MD_OK.replace("REQ-001", "REQ-004"),
-      "docs/requirements/README.md": "# 要件\n\n欠番: REQ-002 は共有予約枠である。\n",
-      "docs/README.md": "# docs\n\n欠番: REQ-002 は共有予約枠である。\n",
-    });
-    expect(ir069.check(ctx)).toEqual([]);
   });
 });
 

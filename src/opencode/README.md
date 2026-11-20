@@ -6,7 +6,7 @@ OpenCode ホスト向けの接続を配置する領域である。ホスト接�
 
 | パス | 内容 |
 |---|---|
-| `plugins/` | OpenCode plugin/hook の正本（REQ-002-045）。Tool 登録配線（`agentdev-gh-tool`、`agentdev-jev-tool`、`agentdev-third-party-tool`）、guard 接続（`agentdev-gh-write-guard`、`agentdev-distribution-boundary-guard`、`agentdev-textlint-guard`） |
+| `plugins/` | OpenCode plugin/hook の正本（REQ-002-045）。Tool 登録配線（`agentdev-gh-tool`、`agentdev-third-party-tool`）、guard 接続（`agentdev-gh-write-guard`、`agentdev-distribution-boundary-guard`、`agentdev-textlint-guard`） |
 
 OpenCode 用 plugin/hook の正本は本パッケージ配下の独立 Plugin パッケージとして管理する（REQ-002-045）。OpenCode は `.opencode/plugins/` 直下の depth-1 ファイルのみを自動読み込みするため、導入時はインストーラが junction 作成とローダーシム生成を行う。
 

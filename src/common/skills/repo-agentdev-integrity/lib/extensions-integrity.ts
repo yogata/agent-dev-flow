@@ -167,8 +167,8 @@ function walkExtension(
 function projectLocalSkillExists(ctx: IntegrityContext, skillName: string): boolean {
   if (ctx.pathExists(`${SKILLS_DIR}/${skillName}`)) return true;
   if (ctx.pathExists(`${REPO_LOCAL_SKILLS_DIR}/${skillName}`)) return true;
-  // src/third-party/skills.yaml に宣言済みの third-party skill（yomiyasu 等の
-  // .opencode/skills 投影物）も既知配置として許容する。worktree（junction・
+  // src/third-party/skills.yaml に宣言済みの third-party skill（.opencode/skills
+  // 投影物）も既知配置として許容する。worktree（junction・
   // third-party 投影未伝播、REQ-018）では宣言で判定しないと環境差の誤検出になる。
   return isDeclaredThirdPartySkill(ctx, skillName);
 }

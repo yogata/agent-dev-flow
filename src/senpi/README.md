@@ -11,7 +11,7 @@ Senpi（OmO Native v5）ホスト向けの接続を配置する領域である�
 
 本領域は Wave 2 以降の接続系実行単位（Tool 接続、guard 接続、Skill 読込・workspace 解決、installer 投影）が順次配置する。配置される接続成果物は `src/opencode/` の対応する接続と同じ業務契約（`src/common/` 配下の共通正本）へ委譲する。
 
-Tool 接続は `tools/` 配下に配置済みである（`agentdev_gh`、`agentdev_jev`、`agentdev_third_party` の Senpi 向け Tool 登録単位と変換。詳細は `tools/README.md` を参照）。
+Tool 接続は `tools/` 配下に配置済みである（`agentdev_gh`、`agentdev_third_party` の Senpi 向け Tool 登録単位と変換。詳細は `tools/README.md` を参照）。
 
 ## 拘束条件
 

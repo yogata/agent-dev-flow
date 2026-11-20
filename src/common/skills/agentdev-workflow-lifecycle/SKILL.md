@@ -148,26 +148,8 @@ promote 系コマンド（intake-promote・learning-promote・inspect-promote）
 
 ## 文章品質・書込み規約（反復規則の単一正本）
 
-本節は、case 系 workflow（agentdev-workflow-case-auto、case-open、case-ready、case-revise、case-run、case-close、workflow-issue）で適用する文章品質規則（yomiyasu 推敲と書込み guard の説明）の本文の正本である。
+本節は、case 系 workflow（agentdev-workflow-case-auto、case-open、case-ready、case-revise、case-run、case-close、workflow-issue）で適用する書込み guard の説明の本文の正本である。
 各 workflow の project extension rules に反復していた規則エントリは Phase B（extensions 抜本縮減）で除去され、本節が規則の唯一の実装点である。工程側 references は対象範囲と呼出条件のみを保持し、本節への名レベル参照により規則本文を消費する。規則本文を各ファイルへ複製しない。本節の配置変更は公開契約の変更として扱う。
-
-### yomiyasu 推敲の適用規律
-
-yomiyasu による推敲・同梱 lint の適用は、利用者が yomiyasu 適用を明示的に指示した場合にのみ実行する（通常フローでは発動しない opt-in 運用）。適用を指示された場合は docs/** の日本語文章を対象に、編集前に yomiyasu を読み込み、内容変更が揃った後に変更文章と周辺文脈を推敲し、同梱 lint を実行して指摘を確認してから提出する。各 edit ごと・既存文書全体の一括推敲は不要。
-
-lint の実行経路: `.opencode/skills/yomiyasu/scripts/yomiyasu_lint.py` を、環境で利用可能な Python コマンド（python3 に固定しない）で実行する。標準入力・パイプ・リダイレクト経由の本文渡しは使わず、検査専用本文ファイルを project root 内の gitignore 対象領域（`.agentdev/tmp/` 等・検査後削除）へ新規作成して lint のファイル引数実行を行い、検査後に当該ファイルを削除する。パイプ・リダイレクト経由の本文渡しが Windows 環境の文字コード再符号化により本文を破損し得る事象の詳細と標準回避手段は、docs/knowledge/windows-powershell-bulk-io-corruption.md を参照する（必要なときだけ参照する条件付き参照）。
-
-GitHub 文章（Issue/PR タイトル・本文、説明・レビュー・完了コメント。委譲先能力スキル〔agentdev-issue-management、agentdev-workflow-templates、agentdev-epic-tracker、agentdev-quality-gates、agentdev-case-run-execution-adapter〕経由の書込みを含む）も、明示指示に基づく適用対象である場合は agentdev_gh へ渡す前に推敲する。本文は lint・指摘確認後、タイトルは本文向け文長・箇条書き比率を合否条件にしない。書込み後 VERIFY は維持する。
-
-更新は変更文章と周辺文脈を対象とし、他者の文章・引用・ログを無断でリライトしない。ラベル・状態・チェックボックスのみの変更は再推敲不要。
-
-推敲は要件の必須性、条件、責任主体、数値、否定条件を保持し、識別子、リンク、コード、引用、固定テンプレート、表構造、AUTOGEN 部分を保護する。既存の用語辞書と文書契約を優先し、曖昧な主体を推測で補わない。箇条書きの削減と否定対比の肯定化を機械的に適用しない。
-
-適用済みは推敲・lint・指摘確認までを指す（修正不要の確認を含む）。警告ゼロ・スコア閾値・--strict を要求せず、lint の通常終了コード 0 を指摘なし・推敲済みの証明として扱わない。正当な用語への指摘は理由を記録して保持できる。修正試行は最大 2 回。
-
-yomiyasu 未導入・lint 実行失敗の場合は対象文章の提出・投稿・マージを停止する。適用確認は最後の文章変更後に行い、親セッションの読込事実のみで委譲先の適用を省略しない。
-
-記録は既存 PR 検証欄等へ対象・実施結果・保持した指摘理由を最小限残し、記録のためだけの再帰的コメント投稿や追加永続管理を作らない。
 
 ### 書込み guard の拒否対象・許可対象と拒否後の回復
 

@@ -136,13 +136,6 @@ implementation:
     - REQ-094-006
     - REQ-094-010
     - REQ-094-011
-  docs/requirements/REQ-090.md:
-    - REQ-094-002
-    - REQ-094-003
-    - REQ-094-004
-    - REQ-094-006
-    - REQ-094-010
-    - REQ-094-011
   docs/requirements/retired/REQ-026.md:
     - REQ-094-003
     - REQ-094-005

@@ -99,7 +99,7 @@ rg -n "\.opencode/tools|\.senpi/tools" src/ docs/ scripts/ *.md
 |---|---|---|
 | src/ 配下のコード・テスト参照 | scripts/self 配下の検査テスト 8 ファイル（旧原本パスをパス定数として保持、実行時に ENOENT）、case-intake-cross-inspection 3 ファイル（区切り配列形式パス）、third-party-sync 契約テスト、textlint-guard テスト 2 ファイル、guard-connection テスト（bare import） | 本 PR 内で新原本パスへ更新し検証済み（bun test src 878 pass / scripts 263 pass） |
 | installer の旧 Local 実装参照 | `scripts/install.ps1`（LocalMode リンク先 `src/opencode-local`、実体不存在）、`scripts/consumer/common.ps1`、`scripts-behavior.test.ts` fixture | 本 PR 内で `src/common/tools/agentdev-gh/local/` へ更新し、実 fixture 統合テストで検証済み（17 pass） |
-| docs 記述の現行化 | docs/designs、docs/knowledge、AGENTS.md の現行記述としての旧原本パス（artifact-responsibilities、document-model、workflow-skill-model、custom-tool-contracts、local-case-file 等のパス文字列） | パス文字列を同値置換で現行化（文意不変）。yomiyasu 同梱 lint 全件 exit 0 を確認 |
+| docs 記述の現行化 | docs/designs、docs/knowledge、AGENTS.md の現行記述としての旧原本パス（artifact-responsibilities、document-model、workflow-skill-model、custom-tool-contracts、local-case-file 等のパス文字列） | パス文字列を同値置換で現行化（文意不変） |
 | 歴史記録・移行記述（参照行として除外） | DEC-004（当時の名称である旨を明記）、DEC-007（superseded 済み決定記録）、docs/requirements/retired 配下、backticks-identifier-threshold の過去事象記述、checker-fixture 知識の過去注記 | 変更しない（Decision と retired REQ は決定記録・歴史記録であり遡及改変しない） |
 | 旧 archive 構造一式（本 PR で修正せず記録） | `scripts/self/release/package-release-archive.ps1`（src/opencode 前提の収集・boundary check）、`scripts/consumer/archive/install.ps1`、`README-INSTALL.md` の同梱内容、`docs/designs/integrity/integrity-contracts.md` の archive レイアウト節 | release archive の新構造（src/common + src/opencode + src/senpi + src/third-party）対応は収集対象と boundary check の再設計を伴うため、Findings / Capture候補 へ記録 |
 | Design 文書の旧構成セクション（本 PR で修正せず記録） | `docs/designs/local/runtime-package-boundary.md`（REQ-009 時代の接続構成を大量保持）、`docs/designs/local/third-party-skill-management.md`（旧 skill-projection-manifest 時代の記述） | 文書全体の現行化は意味判断を伴うため Findings へ記録 |
@@ -117,9 +117,3 @@ rg -n "\.opencode/tools|\.senpi/tools" src/ docs/ scripts/ *.md
 | 配布依存境界最終 gate | `node --experimental-strip-types ./.opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary.ts --profile source --root <worktree> --json` | ok:true / failures 0（scanned 362） |
 | UTF-8 健全性（変更ファイル全件） | BOM / CR / U+FFFD 検査 | 49 ファイル / 異常 0 件 |
 | トレーサビリティ check | `bun src/common/skills/agentdev-traceability/scripts/src/check.ts --root . --req REQ-099-007,REQ-099-008,REQ-099-009,REQ-099-015,REQ-099-016,REQ-099-019` | 9 検出項目の結果は PR 本文の検証差分セクションを参照 |
-
-## REQ-098 yomiyasu 推敲の適用記録
-
-docs 変更（パス現行化と本記録）に対し、yomiyasu を読み込んだ上で編集を行い、同梱 lint
-（`yomiyasu_lint.py`）を変更ファイル 23 件へ実行した。全件 exit 0。パス文字列の同値置換は
-文意・数値・識別子を変更しないため、本文の推敲不要を確認した（REQ-098-007 の修正不要確認）。

@@ -34,7 +34,7 @@ OpenCode セッションを介さず同じ取得操作を実行する CLI を同
 # リポジトリルートをカレントディレクトリとして実行する
 bun src/common/tools/agentdev-third-party/cli.ts --dry-run  # 取得計画の表示のみ（配置しない）
 bun src/common/tools/agentdev-third-party/cli.ts            # 宣言の全件を取得
-bun src/common/tools/agentdev-third-party/cli.ts yomiyasu   # 宣言の1件のみ取得
+bun src/common/tools/agentdev-third-party/cli.ts <name>     # 宣言の1件のみ取得
 ```
 
 - 終了コードは取得成否に連動する（成功 0、失敗 1、引数解釈不能 2）

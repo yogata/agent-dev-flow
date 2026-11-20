@@ -10,7 +10,7 @@ import type {
 const SKILLS_DIR = "src/common/skills";
 
 /** Design checker-execution-contracts が名指しする third-party Skills。 */
-const NAMED_THIRD_PARTY_SKILLS = ["explainer", "explainer-book", "first-reader", "yomiyasu"] as const;
+const NAMED_THIRD_PARTY_SKILLS = ["explainer", "explainer-book", "first-reader"] as const;
 
 /**
  * src/third-party/skills.yaml に宣言された third-party skill 名集合。

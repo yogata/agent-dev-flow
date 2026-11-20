@@ -22,13 +22,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-現行 REQ: 79件、廃止済み: 20件
+現行 REQ: 77件、廃止済み: 19件
 <!-- AUTOGEN:END -->
 
 現行要件は79件である。
-REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）による意図的予約欠番であり、実体は存在しない（[採番管理](designs/foundations/numbering-policy.md) 参照）。
-REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却枠であり、意図的予約欠番として維持する。
-REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全 revert）由来の廃止識別子であり、再利用しない。次の新規 REQ 番号は採番時点で REQ 実ファイル一覧と既知欠番レジストリから決定的採番スクリプト（alloc-req-number.ts）により決定する（[採番管理](designs/foundations/numbering-policy.md) 参照）。
 各 REQ の詳細は各 REQ ファイル本文を参照。
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-table -->
@@ -83,13 +80,11 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [REQ-082](requirements/REQ-082.md) | 対論型レビュー審議契約 |
 | [REQ-083](requirements/REQ-083.md) | 設計PRの状態契約（通常 Pull Request・ブランチ命名・用語・正規操作完結） |
 | [REQ-088](requirements/REQ-088.md) | ADF v4 基盤要件（三層責務・情報寿命・Project Contract・中核文書モデル） |
-| [REQ-090](requirements/REQ-090.md) | Jev 先行評価の実運用組込み（Stage 1: 観測可能化） |
 | [REQ-091](requirements/REQ-091.md) | Supervisor 環境向け credential 供給ブリッジの原本管理 |
 | [REQ-094](requirements/REQ-094.md) | ADF の Markdown 日本語表現および用語選択基準 |
 | [REQ-095](requirements/REQ-095.md) | agentdev_gh 起票・読取操作の呼出側規律 |
 | [REQ-096](requirements/REQ-096.md) | ADF判断アーキテクチャ（判断方法・確定権限・人間判断境界） |
 | [REQ-097](requirements/REQ-097.md) | third-party 成果物の運用前提と導入検知 |
-| [REQ-098](requirements/REQ-098.md) | yomiyasu 推敲の工程必須化（docs 変更と GitHub 書込み文章） |
 | [REQ-099](requirements/REQ-099.md) | ADF 共通原本とホスト接続領域の分離によるマルチホスト併存利用 |
 | [REQ-100](requirements/REQ-100.md) | ADF が起票する Issue タイトルの記述規則 |
 | [REQ-101](requirements/REQ-101.md) | Case Issue 工程記録モデル |
@@ -162,19 +157,14 @@ REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全
 | [DEC-037](decisions/DEC-037.md) | Traceability の Change / Evidence 中心への再中心化（superseded by DEC-054〔トレーサビリティモデルの標準関係構造（Design への定義権委譲を前提とした covers 単独の標準コア関係を含む）を DEC-054 が拡張（covers＋採用された隣接工程間対応）。直接走査、標準能力（coverage/impact/check）、用語政策の各決定は維持する〕） |
 | [DEC-038](decisions/DEC-038.md) | ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則） |
 | [DEC-039](decisions/DEC-039.md) | ADF v4 authority・副作用統制と冪等・並行性モデル |
-| [DEC-040](decisions/DEC-040.md) | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化）（superseded by DEC-044〔決定4 は DEC-044 が置換。決定2 は DEC-046 が置換。決定1・3は維持〕） |
 | [DEC-041](decisions/DEC-041.md) | Wave 構成純度と実行並列上限の単一所有（superseded by DEC-051〔決定5（Wave 収束前提）は DEC-051 が置換。決定1〜4 は本 Decision が現行として維持〕） |
 | [DEC-042](decisions/DEC-042.md) | case-auto 最大並列維持と同期逐次フォールバック禁止 |
-| [DEC-043](decisions/DEC-043.md) | case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング）（superseded by DEC-044〔本 Decision の決定（Stage 2: 閾値ルーティングによる Jev 最終判断採用）は DEC-044（基本判断経路への復帰）が置換する〕） |
-| [DEC-044](decisions/DEC-044.md) | Semantic Evaluation 観測契約の一次事実中心再設計と基本判断経路への復帰（superseded by DEC-052〔決定3（基本判断経路への復帰）のうち「evaluator 失敗・未設定・事前検証失敗時も reasoning model 経由で Workflow を継続する」部分は DEC-052 が REQ-103 の障害時契約（REQ-103-008〜011）で部分置換。決定1・2・4〜8 は維持（status: accepted 維持）〕） |
 | [DEC-045](decisions/DEC-045.md) | リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化（superseded by DEC-050〔部分置換。決定3後半（設定が true でない場合または検証不能な場合は blocked で停止する）を 新規 Decision（deleteBranchOnMerge 設定不備の警告化と操作安全性停止の維持）が置換する。 置換対象外: 決定1（case-close のリモート削除撤廃と GitHub 自動削除委譲）、決定2 （deleteBranchOnMerge=true 導入必須）、決定3前半（preflight での読取専用 repo meta 照会、 agentdev_gh 操作カタログ不拡張、導入系スクリプトのネットワークアクセス禁止）、決定4（ローカル版対象外）。 status は accepted を維持する（decision-lifecycle「部分置換では status 維持」準拠）。〕） |
-| [DEC-046](decisions/DEC-046.md) | Jev 実行基盤の Cloudflare AI Gateway への完全置換 |
 | [DEC-047](decisions/DEC-047.md) | textlint 依存実体の版固定情報解決への転換 |
 | [DEC-048](decisions/DEC-048.md) | ADF判断アーキテクチャ: 判断方法・確定権限・人間判断境界の統一モデル |
 | [DEC-049](decisions/DEC-049.md) | ADF 共通原本とホスト接続領域の分離によるマルチホスト配布モデル |
 | [DEC-050](decisions/DEC-050.md) | deleteBranchOnMerge 設定不備の警告化と操作安全性停止の維持 |
 | [DEC-051](decisions/DEC-051.md) | case-auto stage 3 のスロット型キューへの移行（Wave 収束前提の撤廃） |
-| [DEC-052](decisions/DEC-052.md) | Jev 評価器障害時の判定未確定と依存後続抑止への移行（DEC-044 決定3 の部分置換） |
 | [DEC-053](decisions/DEC-053.md) | ADF v5 工程・成果物モデル（共通責務・参照モデル工程・成果物の意味と正式確定） |
 | [DEC-054](decisions/DEC-054.md) | ADF v5 追跡・品質検証モデル（隣接工程間対応・構造/意味分離・差分影響評価） |
 | [DEC-055](decisions/DEC-055.md) | ADF v5 有限実行と責務再編（工程独立実行・Issue 必要時利用・Wave の意味的依存グループ化） |

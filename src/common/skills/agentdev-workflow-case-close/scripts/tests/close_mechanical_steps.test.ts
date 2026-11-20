@@ -67,7 +67,7 @@ function preMergeInput(overrides: Partial<CloseMechanicalInput> = {}): CloseMech
     integrityGates: [gate("check_integrity"), gate("check_autogen_freshness")],
     textlintGate: gate("textlint-final-check"),
     contractStateCheck: {
-      contractStatePaths: [".agentdev/jev-observations", ".agentdev/learning/inbox/"],
+      contractStatePaths: [".agentdev/intake/inbox", ".agentdev/learning/inbox/"],
       approvalEntries: [],
     },
     verificationScope: {
@@ -224,7 +224,7 @@ describe("入力検証（品質ゲートの省略禁止）", () => {
     const badEntries = {
       ...base,
       contractStateCheck: {
-        contractStatePaths: [".agentdev/jev-observations"],
+        contractStatePaths: [".agentdev/intake/inbox"],
         approvalEntries: [null],
       },
     };
@@ -232,7 +232,7 @@ describe("入力検証（品質ゲートの省略禁止）", () => {
     const badConfirmed = {
       ...base,
       contractStateCheck: {
-        contractStatePaths: [".agentdev/jev-observations"],
+        contractStatePaths: [".agentdev/intake/inbox"],
         approvalEntries: [],
         humanConfirmedPaths: [{ path: "stray.txt" }],
       },
@@ -414,22 +414,22 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
   test("決定的判定: 状態記録配下・承認一覧・人間確認済み・帰属不能の4分類", () => {
     const evaluation = evaluateContractStateResidue(
       {
-        contractStatePaths: [".agentdev/jev-observations"],
+        contractStatePaths: [".agentdev/learning/deferred"],
         approvalEntries: [".agentdev/intake/inbox"],
         humanConfirmedPaths: [
           { path: "notes/stray.txt", basis: "Issue #100 コメントで本 Case 無関係と確認" },
         ],
       },
-      "?? .agentdev/jev-observations/obs-1.json\n",
+      "?? .agentdev/learning/deferred/item-1.json\n",
       [
-        ".agentdev/jev-observations/obs-1.json",
+        ".agentdev/learning/deferred/item-1.json",
         ".agentdev/intake/inbox/item-a.md",
         "notes/stray.txt",
         "notes/unattributed.txt",
       ].join("\n"),
     );
     expect(evaluation.committed).toBe(false);
-    expect(evaluation.uncommittedStateRecords).toEqual([".agentdev/jev-observations/obs-1.json"]);
+    expect(evaluation.uncommittedStateRecords).toEqual([".agentdev/learning/deferred/item-1.json"]);
     expect(evaluation.approvedAllowances).toEqual([
       { path: ".agentdev/intake/inbox/item-a.md", entry: ".agentdev/intake/inbox" },
     ]);
@@ -466,7 +466,7 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
       "status",
       "--porcelain",
       "--",
-      ".agentdev/jev-observations",
+      ".agentdev/intake/inbox",
       ".agentdev/learning/inbox/",
     ]);
     const untrackedCall = runner.calls.find(
@@ -481,7 +481,7 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
   test("実経路: 未コミット契約状態記録の検出時は失敗で完了扱いにしない", () => {
     const runner = fakeRunner({
       issueBody: "- [x] 条件1\n",
-      contractStateStatus: "?? .agentdev/jev-observations/obs-1.json\n",
+      contractStateStatus: "?? .agentdev/intake/inbox/item-1.json\n",
     });
     const report = runCloseMechanicalSteps(
       preMergeInput({ acceptanceVerdicts: [soundPass(CID1)] }),
@@ -496,7 +496,7 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
       reason: "contract-state-residue-unresolved",
     });
     const residue = report.diff.contractStateResidue as { uncommittedStateRecords: string[] };
-    expect(residue.uncommittedStateRecords).toEqual([".agentdev/jev-observations/obs-1.json"]);
+    expect(residue.uncommittedStateRecords).toEqual([".agentdev/intake/inbox/item-1.json"]);
   });
 
   test("実経路: 帰属不能の未追跡残存は人間確認事項として報告し、確認なしに完了判定へ進めない", () => {
@@ -527,7 +527,7 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
       preMergeInput({
         acceptanceVerdicts: [soundPass(CID1)],
         contractStateCheck: {
-          contractStatePaths: [".agentdev/jev-observations", ".agentdev/learning/inbox/"],
+          contractStatePaths: [".agentdev/intake/inbox", ".agentdev/learning/inbox/"],
           approvalEntries: [],
           humanConfirmedPaths: [
             { path: "stray.txt", basis: "対応記録コメントで本 Case 由来・起票済みと確認" },
@@ -558,7 +558,7 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
       preMergeInput({
         acceptanceVerdicts: [soundPass(CID1)],
         contractStateCheck: {
-          contractStatePaths: [".agentdev/jev-observations", ".agentdev/learning/inbox/"],
+          contractStatePaths: [".agentdev/intake/inbox", ".agentdev/learning/inbox/"],
           approvalEntries: ["sandbox"],
         },
       }),

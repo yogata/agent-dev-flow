@@ -113,7 +113,7 @@ data yaml の新設は、当該 yaml を読み込む消費者実装（checker �
 
 ## third-party Skill 境界使用の扱い（skill-use-for-boundary 免除の代替扱い）
 
-third-party Skill 4件（explainer、explainer-book、first-reader、yomiyasu）の `.opencode/skills/` 配下配置に伴う境界検出（旧 skill-use-for-boundary 免除）は、恒久免除レジストリ（baselines/exemptions.json、撤廃済み）から本節への代替扱い記載で移行した（Epic #4126 Phase 4、REQ-010-074）。
+third-party Skill 3件（explainer、explainer-book、first-reader）の `.opencode/skills/` 配下に伴う境界検出の扱いを本節に定める（REQ-010-074）。
 
 - 現行の扱い: third-party Skill は DEC-023 の取得機構（`src/third-party/skills.yaml` 宣言、agentdev_third_party 取得）で管理され、IR-058（distribution-untracked-skill-reference）の skills.yaml 宣言 carve-out と IR-068 の INSPECTION-TOLERATED 判定が検出器レベルの正規扱いを持つ。独立の免除登録は行わない
 - 再取得時の再発受容: third-party Skill の再取得（third-party-sync）で検出違反が再発した場合は、コードレベルの豁免（検出器の正当使用例外パス追加）または個別修正と再取得時の再発受容（同内容の再検出は既知の実行環境差として扱い、都度の免除登録を行わない）のいずれかで処理する。免除レジストリの再設置は行わない

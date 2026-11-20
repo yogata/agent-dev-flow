@@ -10,7 +10,7 @@
 DEC-018 は欠番であり、対応する Decision ファイルは存在しない。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は57件、提案中の Decision は0件である。
+現行の承認済み Decision は54件、提案中の Decision は0件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -54,19 +54,14 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 | DEC-037 | Traceability の Change / Evidence 中心への再中心化 | accepted | 2026-09-18 |
 | DEC-038 | ADF v4 durable state 配置と再構成の契約（状態権威・証跡分離・非原子調整原則） | accepted | 2026-09-19 |
 | DEC-039 | ADF v4 authority・副作用統制と冪等・並行性モデル | accepted | 2026-09-19 |
-| DEC-040 | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化）〔superseded by DEC-044。決定4 は DEC-044 が置換。決定2 は DEC-046 が置換。決定1・3は維持〕 | superseded | 2026-09-22 |
 | DEC-041 | Wave 構成純度と実行並列上限の単一所有 | accepted | 2026-09-23 |
 | DEC-042 | case-auto 最大並列維持と同期逐次フォールバック禁止 | accepted | 2026-09-24 |
-| DEC-043 | case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング）〔superseded by DEC-044。本 Decision の決定（Stage 2: 閾値ルーティングによる Jev 最終判断採用）は DEC-044（基本判断経路への復帰）が置換する〕 | superseded | 2026-09-26 |
-| DEC-044 | Semantic Evaluation 観測契約の一次事実中心再設計と基本判断経路への復帰 | accepted | 2026-09-26 |
 | DEC-045 | リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化 | accepted | 2026-09-27 |
-| DEC-046 | Jev 実行基盤の Cloudflare AI Gateway への完全置換 | accepted | 2026-09-27 |
 | DEC-047 | textlint 依存実体の版固定情報解決への転換 | accepted | 2026-09-29 |
 | DEC-048 | ADF判断アーキテクチャ: 判断方法・確定権限・人間判断境界の統一モデル | accepted | 2026-10-01 |
 | DEC-049 | ADF 共通原本とホスト接続領域の分離によるマルチホスト配布モデル | accepted | 2026-10-02 |
 | DEC-050 | deleteBranchOnMerge 設定不備の警告化と操作安全性停止の維持 | accepted | 2026-10-04 |
 | DEC-051 | case-auto stage 3 のスロット型キューへの移行（Wave 収束前提の撤廃） | accepted | 2026-10-06 |
-| DEC-052 | Jev 評価器障害時の判定未確定と依存後続抑止への移行（DEC-044 決定3 の部分置換） | accepted | 2026-10-07 |
 | DEC-053 | ADF v5 工程・成果物モデル（共通責務・参照モデル工程・成果物の意味と正式確定） | accepted | 2026-10-09 |
 | DEC-054 | ADF v5 追跡・品質検証モデル（隣接工程間対応・構造/意味分離・差分影響評価） | accepted | 2026-10-09 |
 | DEC-055 | ADF v5 有限実行と責務再編（工程独立実行・Issue 必要時利用・Wave の意味的依存グループ化） | accepted | 2026-10-09 |
@@ -127,15 +122,12 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 - [DEC-039](DEC-039.md)（ADF v4 authority・副作用統制と冪等・並行性モデル）
 - [DEC-041](DEC-041.md)（Wave 構成純度と実行並列上限の単一所有）
 - [DEC-042](DEC-042.md)（case-auto 最大並列維持と同期逐次フォールバック禁止）
-- [DEC-044](DEC-044.md)（Semantic Evaluation 観測契約の一次事実中心再設計と基本判断経路への復帰）
 - [DEC-045](DEC-045.md)（リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化）
-- [DEC-046](DEC-046.md)（Jev 実行基盤の Cloudflare AI Gateway への完全置換）
 - [DEC-047](DEC-047.md)（textlint 依存実体の版固定情報解決への転換）
 - [DEC-048](DEC-048.md)（ADF判断アーキテクチャ: 判断方法・確定権限・人間判断境界の統一モデル）
 - [DEC-049](DEC-049.md)（ADF 共通原本とホスト接続領域の分離によるマルチホスト配布モデル）
 - [DEC-050](DEC-050.md)（deleteBranchOnMerge 設定不備の警告化と操作安全性停止の維持）
 - [DEC-051](DEC-051.md)（case-auto stage 3 のスロット型キューへの移行（Wave 収束前提の撤廃））
-- [DEC-052](DEC-052.md)（Jev 評価器障害時の判定未確定と依存後続抑止への移行（DEC-044 決定3 の部分置換））
 - [DEC-053](DEC-053.md)（ADF v5 工程・成果物モデル（共通責務・参照モデル工程・成果物の意味と正式確定））
 - [DEC-054](DEC-054.md)（ADF v5 追跡・品質検証モデル（隣接工程間対応・構造/意味分離・差分影響評価））
 - [DEC-055](DEC-055.md)（ADF v5 有限実行と責務再編（工程独立実行・Issue 必要時利用・Wave の意味的依存グループ化））
@@ -168,8 +160,6 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 - [DEC-017](DEC-017.md)（最小トレーサビリティモデルの採用と Artifact Graph の廃止）
 - [DEC-029](DEC-029.md)（公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入）
 - [DEC-030](DEC-030.md)（トレーサビリティ標準機能への一般化と producer / consumer 境界の確立）
-- [DEC-040](DEC-040.md)（typesafe/Jev 先行評価の採用（Stage 1: 観測可能化））〔superseded by DEC-044。決定4 は DEC-044 が置換。決定2 は DEC-046 が置換。決定1・3は維持〕
-- [DEC-043](DEC-043.md)（case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング））〔superseded by DEC-044。本 Decision の決定（Stage 2: 閾値ルーティングによる Jev 最終判断採用）は DEC-044（基本判断経路への復帰）が置換する〕
 <!-- AUTOGEN:END -->
 
 ### 非推奨（deprecated）
@@ -220,13 +210,9 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 - [DEC-035](DEC-035.md)（v4 Quality / Verification / Evidence / Gate モデルへの分解、検査と証跡の品質境界）
 - [DEC-038](DEC-038.md)（ADF v4 durable state 配置と再構成の契約、状態権威と非原子調整原則、DEC-015 の補完後継）
 - [DEC-039](DEC-039.md)（ADF v4 authority・副作用統制と冪等・並行性モデル、DEC-015 の補完後継）
-- [DEC-040](DEC-040.md)（typesafe/Jev 先行評価の採用（Stage 1: 観測可能化）、superseded by DEC-044〔決定4 部分〕・決定2 は DEC-046 が置換・決定1・3は維持）
 - [DEC-041](DEC-041.md)（Wave 構成純度と実行並列上限の単一所有）
 - [DEC-042](DEC-042.md)（case-auto 最大並列維持と同期逐次フォールバック禁止）
-- [DEC-043](DEC-043.md)（case-ready 実行構造判断への Jev 最終判断採用（Stage 2: 閾値ルーティング）、superseded by DEC-044）
-- [DEC-044](DEC-044.md)（Semantic Evaluation 観測契約の一次事実中心再設計と基本判断経路への復帰、DEC-040・DEC-043 の後継）
 - [DEC-045](DEC-045.md)（リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化）
-- [DEC-046](DEC-046.md)（Jev 実行基盤の Cloudflare AI Gateway への完全置換、DEC-040 決定2 の後継）
 
 ### 整合性・IR 体系
 
@@ -271,10 +257,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-036 | supersedes | DEC-002 | OpenCode ソース・プロジェクション分離の v4 再定義（配備形態として adapter 境界へ統合）を本 Decision の Harness/Backend adapter 境界が所有する |
 | DEC-038 | supersedes | DEC-015 | 補完後継。durable state 配置と再構成の契約への一般化 |
 | DEC-039 | supersedes | DEC-015 | 補完後継。authority・副作用統制と冪等・並行性モデルへの一般化 |
-| DEC-044 | supersedes | DEC-043 | case-ready 実行構造判断の Jev 最終判断採用（Stage 2: 閾値ルーティング）を撤回し、基本判断経路へ復帰。DEC-043 を完全置換 |
-| DEC-044 | supersedes | DEC-040 | 観測契約の一次事実中心再設計による決定4 の置換（決定2 は DEC-046 が置換、決定1・3は維持） |
 | DEC-051 | supersedes | DEC-041 | case-auto stage 3 のスロット型キュー移行による決定5（Wave 収束前提）の置換（決定1〜4は維持） |
-| DEC-052 | supersedes | DEC-044 | Jev 評価器障害時の判定未確定と依存後続抑止への移行による決定3（evaluator 失敗時の reasoning model 経由継続）の部分置換（決定1・2・4〜8は維持。status: accepted 維持） |
 | DEC-062 | relates-to | DEC-001, DEC-009 | 現行 corpus の ID 形式記述（意味的不変）を参照する受理上限撤廃の新規決定。既存 ID・参照の改番は行わない |
 
 ## 関連 REQ
@@ -320,19 +303,14 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-037 | [REQ-012](../requirements/REQ-012.md), [REQ-021](../requirements/REQ-021.md) | - |
 | DEC-038 | [REQ-017](../requirements/REQ-017.md), [REQ-061](../requirements/REQ-061.md) | - |
 | DEC-039 | [REQ-003](../requirements/REQ-003.md), [REQ-034](../requirements/REQ-034.md) | - |
-| DEC-040 | [REQ-090](../requirements/REQ-090.md) | - |
 | DEC-041 | [REQ-031](../requirements/REQ-031.md), [REQ-034](../requirements/REQ-034.md), [REQ-035](../requirements/REQ-035.md), [REQ-061](../requirements/REQ-061.md) | - |
 | DEC-042 | [REQ-031](../requirements/REQ-031.md), [REQ-034](../requirements/REQ-034.md) | case-auto 最大並列維持と同期逐次フォールバック禁止（REQ-034-025/028 意味変更・REQ-034-044/045 APPEND、REQ-031-030 UPDATE と整合） |
-| DEC-043 | [REQ-090](../requirements/REQ-090.md) | - |
-| DEC-044 | [REQ-090](../requirements/REQ-090.md), [REQ-091](../requirements/REQ-091.md) | - |
 | DEC-045 | [REQ-032](../requirements/REQ-032.md), [REQ-009](../requirements/REQ-009.md), [REQ-030](../requirements/REQ-030.md) | - |
-| DEC-046 | [REQ-090](../requirements/REQ-090.md), [REQ-091](../requirements/REQ-091.md) | - |
 | DEC-047 | [REQ-029](../requirements/REQ-029.md), [REQ-053](../requirements/REQ-053.md) | - |
 | DEC-048 | [REQ-096](../requirements/REQ-096.md) | - |
 | DEC-049 | [REQ-099](../requirements/REQ-099.md) | - |
 | DEC-050 | [REQ-030](../requirements/REQ-030.md), [REQ-009](../requirements/REQ-009.md), [REQ-032](../requirements/REQ-032.md) | - |
 | DEC-051 | [REQ-034](../requirements/REQ-034.md), [REQ-035](../requirements/REQ-035.md) | - |
-| DEC-052 | [REQ-090](../requirements/REQ-090.md), [REQ-103](../requirements/REQ-103.md) | - |
 | DEC-053 | [REQ-104](../requirements/REQ-104.md), [REQ-105](../requirements/REQ-105.md), [REQ-012](../requirements/REQ-012.md), [REQ-021](../requirements/REQ-021.md), [REQ-061](../requirements/REQ-061.md), [REQ-088](../requirements/REQ-088.md) | - |
 | DEC-054 | [REQ-106](../requirements/REQ-106.md), [REQ-107](../requirements/REQ-107.md), [REQ-012](../requirements/REQ-012.md), [REQ-021](../requirements/REQ-021.md) | - |
 | DEC-055 | [REQ-108](../requirements/REQ-108.md) | - |

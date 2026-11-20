@@ -197,7 +197,7 @@ catalog は欠番 IR-045（削除済み、ファイル不在）の欠番注記�
 後述「現在人手管理領域の3領域」参照。
 3. **各領域の正規情報源**: frontmatter、各文書本文のセクション構造、宣言等。
 4. **人手管理領域に対する整合性確認方法**: docs-check（IR-061）による検出、人手レビュー等。
-5. **Decision frontmatter の supersede_note 由来の部分置換注記生成**: superseded Decision で frontmatter に `supersede_note` フィールドが存在する場合、decision 系 AUTOGEN ブロック（decision-status 表・superseded セクション）の該当 Decision 行へ部分置換注記を併記して生成する。`superseded_by` と `supersede_note` の両 frontmatter フィールドをデータ源とし、status 表・superseded セクション間で同一注記を出力する（DEC-040 部分置換〔決定4 のみ DEC-044 置換・決定1〜3 維持〕の README 反映。CR-004 裁定の generator 経由反映）。
+5. **Decision frontmatter の supersede_note 由来の部分置換注記生成**: superseded Decision で frontmatter に `supersede_note` フィールドが存在する場合、decision 系 AUTOGEN ブロック（decision-status 表・superseded セクション）の該当 Decision 行へ部分置換注記を併記して生成する。`superseded_by` と `supersede_note` の両 frontmatter フィールドをデータ源とし、status 表・superseded セクション間で同一注記を出力する（部分置換注記の README 反映。CR-004 裁定の generator 経由反映）。
    注記の具体形式は `〔superseded by DEC-MMM。<supersede_note>〕`（`supersede_note` の内容をそのまま展開）とする。配置は status 表（decision-baseline-table）ではタイトルセル内のタイトル直後、superseded セクションでは bullet 行末とし、両ビューで同一文字列を付与する。
    `supersede_note` 未宣言（全体置換等）の場合は注記を付与しない。`supersede_note` が空値・空白のみの場合は部分置換注記を出力しない（空括弧・区切り文字のみの出力を禁止する）。`supersede_note` が YAML ブロックスカラ（`|`）形式の場合も改行を含む内容全体を正規展開して注記へ用いる。
 6. **docs/README.md Decision 静的表の AUTOGEN 生成**: docs/README.md「## Decision」セクションの Decision 静的表（データ行は現行 Decision 実ファイルの frontmatter からの算出結果）を AUTOGEN ブロック `readme-decision-summary-table` の生成対象とする。行生成は DEC frontmatter 由来（リンク・title）とする。恒常規則: 「superseded by DEC-XXX」括弧注記の適用条件は `superseded_by` frontmatter を持つ全 DEC 行（status によらない）であり、注記文言のデータ源は `superseded_by` と `supersede_note` の両 frontmatter フィールドである。`supersede_note` を持つ DEC 行は、その内容を notes 記法〔...〕の部分置換詳細注記として title 直後に展開する。注記形式は title 直後の `title（superseded by DEC-NNN〔notes〕）` に正規化する（全角括弧。notes 記法〔...〕の部分置換詳細注記は notes 抽出合成〔後述節〕で title 直後に合成する）。notes 記法〔...〕の展開は、抽出合成結果と `supersede_note` 展開のいずれかが空の場合は当該部分を出力せず、`title（superseded by DEC-NNN）` 形式へ縮退する。区切り文字のみが残る出力を禁止する。
@@ -212,9 +212,9 @@ notes 記法の定義:
 |---|---|
 | 所在 | docs/README.md「## Decision」セクション内の Decision 表の title セル |
 | 構文 | title セル内の `〔...〕`（U+3014 開き括弧 / U+3015 閉じ括弧）で囲まれた部分置換詳細注記 |
-| 抽出対象 | 各 DEC 行の title セルに手動記載された部分置換詳細注記（例: DEC-040 行「〔決定4 部分置換。決定1〜3は維持〕」）。frontmatter `supersede_note` 由来の注記と突合して合成し、title 直後に「superseded by DEC-XXX」括弧注記の一部として出力する |
+| 抽出対象 | 各 DEC 行の title セルに手動記載された部分置換詳細注記（例: 部分置換注記「〔決定4 部分置換。決定1〜3は維持〕」）。frontmatter `supersede_note` 由来の注記と突合して合成し、title 直後に「superseded by DEC-XXX」括弧注記の一部として出力する |
 
-初回 AUTOGEN 化時は現行静的表の title セル内 notes 記法を抽出して生成に反映する（手動注記の喪失を防止する。既存手動追記作業を消滅させ、DEC-043（過去経緯の履歴記録）（歴史的経緯の記録としての引用） 追記漏れ〔実績事象〕の構造的原因を除去するのが本機構の目的）。表上部の件数 caption は生成対象外の手動残置とする。
+初回 AUTOGEN 化時は現行静的表の title セル内 notes 記法を抽出して生成に反映する（手動注記の喪失を防止する。既存手動追記作業を消滅させ、手動注記の追記漏れ〔実績事象〕の構造的原因を除去するのが本機構の目的）。表上部の件数 caption は生成対象外の手動残置とする。
 
 docs-check は検査対象不変原則（検査対象を直接修正しない）を維持し、生成スクリプトは docs-check から独立して動作する。
 

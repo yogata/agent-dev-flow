@@ -4,8 +4,6 @@ status: accepted
 created: 2026-09-19
 updated: 2026-11-18
 ---
-<!-- ADF-COVERS(design): REQ-090-006 -->
-<!-- ADF-COVERS(design): REQ-103-011（REQ-103 の評価再実行・再開経路の設計対応面） -->
 <!-- ADF-COVERS(implementation): REQ-001-034, REQ-001-043, REQ-008-001, REQ-008-002, REQ-008-004, REQ-008-005, REQ-008-006, REQ-008-007, REQ-008-009, REQ-008-012, REQ-008-014, REQ-122-014 -->
 <!-- ADF-COVERS(implementation): REQ-002-036, REQ-005-002, REQ-005-003, REQ-005-004, REQ-005-024, REQ-048-001, REQ-048-002, REQ-048-003, REQ-048-004, REQ-048-005 -->
 
@@ -20,13 +18,12 @@ durable state 関連の情報を次の 5 分類に配置する。各論理状態
 | 分類 | 内容 | 権威の置き場所 | 寿命（8 種対応） |
 |---|---|---|---|
 | GitHub 正規状態 | Case/子Issue 状態、PR state、Definition 確定状態 | Issue/PR の権威記録先（本文状態節・state・ラベル写像） | Change/Case lifetime |
-| repo 内正規状態 | docs/ 正規成果物（REQ/Decision/Design）、.agentdev/ の Git 管理ドメイン状態（drafts、intake/learning inbox、検出事項、.agentdev/jev-observations/） | 各正規成果物ファイル | Requirement/Architecture/Project lifetime |
+| repo 内正規状態 | docs/ 正規成果物（REQ/Decision/Design）、.agentdev/ の Git 管理ドメイン状態（drafts、intake/learning inbox、検出事項） | 各正規成果物ファイル | Requirement/Architecture/Project lifetime |
 | ローカル実行環境状態 | worktree・checkout・git index・導入状態（junction、依存 install）、起動時対象集合 | ローカル実行環境（保存しない。正規状態から再構成） | Runtime lifetime |
 | 証跡 | 検証 SSoT コメント、対応記録、PR 本文、監査記録 | Issue コメント・PR 本文等の不変記録 | Change/Case lifetime（記録として） |
 | 導出可能情報 | 現在 stage、workflow route、Wave 状態、Epic 集約、進捗表、索引類 | 保存しない（正規状態から再構成） | （保存しない） |
 
 8 情報寿命（ADF lifetime、Project lifetime、Architecture lifetime、Requirement lifetime、Change/Case lifetime、Runtime lifetime、reusable Knowledge、未評価 Observation）と各分類の対応は本表の寿命列が基準とする。docs/knowledge/ の知識は repo 内正規状態（reusable Knowledge）に配置する。未評価 Observation（learning/intake の未評価エントリ）は repo 内正規状態（.agentdev/ ドメイン状態）として保存し、評価結果は昇格ガード（DEC-033）に従って振り分けられる。
-`.agentdev/jev-observations/` は Jev 先行評価の観測記録の配置先である（REQ-090-006）。分類は repo 内正規状態（git 管理対象、REQ-002-012 準拠）、保存形式は JSON（1 semantic evaluation = 1 observation。JSONL は原本としない）、寿命は未評価 Observation（評価・置換判断の進行に応じた整理方針は評価 Issue で定める）である。再開契約: 観測記録は再開ポイントの構成要素とせず、Workflow 再開時に Jev を再呼出しする（再呼出しは別 observation として記録される）。
 REQ-001-034「状態保持領域内の作業用ドラフトは正規のドメイン状態ではなく、コマンド間引き渡し用の中間成果物であること」は Case 状態機械上の正規状態（durable state enum）を指し、本表の「repo 内正規状態（drafts 含む）」は durable state 配置分類（保存権威の置き場所）を指すため、両者は権威クラスを異にして調和する（v3 backlog-artifact-lifecycle Design 配置系 11 識別子の承継・分配の正は第9段 Root Case #3022）。
 
 ## 状態と証跡の分離
@@ -46,16 +43,6 @@ REQ-001-034「状態保持領域内の作業用ドラフトは正規のドメイ
 - cursor 的状態（現在 stage、workflow route）を正規状態として保存しない。最も早い未収束 stage として再構成する
 - 起動時対象集合等の実行中の一時保持は、中断再開に必要な期間に限定してローカルに保持してよい（正規状態ではない）
 - Tool 操作単位の障害回復は、Custom Tool の失敗分類（fail-closed 読戻し検証、verification-incomplete）と冪等再試行原則に従う
-
-## 評価器復旧後の評価再開契約（REQ-103-011）
-
-評価器障害で判定未確定となった必須の閉じた意味評価は、評価器復旧後に正規の再実行・再開経路で再実行する。
-
-- 再開前に入力・規則・成果物・証拠への変更影響を確認する。SSoT 再構成優先順位（前節）に従い、正規状態から現在入力を再取得し、自然言語の前STEP result のみに依存しない
-- 変更影響がある古い判定を再利用せず、成功済み副作用を重複実行せず、影響しない証拠は再利用する
-- 判定未確定自体は durable state enum へ新状態を追加せず、既存状態と証跡記録（記録としての未確定事実）の組合せで扱う
-- 修復・再試行・設定等の運用介入を判定方式の代替または新規規範の確定と混同しない
-- 契約面の正は responsibility-boundaries Design「閉じた意味評価の障害時契約」節が所有し、本節は durable state 面の再開契約を所有する
 
 ## 権威移行点
 

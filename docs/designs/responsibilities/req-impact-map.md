@@ -28,7 +28,7 @@ updated: "2026-11-18"
 |-----|---------|------------------|
 | [REQ-001](../../requirements/REQ-001.md) | 文書体系と持続可能な基準構造 | IR-001, IR-024, IR-044 |
 | [REQ-002](../../requirements/REQ-002.md) | 配布成果物の責務境界 | IR-056, IR-058 |
-| [REQ-010](../../requirements/REQ-010.md) | 自己監査コマンド（docs-check） | IR-001, IR-002, IR-003, IR-004, IR-007, IR-024, IR-044, IR-062, IR-063, IR-064, IR-067, IR-068, IR-069, IR-070 |
+| [REQ-010](../../requirements/REQ-010.md) | 自己監査コマンド（docs-check） | IR-001, IR-002, IR-003, IR-004, IR-007, IR-024, IR-044, IR-062, IR-063, IR-064, IR-067, IR-068, IR-070 |
 | [REQ-011](../../requirements/REQ-011.md) | I/O境界と外部連携手段 | IR-053 |
 | [REQ-018](../../requirements/REQ-018.md) | worktree 構造的制約とテスト fallback | IR-068 |
 | [REQ-029](../../requirements/REQ-029.md) | 配布依存境界 | IR-055, IR-059 |

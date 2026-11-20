@@ -86,7 +86,6 @@ third_party_skills:
   - explainer
   - explainer-book
   - first-reader
-  - yomiyasu
 
 copy_projections:
   # repo-agentdev-integrity は copy 投影（DEC-065 決定3、REQ-002-020 限定例外）。

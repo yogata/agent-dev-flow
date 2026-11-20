@@ -1,4 +1,0 @@
-component: yomiyasu-workflow-extensions
-implementation:
-  src/common/skills/agentdev-project-extensions/scripts/lib/extension_state.ts:
-    - REQ-098-011

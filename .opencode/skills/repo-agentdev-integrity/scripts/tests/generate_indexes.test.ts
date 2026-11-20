@@ -514,18 +514,18 @@ describe("formatSupersedeNoteSuffix (RA-002)", () => {
     fs.mkdirSync(supDecDir, { recursive: true });
     writeDecision(
       supDecDir,
-      "DEC-040",
-      'title: "T40"\nstatus: superseded\nsuperseded_by: DEC-044\nsupersede_note: "決定4 は DEC-044 が置換。決定1〜3は維持"\nrelated_reqs: [REQ-090]\ncreated: "2026-01-01"\nupdated: "2026-01-01"',
+      "DEC-017",
+      'title: "T17"\nstatus: superseded\nsuperseded_by: DEC-037\nsupersede_note: "決定4 は DEC-037 が置換。決定1〜3は維持"\nrelated_reqs: [REQ-032]\ncreated: "2026-01-01"\nupdated: "2026-01-01"',
     );
     writeDecision(
       supDecDir,
-      "DEC-043",
-      'title: "T43"\nstatus: superseded\nsuperseded_by: DEC-044\nrelated_reqs: [REQ-090]\ncreated: "2026-01-01"\nupdated: "2026-01-01"',
+      "DEC-030",
+      'title: "T30"\nstatus: superseded\nsuperseded_by: DEC-037\nrelated_reqs: [REQ-032]\ncreated: "2026-01-01"\nupdated: "2026-01-01"',
     );
     writeDecision(
       supDecDir,
-      "DEC-044",
-      'title: "T44"\nstatus: accepted\nrelated_reqs: [REQ-090]\ncreated: "2026-01-01"\nupdated: "2026-01-01"',
+      "DEC-037",
+      'title: "T37"\nstatus: accepted\nrelated_reqs: [REQ-032]\ncreated: "2026-01-01"\nupdated: "2026-01-01"',
     );
   }
 
@@ -534,22 +534,22 @@ describe("formatSupersedeNoteSuffix (RA-002)", () => {
 
   it("parses superseded_by and supersede_note from frontmatter", () => {
     const byId = collectById();
-    expect(byId.get("DEC-040")?.supersededBy).toBe("DEC-044");
-    expect(byId.get("DEC-040")?.supersedeNote).toBe(
-      "決定4 は DEC-044 が置換。決定1〜3は維持",
+    expect(byId.get("DEC-017")?.supersededBy).toBe("DEC-037");
+    expect(byId.get("DEC-017")?.supersedeNote).toBe(
+      "決定4 は DEC-037 が置換。決定1〜3は維持",
     );
-    expect(byId.get("DEC-043")?.supersededBy).toBe("DEC-044");
-    expect(byId.get("DEC-043")?.supersedeNote).toBe(null);
-    expect(byId.get("DEC-044")?.supersededBy).toBe(null);
+    expect(byId.get("DEC-030")?.supersededBy).toBe("DEC-037");
+    expect(byId.get("DEC-030")?.supersedeNote).toBe(null);
+    expect(byId.get("DEC-037")?.supersededBy).toBe(null);
   });
 
   it("returns the note suffix only for a superseded decision with supersede_note", () => {
     const byId = collectById();
-    expect(formatSupersedeNoteSuffix(byId.get("DEC-040")!)).toBe(
-      "〔superseded by DEC-044。決定4 は DEC-044 が置換。決定1〜3は維持〕",
+    expect(formatSupersedeNoteSuffix(byId.get("DEC-017")!)).toBe(
+      "〔superseded by DEC-037。決定4 は DEC-037 が置換。決定1〜3は維持〕",
     );
-    expect(formatSupersedeNoteSuffix(byId.get("DEC-043")!)).toBe(null);
-    expect(formatSupersedeNoteSuffix(byId.get("DEC-044")!)).toBe(null);
+    expect(formatSupersedeNoteSuffix(byId.get("DEC-030")!)).toBe(null);
+    expect(formatSupersedeNoteSuffix(byId.get("DEC-037")!)).toBe(null);
   });
 
   it("appends the same note to the baseline table row and the superseded section row", () => {
@@ -557,13 +557,13 @@ describe("formatSupersedeNoteSuffix (RA-002)", () => {
     const table = generateDecisionBaselineTable(infos);
     const list = generateDecisionStatusList(infos, "superseded");
     const expectedNote =
-      "〔superseded by DEC-044。決定4 は DEC-044 が置換。決定1〜3は維持〕";
-    expect(table).toContain(`| DEC-040 | T40${expectedNote} | superseded | 2026-01-01 |`);
+      "〔superseded by DEC-037。決定4 は DEC-037 が置換。決定1〜3は維持〕";
+    expect(table).toContain(`| DEC-017 | T17${expectedNote} | superseded | 2026-01-01 |`);
     expect(list).toContain(
-      `- [DEC-040](DEC-040.md)（T40）${expectedNote}`,
+      `- [DEC-017](DEC-017.md)（T17）${expectedNote}`,
     );
-    expect(table.join("\n")).not.toContain("| DEC-043 | T43〔");
-    expect(list.join("\n")).not.toContain("[DEC-043](DEC-043.md)（T43）〔");
+    expect(table.join("\n")).not.toContain("| DEC-030 | T30〔");
+    expect(list.join("\n")).not.toContain("[DEC-030](DEC-030.md)（T30）〔");
   });
 
   it("keeps generation idempotent across repeated runs", () => {
@@ -601,8 +601,8 @@ describe("supersede_note rendering normalization (Issue #3460, ACT-DESIGN-035)",
     );
     writeDecision(
       normDecDir,
-      "DEC-052",
-      'title: "T52"\nstatus: superseded\nsuperseded_by: DEC-050\nsupersede_note: "   "\nrelated_reqs: [REQ-032]\ncreated: "2026-10-01"\nupdated: "2026-10-01"',
+      "DEC-029",
+      'title: "T29"\nstatus: superseded\nsuperseded_by: DEC-050\nsupersede_note: "   "\nrelated_reqs: [REQ-032]\ncreated: "2026-10-01"\nupdated: "2026-10-01"',
     );
     writeDecision(
       normDecDir,
@@ -638,7 +638,7 @@ describe("supersede_note rendering normalization (Issue #3460, ACT-DESIGN-035)",
   it("returns null suffix for empty or whitespace-only supersede_note", () => {
     const map = byId();
     expect(formatSupersedeNoteSuffix(map.get("DEC-051")!)).toBe(null);
-    expect(formatSupersedeNoteSuffix(map.get("DEC-052")!)).toBe(null);
+    expect(formatSupersedeNoteSuffix(map.get("DEC-029")!)).toBe(null);
   });
 
   it("expands block-scalar supersede_note as a single-line suffix", () => {
@@ -671,9 +671,9 @@ describe("supersede_note rendering normalization (Issue #3460, ACT-DESIGN-035)",
     expect(emptyRow).toBe(
       "| [DEC-051](decisions/DEC-051.md) | T51（superseded by DEC-050） |",
     );
-    const wsRow = rows.find((r) => r.includes("[DEC-052]"))!;
+    const wsRow = rows.find((r) => r.includes("[DEC-029]"))!;
     expect(wsRow).toBe(
-      "| [DEC-052](decisions/DEC-052.md) | T52（superseded by DEC-050） |",
+      "| [DEC-029](decisions/DEC-029.md) | T29（superseded by DEC-050） |",
     );
     expect(rows.join("\n")).not.toContain("〔|〕");
   });
@@ -791,15 +791,15 @@ describe("readme-req-summary-table (REQ-057-018)", () => {
 describe("readme-decision-summary-table (AG-005, Case #3166)", () => {
   const dec = (over: Partial<Record<string, unknown>>) =>
     ({
-      id: "DEC-040",
+      id: "DEC-017",
       num: 40,
-      title: "typesafe/Jev 先行評価の採用（Stage 1: 観測可能化）",
+      title: "fixture: サンプル Decision の supersede 表記",
       status: "superseded",
       created: "2026-09-22",
-      filename: "DEC-040.md",
-      relPath: "DEC-040.md",
-      relatedReqs: ["REQ-090"],
-      supersededBy: "DEC-044",
+      filename: "DEC-017.md",
+      relPath: "DEC-017.md",
+      relatedReqs: ["REQ-032"],
+      supersededBy: "DEC-037",
       supersedeNote: null,
       ...over,
     }) as never;
@@ -813,19 +813,19 @@ describe("readme-decision-summary-table (AG-005, Case #3166)", () => {
   it("generates frontmatter-derived rows with superseded_by parenthesized annotation", () => {
     const rows = generateDocsReadmeDecisionTable([dec({})]);
     expect(rows).toContain(
-      "| [DEC-040](decisions/DEC-040.md) | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化）（superseded by DEC-044） |",
+      "| [DEC-017](decisions/DEC-017.md) | fixture: サンプル Decision の supersede 表記（superseded by DEC-037） |",
     );
   });
 
-  it("expands frontmatter supersede_note as notes-notation annotation (sole data source, DEC-040)", () => {
+  it("expands frontmatter supersede_note as notes-notation annotation (sole data source, DEC-017)", () => {
     const rows = generateDocsReadmeDecisionTable([
       dec({
         supersedeNote:
-          "決定4 は DEC-044 が置換。決定2 は DEC-046 が置換。決定1・3は維持",
+          "決定4 は DEC-037 が置換。決定2 は DEC-036 が置換。決定1・3は維持",
       }),
     ]);
     expect(rows).toContain(
-      "| [DEC-040](decisions/DEC-040.md) | typesafe/Jev 先行評価の採用（Stage 1: 観測可能化）（superseded by DEC-044〔決定4 は DEC-044 が置換。決定2 は DEC-046 が置換。決定1・3は維持〕） |",
+      "| [DEC-017](decisions/DEC-017.md) | fixture: サンプル Decision の supersede 表記（superseded by DEC-037〔決定4 は DEC-037 が置換。決定2 は DEC-036 が置換。決定1・3は維持〕） |",
     );
   });
 

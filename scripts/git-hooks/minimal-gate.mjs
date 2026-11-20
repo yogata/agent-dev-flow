@@ -35,9 +35,10 @@ const FILE_LIMITS = [
   { label: "code", test: () => true, maxBytes: 100 * KB, maxLines: 4000 },
 ];
 const GATE_PREFIX = "scripts/git-hooks/";
-// 堆積語彙（追加・変更行で禁止。例外台帳は作らない）。
+// 堆積語彙（追加・変更行で禁止。例外台帳は作らない。learning/deferred は
+// 現行パス・status 値として存続するため語彙から除外）。
 const ACCUMULATION_RE =
-  /(後方互換|互換層|legacy|deprecat|\bv[345]\b|移行手順|見送り|deferred|baseline|crosswalk|retired|欠番)/i;
+  /(後方互換|互換層|legacy|deprecat|\bv[345]\b|移行手順|見送り|baseline|crosswalk|retired|欠番)/i;
 
 const violations = [];
 const fail = (msg) => violations.push(msg);

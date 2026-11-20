@@ -17,7 +17,7 @@ ADF 共通原本（src/common/）とホスト別接続領域（src/opencode/、s
 
 ## 共通原本領域の配置契約（src/common/）
 
-- 共通の Workflow Skill、Capability Skill、Command の業務契約・本文、template、共有可能な Tool engine（agentdev_gh の GitHub 実装と Local 実現、agentdev_jev、agentdev_third_party の engine 部）、guard の共通判定を配置する。
+- 共通の Workflow Skill、Capability Skill、Command の業務契約・本文、template、共有可能な Tool engine（agentdev_gh の GitHub 実装と Local 実現、agentdev_third_party の engine 部）、guard の共通判定を配置する。
 - 共通原本は host 非依存とし、配布物の harness 非依存性（harness 分離モデル Design）に従う。ホスト名、起動 API、実行制御パラメータを本文に固定しない。
 - ホスト別コピーの業務手順を独立編集する構造を持たない。両ホストの公開入口は同じ業務契約を参照する。
 
@@ -41,10 +41,10 @@ ADF 共通原本（src/common/）とホスト別接続領域（src/opencode/、s
 - ローカルIssueの採番・状態写像・読み書きは共通の操作契約と検証 engine に接続し、ホスト別重複を実装しない。
 - 選択したバックエンドに接続し、同じ Tool 名で両バックエンドを同時有効化しない（REQ-009-037 の同居対象外と、Custom Tool の Local 実現への差し替えは同居に非ずの既存解釈を維持）。
 
-- agentdev-gh、agentdev-jev、agentdev-third-party の3系統のホスト間接続について、共通処理（Tool engine への変換、入力検査、契約解釈）とホスト固有処理（OpenCode・Senpi 各自の登録、権限、実行文脈、失敗処理）を区別する（B3-5e）。共通処理は共通原本領域が所有し、ホスト固有処理は各ホスト接続領域が所有する
+- agentdev-gh、agentdev-third-party の2系統のホスト間接続について、共通処理（Tool engine への変換、入力検査、契約解釈）とホスト固有処理（OpenCode・Senpi 各自の登録、権限、実行文脈、失敗処理）を区別する（B3-5e）。共通処理は共通原本領域が所有し、ホスト固有処理は各ホスト接続領域が所有する
 - 同等試験の共通判定部分は共通側へ移設し、接続差の試験は各ホストが保持する。公開契約が両ホストで同一に保たれること（現行の主要接続試験の水準を下げないこと）、共通契約の検証とホスト固有の検証の区別、共通エンジンの試験と接続試験の目的の区別の文書化、重複していた管理箇所の削減を確認する。実ホストでの実測は要求しない（実施計画の前提条件1）
 - 試験の目的区別（共通エンジン試験と接続試験）: 共通エンジンの試験（`src/common/` 配下。Tool 操作契約・fail-closed ゲート・VERIFY・バックエンド実装、および両ホストの登録 surface 経由で同一となる共通判定〔読み戻し検証、物理ラベル写像、終了経路、能力欠落の fail-closed。移設先は `src/common/tools/agentdev-gh/tests/four-combination-shared.ts`、`src/common/tools/agentdev-gh/tests/missing-capability-shared.ts`〕）と接続試験（`src/opencode/`・`src/senpi/` 配下。登録 surface の構築、実行 context 形の変換、ホスト向け投影パスの解決）を区別する。共通判定の本体は共通側 helper へ一元化し、各ホスト試験は接続差の検証のみを保持する
-- 両ホストのツール説明（description）は共通正本の定数（`AGENTDEV_GH_TOOL_DESCRIPTION`、`AGENTDEV_JEV_TOOL_DESCRIPTION`、`AGENTDEV_THIRD_PARTY_TOOL_DESCRIPTION`）を単一参照とし、公開スキーマ（各 `REQUEST_PROPERTY_SCHEMA`）と併せて各ホストの契約テストが正本同一参照を固定する（J-001 型のツール説明・試験条件の二重保守による更新漏れの再発防止構造）
+- 両ホストのツール説明（description）は共通正本の定数（`AGENTDEV_GH_TOOL_DESCRIPTION`、`AGENTDEV_THIRD_PARTY_TOOL_DESCRIPTION`）を単一参照とし、公開スキーマ（各 `REQUEST_PROPERTY_SCHEMA`）と併せて各ホストの契約テストが正本同一参照を固定する（J-001 型のツール説明・試験条件の二重保守による更新漏れの再発防止構造）
 
 ## guard 編集解釈の分離
 

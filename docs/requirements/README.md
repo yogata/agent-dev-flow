@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下79件を第一参照先とする。
+現在の要件判断では、以下77件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -61,13 +61,11 @@
 | [REQ-082](REQ-082.md) | 対論型レビュー審議契約 |
 | [REQ-083](REQ-083.md) | 設計PRの状態契約（通常 Pull Request・ブランチ命名・用語・正規操作完結） |
 | [REQ-088](REQ-088.md) | ADF v4 基盤要件（三層責務・情報寿命・Project Contract・中核文書モデル） |
-| [REQ-090](REQ-090.md) | Jev 先行評価の実運用組込み（Stage 1: 観測可能化） |
 | [REQ-091](REQ-091.md) | Supervisor 環境向け credential 供給ブリッジの原本管理 |
 | [REQ-094](REQ-094.md) | ADF の Markdown 日本語表現および用語選択基準 |
 | [REQ-095](REQ-095.md) | agentdev_gh 起票・読取操作の呼出側規律 |
 | [REQ-096](REQ-096.md) | ADF判断アーキテクチャ（判断方法・確定権限・人間判断境界） |
 | [REQ-097](REQ-097.md) | third-party 成果物の運用前提と導入検知 |
-| [REQ-098](REQ-098.md) | yomiyasu 推敲の工程必須化（docs 変更と GitHub 書込み文章） |
 | [REQ-099](REQ-099.md) | ADF 共通原本とホスト接続領域の分離によるマルチホスト併存利用 |
 | [REQ-100](REQ-100.md) | ADF が起票する Issue タイトルの記述規則 |
 | [REQ-101](REQ-101.md) | Case Issue 工程記録モデル |
@@ -114,7 +112,6 @@
 | [REQ-045](retired/REQ-045.md) | 現行成果物体系の整合性網羅監査 |
 | [REQ-046](retired/REQ-046.md) | 横断正規化後の不変条件 |
 | [REQ-057](retired/REQ-057.md) | docs corpus 整合・現行化バッチ |
-| [REQ-087](retired/REQ-087.md) | 採番例外の記録と REQ 番号ギャップ検査 |
 | [REQ-092](retired/REQ-092.md) | agentdev_gh issue_list 呼出側運用規律（labels は追跡Issue論理軸の物理マッピング入力専用） |
 | [REQ-093](retired/REQ-093.md) | agentdev_gh 起動環境障害の予防・診断・回復の恒久化 |
 | [REQ-121](retired/REQ-121.md) | ADF 全体簡素化計画の見送り記録の正規保持 |
@@ -125,9 +122,6 @@
 - 現行 REQ: `docs/requirements/REQ-{NNN}.md`
 - 廃止済み REQ のIDは再利用しない
 - 文書間に矛盾がある場合は現行 REQ を優先する
-- REQ-063〜REQ-081 は REQ-082 採番時（2026-09-15 ユーザー裁定）による意図的予約欠番であり、実体は存在しない
-- REQ-084〜REQ-086 は共有予約枠（REQ-083〜REQ-096）の未使用・返却枠であり、意図的予約欠番として維持する
-- REQ-089 は J2 shadow 実験（commit 43bf2ec3 で採番後、52c7bc10 で完全 revert）由来の廃止識別子であり、再利用しない。次の新規 REQ 番号は採番時点で REQ 実ファイル一覧と既知欠番レジストリから決定的採番スクリプト（alloc-req-number.ts）により決定する
 
 ## 過去版との関係
 

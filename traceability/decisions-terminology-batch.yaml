@@ -136,14 +136,6 @@ implementation:
     - REQ-094-006
     - REQ-094-010
     - REQ-094-011
-  docs/decisions/DEC-040.md:
-    - REQ-094-001
-    - REQ-094-002
-    - REQ-094-004
-    - REQ-094-005
-    - REQ-094-006
-    - REQ-094-010
-    - REQ-094-011
   docs/decisions/DEC-041.md:
     - REQ-094-001
     - REQ-094-002
@@ -152,23 +144,7 @@ implementation:
     - REQ-094-006
     - REQ-094-010
     - REQ-094-011
-  docs/decisions/DEC-043.md:
-    - REQ-094-001
-    - REQ-094-002
-    - REQ-094-004
-    - REQ-094-005
-    - REQ-094-006
-    - REQ-094-010
-    - REQ-094-011
   docs/decisions/DEC-045.md:
-    - REQ-094-001
-    - REQ-094-002
-    - REQ-094-004
-    - REQ-094-005
-    - REQ-094-006
-    - REQ-094-010
-    - REQ-094-011
-  docs/decisions/DEC-046.md:
     - REQ-094-001
     - REQ-094-002
     - REQ-094-004

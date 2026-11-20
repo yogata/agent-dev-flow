@@ -24,7 +24,6 @@ import { ir063 } from "./ir-063.ts";
 import { ir064 } from "./ir-064.ts";
 import { ir067 } from "./ir-067.ts";
 import { ir068 } from "./ir-068.ts";
-import { ir069 } from "./ir-069.ts";
 import { ir070 } from "./ir-070.ts";
 import { ir071 } from "./ir-071.ts";
 import { ir075 } from "./ir-075.ts";
@@ -52,7 +51,6 @@ export const rules: IntegrityRule[] = [
   ir064,
   ir067,
   ir068,
-  ir069,
   ir070,
   ir071,
   ir075,

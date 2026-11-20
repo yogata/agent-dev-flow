@@ -654,11 +654,11 @@ export interface DecisionInfo {
    */
   relatedReqs: string[] | null;
   /**
-   * frontmatter superseded_by（例: "DEC-044"）。superseded 以外または未宣言は null。
+   * frontmatter superseded_by（例: "DEC-037"）。superseded 以外または未宣言は null。
    */
   supersededBy: string | null;
   /**
-   * frontmatter supersede_note（部分置換注記の本文、例: "決定4 は DEC-044 が置換。決定1〜3は維持"）。
+   * frontmatter supersede_note（部分置換注記の本文、例: "決定4 は DEC-037 が置換。決定1〜3は維持"）。
    * 未宣言は null。
    */
   supersedeNote: string | null;

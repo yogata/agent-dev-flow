@@ -6,7 +6,6 @@ status: accepted
 updated: 2026-11-18
 ---
 
-<!-- ADF-COVERS(design): REQ-090-005, REQ-090-006 -->
 <!-- ADF-COVERS(design): REQ-108-011, REQ-108-012 -->
 
 # ADF 継続コラボレーションループ
@@ -87,7 +86,6 @@ Learning と Observation は無条件に REQ へ昇格しない（operating-mode
 | .agentdev/learning/deferred/ | repo 内正規状態 | 未評価 Observation（living pool） |
 | .agentdev/inspect*/promoted/ | repo 内正規状態 | 未評価 Observation（採用済み） |
 | .agentdev/backlog/req-units/ | repo 内正規状態 | Change/Case lifetime（要件化後は Requirement lifetime） |
-| .agentdev/jev-observations/ | repo 内正規状態 | 未評価 Observation（Jev 先行評価の観測記録。1 semantic evaluation = 1 observation。生成元: Jev 先行評価を実行する6系統 Workflow（Jev Custom Tool 経由。適用対象は閉じた意味評価として適格な判断に限り〔REQ-090-004、REQ-090-024〕、親判断の最終確定結果が発動条件を満たさない後続評価の観測は生成しない〔REQ-090-025〕）。利用元: Jev 有効性評価（Issue B）。git 管理対象の永続 domain state（REQ-002-012 準拠。JSONL は原本としない）。評価・置換判断の進行に応じた整理方針は評価 Issue（B）で定める） |
 
 ## ループ図の読み方
 

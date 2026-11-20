@@ -8,7 +8,7 @@ AgentDevFlow の host 非依存の共通正本を配置する領域である。�
 |---|---|
 | `commands/agentdev/` | 共通の command 業務契約・本文と templates（REQ-002-005、REQ-002-008） |
 | `skills/agentdev-*/` | 共通の Workflow Skill と Capability Skill（REQ-002-008、REQ-002-019） |
-| `tools/` | 共有可能な Tool engine。`agentdev-gh/`（操作契約・fail-closed ゲート・GitHub 実装）、`tools/agentdev-gh/local/`（ローカル版 Custom Tool の Local 実装。ローカル版はこの領域の原本を接続する〔REQ-009-015/016〕）、`agentdev-jev/`、`agentdev-third-party/` |
+| `tools/` | 共有可能な Tool engine。`agentdev-gh/`（操作契約・fail-closed ゲート・GitHub 実装）、`tools/agentdev-gh/local/`（ローカル版 Custom Tool の Local 実装。ローカル版はこの領域の原本を接続する〔REQ-009-015/016〕）、`agentdev-third-party/` |
 | `guards/` | guard の共通判定。`gh-write/gh-command-detector.ts`（生 gh WRITE 迂回検出器）、`distribution-boundary/`（配布依存境界 guard の純関数評価器群）。ホスト接続側は当該ホストの編集操作の意味論を解釈して共通判定へ接続する |
 
 ## 拘束条件

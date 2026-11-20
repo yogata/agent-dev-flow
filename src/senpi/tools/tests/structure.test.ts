@@ -10,16 +10,14 @@ import { describe, expect, test } from "bun:test";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { createAgentdevGhSenpiRegistration } from "../agentdev-gh-tool/registration.ts";
-import { createAgentdevJevSenpiRegistration } from "../agentdev-jev-tool/registration.ts";
 import { createAgentdevThirdPartySenpiRegistration } from "../agentdev-third-party-tool/registration.ts";
 
-const EXPECTED_TOOL_NAMES = ["agentdev_gh", "agentdev_jev", "agentdev_third_party"];
+const EXPECTED_TOOL_NAMES = ["agentdev_gh", "agentdev_third_party"];
 
 describe("登録集合の単一性", () => {
-  test("3つの登録単位は期待した Tool 名を持ち、重複する Tool 名を持たない", () => {
+  test("2つの登録単位は期待した Tool 名を持ち、重複する Tool 名を持たない", () => {
     const registrations = [
       createAgentdevGhSenpiRegistration({ resolveRepo: () => "owner/repo" }),
-      createAgentdevJevSenpiRegistration(),
       createAgentdevThirdPartySenpiRegistration(),
     ];
     const names = registrations.map((r) => r.name);

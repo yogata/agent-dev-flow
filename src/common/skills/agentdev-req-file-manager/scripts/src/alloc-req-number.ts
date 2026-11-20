@@ -4,11 +4,6 @@
  * 既存の REQ ファイル群（retired/ 配下を含む。numbering-policy.md
  * 「新規識別子は、当該種別の現行ファイル群（retired/ を含む）の最大番号に 1 を
  * 加えた値とする」）から最大番号を特定し、その +1 を採番する。
- * あわせて既知欠番レジストリ（docs/designs/foundations/numbering-policy.md
- * 「既知の欠番」節の `REQ-NNN:` 行頭エントリ）を読み込み、現行ファイル群の
- * 最大番号が既知欠番を下回る場合も既知欠番を埋めない
- * （欠番があっても埋めない REQ-NNNN 安定 ID 規約。numbering-policy の記録との
- * 単一情報源化）。
  *
  * I/O:
  *   入力: argv[2] = REQ ディレクトリパス（例: docs/requirements）
@@ -24,72 +19,6 @@ import { emitJson, emitError } from "../lib/result.ts";
 export function nextReqNumber(existingNumbers: number[]): number {
   const max = safeMax(existingNumbers);
   return max + 1;
-}
-
-/**
- * 既知欠番レジストリ（numbering-policy.md「既知の欠番」節本文）から欠番番号を
- * 抽出する（純粋関数）。行頭が `REQ-NNN:` で始まる行を欠番エントリとみなし、
- * その番号のみを採番する（本文 prose 中の言及は採番しない）。
- * 節範囲特定（開始見出し検出と節境界判定の双方）はコード囲みの内側の行を
- * 見出し・節境界として扱わない。
- *
- * コード囲み認識規則:
- *   - 見出し検出と節境界判定は、行頭（字下げなし）のバッククォート 3 つで開始するコード囲みの
- *     内側の行を見出し・節境界として扱わない
- *   - コード囲みの認識は行頭のバッククォート 3 つのみを条件とし、言語指定の有無は受理条件としない
- *   - 閉じのバッククォート 3 つがない場合はファイル末尾までを内側とみなす
- *   - ~~~ 等の代替囲み記法は認識しない
- */
-export function extractKnownGapNumbers(policyContent: string): number[] {
-  const sectionLines: string[] = [];
-  let inSection = false;
-  let inCodeFence = false;
-  for (const line of policyContent.split(/\r?\n/)) {
-    if (/^```/.test(line)) {
-      inCodeFence = !inCodeFence;
-      continue;
-    }
-    if (inCodeFence) {
-      if (inSection) {
-        sectionLines.push(line);
-      }
-      continue;
-    }
-    if (/^#{2,6}\s*既知の欠番\s*$/.test(line)) {
-      inSection = true;
-      continue;
-    }
-    if (inSection && /^#{1,6}\s/.test(line)) {
-      break;
-    }
-    if (inSection) {
-      sectionLines.push(line);
-    }
-  }
-  const gaps: number[] = [];
-  for (const line of sectionLines) {
-    // 既知欠番エントリの受理は桁数上限なし（各セグメント最小1桁）。
-    const m = /^REQ-(\d+)\s*:/.exec(line.trim());
-    if (m && m[1] !== undefined) {
-      gaps.push(Number(m[1]));
-    }
-  }
-  return gaps;
-}
-
-/**
- * REQ ディレクトリから既知欠番レジストリ（numbering-policy.md）を読み込む。
- * レジストリが読み取れない場合は空配列を返し、従来どおりファイル群の max+1 で
- * 採番する（レジストリ不在をエラーにしない）。
- */
-async function loadKnownGapNumbers(dir: string): Promise<number[]> {
-  const policyPath = joinPath(dir, "..", "designs", "foundations", "numbering-policy.md");
-  try {
-    const content = readFileContent(policyPath);
-    return extractKnownGapNumbers(content);
-  } catch {
-    return [];
-  }
 }
 
 /** 番号から `REQ-NNNN` 形式の ID を生成する（純粋関数）。 */
@@ -134,8 +63,7 @@ async function main(): Promise<void> {
   const numbers = collectExistingReqNumbers(dir!);
 
   const max = safeMax(numbers);
-  const gapNumbers = await loadKnownGapNumbers(dir!);
-  const next = nextReqNumber(numbers.concat(gapNumbers));
+  const next = nextReqNumber(numbers);
   emitJson({ ok: true, allocated: formatReqId(next), max });
 }
 

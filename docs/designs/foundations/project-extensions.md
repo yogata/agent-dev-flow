@@ -5,7 +5,6 @@ created: 2026-07-04
 updated: 2026-11-18
 ---
 <!-- ADF-COVERS(implementation): REQ-002-030, REQ-002-031, REQ-044-001, REQ-044-002, REQ-044-005 -->
-<!-- ADF-COVERS(design): REQ-098-001, REQ-098-002, REQ-098-003, REQ-098-004, REQ-098-005, REQ-098-006, REQ-098-008, REQ-098-010, REQ-098-011, REQ-098-014 -->
 
 # Project Extensions
 
@@ -237,25 +236,12 @@ AgentDevFlow 本体リポジトリの .agentdev/extensions/** には本体固有
 extension はトレーサビリティを補完する手段の一つであり得るが、意味境界の唯一の解決手段ではない（REQ-029-003、REQ-029-004）。
 extension 機構自体は追加・拡張・非上書き原則を維持して残置する。
 
-## yomiyasu 推敲の工程必須化
+## 工程拡張の文章品質・書込み規則の共通参照化（B2-2）
 
-docs/** の変更文章と ADF が GitHub へ書き込む文章（Issue/PR のタイトル・本文、説明・レビュー・完了コメント）に対する yomiyasu 推敲の工程適用を、workflow extension への rules/checks/acceptance_gates 追記で表現する（REQ-098）。本節は REQ-098 の工程適用設計を所有する。機械検査である textlint 書込み前 guard（REQ-053）とは別系統の LLM 工程であり、guard を回避・解除しない。
-
-- 適用配置: case-open は Definition 文章の編集前読込と提出前の推敲・lint を担う。case-ready は設計PRのマージ前に適用を確認し、不足時はマージせず対象文章の修正へ差し戻す。case-run は実装に伴う docs 変更へ適用し、case-close は実装PRのマージ前に適用を確認して不足時は case-run へ差し戻す。case-revise を含む Definition 変更の例外経路も同じく定義する（REQ-098-002）。GitHub 書込みを持つ Workflow と実委譲先は、暗黙の伝播を仮定せず呼出経路ごとに適用定義を置く（REQ-098-005）
-- extension 表現: 対象 workflow extension yaml の既存セクション（rules/checks/acceptance_gates）へ id、when、skill で追記する。schema 外フィールド（action、required、fail_on 等）を作らない。委譲先は project-local skill 委譲の既存契約に従い skill: yomiyasu を直接指定する。委譲先実在検査が .opencode/skills/yomiyasu を解決できることを deterministic checker で確認し、ラッパー Skill を追加しない
-- lint 実行: 同梱 lint スクリプト（.opencode/skills/yomiyasu/scripts/yomiyasu_lint.py）へ本文を標準入力で渡し、検査専用の本文ファイルを新規保存しない。Python 呼出コマンドは環境で実際に利用可能なもの（python または python3）を実行時に確認して使用し、python3 へ固定しない
-- 適用済みの判定: 編集前読込、内容変更が揃った後の推敲、lint 実行、指摘確認までを適用済みとし、修正不要という確認を含める。lint の通常の終了コード 0 を指摘なし・推敲済みの証明として扱わず、警告ゼロ・スコア閾値・--strict を合否条件にしない。文脈上正当な用語への指摘は理由を記録して保持し、修正試行は最大 2 回とする（適用の有無を判定できることの要求は REQ-098-008）
-- 停止条件: extension が有効に読み込まれた状態での yomiyasu 未導入・lint 実行失敗時は、対象文章の提出・投稿・マージを停止する。extension ファイル自体の不在時継続と malformed 時 fail-open（REQ-002-031）は変更しない。本必須化は工程上の契約であり、全書込みへの機械的強制は保証しない（REQ-098-008、REQ-098-011）
-- 記録: 既存 PR の検証欄等へ対象・実施結果・保持した指摘の理由を最小限記録する。記録専用の再帰的コメント投稿と追加の永続管理を作らない
-- 対象外の維持: ラベル・状態・チェックボックスのみの変更に再推敲を要求せず、他者の文章・引用・ログを無断でリライトしない（REQ-098-004）。req-define の .agentdev/drafts/** 編集スコープ契約を維持する（REQ-098-010）。既存の ADF-COVERS 宣言、固定見出し、成果物配置契約、書込み guard、UTF-8/LF 保持の各規律は本適用でも維持する（REQ-098-014）
-
-### 工程拡張の文章品質・書込み規則の共通参照化（B2-2）
-
-- 7つの workflow 拡張（agentdev-workflow-case-auto、case-open、case-ready、case-revise、case-run、case-close、workflow-issue）の references に反復した文章品質規則（yomiyasu・guard 説明）の本文は、正を1箇所へ集約する。各拡張は呼出条件と正本への参照のみを保持する
+- 7つの workflow 拡張（agentdev-workflow-case-auto、case-open、case-ready、case-revise、case-run、case-close、workflow-issue）の references に反復した文章品質規則（guard 説明）の本文は、正を1箇所へ集約する。各拡張は呼出条件と正本への参照のみを保持する
 - 障害対応知識（Windows 文字コード破壊、Bun 実行形態差、標準出力消失、Git Bash パス変換、長時間処理起動、Worktree 環境差等）は docs/knowledge/ を参照先とする条件付き参照へ整理する。例外回復の規則も必要なときだけ参照される構造にする
 - guard 拒否後の回復は、worktree 運用指針の迂回禁止（許可された配置先への変更による回復は維持し、別の書込み手段で同じ作業領域外へ書き込む選択肢を案内しない）へ統一する。共通規則と各拡張・worktree 運用指針を照合し、拒否後の回復手順が一致することを確認する
 - 書込み規律の文面は、配布境界ガードと GitHub 書込みガードの実際の検出対象（検出器の実効範囲）と一致する。文書が規定する拒否対象・許可対象と実際の検出器の判定が代表例で一致することを確認する
-- yomiyasu 推敲の意味・数値・否定条件の保護（REQ-098-006）は削らない
 
 ## 関連
 

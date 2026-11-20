@@ -107,7 +107,6 @@ IR エントリ一覧は rules/index.ts のレジストリから `generate_index
 - [IR-064: unresolved-placeholder](rules/IR-064-unresolved-placeholder.md)
 - [IR-067: referenced-req-row-existence](rules/IR-067-referenced-req-row-existence.md)
 - [IR-068: skill-projection-manifest](rules/IR-068-skill-projection-manifest.md)
-- [IR-069: req-number-gap-recorded](rules/IR-069-req-number-gap-recorded.md)
 - [IR-070: design-frontmatter-required-keys](rules/IR-070-design-frontmatter-required-keys.md)
 - [IR-071: integrity-rule-related-req-existence](rules/IR-071-integrity-rule-related-req-existence.md)
 - [IR-075: ir-file-size](rules/IR-075-ir-file-size.md)

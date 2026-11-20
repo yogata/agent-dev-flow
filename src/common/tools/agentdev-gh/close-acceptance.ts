@@ -3,7 +3,7 @@
 // - 判定記録の保存場所はメイン repo root の
 //   `.agentdev/close-acceptance/issue-{NNNN}.json` に固定し、worktree コンテキスト
 //   から呼び出された場合も main repo root 側へ解決する（呼出側 cwd に依存しない
-//   単一の決定的解決規則。git-common-dir 導出。agentdev_jev 観測と同一の内部解決）。
+//   単一の決定的解決規則。git-common-dir 導出）。
 // - Tool は呼出元の申告を受け取らず、自ら記録を読み取り、対象 Issue 番号と
 //   判定対象版（close 時点の対象を識別する版情報。対象 Issue の updated_at）への
 //   束縛と判定内容（変更後の正規完了判定に基づく機械受理の成立）を検証する。

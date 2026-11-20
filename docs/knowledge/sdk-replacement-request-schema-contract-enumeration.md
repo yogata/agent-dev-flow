@@ -15,7 +15,7 @@ updated: 2026-09-28
 
 ### Cloudflare /ai/run の model-in-path 制約（実測）
 
-Cloudflare AI Gateway の `/ai/run/{model}` 形式（model-in-path 継続）は Workers AI の `@cf/` モデル専用であり、第三者モデル（`author/model` 形式）にはパスルートが存在しない。公式の `/ai/run` は body の `{ model, input }` でモデルと入力を渡す。実測では `typesafe/jev` を model-in-path で呼び出すと HTTP 400 `code 7000 "No route for that URI"` で失敗した（Case #3183、失敗観測 20260927T112354Z-6677）。公式カタログ（developers.cloudflare.com の model ページ配下 schema-input.json / schema-output.json）の取得・確認でリクエスト/レスポンスの物理マッピングを修正し、再実測で解消した（観測 20260927T113606Z-6056、commit 58a0fad7）。
+Cloudflare AI Gateway の `/ai/run/{model}` 形式（model-in-path 継続）は Workers AI の `@cf/` モデル専用であり、第三者モデル（`author/model` 形式）にはパスルートが存在しない。公式の `/ai/run` は body の `{ model, input }` でモデルと入力を渡す。実測では第三者モデル（`author/model` 形式）を model-in-path で呼び出すと HTTP 400 `code 7000 "No route for that URI"` で失敗した（Case #3183、失敗観測 20260927T112354Z-6677）。公式カタログ（developers.cloudflare.com の model ページ配下 schema-input.json / schema-output.json）の取得・確認でリクエスト/レスポンスの物理マッピングを修正し、再実測で解消した（観測 20260927T113606Z-6056、commit 58a0fad7）。
 
 ## 適用条件
 
@@ -25,12 +25,11 @@ Cloudflare AI Gateway の `/ai/run/{model}` 形式（model-in-path 継続）は 
 ## 適用対象
 
 - provider 置換・依存削減系の case-run 実装手順（SDK 置換時の実装前工程）
-- 外部 API SDK を fetch 直呼び出しへ置換する全 Case（Jev evaluation gateway 置換〔DEC-046 系〕を含む）
+- 外部 API SDK を fetch 直呼び出しへ置換する全 Case（評価 gateway 置換系を含む）
 
 ## 根拠
 
-- Case #3183（case-run TS-010 実 gateway 検証、PR #3185）: 評価 SDK（`ai` / `@ai-sdk/gateway`）依存を撤去して fetch 直呼び出しに置換した変更で、Cloudflare `/ai/run/{model}` の model-in-path が `typesafe/jev` に対して HTTP 400 code 7000 "No route for that URI" で失敗（失敗観測 20260927T112354Z-6677・TS-010 on_failure 発火）。model-in-path は `@cf/` モデル専用で第三者モデルはボディ渡しが正という実測の確定に至った。公式カタログ取得・確認で物理マッピングを修正し再実測成功
-- DEC-046（Jev 実行基盤の Cloudflare AI Gateway への完全置換）
+- Case #3183（case-run TS-010 実 gateway 検証、PR #3185）: 評価 SDK（`ai` / `@ai-sdk/gateway`）依存を撤去して fetch 直呼び出しに置換した変更で、Cloudflare `/ai/run/{model}` の model-in-path が第三者モデルに対して HTTP 400 code 7000 "No route for that URI" で失敗（失敗観測 20260927T112354Z-6677・TS-010 on_failure 発火）。model-in-path は `@cf/` モデル専用で第三者モデルはボディ渡しが正という実測の確定に至った。公式カタログ取得・確認で物理マッピングを修正し再実測成功
 
 ## 関連知識
 

@@ -4,7 +4,7 @@
  * DEC-065 決定3（カタログ自動生成の単一ソース = rules/index.ts レジストリ）、
  * REQ-122-003（残存24コアルールの4分類構成維持）、REQ-122-006（カタログ自動生成）、
  * REQ-122-011（IR-075 新設・Wave-4 登録）に対応する focused test。Wave-1 で確定した
- * 残存24ルール集合と4分類割当、Wave-4 で登録した IR-075 を固定値としてレジストリと突合し、
+ * 残存23ルール集合と4分類割当、Wave-4 で登録した IR-075 を固定値としてレジストリと突合し、
  * 手編集カタログの再生成による上書き（単一ソース化）を純文字列 fixture で実証する。
  *
  * 改変 AUTOGEN ブロック fixture の鮮度検出（scanBlocks 経路）は
@@ -33,12 +33,12 @@ const REAL_CATALOG_PATH = path.join(
 
 /**
  * Wave-1（Issue #4153 / PR #4157 完了記録、REQ-122-003）で確定した
- * 残存24ルールの4分類割当。
+ * 残存23ルールの4分類割当。
  */
 const WAVE1_CATEGORIES = [
   {
     name: "スキーマ・ID・ファイル名整合",
-    ids: ["IR-001", "IR-002", "IR-003", "IR-007", "IR-044", "IR-069", "IR-070"],
+    ids: ["IR-001", "IR-002", "IR-003", "IR-007", "IR-044", "IR-070"],
   },
   {
     name: "リンク・参照パス・未解決プレースホルダ",
@@ -58,22 +58,22 @@ const WAVE1_CATEGORIES = [
 const WAVE4_RULE_IDS = ["IR-075"] as const;
 
 describe("rules registry（カタログ単一ソース）", () => {
-  test("Wave-1 残存24ルール + IR-075（Wave-4 登録）と IR 番号順で完全一致する", () => {
+  test("Wave-1 残存23ルール + IR-075（Wave-4 登録）と IR 番号順で完全一致する", () => {
     expect(registryRules.map((r) => r.id)).toEqual([
       "IR-001", "IR-002", "IR-003", "IR-004", "IR-007", "IR-008", "IR-013",
       "IR-016", "IR-024", "IR-044", "IR-053", "IR-055", "IR-056", "IR-058",
       "IR-059", "IR-061", "IR-062", "IR-063", "IR-064", "IR-067", "IR-068",
-      "IR-069", "IR-070", "IR-071", "IR-075",
+      "IR-070", "IR-071", "IR-075",
     ]);
   });
 
-  test("Wave-1 確定の4分類割当（7+8+5+4）が registry から IR-075 を除いた集合を重複・過不足なく覆う", () => {
+  test("Wave-1 確定の4分類割当（6+8+5+4）が registry から IR-075 を除いた集合を重複・過不足なく覆う", () => {
     const coreIds = registryRules
       .map((r) => r.id)
       .filter((id) => !WAVE4_RULE_IDS.includes(id as "IR-075"))
       .sort();
     const assigned = WAVE1_CATEGORIES.flatMap((c) => [...c.ids]).sort();
-    expect(assigned).toHaveLength(24);
+    expect(assigned).toHaveLength(23);
     expect(new Set(assigned).size).toBe(assigned.length);
     expect(assigned).toEqual(coreIds);
     expect(WAVE1_CATEGORIES.map((c) => c.name)).toEqual([
@@ -82,12 +82,12 @@ describe("rules registry（カタログ単一ソース）", () => {
       "自動生成・インデックス・投影同期",
       "配布境界",
     ]);
-    expect(WAVE1_CATEGORIES.map((c) => c.ids.length)).toEqual([7, 8, 5, 4]);
+    expect(WAVE1_CATEGORIES.map((c) => c.ids.length)).toEqual([6, 8, 5, 4]);
   });
 
   test("Wave-4 登録の IR-075 が registry に存在し 25 構成である（REQ-122-011）", () => {
     expect(registryRules.map((r) => r.id)).toContain("IR-075");
-    expect(registryRules).toHaveLength(25);
+    expect(registryRules).toHaveLength(24);
   });
 });
 
@@ -95,7 +95,7 @@ describe("generateCatalogEntries（registry → カタログ行）", () => {
   const entries = generateCatalogEntries(registryRules);
 
   test("登録ルール1件につき1行を出力する（重複なし・25 行構成）", () => {
-    expect(entries).toHaveLength(25);
+    expect(entries).toHaveLength(24);
     expect(new Set(entries).size).toBe(entries.length);
   });
 
