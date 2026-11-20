@@ -353,7 +353,8 @@ describe("段階ゲートの工程契約文言（3 Workflow Skill）", () => {
     },
     {
       file: "docs/designs/commands/case-close.md",
-      phrases: [implDeclComment("REQ-021-018, REQ-021-019, REQ-021-022, REQ-021-025")],
+      // Wave-4（REQ-122-012）で case-close Design の references/ 分割対応をこの宣言へ追加した。
+      phrases: [implDeclComment("REQ-021-018, REQ-021-019, REQ-021-022, REQ-021-025, REQ-122-012")],
     },
   ])("工程契約文言が存在する: %s", ({ file, phrases }) => {
     const content = read(file);

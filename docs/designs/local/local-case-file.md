@@ -199,7 +199,7 @@ case-schema 機械可読定義: `src/common/tools/agentdev-gh/local/case-schema/
 - ローカル版 `case-open`: Case Issue 作成ではなく role: case のローカルIssue作成を行う
 - ローカル版 `case-run`: GitHub PR 作成ではなく role: case のローカルIssueへの PR 相当セクション追記を行う
 - ローカル版 `case-close`: GitHub PR 取り込み / Issue クローズではなくローカルIssueの完了更新を行う
-- `/agentdev/issue`: 追跡Issue操作を role: tracking のローカルIssueへ Tool 操作契約経由で実行する
+- 追跡Issue操作（`agentdev-issue-tracking` スキル）: role: tracking のローカルIssueへ Tool 操作契約経由で実行する
 - GitHub Issue 作成、PR 作成、PR 取り込み、Issue クローズおよび `gh issue` / `gh pr` をローカル版の必須操作にしない
 
 runner-local 固有の前提と差分（REQ-011-006）: ローカル版の Tool 操作は、同一の操作契約で Case ファイル読み書きを実装した Local 実装 Tool 経由で実行する。GitHub 環境の存在を前提とせず、GitHub 版との差分は上記の物理写像への集約に限られる。操作順序、読み戻し検証（VERIFY）契約、失敗時動作は GitHub 版と同一である。

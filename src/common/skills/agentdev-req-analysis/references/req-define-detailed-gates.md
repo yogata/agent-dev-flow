@@ -25,7 +25,7 @@ req-define が要件 doc を生成する際の詳細ゲートを定義する。
 5. REQ だけでなく Decision/ Design/ guides/ commands/ skills への影響候補を明示する。
 6. 結果をドラフトに保持する。
 
-この step は要求定義時の局所的な影響候補抽出であり、`/agentdev/inspect-docs` の全体意味レビューの代替ではない。
+この step は要求定義時の局所的な影響候補抽出であり、inspect-docs workflow（backlog-auto stage 1 駆動）の全体意味レビューの代替ではない。
 
 ## 分類ゲート
 

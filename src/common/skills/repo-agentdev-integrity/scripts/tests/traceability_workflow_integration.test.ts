@@ -24,7 +24,6 @@ const SWITCH_TARGET_FILES: readonly string[] = [
   "docs/designs/commands/case-run.md",
   "docs/designs/commands/case-close.md",
   "docs/designs/commands/inspect-docs.md",
-  "docs/designs/commands/inspect-skills.md",
   "docs/designs/commands/backlog-review.md",
   "docs/designs/skills/agentdev-doc-diagnostics.md",
   "docs/designs/skills/agentdev-adversarial-review.md",
@@ -33,7 +32,6 @@ const SWITCH_TARGET_FILES: readonly string[] = [
   "src/common/skills/agentdev-workflow-case-run/SKILL.md",
   "src/common/skills/agentdev-workflow-case-close/SKILL.md",
   "src/common/skills/agentdev-workflow-inspect-docs/SKILL.md",
-  "src/common/skills/agentdev-workflow-inspect-skills/SKILL.md",
   "src/common/skills/agentdev-workflow-backlog-review/SKILL.md",
   "src/common/skills/agentdev-adversarial-review/SKILL.md",
   "src/common/skills/agentdev-case-run-execution-adapter/SKILL.md",
@@ -41,18 +39,15 @@ const SWITCH_TARGET_FILES: readonly string[] = [
   ".agentdev/extensions/skills/agentdev-workflow-case-open.yaml",
   ".agentdev/extensions/skills/agentdev-workflow-case-run.yaml",
   ".agentdev/extensions/skills/agentdev-workflow-case-close.yaml",
-  ".agentdev/extensions/skills/agentdev-adversarial-review.yaml",
 ];
 
 /** REQ-021-021 の対象（診断・レビュー系5工程: Design と Workflow Skill 本文） */
 const DIAGNOSTIC_REVIEW_FILES: readonly string[] = [
   "docs/designs/commands/inspect-docs.md",
-  "docs/designs/commands/inspect-skills.md",
   "docs/designs/commands/backlog-review.md",
   "docs/designs/skills/agentdev-doc-diagnostics.md",
   "docs/designs/skills/agentdev-adversarial-review.md",
   "src/common/skills/agentdev-workflow-inspect-docs/SKILL.md",
-  "src/common/skills/agentdev-workflow-inspect-skills/SKILL.md",
   "src/common/skills/agentdev-workflow-backlog-review/SKILL.md",
   "src/common/skills/agentdev-adversarial-review/SKILL.md",
 ];
@@ -215,7 +210,6 @@ describe("Workflow Skill 本文・extension の切替", () => {
 
   it.each([
     "src/common/skills/agentdev-workflow-inspect-docs/SKILL.md",
-    "src/common/skills/agentdev-workflow-inspect-skills/SKILL.md",
     "src/common/skills/agentdev-workflow-backlog-review/SKILL.md",
     "src/common/skills/agentdev-adversarial-review/SKILL.md",
   ])("診断・レビュー系 Workflow Skill が独立探索手段の節を持つ: %s", (rel) => {
@@ -233,7 +227,6 @@ describe("Workflow Skill 本文・extension の切替", () => {
   it.each([
     ".agentdev/extensions/skills/agentdev-workflow-case-ready.yaml",
     ".agentdev/extensions/skills/agentdev-workflow-case-open.yaml",
-    ".agentdev/extensions/skills/agentdev-adversarial-review.yaml",
   ])("traceability を利用しない工程の extension が traceability rule を持たない: %s", (rel) => {
     // REQ-098 (Issue #3311) により case-ready/case-open は yomiyasu rule を持つため、
     // 本テストの判定対象は traceability 委譲 rule の不在とする

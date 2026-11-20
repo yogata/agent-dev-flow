@@ -69,7 +69,7 @@ backlog-auto は子ワークフロー内部の分類、評価、昇格、RU 生�
 
 - 子ワークフロー内部の分類、評価、昇格、RU 生成を代行しない（各子 Workflow Skill の責務）
 - inspect-promote の `--auto` を明示 opt-in なしに有効化しない
-- capture 系コマンド（learning-capture、intake-capture、intake-from-github）と inspect-skills を自動起動しない
+- capture 系（learning-capture、intake capture）と inspect-skills 相当の診断を自動起動しない
 - req-define と case-auto は一気通貫実行の接続工程（要件定義接続、実行接続）として workflow 委譲経由でのみ起動する。接続工程を外れた自発的な起動を行わず、GitHub Issue / PR 作成を直接実行しない（Issue / PR 作成は case-auto 実行の内部責務）
 - req-define の壁打ち・承認境界、backlog-review の RU 承認、リリース条件・公開権限の確認を自動化しない
 - 版番号の major/minor 自動判定、同一実行での二つの版番号の消費、既存タグの移動、本番環境への自動配備を行わない

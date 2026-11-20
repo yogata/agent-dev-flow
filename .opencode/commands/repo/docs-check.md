@@ -31,7 +31,7 @@ agent-dev-flow リポジトリの自己監査コマンド。AgentDevFlow 管理�
 |---|---|---|---|
 | STEP-1 スクリプト実行 | なし（コマンド実行時に全 artifact を自動スキャン） | 検査スクリプト群の実行結果（exit code・検出結果） | 検査スクリプト群をすべて `bun run` 形式で起動・実行していること。strict failure を示す終了コード1は docs-check 全体の失敗として扱っていること |
 | STEP-2 レポート確認・Finding整理 | 検査スクリプト実行済み | 重複・誤検出・根拠を確認した整理済み finding 群 | report の NG/WARNING finding のみを対象とし（INFO は対象外、REQ-0108-224）、同一是正方針で統合可能かの判断を経ていること（REQ-0108-222。固定単位での機械的分割を行っていないこと） |
-| STEP-3 Intake Item 自動生成 | finding 整理済み | `.agentdev/intake/inbox/` へ保存された通常 intake item（0件以上） | `/agentdev/intake-capture` の通常形式（frontmatter・route・dedup keyなし）に従い、各 item が自己完結（非永続 report への参照なしで後続処理成立）であること。原因分類が確認済/仮説/不明で区別されていること（実行＝保存承認、REQ-0108-225。採否は `intake-promote` へ委譲） |
+| STEP-3 Intake Item 自動生成 | finding 整理済み | `.agentdev/intake/inbox/` へ保存された通常 intake item（0件以上） | intake item の通常形式（frontmatter・route・dedup keyなし）に従い、各 item が自己完結（非永続 report への参照なしで後続処理成立）であること。原因分類が確認済/仮説/不明で区別されていること（実行＝保存承認、REQ-0108-225。採否は intake-promote workflow へ委譲） |
 | STEP-4 Git 永続化（条件付き） | intake item 作成あり | commit・push（`.agentdev/intake/` 配下のみ） | intake item 作成時のみ commit/push を行い、`git add` が `.agentdev/intake/` 配下に限定されていること（integrity report は commit 対象外、REQ-0108-229） |
 | STEP-5 完了報告 | 永続化処理済み（intake item 未作成時は STEP-3 で 0 件確認済み） | 完了報告 | 完了報告 template（.opencode/commands/repo/templates/docs-check/standard.md）に従って出力していること |
 

@@ -25,7 +25,7 @@ ADF が起票する Issue タイトルの具体書式を所有する単一参照
 | Epic として確定した管理 Issue（Root Case） | `Epic: 主題` | case-ready が Epic 構成を確定した時点（`Case:` から更新） |
 | Epic 配下の子 Issue | `[Epic #<親番号>] Wave-N: 主題` | case-ready が子 Issue を作成する時点（N = 所属 Epic 内の確定済み Wave 番号、<親番号> = 親 Epic の Issue 番号） |
 | Case 直下の子 Issue（Epic を構成しない OU 単位並列構成） | `[Case #<親番号>] 主題` | case-ready が Case 直下の子 Issue を作成する時点（<親番号> = 親 Root Case の Issue 番号。順序・実行制御の情報は含めない） |
-| 追跡Issue（role: tracking） | `Tracking: 主題` | 追跡Issue起票経路（/agentdev/issue、各 workflow の起票） |
+| 追跡Issue（role: tracking） | `Tracking: 主題` | 追跡Issue起票経路（会話経由の追跡Issue操作、各 workflow の起票） |
 
 - 子 Issue の書式に `Task:` を使用しない
 - `[Epic #<親番号>]` は表示用の親 Epic 識別子である。親子関係・実行可否の正は Epic 本文の実行構成であり、タイトル解析から親子関係・実行順序を決定しない
@@ -97,7 +97,7 @@ ADF が起票する Issue タイトルの具体書式を所有する単一参照
 - case-open: references/root-case-and-definition-package.md（Root Case 起票）
 - case-ready: references/execution-structure.md（Epic 確定・子 Issue 作成）
 - workflow-templates: SKILL.md のテンプレート選定ルール（本文テンプレートはタイトルを規定しない旨と参照）
-- 追跡Issue起票: agentdev-issue-tracking SKILL.md、agentdev-workflow-issue SKILL.md
+- 追跡Issue起票: agentdev-issue-tracking SKILL.md
 - 読取・書込の安全手順: agentdev-issue-management references/issue-operation-safety.md
 - ローカル版: docs/designs/local/local-case-file.md、agentdev-gh local case-schema の title 値域
 - PR タイトル生成（case-auto Design）: 子 Issue タイトルに依存する生成である旨の整合確認

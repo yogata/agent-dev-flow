@@ -1,14 +1,14 @@
 ---
 name: agentdev-workflow-inspect-docs
-description: "inspect-docs workflow 本体。docs 全体の意味整合性と配布物を診断し、finding を inbox に保存して永続化する（read-only）。USE FOR: 対象収集、REQ/文書種別診断、配布検査、finding 出力。DO NOT USE FOR: 対象修正、finding 分類・処分、単独起動（/agentdev/* command 経由で利用）。"
+description: "inspect-docs workflow 本体。docs 全体の意味整合性と配布物を診断し、finding を inbox に保存して永続化する（read-only）。USE FOR: 対象収集、REQ/文書種別診断、配布検査、finding 出力。DO NOT USE FOR: 対象修正、finding 分類・処分、単独起動（backlog-auto stage 1 経由で利用）。"
 ---
 
 # inspect-docs workflow スキル
 
-inspect-docs command の workflow 実装本体である。
+inspect-docs workflow の実装本体である（backlog-auto stage 1 が Workflow Skill 連携で駆動する内部 workflow）。
 docs 全体（REQ/Decision/Design/guides/README）と配布物の意味整合性診断から、検出事項の `.agentdev/inspect/inbox/` 出力、`.agentdev/inspect/` 配下の git 永続化、完了報告までの制御構造を所有する。
 
-inspect-docs command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（責務3層分化と1:N分割原則、検出と診断コマンド群の要件〔命名統一・公開 command 集合・diagnostics 命名限定・inbox 出力と reject 即時削除〕）。
+inspect-docs の呼出元は backlog-auto workflow（stage 1）であり、入出力契約・ガードレールは本スキルと inspect-docs Design が所有する（責務3層分化と1:N分割原則、検出と診断の要件〔命名統一・diagnostics 命名限定・inbox 出力と reject 即時削除〕）。
 
 ## 型判定: read-only-diagnostic型（STEP model 対象外）
 

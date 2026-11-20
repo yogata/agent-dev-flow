@@ -83,9 +83,9 @@ REQ / Decision の初回作成・増分更新の保存では、書込み直前�
 - 責務の重複、欠落
 - 実行時コマンド境界の矛盾
 
-SPLIT や REQ 再構成候補を検出した場合は、`/agentdev/inspect-docs` の REQ 構造レビュー検出事項として扱う。
+SPLIT や REQ 再構成候補を検出した場合は、inspect-docs workflow（backlog-auto stage 1 駆動）の REQ 構造レビュー検出事項として扱う。
 本工程では保存可能範囲を実行し、完了報告の follow-up として明示する。
-この検査は保存時の局所的な矛盾防止であり、`/agentdev/inspect-docs` の全体意味レビューの代替ではない。
+この検査は保存時の局所的な矛盾防止であり、inspect-docs workflow（backlog-auto stage 1 駆動）の全体意味レビューの代替ではない。
 
 ## インデックス、ハブ更新
 

@@ -1,6 +1,6 @@
 ✅ inspect-docs 完了
 
-完了コマンド:/agentdev/inspect-docs
+完了ワークフロー:inspect-docs workflow（backlog-auto stage 1）
 対象: docs全体（REQ {active_count}件/ ADR {adr_count}件/ Design {spec_count}件/ guides {guide_count}件）
 結果:
  - レビュー観点: {観点リスト}

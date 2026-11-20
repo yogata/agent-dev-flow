@@ -1,20 +1,20 @@
 ---
 name: agentdev-workflow-intake-promote
-description: "intake-promote command の workflow 実装本体。inbox 内 intake item の classification（確認・読込・評価・暫定分類・自律確定候補判定）、review（adversarial-review）、HITL（ユーザー判断必要 item の承認・分類確定）、persistence（採用 item 整形・promoted 保存）、destructive handling（振り分け・inbox 削除・破壊的変更の明示承認・git 永続化）の各 STEP を独立 resume point として所有する。USE FOR: intake-promote 実行時の workflow 制御。DO NOT USE FOR: inbox item の新規保存、単独起動（対応する /agentdev/* コマンド経由で利用すること）。"
+description: "intake-promote workflow 本体（backlog-auto stage 2 が駆動）。inbox 内 intake item の classification（確認・読込・評価・暫定分類・自律確定候補判定）、review（adversarial-review）、HITL（ユーザー判断必要 item の承認・分類確定）、persistence（採用 item 整形・promoted 保存）、destructive handling（振り分け・inbox 削除・破壊的変更の明示承認・git 永続化）の各 STEP を独立 resume point として所有する。USE FOR: intake-promote 実行時の workflow 制御。DO NOT USE FOR: inbox item の新規保存、単独起動（backlog-auto stage 2 経由で利用すること）。"
 ---
 
 # intake-promote workflow スキル
 
-intake-promote command の workflow 実装本体である。
+intake-promote workflow の実装本体である（backlog-auto stage 2 が Workflow Skill 連携で駆動する内部 workflow）。
 `.agentdev/intake/inbox/` 内の intake item を直接読み込み、内部 review フェーズで分類したのち、採用 item を `backlog-review` に渡せる採用済み成果物に整形する制御構造を所有する。
 classification → review → HITL → persistence → destructive handling の各段階を独立 resume point として構成する。
 
-intake-promote command は公開 interface（入出力契約・ガードレール・分類値契約）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（責務3層分化と1:N分割原則、intake pipeline 要件〔蓄積・capture 整理・分類確定・配置先限定〕）。
+intake-promote の呼出元は backlog-auto workflow（stage 2 intake 系統）であり、入出力契約・ガードレール・分類値契約は本スキルと intake-promote Design が所有する（責務3層分化と1:N分割原則、intake pipeline 要件〔蓄積・capture 整理・分類確定・配置先限定〕）。
 各 item の分類確定は、横断契約Designの HITL 判断確定原則に基づき、取得可能な根拠から正規契約からの導出または委譲された裁量の範囲で確定できる item を自律確定し、人間判断への引き上げ条件（intake 分類確定契約。`<foundations/responsibility-boundaries>` Design「人間判断への引き上げ条件」節）に該当する item のみを HITL 対象とする（後述「自律確定とHITL境界」）。
 
 ## 入力
 
-- intake-promote command から渡される intake item 群（`.agentdev/intake/inbox/` 内の Markdown ファイル）
+- backlog-auto stage 2（workflow 連携）から渡される intake item 群（`.agentdev/intake/inbox/` 内の Markdown ファイル）
 - ユーザーによる追加コンテキスト、分類修正指示（対話的に）
 
 ## 出力

@@ -59,7 +59,7 @@ tracking_status_enum:
       - not_planned
 
 # role: tracking の状態遷移
-# 非終端状態間の遷移は追跡Issue操作（/agentdev/issue 相当）が指示に従って
+# 非終端状態間の遷移は追跡Issue操作（agentdev-issue-tracking スキル相当）が指示に従って
 # 実行する。終端状態への遷移は issue_close、終端からの復帰は issue_reopen のみ。
 tracking_transitions:
   - operation: "追跡Issue起票"

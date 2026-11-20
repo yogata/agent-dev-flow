@@ -22,6 +22,6 @@ git 永続化:
   - {intake item 未作成時: 変更なし（intake item 未作成のため）}
   - {intake item 作成あり・失敗時: 失敗工程（{STEP-N ラベル}）+ エラー内容}
 次のコマンド:
-  - {1件以上: `/agentdev/intake-promote {path1} {path2} ...`}
+  - {1件以上: なし（intake-promote workflow は `/agentdev/backlog-auto` stage 2 が処理。対象パス: {path1} {path2} ...）}
   - {0件: なし}
 検証結果: {✅ OK / ⚠️ 注意（違反あり）}

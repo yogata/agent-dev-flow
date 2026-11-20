@@ -22,10 +22,10 @@ Skill、Command、script、checker、hook、Custom Tool 等の具体的な実現
 **昇華可能性評価、無条件自動REQ化禁止**: 各問題クラスについて恒久契約（REQ/Decision/Design）への昇華可能性を評価する。
 8軸評価スコア、禁止条件フィルタリングゲート、既存対策照合を基に判定する。
 **無条件の自動REQ化は禁止する**。
-学びは `promoted/` → `/agentdev/backlog-review` → `/agentdev/req-define` → `/agentdev/case-auto`（内部 lifecycle）の昇華経路を経て初めて REQ 化される。
+学びは `promoted/` → backlog-review workflow（backlog-auto stage 3 駆動） → `/agentdev/req-define` → `/agentdev/case-auto`（内部 lifecycle）の昇華経路を経て初めて REQ 化される。
 
 **living pool 維持**: 昇華不能な知見（`deferred` 判定、情報が断片的、出現回数が少ない等）は `deferred.md` の living pool で維持し、REQ 化しない。
-living pool は終端保管ではなく、次回 `/agentdev/learning-promote` 実行時に再評価の対象となる。
+living pool は終端保管ではなく、次回 learning-promote workflow（backlog-auto stage 2 駆動）実行時に再評価の対象となる。
 `deferred.md` は deferred カテゴリ（処分区分の1つ）のエントリだけでなく、未処理・保留中・再評価対象のエントリも保持する多状態の living pool である。
 
 | # | カテゴリ | 判定基準 |
@@ -83,7 +83,7 @@ Learning 評価結果の 7 系統・処分区分・8 寿命を次の三方対応
 learning-promote が出力する採用済み成果物の形式。
 採用済み成果物は、問題、根拠、望ましい状態、制約、既存事実を req-define が既存 REQ / Decision / Design と実装を再調査して変更方針を確定できる自足的な情報として保持する。
 learning-promote は実現先を確定せず、「反映先候補」は req-define 変更影響分析への情報候補である。
-`/agentdev/backlog-review` が読み込み、RU 化後に `/agentdev/req-define` に合流する。learning 由来で docs/knowledge/ への知識文書保存に分類された成果物は、backlog-review の利用者承認後に docs/knowledge/ へ直接保存され、RU 化を経ない。
+backlog-review workflow（backlog-auto stage 3 駆動） が読み込み、RU 化後に `/agentdev/req-define` に合流する。learning 由来で docs/knowledge/ への知識文書保存に分類された成果物は、backlog-review の利用者承認後に docs/knowledge/ へ直接保存され、RU 化を経ない。
 採用済み成果物は backlog-review 以前の段階（pre-backlog-review）であり、RU への変換は backlog-review が行う。
 
 ```markdown

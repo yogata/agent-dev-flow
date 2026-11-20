@@ -66,14 +66,14 @@ docs-check は Decision を現行の番号帯と廃止済みの番号帯に区�
 結果は `.agentdev/integrity/reports/` に JSON または Markdown 形式で出力する。
 結果分類は NG / warning / info の3段階。
 
-## inspect-docs
+## inspect-docs（内部 workflow）
 
-docs 全体の意味整合性と REQ 体系の健全性を検出するコマンド（REQ-036）。
+docs 全体の意味整合性と REQ 体系の健全性を検出する内部 workflow（REQ-036）。`/agentdev/backlog-auto` の stage 1（inspect-docs）として実行される。
 
 ### 基本フロー
 
 ```
-docs 全体の整合性を確認したい → /agentdev/inspect-docs → 検出レポート生成
+docs 全体の整合性を確認したい → /agentdev/backlog-auto（stage 1: inspect-docs） → 検出レポート生成
 ```
 
 ### 診断対象
@@ -82,21 +82,7 @@ docs 全体の整合性を確認したい → /agentdev/inspect-docs → 検出�
 - 廃止済み REQ と現行 REQ の整合性
 - 移行表の正確性
 
-## inspect-skills
-
-Command/Skill の参照妥当性を検出するコマンド（REQ-036）。
-
-### 基本フロー
-
-```
-Command/Skill の参照妥当性を確認したい → /agentdev/inspect-skills → 検出レポート生成
-```
-
-### 診断対象
-
-- Command から Skill への参照の有効性
-- Skill の構造、実行主体分類の妥当性
-- 配布物の参照整合
+Command/Skill 参照妥当性の機械検査（不存在 command 参照・構文健全性）は docs-check と検証エンジンの TS-008 系検査が担う。
 
 ## 3層ゲートと達成記録先
 

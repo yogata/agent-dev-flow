@@ -7,12 +7,12 @@ description: intake-from-github（GitHub残課題抽出）と intake-promote（r
 
 intake-from-github と intake-promote コマンドの知識ベースである。
 
-## 対象コマンド
+## 対象 workflow・入口
 
-| コマンド | 目的 |
+| 対象 | 目的 |
 |----------|------|
-| `/agentdev/intake-from-github` | クローズ済み Case Issue/PR から残課題を抽出し inbox item を生成する（role: tracking の追跡Issueは抽出対象外） |
-| `/agentdev/intake-promote` | inbox item を review、分類、整形、振り分けし promoted/ に保存する |
+| 会話経由の intake capture（本スキル） | ユーザー手動入力やクローズ済み Case Issue/PR の残課題抽出（role: tracking の追跡Issueは抽出対象外）を inbox item として保存する |
+| intake-promote workflow（backlog-auto stage 2 駆動） | inbox item を review、分類、整形、振り分けし promoted/ に保存する |
 
 ## 参考文献
 

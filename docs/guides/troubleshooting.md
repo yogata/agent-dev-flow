@@ -88,5 +88,5 @@ case-closeが正常に完了していない場合、手動で子状態を更新�
 
 ### REQ 体系が複雑になりすぎている
 
-対処: `/agentdev/inspect-docs`を実行して健全性を診断する。
+対処: `/agentdev/backlog-auto`（stage 1: inspect-docs）を実行して健全性を診断する。
 推奨アクションに従ってREQの統合、分割を検討する。

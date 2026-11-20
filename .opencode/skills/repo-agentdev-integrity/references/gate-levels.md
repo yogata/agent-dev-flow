@@ -62,14 +62,14 @@ docs-check から削除された検査（IR-045 文意整合、語彙コンプ�
 
 ## heuristic（推奨修正）
 
-意味判断を含むが明確な根拠を持つ検査。意味的レビューが必要な場合は `/agentdev/inspect-docs` へ route する。
+意味判断を含むが明確な根拠を持つ検査。意味的レビューが必要な場合は inspect-docs workflow（backlog-auto stage 1 駆動）へ route する。
 
 ### Finding route
 
 | finding レベル | 代表例 | route 先 |
 |---------------|--------|---------|
-| heuristic | retired REQ 現行参照、語彙レジストリ違反 | → `/agentdev/inspect-docs`（意味レビュー） |
-| observation | ADR 技術判断不在、文書種別不一致 | → `/agentdev/inspect-docs`（意味レビュー） |
+| heuristic | retired REQ 現行参照、語彙レジストリ違反 | → inspect-docs workflow（backlog-auto stage 1。意味レビュー） |
+| observation | ADR 技術判断不在、文書種別不一致 | → inspect-docs workflow（backlog-auto stage 1。意味レビュー） |
 
 ### 対象カテゴリ
 

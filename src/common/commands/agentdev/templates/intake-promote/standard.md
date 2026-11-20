@@ -1,6 +1,6 @@
 ✅ intake-promote 完了
 
-完了コマンド:/agentdev/intake-promote
+完了ワークフロー:intake-promote workflow（backlog-auto stage 2）
 対象: .agentdev/intake/promoted/（{N}件）
 結果:
  - 整形対象: {N}件
@@ -9,6 +9,6 @@
  - 自律確定: {N}件（主要根拠とHITL不要理由: {grounds_list}）
 検証結果: ✅ OK
 git 永続化: commit: {hash}, push: {成功/失敗}
-次のコマンド:/agentdev/backlog-review
+次のコマンド: なし（backlog-review workflow は backlog-auto stage 3 が駆動）
 
 

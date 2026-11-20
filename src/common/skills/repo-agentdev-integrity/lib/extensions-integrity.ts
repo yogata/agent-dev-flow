@@ -51,12 +51,21 @@ const OVERRIDE_PHRASES = [
   "replace default",
 ];
 
+// 公開コマンドを持たず Workflow Skill として残る内部 workflow 群。
+// case-* 5 本は v4 で内部 lifecycle 段階へ移行（Case #2981 / DEC-033）。
+// intake-promote / learning-promote / inspect-docs / inspect-promote / backlog-review は
+// Phase B で公開コマンドを廃止し backlog-auto の Workflow Skill 連携へ内部化。
 const INTERNAL_LIFECYCLE_COMMANDS = [
   "case-open",
   "case-ready",
   "case-run",
   "case-close",
   "case-revise",
+  "intake-promote",
+  "learning-promote",
+  "inspect-docs",
+  "inspect-promote",
+  "backlog-review",
 ] as const;
 
 export interface SkillClassification {

@@ -1,16 +1,16 @@
 ---
 name: agentdev-workflow-inspect-promote
-description: "inspect-promote workflow 本体。finding を promote/defer/reject に分類し、--auto、review、自律確定または HITL、処理、.agentdev 永続化を STEP 単位で制御する。USE FOR: inbox 分類、review、確定、処理、永続化。DO NOT USE FOR: finding 生成、REQ/Decision/Design 変更、単独起動（/agentdev/* command 経由で利用）。"
+description: "inspect-promote workflow 本体。finding を promote/defer/reject に分類し、--auto、review、自律確定または HITL、処理、.agentdev 永続化を STEP 単位で制御する。USE FOR: inbox 分類、review、確定、処理、永続化。DO NOT USE FOR: finding 生成、REQ/Decision/Design 変更、単独起動（backlog-auto stage 2 経由で利用）。"
 ---
 
 # inspect-promote workflow スキル
 
-inspect-promote command の workflow 実装本体である。
+inspect-promote workflow の実装本体である（backlog-auto stage 2 が Workflow Skill 連携で駆動する内部 workflow）。
 `.agentdev/inspect/inbox/` の検出事項を分類（promote/defer/reject）し、採用した検出事項を `.agentdev/inspect/promoted/` へ保存、却下した検出事項を即時削除、見送りを inbox に残置する。
 `--auto` 明示 opt-in 時は自動 promote 対象カテゴリに合致する検出事項を `.agentdev/intake/promoted/` へ自動投入する。
 finding disposition を STEP resume point として所有する。
 
-inspect-promote command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（責務3層分化と1:N分割原則、検出と診断コマンド群の要件〔命名統一・公開 command 集合・diagnostics 命名限定・inbox 出力と reject 即時削除〕）。
+inspect-promote の呼出元は backlog-auto workflow（stage 2 inspect 系統）であり、入出力契約・ガードレールは本スキルと inspect-promote Design が所有する（責務3層分化と1:N分割原則、検出と診断の要件〔命名統一・diagnostics 命名限定・inbox 出力と reject 即時削除〕）。
 
 ## 入力
 
@@ -111,5 +111,5 @@ inspect-promote workflow は次の8 STEP で構成する。
 - **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
 - **`<foundations/durable-state-and-recovery>` Design**: STEP reference 構造、resume point
 - **`<foundations/durable-state-and-recovery>` Design**: 入力解決優先順位、永続状態
-- **inspect-promote command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）
-- **`agentdev-workflow-inspect-docs` / `agentdev-workflow-inspect-skills`**: 検出事項の生成を担当する前段 workflow skill
+- **inspect-promote workflow（backlog-auto stage 2）**: 本スキルの駆動経路（backlog-auto の inspect 系統。`--auto` は利用者の明示 opt-in のみ）
+- **`agentdev-workflow-inspect-docs`**: 検出事項の生成を担当する前段 workflow skill

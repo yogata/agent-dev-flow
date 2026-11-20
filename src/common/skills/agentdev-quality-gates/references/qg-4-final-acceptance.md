@@ -113,7 +113,7 @@ PR の CI が全て通過しているか。
 - **warn**: 更新漏れ候補がある。警告表示し、修正の実行は Gate が所有せず正規所有工程（case-close STEP-3 の docs 検証・確定）へ任せる。人間判断への引き上げ条件に該当する場合のみユーザー判断へ。
 - **pass**: 更新漏れなし。
 
-> **局所予防の範囲**: この確認は close 時の局所的な漏れ検出であり、`/agentdev/inspect-docs` の全体意味レビューの代替ではない。
+> **局所予防の範囲**: この確認は close 時の局所的な漏れ検出であり、inspect-docs workflow（backlog-auto stage 1 駆動）の全体意味レビューの代替ではない。
 
 ### 6. test strategy 処理完了
 

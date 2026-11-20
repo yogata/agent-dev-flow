@@ -46,13 +46,13 @@ updated: 2026-11-18
 
 検出された検出事項の対応先:
 
-| 検出事項種別 | 経路 | 対応コマンド |
+| 検出事項種別 | 経路 | 対応先 |
 |---|---|---|
-| document-drift | intake | `/agentdev/intake-capture` |
-| broken-reference | intake | `/agentdev/intake-capture` |
-| obsolete-structure | intake | `/agentdev/intake-capture` |
+| document-drift | intake | 会話経由の intake capture（`agentdev-intake-pipeline` スキル） |
+| broken-reference | intake | 会話経由の intake capture（`agentdev-intake-pipeline` スキル） |
+| obsolete-structure | intake | 会話経由の intake capture（`agentdev-intake-pipeline` スキル） |
 | canonical-conflict | req-define | `/agentdev/req-define` |
-| workflow-gap | intake + learning | `/agentdev/intake-capture` + `learning-capture` |
+| workflow-gap | intake + learning | 会話経由の intake capture（`agentdev-intake-pipeline` スキル） + `learning-capture` |
 | integrity-rule-gap | learning | `learning-capture` |
 
 ## 整合性検査カテゴリ（Integrity Check Categories）

@@ -698,7 +698,7 @@ describe("extractFreshnessTargets（REQ ファイル名のみ報告形式の捕�
   // 括弧内パスであり、REQ 配置知識をエンジン側が保持しない構造）。
   const reqOnlyNgLine = "- **[NG]** req-updated-freshness: frontmatter updated (2026-10-01) does not match the last content-change commit date (2026-11-07) for REQ-105.md: REQ 変更時に frontmatter updated を変更日へ進行させる（patterns.md REQ frontmatter 規約） (src/common/requirements/REQ-105.md) → route: intake";
   const prefixedNgLine = "- **[NG]** req-updated-freshness: frontmatter updated (2026-10-01) does not match the last content-change commit date (2026-11-07) for src/common/skills/agentdev-workflow-phase-tasks-create/SKILL.md: Design 変更時に frontmatter updated を変更日へ進行させる（patterns.md Design frontmatter 形式） (src/common/skills/agentdev-workflow-phase-tasks-create/SKILL.md) → route: intake";
-  const otherCheckNgLine = "- **[NG]** skill-description-length: description exceeds the limit (src/common/skills/agentdev-workflow-issue/SKILL.md) → route: intake";
+  const otherCheckNgLine = "- **[NG]** skill-description-length: description exceeds the limit (src/common/skills/agentdev-workflow-phase-tasks-create/SKILL.md) → route: intake";
 
   test("REQ ファイル名のみ報告形式（for REQ-NNN.md:）を括弧内 repo 相対パスとして捕捉する", () => {
     expect(extractFreshnessTargets(reqOnlyNgLine)).toEqual(["src/common/requirements/REQ-105.md"]);

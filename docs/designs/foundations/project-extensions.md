@@ -152,8 +152,7 @@ command/skill は実行時に自分に対応する extension だけを読む。
 - extension は標準 command/skill の上書きではなく、追加・拡張としてのみ扱う。
 
 対応 extension が存在しない command/skill は正常動作であり、異常状態ではない。
-command が project 非依存で単体動作する正当な状態である。
-例として `/agentdev/inspect-skills` は Design 直接参照を持たず project 非依存で動作するため extension 不要である。
+command が project 非依存で単体動作する正当な状態である（例: Design 直接参照を持たず project 非依存で動作する command は extension 不要である）。
 
 ### 状態機械の共有実装
 
@@ -215,18 +214,18 @@ extension 検査は DEC-006（inspect 3-command 構成への正規化）に基�
 | 層 | 正規所有者 | 検査内容 |
 |---|---|---|
 | deterministic check | IR-056 / `/repo/docs-check`（self-hosting）、case-run・case-close の changed-path routing（consumer） | extension 一覧化、YAML 構文、必須セクションと field、kind と配置、ID と対象 command/skill の対応、context path 実在、委譲先 skill 実在、旧 `.agentdev/doc-inputs/**` 残存 |
-| semantic diagnosis | `/agentdev/inspect-skills` | extension 責務境界、標準 command/skill を上書きする意図の意味診断 |
-| finding disposition | `/agentdev/inspect-promote` | finding の promote、defer、reject |
+| semantic diagnosis | `/repo/docs-check`・検証エンジンの機械検査（不存在 command 参照、構文健全性） | extension 責務境界、標準 command/skill を上書きする意図の機械検査 |
+| finding disposition | backlog-auto 内部の inspect-promote workflow | finding の promote、defer、reject |
 
 AgentDevFlow 標準の inspect 責務は上記構造確認・path 実在確認・skill 存在確認までとする。
 command/skill 本文の Decision/REQ/Design 具体参照禁止の持続的検査は、各適用プロジェクトが project-local skill により実装する（AgentDevFlow 標準の対象外）。
 agent-dev-flow リポジトリ自身は適用プロジェクトの1つとして repo-local skill により検査を実装するが、これは標準仕様ではなくローカル運用である。
-`/agentdev/inspect-docs` へ extension の意味診断を追加しない（三層非重複）。
+inspect-docs workflow（backlog-auto 内部）へ extension の意味診断を追加しない（三層非重複）。
 
 ## ハイブリッド方式
 
 extension 原本は各プロジェクトが所有する。
-AgentDevFlow 本体は初期テンプレート、スキーマ、検査（`/repo/docs-check`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote` の3層）を提供し、consumer はテンプレートを初期値として取り込みカスタマイズする。
+AgentDevFlow 本体は初期テンプレート、スキーマ、検査（`/repo/docs-check` と検証エンジンの機械検査、backlog-auto 内部の inspect-promote workflow）を提供し、consumer はテンプレートを初期値として取り込みカスタマイズする。
 AgentDevFlow 本体リポジトリの .agentdev/extensions/** には本体固有 Design パスを記述してよい。
 
 ## 配布物参照境界の責務分担

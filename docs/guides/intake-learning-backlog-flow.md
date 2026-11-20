@@ -37,12 +37,10 @@ inbox/ → promoted/（採用 item の inbox 元ファイルは削除）
 
 ### コマンド
 
-| 前工程の生成物 | コマンド | 出力 |
+| 前工程の生成物 | 実行主体 | 出力 |
 |----------|------|------|
-| ユーザー手動入力 | `/agentdev/intake-capture` | `inbox/` |
-| クローズ済み Issue/PR | `/agentdev/intake-from-github` | `inbox/` |
-| `inbox/` | `/agentdev/intake-triage` | 処理結果サマリー（Route A 修正 / Route B 破棄 / Route C `req-units/` への RU 生成、残件 0 件） |
-| `inbox/` | `/agentdev/intake-promote` | `promoted/`（inbox 元ファイルは削除） |
+| ユーザー手動入力・クローズ済み Issue/PR の残課題抽出 | 会話経由の intake capture（`agentdev-intake-pipeline` スキル） | `inbox/` |
+| `inbox/` | intake-promote workflow（backlog-auto stage 2 が駆動） | `promoted/`（inbox 元ファイルは削除） |
 
 ### 各ディレクトリの役割
 
@@ -68,10 +66,10 @@ inbox/ + deferred/ → promoted/
 
 ### コマンド/スキル
 
-| 前工程の生成物 | コマンド | 出力 |
+| 前工程の生成物 | 実行主体 | 出力 |
 |----------|------|------|
 | 観測（case-run 中等） | `learning-capture`（スキル） | `inbox/` |
-| `inbox/` + `deferred/` | `/agentdev/learning-promote` | `promoted/` |
+| `inbox/` + `deferred/` | learning-promote workflow（backlog-auto stage 2 が駆動） | `promoted/` |
 
 ### 各成果物の役割
 
@@ -93,11 +91,11 @@ Intake/Learning 両方の採用済み成果物を RU に統合する。
 
 ### コマンド
 
-| 前工程の生成物 | コマンド | 出力 |
+| 前工程の生成物 | 実行主体 | 出力 |
 |----------|------|------|
-| `promoted/`（intake/learning） | `/agentdev/backlog-review` | `RU-*.md` |
+| `promoted/`（intake/learning） | backlog-review workflow（backlog-auto stage 3 が駆動） | `RU-*.md` |
 
-`/agentdev/backlog-review` は分析と統合結果をユーザーに確認する（HITL）。
+backlog-review workflow は分析と統合結果をユーザーに確認する（HITL）。
 承認後に直接 RU を生成する。
 
 生成された RU 一式は `/agentdev/backlog-auto` の一気通貫実行で req-define → case-auto へ自動接続され、一式全体の完了判定とパッチリリース作成まで進む（利用者判断境界は維持）。
@@ -116,10 +114,10 @@ RU 本文は後続工程（req-define）で必要な情報を自足し、整理�
 
 ## RU の削除ルール
 
-| トリガー | 実行コマンド | 対象 |
+| トリガー | 実行主体 | 対象 |
 |----------|-------------|------|
 | Definition 確定 + VERIFY 成功 | case-ready（case-auto 駆動） | 該当 RU ファイル |
-| 採用済み成果物の RU 化成功 | `/agentdev/backlog-review` | 該当する採用済み成果物 |
+| 採用済み成果物の RU 化成功 | backlog-review workflow（backlog-auto 駆動） | 該当する採用済み成果物 |
 
 case-ready（内部 lifecycle 段階）は Definition 確定後に RU を削除し、RU パスを docs 永続文書の根拠参照から除外する。
 RU は一時成果物であり、永続化未完了の場合は残置する。
@@ -131,7 +129,7 @@ RU は一時成果物であり、永続化未完了の場合は残置する。
 
 ## 追跡Issue（別系統）
 
-追跡Issue（`/agentdev/issue`）は、開発中の未解決事項を管理する Intake / Learning とは別系統の課題管理である。
+追跡Issue（会話経由の `agentdev-issue-tracking` スキル利用）は、開発中の未解決事項を管理する Intake / Learning とは別系統の課題管理である。
 
 - **管理単位**: GitHub Issue（role: tracking）。docs/ 配下に課題ファイルの文書種別は設けない（REQ-049）
 - **操作**: 起票、検索・参照、更新、コメント追加、保留、再評価、実行準備完了、解決、反映確認、クローズ、再オープン。読み書きは Custom Tool `agentdev_gh` の操作契約経由で行う
