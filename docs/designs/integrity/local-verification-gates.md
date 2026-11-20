@@ -21,8 +21,11 @@ git rev-parse --show-toplevel を起点とする（worktree 環境対応）。
 - Step 0（Minimal-by-Default ゲート: scripts/git-hooks/minimal-gate.mjs）: agent-dev-flow ソース
   リポジトリ専用のローカル検査であり、配布物には含めない（配布写像は
   trusted-distribution-gate/manifest.ts の限定列挙で scripts/git-hooks/ は対象外）。ブロックするのは
-  「新規追加ファイルが単一ファイルサイズ上限（.md 20KB・.ts 25KB）を超える場合」のみである。
-  既存の上限超過ファイルを編集する場合は WARN 表示のみで終了コード 0 とし、縮小途中の
+  「恒久資産（`.agentdev/` 以外）の新規追加ファイルが単一ファイルサイズ上限（.md 20KB・.ts 25KB）を
+  超える場合」のみである。`.agentdev/` 配下（drafts/・backlog/ 等）は工程の一時ワークスペースであるため、
+  上限超過は新規・既存を問わず WARN 表示のみで終了コード 0 とする（draft は case-ready の成功後に
+  削除される中間成果物であり、恒久文書の容量抑制の対象外）。恒久資産の既存の上限超過ファイルを
+  編集する場合も WARN 表示のみで終了コード 0 とし、縮小途中の
   コミットを妨げない。アクティブ WIP キュー（`.agentdev/backlog/req-units/`・`intake/inbox/`・
   `learning/inbox/`・`inspect/inbox/`。`.gitkeep` と README.md は集計から除外）の滞留合計が
   10 件を超える場合と、ガバナンス表面積（IR ルール 25 件・公開コマンド 15 件）が上限を超える

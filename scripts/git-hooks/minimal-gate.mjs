@@ -4,9 +4,10 @@
 // 3 検査: (a) 単一ファイルサイズ上限（LLM コンテキスト・1モジュール1責務の目安）
 //        (b) アクティブ WIP キューの滞留監視（WARN 表示のみ）
 //        (c) .agentdev/ 未処理キュー（inbox）滞留の push ブロック
-// 強制度合い: block は「新規追加ファイルが単一ファイルサイズ上限を超える場合」のみ。
-// 既存の上限超過ファイルの編集・WIP キュー滞留・ガバナンス表面積は WARN 表示のみで
-// 終了コード 0 とし、リファクタリング途中のコミットを妨げない。
+// 強制度合い: block は「恒久資産（.agentdev/ 以外）の新規追加ファイルが単一ファイルサイズ上限を
+// 超える場合」のみ。.agentdev/ 配下（drafts/・backlog/ 等）は工程の一時ワークスペースであるため、
+// 上限超過は新規・既存を問わず WARN 表示のみで終了コード 0 とする。恒久資産の既存の上限超過
+// ファイルを編集する場合も WARN 表示のみとし、リファクタリング途中のコミットを妨げない。
 // 存在しない過去資産の監視（禁止パス・追加行の禁止語スキャン）は置かない（Zero-Base Filter。
 // 歴史は Git ログが唯一の正本である）。
 // 呼び出し: bun scripts/git-hooks/minimal-gate.mjs pre-commit | pre-push
@@ -85,7 +86,7 @@ function stagedEntries() {
   return entries;
 }
 
-// --- (a) 単一ファイルサイズ上限（新規追加のみ block。既存の上限超過ファイルの編集は WARN） ---
+// --- (a) 単一ファイルサイズ上限（恒久資産の新規追加のみ block。.agentdev/ 一時ワークスペースと既存ファイルの編集は WARN） ---
 function checkFileSizes() {
   const head = headTree();
   for (const { status, file } of stagedEntries()) {
@@ -95,6 +96,12 @@ function checkFileSizes() {
     const size = worktreeSize(file);
     if (size < 0) continue;
     if (size <= limit.maxBytes) continue;
+    if (file === ".agentdev" || file.startsWith(".agentdev/")) {
+      warn(
+        `WARN 単一ファイル上限超過(.agentdev/ 一時ワークスペース・ブロックしない): ${file} ${size} バイト（上限 ${limit.maxBytes}、${limit.label}）`,
+      );
+      continue;
+    }
     const old = head.get(file) ?? 0;
     if (old === 0) {
       fail(`単一ファイル上限(新規追加): ${file} ${size} バイト（上限 ${limit.maxBytes}、${limit.label}）`);

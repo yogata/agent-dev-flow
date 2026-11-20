@@ -220,6 +220,20 @@ test("REQ-122-008: 新規追加ファイルのサイズ上限超過はブロッ�
   }
 });
 
+test("REQ-122-008: .agentdev/ 配下（一時ワークスペース）の新規ファイル超過は WARN 表示のみでブロックしない", () => {
+  const dir = makeFixtureRepo();
+  try {
+    // 忠実な req-draft と同規模の 36KB 新規 .md でも終了コード 0。
+    stageFixtureFile(dir, ".agentdev/drafts/req-draft-example.md", `${"x".repeat(36 * 1024)}\n`);
+    const r = runGate(dir);
+    expect(r.status).toBe(0);
+    expect(r.out).toContain("WARN");
+    expect(r.out).toContain(".agentdev/drafts/req-draft-example.md");
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test("REQ-122-008: 既存の上限超過ファイルを編集してもブロックせず WARN 表示（終了コード 0）", () => {
   const dir = makeFixtureRepo();
   try {
