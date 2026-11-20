@@ -22,10 +22,10 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-REQ: 77件
+REQ: 78件
 <!-- AUTOGEN:END -->
 
-現行要件は79件である。
+現行要件は78件である。
 各 REQ の詳細は各 REQ ファイル本文を参照。
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-table -->
@@ -108,6 +108,7 @@ REQ: 77件
 | [REQ-119](requirements/REQ-119.md) | backlog 一式 20261107T161204JST の整合是正と機械工程堅牢化（6 作業単位） |
 | [REQ-120](requirements/REQ-120.md) | ADF 全体簡素化 C-α2 小修正（配布ゲート README 集約・evidence 拡張子規則・状態表約束範囲） |
 | [REQ-122](requirements/REQ-122.md) | 整合性検証体制の刷新（IR 減量・検証エンジン分割・ローカル Git Hook ゲート・巨大コマンド分割・自動トリアージ）（16 作業単位） |
+| [REQ-123](requirements/REQ-123.md) | 構造スリム化リファクタリング（trusted-distribution-gate 過剰防御の解体・traceability 試験再編・巨大設計書スリム化・大型スクリプト分割）（6 作業単位） |
 <!-- AUTOGEN:END -->
 
 - [要件インデックス](requirements/README.md)
