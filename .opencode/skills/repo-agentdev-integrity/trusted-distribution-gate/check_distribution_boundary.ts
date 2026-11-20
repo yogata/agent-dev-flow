@@ -62,13 +62,6 @@ export type {
   DistributionRuleFinding,
 } from "./distribution-boundary-types.ts";
 export { checkDistributionRules } from "./distribution-boundary-rules.ts";
-export {
-  CONCRETE_ID_PATTERN,
-  DOCS_PATH_PATTERN,
-  FIXED_URL_PATTERN,
-  RAW_FIXED_URL_PATTERN,
-  isConcreteDocsPath,
-} from "./distribution-boundary.ts";
 
 function detectionToFailure(d: Detection): BoundaryFailure {
   return {

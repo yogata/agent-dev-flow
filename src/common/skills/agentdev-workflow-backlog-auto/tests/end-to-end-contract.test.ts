@@ -125,7 +125,7 @@ describe("コマンド定義の公開 interface 拡張 pin", () => {
   });
 
   test("ガードレールの自動起動除外リストが見直され、接続工程の委譲経由起動と判断境界の自動化禁止が宣言されている", () => {
-    expect(COMMAND).toContain("capture 系コマンド（learning-capture、intake-capture、intake-from-github）と inspect-skills を自動起動しない");
+    expect(COMMAND).toContain("capture 系（learning-capture、intake capture）と inspect-skills 相当の診断を自動起動しない");
     expect(COMMAND).toContain("req-define と case-auto は一気通貫実行の接続工程（要件定義接続、実行接続）として workflow 委譲経由でのみ起動する");
     expect(COMMAND).toContain("接続工程を外れた自発的な起動を行わず、GitHub Issue / PR 作成を直接実行しない（Issue / PR 作成は case-auto 実行の内部責務）");
     expect(COMMAND).toContain("req-define の壁打ち・承認境界、backlog-review の RU 承認、リリース条件・公開権限の確認を自動化しない");

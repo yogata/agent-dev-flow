@@ -12,10 +12,3 @@ component: req-122-wave4-phase4
 implementation:
   src/common/skills/repo-agentdev-integrity/rules/ir-075.ts:
     - REQ-122-011
-  src/common/commands/agentdev/intake-triage.md:
-    - REQ-122-013
-  src/common/skills/agentdev-workflow-intake-triage/SKILL.md:
-    - REQ-122-013
-verification:
-  src/common/skills/agentdev-workflow-intake-triage/SKILL.md:
-    - REQ-122-013

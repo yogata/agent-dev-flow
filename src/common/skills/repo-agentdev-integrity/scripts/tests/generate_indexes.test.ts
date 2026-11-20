@@ -41,7 +41,6 @@ import {
   generateReqActiveTable,
   README_REQ_SUMMARY_COUNT_BLOCK_ID,
   README_REQ_SUMMARY_TABLE_BLOCK_ID,
-  README_REQ_SUMMARY_TABLE_GENERATOR,
   README_DECISION_SUMMARY_TABLE_BLOCK_ID,
   generateDocsReadmeDecisionTable,
   buildReqToIrIndex,
@@ -762,16 +761,6 @@ describe("readme-req-summary-table (REQ-057-018)", () => {
     expect(README_REQ_SUMMARY_COUNT_BLOCK_ID).toBe("readme-req-summary-count");
   });
 
-  it("generates the same structure as req-active-table (same source, same shape)", () => {
-    const rows = [
-      { id: "REQ-001", relPath: "requirements/REQ-001.md", title: "文書体系" },
-      { id: "REQ-002", relPath: "requirements/REQ-002.md", title: "配布成果物の責務境界" },
-    ] as never[];
-    expect(README_REQ_SUMMARY_TABLE_GENERATOR(rows)).toEqual(
-      generateReqActiveTable(rows),
-    );
-  });
-
   it("replaces docs/README.md readme-req-summary-table block with REQ ID + title rows", () => {
     const original = [
       "現行要件の説明文（人手編集領域）",
@@ -790,7 +779,7 @@ describe("readme-req-summary-table (REQ-057-018)", () => {
     const updated = replaceAutogenBlock(
       original,
       README_REQ_SUMMARY_TABLE_BLOCK_ID,
-      README_REQ_SUMMARY_TABLE_GENERATOR(rows),
+      generateReqActiveTable(rows),
     );
     expect(updated).toContain("<!-- AUTOGEN:BEGIN:id=readme-req-summary-table -->");
     expect(updated).toContain("| REQ ID | タイトル |");

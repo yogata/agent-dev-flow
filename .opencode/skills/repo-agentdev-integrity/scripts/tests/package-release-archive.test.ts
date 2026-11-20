@@ -117,8 +117,6 @@ interface RepoPaths {
 interface ResidueReport {
   /** True iff the final archive path exists after the run. */
   finalZip: boolean;
-  /** True iff the legacy staging directory (dist/agentdev-release-<sha>/) exists. */
-  legacyStageRoot: boolean;
   /** Names of any .trust-stage-* dirs left under dist/. */
   trustStageDirs: string[];
   /** All entries left under dist/. */
@@ -209,12 +207,11 @@ function patchScript(repo: RepoPaths, find: string | RegExp, replace: string): v
 function inspect(repo: RepoPaths): ResidueReport {
   const dist = repo.distDir;
   if (!fs.existsSync(dist)) {
-    return { finalZip: false, legacyStageRoot: false, trustStageDirs: [], allDistEntries: [] };
+    return { finalZip: false, trustStageDirs: [], allDistEntries: [] };
   }
   const entries = fs.readdirSync(dist);
   return {
     finalZip: fs.existsSync(repo.finalZipPath),
-    legacyStageRoot: fs.existsSync(path.join(dist, `agentdev-release-${repo.commitShort}`)),
     trustStageDirs: entries.filter((e) => e.startsWith(".trust-stage-")),
     allDistEntries: entries.slice().sort(),
   };
@@ -236,8 +233,7 @@ describe("package-release-archive.ps1 / happy path", () => {
       expect(res.exitCode).toBe(0);
       const report = inspect(repo);
       expect(report.finalZip).toBe(true);
-      expect(report.legacyStageRoot).toBe(false);
-      expect(report.trustStageDirs).toEqual([]);
+          expect(report.trustStageDirs).toEqual([]);
       // dist/ contains ONLY the final ZIP.
       expect(report.allDistEntries).toEqual([`agentdev-release-${repo.commitShort}.zip`]);
     } finally {
@@ -302,8 +298,7 @@ describe("package-release-archive.ps1 / archive boundary violation", () => {
       expect(res.exitCode).toBe(6);
       const report = inspect(repo);
       expect(report.finalZip).toBe(false);
-      expect(report.legacyStageRoot).toBe(false);
-      expect(report.trustStageDirs).toEqual([]);
+          expect(report.trustStageDirs).toEqual([]);
     } finally {
       rmrf(repo.root);
     }
@@ -328,8 +323,7 @@ describe("package-release-archive.ps1 / producer traceability metadata purity (T
       expect(res.exitCode).toBe(6);
       const report = inspect(repo);
       expect(report.finalZip).toBe(false);
-      expect(report.legacyStageRoot).toBe(false);
-      expect(report.trustStageDirs).toEqual([]);
+          expect(report.trustStageDirs).toEqual([]);
     } finally {
       rmrf(repo.root);
     }
@@ -395,8 +389,7 @@ describe("package-release-archive.ps1 / archive extras boundary violation", () =
       expect(res.exitCode).toBe(6);
       const report = inspect(repo);
       expect(report.finalZip).toBe(false);
-      expect(report.legacyStageRoot).toBe(false);
-      expect(report.trustStageDirs).toEqual([]);
+          expect(report.trustStageDirs).toEqual([]);
     } finally {
       rmrf(repo.root);
     }
@@ -412,8 +405,7 @@ describe("package-release-archive.ps1 / missing trusted host checker", () => {
       expect(res.exitCode).toBe(8);
       const report = inspect(repo);
       expect(report.finalZip).toBe(false);
-      expect(report.legacyStageRoot).toBe(false);
-      expect(report.trustStageDirs).toEqual([]);
+          expect(report.trustStageDirs).toEqual([]);
     } finally {
       rmrf(repo.root);
     }
@@ -436,8 +428,7 @@ describe("package-release-archive.ps1 / archive expansion failure", () => {
       expect(res.exitCode).not.toBe(0);
       const report = inspect(repo);
       expect(report.finalZip).toBe(false);
-      expect(report.legacyStageRoot).toBe(false);
-      expect(report.trustStageDirs).toEqual([]);
+          expect(report.trustStageDirs).toEqual([]);
     } finally {
       rmrf(repo.root);
     }
@@ -456,8 +447,7 @@ describe("package-release-archive.ps1 / missing trusted installer", () => {
       expect(res.exitCode).not.toBe(0);
       const report = inspect(repo);
       expect(report.finalZip).toBe(false);
-      expect(report.legacyStageRoot).toBe(false);
-      expect(report.trustStageDirs).toEqual([]);
+          expect(report.trustStageDirs).toEqual([]);
     } finally {
       rmrf(repo.root);
     }
@@ -474,8 +464,7 @@ describe("package-release-archive.ps1 / installer non-zero exit", () => {
       expect(res.exitCode).not.toBe(0);
       const report = inspect(repo);
       expect(report.finalZip).toBe(false);
-      expect(report.legacyStageRoot).toBe(false);
-      expect(report.trustStageDirs).toEqual([]);
+          expect(report.trustStageDirs).toEqual([]);
     } finally {
       rmrf(repo.root);
     }
@@ -510,8 +499,7 @@ describe("package-release-archive.ps1 / archive-installed boundary failure", () 
       expect(res.exitCode).toBe(7);
       const report = inspect(repo);
       expect(report.finalZip).toBe(false);
-      expect(report.legacyStageRoot).toBe(false);
-      expect(report.trustStageDirs).toEqual([]);
+          expect(report.trustStageDirs).toEqual([]);
     } finally {
       rmrf(repo.root);
     }
@@ -531,8 +519,7 @@ describe("package-release-archive.ps1 / pre-existing final collision", () => {
       // Existing archive must be untouched.
       expect(fs.readFileSync(repo.finalZipPath, "utf-8")).toBe("PRE-EXISTING-SENTINEL");
       const report = inspect(repo);
-      expect(report.legacyStageRoot).toBe(false);
-      expect(report.trustStageDirs).toEqual([]);
+          expect(report.trustStageDirs).toEqual([]);
       // dist/ contains only the pre-existing sentinel.
       expect(report.allDistEntries).toEqual([`agentdev-release-${repo.commitShort}.zip`]);
     } finally {
@@ -573,8 +560,7 @@ describe("package-release-archive.ps1 / publish primitive contract", () => {
       expect(res.exitCode).toBe(8);
       const report = inspect(repo);
       expect(report.finalZip).toBe(false);
-      expect(report.legacyStageRoot).toBe(false);
-      expect(report.trustStageDirs).toEqual([]);
+          expect(report.trustStageDirs).toEqual([]);
     } finally {
       rmrf(repo.root);
     }

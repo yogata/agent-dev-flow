@@ -1,17 +1,4 @@
 component: yomiyasu-workflow-extensions
 implementation:
-  src/common/skills/agentdev-workflow-lifecycle/SKILL.md:
-    - REQ-098-001
-    - REQ-098-002
-    - REQ-098-003
-    - REQ-098-004
-    - REQ-098-005
-    - REQ-098-006
-    - REQ-098-008
-    - REQ-098-014
   src/common/skills/agentdev-project-extensions/scripts/lib/extension_state.ts:
     - REQ-098-011
-verification:
-  .opencode/skills/repo-agentdev-integrity/scripts/tests/writing-quality-aggregation-pins.test.ts:
-    - REQ-098-001
-    - REQ-098-006

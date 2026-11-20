@@ -611,16 +611,6 @@ links:
       - docs/requirements/REQ-014.md
       - docs/requirements/REQ-015.md
       - docs/requirements/REQ-027.md
-    src/common/skills/agentdev-workflow-intake-capture/SKILL.md:
-      - docs/decisions/DEC-010.md
-      - docs/requirements/REQ-002.md
-      - docs/requirements/REQ-027.md
-      - docs/requirements/REQ-037.md
-    src/common/skills/agentdev-workflow-intake-from-github/SKILL.md:
-      - docs/decisions/DEC-010.md
-      - docs/requirements/REQ-002.md
-      - docs/requirements/REQ-027.md
-      - docs/requirements/REQ-037.md
     src/common/skills/agentdev-workflow-intake-promote/SKILL.md:
       - docs/decisions/DEC-010.md
       - docs/decisions/DEC-011.md
@@ -721,45 +711,10 @@ links:
     src/common/commands/agentdev/backlog-auto.md:
       - docs/decisions/DEC-010.md
       - docs/requirements/REQ-041.md
-    src/common/commands/agentdev/backlog-review.md:
-      - docs/decisions/DEC-010.md
-      - docs/requirements/REQ-039.md
-      - docs/requirements/REQ-056.md
-    src/common/commands/agentdev/inspect-docs.md:
-      - docs/decisions/DEC-010.md
-      - docs/requirements/REQ-036.md
-    src/common/commands/agentdev/inspect-promote.md:
-      - docs/decisions/DEC-010.md
-      - docs/designs/commands/inspect-promote.md
-      - docs/designs/workflows/capture-boundaries.md
-      - docs/requirements/REQ-036.md
-    src/common/commands/agentdev/inspect-skills.md:
-      - docs/decisions/DEC-010.md
-      - docs/requirements/REQ-036.md
-    src/common/commands/agentdev/intake-capture.md:
-      - docs/decisions/DEC-010.md
-      - docs/requirements/REQ-037.md
-    src/common/commands/agentdev/intake-from-github.md:
-      - docs/decisions/DEC-010.md
-      - docs/requirements/REQ-037.md
-    src/common/commands/agentdev/intake-promote.md:
-      - docs/decisions/DEC-010.md
-      - docs/designs/commands/intake-promote.md
-      - docs/requirements/REQ-037.md
-    src/common/commands/agentdev/learning-promote.md:
-      - docs/decisions/DEC-010.md
-      - docs/requirements/REQ-014.md
-      - docs/requirements/REQ-015.md
-      - docs/requirements/REQ-038.md
     src/common/commands/agentdev/req-define.md:
       - docs/decisions/DEC-010.md
       - docs/requirements/REQ-008.md
     src/common/skills/agentdev-doc-diagnostics/SKILL.md:
-      - docs/requirements/REQ-036.md
-    src/common/skills/agentdev-workflow-inspect-skills/SKILL.md:
-      - docs/decisions/DEC-010.md
-      - docs/requirements/REQ-002.md
-      - docs/requirements/REQ-027.md
       - docs/requirements/REQ-036.md
     src/common/skills/agentdev-workflow-lifecycle/SKILL.md:
       - docs/decisions/DEC-011.md

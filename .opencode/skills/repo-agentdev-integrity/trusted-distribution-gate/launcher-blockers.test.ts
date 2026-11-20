@@ -31,6 +31,7 @@ import {
   makeFixtureRepo,
   writeFix,
   headOid,
+  deleteAndCommit,
 } from "./launcher-fixture.ts";
 import { runLauncher, type LauncherOptions } from "./launcher.ts";
 import {
@@ -325,4 +326,41 @@ describe("launcher / serial same-final-output (one wins, one fails)", () => {
       disposeRepo(repo);
     }
   }, 120000);
+});
+
+describe("launcher / bootstrap script deletion in seed mode", () => {
+  test("deleting scripts/install.ps1 from candidate produces exit 1, no archive", () => {
+    const repo = makeFixtureRepo();
+    try {
+      const base = headOid(repo);
+      const candidate = deleteAndCommit(repo, "scripts/install.ps1");
+      const out = makeTmpDir("trust-boot-del1-");
+      const opts: LauncherOptions = {
+        repo_root: repo, base_oid: base, candidate_oid: candidate, output_dir: out,
+        repository_identity: { owner_slash_name: "yogata/agent-dev-flow", default_branch: "main" },
+        bootstrap_mode: true,
+      };
+      const result = runLauncher(opts);
+      expect(result.exit_code).toBe(1);
+      expect(result.archive_path).toBeNull();
+    } finally { disposeRepo(repo); }
+  }, 60000);
+
+  test("deleting both bootstrap scripts from candidate produces exit 1, no archive", () => {
+    const repo = makeFixtureRepo();
+    try {
+      const base = headOid(repo);
+      let candidate = deleteAndCommit(repo, "scripts/install.ps1");
+      candidate = deleteAndCommit(repo, "scripts/consumer/common.ps1");
+      const out = makeTmpDir("trust-boot-del2-");
+      const opts: LauncherOptions = {
+        repo_root: repo, base_oid: base, candidate_oid: candidate, output_dir: out,
+        repository_identity: { owner_slash_name: "yogata/agent-dev-flow", default_branch: "main" },
+        bootstrap_mode: true,
+      };
+      const result = runLauncher(opts);
+      expect(result.exit_code).toBe(1);
+      expect(result.archive_path).toBeNull();
+    } finally { disposeRepo(repo); }
+  }, 60000);
 });

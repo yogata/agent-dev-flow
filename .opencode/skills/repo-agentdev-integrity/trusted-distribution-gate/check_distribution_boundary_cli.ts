@@ -9,8 +9,6 @@
 //
 // Profile values map to lib Projection (source/link/archive/archive-installed
 // per docs/designs/integrity/distribution-boundary.md "projection の分離").
-// Legacy installed/release values are accepted as aliases for
-// link/archive-installed so existing invocations continue to work.
 
 import type { Projection } from "./distribution-boundary.ts";
 import { checkDistributionRules } from "./distribution-boundary-rules.ts";
@@ -21,12 +19,10 @@ function normalizeProfileToProjection(profile: string): Projection | null {
     case "source":
       return "source";
     case "link":
-    case "installed":
       return "link";
     case "archive":
       return "archive";
     case "archive-installed":
-    case "release":
       return "archive-installed";
     default:
       return null;
@@ -63,7 +59,7 @@ export function runCli(): void {
   const projection = normalizeProfileToProjection(profile);
   if (projection === null) {
     process.stderr.write(
-      `error: --profile must be source|link|archive|archive-installed (or legacy installed|release) (got '${profile}')\n`,
+      `error: --profile must be source|link|archive|archive-installed (got '${profile}')\n`,
     );
     process.exit(2);
   }
