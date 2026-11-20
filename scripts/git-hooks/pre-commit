@@ -20,7 +20,7 @@ AUTOGEN_GATE="$INTEGRITY_DIR/check_autogen_freshness.ts"
 SELF_SYNC="$REPO_ROOT/scripts/self-sync.ps1"
 GATE="$REPO_ROOT/scripts/git-hooks/minimal-gate.mjs"
 
-# --- Step 0（Minimal-by-Default ゲート: 物理バジェット・堆積語彙） ---
+# --- Step 0（Minimal-by-Default ゲート: 新規ファイルのサイズ上限のみブロック、WIP 滞留・ガバナンス表面積は WARN 表示のみ） ---
 echo "[pre-commit] Minimal-by-Default ゲート（minimal-gate.mjs）を実行します。"
 if ! bun "$GATE" pre-commit; then
   echo "[pre-commit] Minimal-by-Default ゲートが失敗したため、このコミットを物理ブロックしました。" >&2

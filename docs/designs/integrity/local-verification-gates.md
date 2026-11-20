@@ -2,7 +2,7 @@
 title: ローカル検証ゲート Design
 status: draft
 created: 2026-11-18
-updated: "2026-11-19"
+updated: "2026-11-20"
 ---
 
 <!-- ADF-COVERS(design): REQ-122-008, REQ-122-009, REQ-122-010, REQ-122-015（ローカル検証ゲートと最終検証の実行契約。REQ-116 型の covers 宣言） -->
@@ -18,6 +18,17 @@ updated: "2026-11-19"
 （set -euo pipefail）で明確なエラーメッセージを出力する構成とする。REPO_ROOT は
 git rev-parse --show-toplevel を起点とする（worktree 環境対応）。
 
+- Step 0（Minimal-by-Default ゲート: scripts/git-hooks/minimal-gate.mjs）: agent-dev-flow ソース
+  リポジトリ専用のローカル検査であり、配布物には含めない（配布写像は
+  trusted-distribution-gate/manifest.ts の限定列挙で scripts/git-hooks/ は対象外）。ブロックするのは
+  「新規追加ファイルが単一ファイルサイズ上限（.md 20KB・.ts 25KB）を超える場合」のみである。
+  既存の上限超過ファイルを編集する場合は WARN 表示のみで終了コード 0 とし、縮小途中の
+  コミットを妨げない。アクティブ WIP キュー（`.agentdev/backlog/req-units/`・`intake/inbox/`・
+  `learning/inbox/`・`inspect/inbox/`。`.gitkeep` と README.md は集計から除外）の滞留合計が
+  10 件を超える場合と、ガバナンス表面積（IR ルール 25 件・公開コマンド 15 件）が上限を超える
+  場合も WARN 表示のみとする。リポジトリ全体の総ファイル数・総容量の検査、追加行の本文に
+  対する禁止語スキャン、存在しない過去資産（禁止パス）の監視は行わない（墓標実装を置かない。
+  歴史は Git ログが唯一の正本である）。
 - Step 1（src/ → .opencode/ 自動投影・同期）: git diff --cached --name-only に src/ 配下のファイルが
   含まれる場合のみ投影・ビルドスクリプトを自動実行し、投影で更新された .opencode/ 配下の差分を
   git add .opencode/ でステージングへ追加する（投影忘れによる IR-016 違反の未然防止）。

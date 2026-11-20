@@ -1,12 +1,17 @@
 // scripts/git-hooks/minimal-gate.mjs — Minimal-by-Default ゲート（決定論的・ローカル）。
-// 3 検査: (a) 物理バジェット（領域別ファイル数・容量・単一ファイル上限）
-//        (b) 歴史堆積語彙の追加・変更行ブロック（例外台帳なし）
+// agent-dev-flow ソースリポジトリ専用。配布物（配布アーカイブ・consumer リポジトリ）には
+// 含めない（配布写像は trusted-distribution-gate/manifest.ts の限定列挙で scripts/git-hooks/ は対象外）。
+// 3 検査: (a) 単一ファイルサイズ上限（LLM コンテキスト・1モジュール1責務の目安）
+//        (b) アクティブ WIP キューの滞留監視（WARN 表示のみ）
 //        (c) .agentdev/ 未処理キュー（inbox）滞留の push ブロック
-// 予算の判断規則: 上限超過かつ前回比増加の場合のみブロックする（新規膨張のみを阻止し、
-// 縮小方向の変更は常に許可する）。検証基盤自身（scripts/git-hooks/）は予算計上から除外する。
+// 強制度合い: block は「新規追加ファイルが単一ファイルサイズ上限を超える場合」のみ。
+// 既存の上限超過ファイルの編集・WIP キュー滞留・ガバナンス表面積は WARN 表示のみで
+// 終了コード 0 とし、リファクタリング途中のコミットを妨げない。
+// 存在しない過去資産の監視（禁止パス・追加行の禁止語スキャン）は置かない（Zero-Base Filter。
+// 歴史は Git ログが唯一の正本である）。
 // 呼び出し: bun scripts/git-hooks/minimal-gate.mjs pre-commit | pre-push
 import { execFileSync } from "node:child_process";
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 
 const mode = process.argv[2] ?? "pre-commit";
@@ -14,34 +19,29 @@ const root = execFileSync("git", ["rev-parse", "--show-toplevel"], { encoding: "
 const git = (args) => execFileSync("git", args, { cwd: root, encoding: "utf8", maxBuffer: 1 << 26 });
 
 const KB = 1024;
-const MB = 1024 * 1024;
-// 領域別上限（Step 0 推奨値を初期値として採用。段階的に縮小する静的上限）。
-const AREAS = [
-  { name: "(total)", maxFiles: 1300, maxBytes: 10 * MB },
-  { name: "src/", maxFiles: 600, maxBytes: 5 * MB },
-  { name: ".opencode/", maxFiles: 60 },
-  { name: "docs/decisions/", maxFiles: 35 },
-  { name: "docs/designs/", maxFiles: 110, maxBytes: Math.round(1.3 * MB) },
-  { name: "docs/requirements/", maxFiles: 70 },
-  { name: "docs/knowledge/", maxFiles: 30 },
-  { name: "docs/reports/", maxFiles: 15, maxBytes: Math.round(0.5 * MB) },
-  { name: "traceability/", maxFiles: 45 },
-  { name: "scripts/", maxFiles: 40, maxBytes: Math.round(0.6 * MB) },
-  { name: ".agentdev/", maxFiles: 20 },
+// 単一ファイルサイズ上限（LLM コンテキスト・1モジュール1責務の目安）。
+const FILE_SIZE_LIMITS = [
+  { label: ".md", test: (p) => p.endsWith(".md"), maxBytes: 20 * KB },
+  { label: ".ts", test: (p) => p.endsWith(".ts"), maxBytes: 25 * KB },
 ];
-// 単一ファイル上限（サイズ・行数）。先頭一致の最初の条件を適用する。
-const FILE_LIMITS = [
-  { label: ".md", test: (p) => p.endsWith(".md"), maxBytes: 50 * KB, maxLines: 2000 },
-  { label: "code", test: () => true, maxBytes: 100 * KB, maxLines: 4000 },
+// アクティブ WIP キュー（滞留は WARN 表示のみ。.gitkeep と README.md は数えない）。
+const WIP_QUEUE_DIRS = [
+  ".agentdev/backlog/req-units",
+  ".agentdev/intake/inbox",
+  ".agentdev/learning/inbox",
+  ".agentdev/inspect/inbox",
 ];
-const GATE_PREFIX = "scripts/git-hooks/";
-// 堆積語彙（追加・変更行で禁止。例外台帳は作らない。learning/deferred は
-// 現行パス・status 値として存続するため語彙から除外）。
-const ACCUMULATION_RE =
-  /(後方互換|互換層|legacy|deprecat|\bv[345]\b|移行手順|見送り|baseline|crosswalk|retired|欠番)/i;
+const WIP_QUEUE_MAX = 10;
+// ガバナンス表面積（WARN 表示のみ）。
+const IR_RULES_DIR = "src/common/skills/repo-agentdev-integrity/rules";
+const IR_RULES_MAX = 25;
+const PUBLIC_COMMANDS_DIR = "src/common/commands/agentdev";
+const PUBLIC_COMMANDS_MAX = 15;
 
 const violations = [];
+const warnings = [];
 const fail = (msg) => violations.push(msg);
+const warn = (msg) => warnings.push(msg);
 const worktreeSize = (p) => {
   try {
     return statSync(path.join(root, p)).size;
@@ -49,15 +49,8 @@ const worktreeSize = (p) => {
     return -1;
   }
 };
-const worktreeLines = (p) => {
-  try {
-    return readFileSync(path.join(root, p), "utf8").split("\n").length;
-  } catch {
-    return -1;
-  }
-};
 
-// --- (a) 物理バジェット ---
+// --- git 状態の読み取り補助（stagedEntries と単一ファイル上限の判定で使用） ---
 function headTree() {
   const map = new Map();
   let out = "";
@@ -92,93 +85,71 @@ function stagedEntries() {
   return entries;
 }
 
-function checkBudget() {
+// --- (a) 単一ファイルサイズ上限（新規追加のみ block。既存の上限超過ファイルの編集は WARN） ---
+function checkFileSizes() {
   const head = headTree();
-  const projected = new Map(head);
-  const touched = [];
   for (const { status, file } of stagedEntries()) {
-    if (status === "D") {
-      projected.delete(file);
-    } else {
-      const size = worktreeSize(file);
-      if (size < 0) projected.delete(file);
-      else projected.set(file, size);
-      touched.push({ file, old: head.get(file) ?? 0 });
-    }
-  }
-  const inArea = (file, area) => {
-    if (file.startsWith(GATE_PREFIX)) return false;
-    if (area.name === "(total)") return true;
-    return file.startsWith(area.name);
-  };
-  for (const area of AREAS) {
-    let curN = 0;
-    let curB = 0;
-    let projN = 0;
-    let projB = 0;
-    for (const [file, size] of head) {
-      if (!inArea(file, area)) continue;
-      curN += 1;
-      curB += size;
-    }
-    for (const [file, size] of projected) {
-      if (!inArea(file, area)) continue;
-      projN += 1;
-      projB += size;
-    }
-    if (area.maxFiles !== undefined && projN > area.maxFiles && projN > curN) {
-      fail(`物理バジェット超過(増加): ${area.name} ファイル数 ${curN} → ${projN}（上限 ${area.maxFiles}）`);
-    }
-    if (area.maxBytes !== undefined && projB > area.maxBytes && projB > curB) {
-      fail(`物理バジェット超過(増加): ${area.name} 容量 ${curB} → ${projB} バイト（上限 ${area.maxBytes}）`);
-    }
-  }
-  for (const { file, old } of touched) {
-    if (file.startsWith(GATE_PREFIX)) continue;
-    const limit = FILE_LIMITS.find((l) => l.test(file));
+    if (status === "D") continue;
+    const limit = FILE_SIZE_LIMITS.find((l) => l.test(file));
     if (!limit) continue;
     const size = worktreeSize(file);
-    const lines = worktreeLines(file);
-    if (size > limit.maxBytes && size > old) {
-      fail(`単一ファイル上限(増加): ${file} ${size} バイト（上限 ${limit.maxBytes}、${limit.label}）`);
-    }
-    if (lines > limit.maxLines && size > old) {
-      fail(`単一ファイル上限(増加): ${file} ${lines} 行（上限 ${limit.maxLines}、${limit.label}）`);
-    }
-  }
-}
-
-// --- (b) 堆積語彙ブロック（追加・変更行のみ。検証基盤自身を対象外） ---
-function checkVocabulary() {
-  let out = "";
-  try {
-    out = git(["diff", "--cached", "-U0", "--no-color"]);
-  } catch {
-    return;
-  }
-  let file = "";
-  let lineNo = 0;
-  for (const line of out.split("\n")) {
-    if (line.startsWith("+++")) {
-      file = line.slice(6).trim();
-      continue;
-    }
-    const hunk = line.match(/^@@ -(?:\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
-    if (hunk) {
-      lineNo = Number(hunk[1]) - 1;
-      continue;
-    }
-    if (line.startsWith("+") && file && !file.startsWith(GATE_PREFIX)) {
-      lineNo += 1;
-      const text = line.slice(1);
-      if (ACCUMULATION_RE.test(text)) {
-        fail(`堆積語彙: ${file}:${lineNo} ${text.trim().slice(0, 100)}`);
-      }
+    if (size < 0) continue;
+    if (size <= limit.maxBytes) continue;
+    const old = head.get(file) ?? 0;
+    if (old === 0) {
+      fail(`単一ファイル上限(新規追加): ${file} ${size} バイト（上限 ${limit.maxBytes}、${limit.label}）`);
+    } else {
+      warn(
+        `WARN 単一ファイル上限超過(既存ファイルの編集・ブロックしない): ${file} ${size} バイト（上限 ${limit.maxBytes}、${limit.label}）`,
+      );
     }
   }
 }
 
-// --- (c) キュー滞留ゼロ強制（.agentdev/ 配下の inbox ディレクトリ） ---
+// --- (b) アクティブ WIP キューの滞留監視（WARN 表示のみ） ---
+function countQueueFiles(relDir) {
+  const abs = path.join(root, relDir);
+  if (!existsSync(abs)) return 0;
+  const walk = (dir) => {
+    let n = 0;
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.name === ".gitkeep" || entry.name === "README.md") continue;
+      if (entry.isDirectory()) n += walk(path.join(dir, entry.name));
+      else n += 1;
+    }
+    return n;
+  };
+  return walk(abs);
+}
+
+function checkWipQueues() {
+  const counts = WIP_QUEUE_DIRS.map((d) => ({ dir: d, n: countQueueFiles(d) }));
+  const total = counts.reduce((s, c) => s + c.n, 0);
+  if (total > WIP_QUEUE_MAX) {
+    const detail = counts.filter((c) => c.n > 0).map((c) => `${c.dir}: ${c.n}`).join(", ");
+    warn(`WARN WIPキュー滞留: 合計 ${total} 件（目安 ${WIP_QUEUE_MAX}）${detail ? ` — ${detail}` : ""}`);
+  }
+}
+
+// --- (c) ガバナンス表面積の監視（WARN 表示のみ） ---
+function countDirFiles(relDir, filter) {
+  const abs = path.join(root, relDir);
+  if (!existsSync(abs)) return 0;
+  return readdirSync(abs).filter((f) => (filter ? filter(f) : true)).length;
+}
+
+function checkGovernance() {
+  const irs = countDirFiles(IR_RULES_DIR, (f) => /^ir-\d+.*\.ts$/.test(f));
+  if (irs > IR_RULES_MAX) {
+    warn(`WARN ガバナンス表面積: IR ルール ${irs} 件（上限 ${IR_RULES_MAX}）`);
+  }
+  const cmds = countDirFiles(PUBLIC_COMMANDS_DIR, (f) => f.endsWith(".md") && f !== "README.md");
+  if (cmds > PUBLIC_COMMANDS_MAX) {
+    warn(`WARN ガバナンス表面積: 公開コマンド ${cmds} 件（上限 ${PUBLIC_COMMANDS_MAX}）`);
+  }
+}
+
+// --- (d) キュー滞留ゼロ強制（pre-push。.agentdev/ 配下の inbox ディレクトリ） ---
 function checkQueue() {
   const base = path.join(root, ".agentdev");
   if (!existsSync(base)) return;
@@ -200,8 +171,9 @@ function checkQueue() {
 }
 
 if (mode === "pre-commit") {
-  checkBudget();
-  checkVocabulary();
+  checkFileSizes();
+  checkWipQueues();
+  checkGovernance();
 } else if (mode === "pre-push") {
   checkQueue();
 } else {
@@ -209,10 +181,11 @@ if (mode === "pre-commit") {
   process.exit(2);
 }
 
+for (const w of warnings) console.log(`  - ${w}`);
 if (violations.length > 0) {
   console.error(`[minimal-gate] ${mode} 検査不合格（${violations.length} 件）:`);
   for (const v of violations) console.error(`  - ${v}`);
   process.exit(1);
 }
-console.log(`[minimal-gate] ${mode} 検査合格`);
+console.log(`[minimal-gate] ${mode} 検査合格${warnings.length > 0 ? `（WARN ${warnings.length} 件）` : ""}`);
 process.exit(0);

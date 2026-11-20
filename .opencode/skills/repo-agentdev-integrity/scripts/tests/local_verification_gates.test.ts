@@ -1,12 +1,17 @@
 // ADF-COVERS(verification): REQ-122-008, REQ-122-009, REQ-122-010
-// ローカル検証ゲート（scripts/git-hooks/pre-commit・pre-push、scripts/setup-hooks.ts）の
-// 恒常的契約検証（DEC-066 決定1〜3、docs/designs/integrity/local-verification-gates.md）。
+// ローカル検証ゲート（scripts/git-hooks/pre-commit・pre-push、scripts/setup-hooks.ts、
+// scripts/git-hooks/minimal-gate.mjs）の恒常的契約検証（DEC-066 決定1〜3、
+// docs/designs/integrity/local-verification-gates.md）。
 // hook 契約の決定的機械検査（shebang・LF 固定・worktree 対応・--no-verify 案内・
-// bun test 実行形態・セットアップ資産の成立）を行う。
+// bun test 実行形態・セットアップ資産の成立）と、minimal-gate.mjs の挙動
+// （新規ファイルのサイズ上限ブロック・既存超過ファイル編集の WARN・本文テキストの
+// 非検査・墓標なし・WIP 滞留とガバナンス表面積の WARN）を行う。
 // テスト実行 cwd はリポジトリルート（REQ-060 bun test 実行形態）を前提とする。
 
 import { test, expect } from "bun:test";
+import { spawnSync } from "node:child_process";
 import * as fs from "node:fs";
+import * as os from "node:os";
 import * as path from "node:path";
 
 const REPO_ROOT = process.cwd();
@@ -14,6 +19,11 @@ const PRE_COMMIT_PATH = path.join(REPO_ROOT, "scripts", "git-hooks", "pre-commit
 const PRE_PUSH_PATH = path.join(REPO_ROOT, "scripts", "git-hooks", "pre-push");
 const SETUP_HOOKS_PATH = path.join(REPO_ROOT, "scripts", "setup-hooks.ts");
 const GITATTRIBUTES_PATH = path.join(REPO_ROOT, ".gitattributes");
+const GATE_SCRIPT_PATH = path.join(REPO_ROOT, "scripts", "git-hooks", "minimal-gate.mjs");
+// git push のフックから export された GIT_* 変数がフィクスチャの git 操作を横取りしないよう除外する。
+const CLEAN_ENV: Record<string, string> = Object.fromEntries(
+  Object.entries(process.env).filter(([k]) => !k.startsWith("GIT_")),
+);
 
 function readRepoFile(relativePath: string): string {
   return fs.readFileSync(path.join(REPO_ROOT, relativePath), "utf-8");
@@ -113,4 +123,177 @@ test("REQ-122-010: .gitattributes に scripts/git-hooks/* text eol=lf が存在�
   const gitattributes = fs.readFileSync(GITATTRIBUTES_PATH, "utf-8");
   const lines = gitattributes.split(/\r?\n/).map((line) => line.trim());
   expect(lines).toContain("scripts/git-hooks/* text eol=lf");
+});
+
+// --- minimal-gate.mjs 挙動検証（一時フィクスチャリポジトリで実行） ---
+
+function fixtureGit(cwd: string, args: string[]): void {
+  const result = spawnSync("git", args, { cwd, env: CLEAN_ENV, encoding: "utf-8" });
+  if (result.status !== 0) {
+    throw new Error(`git ${args.join(" ")} failed: ${result.stderr}`);
+  }
+}
+
+function makeFixtureRepo(): string {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "mg-fixture-"));
+  fixtureGit(dir, ["init", "--quiet"]);
+  fixtureGit(dir, ["config", "user.email", "fixture@example.com"]);
+  fixtureGit(dir, ["config", "user.name", "fixture"]);
+  fs.writeFileSync(path.join(dir, "README.md"), "fixture\n", "utf-8");
+  fixtureGit(dir, ["add", "-A"]);
+  fixtureGit(dir, ["commit", "--quiet", "-m", "init"]);
+  return dir;
+}
+
+function stageFixtureFile(cwd: string, rel: string, content: string): void {
+  const p = path.join(cwd, ...rel.split("/"));
+  fs.mkdirSync(path.dirname(p), { recursive: true });
+  fs.writeFileSync(p, content, "utf-8");
+  fixtureGit(cwd, ["add", "--", rel]);
+}
+
+function writeFixtureFile(cwd: string, rel: string, content: string): void {
+  const p = path.join(cwd, ...rel.split("/"));
+  fs.mkdirSync(path.dirname(p), { recursive: true });
+  fs.writeFileSync(p, content, "utf-8");
+}
+
+function runGate(cwd: string): { status: number; out: string } {
+  const result = spawnSync(process.execPath, [GATE_SCRIPT_PATH, "pre-commit"], {
+    cwd,
+    env: CLEAN_ENV,
+    encoding: "utf-8",
+  });
+  return { status: result.status ?? -1, out: `${result.stdout ?? ""}\n${result.stderr ?? ""}` };
+}
+
+test("REQ-122-008: minimal-gate.mjs は総数検査・語彙スキャン・墓標監視を持たない", () => {
+  const content = fs.readFileSync(GATE_SCRIPT_PATH, "utf-8");
+  expect(content).toContain("FILE_SIZE_LIMITS");
+  expect(content).toContain("WIP_QUEUE_DIRS");
+  expect(content).not.toContain("ACCUMULATION_RE");
+  expect(content).not.toContain("LEGACY_PATH_RES");
+  expect(content).not.toContain("AREAS");
+});
+
+test("REQ-122-008: baseline・後方互換等を含む新規ファイルの本文はブロックしない", () => {
+  const dir = makeFixtureRepo();
+  try {
+    stageFixtureFile(
+      dir,
+      "docs/migration-note.md",
+      "# 説明\n後方互換のためのシム、baseline、retired 資産の説明文。\n",
+    );
+    const r = runGate(dir);
+    expect(r.status).toBe(0);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("REQ-122-008: 存在しない過去資産のパス（baselines/ 等）の新規追加は監視しない（墓標なし）", () => {
+  const dir = makeFixtureRepo();
+  try {
+    stageFixtureFile(dir, "baselines/core.md", "x\n");
+    stageFixtureFile(dir, "src/retired-map.ts", "export {};\n");
+    const r = runGate(dir);
+    expect(r.status).toBe(0);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("REQ-122-008: 新規追加ファイルのサイズ上限超過はブロックする（.md 20KB・.ts 25KB）", () => {
+  const dir = makeFixtureRepo();
+  try {
+    stageFixtureFile(dir, "docs/big-new.md", `${"x".repeat(21 * 1024)}\n`);
+    expect(runGate(dir).status).toBe(1);
+    fixtureGit(dir, ["rm", "--quiet", "--cached", "--", "docs/big-new.md"]);
+    stageFixtureFile(dir, "src/big-new.ts", `export const a = "${"x".repeat(26 * 1024)}";\n`);
+    expect(runGate(dir).status).toBe(1);
+    fixtureGit(dir, ["rm", "--quiet", "--cached", "--", "src/big-new.ts"]);
+    // RU-0304.md 級（17KB）の通常ドキュメントは通過する。
+    stageFixtureFile(dir, "docs/normal-new.md", `${"x".repeat(17 * 1024)}\n`);
+    expect(runGate(dir).status).toBe(0);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("REQ-122-008: 既存の上限超過ファイルを編集してもブロックせず WARN 表示（終了コード 0）", () => {
+  const dir = makeFixtureRepo();
+  try {
+    stageFixtureFile(dir, "docs/big-old.md", `${"x".repeat(21 * 1024)}\n`);
+    fixtureGit(dir, ["commit", "--quiet", "-m", "big"]);
+    stageFixtureFile(dir, "docs/big-old.md", `${"x".repeat(21 * 1024 - 512)}\n`);
+    const r = runGate(dir);
+    expect(r.status).toBe(0);
+    expect(r.out).toContain("WARN");
+    expect(r.out).toContain("big-old.md");
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("REQ-122-008: WIP キュー滞留は WARN 表示のみ（.gitkeep・README.md は集計から除外）", () => {
+  const dir = makeFixtureRepo();
+  try {
+    // 10 実ファイル + README.md + .gitkeep×50 = 集計 10（目安 10 以下）→ WARN なし。
+    for (let i = 0; i < 10; i++) {
+      writeFixtureFile(dir, `.agentdev/backlog/req-units/RU-900${i}.md`, "x\n");
+    }
+    writeFixtureFile(dir, ".agentdev/backlog/req-units/README.md", "# backlog\n");
+    for (let i = 0; i < 50; i++) {
+      writeFixtureFile(dir, `.agentdev/learning/inbox/q${i}/.gitkeep`, "");
+    }
+    stageFixtureFile(dir, "one.txt", "x\n");
+    const ok = runGate(dir);
+    expect(ok.status).toBe(0);
+    expect(ok.out).not.toContain("WARN");
+    // 11 実ファイルで目安超過 → WARN 表示（終了コード 0）。
+    writeFixtureFile(dir, ".agentdev/backlog/req-units/RU-9010.md", "x\n");
+    const warned = runGate(dir);
+    expect(warned.status).toBe(0);
+    expect(warned.out).toContain("WARN");
+    expect(warned.out).toContain("11");
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("REQ-122-008: ガバナンス表面積（IR ルール 25・公開コマンド 15）超過は WARN 表示のみ", () => {
+  const dir = makeFixtureRepo();
+  try {
+    for (let i = 0; i < 26; i++) {
+      writeFixtureFile(dir, `src/common/skills/repo-agentdev-integrity/rules/ir-9${String(i).padStart(2, "0")}.ts`, "export {};\n");
+    }
+    for (let i = 0; i < 16; i++) {
+      writeFixtureFile(dir, `src/common/commands/agentdev/cmd-${i}.md`, "# cmd\n");
+    }
+    stageFixtureFile(dir, "one.txt", "x\n");
+    const r = runGate(dir);
+    expect(r.status).toBe(0);
+    expect(r.out).toContain("IR ルール 26 件");
+    expect(r.out).toContain("公開コマンド 16 件");
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("REQ-122-008: 総ファイル数・総容量の検査は行わない（1301 ファイルの追加増加も警告なし）", () => {
+  const dir = makeFixtureRepo();
+  try {
+    fs.mkdirSync(path.join(dir, "many"), { recursive: true });
+    for (let i = 0; i < 1301; i++) {
+      fs.writeFileSync(path.join(dir, "many", `f${i}.txt`), "x\n");
+    }
+    fixtureGit(dir, ["add", "-A"]);
+    fixtureGit(dir, ["commit", "--quiet", "-m", "many"]);
+    stageFixtureFile(dir, "one-more.txt", "x\n");
+    const r = runGate(dir);
+    expect(r.status).toBe(0);
+    expect(r.out).not.toContain("WARN");
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 });
