@@ -3,24 +3,34 @@
 
 AgentDevFlow を編集するエージェント向けのリポジトリガイドレール。
 
-## 行動規範
+## 最上位制約 — Minimal-by-Default 5原則
 
-- **実験前提の3原則（最上位ルール）**: 本節の他の行動規範に矛盾する場合に優先する。判断根拠と採用判断の正は `docs/designs/foundations/design-principles.md`「## 0. 実験前提の3原則（最上位ルール）」節と DEC-064（accepted）にある。
-  1. 実験・ロールバック許容: 本リポジトリの変更は実験として扱い、Git 履歴による復元でロールバックに対応する。対照表・バックアップ資産などの防衛的恒久資産の維持を移行・整理の前提条件としない。
-  2. 後方互換性の完全破棄: 旧表記・旧パス・旧契約への移行補助層（crosswalk、Baseline、マイグレーションスクリプト）を恒久資産として維持せず、LLM/スクリプトによる一括直接修正を標準手段とする。履歴性は Git 履歴で担保する。
-  3. 測定不能停滞の排除と二択即決: 再評価条件が実測不能・確定不能のままの保留（測定待ち）を禁止し、測定待ち案件は「仮説の即時導入」または「完全削除」の二択で即決する。完全削除処分は処分理由の明示をもって決済記録とし、黙認と区別する。deferred 機構（REQ-038-006）と blocked 機構（REQ-120）そのものは存続させ、「測定待ちを理由とする保留」のみを禁止する（狭義解釈）。
-- 基本言語は日本語。例外無く、中国語での出力を禁止する。文章表層品質の執筆規範の参照語彙は `agentdev-textlint-guard` Plugin（配布資産として維持）の標準規則と用語 prh 辞書とする。本体リポジトリにおける textlint 自動検査運用（プロジェクト側設定・書込み前検査・最終検査）は DEC-065 により終了済みであり、参照語彙としてのみ利用する。
-- 思考・thinking・出力における基本言語は日本語。
-- 文書種別の配置基準、用語政策（英字許容リスト、訳語表）は `docs/designs/responsibilities/document-type-responsibilities.md` を参照すること。
-- req-define に構造化された要件が渡された場合は別エージェントでの使用を想定し、AskUserQuestion を使用せずに質問すること。
+本節は他の規則に優先する。
+
+1. **Working Tree ＝「現在の姿」**: リポジトリ内の文書・コード・DEC に過去の経緯・旧構成との比較・手順書・廃止理由・保留記録を書かない。歴史は Git ログが唯一の正本である。
+2. **Zero-Base Filter**: すべてのファイル・機能・ルール・テストに「今日この姿を知った上で一から作るなら作るか」を問い、不要なものは既存ごと削除する。
+3. **Rewrite over Patch**: 複雑化したモジュールや設計書に例外分岐・防衛的な分岐を追加せず、最小構成で書き直す。
+4. **Clean Deletion**: 削除した資産の不在証明テスト・番号記録・代替経路の分岐を残さない。削除後の参照は Git ログで解決する。
+5. **配布物ゼロ汚染**: 利用プロジェクトへ配布される領域（`src/` のコマンド・スキル・スクリプト等）に `REQ-ID`・`docs/` 参照・開発用トレーサビリティ情報を 1 文字も混入させない。
+
+機械強制: `scripts/git-hooks/minimal-gate.mjs` が物理バジェット（領域別ファイル数・容量・単一ファイル上限）と歴史堆積語彙の追加行をブロックし、pre-push が `.agentdev/` 配下の未処理キュー（inbox）滞留をブロックする。
+
+## 基本規則
+
+- 基本言語は日本語であり、思考・出力とも日本語で行う。中国語での出力を禁止する。
+- 文章表層品質の参照語彙は `agentdev-textlint-guard` Plugin（配布資産）の標準規則と用語 prh 辞書とする。
+- 文書種別の配置基準と用語政策（英字許容リスト、訳語表）は `docs/designs/responsibilities/document-type-responsibilities.md` を参照する。
+- req-define に構造化された要件が渡された場合は別エージェントでの使用を想定し、AskUserQuestion を使用せずに質問する。
 - 本リポジトリは AgentDevFlow プラグインを管理する。
-- Windows 環境で既存 UTF-8（BOM なし）ファイルを編集する際は edit ツール（per-line string replace）を優先し、Write ツール（全面上書き）は新規ファイル作成時に限定すること。Write ツールが既存 UTF-8 ファイルを cp932 で書き出し文字化けを生む事象が実証済みのため。
-- Windows 環境で PowerShell 標準 cmdlet（Get-Content / Set-Content）経由の既存 UTF-8（BOM なし）/LF ファイル一括読み書きは避けること。cp932 解釈や CRLF 書き出しによりファイルを破壊し得るため、標準手段は edit ツール、node の readFileSync/writeFileSync、[System.IO.File] の明示エンコーディング指定とする。詳細は `docs/knowledge/windows-powershell-bulk-io-corruption.md` を参照すること。
-- Windows 環境で PowerShell のリダイレクト演算子（`>` / `>>` / `*>`）やパイプによるファイル出力も、cp932 再符号化による UTF-8 破損の対象である。証跡退避を含むファイル出力は上記の標準手段で行うこと。詳細は `docs/knowledge/windows-powershell-bulk-io-corruption.md` を参照すること。
-- worktree 操作（実装、検証、証跡退避を含む）中の書込み guard 運用指針は `src/common/skills/agentdev-git-worktree/references/worktree-operations.md`「書込み guard 運用指針」節を参照すること。guard による書込みブロックは fail-closed として維持し、ブロック解除・迂回ではなく標準手段へ切替する。
-- 同一ファイルへの複数 edit は、相互非依存の oldString 選択または順次実行に限定する。書込み guard によるブロック（fail-closed 拒否）後は、grep 等の実取得でファイルの現在状態を確認してから oldString を組み立てて再適用する。guard の解除・迂回を行わない。詳細は `src/common/skills/agentdev-git-worktree/references/worktree-operations.md`「同一ファイルへの複数 edit の規律」節を参照すること。
 
-## ハーネス選定
+## Windows 環境のファイル入出力規律
 
-- oh-my-openagent を導入済み
-- Git 操作（push を含む）の認証は非対話経路で設定済みであり、対話認証の待機なしに対象の Git 操作が完了する。認証失敗、対話要求、タイムアウトを検出した場合は、待機を反復せず失敗、必要な処置、再開条件を報告する。資格情報の値を解析証拠やログへ出力しない。設定手順と当環境の認証経路実績は `docs/knowledge/git-noninteractive-auth.md` を参照すること。
+- 既存 UTF-8（BOM なし）ファイルの編集は edit ツール（per-line string replace）を優先し、Write ツール（全面上書き）は新規ファイル作成時に限定する。
+- PowerShell 標準 cmdlet（Get-Content / Set-Content）・リダイレクト演算子（`>` / `>>` / `*>`）・パイプ経由の既存 UTF-8/LF ファイル読み書きは cp932 再符号化によりファイルを破壊し得るため行わない。標準手段は edit ツール、node の readFileSync/writeFileSync、[System.IO.File] の明示エンコーディング指定である（詳細: `docs/knowledge/windows-powershell-bulk-io-corruption.md`）。
+- 同一ファイルへの複数 edit は相互非依存の oldString 選択または順次実行に限定する。書込み guard によるブロック後は grep 等で現在状態を確認してから oldString を組み立てて再適用する（guard の解除・迂回は行わない。`src/common/skills/agentdev-git-worktree/references/worktree-operations.md` 参照）。
+
+## ハーネス選定と Git
+
+- oh-my-openagent を導入済みである。
+- Git 操作（push を含む）の認証は非対話経路で設定済みであり、対話認証の待機なしに完了する。認証失敗・対話要求・タイムアウトを検出した場合は待機を反復せず失敗として報告する。資格情報の値を解析証拠やログへ出力しない（詳細: `docs/knowledge/git-noninteractive-auth.md`）。
+- ローカルコミットは `scripts/git-hooks/`（pre-commit・pre-push・minimal-gate.mjs）の検証ゲート下で行う。
