@@ -1,10 +1,10 @@
 // ADF-COVERS(verification): REQ-098-001, REQ-098-006
 //
 // Issue #4030（B2-2: 工程拡張の文章品質・書込み規則の共通参照化）で確定した
-// 集約構造の pin 検査。7つの workflow 拡張 rules が反復本文を廃止し、正本節
-// （agentdev-workflow-lifecycle スキル「文章品質・書込み規約」節）への名レベル
-// 参照のみを保持することを、内容検索（pin 型・anchor 型）で固定する。
-// pin の文言変更は期待値追随を同一 PR で行う。
+// 集約構造の pin 検査。Phase B（extensions 抜本縮減）により各 workflow 拡張から
+// yomiyasu 規則エントリは除去され、正本節（agentdev-workflow-lifecycle スキル
+// 「文章品質・書込み規約」節）が規則の唯一の実装点となった。本検査は正本節の
+// 存在と文面を固定する。pin の文言変更は期待値追随を同一 PR で行う。
 
 import { describe, expect, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
@@ -13,28 +13,10 @@ import { join } from "node:path";
 const repoRoot = join(import.meta.dir, "..", "..", "..", "..", "..", "..");
 
 function read(...parts: string[]): string {
-  return readFileSync(join(repoRoot, ...parts), "utf8");
+  return readFileSync(join(repoRoot, ...parts), "utf-8");
 }
 
-const EXTENSIONS = [
-  "agentdev-workflow-case-auto",
-  "agentdev-workflow-case-open",
-  "agentdev-workflow-case-ready",
-  "agentdev-workflow-case-revise",
-  "agentdev-workflow-case-run",
-  "agentdev-workflow-case-close",
-  "agentdev-workflow-issue",
-].map((n) => [".agentdev", "extensions", "skills", `${n}.yaml`] as string[]);
-
 const CANONICAL = "文章品質・書込み規約（反復規則の単一正本）";
-const CANONICAL_REF = "「文章品質・書込み規約」節を正本として参照する";
-// 旧反復本文の固有指標語（集約後に拡張へ残ってはならない）。
-const OLD_BODY_MARKERS = [
-  "検査専用本文ファイル",
-  "標準回復手段",
-  "yomiyasu_lint.py を環境で利用可能な Python コマンド",
-  "修正試行は最大 2 回",
-];
 // 旧本文が案内していた迂回選択肢（workspace 外配置先への別手段書込み）。
 const BYPASS_GUIDANCE_MARKERS = [
   "〔a〕bash の heredoc",
@@ -113,23 +95,4 @@ describe("文章品質規則の集約構造（B2-2・Issue #4030）", () => {
       expect(existsSync(join(repoRoot, "docs", "knowledge", doc))).toBe(true);
     }
   });
-});
-
-describe("7 workflow 拡張 rules の正本参照（B2-2・Issue #4030）", () => {
-  for (const rel of EXTENSIONS) {
-    test(`${rel}: 呼出条件と正本への参照のみを保持する`, () => {
-      const ext = read(...rel);
-      expect(ext).toContain("id: yomiyasu-application-before-write");
-      expect(ext).toContain("skill: yomiyasu");
-      expect(ext).toContain(CANONICAL_REF);
-      // 反復本文の残留 0（集約対象の反復実体が各拡張へ残っていない）
-      for (const marker of OLD_BODY_MARKERS) {
-        expect(ext.includes(marker)).toBe(false);
-      }
-      // 迂回案内の矛盾記述 0（旧本文の迂回選択肢〔a〕〔b〕が残っていない）
-      for (const marker of BYPASS_GUIDANCE_MARKERS) {
-        expect(ext.includes(marker)).toBe(false);
-      }
-    });
-  }
 });

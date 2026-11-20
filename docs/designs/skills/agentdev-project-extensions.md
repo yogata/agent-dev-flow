@@ -26,7 +26,7 @@ updated: 2026-11-18
 ### DO NOT USE FOR
 
 - extension スキーマの定義（基盤 Design `foundations/project-extensions.md` の責務）
-- extension 構造の診断、検査（`/repo/docs-check`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote` の3層責務、DEC-006）
+- extension 構造の診断、検査（`/repo/docs-check` と検証エンジンの機械検査、backlog-auto 内部の inspect-promote workflow、DEC-006）
 - 配布 command/skill 本文の変更
 - project-local skill の実装（各適用プロジェクトの責務）
 
@@ -59,7 +59,7 @@ updated: 2026-11-18
 ## 対象外
 
 - extension スキーマ、配置、命名の定義（基盤 Design `foundations/project-extensions.md`）
-- extension 構造の診断（`/repo/docs-check`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote` の3層、DEC-006）
+- extension 構造の診断（`/repo/docs-check` と検証エンジンの機械検査、backlog-auto 内部の inspect-promote workflow、DEC-006）
 - project-local skill の実装（各適用プロジェクトの責務）
 - extension 自体の作成、編集（プロジェクト側の責務）
 

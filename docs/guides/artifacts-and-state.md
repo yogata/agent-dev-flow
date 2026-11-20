@@ -110,11 +110,11 @@ scripts/
 
 | 成果物 | 生成 | 読取り | 削除トリガー |
 |--------|------|------|-------------|
-| 採用済み成果物（Intake） | `/agentdev/intake-promote` | `/agentdev/backlog-review` | RU 化成功時 |
-| 採用済み成果物（Learning） | `/agentdev/learning-promote` | `/agentdev/backlog-review` | RU 化成功時 |
-| RU | `/agentdev/backlog-review`, セッション由来 | `/agentdev/req-define`, case-open / case-ready（内部 lifecycle 段階） | case-ready（case-auto 駆動）の Definition 確定 + VERIFY 成功時 |
+| 採用済み成果物（Intake） | intake-promote workflow（backlog-auto 駆動） | backlog-review workflow（backlog-auto 駆動） | RU 化成功時 |
+| 採用済み成果物（Learning） | learning-promote workflow（backlog-auto 駆動） | backlog-review workflow（backlog-auto 駆動） | RU 化成功時 |
+| RU | backlog-review workflow（backlog-auto 駆動）, セッション由来 | `/agentdev/req-define`, case-open / case-ready（内部 lifecycle 段階） | case-ready（case-auto 駆動）の Definition 確定 + VERIFY 成功時 |
 | REQ ファイル | case-ready, case-revise（内部 lifecycle 段階） | case-open, case-run, case-close（内部 lifecycle 段階） | なし（永続） |
-| 追跡Issue | `/agentdev/issue`、各 workflow | `/agentdev/issue`、`/agentdev/req-define`（実行確定時の要件化経路） | なし（永続。解決済み、クローズ済みも同一体系内に残置） |
+| 追跡Issue | 各 workflow・会話経由の `agentdev-issue-tracking` スキル利用 | `agentdev-issue-tracking`（会話経由）、`/agentdev/req-define`（実行確定時の要件化経路） | なし（永続。解決済み、クローズ済みも同一体系内に残置） |
 | Case Issue | case-open（case-auto 駆動） | case-run, case-close（内部 lifecycle 段階） | なし（永続） |
 
 流れは以下の通り。

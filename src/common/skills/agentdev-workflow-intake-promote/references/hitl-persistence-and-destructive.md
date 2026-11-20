@@ -163,7 +163,7 @@
 
 1. 完了報告 template（`.opencode/commands/agentdev/templates/intake-promote/standard.md`）に従って出力する
 2. 分類結果（採用、保留、却下の件数、一覧。自律確定 item は主要根拠とHITL不要理由を含む）と git 永続化結果（変更有無、ファイル一覧、commit hash、push 成否）を含める
-3. 次ステップ（`/agentdev/backlog-review`）の提示のみを行い、自動起動しない
+3. 次ステップ（backlog-review workflow。backlog-auto stage 3 が駆動）の提示のみを行い、自動起動しない
 
 ### Result
 

@@ -182,7 +182,7 @@ SKILL.md 本文では実観測原則、 trigger、禁止事項、 split rule の
 ### Layer 2: Analysis フェーズ（意味的分類と整理）
 
 ```
-/agentdev/learning-promote
+/agentdev/backlog-auto
 ```
 
 → 実行内容（内部分析フェーズ）:
@@ -237,7 +237,7 @@ SKILL.md 本文では実観測原則、 trigger、禁止事項、 split rule の
 inbox.mdのエントリ数（`## ` で始まる行）をカウントする。15件以上の場合、以下を提案する:
 
 > inbox.mdが{N}件になっています。
-> `/agentdev/learning-promote` で分析することを推奨します。
+> `/agentdev/backlog-auto`（stage 2: learning-promote workflow）で分析することを推奨します。
 
 ## ヒント
 
@@ -246,5 +246,5 @@ inbox.mdのエントリ数（`## ` で始まる行）をカウントする。15�
 3. **13フィールドを完備**（全フィールドを埋めることで下流の分析精度が向上する）
 4. **Decision/REQ/spec影響を見逃さない**（ユーザー確認「あり」の場合は特に注意深く評価）
 5. **ユーザーへの通知は行うが承認は求めない**（学びの内容は通知するが、承認や却下は求めない）
-6. **inbox.mdが溜まったら**（15件以上で `/agentdev/learning-promote` を提案）
+6. **inbox.mdが溜まったら**（15件以上で `/agentdev/backlog-auto`（learning-promote workflow を含む）を提案）
 

@@ -90,25 +90,21 @@ AgentDevFlow は共通原本とホスト別接続領域に分かれる。
 
 引数の意味は command 本文と Workflow Skill 本文が共通原本の単一原本であるため、両ホストで同一である。Custom Tool の引数も host 非依存の公開スキーマ（`src/common/tools/agentdev-*/public-schema.ts`）を共通参照する。
 
-全公開 command の対応表を次に示す（2026-10-02 時点、13件）。
+全公開 command の対応表を次に示す（8件）。
 
 | 業務名 | OpenCode での入口 | Senpi での入口 | 共通の到達先 |
 |---|---|---|---|
 | req-define | `/agentdev/req-define` | `agentdev-workflow-req-define` | `src/common/skills/agentdev-workflow-req-define/` |
 | case-auto | `/agentdev/case-auto` | `agentdev-workflow-case-auto` | `src/common/skills/agentdev-workflow-case-auto/` |
 | backlog-auto | `/agentdev/backlog-auto` | `agentdev-workflow-backlog-auto` | `src/common/skills/agentdev-workflow-backlog-auto/` |
-| backlog-review | `/agentdev/backlog-review` | `agentdev-workflow-backlog-review` | `src/common/skills/agentdev-workflow-backlog-review/` |
-| intake-capture | `/agentdev/intake-capture` | `agentdev-workflow-intake-capture` | `src/common/skills/agentdev-workflow-intake-capture/` |
-| intake-from-github | `/agentdev/intake-from-github` | `agentdev-workflow-intake-from-github` | `src/common/skills/agentdev-workflow-intake-from-github/` |
-| intake-promote | `/agentdev/intake-promote` | `agentdev-workflow-intake-promote` | `src/common/skills/agentdev-workflow-intake-promote/` |
-| learning-promote | `/agentdev/learning-promote` | `agentdev-workflow-learning-promote` | `src/common/skills/agentdev-workflow-learning-promote/` |
-| inspect-docs | `/agentdev/inspect-docs` | `agentdev-workflow-inspect-docs` | `src/common/skills/agentdev-workflow-inspect-docs/` |
-| inspect-skills | `/agentdev/inspect-skills` | `agentdev-workflow-inspect-skills` | `src/common/skills/agentdev-workflow-inspect-skills/` |
-| inspect-promote | `/agentdev/inspect-promote` | `agentdev-workflow-inspect-promote` | `src/common/skills/agentdev-workflow-inspect-promote/` |
-| issue | `/agentdev/issue` | `agentdev-workflow-issue` | `src/common/skills/agentdev-workflow-issue/` |
-| third-party-sync | `/agentdev/third-party-sync` | `agentdev-workflow-third-party-sync` | `src/common/skills/agentdev-workflow-third-party-sync/` |
+| phase-tasks-create | `/agentdev/phase-tasks-create` | `agentdev-workflow-phase-tasks-create` | `src/common/skills/agentdev-workflow-phase-tasks-create/` |
+| phase-tasks-update | `/agentdev/phase-tasks-update` | `agentdev-workflow-phase-tasks-update` | `src/common/skills/agentdev-workflow-phase-tasks-update/` |
+| phase-artifacts-update | `/agentdev/phase-artifacts-update` | `agentdev-workflow-phase-artifacts-update` | `src/common/skills/agentdev-workflow-phase-artifacts-update/` |
+| phase-review | `/agentdev/phase-review` | `agentdev-workflow-phase-review` | `src/common/skills/agentdev-workflow-phase-review/` |
+| phase-transition | `/agentdev/phase-transition` | `agentdev-workflow-phase-transition` | `src/common/skills/agentdev-workflow-phase-transition/` |
 
 case-open、case-ready、case-run、case-close、case-revise は内部 lifecycle 段階であり、公開入口を持たない。`case-auto` が内部で解決して駆動するため、対応表の対象外である。
+backlog-review、intake-promote、learning-promote、inspect-docs、inspect-promote も公開入口を持たない内部 workflow であり、`backlog-auto` が Workflow Skill として駆動するため、対応表の対象外である。
 
 ### 対応表の生成規律と検証方法
 

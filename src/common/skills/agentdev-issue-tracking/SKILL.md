@@ -121,7 +121,7 @@ Comment 更新・削除の適用可否判断規律の正は本節の操作知識
 
 ## 他 workflow からの利用
 
-本スキルは共有能力であり、人間向け公開入口（`/agentdev/issue` command）の明示実行を利用の必須条件としない。
+本スキルは共有能力であり、会話経由の自然言語指示から利用できる（追跡Issue操作の公開コマンド入口は持たない）。
 
 - 要件定義、設計、レビュー、実装、検証等の各 workflow、各 skill は、未解決事項を認識した場合に本スキルの知識を直接利用し、Tool 操作契約経由で追跡Issueの操作を行える
 - 保留中の追跡Issueは `issue_list`（search による絞り込み）や `issue_read`（本文の状態保持節の確認）で到達できる。関連する作業、設計、レビュー、分析を行う際に再評価条件の成立を確認する
@@ -142,7 +142,6 @@ Comment 更新・削除の適用可否判断規律の正は本節の操作知識
 
 ## See Also
 
-- **agentdev-workflow-issue**: `/agentdev/issue` の workflow 実装本体（本スキルの知識を利用する対話操作完結型 workflow）
 - **agentdev-issue-management**: GitHub Issue 操作の安全性手続き（VERIFY、リンク確認）
 - **agentdev-decision-file-manager**: 解決結果を Decision へ反映する際の委譲先
 - **agentdev-req-file-manager**: 解決結果を REQ へ反映する際の委譲先

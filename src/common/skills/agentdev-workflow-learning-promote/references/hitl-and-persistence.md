@@ -130,7 +130,7 @@ staged エントリ除去時に採用済み成果物の「元learning item/ 根�
 ### Procedure
 
 1. 完了報告 template（`.opencode/commands/agentdev/templates/learning-promote/standard.md`）に従って出力する
-2. 8軸評価サマリ、判定結果（promote/defer/reject/duplicate 件数、自律確定と HITL 確定の内訳）、後続ルート（`/agentdev/backlog-review`）、git 永続化結果（変更有無、ファイル一覧、commit hash、push 成否）を含める
+2. 8軸評価サマリ、判定結果（promote/defer/reject/duplicate 件数、自律確定と HITL 確定の内訳）、後続ルート（backlog-review workflow（backlog-auto stage 3 駆動））、git 永続化結果（変更有無、ファイル一覧、commit hash、push 成否）を含める
 
 ### Result
 

@@ -88,18 +88,12 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [commands/case-run.md](commands/case-run.md) | accepted | case-run（内部 lifecycle 段階、case-auto 駆動） |
 | [commands/case-close.md](commands/case-close.md) | accepted | case-close（内部 lifecycle 段階、case-auto 駆動） |
 | [commands/case-auto.md](commands/case-auto.md) | accepted | `/agentdev/case-auto` |
-| [commands/intake-capture.md](commands/intake-capture.md) | accepted | `/agentdev/intake-capture` |
-| [commands/intake-from-github.md](commands/intake-from-github.md) | accepted | `/agentdev/intake-from-github` |
-| [commands/intake-promote.md](commands/intake-promote.md) | accepted | `/agentdev/intake-promote` |
-| [commands/learning-promote.md](commands/learning-promote.md) | accepted | `/agentdev/learning-promote` |
-| [commands/backlog-review.md](commands/backlog-review.md) | accepted | `/agentdev/backlog-review` |
-| [commands/inspect-docs.md](commands/inspect-docs.md) | accepted | `/agentdev/inspect-docs` |
-| [commands/inspect-skills.md](commands/inspect-skills.md) | accepted | `/agentdev/inspect-skills` |
-| [commands/inspect-promote.md](commands/inspect-promote.md) | accepted | `/agentdev/inspect-promote` |
+| [commands/intake-promote.md](commands/intake-promote.md) | accepted | intake-promote（内部 workflow、backlog-auto 駆動） |
+| [commands/learning-promote.md](commands/learning-promote.md) | accepted | learning-promote（内部 workflow、backlog-auto 駆動） |
+| [commands/backlog-review.md](commands/backlog-review.md) | accepted | backlog-review（内部 workflow、backlog-auto 駆動） |
+| [commands/inspect-docs.md](commands/inspect-docs.md) | accepted | inspect-docs（内部 workflow、backlog-auto 駆動） |
+| [commands/inspect-promote.md](commands/inspect-promote.md) | accepted | inspect-promote（内部 workflow、backlog-auto 駆動） |
 | [commands/backlog-auto.md](commands/backlog-auto.md) | accepted | `/agentdev/backlog-auto` |
-| [commands/issue.md](commands/issue.md) | accepted | `/agentdev/issue` |
-| [commands/third-party-sync.md](commands/third-party-sync.md) | accepted | `/agentdev/third-party-sync`（third-party Skill 取得入口、Custom Tool 委譲） |
-| [commands/intake-triage.md](commands/intake-triage.md) | draft | `/agentdev/intake-triage`（intake/learning inbox の自動トリアージ入口、Workflow Skill 委譲） | intake/learning inbox 項目のクラスタリングと Route A（即時決済）/ Route B（即時破棄）/ Route C（バックログ昇格）の3ルート自動振り分け、サマリー出力 |
 
 `/repo/docs-check` は repo-local、配布対象外のため対象外。
 

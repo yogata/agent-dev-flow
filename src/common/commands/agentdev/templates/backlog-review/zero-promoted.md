@@ -1,6 +1,6 @@
 ✅ backlog-review 完了
 
-完了コマンド:/agentdev/backlog-review
+完了ワークフロー:backlog-review workflow（backlog-auto stage 3）
 対象: 採用済み成果物 0件
 結果:
  - 処理対象なし（正常終了）

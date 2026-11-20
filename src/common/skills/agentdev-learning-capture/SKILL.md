@@ -19,7 +19,7 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 - `.agentdev/learning/inbox/` 配下への1トピック1ファイル（`YYYY-MM-DD-<slug>.md`）の保存を行う
 - **git永続化（commit/push）は呼出元コマンドの責務**。本スキル内で `git add`/ `git commit`/ `git push` を実行してはならない
-- `deferred/` は参照・作成しない（`/agentdev/learning-promote` のみが管理）
+- `deferred/` は参照・作成しない（learning-promote workflow（backlog-auto stage 2 駆動）のみが管理）
 
 ## 常に守る不変条件
 
@@ -27,7 +27,7 @@ description: Agent-first extraction and capture of learnings from problems auton
 - **実観測ベース**: エージェントが実際に観測した事象に基づいて学び候補を抽出する。推測のみのエントリは保存しない。品質評価は保留し下流（promote）に委ねる。重複は気にしない（統合は promote が行う）
 - **13フィールド完備**: 基準テンプレート（`references/capture-entry-template.md`）に従い全13フィールドを必ず含める。推論でフォーマットを組み立てず、テンプレートから取得する
 - **Decision/REQ/spec反映判断を行わない**: 影響の記録まで。実際のDecision/REQ/spec更新、昇格判断は別スキルの責務
-- **intake item を作成しない**: 学びの抽出過程で具体的な修正対象が残る場合は intake workflow（`/agentdev/intake-capture`）に委ねる
+- **intake item を作成しない**: 学びの抽出過程で具体的な修正対象が残る場合は intake pipeline（`agentdev-intake-pipeline` スキル）に委ねる
 
 ## いつトリガーするか
 
@@ -54,9 +54,9 @@ description: Agent-first extraction and capture of learnings from problems auton
 - **ユーザーに学びの有無を問わない**（「学びはありましたか？」「何か学びはありますか？」等の問いかけは禁止。エージェントが自ら判断する）
 - **ユーザーに学びの内容の入力を促さない**（「学びの内容を入力してください」「学びを教えてください」等の要求は禁止。エージェントが学びを生成して提示する）
 - **Decision/REQ/spec反映判断を行わない**（影響の記録まで。実際のDecision/REQ/spec更新は別スキルの責務）
-- **昇格判断を行わない**（学びをスキルやコマンドに昇格すべきかの判断は `/agentdev/learning-promote` の責務）
+- **昇格判断を行わない**（学びをスキルやコマンドに昇格すべきかの判断は learning-promote workflow（backlog-auto stage 2 駆動）の責務）
 - **複雑なロジックを使わない**（シンプルな1ファイル書き出しのみ）
-- **intake item を作成しない**（学びの抽出過程で具体的な修正対象が残る場合は、intake workflow（`/agentdev/intake-capture`）に委ねる。learning capture は intake item を作成しない）
+- **intake item を作成しない**（学びの抽出過程で具体的な修正対象が残る場合は、intake pipeline（`agentdev-intake-pipeline` スキル）に委ねる。learning capture は intake item を作成しない）
 
 ## 観測の分割ルール（split rule）
 
@@ -64,12 +64,12 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 | 内容の性質 | 向け先 | 理由 |
 |---|---|---|
-| 具体的な修正対象（積み残し作業候補、バグ、設定不備等） | intake item（`/agentdev/intake-capture`） | 具体的作業は intake workflow が管理 |
+| 具体的な修正対象（積み残し作業候補、バグ、設定不備等） | intake item（`agentdev-intake-pipeline` スキル） | 具体的作業は intake pipeline が管理 |
 | 再発防止知見（予防策、判断基準、運用ルール等） | learning item（`inbox/` 1ファイル） | 知見の蓄積、昇華は learning pipeline が管理 |
 | 両方含まれる | 両方に分割してそれぞれ出力 | 1観測 = 最大1 learning item + 1 intake item |
 
 learning は「改善提案そのもの」ではなく「改善提案へ昇華されうる再発防止知見」である。
-単一の観測が同時に learning item と intake item の両方を生み出す場合、本スキルは learning item のみを生成し、intake item の生成は `/agentdev/intake-capture` に委ねる。
+単一の観測が同時に learning item と intake item の両方を生み出す場合、本スキルは learning item のみを生成し、intake item の生成は intake pipeline（`agentdev-intake-pipeline` スキル）に委ねる。
 1つの観測から得られた知見を単一エントリに混在させてはならない（capture-boundaries.md の split rule に準拠）。
 
 ## 計測前提を含む記録の baseline 明記（採番時点）

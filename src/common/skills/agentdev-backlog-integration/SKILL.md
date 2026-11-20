@@ -5,14 +5,14 @@ description: backlog-review の採用済み成果物（promoted artifact）統�
 
 # バックログレビュー統合知識ベース（backlog-review）
 
-backlog-review コマンドの統合判定知識ベースである。
+backlog-review workflow の統合判定知識ベースである。
 採用済み成果物（promoted artifact）の読み込み、分析、RU への統合、分割判定、矛盾検出、RU 生成、depends_on 依存解決、docs/knowledge/ 知識文書保存を含む backlog 自体の処置（重複・陳腐化した知識の削除、保留）の判定基準と詳細構造を提供する。
 
-## 対象コマンド
+## 対象 workflow
 
-| コマンド | 目的 |
+| workflow | 目的 |
 |----------|------|
-| `.opencode/commands/agentdev/backlog-review.md` | 採用済み成果物を読み込み、分析し、統合、分割判定、矛盾検出を経て RU を生成する |
+| `agentdev-workflow-backlog-review`（backlog-auto stage 3 が駆動する内部 workflow） | 採用済み成果物を読み込み、分析し、統合、分割判定、矛盾検出を経て RU を生成する |
 
 ## 参考文献
 
@@ -21,8 +21,8 @@ backlog-review コマンドの統合判定知識ベースである。
 | `references/integration-judgment.md` | 成果物の読み込み、分析、統合分割判定、depends_on 依存解決、矛盾検出、RU 生成の判定ロジック。adversarial-review 候補判断と内部挿入（backlog-review）の実行時参照 |
 | `references/learning-outcome-routing.md` | docs/knowledge/ 知識文書保存と backlog 自体の処置の契約（source type 非依存）。docs/knowledge/ 直接保存の手順、操作種別判定、ユーザー承認境界、git 永続化対象の副作用、成果物ライフサイクルの実行時参照 |
 
-backlog-review コマンドの実行時投影先パスは `.opencode/commands/agentdev/backlog-review.md`。
-command 本文内で backlog-review を参照する場合はこちらを使用。
+backlog-review workflow の実装本体は `agentdev-workflow-backlog-review` スキルである（backlog-auto stage 3 が Workflow Skill として駆動する）。
+workflow 本文内で backlog-review を参照する場合はこちらを使用。
 
 ## adversarial-review 候補判断と内部挿入（backlog-review）
 

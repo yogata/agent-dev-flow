@@ -177,7 +177,7 @@ QG-3 の検査をサブエージェントに委譲する場合:
 - QG-3 は**乖離の分類と推奨アクションの提示**に限定する。
 - REQ/Definition ファイルの更新判断、更新実行は行わない（case-revise の責務）。
 - 品質メトリクス収集（型チェック/ Lint/ ビルド/ テスト）は行わない（実行担当サブエージェント委譲内のローカル検証（test-fix ループ）の責務）。
-- docs 全体の意味レビューは行わない（`/agentdev/inspect-docs` の責務）。
+- docs 全体の意味レビューは行わない（inspect-docs workflow（backlog-auto stage 1 駆動）の責務）。
 
 ## See Also
 

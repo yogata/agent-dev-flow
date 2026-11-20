@@ -188,7 +188,7 @@ AgentDevFlow 本体は初期テンプレート、schema、検査、保守 comman
 - boilerplate 行4: 詳細な読み込み契約は本 SKILL 参照との宣言
 
 「4行上限」は boilerplate リスト部分の4行を指す（Design 適用パターン1「上限: 宣言4行まで」）。
-本範囲は16 command の公開契約（extension 読込宣言）の一部として許容判定された事例に該当する。
+本範囲は過去に 16 command の公開契約（extension 読込宣言）として許容判定された事例に該当する。
 
 ### 詳細契約
 

@@ -61,9 +61,9 @@ updated: "2026-11-18"
 
 ## 所有関係と委譲
 
-- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、command 定義（共通原本 `src/common/commands/agentdev/inspect-promote.md`。実行時投影先は `.opencode/commands/agentdev/`）はその実行時投影である（DEC-010、配備形態は DEC-049）。
+- public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design である（DEC-010、配備形態は DEC-049）。Phase B で公開コマンド定義は廃止され、本 workflow は backlog-auto stage 2 が駆動する内部 workflow となった。
 - workflow 実装本体（STEP 構成、resume protocol、reference 構成）は Workflow Skill（`agentdev-workflow-inspect-promote`）が所有し、本 Design はこれらを複製しない。検出事項ごとの分類確定状態の再構成規則（durable state からの復元）は本 Design が正規所有する（v3 backlog-artifact-lifecycle Design からの移管。帰属の記録は collaboration-loop Design「v3 backlog-artifact-lifecycle Design からの吸収」節）。
-- Workflow Skill の単独起動防止（soft guard）は、command 定義本文の soft guard 宣言節と Workflow Skill description の DO NOT USE FOR トリガーの二層により実効する。
+- Workflow Skill の単独起動防止（soft guard）は Workflow Skill description の DO NOT USE FOR トリガーにより実効する（Phase B で公開コマンド定義は廃止済み。soft guard 宣言節の二層構成は解消）。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 
 ## 参照する横断 Design

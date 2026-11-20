@@ -592,9 +592,9 @@ describe("上位層の Tool 操作契約経由（直接読み書きなし）", (
     }
   });
 
-  it("追跡Issue操作入口の SKILL と command が自然言語操作種別を網羅する", () => {
-    const workflow = fs.readFileSync(
-      path.join("src", "common", "skills", "agentdev-workflow-issue", "SKILL.md"),
+  it("追跡Issue操作の能力スキルが自然言語操作種別を網羅する", () => {
+    const capability = fs.readFileSync(
+      path.join("src", "common", "skills", "agentdev-issue-tracking", "SKILL.md"),
       "utf8",
     );
     for (const op of [
@@ -610,28 +610,13 @@ describe("上位層の Tool 操作契約経由（直接読み書きなし）", (
       "クローズ",
       "再オープン",
     ]) {
-      if (!workflow.includes(op)) {
-        throw new Error(`workflow-issue SKILL.md misses operation: ${op}`);
-      }
-    }
-    const command = fs.readFileSync(
-      path.join("src", "common", "commands", "agentdev", "issue.md"),
-      "utf8",
-    );
-    for (const op of ["起票", "検索", "参照", "更新", "保留", "再評価", "解決", "反映確認", "クローズ", "再オープン"]) {
-      if (!command.includes(op)) {
-        throw new Error(`issue command misses operation: ${op}`);
+      if (!capability.includes(op)) {
+        throw new Error(`agentdev-issue-tracking SKILL.md misses operation: ${op}`);
       }
     }
   });
 
   it("GitHub 実装詳細の把握をユーザーに要求せず、リポジトリ内課題ファイルを作成しない境界が明示される", () => {
-    const command = fs.readFileSync(
-      path.join("src", "common", "commands", "agentdev", "issue.md"),
-      "utf8",
-    );
-    expect(command).toContain("ラベル名等の操作文法や GitHub 実装詳細をユーザーに要求しない");
-    expect(command).toContain("リポジトリ内に課題ファイルを作成し、commit しない");
     const capability = fs.readFileSync(
       path.join("src", "common", "skills", "agentdev-issue-tracking", "SKILL.md"),
       "utf8",

@@ -14,7 +14,7 @@ GitHub Issue の作成、更新、リンク、確認を安全に行うための�
 
 ## 適用対象
 
-- case-open、case-ready、case-revise、case-close、/agentdev/issue での Issue 操作後の VERIFY 手順
+- case-open、case-ready、case-revise、case-close、追跡Issue操作（agentdev-issue-tracking スキル）での Issue 操作後の VERIFY 手順
 - Parent/Child リンク確認（`親Epic: #{N}` パターン検証）
 - Epic 実行構成表更新の安全手順
 - 追跡Issueと Case Issue の関連参照の整合確認

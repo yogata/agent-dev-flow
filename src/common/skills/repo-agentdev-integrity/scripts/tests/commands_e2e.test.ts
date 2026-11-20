@@ -284,11 +284,12 @@ const templateFiles = getTemplateFiles();
 /**
  * REQ-057-011 (Q2 Plan A): derive the expected list from the actual public
  * command enumeration instead of a fixed list. The minimum-count floor keeps
- * enumeration-leak detection meaningful (last known correct state: 13; the v4
- * 2-entry model removed the case-* 5 command definitions as internal lifecycle
- * stages, Case #2981 / DEC-033).
+ * enumeration-leak detection meaningful (last known correct state: 8; Phase B
+ * は intake/inspect/learning/backlog-review/issue/third-party-sync 系を
+ * 公開コマンドから内部 workflow・能力経由へ整理し、公開コマンドは
+ * 要求入口 2 + 標準実行 1 + 工程駆動 5 の 8 本とした)。
  */
-const MIN_COMMAND_COUNT = 13;
+const MIN_COMMAND_COUNT = 8;
 
 function deriveExpectedCommands(commandFiles: Map<string, string>): string[] {
   return [...commandFiles.keys()].sort();
@@ -309,9 +310,11 @@ const COMMAND_COUNT = EXPECTED_COMMANDS.length;
 // case-open/case-ready/case-revise/case-run/case-close は Case #2981（DEC-033）で
 // 公開 command から内部 lifecycle 段階へ移行し、定義ファイルは削除済み。公開経路は
 // 2 入口モデル（req-define 手動要求入口、backlog-auto 要求蓄積入口）→ case-auto 合流。
+// intake 系（capture / from-github / triage / promote）・learning-promote・inspect 系
+// （docs / skills / promote）・backlog-review・issue・third-party-sync は Phase B で
+// 公開 command を廃止し、backlog-auto が Workflow Skill として駆動する内部 workflow
+// （capture 系・issue は Capability Skill・会話経由、third-party 取得は CLI）へ整理済み。
 const REQ_CASE_PIPELINE = ["req-define", "case-auto"];
-const LEARNING_PIPELINE = ["learning-promote"];
-const INTAKE_PIPELINE = ["intake-capture", "intake-from-github", "intake-promote"];
 
 // ─── REQ-0030-009: Normal-path E2E tests ───────────────────────────────────
 
@@ -418,44 +421,21 @@ describe("REQ-0030-009: E2E workflow tests for all commands", () => {
   });
 
   describe("Pipeline continuity: learning pipeline", () => {
-    it("learning-promote references backlog-review for promotion route", () => {
-      const promote = commands.get("learning-promote");
-      expect(promote).toBeDefined();
-      if (promote) {
-        expect(promote).toContain("backlog-review");
+    it("backlog-auto が learning 系統の workflow 連携を所有する", () => {
+      const backlogAuto = commands.get("backlog-auto");
+      expect(backlogAuto).toBeDefined();
+      if (backlogAuto) {
+        expect(backlogAuto).toContain("learning-promote");
       }
     });
   });
 
   describe("Pipeline continuity: intake pipeline", () => {
-    it("intake-capture and intake-from-github produce compatible outputs", () => {
-      const capture = commands.get("intake-capture");
-      const fromGithub = commands.get("intake-from-github");
-      expect(capture).toBeDefined();
-      expect(fromGithub).toBeDefined();
-      if (capture && fromGithub) {
-        const captureOutput = extractSection(capture, "出力");
-        const githubOutput = extractSection(fromGithub, "出力");
-        expect(captureOutput).toContain("inbox");
-        expect(githubOutput).toContain("inbox");
-      }
-    });
-
-    it("intake-promote input matches intake-capture/intake-from-github output", () => {
-      const promote = commands.get("intake-promote");
-      expect(promote).toBeDefined();
-      if (promote) {
-        const promoteInput = extractSection(promote, "入力");
-        expect(promoteInput).toContain("inbox");
-      }
-    });
-
-    it("intake-promote output references backlog-review", () => {
-      const promote = commands.get("intake-promote");
-      expect(promote).toBeDefined();
-      if (promote) {
-        const promoteOutput = extractSection(promote, "出力");
-        expect(promoteOutput).toContain("promoted");
+    it("backlog-auto が intake 系統の workflow 連携を所有する", () => {
+      const backlogAuto = commands.get("backlog-auto");
+      expect(backlogAuto).toBeDefined();
+      if (backlogAuto) {
+        expect(backlogAuto).toContain("intake-promote");
       }
     });
   });
@@ -523,7 +503,7 @@ describe("TS-008: 不存在 command 参照検出", () => {
       "",
       "See /agentdev/req-define for the requirement flow.",
       "Removed: /agentdev/retired-old-command is gone.",
-      "See /agentdev/backlog-review next.",
+      "See /agentdev/case-auto next.",
       "",
     ].join("\n");
     const findings = detectNonExistentCommandRefs(content, validCommands, {

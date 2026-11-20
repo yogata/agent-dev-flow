@@ -1,20 +1,20 @@
 ---
 name: agentdev-workflow-backlog-review
-description: "backlog-review workflow 本体。採用済み成果物の分析・分類、統合/分割と依存解決、知識文書や backlog の処置、review・承認、矛盾検出、RU 生成・削除、永続化を独立 resume point として制御する。USE FOR: backlog-review の工程制御。DO NOT USE FOR: 単独起動（対応する /agentdev/* command 経由で利用）。"
+description: "backlog-review workflow 本体。採用済み成果物の分析・分類、統合/分割と依存解決、知識文書や backlog の処置、review・承認、矛盾検出、RU 生成・削除、永続化を独立 resume point として制御する。USE FOR: backlog-review の工程制御。DO NOT USE FOR: 単独起動（backlog-auto stage 3 経由で利用）。"
 ---
 
 # backlog-review workflow スキル
 
-backlog-review command の workflow 実装本体である。
+backlog-review workflow の実装本体である（backlog-auto stage 3 が Workflow Skill 連携で駆動する内部 workflow）。
 `.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/inspect/promoted/*.md` の採用済み成果物を読み込み、分析、統合してユーザーに判定を提示し、承認後に直接 RU（Requirement Unit）を生成する制御構造を所有する。
 backlog-review が docs/knowledge/ への知識文書保存へ処置すると判定した採用済み成果物（source type は問わない）は、利用者承認後に docs/knowledge/ へ直接保存され、RU 化を経ない。docs/knowledge/ への書き込みは git 永続化対象の副作用である。REQ / Decision / Design 反映、ガードレール移管、Project Extension 接続、通常の Issue による修正等の具体的実現先へのルーティングは learning 由来を含めて行わず、システム変更を必要とするものは RU として req-define へ渡す（バックログ統合要件の正規昇華経路規定）。
 ユーザー承認は RU 作成承認を兼ねる。
 
-backlog-review command は公開 interface（入出力契約・ガードレール・RU フォーマット委譲契約）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する（Command / Workflow Skill / Capability Skill 責務3層分化の Decision、バックログ統合要件の成果処理行）。
+backlog-review の呼出元は backlog-auto workflow（stage 3）であり、入出力契約・ガードレール・RU フォーマット委譲契約は本スキルと backlog-review Design が所有する（Command / Workflow Skill / Capability Skill 責務3層分化の Decision、バックログ統合要件の成果処理行）。
 
 ## 入力
 
-- backlog-review command から渡される採用済み成果物（`.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/inspect/promoted/*.md`）
+- backlog-auto stage 3（workflow 連携）から渡される採用済み成果物（`.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/inspect/promoted/*.md`）
 - 引数指定時は指定されたファイルパスのみを対象とする。引数なしの場合は全ディレクトリの採用済み成果物を対象とする
 
 ## 出力

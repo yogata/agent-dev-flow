@@ -18,10 +18,6 @@ rules:
   - id: traceability-check-before-pr
     when: 対象要件の対応関係確認と PR 作成前の対応宣言整合性検査（check）を実施するとき。利用不能時は README 索引、正規成果物の直接読取、rg 等の独立探索手段で続行する
     skill: agentdev-traceability
-  - id: yomiyasu-application-before-write
-    when: >-
-      利用者が yomiyasu 推敲の適用を明示的に指示した場合にのみ適用する（通常フローでは発動しない opt-in 運用。明示指示のない docs/** の日本語文章変更と GitHub 文章〔Issue/PR タイトル・本文、説明・レビュー・完了コメント。委譲先能力スキル経由の書込みを含む〕の agentdev_gh への書込みには自動適用しない）。yomiyasu 推敲の適用手順（編集前読込、推敲タイミング、同梱 lint の実行経路）、適用済みの判定、停止条件、記録様式、推敲の保護条件、書込み guard の拒否対象・許可対象と拒否後の回復（迂回禁止）の規律は、`agentdev-workflow-lifecycle` スキル「文章品質・書込み規約」節を正本として参照する。規則本文を複製しない。実装に伴う docs 変更への適用と、実行担当サブエージェント委譲への適用義務の引継ぎを含む
-    skill: yomiyasu
 
 checks: []
 

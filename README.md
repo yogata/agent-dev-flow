@@ -41,7 +41,5 @@ bun install && bun run build:engine
 | システム仕様 | [system.md](docs/designs/foundations/system.md) |
 | 適用プロジェクトへの導入 | [Consumer Project 導入](docs/guides/consumer-project-setup.md) |
 
-配布コマンドの索引。
-詳細な選び方は上表の[コマンド選択](docs/guides/command-selection.md)、各コマンドの入出力は[コマンドリファレンス](src/common/commands/agentdev/README.md)を参照する。
-
-`/agentdev/req-define`、`/agentdev/backlog-auto`、`/agentdev/case-auto`、`/agentdev/intake-capture`、`/agentdev/intake-from-github`、`/agentdev/intake-triage`、`/agentdev/intake-promote`、`/agentdev/learning-promote`、`/agentdev/backlog-review`、`/agentdev/inspect-docs`、`/agentdev/inspect-skills`、`/agentdev/inspect-promote`、`/agentdev/issue`、`/agentdev/third-party-sync`、`/agentdev/phase-tasks-create`、`/agentdev/phase-tasks-update`、`/agentdev/phase-artifacts-update`、`/agentdev/phase-review`、`/agentdev/phase-transition`
+配布コマンドの索引（要求入口の req-define / backlog-auto、標準実行の case-auto、工程駆動実行の phase 系 5 操作の公開 8 コマンド）。
+コマンドの一覧、入出力、内部 workflow（intake・learning・inspect 系、backlog-review、case 系内部 lifecycle 段階）の対応は、正規参照表である[コマンドリファレンス](src/common/commands/agentdev/README.md)を参照する。詳細な選び方は上表の[コマンド選択](docs/guides/command-selection.md)を参照する。

@@ -1,6 +1,6 @@
 ✅ backlog-review 完了
 
-完了コマンド:/agentdev/backlog-review
+完了ワークフロー:backlog-review workflow（backlog-auto stage 3）
 対象: 採用済み成果物 {promoted_count}件（intake: {intake_count}, learning: {learning_count}）
 結果:
  - 分析完了: {analyzed_count}件

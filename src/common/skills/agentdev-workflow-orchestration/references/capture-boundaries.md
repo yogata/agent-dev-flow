@@ -11,7 +11,7 @@ AgentDevFlow コマンド群における Intake/ Learning キャプチャの責�
 
 - **性質**: 積み残し作業、バグ、設定不備、ドキュメント矛盾など、具体的なアクションアイテム
 - **保存先**: `.agentdev/intake/inbox/`（Intake ワークフロー経由のみ）
-- **後続ルート**: `/agentdev/intake-promote` → `/agentdev/backlog-review` → RU
+- **後続ルート**: intake-promote workflow → backlog-review workflow → RU（backlog-auto が駆動）
 
 ### Learning 候補
 
@@ -19,7 +19,7 @@ AgentDevFlow コマンド群における Intake/ Learning キャプチャの責�
 
 - **性質**: 予防策、判断ミスの分析、手順漏レの気づきなど、汎用的な知見
 - **保存先**: `.agentdev/learning/inbox/`（learning-capture スキル経由のみ）
-- **後続ルート**: `/agentdev/learning-promote` → `/agentdev/backlog-review` → RU
+- **後続ルート**: learning-promote workflow → backlog-review workflow → RU（backlog-auto が駆動）
 
 ## 分割ルール（観測の分割）
 

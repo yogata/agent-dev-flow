@@ -115,7 +115,7 @@ IR エントリ一覧は rules/index.ts のレジストリから `generate_index
 
 ### IR-019, IR-022, IR-026, IR-036: inspect-docs 移管（retired REQ-028-007（後継は DEC-006/REQ-036 系）、OU-006 Phase 5）
 
-> **docs-check 除外・inspect-docs 移管（2026-08-11）**: 4件の意味判断系 IR を docs-check（機械検出層）から除外し、inspect/diagnostics 層（`/agentdev/inspect-docs`、`/agentdev/inspect-skills`）へ移管した。文意品質の意味診断は docs 横断診断・inspect 系診断が、文章表層品質は textlint 共通基盤が担う（retired REQ-028-007（後継は DEC-006/REQ-036 系）、Phase 3 §5.2、§4.3）。
+> **docs-check 除外・inspect-docs 移管（2026-08-11）**: 4件の意味判断系 IR を docs-check（機械検出層）から除外し、inspect/diagnostics 層（inspect-docs workflow、Capability `agentdev-inspect-skills` の診断観点）へ移管した。文意品質の意味診断は docs 横断診断・inspect 系診断が、文章表層品質は textlint 共通基盤が担う（retired REQ-028-007（後継は DEC-006/REQ-036 系）、Phase 3 §5.2、§4.3）。
 > 意味判断・文脈判断を必要とする検査は機械検出層が保持せず、意味的診断層が担う（3層検出構造、`integrity-contracts.md`「3層検出構造の責務分担」）。
 > catalog↔実装双方向同期運用手順（REQ-010-003）に従い、当該 IR エントリを物理削除した。
 

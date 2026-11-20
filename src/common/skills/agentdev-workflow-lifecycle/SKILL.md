@@ -129,27 +129,27 @@ promote 系コマンド（intake-promote・learning-promote・inspect-promote）
 自律確定はユーザー承認の擬制ではなく、保留・未処理の対象を自動削除しない安全境界は維持する。
 自律確定可否の詳細判定（確定権限3分類〔正規契約からの導出・委譲された裁量・人間に留保された判断〕の判定表、人間判断への引き上げ条件）は responsibility-boundaries Design（extension 経由で解決）「ADF判断アーキテクチャ詳細基準」節が集約所有し、本節と各 command 定義・Workflow Skill は判定表を複製しない。
 
-### inspect-* コマンド選択 routing
+### inspect 系診断の選択 routing
 
-変更ファイル種別に基づき、実行する inspect-* コマンドを選ぶ。inspect-docs と inspect-skills は配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）の検出対象が一部重複する（inspect-docs の配布物整合性検査、inspect-skills の配布物構文健全性・責務整合診断）。変更範囲に応じて振り分けることで重複検出を防ぐ。
+変更ファイル種別に基づき、実行する診断を選ぶ。docs の意味診断は inspect-docs workflow（backlog-auto stage 1）が、配布物（`.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`）の構文健全性・責務整合は docs-check・検証エンジンの機械検査が担う（Capability Skill `agentdev-inspect-skills` の診断観点は機械検査を補完する知識源）。変更範囲に応じて振り分けることで重複検出を防ぐ。
 
-| 変更ファイル種別 | 実行コマンド |
+| 変更ファイル種別 | 実行診断 |
 |------|------|
 | docs の requirements・decisions 配下の文書 | inspect-docs |
 | docs の designs 配下の Design（command Design・skill Design 配下を除く） | inspect-docs |
 | docs の guides 配下の文書、README.md | inspect-docs |
-| `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md` | inspect-skills |
-| `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md`（実行時プロジェクション） | inspect-skills |
-| docs の designs 配下の command Design・skill Design 配下 | inspect-skills |
-| 上記両方（docs と command/skill にまたがる変更） | inspect-docs を先に実行し、続けて inspect-skills を実行 |
+| `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md` | docs-check・検証エンジンの機械検査 |
+| `.opencode/commands/**/*.md`、`.opencode/skills/**/*.md`（実行時プロジェクション） | docs-check・検証エンジンの機械検査 |
+| docs の designs 配下の command Design・skill Design 配下 | inspect-docs |
+| 上記両方（docs と command/skill にまたがる変更） | 両方（inspect-docs と docs-check）を実行 |
 
-振り分けは実行コマンド選択の目安であり、各コマンドの検出対象（既定のスキャン範囲）は変更しない。
-配布物のみの変更時は inspect-skills を優先する。
+振り分けは診断選択の目安であり、各診断の検出対象（既定のスキャン範囲）は変更しない。
+配布物のみの変更時は docs-check を優先する。
 
 ## 文章品質・書込み規約（反復規則の単一正本）
 
-本節は、case 系 workflow 拡張（agentdev-workflow-case-auto、case-open、case-ready、case-revise、case-run、case-close、workflow-issue の project extension rules）に反復していた文章品質規則（yomiyasu 推敲と書込み guard の説明）の本文の正本である。
-各 workflow 拡張と工程側 references は対象範囲と呼出条件のみを保持し、本節への名レベル参照により規則本文を消費する。規則本文を各ファイルへ複製しない。本節の配置変更は公開契約の変更として扱う。
+本節は、case 系 workflow（agentdev-workflow-case-auto、case-open、case-ready、case-revise、case-run、case-close、workflow-issue）で適用する文章品質規則（yomiyasu 推敲と書込み guard の説明）の本文の正本である。
+各 workflow の project extension rules に反復していた規則エントリは Phase B（extensions 抜本縮減）で除去され、本節が規則の唯一の実装点である。工程側 references は対象範囲と呼出条件のみを保持し、本節への名レベル参照により規則本文を消費する。規則本文を各ファイルへ複製しない。本節の配置変更は公開契約の変更として扱う。
 
 ### yomiyasu 推敲の適用規律
 

@@ -58,7 +58,7 @@ strict（参照切れは broken-reference として即時修正対象）
 3. executable detector: `checkReferencePaths`（`src/common/skills/repo-agentdev-integrity/rules/reference-path-core.ts`。他検出との共有 detector）
 4. regression test: `check_reference_paths.test.ts`（正常/異常 fixture を同一ケースで保持）
 5. execution route: docs-check（`/repo/docs-check` → 検証エンジン cli.ts、full-audit / --changed で到達可能）
-6. finding route: intake（`/agentdev/intake-capture`）
+6. finding route: intake（会話経由の intake capture。`agentdev-intake-pipeline` スキル）
 7. 他 IR 非包含: IR-008（SKILL.md の references/ 実在）、IR-013（completion-reports/ 種別パス）、IR-055（docs パス系の導入先未解決参照）はいずれも本 invariant と独立
 8. severity / gate_level 実行可能性: strict / full-audit + delta-guard により機械判定で完結する
 

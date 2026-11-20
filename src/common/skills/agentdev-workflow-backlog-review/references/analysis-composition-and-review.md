@@ -19,7 +19,7 @@
 
 ### Input Resolution
 
-- backlog-review command から渡される引数（ファイルパス指定）の有無（durable state 最優先は promoted/ 実ファイル）
+- backlog-auto stage 3（workflow 連携）で渡される引数（ファイルパス指定）の有無（durable state 最優先は promoted/ 実ファイル）
 - ドメイン状態永続化プロシージャは `agentdev-git-worktree` に従う
 
 ### Preconditions
