@@ -16,6 +16,7 @@ import { describe, expect, test, beforeEach, afterEach } from "bun:test";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
+import { spawn, type ChildProcess } from "child_process";
 import {
   computeSha256,
   buildArchiveFromBlobs,
@@ -25,6 +26,8 @@ import { verifyArchive } from "./archive-verify.ts";
 import {
   prepareStagedArchive,
   publishStagedArchive,
+  ArchiveBuilderError,
+  type StagedArchive,
 } from "./archive-publish.ts";
 
 const EXTERNAL_PROCESS_TIMEOUT_MS = 60000;
@@ -262,6 +265,135 @@ describe("archive-builder / shell-injection resistance (parent defect #2)", () =
     ];
     expect(() => buildArchiveFromBlobs(malicious, path.join(TMP_ROOT, "inj-stage-2"))).toThrow();
   });
+});
+
+describe("publish / atomic no-overwrite publication (TOCTOU)", () => {
+  test("pre-existing final bytes are NOT overwritten when publication runs", () => {
+    // A competing process creates `finalPath` between the existence check
+    // and the publish primitive. linkSync atomically fails EEXIST whenever
+    // the destination exists at the moment of the call, so pre-creating
+    // the sentinel reproduces the race deterministically.
+    const outputRoot = fs.mkdtempSync(path.join(os.tmpdir(), "trust-toctou-"));
+    try {
+      const stage = prepareStagedArchive(
+        [{ archivePath: "a.md", bytes: new TextEncoder().encode("# staged\n") }],
+        outputRoot,
+      );
+      const finalPath = path.join(outputRoot, "final.zip");
+      const sentinel = Buffer.from("PRE-EXISTING-FROM-TOCTOU-RACE");
+      fs.writeFileSync(finalPath, sentinel);
+      expect(() => publishStagedArchive(stage, finalPath, outputRoot)).toThrow(ArchiveBuilderError);
+      const after = fs.readFileSync(finalPath);
+      expect(after.equals(sentinel)).toBe(true);
+    } finally {
+      try { fs.rmSync(outputRoot, { recursive: true, force: true }); } catch { /* */ }
+    }
+  });
+});
+
+describe("publish / post-link cleanup failure is non-fatal", () => {
+  test("publish returns success when stage.cleanup() throws after successful link", () => {
+    // The link (publication linearization point) already succeeded, so a
+    // cleanup failure MUST NOT surface as an error: nonzero exit must mean
+    // "no newly-published archive".
+    const outputRoot = fs.mkdtempSync(path.join(os.tmpdir(), "trust-post-link-"));
+    try {
+      const realStage = prepareStagedArchive(
+        [{ archivePath: "a.md", bytes: new TextEncoder().encode("# staged\n") }],
+        outputRoot,
+      );
+      const finalPath = path.join(outputRoot, "final.zip");
+      const stageWithFailingCleanup: StagedArchive = {
+        stagedZip: realStage.stagedZip,
+        stageDir: realStage.stageDir,
+        cleanup: (): never => {
+          throw new Error("intentional cleanup failure");
+        },
+      };
+      expect(() => publishStagedArchive(stageWithFailingCleanup, finalPath, outputRoot)).not.toThrow();
+      expect(fs.existsSync(finalPath)).toBe(true);
+      const content = fs.readFileSync(finalPath);
+      expect(content.length).toBeGreaterThan(0);
+      expect(content[0]).toBe(0x50); // 'P'
+      expect(content[1]).toBe(0x4b); // 'K'
+    } finally {
+      try { fs.rmSync(outputRoot, { recursive: true, force: true }); } catch { /* */ }
+    }
+  });
+});
+
+describe("true two-process publication race", () => {
+  test("two concurrent workers: exactly one wins, one EEXIST loser, verified archive, no residue", async () => {
+    const sharedRoot = fs.mkdtempSync(path.join(os.tmpdir(), "trust-race-"));
+    const finalName = "final.zip";
+    const finalPath = path.join(sharedRoot, finalName);
+    const ready1 = path.join(sharedRoot, "ready1");
+    const ready2 = path.join(sharedRoot, "ready2");
+    const goFile = path.join(sharedRoot, "go");
+    const result1 = path.join(sharedRoot, "result1");
+    const result2 = path.join(sharedRoot, "result2");
+    const worker = path.join(__dirname, "concurrent-publish.test-worker.ts");
+
+    const procs: ChildProcess[] = [];
+    const cleanupAll = (): void => {
+      for (const p of procs) {
+        try { p.kill("SIGKILL"); } catch (e) { void e; }
+      }
+      try { fs.rmSync(sharedRoot, { recursive: true, force: true }); } catch (e) { void e; }
+    };
+
+    try {
+      const p1 = spawn("bun", [worker, sharedRoot, finalName, ready1, goFile, result1]);
+      const p2 = spawn("bun", [worker, sharedRoot, finalName, ready2, goFile, result2]);
+      procs.push(p1, p2);
+
+      const exitP1 = new Promise<number>((resolve, reject) => {
+        p1.on("exit", (c) => resolve(c ?? -1));
+        p1.on("error", (e) => reject(e));
+      });
+      const exitP2 = new Promise<number>((resolve, reject) => {
+        p2.on("exit", (c) => resolve(c ?? -1));
+        p2.on("error", (e) => reject(e));
+      });
+
+      const readyDeadline = Date.now() + 60000;
+      while ((!fs.existsSync(ready1) || !fs.existsSync(ready2)) && Date.now() < readyDeadline) {
+        await new Promise<void>((r) => setTimeout(r, 100));
+      }
+      expect(fs.existsSync(ready1)).toBe(true);
+      expect(fs.existsSync(ready2)).toBe(true);
+
+      fs.writeFileSync(goFile, "GO");
+
+      const [exit1, exit2] = await Promise.race([
+        Promise.all([exitP1, exitP2]),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timeout")), 30000)),
+      ]);
+
+      const codes = [exit1, exit2].sort();
+      expect(codes).toEqual([0, 3]);
+
+      expect(fs.existsSync(finalPath)).toBe(true);
+
+      const r1 = fs.readFileSync(result1, "utf-8");
+      const r2 = fs.readFileSync(result2, "utf-8");
+      const results = [r1, r2].sort();
+      expect(results[0]).toMatch(/FAIL:.*pre-existing/i);
+      expect(results[1]).toBe("OK");
+
+      const blobBytes = new TextEncoder().encode("# staged blob\n");
+      const expectedEntries = [
+        { path: "a.md", sha256: computeSha256(blobBytes), size: blobBytes.length },
+      ];
+      const verifyResult = verifyArchive(finalPath, expectedEntries);
+      expect(verifyResult.ok).toBe(true);
+
+      const entries = fs.readdirSync(sharedRoot).filter((e) => e.startsWith(".trust-stage-"));
+      expect(entries).toEqual([]);
+    } finally {
+      cleanupAll();
+    }
+  }, 120000);
 });
 
 // Helper: zip a directory's CONTENTS (not the dir itself) for the

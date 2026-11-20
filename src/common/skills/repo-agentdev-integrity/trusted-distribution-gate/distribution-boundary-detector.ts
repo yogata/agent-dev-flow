@@ -35,13 +35,10 @@ import {
 
 export {
   GENERIC_ID_PATTERN,
-  CONCRETE_ID_PATTERN,
   DOCS_PATH_PATTERN,
   DOCS_PATH_PERCENT_PATTERN,
   URL_CANDIDATE_PATTERN,
   ID_EVASION_PATTERN,
-  FIXED_URL_PATTERN,
-  RAW_FIXED_URL_PATTERN,
   normalizePathToken,
   stripQueryAndFragment,
   isConcreteDocsPath,

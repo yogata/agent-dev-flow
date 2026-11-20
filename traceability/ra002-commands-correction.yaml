@@ -1,17 +1,5 @@
 component: ra002-commands-correction
 implementation:
-  src/common/commands/agentdev/intake-promote.md:
-  - REQ-096-018
-  - REQ-096-023
-  src/common/commands/agentdev/learning-promote.md:
-  - REQ-096-018
-  - REQ-096-023
-  src/common/commands/agentdev/inspect-promote.md:
-  - REQ-096-018
-  - REQ-096-023
-  src/common/commands/agentdev/backlog-review.md:
-  - REQ-096-020
-  - REQ-096-023
   src/common/commands/agentdev/README.md:
     - REQ-096-023
     - REQ-111-009

@@ -1,5 +1,8 @@
 import { test, expect, describe } from "bun:test";
-import { extractKnownGapNumbers, nextReqNumber, formatReqId } from "../src/alloc-req-number.ts";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { collectExistingReqNumbers, extractKnownGapNumbers, nextReqNumber, formatReqId } from "../src/alloc-req-number.ts";
 
 describe("nextReqNumber", () => {
   test("returns 1 for empty list", () => {
@@ -85,5 +88,22 @@ describe("extractKnownGapNumbers code fence awareness (節範囲特定はコー�
       "## 採番ミスの是正",
     ].join("\n");
     expect(extractKnownGapNumbers(policy)).toEqual([92]);
+  });
+});
+
+describe("collectExistingReqNumbers (numbering-policy.md: 現行ファイル群は retired/ を含む)", () => {
+  test("retired/ 配下の REQ 番号も収集対象に数える", () => {
+    const root = mkdtempSync(join(tmpdir(), "alloc-req-retired-"));
+    try {
+      writeFileSync(join(root, "REQ-005.md"), "---\nid: REQ-005\n---\n本文\n");
+      writeFileSync(join(root, "notes.md"), "---\nid: REQ-007\n---\n本文\n");
+      mkdirSync(join(root, "retired"));
+      writeFileSync(join(root, "retired", "REQ-042.md"), "---\nid: REQ-042\n---\n本文\n");
+      writeFileSync(join(root, "retired", "old-notes.md"), "---\nid: REQ-009\n---\n本文\n");
+      const numbers = collectExistingReqNumbers(root);
+      expect(numbers.sort((a, b) => a - b)).toEqual([5, 7, 9, 42]);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
   });
 });

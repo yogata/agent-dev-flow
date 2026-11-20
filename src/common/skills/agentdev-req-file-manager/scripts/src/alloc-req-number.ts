@@ -1,7 +1,9 @@
 /**
  * REQ番号採番スクリプト（「Script 所有権と委譲契約」に基づく本 skill 正規所有）。
  *
- * 既存の REQ ファイル群から最大番号を特定し、その +1 を採番する。
+ * 既存の REQ ファイル群（retired/ 配下を含む。numbering-policy.md
+ * 「新規識別子は、当該種別の現行ファイル群（retired/ を含む）の最大番号に 1 を
+ * 加えた値とする」）から最大番号を特定し、その +1 を採番する。
  * あわせて既知欠番レジストリ（docs/designs/foundations/numbering-policy.md
  * 「既知の欠番」節の `REQ-NNN:` 行頭エントリ）を読み込み、現行ファイル群の
  * 最大番号が既知欠番を下回る場合も既知欠番を埋めない
@@ -95,28 +97,41 @@ export function formatReqId(n: number): string {
   return `REQ-${pad3(n)}`;
 }
 
+/**
+ * 当該種別の現行ファイル群（retired/ を含む）から既存 REQ 番号を収集する
+ * （numbering-policy.md「新規識別子は、当該種別の現行ファイル群（retired/ を含む）
+ * の最大番号に 1 を加えた値とする」準拠）。
+ * 各ファイルはファイル名由来（REQ-NNNN.md）を優先し、ファイル名が形式に合わない
+ * 場合は frontmatter id 由来でフォールバックする。
+ */
+export function collectExistingReqNumbers(dir: string): number[] {
+  const numbers: number[] = [];
+  for (const target of [dir, joinPath(dir, "retired")]) {
+    for (const filename of listMarkdownFiles(target)) {
+      // ファイル名由来
+      const fromName = reqNumberFromFilename(filename);
+      if (fromName !== null) {
+        numbers.push(fromName);
+        continue;
+      }
+      // frontmatter id 由来（ファイル名が REQ-NNNN.md でない場合のフォールバック）
+      const content = readFileContent(joinPath(target, filename));
+      const fm = parseFrontmatterForReq(content);
+      if (fm !== null) {
+        numbers.push(fm);
+      }
+    }
+  }
+  return numbers;
+}
+
 async function main(): Promise<void> {
   const dir = process.argv[2];
   if (!dir) {
     emitError("Usage: alloc-req-number <req-dir>");
   }
 
-  const files = listMarkdownFiles(dir!);
-  const numbers: number[] = [];
-  for (const filename of files) {
-    // ファイル名由来
-    const fromName = reqNumberFromFilename(filename);
-    if (fromName !== null) {
-      numbers.push(fromName);
-      continue;
-    }
-    // frontmatter id 由来（ファイル名が REQ-NNNN.md でない場合のフォールバック）
-    const content = readFileContent(joinPath(dir!, filename));
-    const fm = parseFrontmatterForReq(content);
-    if (fm !== null) {
-      numbers.push(fm);
-    }
-  }
+  const numbers = collectExistingReqNumbers(dir!);
 
   const max = safeMax(numbers);
   const gapNumbers = await loadKnownGapNumbers(dir!);

@@ -922,6 +922,34 @@ verification:
   - REQ-117-012
   - REQ-117-014
   - REQ-117-015
+  # 区分C 追加（2026-11-20、Phase C 最終リファクタリング: 墓標テスト・LLM 文書への
+  # 固定ピンテストの削除に伴う登録）。abolished_asset_removal.test.ts（廃止済み資産の不在監視）
+  # および definition-realization-contract-pins.test.ts（Markdown 文言ピン）が唯一の検証対応だった行。
+  # 検証は当該テスト削除時点（Phase C PR）の一回限りの突合で補完され、恒常 checker を持たない。
+  # 2026-11-11・2026-11-18 の区分C 登録と同一判断（削除済み恒常 checker 行の区分明示）に従う。
+  - REQ-004-064
+  - REQ-004-065
+  - REQ-030-031
+  - REQ-031-036
+  - REQ-032-040
+  - REQ-032-041
+  - REQ-034-048
+  - REQ-052-016
+  - REQ-052-017
+  - REQ-062-010
+  - REQ-115-001
+  - REQ-115-002
+  - REQ-115-003
+  - REQ-116-001
+  - REQ-116-002
+  - REQ-116-003
+  - REQ-116-004
+  - REQ-116-005
+  - REQ-122-002
+  - REQ-122-004
+  # REQ-122-013 は Phase B（#4165）の intake-triage 統合削除で verification 成果物
+  # （agentdev-workflow-intake-triage sidecar エントリ）が消失した行の追加登録。
+  - REQ-122-013
 
 design:
   default: required

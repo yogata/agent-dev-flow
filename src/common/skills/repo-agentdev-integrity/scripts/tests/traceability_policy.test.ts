@@ -5,10 +5,10 @@
 // 未指定行 = required、明示登録行 = optional、policy 不在時は全行 required で
 // 実行時エラーで停止しないこと、policy 構文不正・schema 不適合の検出、
 // 要否判定不能時の fail-closed（unavailable）、optional 列挙の未知行の安全側除外、
-// 未分類中間状態（classification）の不在を検証する。
+// design・implementation 軸の optional 区分機構（REQ-021-031・REQ-021-032）を検証する。
 
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { scanCorpus } from "../../../../skills/agentdev-traceability/scripts/lib/corpus.ts";
 import { runChecks } from "../../../../skills/agentdev-traceability/scripts/lib/check.ts";
@@ -169,6 +169,13 @@ describe("optional 列挙の未知行（REQ-012-047 の policy 面）", () => {
     ]);
     // 判定自体は継続可能のため unavailable にはしない
     expect(resolved.unavailable).toBe(false);
+    // check 結合面: 未知行は unknown-req-refs 検査の findings に policy.yaml 由来で計上される
+    const report = runChecks(scanCorpus(ROOT), KNOWN, { verificationPolicy: resolved });
+    expect(report.checks["unknown-req-refs"].status).toBe("fail");
+    const policyRef = report.checks["unknown-req-refs"].findings.find(
+      (f) => f.reqId === "REQ-900-999",
+    );
+    expect(policyRef?.file).toBe("traceability/policy.yaml");
   });
 });
 
@@ -187,6 +194,7 @@ describe("policy 解決と check の結合（fail-closed 面）", () => {
     ]);
     writeFixture("complete/verify.ts", [tsDecl("verification", KNOWN.join(", "))]);
     const report = runChecks(scanCorpus(ROOT), KNOWN, { verificationPolicy: resolved });
+    expect(report.checks["policy-invalid"].status).toBe("fail");
     expect(report.checks["missing-design"].status).toBe("pass");
     expect(report.checks["missing-implementation"].status).toBe("pass");
     expect(report.checks["missing-verification"].status).toBe("fail");
@@ -253,38 +261,165 @@ describe("policy 解決と check の結合（fail-closed 面）", () => {
   });
 });
 
-describe("旧カタログ機構の不在（RA-002）", () => {
-  it("旧検証対応要否カタログ（verification-scope-catalog.md）を参照する解決器は存在しない", () => {
-    const libDir = join(
-      REPO_ROOT,
-      "src",
-      "common",
-      "skills",
-      "agentdev-traceability",
-      "scripts",
-      "lib",
-    );
-    const scopeSource = readFileSync(join(libDir, "verification_scope.ts"), "utf-8");
-    expect(scopeSource.includes("verification-scope-catalog")).toBe(false);
-    expect(scopeSource.includes("任意行エントリ")).toBe(false);
-    expect(existsSync(join(libDir, "classification.ts"))).toBe(false);
+describe("policy 軸拡張: design・implementation optional 区分機構（REQ-021-031・REQ-021-032）", () => {
+  // fixture はファイル単位で蓄積されるため、軸拡張の検証は本 describe 専用の
+  // 独立要件行（REQ-905-NNN。先行テスト・retired fixture 番号と非衝突）で行う。
+  // policy 解決の unknown-req-ref 検査に通すため現行要件集合へ加えて渡す。
+  const AXIS_REQ = (n: string) => `REQ-905-${n}`;
+  const AXIS_KNOWN = ["REQ-905-001", "REQ-905-002", "REQ-905-003", "REQ-905-004"];
+  const axisRootKnown = (): string[] => [...KNOWN, ...AXIS_KNOWN];
+  beforeAll(() => {
+    writeFixture("docs/requirements/REQ-905.md", [
+      "---",
+      "id: REQ-905",
+      "---",
+      "",
+      "## 要件",
+      "",
+      "| ID | 要件 |",
+      "|---|---|",
+      "| REQ-905-001 | 例 |",
+      "| REQ-905-002 | 例 |",
+      "| REQ-905-003 | 例 |",
+      "| REQ-905-004 | 例 |",
+    ]);
   });
 
-  it("未分類中間状態を導出する分類モデルは存在しない（REQ-012-051）", () => {
-    const checkSource = readFileSync(
-      join(
-        REPO_ROOT,
-        "src",
-        "common",
-        "skills",
-        "agentdev-traceability",
-        "scripts",
-        "lib",
-        "check.ts",
-      ),
-      "utf-8",
+  it("design.optional 登録行は missing-design から除外され、他軸は必須のまま", () => {
+    writePolicy([
+      "verification:",
+      "  default: required",
+      "design:",
+      "  default: required",
+      "  optional:",
+      `    - ${AXIS_REQ("001")}`,
+    ]);
+    const resolved = resolveVerificationPolicyFromRoot(ROOT, axisRootKnown());
+    expect([...resolved.designOptionalReqIds]).toEqual(["REQ-905-001"]);
+    const report = runChecks(scanCorpus(ROOT), KNOWN, {
+      completenessReqIds: ["REQ-905-001"],
+      verificationPolicy: resolved,
+    });
+    expect(report.checks["missing-design"].status).toBe("pass");
+    // design 軸のみ登録しても implementation・verification は必須のまま
+    expect(report.checks["missing-implementation"].status).toBe("fail");
+    expect(report.checks["missing-verification"].status).toBe("fail");
+  });
+
+  it("implementation.optional 登録行は missing-implementation から除外される", () => {
+    writePolicy([
+      "verification:",
+      "  default: required",
+      "implementation:",
+      "  default: required",
+      "  optional:",
+      `    - ${AXIS_REQ("002")}`,
+    ]);
+    const resolved = resolveVerificationPolicyFromRoot(ROOT, axisRootKnown());
+    expect([...resolved.implementationOptionalReqIds]).toEqual(["REQ-905-002"]);
+    const report = runChecks(scanCorpus(ROOT), KNOWN, {
+      completenessReqIds: ["REQ-905-002"],
+      verificationPolicy: resolved,
+    });
+    expect(report.checks["missing-implementation"].status).toBe("pass");
+    // implementation 軸のみ登録しても design は必須のまま
+    expect(report.checks["missing-design"].status).toBe("fail");
+  });
+
+  it("policy 未登録行は design・implementation 軸とも対応必須のまま", () => {
+    writePolicy(["verification:", "  default: required"]);
+    const resolved = resolveVerificationPolicyFromRoot(ROOT, axisRootKnown());
+    expect(resolved.designOptionalReqIds.size).toBe(0);
+    expect(resolved.implementationOptionalReqIds.size).toBe(0);
+    const report = runChecks(scanCorpus(ROOT), KNOWN, { completenessReqIds: ["REQ-905-003"], verificationPolicy: resolved });
+    expect(report.checks["missing-design"].findings).toEqual([{ reqId: "REQ-905-003" }]);
+    expect(report.checks["missing-implementation"].findings).toEqual([{ reqId: "REQ-905-003" }]);
+  });
+
+  it("design 軸の unknown-req-ref を unknown-req-refs で検出し、当該行は必須に戻す", () => {
+    writePolicy([
+      "verification:",
+      "  default: required",
+      "design:",
+      "  default: required",
+      "  optional:",
+      "    - REQ-900-996",
+    ]);
+    const resolved = resolveVerificationPolicyFromRoot(ROOT, axisRootKnown());
+    expect(resolved.designOptionalReqIds.size).toBe(0);
+    const report = runChecks(scanCorpus(ROOT), KNOWN, { verificationPolicy: resolved });
+    expect(report.checks["unknown-req-refs"].status).toBe("fail");
+    const policyRef = report.checks["unknown-req-refs"].findings.find((f) => f.reqId === "REQ-900-996");
+    expect(policyRef?.file).toBe("traceability/policy.yaml");
+  });
+
+  it("design 軸の schema 違反（未知キー・default 不正）を policy-invalid で検出する", () => {
+    writePolicy([
+      "verification:",
+      "  default: required",
+      "design:",
+      "  default: optional",
+      "  unknown-key:",
+      `    - ${AXIS_REQ("001")}`,
+    ]);
+    const resolved = resolveVerificationPolicyFromRoot(ROOT, axisRootKnown());
+    expect(resolved.unavailable).toBe(true);
+    const report = runChecks(scanCorpus(ROOT), KNOWN, { verificationPolicy: resolved });
+    expect(report.checks["policy-invalid"].status).toBe("fail");
+    expect(report.checks["policy-invalid"].findings).toHaveLength(2);
+  });
+
+  it("policy 解決不能時は optional 登録を読めないため該当行は対応必須に戻る（安全側既定）", () => {
+    writePolicy([
+      "verification:",
+      "  default: required",
+      "design:",
+      "  default: required",
+      "  optional:",
+      `    - ${AXIS_REQ("004")}`,
+    ]);
+    writeFixture("axis/policy-unavailable-marker.md", [""]);
+    const resolved = resolveVerificationPolicyFromRoot(ROOT, axisRootKnown());
+    expect([...resolved.designOptionalReqIds]).toEqual(["REQ-905-004"]);
+    const okReport = runChecks(scanCorpus(ROOT), KNOWN, {
+      completenessReqIds: ["REQ-905-004"],
+      verificationPolicy: resolved,
+    });
+    expect(okReport.checks["missing-design"].status).toBe("pass");
+    // policy を破損させて解決不能にすると、登録は読めず対応必須に戻る
+    rmSync(join(ROOT, "traceability", "policy.yaml"), { recursive: true, force: true });
+    mkdirSync(join(ROOT, "traceability", "policy.yaml"), { recursive: true });
+    const broken = resolveVerificationPolicyFromRoot(ROOT, axisRootKnown());
+    expect(broken.unavailable).toBe(true);
+    const brokenReport = runChecks(scanCorpus(ROOT), KNOWN, {
+      completenessReqIds: ["REQ-905-004"],
+      verificationPolicy: broken,
+    });
+    expect(brokenReport.checks["missing-design"].status).toBe("fail");
+    expect(brokenReport.checks["missing-verification"].status).toBe("fail");
+  });
+
+  it("parseVerificationPolicy は verification・design・implementation の3軸を解析する", () => {
+    const parsed = parseVerificationPolicy(
+      [
+        "verification:",
+        "  default: required",
+        "  optional:",
+        "    - REQ-900-001",
+        "design:",
+        "  optional:",
+        "    - REQ-900-002",
+        "implementation:",
+        "  default: required",
+        "  optional:",
+        "    - REQ-900-003",
+        "    - REQ-900-004",
+      ].join("\n"),
     );
-    expect(checkSource.includes("unclassified")).toBe(false);
-    expect(checkSource.includes("verificationClassification")).toBe(false);
+    expect(parsed.issues).toEqual([]);
+    expect(parsed.unavailable).toBe(false);
+    expect([...parsed.optionalReqIds]).toEqual(["REQ-900-001"]);
+    expect([...parsed.designOptionalReqIds]).toEqual(["REQ-900-002"]);
+    expect([...parsed.implementationOptionalReqIds]).toEqual(["REQ-900-003", "REQ-900-004"]);
   });
 });

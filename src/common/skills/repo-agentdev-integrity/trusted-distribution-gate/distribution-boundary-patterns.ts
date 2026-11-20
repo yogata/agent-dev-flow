@@ -22,11 +22,6 @@ import type { RepositoryIdentity } from "./distribution-boundary-detector.ts";
 // marker breaks the word boundary and the placeholder forms have no digits.
 export const GENERIC_ID_PATTERN = /\b([A-Z]{2,})-(\d{1,})\b/g;
 
-// Legacy alias: closed-list pattern is kept as a deprecated re-export so the
-// existing checker adapter continues to compile. The actual extractor uses
-// GENERIC_ID_PATTERN.
-export const CONCRETE_ID_PATTERN = GENERIC_ID_PATTERN;
-
 // Docs path token: slash, backslash, or percent-encoded separator. Captures
 // the broad token; resolution normalizes and inspects the trailing portion.
 // Query and fragment separators terminate the path token.
@@ -45,9 +40,6 @@ export const DOCS_PATH_PERCENT_PATTERN =
 // under-match is the bypass we guard against.
 export const URL_CANDIDATE_PATTERN =
   /(?:github\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+\/(?:blob|raw)\/|raw\.githubusercontent\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+\/)[^\s)\]\\"'`<>{}]+/gi;
-
-export const FIXED_URL_PATTERN = URL_CANDIDATE_PATTERN;
-export const RAW_FIXED_URL_PATTERN = URL_CANDIDATE_PATTERN;
 
 // Evasion pattern: catches UPPER-prefix + hyphen followed by an escape
 // sequence (\\uXXXX, \\xXX, or 0xXX) instead of literal digits. The raw-digit

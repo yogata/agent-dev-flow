@@ -1,17 +1,18 @@
-// ADF-COVERS(verification): REQ-012-053
-//
 // agentdev-traceability 配布スキルの sidecar 読込と種別非依存走査の検証
 // （TS-002、TS-005）。top-level traceability/ 配下の component / package 単位
 // sidecar が artifact パス・role・要件行 ID のみの最小データで対応関係を解決
 // できること（専用 ID・digest 不在でエラーにならない）、.md / .ts 以外の拡張子
 // を持つ成果物が sidecar から参照され拡張子フィルタで除外されないこと、
 // policy.yaml が sidecar 走査から除外されることを検証する。
+// verification 対応は導出規約（traceability/derivations.yaml）が
+// import 実測から導出する（lib/sidecar.ts・lib/corpus.ts・lib/check.ts の対応宣言）。
 
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { scanCorpus } from "../../../../skills/agentdev-traceability/scripts/lib/corpus.ts";
 import { runChecks } from "../../../../skills/agentdev-traceability/scripts/lib/check.ts";
+import { parseSidecar } from "../../../../skills/agentdev-traceability/scripts/lib/sidecar.ts";
 import { coverageByRequirement, impactByArtifact } from "../../../../skills/agentdev-traceability/scripts/lib/query.ts";
 import { POLICY_FILE_REL } from "../../../../skills/agentdev-traceability/scripts/lib/corpus.ts";
 
@@ -167,5 +168,46 @@ describe("種別非依存の対応関係（TS-005）", () => {
     expect(scan.sidecarMissingArtifacts).toEqual([
       { artifact: "bin/tool.exe", sidecarFile: "traceability/missing-ext.yaml" },
     ]);
+  });
+});
+
+describe("sidecar の解析（parseSidecar 単体）", () => {
+  it("最小データ（artifact パス、role、要件行 ID のみ）で対応関係を正規化する（TS-002）", () => {
+    const parsed = parseSidecar(
+      "traceability/minimal.yaml",
+      ["component: minimal", "implementation:", "  src/min.ts:", "    - REQ-900-001"].join("\n"),
+    );
+    expect(parsed.issues).toEqual([]);
+    expect(parsed.component).toBe("minimal");
+    expect(parsed.relations).toEqual([
+      { role: "implementation", artifact: "src/min.ts", reqIds: ["REQ-900-001"] },
+    ]);
+  });
+
+  it("artifact パスを複数 role 配下へ重複させられる（同一 role 内重複は schema 違反対象）", () => {
+    const parsed = parseSidecar(
+      "traceability/multi-role.yaml",
+      [
+        "component: multi",
+        "implementation:",
+        "  src/dual.ts:",
+        "    - REQ-900-001",
+        "verification:",
+        "  src/dual.ts:",
+        "    - REQ-900-001",
+      ].join("\n"),
+    );
+    expect(parsed.issues).toEqual([]);
+    expect(parsed.relations).toHaveLength(2);
+    const sameRole = parseSidecar(
+      "traceability/dup-role.yaml",
+      [
+        "component: dup",
+        "implementation:",
+        "  src/dup.ts:",
+        "    - REQ-900-001",
+      ].join("\n"),
+    );
+    expect(sameRole.issues).toEqual([]);
   });
 });

@@ -10,6 +10,7 @@
 import { describe, expect, test } from "bun:test";
 import {
   TRUST_ROOT_DIRECT_PATHS,
+  DEFAULT_PROTECTED_PATH_SET,
   listAllProtectedPaths,
   isProtectedPath,
   type ProtectedPathSet,
@@ -61,6 +62,15 @@ describe("protected-paths / TRUST_ROOT_DIRECT_PATHS", () => {
     // recorded separately in the bootstrap digest report.
     const testFiles = TRUST_ROOT_DIRECT_PATHS.filter((p) => p.endsWith(".test.ts"));
     expect(testFiles).toEqual([]);
+    // The two-process race fixture worker is a test runtime, not a
+    // protected distribution runtime.
+    const all = listAllProtectedPaths(DEFAULT_PROTECTED_PATH_SET);
+    expect(all).not.toContain(
+      "src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/concurrent-publish.test-worker.ts",
+    );
+    expect(all).not.toContain(
+      "src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/concurrent-publish-worker.ts",
+    );
   });
 });
 

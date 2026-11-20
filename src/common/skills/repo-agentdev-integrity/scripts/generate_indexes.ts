@@ -474,14 +474,6 @@ export function collectIrFiles(rulesDir: string): IrInfo[] {
 // ─── Catalog 生成 ────────────────────────────────────────────────────────────
 
 /**
- * catalog 用の IR エントリ bullet 行を生成する。
- * 形式: `- [IR-NNN: title](rules/IR-NNN-slug.md)`
- */
-function formatCatalogLine(info: IrInfo): string {
-  return `- [${info.id}: ${info.title}](${info.relPath})`;
-}
-
-/**
  * rules/index.ts のレジストリから catalog の AUTOGEN ブロック本文を生成する
  * （DEC-065 決定3: カタログ自動生成の単一ソース = rules レジストリ）。
  * IR-075 は Wave-4 でルール登録されるため、登録前は 24 構成となる。
@@ -490,26 +482,6 @@ export function generateCatalogEntries(
   rules: readonly { id: string; title: string; slug: string }[],
 ): string[] {
   return rules.map((rule) => `- [${rule.id}: ${rule.title}](rules/IR-${rule.id.slice(3)}-${rule.slug}.md)`);
-}
-
-/**
- * catalog の AUTOGEN ブロック2件（pre/post IR-045）向けにエントリ群を分割生成する。
- * 戻り値: { pre: IR-001..IR-044, post: IR-046..IR-NNN }
- */
-export function generateCatalogBlocks(
-  infos: IrInfo[],
-): { pre: string[]; post: string[] } {
-  const pre: string[] = [];
-  const post: string[] = [];
-  for (const info of infos) {
-    if (info.num < 45) {
-      pre.push(formatCatalogLine(info));
-    } else if (info.num > 45) {
-      post.push(formatCatalogLine(info));
-    }
-    // info.num === 45 はファイル不在のため対象外。
-  }
-  return { pre, post };
 }
 
 // ─── rule-ownership appendix 生成 ─────────────────────────────────────────────
@@ -1143,14 +1115,6 @@ export function generateReadmeReqSummaryCount(args: {
   return [`現行 REQ: ${args.activeReqCount}件、廃止済み: ${args.retiredReqCount}件`];
 }
 
-/**
- * docs/README.md REQ 詳細表（readme-req-summary-table）の生成本体。
- * REQ-057-018 の採用 block ID 群に含まれる。生成元と構造は docs/requirements/README.md
- * の req-active-table と同一（同一 collectReqFiles / 同一 generateReqActiveTable、2列構成）。
- * 表と人手編集領域（説明文）の間は AUTOGEN マーカーで分離する（3領域分離契約）。
- */
-export const README_REQ_SUMMARY_TABLE_GENERATOR = generateReqActiveTable;
-
 // ─── AG-005: docs/README.md Decision 静的表生成 ──────────────────────────────
 
 // docs/README.md「## Decision」セクションの Decision 静的表 AUTOGEN block ID
@@ -1476,7 +1440,7 @@ EXIT CODES:
 
 TARGET FILES (SC-002 Phase C):
   Wave 1:
-    - docs/designs/integrity/integrity-rule-catalog.md (catalog IR entries, 2 blocks around IR-045 gap)
+    - docs/designs/integrity/integrity-rule-catalog.md (catalog IR entries)
     - docs/designs/integrity/rule-ownership.md (IR cross-reference appendix)
   Wave 2 (AG-008/009, DEC-009):
     - docs/decisions/README.md (decision-* baseline/status/retired/related-req blocks; skipped when absent)

@@ -122,13 +122,10 @@ export function decideGate(detections: readonly Detection[]): GateResult {
 // Re-export detector core (patterns, config, classification).
 export {
   GENERIC_ID_PATTERN,
-  CONCRETE_ID_PATTERN,
   DOCS_PATH_PATTERN,
   DOCS_PATH_PERCENT_PATTERN,
   URL_CANDIDATE_PATTERN,
   ID_EVASION_PATTERN,
-  FIXED_URL_PATTERN,
-  RAW_FIXED_URL_PATTERN,
   DEFAULT_REPOSITORY_IDENTITY,
   DEFAULT_DETECTOR_CONFIG,
   normalizePathToken,
