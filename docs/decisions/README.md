@@ -10,19 +10,16 @@
 DEC-018 は欠番であり、対応する Decision ファイルは存在しない。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は54件、提案中の Decision は0件である。
+現行の承認済み Decision は45件、提案中の Decision は0件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
 | Decision番号 | タイトル | ステータス | 作成日 |
 |---------|---------|-----------|--------|
 | DEC-001 | AgentDevFlow 憲章 | accepted | 2026-07-24 |
-| DEC-002 | OpenCode ソース・プロジェクション分離 | superseded | 2026-07-25 |
 | DEC-003 | req_draft ソフトコントラクト原則 | accepted | 2026-07-25 |
 | DEC-004 | 差し替え可能な I/O 境界 | accepted | 2026-07-25 |
-| DEC-005 | Project Extensions Architecture | superseded | 2026-07-25 |
 | DEC-006 | inspect 3-command 構成への正規化 | accepted | 2026-07-27 |
-| DEC-007 | Artifact Graph 標準化と配布スキル昇格 | superseded | 2026-08-08 |
 | DEC-008 | case-auto の限定的親判断解決（bounded parent decision resolution） | accepted | 2026-08-09 |
 | DEC-009 | ADR から Decision への正規成果物モデル移行 | accepted | 2026-08-10 |
 | DEC-010 | Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則 | accepted | 2026-08-10 |
@@ -30,9 +27,7 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 | DEC-012 | Extension を file-kind から workflow/capability responsibility へ再編 | accepted | 2026-08-10 |
 | DEC-013 | IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定 | accepted | 2026-08-11 |
 | DEC-014 | 配布依存境界の多層 enforcement | accepted | 2026-08-11 |
-| DEC-015 | ADF決定論的実行中核と実行基盤実行機構の責務分界 | superseded | 2026-08-15 |
 | DEC-016 | 導入系スクリプトの副作用ゼロ原則 | accepted | 2026-08-15 |
-| DEC-017 | 最小トレーサビリティモデルの採用と Artifact Graph の廃止 | superseded | 2026-08-17 |
 | DEC-019 | 一般処理の標準API委譲とADF固有意味論の所有境界 | accepted | 2026-08-20 |
 | DEC-020 | GitHub Issue 共通管理単位の採用 | accepted | 2026-08-23 |
 | DEC-021 | scripts 公開入口の2本固定と安定契約 | accepted | 2026-08-23 |
@@ -41,14 +36,7 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 | DEC-024 | 変更誘発境界リスク分析の導入と検証契約への投影 | accepted | 2026-08-31 |
 | DEC-025 | プロジェクト知識を Capability Skill から分離し、独立した正規知識層として管理する | accepted | 2026-09-01 |
 | DEC-026 | 実現面変更方針の構造化ハンドオフ（realization_actions） | accepted | 2026-09-03 |
-| DEC-027 | 観測ベース統制縮小評価ループ | accepted | 2026-09-04 |
-| DEC-028 | 文章表層品質の共通実行基盤 | accepted | 2026-09-09 |
-| DEC-029 | 公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入 | superseded | 2026-09-14 |
-| DEC-030 | トレーサビリティ標準機能への一般化と producer / consumer 境界の確立 | superseded | 2026-09-17 |
-| DEC-031 | ADF v4 Standard Operating Model の採用とプロセス・実装の責務分離 | accepted | 2026-09-18 |
 | DEC-032 | ADF 責務の三層モデルと Project Contract の論理ビュー・情報寿命モデル | accepted | 2026-09-18 |
-| DEC-033 | ADF v4 公開運用モデル（UX 2入口収斂・内部 lifecycle・継続コラボレーションループ・学習昇格ガード） | accepted | 2026-09-18 |
-| DEC-034 | v4 の移行・release 標準境界（非破壊移行原則・v4.0.0-rc.1 cutover・self-hosting） | accepted | 2026-09-18 |
 | DEC-035 | v4 Quality / Verification / Evidence / Gate モデルへの分解 | accepted | 2026-09-18 |
 | DEC-036 | 意味 Skill と決定的実装の責務分離および Harness/Backend adapter 境界 | accepted | 2026-09-18 |
 | DEC-037 | Traceability の Change / Evidence 中心への再中心化 | accepted | 2026-09-18 |
@@ -56,11 +44,10 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 | DEC-039 | ADF v4 authority・副作用統制と冪等・並行性モデル | accepted | 2026-09-19 |
 | DEC-041 | Wave 構成純度と実行並列上限の単一所有 | accepted | 2026-09-23 |
 | DEC-042 | case-auto 最大並列維持と同期逐次フォールバック禁止 | accepted | 2026-09-24 |
-| DEC-045 | リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化 | accepted | 2026-09-27 |
 | DEC-047 | textlint 依存実体の版固定情報解決への転換 | accepted | 2026-09-29 |
 | DEC-048 | ADF判断アーキテクチャ: 判断方法・確定権限・人間判断境界の統一モデル | accepted | 2026-10-01 |
 | DEC-049 | ADF 共通原本とホスト接続領域の分離によるマルチホスト配布モデル | accepted | 2026-10-02 |
-| DEC-050 | deleteBranchOnMerge 設定不備の警告化と操作安全性停止の維持 | accepted | 2026-10-04 |
+| DEC-050 | マージ済みリモートブランチの削除と操作安全性 | accepted | 2026-10-04 |
 | DEC-051 | case-auto stage 3 のスロット型キューへの移行（Wave 収束前提の撤廃） | accepted | 2026-10-06 |
 | DEC-053 | ADF v5 工程・成果物モデル（共通責務・参照モデル工程・成果物の意味と正式確定） | accepted | 2026-10-09 |
 | DEC-054 | ADF v5 追跡・品質検証モデル（隣接工程間対応・構造/意味分離・差分影響評価） | accepted | 2026-10-09 |
@@ -68,12 +55,9 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 | DEC-056 | ADF v5 移行と互換性の境界（後方互換非必須・意味保存移行・未処理改善情報の継続） | accepted | 2026-10-09 |
 | DEC-057 | 工程駆動コラボレーションモデル（検討テーマ・外部検討・段階形成）の採用 | accepted | 2026-10-12 |
 | DEC-058 | 工程遷移と双経路併存モデルの採用（REQ-005-001/010/011 改訂を含む） | accepted | 2026-10-12 |
-| DEC-059 | backlog-auto 一気通貫実行のパッチリリース規則 | accepted | 2026-10-15 |
-| DEC-060 | ADF本体の GitHub Release 記録と公開承認境界 | accepted | 2026-10-16 |
-| DEC-061 | Release 公開操作のカタログ正規化（承認後の workflow 実行経路） | accepted | 2026-10-20 |
+| DEC-061 | 改善サイクルのパッチリリースと公開承認 | accepted | 2026-10-20 |
 | DEC-062 | 要件ID桁数の受理上限撤廃と表示ゼロ埋め・受理検証の分離 | accepted | 2026-10-26 |
 | DEC-063 | 分割③ CI 日次定期実行（cron schedule）の撤去 | accepted | 2026-11-16 |
-| DEC-064 | 実験前提の恒久運用原則の採用と移行完了後レガシー資産の扱い境界 | accepted | 2026-11-17 |
 | DEC-065 | 整合性検証体制の中核化（IR 24+IR-075 体系・プラグイン型検証エンジン・src 正本化） | accepted | 2026-11-18 |
 | DEC-066 | ローカル Git Hook による決定論的検証ゲート（CI 非依存） | accepted | 2026-11-18 |
 | DEC-067 | 仮説に基づく既存統制変更原則 | accepted | 2026-11-19 |
@@ -109,12 +93,7 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 - [DEC-024](DEC-024.md)（変更誘発境界リスク分析の導入と検証契約への投影）
 - [DEC-025](DEC-025.md)（プロジェクト知識を Capability Skill から分離し、独立した正規知識層として管理する）
 - [DEC-026](DEC-026.md)（実現面変更方針の構造化ハンドオフ（realization_actions））
-- [DEC-027](DEC-027.md)（観測ベース統制縮小評価ループ）
-- [DEC-028](DEC-028.md)（文章表層品質の共通実行基盤）
-- [DEC-031](DEC-031.md)（ADF v4 Standard Operating Model の採用とプロセス・実装の責務分離）
 - [DEC-032](DEC-032.md)（ADF 責務の三層モデルと Project Contract の論理ビュー・情報寿命モデル）
-- [DEC-033](DEC-033.md)（ADF v4 公開運用モデル（UX 2入口収斂・内部 lifecycle・継続コラボレーションループ・学習昇格ガード））
-- [DEC-034](DEC-034.md)（v4 の移行・release 標準境界（非破壊移行原則・v4.0.0-rc.1 cutover・self-hosting））
 - [DEC-035](DEC-035.md)（v4 Quality / Verification / Evidence / Gate モデルへの分解）
 - [DEC-036](DEC-036.md)（意味 Skill と決定的実装の責務分離および Harness/Backend adapter 境界）
 - [DEC-037](DEC-037.md)（Traceability の Change / Evidence 中心への再中心化）
@@ -122,11 +101,10 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 - [DEC-039](DEC-039.md)（ADF v4 authority・副作用統制と冪等・並行性モデル）
 - [DEC-041](DEC-041.md)（Wave 構成純度と実行並列上限の単一所有）
 - [DEC-042](DEC-042.md)（case-auto 最大並列維持と同期逐次フォールバック禁止）
-- [DEC-045](DEC-045.md)（リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化）
 - [DEC-047](DEC-047.md)（textlint 依存実体の版固定情報解決への転換）
 - [DEC-048](DEC-048.md)（ADF判断アーキテクチャ: 判断方法・確定権限・人間判断境界の統一モデル）
 - [DEC-049](DEC-049.md)（ADF 共通原本とホスト接続領域の分離によるマルチホスト配布モデル）
-- [DEC-050](DEC-050.md)（deleteBranchOnMerge 設定不備の警告化と操作安全性停止の維持）
+- [DEC-050](DEC-050.md)（マージ済みリモートブランチの削除と操作安全性）
 - [DEC-051](DEC-051.md)（case-auto stage 3 のスロット型キューへの移行（Wave 収束前提の撤廃））
 - [DEC-053](DEC-053.md)（ADF v5 工程・成果物モデル（共通責務・参照モデル工程・成果物の意味と正式確定））
 - [DEC-054](DEC-054.md)（ADF v5 追跡・品質検証モデル（隣接工程間対応・構造/意味分離・差分影響評価））
@@ -134,12 +112,9 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 - [DEC-056](DEC-056.md)（ADF v5 移行と互換性の境界（後方互換非必須・意味保存移行・未処理改善情報の継続））
 - [DEC-057](DEC-057.md)（工程駆動コラボレーションモデル（検討テーマ・外部検討・段階形成）の採用）
 - [DEC-058](DEC-058.md)（工程遷移と双経路併存モデルの採用（REQ-005-001/010/011 改訂を含む））
-- [DEC-059](DEC-059.md)（backlog-auto 一気通貫実行のパッチリリース規則）
-- [DEC-060](DEC-060.md)（ADF本体の GitHub Release 記録と公開承認境界）
-- [DEC-061](DEC-061.md)（Release 公開操作のカタログ正規化（承認後の workflow 実行経路））
+- [DEC-061](DEC-061.md)（改善サイクルのパッチリリースと公開承認）
 - [DEC-062](DEC-062.md)（要件ID桁数の受理上限撤廃と表示ゼロ埋め・受理検証の分離）
 - [DEC-063](DEC-063.md)（分割③ CI 日次定期実行（cron schedule）の撤去）
-- [DEC-064](DEC-064.md)（実験前提の恒久運用原則の採用と移行完了後レガシー資産の扱い境界）
 - [DEC-065](DEC-065.md)（整合性検証体制の中核化（IR 24+IR-075 体系・プラグイン型検証エンジン・src 正本化））
 - [DEC-066](DEC-066.md)（ローカル Git Hook による決定論的検証ゲート（CI 非依存））
 - [DEC-067](DEC-067.md)（仮説に基づく既存統制変更原則）
@@ -153,13 +128,6 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 ### 置き換え済み（superseded）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-superseded -->
-- [DEC-002](DEC-002.md)（OpenCode ソース・プロジェクション分離）
-- [DEC-005](DEC-005.md)（Project Extensions Architecture）
-- [DEC-007](DEC-007.md)（Artifact Graph 標準化と配布スキル昇格）
-- [DEC-015](DEC-015.md)（ADF決定論的実行中核と実行基盤実行機構の責務分界）
-- [DEC-017](DEC-017.md)（最小トレーサビリティモデルの採用と Artifact Graph の廃止）
-- [DEC-029](DEC-029.md)（公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入）
-- [DEC-030](DEC-030.md)（トレーサビリティ標準機能への一般化と producer / consumer 境界の確立）
 <!-- AUTOGEN:END -->
 
 ### 非推奨（deprecated）
@@ -180,57 +148,48 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 
 ### 配布基盤・ソースモデル
 
-- [DEC-002](DEC-002.md)（OpenCode ソース・プロジェクション分離、superseded by DEC-036）
 - [DEC-004](DEC-004.md)（差し替え可能な I/O 境界）
-- [DEC-005](DEC-005.md)（Project Extensions Architecture、superseded by DEC-006）
 - [DEC-006](DEC-006.md)（inspect 3-command 構成への正規化、extension 検査の3層責務分離）
-- [DEC-007](DEC-007.md)（Artifact Graph 標準化と配布スキル昇格、superseded by DEC-017）
 - [DEC-012](DEC-012.md)（Extension を file-kind から workflow/capability responsibility へ再編）
 - [DEC-014](DEC-014.md)（配布依存境界の多層 enforcement、IR-059 範囲と enforcement 経路の変更）
 - [DEC-016](DEC-016.md)（導入系スクリプトの副作用ゼロ原則、provisioning 責務の利用者移転）
-- [DEC-017](DEC-017.md)（最小トレーサビリティモデルの採用と Artifact Graph の廃止、要件中心の最小 TIM と agentdev-traceability への置換）
 - [DEC-021](DEC-021.md)（scripts 公開入口の2本固定と安定契約、公開入口の構造境界と入口名の安定性）
 - [DEC-023](DEC-023.md)（third-party Skill の分離管理と取得機構の導入、第三区分所有境界と参照点集約）
-- [DEC-028](DEC-028.md)（文章表層品質の共通実行基盤、textlint 採用と書込み前・最終検査の共通化、DEC-001 決定3の限定後継、依存実体の配布供給条項は DEC-047 が部分後継）
-- [DEC-036](DEC-036.md)（意味 Skill と決定的実装の責務分離および Harness/Backend adapter 境界、DEC-015 の主後継・DEC-002 の v4 再定義）
-- [DEC-047](DEC-047.md)（textlint 依存実体の版固定情報解決への転換、DEC-028 の部分後継）
+- [DEC-036](DEC-036.md)（意味判断・決定的実装・実行基盤の責務境界）
+- [DEC-047](DEC-047.md)（textlint の共通実行基盤と依存の版固定）
 
 ### ワークフロー・委譲契約
 
 - [DEC-003](DEC-003.md)（req_draft ソフトコントラクト原則）
 - [DEC-008](DEC-008.md)（case-auto の限定的親判断解決、bounded parent decision resolution）
 - [DEC-011](DEC-011.md)（STEP resume point と会話記憶非依存）
-- [DEC-015](DEC-015.md)（ADF決定論的実行中核と実行基盤実行機構の責務分界、処理単位と状態機械の選択的適用）
 - [DEC-019](DEC-019.md)（一般処理の標準API委譲とADF固有意味論の所有境界、YAML 構文解析・再帰ファイル探索・CLI 引数解析の標準 API 委譲）
 - [DEC-020](DEC-020.md)（GitHub Issue 共通管理単位の採用、追跡Issueと Case Issue の役割分離と論理スキーマ一元管理）
 - [DEC-024](DEC-024.md)（変更誘発境界リスク分析の導入と検証契約への投影、case-specific risk を品質プロセスの第一級入力とする原則）
-- [DEC-031](DEC-031.md)（ADF v4 Standard Operating Model の採用とプロセス・実装の責務分離、v4 の中核運用モデル）
-- [DEC-033](DEC-033.md)（ADF v4 公開運用モデル（UX 2入口収斂・内部 lifecycle・継続コラボレーションループ・学習昇格ガード）、DEC-029 の後継）
-- [DEC-034](DEC-034.md)（v4 の移行・release 標準境界、非破壊移行原則と self-hosting cutover）
 - [DEC-035](DEC-035.md)（v4 Quality / Verification / Evidence / Gate モデルへの分解、検査と証跡の品質境界）
-- [DEC-038](DEC-038.md)（ADF v4 durable state 配置と再構成の契約、状態権威と非原子調整原則、DEC-015 の補完後継）
-- [DEC-039](DEC-039.md)（ADF v4 authority・副作用統制と冪等・並行性モデル、DEC-015 の補完後継）
+- [DEC-038](DEC-038.md)（永続状態の配置と再構成）
+- [DEC-039](DEC-039.md)（副作用の権限、冪等性、並行性）
 - [DEC-041](DEC-041.md)（Wave 構成純度と実行並列上限の単一所有）
 - [DEC-042](DEC-042.md)（case-auto 最大並列維持と同期逐次フォールバック禁止）
-- [DEC-045](DEC-045.md)（リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化）
+- [DEC-050](DEC-050.md)（マージ済みリモートブランチの削除と操作安全性）
+- [DEC-053](DEC-053.md)（工程・成果物モデル）
+- [DEC-055](DEC-055.md)（公開経路、内部工程、有限実行）
+- [DEC-056](DEC-056.md)（移行時の意味保存と検証）
+- [DEC-061](DEC-061.md)（パッチリリースと公開承認）
 
 ### 整合性・IR 体系
 
 - [DEC-013](DEC-013.md)（IR 登録モデルの簡素化、tombstone 廃止 + lifecycle/enforcement/baseline_status 除去）
-- [DEC-037](DEC-037.md)（Traceability の Change / Evidence 中心への再中心化、DEC-017・DEC-030 の後継）
+- [DEC-037](DEC-037.md)（変更・証拠・影響範囲の対応付け）
+- [DEC-067](DEC-067.md)（仮説に基づく既存統制変更原則）
 
 Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 
 | Decision | 関係 | 対象 | 説明 |
 |-----|------|------|------|
-| DEC-002 | relates-to | v2:ADR-0105 | source/projection 分離に関する過去版の決定 |
 | DEC-003 | relates-to | v2:ADR-0124 | req_draft ソフトコントラクトに関する過去版の決定 |
 | DEC-004 | relates-to | v2:ADR-0130 | 差し替え可能な I/O 境界に関する過去版の決定 |
-| DEC-005 | relates-to | v2:ADR-0135 | Project Extensions Architecture に関する過去版の決定 |
-| DEC-006 | supersedes | DEC-005 | inspect-extensions 廃止と extension 検査の3層責務分離を確定し、DEC-005 を置換 |
 | DEC-006 | relates-to | v2:ADR-0135 | Project Extensions Architecture に関する過去版の決定（inspect-extensions 廃止後の責務移管先） |
-| DEC-007 | supersedes-spec | docs/designs/local/artifact-graph.md | 現行 Design「対象外」節を撤回し、標準配布スキルへ昇格。後継 Design は docs/designs/skills/agentdev-artifact-graph.md（履歴記録）。現行後継は agentdev-traceability / docs/designs/foundations/traceability-model.md（DEC-017 により移管） |
-| DEC-007 | relates-to | DEC-002 | 配布物原本は src/opencode/ へ配置する原則に従う |
 | DEC-008 | relates-to | DEC-001 | case-auto 自走境界（決定4）の適用範囲内で bounded parent decision resolution を確定 |
 | DEC-008 | relates-to | v2:ADR-0112, v2:ADR-0138 | case-auto 判断委譲に関する過去版合意履歴 |
 | DEC-009 | relates-to | v2:ADR-* | ADR から Decision への正規成果物モデル移行。過去版参照は v2:ADR-* のまま維持（AG-010） |
@@ -242,21 +201,6 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-014 | relates-to | DEC-001 決定4 | 配布依存境界の多層 enforcement に対する新規統制追加原則の7条件立証 |
 | DEC-014 | relates-to | DEC-006 | DEC-006 の inspect 3-command 正規化と IR-056 の Project Extensions 検査分離を維持しつつ、IR-059 の範囲と経路を変更する後続決定。DEC-006 全体を置換しない |
 | DEC-014 | relates-to | DEC-013 | IR 存在条件モデルに従い、IR-059 の範囲変更を本 Decision で確定 |
-| DEC-015 | relates-to | DEC-001 | 決定2 の harness 委譲リストを参照し再列挙しない。決定1（ADF の中心責務）の精製と決定3（hard governance の限定）の適用として整理 |
-| DEC-015 | relates-to | DEC-010 | Command / Workflow Skill / Capability Skill 責務3層分化を維持したまま決定論的処理を接続 |
-| DEC-015 | relates-to | DEC-011 | STEP（workflow 層の再開単位）と処理単位（orchestration 層の再開単位）の階層関係を明確化 |
-| DEC-016 | relates-to | DEC-002 | 導入系スクリプトの副作用ゼロ原則。原本/プロジェクション分離における移行・同期の責務分離の類推 |
-| DEC-017 | supersedes | DEC-007 | 最小トレーサビリティモデルの採用により、Artifact Graph を標準探索モデルとする決定を置換する。標準配布スキルの地位は agentdev-traceability が引き継ぐ |
-| DEC-017 | relates-to | DEC-009 | Decision 成果物型の TIM 上の位置づけ（ADF 拡張） |
-| DEC-017 | relates-to | DEC-010 | 4層分離はトレーサビリティ機能内部の概念層であり、Command / Workflow Skill / Capability Skill の配布物3層モデルとは別軸である |
-| DEC-019 | relates-to | DEC-015 | ADF vs harness の責務分界とは軸が異なる（ADF 固有 vs 一般処理の標準 API 委譲）。責務分界の類推として参照する |
-| DEC-037 | supersedes | DEC-017 | Traceability の主目的の定義権（要件中心の対応完全性から Change/Evidence 中心への再中心化）を traceability-model Design へ移動。DEC-017 決定2（直接走査）・決定3（標準スキル）・決定5（用語政策）は搬送範囲表で維持 |
-| DEC-037 | supersedes | DEC-030 | Traceability の主目的の定義権（要件中心の対応完全性から Change/Evidence 中心への再中心化）を traceability-model Design へ移動。DEC-030 の機構上の決定は搬送範囲表で維持 |
-| DEC-033 | supersedes | DEC-029 | 公開ワークフロー状態遷移中心再構成を v4 公開運用モデル（UX 2入口収斂・内部 lifecycle）へ一般化して置換 |
-| DEC-036 | supersedes | DEC-015 | 主後継。決定論的実行中核と実行基盤実行機構の責務分界を semantic Skill / deterministic code 分離へ発展・置換 |
-| DEC-036 | supersedes | DEC-002 | OpenCode ソース・プロジェクション分離の v4 再定義（配備形態として adapter 境界へ統合）を本 Decision の Harness/Backend adapter 境界が所有する |
-| DEC-038 | supersedes | DEC-015 | 補完後継。durable state 配置と再構成の契約への一般化 |
-| DEC-039 | supersedes | DEC-015 | 補完後継。authority・副作用統制と冪等・並行性モデルへの一般化 |
 | DEC-051 | supersedes | DEC-041 | case-auto stage 3 のスロット型キュー移行による決定5（Wave 収束前提）の置換（決定1〜4は維持） |
 | DEC-062 | relates-to | DEC-001, DEC-009 | 現行 corpus の ID 形式記述（意味的不変）を参照する受理上限撤廃の新規決定。既存 ID・参照の改番は行わない |
 
@@ -266,12 +210,9 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | Decision | 関連REQ | 説明 |
 |-----|---------|------|
 | DEC-001 | [REQ-001](../requirements/REQ-001.md), [REQ-002](../requirements/REQ-002.md), [REQ-003](../requirements/REQ-003.md), [REQ-004](../requirements/REQ-004.md), [REQ-005](../requirements/REQ-005.md), [REQ-006](../requirements/REQ-006.md), [REQ-007](../requirements/REQ-007.md), [REQ-008](../requirements/REQ-008.md), [REQ-009](../requirements/REQ-009.md), [REQ-010](../requirements/REQ-010.md), [REQ-011](../requirements/REQ-011.md) | AgentDevFlow 憲章の全体原則（hard governance 8点、新規統制追加7条件、リリース条件） |
-| DEC-002 | [REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md) | 配布成果物のソース・プロジェクション分離 |
 | DEC-003 | [REQ-004](../requirements/REQ-004.md), [REQ-008](../requirements/REQ-008.md) | req_draft soft-contract 原則（LLM推論消費、厳格schemaなし） |
 | DEC-004 | [REQ-011](../requirements/REQ-011.md), [REQ-009](../requirements/REQ-009.md) | 差し替え可能な I/O 境界（境界成果物は DEC-022 決定4により Custom Tool、Local backend） |
-| DEC-005 | [REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md) | Project Extensions Architecture（.agentdev/extensions/** によるプロジェクト固有追加）。DEC-006 により superseded |
 | DEC-006 | [REQ-010](../requirements/REQ-010.md), [REQ-002](../requirements/REQ-002.md) | inspect 3-command 構成への正規化（inspect-extensions 廃止、extension 検査の3層責務分離） |
-| DEC-007 | [REQ-012](../requirements/REQ-012.md), [REQ-002](../requirements/REQ-002.md), [REQ-009](../requirements/REQ-009.md) | Artifact Graph 標準化と配布スキル昇格（open extensibility、project/self-hosting augmentation、fail-open、決定論性）。関連 REQ-013 の後継は REQ-012 |
 | DEC-008 | [REQ-006](../requirements/REQ-006.md), [REQ-014](../requirements/REQ-014.md), [REQ-003](../requirements/REQ-003.md) | case-auto の限定的親判断解決（bounded parent decision resolution、REQ-034-032〜034、REQ-014-009/010、REQ-003-008/009/010 と整合） |
 | DEC-009 | [REQ-001](../requirements/REQ-001.md) | ADR から Decision への正規成果物モデル移行（AG-001〜017、REQ-001-056〜064） |
 | DEC-010 | [REQ-002](../requirements/REQ-002.md), [REQ-027](../requirements/REQ-027.md) | Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則（AG-003、AG-007、REQ-002-001〜004 意味変更） |
@@ -279,9 +220,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-012 | [REQ-002](../requirements/REQ-002.md) | Extension を file-kind から workflow/capability responsibility へ再編（AG-008、REQ-002-030/031 意味変更） |
 | DEC-013 | [REQ-010](../requirements/REQ-010.md) | IR 登録モデルの簡素化（AG-008 tombstone 廃止、AG-009 lifecycle/enforcement/baseline_status 簡素化、旧 IR 状態モデル行群（`REQ-010-053..057` 相当）RETIRE、REQ-036-022 UPDATE）。歴史的根拠の retired REQ-028 は本文に保持し、その後継の決定は本 DEC-013 |
 | DEC-014 | [REQ-029](../requirements/REQ-029.md), [REQ-002](../requirements/REQ-002.md), [REQ-010](../requirements/REQ-010.md), [REQ-009](../requirements/REQ-009.md) | 配布依存境界の多層 enforcement（REQ-029 新設、REQ-002 縮約、REQ-010-060 最終保証 gate、REQ-009-045 release artifact 境界、IR-059 範囲と source/save/complete/release 経路変更） |
-| DEC-015 | [REQ-002](../requirements/REQ-002.md), [REQ-005](../requirements/REQ-005.md), [REQ-011](../requirements/REQ-011.md), [REQ-034](../requirements/REQ-034.md), [REQ-035](../requirements/REQ-035.md), [REQ-038](../requirements/REQ-038.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界（REQ-002-035/036、REQ-005-025〜028、REQ-011-019、REQ-034-035/036、REQ-035-011、REQ-038-005 と整合） |
 | DEC-016 | [REQ-009](../requirements/REQ-009.md) | 導入系スクリプトの副作用ゼロ原則（provisioning 責務の利用者移転、REQ-009-010 UPDATE、REQ-009-046〜049 APPEND と整合） |
-| DEC-017 | [REQ-012](../requirements/REQ-012.md), [REQ-021](../requirements/REQ-021.md) | 最小トレーサビリティモデルの採用と Artifact Graph の廃止（REQ-012 UPDATE、REQ-021 UPDATE、REQ-020 RETIRE、REQ-040 RETIRE と整合）。関連 REQ-020/REQ-040 の後継は REQ-012 |
 | DEC-019 | [REQ-044](../requirements/REQ-044.md) | 一般処理の標準API委譲とADF固有意味論の所有境界（REQ-044 CREATE と整合。Design 4 件への実装契約追記・更新を伴う） |
 | DEC-020 | [REQ-049](../requirements/REQ-049.md), [REQ-001](../requirements/REQ-001.md), [REQ-009](../requirements/REQ-009.md), [REQ-011](../requirements/REQ-011.md) | GitHub Issue 共通管理単位の採用（REQ-049 全面再構成、REQ-001/REQ-009/REQ-011 UPDATE と整合。Design への契約更新を伴う） |
 | DEC-021 | [REQ-050](../requirements/REQ-050.md) | scripts 公開入口の2本固定と安定契約（REQ-050 CREATE、REQ-009-002/044 UPDATE、DEC-016 参照修正と整合） |
@@ -290,14 +229,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-024 | [REQ-054](../requirements/REQ-054.md), [REQ-055](../requirements/REQ-055.md), [REQ-056](../requirements/REQ-056.md) | 変更誘発境界リスク分析の導入と検証契約への投影（REQ-054/055/056 CREATE、REQ-002-046 APPEND、REQ-039-006 APPEND と整合） |
 | DEC-025 | [REQ-056](../requirements/REQ-056.md) | - |
 | DEC-026 | [REQ-008](../requirements/REQ-008.md), [REQ-004](../requirements/REQ-004.md), [REQ-017](../requirements/REQ-017.md), [REQ-038](../requirements/REQ-038.md), [REQ-039](../requirements/REQ-039.md) | - |
-| DEC-027 | [REQ-048](../requirements/REQ-048.md) | - |
-| DEC-028 | [REQ-053](../requirements/REQ-053.md), [REQ-010](../requirements/REQ-010.md), [REQ-036](../requirements/REQ-036.md) | 文章表層品質の共通実行基盤（REQ-053 全面更新、REQ-010-071/074 UPDATE と REQ-010-075 APPEND、REQ-036-008/023 UPDATE と整合） |
-| DEC-029 | [REQ-005](../requirements/REQ-005.md), [REQ-006](../requirements/REQ-006.md) | - |
-| DEC-030 | [REQ-012](../requirements/REQ-012.md), [REQ-021](../requirements/REQ-021.md), [REQ-029](../requirements/REQ-029.md), [REQ-002](../requirements/REQ-002.md), [REQ-061](../requirements/REQ-061.md), [REQ-057](../requirements/REQ-057.md) | トレーサビリティ標準機能への一般化と producer / consumer 境界の確立（REQ-012 UPDATE、REQ-021 UPDATE、REQ-029 APPEND、REQ-002 APPEND、REQ-061 UPDATE、REQ-057 UPDATE と整合。DEC-017 決定1の部分改正） |
-| DEC-031 | [REQ-088](../requirements/REQ-088.md) | - |
 | DEC-032 | [REQ-088](../requirements/REQ-088.md), [REQ-001](../requirements/REQ-001.md) | - |
-| DEC-033 | [REQ-005](../requirements/REQ-005.md), [REQ-006](../requirements/REQ-006.md) | - |
-| DEC-034 | [REQ-009](../requirements/REQ-009.md), [REQ-088](../requirements/REQ-088.md) | - |
 | DEC-035 | [REQ-007](../requirements/REQ-007.md), [REQ-055](../requirements/REQ-055.md) | - |
 | DEC-036 | [REQ-002](../requirements/REQ-002.md), [REQ-044](../requirements/REQ-044.md), [REQ-052](../requirements/REQ-052.md) | - |
 | DEC-037 | [REQ-012](../requirements/REQ-012.md), [REQ-021](../requirements/REQ-021.md) | - |
@@ -305,27 +237,23 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-039 | [REQ-003](../requirements/REQ-003.md), [REQ-034](../requirements/REQ-034.md) | - |
 | DEC-041 | [REQ-031](../requirements/REQ-031.md), [REQ-034](../requirements/REQ-034.md), [REQ-035](../requirements/REQ-035.md), [REQ-061](../requirements/REQ-061.md) | - |
 | DEC-042 | [REQ-031](../requirements/REQ-031.md), [REQ-034](../requirements/REQ-034.md) | case-auto 最大並列維持と同期逐次フォールバック禁止（REQ-034-025/028 意味変更・REQ-034-044/045 APPEND、REQ-031-030 UPDATE と整合） |
-| DEC-045 | [REQ-032](../requirements/REQ-032.md), [REQ-009](../requirements/REQ-009.md), [REQ-030](../requirements/REQ-030.md) | - |
-| DEC-047 | [REQ-029](../requirements/REQ-029.md), [REQ-053](../requirements/REQ-053.md) | - |
+| DEC-047 | [REQ-029](../requirements/REQ-029.md), [REQ-053](../requirements/REQ-053.md), [REQ-010](../requirements/REQ-010.md), [REQ-036](../requirements/REQ-036.md) | - |
 | DEC-048 | [REQ-096](../requirements/REQ-096.md) | - |
 | DEC-049 | [REQ-099](../requirements/REQ-099.md) | - |
 | DEC-050 | [REQ-030](../requirements/REQ-030.md), [REQ-009](../requirements/REQ-009.md), [REQ-032](../requirements/REQ-032.md) | - |
 | DEC-051 | [REQ-034](../requirements/REQ-034.md), [REQ-035](../requirements/REQ-035.md) | - |
 | DEC-053 | [REQ-104](../requirements/REQ-104.md), [REQ-105](../requirements/REQ-105.md), [REQ-012](../requirements/REQ-012.md), [REQ-021](../requirements/REQ-021.md), [REQ-061](../requirements/REQ-061.md), [REQ-088](../requirements/REQ-088.md) | - |
 | DEC-054 | [REQ-106](../requirements/REQ-106.md), [REQ-107](../requirements/REQ-107.md), [REQ-012](../requirements/REQ-012.md), [REQ-021](../requirements/REQ-021.md) | - |
-| DEC-055 | [REQ-108](../requirements/REQ-108.md) | - |
+| DEC-055 | [REQ-108](../requirements/REQ-108.md), [REQ-005](../requirements/REQ-005.md), [REQ-006](../requirements/REQ-006.md) | - |
 | DEC-056 | [REQ-109](../requirements/REQ-109.md), [REQ-009](../requirements/REQ-009.md) | - |
 | DEC-057 | [REQ-110](../requirements/REQ-110.md), [REQ-104](../requirements/REQ-104.md) | - |
 | DEC-058 | [REQ-111](../requirements/REQ-111.md), [REQ-005](../requirements/REQ-005.md) | - |
-| DEC-059 | [REQ-114](../requirements/REQ-114.md) | - |
-| DEC-060 | [REQ-114](../requirements/REQ-114.md) | - |
 | DEC-061 | [REQ-114](../requirements/REQ-114.md) | - |
 | DEC-062 | [REQ-004](../requirements/REQ-004.md), [REQ-009](../requirements/REQ-009.md), [REQ-012](../requirements/REQ-012.md), [REQ-051](../requirements/REQ-051.md) | - |
 | DEC-063 | - | - |
-| DEC-064 | [REQ-109](../requirements/REQ-109.md) | - |
 | DEC-065 | [REQ-122](../requirements/REQ-122.md) | - |
 | DEC-066 | [REQ-122](../requirements/REQ-122.md) | - |
-| DEC-067 | [REQ-048](../requirements/REQ-048.md) | - |
+| DEC-067 | [REQ-048](../requirements/REQ-048.md), [REQ-109](../requirements/REQ-109.md) | - |
 <!-- AUTOGEN:END -->
 
 ## 過去版の履歴基盤

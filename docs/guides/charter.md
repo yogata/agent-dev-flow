@@ -86,7 +86,7 @@ AgentDevFlow は必要能力と標準方針を定義できる。
 本 charter が要約する DEC-001 と合わせ、責務境界の現在像を構成する基準は次の正規文書である。
 本節は導線であり、基準本文を複製しない。
 
-- 三層責務と標準運用モデル: [REQ-088](../requirements/REQ-088.md)、[ADF v4 Operating Model](../designs/foundations/operating-model.md)、[DEC-031](../decisions/DEC-031.md)
+- 三層責務と標準運用モデル: [REQ-088](../requirements/REQ-088.md)、[Operating Model](../designs/foundations/operating-model.md)、[DEC-053](../decisions/DEC-053.md)
 - 判断方法と確定権限の分離、人間判断境界: [REQ-096](../requirements/REQ-096.md)、[DEC-048](../decisions/DEC-048.md)
 - REQ / Decision / Design / Knowledge / Report / Guide の文書責務: [REQ-001](../requirements/REQ-001.md)
 - 正規文書の読み方: [プロジェクトドキュメントと Design](project-docs-and-specs.md)

@@ -7,11 +7,11 @@ AgentDevFlow で使う用語の定義。
 | 用語 | 読み方 | 定義 |
 |------|--------|------|
 | req-define | レキ、ディファイン | AI と対話して要件を整理するコマンド |
-| case-ready | ケース、レディ | 内部 lifecycle 段階の一つ。Definition Package を保存・確定し、Epic / Wave / Issue の実行構造を確定する（v4 では公開コマンドではなく case-auto が駆動、DEC-033） |
-| case-revise | ケース、リバイス | 内部 lifecycle 段階の一つ。再合意済み Definition 変更を既存 Root Case に反映する（v4 では公開コマンドではなく case-auto が駆動、DEC-033） |
-| case-open | ケース、オープン | 内部 lifecycle 段階の一つ。要件から GitHub Issue を作成する（v4 では公開コマンドではなく case-auto が駆動、DEC-033） |
-| case-run | ケース、ラン | 内部 lifecycle 段階の一つ。Issue に基づいて実装し、PR を作成する（v4 では公開コマンドではなく case-auto が駆動、DEC-033） |
-| case-close | ケース、クローズ | 内部 lifecycle 段階の一つ。PR をマージし、Issue をクローズする（v4 では公開コマンドではなく case-auto が駆動、DEC-033） |
+| case-ready | ケース、レディ | case-auto の内部工程。Definition Package を保存し、Epic・Wave・Issue の実行構造を確定する |
+| case-revise | ケース、リバイス | case-auto の内部工程。再合意済みの Definition 変更を既存の Root Case に反映する |
+| case-open | ケース、オープン | case-auto の内部工程。要件から GitHub Issue を作成する |
+| case-run | ケース、ラン | case-auto の内部工程。Issue に基づいて実装し、PR を作成する |
+| case-close | ケース、クローズ | case-auto の内部工程。PR をマージし、Issue をクローズする |
 | intake | インテイク | 具体的な修正対象が特定できる作業候補を収集するパイプライン。気づき・課題の inbox 記録は会話経由の `agentdev-intake-pipeline` スキルが担う |
 | intake-promote（内部 workflow） | インテイク、プロモート | inbox の項目をレビュー、採用、却下、保留判定し、採用済み成果物に整形する内部 workflow（backlog-auto stage 2 が駆動） |
 | learning-capture（スキル） | ラーニング、キャプチャ | 観測から再発防止知見を inbox/ に蓄積するスキル（コマンドではなくスキルとして提供される） |
@@ -23,7 +23,7 @@ AgentDevFlow で使う用語の定義。
 | third-party Skill | サードパーティー、スキル | ADF が製作していない外部由来の skill。宣言（skills.yaml）に基づき取得機構 CLI（`bun .opencode/tools/agentdev-third-party/cli.ts`）で取得・同期する |
 | inspect-docs（内部 workflow） | インスペクト、ドックス | docs 全体の意味整合性を検出し、検出事項（finding）を出力する内部 workflow（backlog-auto stage 1 が駆動） |
 | inspect-promote（内部 workflow） | インスペクト、プロモート | 検出事項（finding）を分類（promote/defer/reject）し、採用済み成果物を生成する内部 workflow（backlog-auto stage 2 が駆動） |
-| case-auto | ケース、オート | 標準実行コマンド。内部 lifecycle（case-open → case-ready → case-run → case-close、再合意変更時は case-revise → case-ready）を順次駆動する（v4 では個別コマンドの順次手動実行を標準としない、DEC-033） |
+| case-auto | ケース、オート | 標準実行コマンド。内部 lifecycle（case-open → case-ready → case-run → case-close、再合意変更時は case-revise → case-ready）を順次駆動する（DEC-055） |
 | phase-tasks-create | フェーズ、タスクス、クリエイト | 工程駆動のテーマ初回形成を行うコマンド。参考テーマ候補と既知の必須事項を区別して提示する（REQ-110） |
 | phase-tasks-update | フェーズ、タスクス、アップデート | 検討テーマの追加、具体化、分割、統合、廃止を行うコマンド。テーマ初回形成の前後を問わず独立実行できる（REQ-110） |
 | phase-artifacts-update | フェーズ、アーティファクト、アップデート | 採用済みの内容を正規成果物へ増分反映または初回作成するコマンド。外部検討の戻り内容と利用者の直接採用の双方を受理し、衝突、未確認、保存失敗を区別して報告する（REQ-110） |

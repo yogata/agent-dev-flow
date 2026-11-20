@@ -8,7 +8,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 第4世代（v4）の現在像を定義する正規文書への導線は次のとおりである。
 
 - 憲章と責務境界: [DEC-001](decisions/DEC-001.md)、[憲章](guides/charter.md)
-- 三層責務と標準運用モデル: [REQ-088](requirements/REQ-088.md)、[ADF v4 Operating Model](designs/foundations/operating-model.md)、[DEC-031](decisions/DEC-031.md)
+- 三層責務と標準運用モデル: [REQ-088](requirements/REQ-088.md)、[Operating Model](designs/foundations/operating-model.md)、[DEC-053](decisions/DEC-053.md)
 - Project Contract の論理ビューと再構成方法: [REQ-088](requirements/REQ-088.md)、[ADF v4 Operating Model](designs/foundations/operating-model.md)「Project Contract の論理ビュー」節
 - 標準入口と標準実行: [クイックスタート](guides/quickstart.md)、[要件定義 → Case実行フロー](guides/req-case-flow.md)。req-define と backlog-auto が要求入口、case-auto が標準実行
 - 判断方法と確定権限の分離、人間判断境界: [REQ-096](requirements/REQ-096.md)、[DEC-048](decisions/DEC-048.md)
@@ -120,12 +120,9 @@ REQ: 77件
 | Decision | タイトル |
 |---|---|
 | [DEC-001](decisions/DEC-001.md) | AgentDevFlow 憲章 |
-| [DEC-002](decisions/DEC-002.md) | OpenCode ソース・プロジェクション分離（superseded by DEC-036） |
 | [DEC-003](decisions/DEC-003.md) | req_draft ソフトコントラクト原則 |
 | [DEC-004](decisions/DEC-004.md) | 差し替え可能な I/O 境界 |
-| [DEC-005](decisions/DEC-005.md) | Project Extensions Architecture（superseded by DEC-006） |
 | [DEC-006](decisions/DEC-006.md) | inspect 3-command 構成への正規化 |
-| [DEC-007](decisions/DEC-007.md) | Artifact Graph 標準化と配布スキル昇格（superseded by DEC-017） |
 | [DEC-008](decisions/DEC-008.md) | case-auto の限定的親判断解決（bounded parent decision resolution） |
 | [DEC-009](decisions/DEC-009.md) | ADR から Decision への正規成果物モデル移行 |
 | [DEC-010](decisions/DEC-010.md) | Command / Workflow Skill / Capability Skill 責務3層分化と1:N分割原則 |
@@ -133,9 +130,7 @@ REQ: 77件
 | [DEC-012](decisions/DEC-012.md) | Extension を file-kind から workflow/capability responsibility へ再編 |
 | [DEC-013](decisions/DEC-013.md) | IR 登録モデルの簡素化 — 現存 IR を実行可能な恒久統制に限定 |
 | [DEC-014](decisions/DEC-014.md) | 配布依存境界の多層 enforcement |
-| [DEC-015](decisions/DEC-015.md) | ADF決定論的実行中核と実行基盤実行機構の責務分界（superseded by DEC-036） |
 | [DEC-016](decisions/DEC-016.md) | 導入系スクリプトの副作用ゼロ原則 |
-| [DEC-017](decisions/DEC-017.md) | 最小トレーサビリティモデルの採用と Artifact Graph の廃止（superseded by DEC-037） |
 | [DEC-019](decisions/DEC-019.md) | 一般処理の標準API委譲とADF固有意味論の所有境界 |
 | [DEC-020](decisions/DEC-020.md) | GitHub Issue 共通管理単位の採用 |
 | [DEC-021](decisions/DEC-021.md) | scripts 公開入口の2本固定と安定契約 |
@@ -144,14 +139,7 @@ REQ: 77件
 | [DEC-024](decisions/DEC-024.md) | 変更誘発境界リスク分析の導入と検証契約への投影 |
 | [DEC-025](decisions/DEC-025.md) | プロジェクト知識を Capability Skill から分離し、独立した正規知識層として管理する |
 | [DEC-026](decisions/DEC-026.md) | 実現面変更方針の構造化ハンドオフ（realization_actions） |
-| [DEC-027](decisions/DEC-027.md) | 観測ベース統制縮小評価ループ（superseded by DEC-067〔決定1のうち改善サイクル（Execute → Observe → Measure → Candidate → Experiment → KEEP / NARROW / MERGE / DOWNGRADE / DELETE）を唯一の必須経路とする扱い、決定3のうち経験的な冗長性の縮小に事前実測（Baseline と Guardrail の設定と実測）を前置きする要求、決定4のうち基準測定（Baseline）と観測結果（Observation）をすべての変更で必須とする扱いは新規 Decision「仮説に基づく既存統制変更原則」が部分置換。決定1のうち機構の追加量を成果としない評価姿勢、決定2（便益と費用の両面からの評価）、決定3前半（構造的・経験的冗長性の区別と、構造的冗長性を性能実験を待たず縮小候補として評価できる扱い）、決定4の実験契約（1 experiment = 1 major structural change、混在禁止）、決定5、決定6は維持（status: accepted 維持）〕） |
-| [DEC-028](decisions/DEC-028.md) | 文章表層品質の共通実行基盤（superseded by DEC-047〔「配布前に依存を解決した成果物を供給し、導入先での追加パッケージ取得を必要としない」条項は DEC-047 が textlint guard 依存実体の配布供給の範囲で部分置換。DEC-016 維持宣言と他の決定は維持（status: accepted 維持）。本体リポジトリにおける共通自動検査運用の終了は新規 Decision（整合性検証体制の中核化）が部分置換する（Plugin 製品としての決定は維持）〕） |
-| [DEC-029](decisions/DEC-029.md) | 公開ワークフローの状態遷移中心再構成と Definition 確定境界の導入（superseded by DEC-033） |
-| [DEC-030](decisions/DEC-030.md) | トレーサビリティ標準機能への一般化と producer / consumer 境界の確立（superseded by DEC-037） |
-| [DEC-031](decisions/DEC-031.md) | ADF v4 Standard Operating Model の採用とプロセス・実装の責務分離 |
 | [DEC-032](decisions/DEC-032.md) | ADF 責務の三層モデルと Project Contract の論理ビュー・情報寿命モデル |
-| [DEC-033](decisions/DEC-033.md) | ADF v4 公開運用モデル（UX 2入口収斂・内部 lifecycle・継続コラボレーションループ・学習昇格ガード）（superseded by DEC-055〔Wave を実行スケジューリング単位とする規定を DEC-055 が置換（Wave＝意味的な依存関係のまとまり、並列上限は独立した実行制御）。UX 2入口収斂、内部 lifecycle、継続コラボレーションループ、学習昇格ガード、work_type/scale/Epic の規定は維持する〕） |
-| [DEC-034](decisions/DEC-034.md) | v4 の移行・release 標準境界（非破壊移行原則・v4.0.0-rc.1 cutover・self-hosting）（superseded by DEC-056〔v4→v5 移行への手順・切替構成の直接適用を DEC-056 が置換。非破壊移行原則（決定1）と検証重視は維持する。決定2・3の v4.0.0-rc.1 cutover と v4.0.0 release 条件は v3→v4 移行の歴史的記録として維持する〕） |
 | [DEC-035](decisions/DEC-035.md) | v4 Quality / Verification / Evidence / Gate モデルへの分解 |
 | [DEC-036](decisions/DEC-036.md) | 意味 Skill と決定的実装の責務分離および Harness/Backend adapter 境界（superseded by DEC-048〔決定(1)（deterministic 処理／semantic 判断の二分法）は DEC-048 が部分置換。決定(2)（Harness/Backend adapter 境界）のうち配備形態（原本配置・投影モデル）に関する部分は DEC-049（ADF 共通原本とホスト接続領域の分離）が部分置換する。責務境界（semantic contract と実行機構の分離）、adapter 追加契機、決定(3)（Project Extensions の位置づけ）は本 Decision が維持する（status: accepted 維持）。semantic 6 項目・deterministic 11 項目の列挙の後継は foundations/responsibility-boundaries Design「v4 責務分類語彙の後継」節が所有する。〕） |
 | [DEC-037](decisions/DEC-037.md) | Traceability の Change / Evidence 中心への再中心化（superseded by DEC-054〔トレーサビリティモデルの標準関係構造（Design への定義権委譲を前提とした covers 単独の標準コア関係を含む）を DEC-054 が拡張（covers＋採用された隣接工程間対応）。直接走査、標準能力（coverage/impact/check）、用語政策の各決定は維持する〕） |
@@ -159,11 +147,10 @@ REQ: 77件
 | [DEC-039](decisions/DEC-039.md) | ADF v4 authority・副作用統制と冪等・並行性モデル |
 | [DEC-041](decisions/DEC-041.md) | Wave 構成純度と実行並列上限の単一所有（superseded by DEC-051〔決定5（Wave 収束前提）は DEC-051 が置換。決定1〜4 は本 Decision が現行として維持〕） |
 | [DEC-042](decisions/DEC-042.md) | case-auto 最大並列維持と同期逐次フォールバック禁止 |
-| [DEC-045](decisions/DEC-045.md) | リモートブランチ削除の GitHub 自動削除への委譲と deleteBranchOnMerge 設定前提の必須化（superseded by DEC-050〔部分置換。決定3後半（設定が true でない場合または検証不能な場合は blocked で停止する）を 新規 Decision（deleteBranchOnMerge 設定不備の警告化と操作安全性停止の維持）が置換する。 置換対象外: 決定1（case-close のリモート削除撤廃と GitHub 自動削除委譲）、決定2 （deleteBranchOnMerge=true 導入必須）、決定3前半（preflight での読取専用 repo meta 照会、 agentdev_gh 操作カタログ不拡張、導入系スクリプトのネットワークアクセス禁止）、決定4（ローカル版対象外）。 status は accepted を維持する（decision-lifecycle「部分置換では status 維持」準拠）。〕） |
 | [DEC-047](decisions/DEC-047.md) | textlint 依存実体の版固定情報解決への転換 |
 | [DEC-048](decisions/DEC-048.md) | ADF判断アーキテクチャ: 判断方法・確定権限・人間判断境界の統一モデル |
 | [DEC-049](decisions/DEC-049.md) | ADF 共通原本とホスト接続領域の分離によるマルチホスト配布モデル |
-| [DEC-050](decisions/DEC-050.md) | deleteBranchOnMerge 設定不備の警告化と操作安全性停止の維持 |
+| [DEC-050](decisions/DEC-050.md) | マージ済みリモートブランチの削除と操作安全性 |
 | [DEC-051](decisions/DEC-051.md) | case-auto stage 3 のスロット型キューへの移行（Wave 収束前提の撤廃） |
 | [DEC-053](decisions/DEC-053.md) | ADF v5 工程・成果物モデル（共通責務・参照モデル工程・成果物の意味と正式確定） |
 | [DEC-054](decisions/DEC-054.md) | ADF v5 追跡・品質検証モデル（隣接工程間対応・構造/意味分離・差分影響評価） |
@@ -171,12 +158,9 @@ REQ: 77件
 | [DEC-056](decisions/DEC-056.md) | ADF v5 移行と互換性の境界（後方互換非必須・意味保存移行・未処理改善情報の継続） |
 | [DEC-057](decisions/DEC-057.md) | 工程駆動コラボレーションモデル（検討テーマ・外部検討・段階形成）の採用 |
 | [DEC-058](decisions/DEC-058.md) | 工程遷移と双経路併存モデルの採用（REQ-005-001/010/011 改訂を含む） |
-| [DEC-059](decisions/DEC-059.md) | backlog-auto 一気通貫実行のパッチリリース規則（superseded by DEC-060〔決定(1)の「公開操作」規則（GitHub Release 等の追加公開成果物の実行経路）は、後継 Decision DEC-060（ADF本体の GitHub Release 記録と公開承認境界）が部分置換する。版番号規則、正式リリースの基準、リリース条件、完遂済み・リリース保留、タグ権威・不移動の各決定は本 Decision が維持する。〕） |
-| [DEC-060](decisions/DEC-060.md) | ADF本体の GitHub Release 記録と公開承認境界（superseded by DEC-061〔決定(1)のうち公開の実行経路・実行主体に関わる部分と決定(3)（カタログへの追加範囲）は、後継 Decision DEC-061（Release 公開操作のカタログ正規化（承認後の workflow 実行経路））が部分置換する。承認境界（公開は利用者が草稿作成とは別に明確に認めた場合に限る）、release_create の入力契約に公開モードを含めない規則、草稿作成・読み戻しのカタログ限定経路、決定(2)（DEC-059 / DEC-039 系譜の維持）は本 Decision が維持する。〕） |
-| [DEC-061](decisions/DEC-061.md) | Release 公開操作のカタログ正規化（承認後の workflow 実行経路） |
+| [DEC-061](decisions/DEC-061.md) | 改善サイクルのパッチリリースと公開承認 |
 | [DEC-062](decisions/DEC-062.md) | 要件ID桁数の受理上限撤廃と表示ゼロ埋め・受理検証の分離 |
 | [DEC-063](decisions/DEC-063.md) | 分割③ CI 日次定期実行（cron schedule）の撤去 |
-| [DEC-064](decisions/DEC-064.md) | 実験前提の恒久運用原則の採用と移行完了後レガシー資産の扱い境界（superseded by DEC-067〔決定4のうち DEC-027 の実測必須方式を前提とした整合説明（「DEC-027 の観測ベース評価ループ（実測してから縮小判断）と矛盾しない」）に限り新規 Decision「仮説に基づく既存統制変更原則」が部分置換。決定4のその他の内容（測定待ちによる無期限の保留禁止、deferred 機構と blocked 機構そのものの維持、測定結果の不存在のみを理由とする統制削除の禁止、原則3の狭義解釈）と決定1〜3・5は維持（status: accepted 維持）〕） |
 | [DEC-065](decisions/DEC-065.md) | 整合性検証体制の中核化（IR 24+IR-075 体系・プラグイン型検証エンジン・src 正本化） |
 | [DEC-066](decisions/DEC-066.md) | ローカル Git Hook による決定論的検証ゲート（CI 非依存） |
 | [DEC-067](decisions/DEC-067.md) | 仮説に基づく既存統制変更原則 |

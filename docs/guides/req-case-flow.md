@@ -125,7 +125,7 @@ docs 更新責務は全 work_type 共通である（bugfix も含む）。
 ## case-auto（標準実行コマンド）
 
 `/agentdev/case-auto` は、`/agentdev/req-define` 完了後の後続工程を一括実行する標準実行コマンドである。
-v4（DEC-033）では内部 lifecycle 段階（case-open → case-ready → case-run → case-close）を個別コマンドとして順次手動実行する UX を標準としないため、case-auto の利用が標準導線である。
+標準経路は、case-auto が内部工程を順に実行する（DEC-055）。
 
 ### 実行内容
 

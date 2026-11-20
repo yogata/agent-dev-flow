@@ -375,7 +375,7 @@ ADF の正式なモデル名・成果物名（Decision、Design、Case、Epic、
 |---|---|---|
 | 政策表 | 本 Design 用語政策節 | 4分類定義、訳語表、英字許容リスト |
 
-prh 機械辞書への新語登録は、文脈非依存性と誤検出ゼロの実測立証を前提とする（DEC-028 の限定例外）。実測立証は case 実行側のフェーズで行う。
+prh 機械辞書への新語登録は、文脈非依存性と誤検出ゼロの実測立証を前提とする（DEC-047 の限定例外）。実測立証は case 実行側のフェーズで行う。
 
 設計PR・設計修正PR・実装PR の語彙管理: 旧来の Definition 用語を設計PR・設計修正PRへ、`実装 PR` 等の揺れを実装PRへ統一する。ブランチ名・worktree 名の識別子（definition/issue-{N} 等）と履歴成果物の旧表現は置換対象外とする。prh 固定置換として登録済みである。
 
@@ -441,7 +441,7 @@ prh 辞書による用語置換の適用境界は次の 4 区分とする。
 REQ 作成時の分析は agentdev-req-analysis、事後構造診断は agentdev-req-structure-diagnostics が所有する。
 docs 横断診断と専門能力への振分けは agentdev-doc-diagnostics が所有する。
 Command と Skill は既存の作成支援と事後診断の責務を維持する。
-`docs/designs/commands/case-*.md` の 5 件（case-open、case-ready、case-revise、case-run、case-close）は内部 lifecycle 段階契約を所有する Design である（v4、DEC-033）。対応する公開 command 定義は存在せず、case-auto の orchestration から駆動される。Design 実体の配置規則は不変である。
+case-open、case-ready、case-revise、case-run、case-close の Design は、case-auto が起動する内部工程の契約を所有する（DEC-055）。
 Decision の要否は既存の判断能力が、文書保存は既存のファイル管理能力が担い、意味品質の観点をこれらの既存責務へ接続する。
 
 ## 規範情報と非規範情報の配置基準

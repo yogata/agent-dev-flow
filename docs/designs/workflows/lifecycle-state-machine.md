@@ -20,7 +20,7 @@ v4 ライフサイクル状態は、durable state enum（永続状態）と runt
 - runtime 実行状態: case 実行内の一時状態（ready/running 等）。永続状態に書き込まず、実行終了時に消滅する。v3 の非永続化契約（子Issue の ready/running は永続状態に書き込まない）を継承する
 - 2 層の写像: runtime 実行状態は durable state enum の遷移中の位置として解釈され、独立した状態空間を持たない
 
-単一の巨大状態機械ではなく、Case 実行に関わる状態機械族と射影の構成として記述する（DEC-015（superseded by DEC-036/038/039）/REQ-005-026 の状態機械選択適用原則の継承）。
+Case 実行は、処理単位ごとの状態機械と射影の組合せとして記述する（DEC-038、REQ-005-026）。
 
 ## 階層合成（子 = 実状態、上位 = 導出投影）
 
@@ -60,7 +60,7 @@ v4 ライフサイクル状態は、durable state enum（永続状態）と runt
 | case-close | running -> closing -> closed（QG-4、PR マージ、チェックボックス確定、クローズ） |
 | case-revise | 定義変更ループの再入口（設計修正PR -> case-ready 相当への復帰） |
 
-本表は写像であり、v3 command 定義の置換・廃止を実行するものではない。公開 UX は 2 中心フロー（req-define -> case-auto、backlog-auto -> req-define -> case-auto）のままである（DEC-033）。
+公開 UX の中心経路は `req-define → case-auto` と `backlog-auto → req-define → case-auto` である（DEC-055）。
 
 ## 部分ライフサイクルの位置づけ（v3 現行状態の記述に限定）
 

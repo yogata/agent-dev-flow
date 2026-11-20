@@ -161,7 +161,7 @@ checker 実装と本表は同一規則を反映し、乖離は検査で検出対
 | 制御構造の記述 | STEP 順序、分岐、停止条件を本文で所有する | workflow 制御構造を本文に持たない |
 | 呼称の例外 | なし | `agentdev-workflow-*` プレフィックスの一部スキルは歴史的経緯で Capability Skill として運用する（「workflow-* プレフィックスを持つ Capability Skill 的スキル」節） |
 
-内部 lifecycle 例外（INTERNAL_LIFECYCLE_COMMANDS）: checker 実測の分類件数は 18 である（公開 command 13 + 内部 lifecycle 5）。公開 command 定義から削除された case-* 5 command（case-open、case-ready、case-revise、case-run、case-close）は、対応する Workflow Skill（`agentdev-workflow-case-*`）が内部 lifecycle 実装として Workflow Skill 分類を維持する（check_extensions.ts の INTERNAL_LIFECYCLE_COMMANDS・Case #2981/DEC-033）。公開 command 定義の不在を理由に Capability へ降格しない。
+case-open、case-ready、case-revise、case-run、case-close は内部工程であり（DEC-055）、公開コマンドがなくても Workflow Skill に分類する。
 
 ## 決定論的処理との責務接続（DEC-036）
 
@@ -254,4 +254,3 @@ artifact-contracts.md の肥大化シグナル（500行超）に対応し、Work
 - B2-1 の集約先選定と節構成の確定（Epic #4026）: 共通報告・Decision・自律確定規則の正本を lifecycle skill（agentdev-workflow-lifecycle）SKILL.md の「共通報告・Decision・自律確定規約（反復規則の単一正本）」節へ集約し、小節4種（完了報告の必須要素 / decision 成果物の役割と正本の優先度への参照 / promote 系操作の自律確定と HITL 境界 / inspect-* コマンド選択 routing）の節構成を確定した。節名は名レベル参照の識別子として使用する公開契約面であり、配置変更は公開契約の変更として扱う
 - B2-2 の集約先選定と節構成の確定（Epic #4026）: 文章品質・書込み規則の正本を同一 SKILL.md の「文章品質・書込み規約（反復規則の単一正本）」節へ集約し、小節2種（書込み guard の拒否対象・許可対象と拒否後の回復 / 障害対応知識の条件付き参照）の節構成と集約先選定を確定した。7工程拡張 rules は節名を名レベル参照の識別子として使用する
 - 書込み guard 3種の拒否対象・許可対象は、正本節の表形式で検出器の実効範囲と一致する運用契約として規定する（B2-2）。guard の lib 実装は検出対象と代表例で文面と一致させ、実装詳細の Design 反映を要求しない
-

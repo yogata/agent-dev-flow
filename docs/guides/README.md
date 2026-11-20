@@ -19,7 +19,7 @@
 ガイドは基準への導線を提供し、基準本文を複製しない。
 
 - 憲章と責務境界: [憲章](charter.md)（基準は [DEC-001](../decisions/DEC-001.md)）
-- 三層責務と標準運用モデル: [REQ-088](../requirements/REQ-088.md)、[ADF v4 Operating Model](../designs/foundations/operating-model.md)、[DEC-031](../decisions/DEC-031.md)
+- 三層責務と標準運用モデル: [REQ-088](../requirements/REQ-088.md)、[Operating Model](../designs/foundations/operating-model.md)、[DEC-053](../decisions/DEC-053.md)
 - Project Contract の論理ビューと再構成方法: [REQ-088](../requirements/REQ-088.md)、[ADF v4 Operating Model](../designs/foundations/operating-model.md)「Project Contract の論理ビュー」節、[プロジェクトドキュメントと Design](project-docs-and-specs.md)
 - 標準入口と標準実行: [クイックスタート](quickstart.md)、[要件定義 → Case実行フロー](req-case-flow.md)。req-define と backlog-auto が要求入口、case-auto が標準実行
 - 判断方法と確定権限の分離、人間判断境界: [REQ-096](../requirements/REQ-096.md)、[DEC-048](../decisions/DEC-048.md)

@@ -66,10 +66,10 @@ Traceability の主目的は次の 4 問いに答えられることである。
 
 ## 永続情報と導出可能情報の分離
 
-v4 の意味モデルから永続すべき関係（Change の Evidence・impact、要求実現関係）と導出可能な関係を分離する基準。現行 sidecar/policy/checker 形式を前提とせず、DEC-030 機構のうち拡張して搬送する範囲と再導出する範囲の判定。
+Change の Evidence・影響・要求実現関係のうち保存すべきものを、正本から導出できる関係から分離する。
 
 - Case/Change の Evidence と impact を第一級とする
-- DEC-030 の sidecar/policy/producer-consumer 機構は、永続情報として価値がある範囲で拡張して搬送する（機構の廃止ではなく、中心の移動と必要永続情報/導出可能情報の分離）
+- sidecar と policy は、正本から導出できず継続利用に必要な情報を保持する。
 - traceability sidecar の対応宣言のうち、正規成果物の配置と内容から機械導出できる対応（実装・試験ファイルの対応等）は導出によって宣言でき、手動保守をなくなった分だけ縮小する（B3-6、REQ-012-060/061）。導出対象と手動付与対象（人間が根拠を確認して付与すべき対応）の境界は本分離契約の一部として明記する
 - 対応宣言の存在を受け入れ証明としない原則（T-003、REQ-012-032）は維持する。代表する変更（ファイル新設・改名）で、導入前に手動更新していた sidecar 行が導入後は不要になることと、引き続き手動が必要な行の種類を記録する
 
@@ -86,18 +86,18 @@ v4 の意味モデルから永続すべき関係（Change の Evidence・impact�
 - B3-6 の導出・手動境界の実装列挙（Epic #4026）: 導出対象はテスト本文の import 実測と検証対象モジュールの対応宣言から導出できる verification 対応である。手動不要化の対比証明（新設・改名の模擬テスト、4 sidecar 行〔19 要件行〕と 7 テストの inline 重複宣言の導出移行）は Epic #4026 実装PR の「代表変更の対比記録」が正とする
 - 引き続き手動付与対象は次の6分類である（Epic #4026）。(1) implementation 対応（人間の根拠確認を要する）。(2) design 対応の付与判断（producer 側文書の inline 宣言として運用）。(3) 検証対応要否（policy.yaml。REQ-012-051 により導出禁止）。(4) import 解析で検証対象が解決できない検証手段の verification 対応。(5) decision 対応。(6) 配布境界対象の src/common 配下テスト（repository-local tests のみ導出対象化）
 
-## DEC-030 機構の搬送範囲
+## 対応機構
 
-DEC-030（トレーサビリティ標準機能への一般化と producer / consumer 境界の確立）の機構上の決定は、次の範囲で本 Design が搬送する。この表は DEC-037 relations の reason が述べる維持範囲の正である。
+この表は DEC-037 に基づく対応機構の設計を示す。
 
-| DEC-030 機構 | 処遇 | 本 Design での扱い |
+| 機構 | 位置付け | 本 Design での扱い |
 |---|---|---|
 | sidecar / policy スキーマ（component / package 単位、最小データ構成） | 搬送 | 前提を解除して判定した結果、現行形式を搬送する。スキーマ詳細の正は skills/agentdev-traceability.md（REQ-012-053） |
-| 直接走査（派生索引不採用） | 搬送 | 正規成果物の直接走査で対応関係をその場で解決する（DEC-017 決定2 の維持。REQ-012-048） |
+| 直接走査 | 標準 | 正規成果物の直接走査で対応関係を解決する（REQ-012-048） |
 | coverage / impact / check の 3 能力 | 搬送 | 標準公開能力は変更しない（REQ-012-044）。4 問い × 能力写像表に従う |
 | fail-closed と fail-open の境界 | 搬送 | check は fail-closed、coverage と impact は advisory・fail-open で運用する（REQ-012-056） |
 | producer / consumer 境界（inline は producer 側のみ、配布閉包純度） | 搬送 | REQ-012-054 と REQ-029 の現行契約を維持する |
-| global completeness 規則（全要件行の対応完全性） | 2 層化として再定義 | completeness の 2 層節へ移管する（DEC-017 決定4 の移行完了条件は履行済みの履歴） |
+| 対応完全性 | 2 層 | completeness の 2 層節を参照する |
 
 ## completeness の 2 層
 
@@ -135,7 +135,7 @@ missing-design 942 件と missing-implementation 111 件（2026-09-19 時点の 
 ## 用語
 
 - TIM（最小トレーサビリティモデル）は、v4 Traceability モデルの要求実現関係部分（covers 対応関係、採用された隣接工程間対応、4 役割、対応完全性規則）の旧設計名称である。単なる旧称ではなく、本 Design の要求実現関係部分を指す包摂型の用語橋である。既存文書の TIM 語は本 Design の当該部分を読むものとして解釈する。TIM の標準コア関係の語義は REQ-107 定義適用に伴い、covers 単独から covers と採用された隣接工程間対応（標準関係の構造節）へ更新済みである
-- 日本語本文の正式用語は「対応関係」「対応付け」を用いる（DEC-017 決定5 の維持、REQ-012-042）。coverage / covers は機械識別子または外部標準との対応説明に限定する
+- 日本語本文では「対応関係」「対応付け」を用いる（REQ-012-042）。coverage / covers は機械識別子または外部標準との対応説明に限る。
 
 ## traceability-model.md からの吸収節
 
@@ -146,7 +146,7 @@ missing-design 942 件と missing-implementation 111 件（2026-09-19 時点の 
 | モデル要素（要件行、covers、4 役割の対応関係） | 本 Design の要求実現関係部分（用語節の TIM 定義）と REQ-012 |
 | 対応関係の完全性規則 | 本 Design の completeness の 2 層節 |
 | 保存方式（sidecar と inline、同一論理対応関係への正規化） | REQ-012-053、REQ-012-054 と skills/agentdev-traceability.md |
-| 直接走査（派生索引不採用） | 本 Design の DEC-030 機構の搬送範囲表 |
+| 直接走査 | 本 Design の対応機構表 |
 | 用語政策（「対応関係」「対応付け」） | 本 Design の用語節 |
 | 工程割当（req-define から case-close までの利用、作成、検査の割当） | REQ-021 と各 command Design が所有する。本 Design は再掲しない |
 

@@ -66,7 +66,7 @@ AgentDevFlow 配布物と harness 実行制御の責務分離モデルを定義�
 本 Design は harness execution mechanism の境界宣言のみを所有し、起動 API、並列数、timeout 等の具体は各 skill の `references/` へ集約する。
 external execution boundary（外部バックエンド接続）は REQ-011 が正規所有する（REQ-011-017）。
 
-並列判断と並列起動機構の境界（DEC-015（superseded by DEC-036/038/039））: 並列可否、処理単位間の依存関係、合流条件等の判定は ADF の決定論的実行中核が所有し、実際の並列起動機構は実行基盤（harness）が所有する。
+並列可否、処理単位間の依存関係、合流条件は ADF が判定し、並列起動は実行基盤が担う（DEC-036、DEC-039）。
 REQ-011-018 の「並列実行」は並列起動機構を指し、並列の可否・依存・合流の判定は ADF 側実行判断（REQ-011-019）が所有する。
 実際に起動するエージェント数、起動 API、実行基盤固有の並列化手段を ADF の正規契約へ固定しない。
 
@@ -145,7 +145,7 @@ AgentDevFlow 配布command / Workflow Skill / Design は ToDo を必須機構と
 ## 関連
 
 - DEC-001（AgentDevFlow 憲章）: 決定2（ADF が所有しない領域）が本 Design の原本原則。
-- DEC-002（OpenCode ソース・プロジェクション分離、superseded。配備形態の現行体制は DEC-049）: 本 Design の harness 非依存原則を原本とプロジェクションの分離によって物理層で担保する。
+- DEC-049: 共通原本と投影を分け、実行基盤への依存を投影境界に置く。
 - REQ-002（配布成果物の責務境界）: 配布成果物側の正規所有者。本 Design は交叉参照として所有内容を重複しない。
 - v2:ADR-0136（配布物の harness 実行制御分離）: 吸収元。決定本質は charter 決定2 に先駆的適用として含まれる。
 - v2:REQ-0162（配布物の harness 実行制御分離）: 吸収元。原則の SSoT と各要件行（4状態結果契約、配布 docs 制約、ADF 可観測タイムスタンプ境界、ID 除去、パス除去）を本 Design および REQ-002 へ統合した。
