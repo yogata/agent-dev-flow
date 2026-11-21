@@ -2,11 +2,13 @@
 title: 導入スクリプトの使いやすさ詳細
 status: accepted
 created: 2026-08-02
-updated: 2026-11-18
+updated: "2026-11-21"
 ---
+<!-- ADF-COVERS(implementation): REQ-050-006（誤実行防止の環境判定方式の判定材料と手順。runtime-package-boundary.md から移管〔REQ-123-003〕） -->
 <!-- ADF-COVERS(implementation): REQ-009-001, REQ-009-003, REQ-009-004, REQ-009-005, REQ-009-040, REQ-009-041, REQ-009-042, REQ-009-043, REQ-009-044, REQ-009-046, REQ-009-047, REQ-009-048, REQ-009-049 -->
 <!-- ADF-COVERS(implementation): REQ-009-040, REQ-009-041, REQ-009-042, REQ-009-043, REQ-009-044 -->
 <!-- ADF-COVERS(design): REQ-009-053, REQ-009-054 -->
+<!-- ADF-COVERS(design): REQ-050-002, REQ-050-003, REQ-050-005, REQ-050-015, REQ-058-001, REQ-058-004, REQ-058-005, REQ-058-006, REQ-058-008, REQ-058-012（ジャンクション状態の判定と自己修復節が正本一致検査の design 実体。runtime-package-boundary.md から移管〔REQ-123-003〕） -->
 
 # 導入スクリプトの使いやすさ詳細
 
@@ -38,6 +40,8 @@ install.ps1 は引数なし起動時、対話ウィザードにより実行モ�
 欠落はない（「install.ps1 -Mode check の検査カタログ」参照）。
 
 ### チェックアウト未検出時のエラーメッセージ
+
+チェックアウト検証は usable checkout 判定で行う（REQ-009-047、REQ-009-048。runtime-package-boundary.md から移管〔REQ-123-003〕）。install スクリプト（-Mode apply / check / dry-run）は、チェックアウト配置先（既定 `.agentdev-plugin/`）配下に共通原本 `src/common/` が存在することで検証し、`.git` の存在を必須としない。版（commit/branch）報告は `.git` が存在する場合のみ行い、ZIP 展開チェックアウトの版は unknown。version manifest は導入せず、ZIP 展開環境はサポート対象外とする。provisioning を代行実行しない。
 
 チェックアウト配置先に src/opencode/ が存在しない場合、install スクリプトはエラー停止し、
 clone コマンド例とソース ZIP 取得手順を案内表示する（REQ-009-047）。
@@ -97,6 +101,19 @@ dry-run の WOULD REMOVE 予測対象は stale junction と stale shim の両方
 `apply` 完了後、同一条件で `check` を再実行した際に処理対象となった乖離が残存しないことを同期完了条件とする。最終 `check` が正常状態へ収束しない場合は再同期完了とは判定しない。
 
 archive installer（junction 方式ではない）は本契約の直接対象外とし、同等の収束契約が必要かどうかの評価を本契約の実装対象に含めない。
+
+### ジャンクション状態の判定と自己修復（runtime-package-boundary.md から移管〔REQ-123-003〕）
+
+両公開入口は、各ジャンクション対象の有無と解決先の一致を同じ正本解決条件で確認する（REQ-050-002/003、REQ-058-012）。判定と挙動は両公開入口・両ホスト・全モードに適用する。
+
+| 状態 | 判定基準 | 挙動 |
+|------|----------|------|
+| 正常（correct target） | ジャンクションが存在し解決先が現行正本解決（LocalMode 含む）と一致 | apply 維持 / check OK 報告 / dry-run 変更なし報告 |
+| wrong target（管理物） | 解決先が現行正本と不一致（旧正本含む）。Test-ManagedProjectionJunction / Test-ManagedSenpiJunction が管理対象投影物と判定 | apply 削除して現行正本へ再作成（自己修復）/ check NG 報告 / dry-run 予測表示（REQ-058-004） |
+| wrong target（管理物と確認できない） | 解決先が正本候補外など管理対象と判定できない | apply 自動置換せず保持し衝突を報告して非正常終了 / check NG 報告 / dry-run 保持を報告 |
+| ジャンクション以外のパス | パスが存在するがジャンクションでない | 全モードでエラー停止・報告 |
+
+- 正本解決は `Get-TargetSourcePath`（install・self-sync それぞれの実装）を使い src 配下は LocalMode の有無で切り替わる。修復可否判定は `Test-ManagedProjectionJunction`・`Test-ManagedSenpiJunction` を再用する。旧正本を向くリンクも管理対象投影物として修復可能に含め（REQ-099-012）正本候補外は自動置換しない。修復はジャンクションの削除・再作成に限定し旧正本側の実体を移動・削除せず依存生成・通信を行わない。dry-run は予測表示のみで check・dry-run はリンク先を変更しない（REQ-050-005）。修復予定ありの dry-run 終了コードは 0、check の乖離は 1。apply は検出乖離を解消し同一条件の check 再実行で残存しないことを収束とする（REQ-050-015、REQ-058-006）。衝突・修復失敗の apply を正常終了にしない。自己修復は LocalMode・通常版の両方に適用され種別切り替え後の旧接続先残存は apply 再実行で復元される。管理対象外リンク・実ディレクトリ・repo-local 資産の保護は本 Design「stale 管理投影物の廃止時クリーンアップと同期完了条件」を参照（REQ-058）
 
 REQ-009-042 が要求するヘルプの3モード説明もこの定義に従い、clone 軸の説明を含まない。
 
@@ -174,7 +191,14 @@ sync-self の停止メッセージ:
 
 ### 誤実行防止（リポジトリ種別判定）の案内メッセージ
 
-cwd 安全化（REQ-009-041）とは別軸の誤実行防止として、両公開入口は実行対象環境のリポジトリ種別を機械判定し、誤った環境では変更前に停止して適切な入口を案内する（REQ-050-006）。判定材料と手順は runtime-package-boundary Design「誤実行防止の環境判定方式」が所有し、本節は案内メッセージ形式を定める。
+cwd 安全化（REQ-009-041）とは別軸の誤実行防止として、両公開入口は実行対象環境のリポジトリ種別を機械判定し、誤った環境では変更前に停止して適切な入口を案内する（REQ-050-006）。判定材料と手順の正規所有は本 Design である（runtime-package-boundary.md から移管。REQ-123-003）。
+
+| 入口 | 誤実行検出条件 | 判定材料 |
+|------|--------------|---------|
+| `scripts/install.ps1` | 実行対象が AgentDevFlow 本体リポジトリ | 実行ディレクトリ直下に `src/opencode/` が存在すること（consumer ではチェックアウトは `.agentdev-plugin/` 配下） |
+| `scripts/self-sync.ps1` | 実行対象が本体リポジトリでない | `$PSScriptRoot` の親に `src/opencode` が存在しないこと |
+
+REQ-009-041（cwd 安全化）は実行ディレクトリの想定外検知を、本判定はリポジトリ種別の誤り検知を担う別判定である。
 
 scripts/install.ps1 を AgentDevFlow 本体リポジトリで実行した場合の停止メッセージ:
 

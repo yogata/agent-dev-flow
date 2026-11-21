@@ -169,6 +169,36 @@ Epic 実装はこれに従う。
 - trust root / protected path と配布 manifest の対象パス: スクリプトパスを契約として保持する検証処理・テストは新構造（scripts/install.ps1、scripts/self-sync.ps1、scripts/consumer/ 配下、scripts/self/ 配下）へ追従させる。trust root / protected path は新しい信頼対象パスを保護し、移動後の旧パスのみを保護する状態にしない。公開入口の実行依存集合（scripts/consumer/common.ps1 等）が配布 manifest 対象に完全に含まれることを検証対象とする。
 - trusted-distribution-gate CLI（`trusted-distribution-gate/cli.ts`）の引数構文解析は `node:util.parseArgs` へ移行する。オプション間依存（`--profile release` 時の `--archive` 必須等）の意味検証は ADF 側に残留し、CLI の終了コード・stdout・stderr 契約は変更しない。移行契約の詳細は checker 共通実行契約 Design「再帰ファイル探索と CLI 引数解析の標準API移行」が定める。
 
+## 配布物依存スキルの src 昇格（REQ-002-001/002、v2:ADR-0134）
+
+本節は runtime-package-boundary.md から移管した（REQ-123-003）。
+`.opencode/skills/` 配下は既定で git 管理対象外である。配布物が依存するスキルは `src/common/skills/` へ昇格し、配布物の自己完結性（self-contained）を維持する（v2:ADR-0134）。
+
+### 昇格基準
+
+| 区分 | 配置 | git 管理 | 配布 | 根拠 |
+|------|------|----------|------|------|
+| 配布物依存スキル | `src/common/skills/<name>/` | `src/` 配下で通常トラック | `agentdev-*` グロブ対象外の場合は install script で個別 junction 対象に追加 | v2:ADR-0134 / REQ-002-001 |
+| repo-local 専用スキル | `.opencode/skills/repo-*/` | `.gitignore` `repo-*` ホワイトリストでトラック | 配布対象外（REQ-001） | REQ-001 / REQ-002-002 |
+| third-party Skill | `.opencode/skills/<name>/`（取得機構経由配置） | git 管理対象外 | 配布対象外。配布成果物から参照する場合は宣言と参照点集約（REQ-002-044）に従う | REQ-002-044 |
+
+昇格判定は「配布物が当該スキルを参照するか否か」で機械的に行い、IR-058 が `git ls-files` 突合とテキスト参照走査で検出する。昇格手順: (1) 配布物から参照を確認、(2) `git mv` で `src/common/skills/<name>/` へ移動、(3) 個別 `.gitignore` トラック行を削除、(4) グロブ対象外の場合は両入口の junction 対象関数に個別追加、(5) consumer 向け推奨 `.gitignore` へ追加、(6) docs-check で IR-016 と IR-058 の NG 0 件を確認。
+
+### 現行の境界
+
+| スキル | 区分 | 備考 |
+|--------|------|------|
+| `agentdev-*` 配下全件 | 配布物依存 | `src/common/skills/` 配下、`agentdev-*` グロブで自動 junction |
+| `repo-agentdev-integrity` | repo-local 専用 | `/repo/docs-check` 実行スキル。REQ-001 の `repo-*` carve-out 対象。cli.ts の正本は `src/common/skills/repo-agentdev-integrity/` 配下、`.opencode/skills/` 側は copy 投影として git 管理（DEC-065 決定3、REQ-002-020 の限定例外。IR-016 copy 投影整合、IR-068 copy_projections 登録突合で検査）。checker を呼び出す command は DEC-006 により repo-local command（`docs-check` 等）へ正規化済み |
+
+## repo-local Plugin の配布除外と自己ホスト投影（runtime-package-boundary.md から移管〔REQ-123-003〕）
+
+本節は runtime-package-boundary.md「Tools / Plugins の配布・投影」の repo-local Plugin 契約（REQ-002-045）を引き継ぐ。runtime-package-boundary.md は Custom Tool・Plugin / Hook を正規配布種別として扱う種別宣言（REQ-052）と公開入口2本固定（REQ-050-001、REQ-052-008）を維持する。
+
+- 原本配置原則は `src/opencode/plugins/<agentdev-name>/` 配下。consumer 配布系全経路（install、archive installer、package-release-archive）は repo-local 配布除外を実装し、3ファイルの列挙条件を同期する義務を持つ。除外機構は明示的除外リスト等とし、REQ-002-011 の repo-* prefix 方式は plugin に採用しない
+- `scripts/self-sync.ps1` は repo-local Plugin を除外しない（自己ホスト投影を維持）。自己ホスト投影は canonical チェックアウト内部の source → projection 構成であり配布ではないため、配布除外機構の適用対象外である。textlint 検査基盤の保存済み結果（実行時データ）は配布対象外（Plugin 本体実装仕様が所有。DEC-065）
+- 配布除外規則の正本を1箇所に定め、各入口は正本の参照・導出で除外集合を決定し同一の除外集合に単一導出で一致することを検証する。検査側の監査期待値の独立性と検出パイプラインは本 Design「配布テキスト成果物の対象モデル」（監査期待の独立性予約 I-004）正規所有（REQ-029、DEC-014）
+
 ## 関連 Design と実装詳細の帰属
 
 - 検出シグナル、正規表現、exemption 条件、severity、gate 実行経路の詳細: IR-059 と integrity-rule-catalog.md、rule-ownership.md、req-impact-map.md の同期更新で整理する。

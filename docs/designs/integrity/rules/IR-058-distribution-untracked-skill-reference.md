@@ -19,12 +19,12 @@ verification_path: src/common/skills/repo-agentdev-integrity/scripts/rules/rules
 | detection_method | `src/common/skills/repo-agentdev-integrity/rules/ir-058.ts` が実装する。ステップ1: `.opencode/skills/` 配下のディレクトリ一覧から `src/common/skills/` に存在しないもの（projection-only）を抽出し、`repo-*` プレフィックス（REQ-001 repo-local）を除外する。ステップ2: 各 projection-only スキル名について、配布物ファイル群を走査し、パス参照（`.opencode/skills/<name>`、`src/common/skills/<name>`）、バッククォート参照（`` `<name>` ``）、日本語散文参照（`<name> スキル`、`<name>スキル`）、`load_skills` リテラル参照のいずれかで出現するか確認する。出現した場合は src 昇格を促す NG を出力する |
 | affected_artifacts | [src/common/commands/agentdev/**/*.md, src/common/skills/**/*.md, .opencode/skills/<name>/] |
 | related_req | [REQ-002-001, REQ-002-002, REQ-002-003] |
-| related_design | [../integrity/integrity-rule-catalog.md, ../local/runtime-package-boundary.md] |
+| related_design | [../integrity/integrity-rule-catalog.md, ../integrity/distribution-boundary.md] |
 | gate_level | full-audit, delta-guard, impact-guard |
 | false_positive_risk | 低。スキル名は kebab-case であり語境界マッチで偽陽性は限定的。`repo-*` プレフィックスは REQ-001 により repo-local として除外。ルールカタログ・vocabulary-registry・IR-058 ルールファイル自体・runtime-package-boundary Design は検出語を正当に含むため exemption 対象とする |
 | regression_test | `scripts/rules/rules.test.ts`（ir058 インメモリケース。旧 checker での describe 名は `IR-058 distribution-untracked-skill-reference`）。projection-only かつ配布物から参照されるスキルを置いた fixture で NG が出力されること、参照無し fixture で OK が出力されること、`repo-*` スキルは参照されても検出されないことを検証する |
 | finding_route | intake |
-| triage_action | 新規検出時は対象スキルを `src/common/skills/` へ昇格（REQ-002-001）。昇格基準、手順は `runtime-package-boundary.md`「配布物依存スキルの src 昇格」セクション参照。repo-local 専用スキルとして扱う場合は `repo-*` プレフィックスへ rename するか、IR-058 exemption 登録の正当性を別途確認する |
+| triage_action | 新規検出時は対象スキルを `src/common/skills/` へ昇格（REQ-002-001）。昇格基準、手順は `distribution-boundary.md`「配布物依存スキルの src 昇格」セクション参照（runtime-package-boundary.md から移管〔REQ-123-003〕）。repo-local 専用スキルとして扱う場合は `repo-*` プレフィックスへ rename するか、IR-058 exemption 登録の正当性を別途確認する |
 | last_verified | 2026-07-03 |
 
 ## 検査項目
@@ -77,4 +77,4 @@ full audit を即 fail gate 化する。
 
 - [integrity-rule-catalog.md](../integrity-rule-catalog.md)
 - [rule-ownership.md](../rule-ownership.md)
-- [../../local/runtime-package-boundary.md](../../local/runtime-package-boundary.md)（配布物依存スキルの src 昇格）
+- [../distribution-boundary.md](../distribution-boundary.md)（配布物依存スキルの src 昇格）
