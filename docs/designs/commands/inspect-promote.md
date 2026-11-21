@@ -71,7 +71,7 @@ updated: "2026-11-18"
 - [workflows/lifecycle-state-machine.md](../workflows/lifecycle-state-machine.md)（コマンド分類）
 - [workflows/capture-boundaries.md](../workflows/capture-boundaries.md)（検出事項プロトコル〔v4 帰属先〕）、[workflows/collaboration-loop.md](../workflows/collaboration-loop.md)（ループ統合と v3 backlog-artifact-lifecycle Design からの吸収記録: 自動 promote 対象カテゴリ・投入先・実行ログ・誤検知 revoke 手順・分類確定状態再構成規則の帰属）
 
-## 自律確定の判定位置とHITLフォールバック（新規セクション）
+## 自律確定の判定位置とHITLフォールバック
 
 本節は inspect-promote における自律確定の判定位置とHITLフォールバックの実行詳細を所有する。判断確定の境界は REQ-096（ADF判断アーキテクチャ）の共通原則に従い、詳細判定表は responsibility-boundaries Design（ADF判断アーキテクチャ詳細基準節）が集約所有する（本 Design と Workflow Skill は同一内容を重複保持しない）。
 

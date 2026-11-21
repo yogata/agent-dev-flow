@@ -41,7 +41,7 @@ intake 候補と learning 候補は必ず別々の成果物として扱い、混
 
 case-run で発見した本筋外検出事項（Finding）の永続化チャネルとして PR 本文を使用する（REQ-006）。
 
-- 書込み元: case-run 経由の実行担当サブエージェント（STEP-S4/STEP-W3 委譲先）
+- 書込み元: case-run 経由の実行担当サブエージェント（STEP-S4/STEP-S5 委譲先）
 - 読取り元: case-close（STEP-6）
 - 各 case-run は自身の PR にのみ書込み。`.agentdev/intake/inbox/` は直接変更しない
 - capture 候補を intake 候補と learning 候補に分け、別々の成果物として扱う（Split Rule に準拠）

@@ -150,5 +150,5 @@ REQ-114-013（3 採用形態での共通 E2E 挙動確認）の実装・検証�
 ADF v4 の責務分類（正典: DEC-048、foundations/responsibility-boundaries Design「v4 責務分類語彙の後継」節）における本 Design の 3 区分（意味判断担当〔閉じた意味評価・開いた推論を所有〕/ 決定的処理委譲先 / 知識提供）。語彙の原本は foundations/responsibility-boundaries Design「v4 責務分類語彙の後継」節であり、本節はその確定値を記録する。
 
 - **意味判断担当**: 0 件
-- **決定的処理委譲先**: Wave scheduling（fan-in 判定）は委譲先未整備の債務（第13段 full validation で再評価）
+- **決定的処理委譲先**: Wave scheduling（fan-in 判定）は case-auto orchestration stage 3 が単一所有する（本 skill は再所有しない）
 - **知識提供**: orchestration stage 構成・停止伝播・resume 契約

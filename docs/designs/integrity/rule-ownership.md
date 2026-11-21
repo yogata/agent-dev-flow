@@ -30,7 +30,7 @@ req-impact-map.md の配置の原本は `../responsibilities/req-impact-map.md` 
 
 ## 意味判断・決定的処理の分類注記（DEC-048）
 
-各ルールドメインの正規所有者の所在は、判断方法3分類（決定的処理・閉じた意味評価・開いた推論。正典: DEC-048、`../foundations/responsibility-boundaries.md`「v4 責務分類語彙の後継」節）に従って読む。判定基準・運用規則の意味契約は Design または Skill の知識（意味判断側）が、checker 実体・採番・整合検査・機械分類（check_extensions.ts deriveSkillClassification 等）の決定的処理は script / repo-local checker が所有する。v4 分類軸を検査する新規 checker は現段階で作らない（第13段 full validation で再評価する）。
+各ルールドメインの正規所有者の所在は、判断方法3分類（決定的処理・閉じた意味評価・開いた推論。正典: DEC-048、`../foundations/responsibility-boundaries.md`「v4 責務分類語彙の後継」節）に従って読む。判定基準・運用規則の意味契約は Design または Skill の知識（意味判断側）が、checker 実体・採番・整合検査・機械分類（check_extensions.ts deriveSkillClassification 等）の決定的処理は script / repo-local checker が所有する。v4 分類軸を検査する新規 checker は現段階で作らない（既存の判断方法3分類の採用基準に従って個別判断する）。
 
 ## ルールドメイン一覧
 

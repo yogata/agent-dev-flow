@@ -21,7 +21,7 @@ review 挿入位置は「Scale 判断後・Decision判断前・要件doc生成�
 
 | 条件 | feature の場合 | feature 以外（bugfix, maintenance, docs_chore）の場合 |
 |---|---|---|
-| Scale 判断後 | Scale判断完了後 | work_type 判定完了後。Scale判断 は feature のみ実行するため、work_type 判定完了をもって意味的完成とする |
+| Scale 判断後 | Scale判断完了後 | work_type 判定完了後。Scale判断 は全 work_type に対して実行するため、work_type 判定完了をもって意味的完成とする |
 | Decision判断前 | Decision判断の判断結果がドラフト保存で永続化される前 | 同左 |
 | 要件doc生成前 | 要件doc生成の成果物がドラフト保存で永続化される前 | 同左 |
 

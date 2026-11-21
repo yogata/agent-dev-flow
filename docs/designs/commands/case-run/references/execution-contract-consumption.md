@@ -9,7 +9,7 @@ updated: "2026-11-19"
 
 # execution contract 消費境界
 
-## execution contract 消費境界（新規セクション）
+## execution contract 消費境界
 
 case-run は REQ-017 に定義される実行契約（対象範囲、実現方針、完了条件）を消費境界として扱う。
 
