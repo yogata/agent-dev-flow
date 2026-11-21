@@ -1,5 +1,5 @@
-// ADF-COVERS(verification): REQ-001-026, REQ-001-028
-// ADF-COVERS(implementation): REQ-010-059
+// ADF-COVERS(verification): REQ-001-026, REQ-001-028, REQ-123-005, REQ-123-006
+// ADF-COVERS(implementation): REQ-010-059, REQ-123-005, REQ-123-006
 /**
  * check_autogen_freshness.ts — AUTOGEN ブロック鮮度検出 gate (REQ-010-059).
  *
@@ -28,17 +28,6 @@ import {
 } from "../lib/cli_utils.ts";
 import {
   findAutogenBlocks,
-  collectIrFiles,
-  collectDecisionFiles,
-  collectReqFiles,
-  generateCatalogEntries,
-  generateRuleOwnershipAppendix,
-  generateDecisionBaselineCaption,
-  generateDecisionBaselineTable,
-  generateDecisionStatusList,
-  generateReqActiveCaption,
-  generateReqActiveTable,
-  generateReadmeReqSummaryCount,
   CATALOG_BLOCK_ID,
   RULE_OWNERSHIP_BLOCK_ID,
   DECISION_BASELINE_COUNT_BLOCK_ID,
@@ -51,7 +40,26 @@ import {
   REQ_ACTIVE_TABLE_BLOCK_ID,
   README_REQ_SUMMARY_COUNT_BLOCK_ID,
   README_REQ_SUMMARY_TABLE_BLOCK_ID,
-} from "./generate_indexes.ts";
+} from "./generate_indexes/markers.ts";
+import {
+  collectIrFiles,
+  collectDecisionFiles,
+  collectReqFiles,
+} from "./generate_indexes/collectors.ts";
+import {
+  generateCatalogEntries,
+  generateRuleOwnershipAppendix,
+} from "./generate_indexes/integrity_indexes.ts";
+import {
+  generateDecisionBaselineCaption,
+  generateDecisionBaselineTable,
+  generateDecisionStatusList,
+} from "./generate_indexes/decision_readme.ts";
+import {
+  generateReqActiveCaption,
+  generateReqActiveTable,
+} from "./generate_indexes/req_readme.ts";
+import { generateReadmeReqSummaryCount } from "./generate_indexes/docs_readme.ts";
 import { rules as registryRules } from "../rules/index.ts";
 
 const path = require("path") as typeof import("path");

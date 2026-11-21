@@ -1,4 +1,4 @@
-// ADF-COVERS(implementation): REQ-056-010, REQ-056-011
+// ADF-COVERS(implementation): REQ-056-010, REQ-056-011, REQ-123-005, REQ-123-006
 /**
  * check_knowledge_docs.ts — docs/knowledge/ 構造検査 checker (REQ-056-010/011).
  *

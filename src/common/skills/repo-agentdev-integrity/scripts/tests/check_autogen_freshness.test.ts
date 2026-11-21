@@ -12,8 +12,8 @@ import {
   CATALOG_BLOCK_ID,
   DECISION_BASELINE_TABLE_BLOCK_ID,
   findAutogenBlocks,
-  generateCatalogEntries,
-} from "../generate_indexes.ts";
+} from "../generate_indexes/markers.ts";
+import { generateCatalogEntries } from "../generate_indexes/integrity_indexes.ts";
 import {
   buildBlockTargets,
   classifyStaleness,

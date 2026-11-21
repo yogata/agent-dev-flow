@@ -18,17 +18,6 @@ import {
 import {
   CATALOG_BLOCK_ID,
   RULE_OWNERSHIP_BLOCK_ID,
-  collectIrFiles,
-  findAutogenBlocks,
-  generateCatalogEntries,
-  generateRuleOwnershipAppendix,
-  collectDecisionFiles,
-  findUndeclaredRelatedReqDecisions,
-  generateDecisionBaselineCaption,
-  generateDecisionBaselineTable,
-  generateDecisionStatusList,
-  generateDecisionRelatedReqTable,
-  extractRelatedReqNotes,
   DECISION_BASELINE_COUNT_BLOCK_ID,
   DECISION_BASELINE_TABLE_BLOCK_ID,
   DECISION_STATUS_ACCEPTED_BLOCK_ID,
@@ -36,16 +25,37 @@ import {
   DECISION_STATUS_SUPERSEDED_BLOCK_ID,
   DECISION_STATUS_DEPRECATED_BLOCK_ID,
   DECISION_RELATED_REQ_TABLE_BLOCK_ID,
-  collectReqFiles,
-  generateReqActiveCaption,
-  generateReqActiveTable,
   REQ_ACTIVE_COUNT_BLOCK_ID,
   REQ_ACTIVE_TABLE_BLOCK_ID,
-  generateReadmeReqSummaryCount,
-  generateDocsReadmeDecisionTable,
   README_REQ_SUMMARY_COUNT_BLOCK_ID,
   README_DECISION_SUMMARY_TABLE_BLOCK_ID,
-} from "../scripts/generate_indexes.ts";
+  findAutogenBlocks,
+} from "../scripts/generate_indexes/markers.ts";
+import {
+  collectIrFiles,
+  collectDecisionFiles,
+  collectReqFiles,
+} from "../scripts/generate_indexes/collectors.ts";
+import {
+  generateCatalogEntries,
+  generateRuleOwnershipAppendix,
+} from "../scripts/generate_indexes/integrity_indexes.ts";
+import {
+  extractRelatedReqNotes,
+  findUndeclaredRelatedReqDecisions,
+  generateDecisionBaselineCaption,
+  generateDecisionBaselineTable,
+  generateDecisionRelatedReqTable,
+  generateDecisionStatusList,
+} from "../scripts/generate_indexes/decision_readme.ts";
+import {
+  generateReqActiveCaption,
+  generateReqActiveTable,
+} from "../scripts/generate_indexes/req_readme.ts";
+import {
+  generateDocsReadmeDecisionTable,
+  generateReadmeReqSummaryCount,
+} from "../scripts/generate_indexes/docs_readme.ts";
 import { rules as registryRules } from "./index.ts";
 
 interface AutogenBlockSpec {
