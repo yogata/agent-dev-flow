@@ -1,13 +1,14 @@
 // scripts/git-hooks/minimal-gate.mjs — Minimal-by-Default ゲート（決定論的・ローカル）。
 // agent-dev-flow ソースリポジトリ専用。配布物（配布アーカイブ・consumer リポジトリ）には
 // 含めない（配布写像は trusted-distribution-gate/manifest.ts の限定列挙で scripts/git-hooks/ は対象外）。
-// 3 検査: (a) 単一ファイルサイズ上限（LLM コンテキスト・1モジュール1責務の目安）
-//        (b) アクティブ WIP キューの滞留監視（WARN 表示のみ）
-//        (c) .agentdev/ 未処理キュー（inbox）滞留の push ブロック
+// 2 検査: (a) 単一ファイルサイズ上限（LLM コンテキスト・1モジュール1責務の目安）
+//        (b) アクティブ WIP キューの滞留監視（WARN 表示のみ。pre-commit と pre-push の両方で実行）
 // 強制度合い: block は「恒久資産（.agentdev/ 以外）の新規追加ファイルが単一ファイルサイズ上限を
 // 超える場合」のみ。.agentdev/ 配下（drafts/・backlog/ 等）は工程の一時ワークスペースであるため、
 // 上限超過は新規・既存を問わず WARN 表示のみで終了コード 0 とする。恒久資産の既存の上限超過
 // ファイルを編集する場合も WARN 表示のみとし、リファクタリング途中のコミットを妨げない。
+// backlog/inbox は後から非同期に処理するキューであるため、滞留ゼロを強制しない
+// （ワークフロー自身の learning 自動保存が push を自己ブロックする構造欠陥の解消。2026-11-20）。
 // 存在しない過去資産の監視（禁止パス・追加行の禁止語スキャン）は置かない（Zero-Base Filter。
 // 歴史は Git ログが唯一の正本である）。
 // 呼び出し: bun scripts/git-hooks/minimal-gate.mjs pre-commit | pre-push
@@ -156,33 +157,14 @@ function checkGovernance() {
   }
 }
 
-// --- (d) キュー滞留ゼロ強制（pre-push。.agentdev/ 配下の inbox ディレクトリ） ---
-function checkQueue() {
-  const base = path.join(root, ".agentdev");
-  if (!existsSync(base)) return;
-  const scan = (dir) => {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, entry.name);
-      if (!entry.isDirectory()) continue;
-      if (entry.name === "inbox") {
-        const lingering = readdirSync(full).filter((f) => f !== ".gitkeep");
-        if (lingering.length > 0) {
-          fail(`未処理キュー滞留: ${path.relative(root, full)} に ${lingering.length} 件残存`);
-        }
-      } else {
-        scan(full);
-      }
-    }
-  };
-  scan(base);
-}
+// --- (d) WIP キュー滞留の WARN は pre-commit と pre-push の両方で共通実行 ---
 
 if (mode === "pre-commit") {
   checkFileSizes();
   checkWipQueues();
   checkGovernance();
 } else if (mode === "pre-push") {
-  checkQueue();
+  checkWipQueues();
 } else {
   console.error(`[minimal-gate] 未知のモード: ${mode}`);
   process.exit(2);

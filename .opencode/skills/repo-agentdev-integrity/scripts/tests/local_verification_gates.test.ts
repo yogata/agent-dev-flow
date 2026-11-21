@@ -158,14 +158,27 @@ function writeFixtureFile(cwd: string, rel: string, content: string): void {
   fs.writeFileSync(p, content, "utf-8");
 }
 
-function runGate(cwd: string): { status: number; out: string } {
-  const result = spawnSync(process.execPath, [GATE_SCRIPT_PATH, "pre-commit"], {
+function runGate(cwd: string, mode: "pre-commit" | "pre-push" = "pre-commit"): { status: number; out: string } {
+  const result = spawnSync(process.execPath, [GATE_SCRIPT_PATH, mode], {
     cwd,
     env: CLEAN_ENV,
     encoding: "utf-8",
   });
   return { status: result.status ?? -1, out: `${result.stdout ?? ""}\n${result.stderr ?? ""}` };
 }
+
+test("REQ-122-008: pre-push は inbox 滞留をブロックしない（非同期キュー前提・WARN 表示のみ）", () => {
+  const dir = makeFixtureRepo();
+  try {
+    // ワークフロー自身が learning/inbox へ自動保存した記録1件があっても push 相当の検査は通る。
+    writeFixtureFile(dir, ".agentdev/learning/inbox/2026-11-21-learning-note.md", "# learning\n");
+    const r = runGate(dir, "pre-push");
+    expect(r.status).toBe(0);
+    expect(r.out).toContain("検査合格");
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
 
 test("REQ-122-008: minimal-gate.mjs は総数検査・語彙スキャン・墓標監視を持たない", () => {
   const content = fs.readFileSync(GATE_SCRIPT_PATH, "utf-8");

@@ -37,9 +37,9 @@ fail_with_guidance() {
   exit 1
 }
 
-echo "[pre-push] Step 0/4: 未処理キュー滞留ゼロ強制（minimal-gate.mjs）を実行します。"
+echo "[pre-push] Step 0/4: WIP キュー滞留の監視（WARN 表示のみ・minimal-gate.mjs）を実行します。"
 if ! bun "$GATE" pre-push; then
-  echo "[pre-push] .agentdev/ の未処理キューに残存があるため、この push を物理ブロックしました。" >&2
+  echo "[pre-push] minimal-gate の実行が失敗したため、この push を物理ブロックしました。" >&2
   fail_with_guidance
 fi
 
