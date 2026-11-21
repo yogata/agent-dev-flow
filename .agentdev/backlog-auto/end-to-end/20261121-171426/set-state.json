@@ -215,7 +215,7 @@
     },
     "stage5_execution": {
       "status": "in_progress",
-      "at": "2026-11-22T02:15:00+09:00",
+      "at": "2026-11-22T03:33:00+09:00",
       "phase": "case-close",
       "resume": {
         "resumedFrom": {
@@ -244,7 +244,24 @@
           }
         }
       },
-      "inputCleanupCommit": "b9f793fbe"
+      "inputCleanupCommit": "b9f793fbe",
+      "acceptance": {
+        "completedAt": "2026-11-22T03:33:00+09:00",
+        "closedChildren": [4179, 4180, 4181, 4182, 4183, 4184, 4185, 4187, 4188],
+        "blockedChildren": [4186],
+        "remediation": {
+          "semanticRemediationPr": 4201,
+          "manifestFollowUpCommit": "53c2604c1",
+          "descriptionDebtTrackingIssue": 4200
+        },
+        "blockedDetail": {
+          "issue": 4186,
+          "condition": "TS-008 条件1（production-equivalent: 実 req-define workflow 実行での IR-044 シグナル語走査発火・表記ガイダンス適用の記録）",
+          "reason": "本番相当の実 workflow 実行証拠が工程境界（新規一式禁止・単独 req-define 起動）内で取得不能。条件2（成果物の IR-044 検出 0 件）は pass。",
+          "pendingArbitration": "HITL で (a) 実 req-define 実行の新規承認 / (b) 検証方法解釈変更の承認 / (c) 完遂判定からの除外 を仲裁予定"
+        },
+        "epicTable": "9 completed・1 blocked 反映済み（#4177 実行構成表）"
+      }
     },
     "stage6_completionJudgment": { "status": "not_started" },
     "stage7_release": { "status": "not_started" }
