@@ -112,11 +112,11 @@ IR-047（src/opencode-local link origin dir structure）は、実行検出が配
 
 ### IR-023 削除に伴う交叉参照再配置
 
-IR-023（Integrity artifact validator drift）は prose-only 規則であり、独立の機械検出を持ち得なかった（回帰試験名 `prevention_gates.test.ts` は不存在）。実際の drift 抑制は IR-074（checkIrRuleClassification、check_integrity.ts）が担う。各条項を IR-074 と integrity-contracts.md「3層検出構造の責務分担」節（REQ-010-008 の Design 対応）へ移管し、規則文書を物理削除した。
+IR-023（Integrity artifact validator drift）は prose-only 規則であり、独立の機械検出を持ち得なかった（回帰試験名 `prevention_gates.test.ts` は不存在）。実際の drift 抑制は integrity-contracts.md の条文検査と rule-ownership.md の同期条件が担う（IR-074 は実装されずに欠番となった候補であり参照しない）。各条項を IR-074 と integrity-contracts.md「3層検出構造の責務分担」節（REQ-010-008 の Design 対応）へ移管し、規則文書を物理削除した。
 
 | 旧交叉参照 | 旧タイトル | 再配置元 | 再配置日 | 後継 |
 |---|---|---|---|---|
-| `IR-023` | Integrity artifact validator drift | integrity-rule-catalog.md ルールインデックス AUTOGEN（`catalog-ir-entries-pre-045`）・影響マトリクス REQ-010 行 AUTOGEN・rule-ownership.md「同期条件と独立所有の明示」節の現行機構引用記述・rule-ownership.md IR 別関連マッピング AUTOGEN | 2026-11-15 | IR-074（ir-rule-classification-traceability）+ integrity-contracts.md「3層検出構造の責務分担」節 |
+| `IR-023` | Integrity artifact validator drift | integrity-rule-catalog.md ルールインデックス AUTOGEN（`catalog-ir-entries-pre-045`）・影響マトリクス REQ-010 行 AUTOGEN・rule-ownership.md「同期条件と独立所有の明示」節の現行機構引用記述・rule-ownership.md IR 別関連マッピン（IR-074 参照は幽霊後継のため除去）グ AUTOGEN | 2026-11-15 | IR-074（ir-rule-classification-traceability）+ integrity-contracts.md「3層検出構造の責務分担」節 |
 
 ### IR-020 削除に伴う交叉参照再配置
 
@@ -136,7 +136,7 @@ IR-009（旧 namespace 残存）、IR-014（reference/ 残存検出）、IR-021�
 | `IR-009` | 旧 namespace 残存 | 影響マトリクス REQ-010/REQ-036 行 AUTOGEN・rule-ownership.md IR 別関連マッピング AUTOGEN・check_integrity.ts checkLegacyNamespace | 2026-11-18 | なし（レガシー移行資産の完全削除で暫定統制の義務消滅） |
 | `IR-014` | reference/ 残存検出 | 影響マトリクス REQ-002/REQ-037 行 AUTOGEN・rule-ownership.md IR 別関連マッピング AUTOGEN・check_integrity.ts checkObsoleteReferenceDirs | 2026-11-18 | なし（SKILL frontmatter 検査の obsolete reference/ 判定も同時削除） |
 | `IR-021` | 廃止済み skill 参照検出 | 影響マトリクス REQ-010 行 AUTOGEN・rule-ownership.md IR 別関連マッピング AUTOGEN・check_integrity.ts checkAbolishedSkillReferences | 2026-11-18 | なし（同上） |
-| `IR-046` | consumer-generated リポジトリ種別誤検知防止 | 影響マトリクス REQ-009 行 AUTOGEN・rule-ownership.md IR 別関連マッピング AUTOGEN・lib/distribution-boundary-rules.ts checkIr046 | 2026-11-18 | なし（IR-047/048 は存続） |
+| `IR-046` | consumer-generated リポジトリ種別誤検知防止 | 影響マトリクス REQ-009 行 AUTOGEN・rule-ownership.md IR 別関連マッピング AUTOGEN・lib/distribution-boundary-rules.ts checkIr046 | 2026-11-18 | なし（IR-048 は存続。IR-047 は削除済み・上方の交叉参照再配置節参照） |
 | `IR-054` | draft Design 放置検出 | 影響マトリクス REQ-001 行 AUTOGEN・rule-ownership.md IR 別関連マッピング AUTOGEN・check_integrity.ts checkDraftSpecStaleness | 2026-11-18 | docs/designs/README.md status 列追跡 + case-close Design 確定工程 |
 | `IR-057` | obsolete-spec-path-after-domain-split | 影響マトリクス REQ-001/REQ-009/REQ-036 行 AUTOGEN・rule-ownership.md IR 別関連マッピング AUTOGEN・check_integrity.ts checkObsoleteSpecPath・check_changed_docs.ts IR-057 validator | 2026-11-18 | なし（data/obsolete-path-map.yaml も同時削除） |
 | `IR-065` | obsolete-vocabulary-current-use | 影響マトリクス REQ-010 行 AUTOGEN・rule-ownership.md IR 別関連マッピング AUTOGEN・check_integrity.ts checkObsoleteVocabulary | 2026-11-18 | なし（data/obsolete-vocabulary-map.yaml も同時削除。vocabulary-registry 対照表運用は存続） |

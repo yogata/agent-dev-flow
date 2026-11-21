@@ -127,13 +127,13 @@ IR エントリ一覧は rules/index.ts のレジストリから `generate_index
 > **削除済み（REQ-010-003、REQ-036-023）**: IR-045 の検査は docs-check の機械検出対象から除外し、文意品質の意味診断は docs 横断診断・inspect 系診断（`agentdev-doc-diagnostics`、`agentdev-inspect-skills`）、文章表層品質は textlint 共通基盤（`agentdev-textlint-guard`）へ移管した。
 > docs-check は意味判断を要する文意整合検査を保持しない（機械化原則 REQ-010-003、REQ-036-008）。
 > catalog↔実装双方向同期運用手順（REQ-010-003）に従い baseline_status: resolved の上で本エントリを削除した。
-> IR-045 識別子は `vocabulary-registry.md`「文意品質検出対象語（IR-045）」で文意品質検出対象語の参照として残る。
+> IR-045 識別子は語彙対照表運用の廃止（DEC-065・後継レジストリなし）後は欠番参照であり、現行の語彙基準の正は品質仕様（quality-specs.md）が所有する。
 > 新規検出時の復活運用（REQ-010-003）に従い、必要に応じて docs-check 検出対象への復活を検討する。
 
 ### IR-009/014/021/046/054/057/065/066: 削除（OU-004、Epic #4126 Phase 4）
 
-> **削除済み（REQ-010-003、REQ-010-074/079、DEC-064）**: 8ルールの検査は機械検出層から削除し、ルールファイル（rules/IR-{009,014,021,046,054,057,065,066}-*.md）と checker 実装・テストアサーションを物理削除した。
-> 削除根拠: 旧 namespace・旧パス・廃止語彙の残存検出は移行期の暫定統制であり、レガシー移行資産の完全削除（Epic #4126）完了後は恒久維持義務を負わない（DEC-064）。IR-054（draft Design 放置検出）は Design status 追跡（docs/designs/README.md status 列）と case-close の Design 確定工程で代替する。
+> **削除済み（REQ-010-003、REQ-010-074/079）**: 8ルールの検査は機械検出層から削除し、ルールファイル（rules/IR-{009,014,021,046,054,057,065,066}-*.md）と checker 実装・テストアサーションを物理削除した。
+> 削除根拠: 旧 namespace・旧パス・廃止語彙の残存検出は移行期の暫定統制であり、レガシー移行資産の完全削除（Epic #4126）完了後は恒久維持義務を負わない。IR-054（draft Design 放置検出）は Design status 追跡（docs/designs/README.md status 列）と case-close の Design 確定工程で代替する。
 > IR-055・IR-059 は baseline 運用のみ撤廃して検出器として存続する（検出違反は直接修正で解消。IR-073 と同一の扱い）。
 > catalog↔実装双方向同期運用手順（REQ-010-003）に従い、当該 IR エントリをカタログ一覧から除去した。
 
@@ -145,7 +145,7 @@ IR エントリ一覧は rules/index.ts のレジストリから `generate_index
 | IR-046 | consumer-generated リポジトリ種別誤検知防止 | 削除（欠番） | 同上（IR-047/048 は本節の記録時点で存続。REQ-122 Wave-1 の IR 減量〔DEC-065・56→24〕で両ルールは削除済み・現行レジストリ非登録） |
 | IR-054 | draft Design 放置検出 | 削除（欠番） | 同上（Design status 追跡と case-close Design 確定で代替） |
 | IR-057 | obsolete-spec-path-after-domain-split | 削除（欠番） | 同上（targeted docs guard の IR-057 validator も同時に削除） |
-| IR-065 | obsolete-vocabulary-current-use | 削除（欠番） | 同上（vocabulary-registry の対照表運用は存続） |
+| IR-065 | obsolete-vocabulary-current-use | 削除（欠番） | 同上 |
 | IR-066 | legacy-path-removed-name | 削除（欠番） | 同上 |
 
 > 識別子の再利用禁止は `foundations/numbering-policy.md` が保持し、履歴性は Git で担保する（DEC-013 AG-008）。
@@ -207,7 +207,7 @@ AG-005 規則群（`lint_skills.ts`、RU-0018 / Issue #2179、PR #2184 で main 
 | references 目次欠落 | hard | 300 行超の references ファイルにおける目次（TOC）欠落 |
 | 集約予算 350 | warn | description 平均 350 文字予算超過（N = `src/common/skills` 配下 SKILL.md ファイル数） |
 
-正規所有者（Design が正、linter は検出ビュー）: `agentdev-skill-authoring` Design「skill 記述基準（層1〜3）」、`command-file-format` Design「機械検査対象」。
+正規所有者（Design が正、linter は検出ビュー）: `agentdev-skill-authoring` Design「skill 記述基準（層1〜3）」、`agentdev-command-authoring` Design「機械検査対象」。
 
 登録判断: 新規カテゴリ追加判定フローに従い、(1) 検出が機械的パターンマッチで完結する、(2) 判定基準の正典が既存 Design（skill authoring 層1〜2）に存在し checker は検出ビューに留まる、(3) 既存 IR カテゴリと検出対象が重複しない、の各条件を満たすため checker カテゴリとして登録し IR 番号付与は行わないものと判定した。検出された違反は baseline による免除管理を行わず（REQ-010-082）、対象側の直接修正で 0 件化する運用とする。
 
@@ -264,7 +264,7 @@ docs-check（`/repo/docs-check`、検証エンジン cli.ts）と skill 定義�
 | 検査対象 | `.md` のみ | Markdown 形式の永続文書（REQ/Decision/Design/guides/SKILL.md/command 定義） |
 | 除外 | `retired/` 配下 | 履歴参照用、検出対象外 |
 | 除外 | code block 内部 | 例示、パターン説明は検出対象外 |
-| 正当使用例外 | vocabulary-registry.md / integrity-rule-catalog.md / gate-levels.md / remediation-routing.md | 検出ルール自体の記述、正規語彙の対照表 |
+| 正当使用例外 | integrity-rule-catalog.md / gate-levels.md / remediation-routing.md | 検出ルール自体の記述。語彙基準の対照表の正は品質仕様（quality-specs.md）が所有 |
 
 ### NG ルール間依存関係マップ
 
@@ -302,7 +302,7 @@ checkWorkflowStatusProhibition
 2. **catalog エントリ追加**: `integrity-rule-catalog.md` に12フィールド以上の IR エントリを追加する（DEC-013 適用後、field 数 ≥ 12）。新規 IR 登録 gate（(a)/(b)）の確認を必須とする
 3. **実装追加**: 検証エンジン rules レジストリ（rules/ 配下プラグイン）へ検出関数を実装し、rules/index.ts に登録する。exemption 条件、false_positive_risk を実装に反映する
 4. **テストデータ更新**: 検証エンジン rules レジストリの有効なテストデータ（valid fixture）が新ルールで NG とならないことを確認する（drift detection smoke test。bun test 実行）
-5. **vocabulary-registry 同期**: 新ルールが語彙検出に関わる場合、`vocabulary-registry.md` を更新する
+5. **語彙基準同期**: 新ルールが語彙検出に関わる場合、品質仕様（quality-specs.md）の語彙基準へ反映する
 6. **categoryToCheckPattern map 更新**: 検証エンジン rules レジストリへ新規ルールを登録する（plugin 型アーキテクチャ、integrity-engine-plugin-architecture Design）（skill-category-gap 解消、REQ-010-005）
 
 追加可否判定: 上記 1-6 全て満たす場合のみ追加可。
@@ -361,7 +361,7 @@ regression test の fixture copy は実ファイル構成の完全ミラーリ�
 
 `document-type-responsibilities.md` 訳語表に掲載される散文英語普通名詞（finding, promoted artifact, drift, regression, gate, severity, category, schema, observation 等）を候補語として網羅検証し、各語を検出対象（IR-044 drift 検出候補）または正規使用（対象外）のいずれかに分類する。
 
-候補語対照表は `.opencode/skills/repo-agentdev-integrity/references/vocabulary-registry.md` と連携して最新状態を保ち、対象外とする語には IR-044 適用除外の根拠を併記する。
+候補語対照表の運用は品質仕様（quality-specs.md）の語彙基準と連携して最新状態を保ち、対象外とする語には IR-044 適用除外の根拠を併記する。
 候補語の限定は訳語表全体で検証した結果に基づき、限定の根拠を対照表へ明記する。
 
 ## ガードレール識別体系検査（Gxx 検査の置換）
