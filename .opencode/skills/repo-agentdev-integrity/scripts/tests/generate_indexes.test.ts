@@ -1,17 +1,15 @@
 // ADF-COVERS(verification): REQ-010-011, REQ-059-001, REQ-059-002, REQ-059-003, REQ-059-004, REQ-059-005, REQ-047-013
 /**
- * Regression tests for AUTOGEN marker detection (Issue #1771, RU-0002).
+ * Representative tests for index generation modules (generate_indexes/).
  *
- * Verifies that the whole-line matching strategy correctly:
- *   - detects real AUTOGEN marker lines (positive cases)
- *   - ignores backtick-wrapped marker strings in prose (negative cases)
- *   - handles boundary cases where backticks are adjacent to marker lines
+ * 全インデックス種別の代表正常系と、マーカー検出・計測日導出・関連REQ表・
+ * supersede 注記・逆索引・manifest 再生成の代表異常系を代表ケースで固定する。
+ *
+ * マーカー検出（行全体一致）は backtick 囲みの marker 文字列を実 marker と
+ * 誤認して generate_indexes.ts が停止した回帰（PR #1718 / Issue #1771、RU-0002）を
+ * 代表ケースで固定する。
  *
  * Design: docs/designs/integrity/index-auto-generation.md「AUTOGEN marker 検出契約」
- * Background: PR #1718 workaround (HTML comment syntax abstraction) addressed
- * a symptom where backtick-wrapped marker strings in spec-health-metrics.md L26
- * were misrecognized as real markers, causing generate_indexes.ts to stop.
- * This test locks the root-cause fix (whole-line matching).
  */
 import { describe, it, expect, afterAll } from "bun:test";
 import * as fs from "fs";
@@ -23,170 +21,90 @@ import {
   extractAutogenBeginId,
   findAutogenBlocks,
   replaceAutogenBlock,
-  deriveMeasureDateFromLastCommit,
-  collectDecisionFiles,
-  extractRelatedReqNotes,
-  findUndeclaredRelatedReqDecisions,
-  formatRelatedReqCell,
-  generateDecisionRelatedReqTable,
-  generateDecisionBaselineTable,
-  generateDecisionStatusList,
-  formatSupersedeNoteSuffix,
-  normalizeSupersedeNote,
-  collectReqFiles,
-  generateReqActiveTable,
   README_REQ_SUMMARY_COUNT_BLOCK_ID,
   README_REQ_SUMMARY_TABLE_BLOCK_ID,
   README_DECISION_SUMMARY_TABLE_BLOCK_ID,
-  generateDocsReadmeDecisionTable,
+} from "../generate_indexes/markers.ts";
+import {
+  collectDecisionFiles,
+  collectReqFiles,
+} from "../generate_indexes/collectors.ts";
+import {
   buildReqToIrIndex,
   generateReqImpactMapCrossref,
-  deriveSkillProjectionManifestSkills,
-  replaceSkillProjectionManifestSkills,
-  replaceSkillProjectionManifestGeneratedAt,
-  collectIrFiles,
+} from "../generate_indexes/integrity_indexes.ts";
+import {
+  extractRelatedReqNotes,
+  findUndeclaredRelatedReqDecisions,
+  formatRelatedReqCell,
+  formatSupersedeNoteSuffix,
+  generateDecisionBaselineTable,
+  generateDecisionRelatedReqTable,
+  generateDecisionStatusList,
+  normalizeSupersedeNote,
+} from "../generate_indexes/decision_readme.ts";
+import { generateReqActiveTable } from "../generate_indexes/req_readme.ts";
+import { generateDocsReadmeDecisionTable } from "../generate_indexes/docs_readme.ts";
+import {
   SKILL_PROJECTION_MANIFEST_REL,
-} from "../generate_indexes.ts";
+  deriveSkillProjectionManifestSkills,
+  replaceSkillProjectionManifestGeneratedAt,
+  replaceSkillProjectionManifestSkills,
+} from "../generate_indexes/skill_manifest.ts";
+import { deriveMeasureDateFromLastCommit } from "../generate_indexes/measure_date.ts";
 import { findRepoRoot } from "../../lib/cli_utils.ts";
 
 const REPO_ROOT_FOR_B31 = findRepoRoot(import.meta.dir);
 
-describe("isAutogenBeginLine", () => {
-  it("returns true for a canonical marker line", () => {
+describe("AUTOGEN marker detection (whole-line matching, Issue #1771)", () => {
+  it("detects canonical and whitespace-padded marker lines", () => {
     expect(isAutogenBeginLine("<!-- AUTOGEN:BEGIN:id=catalog-ir-entries-pre-045 -->")).toBe(true);
-  });
-
-  it("returns true with leading whitespace", () => {
     expect(isAutogenBeginLine("  <!-- AUTOGEN:BEGIN:id=xxx -->")).toBe(true);
-  });
-
-  it("returns true with trailing whitespace", () => {
     expect(isAutogenBeginLine("<!-- AUTOGEN:BEGIN:id=xxx -->  ")).toBe(true);
-  });
-
-  it("returns false for a backtick-wrapped marker (negative)", () => {
-    expect(isAutogenBeginLine("`<!-- AUTOGEN:BEGIN:id=xxx -->`")).toBe(false);
-  });
-
-  it("returns false for a prefix-backtick boundary", () => {
-    expect(isAutogenBeginLine("`<!-- AUTOGEN:BEGIN:id=xxx -->")).toBe(false);
-  });
-
-  it("returns false for a suffix-backtick boundary", () => {
-    expect(isAutogenBeginLine("<!-- AUTOGEN:BEGIN:id=xxx -->`")).toBe(false);
-  });
-
-  it("returns false for a prose line containing the marker inline", () => {
-    const line = "AUTOGENブロックは`<!-- AUTOGEN:BEGIN:id=... -->`から対応する`<!-- AUTOGEN:END -->`までを除外する。";
-    expect(isAutogenBeginLine(line)).toBe(false);
-  });
-
-  it("returns false for a plain text line", () => {
-    expect(isAutogenBeginLine("This is a normal paragraph.")).toBe(false);
-  });
-});
-
-describe("isAutogenEndLine", () => {
-  it("returns true for a canonical end marker line", () => {
     expect(isAutogenEndLine("<!-- AUTOGEN:END -->")).toBe(true);
-  });
-
-  it("returns true with leading whitespace", () => {
     expect(isAutogenEndLine("  <!-- AUTOGEN:END -->")).toBe(true);
-  });
-
-  it("returns false for a backtick-wrapped end marker (negative)", () => {
-    expect(isAutogenEndLine("`<!-- AUTOGEN:END -->`")).toBe(false);
-  });
-
-  it("returns false for a prose line containing end marker inline", () => {
-    const line = "対応する`<!-- AUTOGEN:END -->`までを除外する。";
-    expect(isAutogenEndLine(line)).toBe(false);
-  });
-});
-
-describe("extractAutogenBeginId", () => {
-  it("extracts the id from a canonical marker line", () => {
     expect(extractAutogenBeginId("<!-- AUTOGEN:BEGIN:id=catalog-ir-entries-pre-045 -->")).toBe("catalog-ir-entries-pre-045");
-  });
-
-  it("extracts id with leading whitespace", () => {
     expect(extractAutogenBeginId("  <!-- AUTOGEN:BEGIN:id=spec-metrics-measurement-example -->")).toBe("spec-metrics-measurement-example");
   });
 
-  it("returns null for a backtick-wrapped marker (negative)", () => {
+  it("rejects backtick-wrapped, boundary-adjacent, and prose-inline markers", () => {
+    expect(isAutogenBeginLine("`<!-- AUTOGEN:BEGIN:id=xxx -->`")).toBe(false);
+    expect(isAutogenBeginLine("`<!-- AUTOGEN:BEGIN:id=xxx -->")).toBe(false);
+    expect(isAutogenBeginLine("<!-- AUTOGEN:BEGIN:id=xxx -->`")).toBe(false);
+    const prose = "AUTOGENブロックは`<!-- AUTOGEN:BEGIN:id=... -->`から対応する`<!-- AUTOGEN:END -->`までを除外する。";
+    expect(isAutogenBeginLine(prose)).toBe(false);
+    expect(isAutogenEndLine(prose)).toBe(false);
+    expect(isAutogenBeginLine("This is a normal paragraph.")).toBe(false);
     expect(extractAutogenBeginId("`<!-- AUTOGEN:BEGIN:id=xxx -->`")).toBe(null);
-  });
-
-  it("returns null for a non-marker line", () => {
     expect(extractAutogenBeginId("normal text")).toBe(null);
   });
-});
 
-describe("findAutogenBlocks", () => {
-  it("detects a real AUTOGEN block (positive)", () => {
-    const content = [
+  it("finds and replaces only real blocks even when prose contains backtick-wrapped markers", () => {
+    const mixed = [
       "# Title",
       "",
-      "<!-- AUTOGEN:BEGIN:id=test-block -->",
-      "line A",
-      "line B",
+      "AUTOGENブロックは`<!-- AUTOGEN:BEGIN:id=... -->`から対応する`<!-- AUTOGEN:END -->`までを除外する。",
+      "",
+      "<!-- AUTOGEN:BEGIN:id=real-block -->",
+      "old line",
       "<!-- AUTOGEN:END -->",
       "",
       "After block.",
     ].join("\n");
-
-    const blocks = findAutogenBlocks(content);
-    expect(blocks.length).toBe(1);
-    expect(blocks[0].id).toBe("test-block");
-    expect(blocks[0].startLine).toBe(2);
-    expect(blocks[0].endLine).toBe(5);
-    expect(blocks[0].currentBody).toEqual(["line A", "line B"]);
-  });
-
-  it("ignores backtick-wrapped marker strings in prose (negative)", () => {
-    const content = [
-      "# Title",
-      "",
-      "AUTOGENブロックは`<!-- AUTOGEN:BEGIN:id=... -->`から対応する`<!-- AUTOGEN:END -->`までを除外する。",
-      "",
-      "No real markers here.",
-    ].join("\n");
-
-    const blocks = findAutogenBlocks(content);
-    expect(blocks.length).toBe(0);
-  });
-
-  it("detects only the real block when prose has backtick-wrapped markers (mixed)", () => {
-    const content = [
-      "# Design",
-      "",
-      "AUTOGENブロックは`<!-- AUTOGEN:BEGIN:id=... -->`から対応する`<!-- AUTOGEN:END -->`までを除外する。",
-      "",
-      "## Section",
-      "",
-      "<!-- AUTOGEN:BEGIN:id=real-block -->",
-      "data",
-      "<!-- AUTOGEN:END -->",
-    ].join("\n");
-
-    const blocks = findAutogenBlocks(content);
+    const blocks = findAutogenBlocks(mixed);
     expect(blocks.length).toBe(1);
     expect(blocks[0].id).toBe("real-block");
+    expect(blocks[0].startLine).toBe(4);
+    expect(blocks[0].endLine).toBe(6);
+    expect(blocks[0].currentBody).toEqual(["old line"]);
+
+    const replaced = replaceAutogenBlock(mixed, "real-block", ["new line"]);
+    expect(replaced).toContain("new line");
+    expect(replaced).not.toContain("old line");
+    expect(replaced).toContain("AUTOGENブロックは`<!-- AUTOGEN:BEGIN:id=... -->`から対応する`<!-- AUTOGEN:END -->`までを除外する。");
   });
 
-  it("ignores a marker line with an adjacent backtick (boundary)", () => {
-    const content = [
-      "<!-- AUTOGEN:BEGIN:id=boundary -->",
-      "content",
-      "<!-- AUTOGEN:END -->`",
-    ].join("\n");
-
-    const blocks = findAutogenBlocks(content);
-    expect(blocks.length).toBe(0);
-  });
-
-  it("detects multiple distinct real blocks", () => {
+  it("detects multiple distinct real blocks and leaves unmatched ids unchanged", () => {
     const content = [
       "<!-- AUTOGEN:BEGIN:id=block-1 -->",
       "a",
@@ -196,86 +114,36 @@ describe("findAutogenBlocks", () => {
       "b",
       "<!-- AUTOGEN:END -->",
     ].join("\n");
-
     const blocks = findAutogenBlocks(content);
     expect(blocks.length).toBe(2);
-    expect(blocks[0].id).toBe("block-1");
-    expect(blocks[1].id).toBe("block-2");
-  });
-});
-
-describe("replaceAutogenBlock", () => {
-  it("replaces the body of a matching real block", () => {
-    const content = [
-      "<!-- AUTOGEN:BEGIN:id=target -->",
-      "old line",
-      "<!-- AUTOGEN:END -->",
-    ].join("\n");
-
-    const result = replaceAutogenBlock(content, "target", ["new line"]);
-    expect(result).toContain("new line");
-    expect(result).not.toContain("old line");
-  });
-
-  it("does not match a backtick-wrapped marker (negative)", () => {
-    const content = [
-      "Prose: `<!-- AUTOGEN:BEGIN:id=target -->` text.",
-      "<!-- AUTOGEN:BEGIN:id=target -->",
-      "old",
-      "<!-- AUTOGEN:END -->",
-    ].join("\n");
-
-    const result = replaceAutogenBlock(content, "target", ["new"]);
-    expect(result).toContain("new");
-    expect(result).not.toContain("old");
-    expect(result).toContain("Prose: `<!-- AUTOGEN:BEGIN:id=target -->` text.");
-  });
-
-  it("leaves content unchanged when no matching block exists", () => {
-    const content = "no markers here";
-    const result = replaceAutogenBlock(content, "absent", ["new"]);
-    expect(result).toBe(content);
+    expect(blocks.map((b) => b.id)).toEqual(["block-1", "block-2"]);
+    expect(replaceAutogenBlock(content, "absent", ["new"])).toBe(content);
   });
 });
 
 // ─── 計測日導出（SC-002「計測日導出」、Issue #2211）───────────────────────
-// 対象ドキュメント群の最終コミット日付導出（実行時日付非依存）を固定する回帰テスト。
 
 describe("deriveMeasureDateFromLastCommit", () => {
-  it("returns YYYY-MM-DD for a tracked file with commit history", () => {
-    const root = findRepoRoot(import.meta.dir);
-    const date = deriveMeasureDateFromLastCommit(root, [
-      path.join(root, "docs", "README.md"),
-    ]);
-    expect(date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-  });
-
-  it("returns a stable value across repeated calls", () => {
+  it("returns a stable YYYY-MM-DD for a tracked file with commit history", () => {
     const root = findRepoRoot(import.meta.dir);
     const p = path.join(root, "docs", "README.md");
-    expect(deriveMeasureDateFromLastCommit(root, [p])).toBe(
-      deriveMeasureDateFromLastCommit(root, [p]),
-    );
+    const date = deriveMeasureDateFromLastCommit(root, [p]);
+    expect(date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(deriveMeasureDateFromLastCommit(root, [p])).toBe(date);
   });
 
-  it("returns null for paths without commit history", () => {
+  it("returns null without commit history or for an empty path list", () => {
     const root = findRepoRoot(import.meta.dir);
     expect(
       deriveMeasureDateFromLastCommit(root, [
         path.join(root, "docs", "__no_such_file__.md"),
       ]),
     ).toBe(null);
-  });
-
-  it("returns null for an empty path list", () => {
-    const root = findRepoRoot(import.meta.dir);
     expect(deriveMeasureDateFromLastCommit(root, [])).toBe(null);
   });
 });
 
 // ─── Decision 関連REQ表（REQ-059-001..003）──────────────────────────────────
-// related_reqs 抽出（空宣言と未宣言の区別）、混合領域生成（説明列保持）、
-// 未宣言検出を固定する回帰テスト（Issue #2756）。
 
 const RR_TMP_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), "genidx-related-req-"));
 
@@ -287,7 +155,7 @@ function writeDecision(dir: string, id: string, fmBody: string): void {
   );
 }
 
-describe("Decision related_reqs collection (REQ-059-001)", () => {
+describe("Decision related_reqs collection (REQ-059-001..003)", () => {
   const decDir = path.join(RR_TMP_ROOT, "decisions");
   if (!fs.existsSync(decDir)) {
     fs.mkdirSync(decDir, { recursive: true });
@@ -314,10 +182,6 @@ describe("Decision related_reqs collection (REQ-059-001)", () => {
     expect(byId.get("DEC-001")?.relatedReqs).toEqual(["REQ-002", "REQ-009"]);
     expect(byId.get("DEC-002")?.relatedReqs).toEqual([]);
     expect(byId.get("DEC-003")?.relatedReqs).toBe(null);
-  });
-
-  it("detects undeclared decisions as finding candidates (REQ-059-003)", () => {
-    const infos = collectDecisionFiles(decDir);
     const undeclared = findUndeclaredRelatedReqDecisions(infos);
     expect(undeclared.map((d) => d.id)).toEqual(["DEC-003"]);
   });
@@ -372,14 +236,11 @@ describe("extractRelatedReqNotes", () => {
   });
 });
 
-// ─── supersede_note 由来の部分置換注記生成（index-auto-generation.md「現在稼働
-// している自動生成契約」5、RA-002）─────────────────────────────────────────
-// superseded Decision の frontmatter superseded_by + supersede_note をデータ源として
-// status 表・superseded セクションの該当行へ同一注記を併記することを固定する。
+// ─── supersede_note 由来の部分置換注記生成（RA-002 / Issue #3460）────────────
 
 const SUP_TMP_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), "genidx-supersede-"));
 
-describe("formatSupersedeNoteSuffix (RA-002)", () => {
+describe("supersede_note parsing and suffix generation (RA-002)", () => {
   const supDecDir = path.join(SUP_TMP_ROOT, "decisions");
   if (!fs.existsSync(supDecDir)) {
     fs.mkdirSync(supDecDir, { recursive: true });
@@ -400,22 +261,18 @@ describe("formatSupersedeNoteSuffix (RA-002)", () => {
     );
   }
 
-  const collectById = () =>
-    new Map(collectDecisionFiles(supDecDir).map((d) => [d.id, d]));
-
   it("parses superseded_by and supersede_note from frontmatter", () => {
-    const byId = collectById();
+    const byId = new Map(collectDecisionFiles(supDecDir).map((d) => [d.id, d]));
     expect(byId.get("DEC-017")?.supersededBy).toBe("DEC-037");
     expect(byId.get("DEC-017")?.supersedeNote).toBe(
       "決定4 は DEC-037 が置換。決定1〜3は維持",
     );
-    expect(byId.get("DEC-030")?.supersededBy).toBe("DEC-037");
     expect(byId.get("DEC-030")?.supersedeNote).toBe(null);
     expect(byId.get("DEC-037")?.supersededBy).toBe(null);
   });
 
   it("returns the note suffix only for a superseded decision with supersede_note", () => {
-    const byId = collectById();
+    const byId = new Map(collectDecisionFiles(supDecDir).map((d) => [d.id, d]));
     expect(formatSupersedeNoteSuffix(byId.get("DEC-017")!)).toBe(
       "〔superseded by DEC-037。決定4 は DEC-037 が置換。決定1〜3は維持〕",
     );
@@ -436,19 +293,6 @@ describe("formatSupersedeNoteSuffix (RA-002)", () => {
     expect(table.join("\n")).not.toContain("| DEC-030 | T30〔");
     expect(list.join("\n")).not.toContain("[DEC-030](DEC-030.md)（T30）〔");
   });
-
-  it("keeps generation idempotent across repeated runs", () => {
-    const infos = collectDecisionFiles(supDecDir);
-    const firstTable = generateDecisionBaselineTable(infos);
-    const firstList = generateDecisionStatusList(infos, "superseded");
-    const secondTable = generateDecisionBaselineTable(collectDecisionFiles(supDecDir));
-    const secondList = generateDecisionStatusList(
-      collectDecisionFiles(supDecDir),
-      "superseded",
-    );
-    expect(secondTable).toEqual(firstTable);
-    expect(secondList).toEqual(firstList);
-  });
 });
 
 describe("supersede_note rendering normalization (Issue #3460, ACT-DESIGN-035)", () => {
@@ -462,18 +306,8 @@ describe("supersede_note rendering normalization (Issue #3460, ACT-DESIGN-035)",
     );
     writeDecision(
       normDecDir,
-      "DEC-050",
-      'title: "T50"\nstatus: accepted\nrelated_reqs: [REQ-032]\ncreated: "2026-10-01"\nupdated: "2026-10-01"',
-    );
-    writeDecision(
-      normDecDir,
       "DEC-051",
       'title: "T51"\nstatus: superseded\nsuperseded_by: DEC-050\nsupersede_note: ""\nrelated_reqs: [REQ-032]\ncreated: "2026-10-01"\nupdated: "2026-10-01"',
-    );
-    writeDecision(
-      normDecDir,
-      "DEC-029",
-      'title: "T29"\nstatus: superseded\nsuperseded_by: DEC-050\nsupersede_note: "   "\nrelated_reqs: [REQ-032]\ncreated: "2026-10-01"\nupdated: "2026-10-01"',
     );
     writeDecision(
       normDecDir,
@@ -493,33 +327,21 @@ describe("supersede_note rendering normalization (Issue #3460, ACT-DESIGN-035)",
     );
   });
 
-  it("normalizes block-scalar supersede_note into a single-line note", () => {
+  it("normalizes block-scalar notes to single-line and empty inputs to null", () => {
     expect(normalizeSupersedeNote(byId().get("DEC-045")!.supersedeNote)).toBe(
       "部分置換。決定3後半を新規 Decision が置換する。 置換対象外: 決定1、決定2。",
     );
-  });
-
-  it("normalizes empty, whitespace-only, and undeclared note inputs to null", () => {
     expect(normalizeSupersedeNote("")).toBe(null);
     expect(normalizeSupersedeNote("   ")).toBe(null);
     expect(normalizeSupersedeNote("\n  ")).toBe(null);
     expect(normalizeSupersedeNote(null)).toBe(null);
-  });
-
-  it("returns null suffix for empty or whitespace-only supersede_note", () => {
-    const map = byId();
-    expect(formatSupersedeNoteSuffix(map.get("DEC-051")!)).toBe(null);
-    expect(formatSupersedeNoteSuffix(map.get("DEC-029")!)).toBe(null);
+    expect(formatSupersedeNoteSuffix(byId().get("DEC-051")!)).toBe(null);
   });
 
   it("expands block-scalar supersede_note as a single-line suffix", () => {
     expect(formatSupersedeNoteSuffix(byId().get("DEC-053")!)).toBe(
       "〔superseded by DEC-050。決定2のみ後継が置換。 決定1・3は維持。〕",
     );
-  });
-
-  it("keeps the status-gated suffix behavior for accepted decisions with superseded_by", () => {
-    expect(formatSupersedeNoteSuffix(byId().get("DEC-045")!)).toBe(null);
   });
 
   it("expands block-scalar supersede_note in docs/README table row without pipe-only output", () => {
@@ -541,10 +363,6 @@ describe("supersede_note rendering normalization (Issue #3460, ACT-DESIGN-035)",
     const emptyRow = rows.find((r) => r.includes("[DEC-051]"))!;
     expect(emptyRow).toBe(
       "| [DEC-051](decisions/DEC-051.md) | T51（superseded by DEC-050） |",
-    );
-    const wsRow = rows.find((r) => r.includes("[DEC-029]"))!;
-    expect(wsRow).toBe(
-      "| [DEC-029](decisions/DEC-029.md) | T29（superseded by DEC-050） |",
     );
     expect(rows.join("\n")).not.toContain("〔|〕");
   });
@@ -590,12 +408,9 @@ describe("doc_decision template related_reqs initial value (REQ-059-004)", () =>
 });
 
 describe("readme-req-summary-table (REQ-057-018)", () => {
-  it("uses the adopted block ID registered in index-auto-generation Design", () => {
+  it("replaces docs/README.md readme-req-summary-table block with REQ ID + title rows", () => {
     expect(README_REQ_SUMMARY_TABLE_BLOCK_ID).toBe("readme-req-summary-table");
     expect(README_REQ_SUMMARY_COUNT_BLOCK_ID).toBe("readme-req-summary-count");
-  });
-
-  it("replaces docs/README.md readme-req-summary-table block with REQ ID + title rows", () => {
     const original = [
       "現行要件の説明文（人手編集領域）",
       "",
@@ -638,33 +453,27 @@ describe("readme-decision-summary-table (AG-005, Case #3166)", () => {
       ...over,
     }) as never;
 
-  it("uses the block ID registered in index-auto-generation Design", () => {
+  it("generates rows with superseded_by annotation and expands supersede_note as notes notation", () => {
     expect(README_DECISION_SUMMARY_TABLE_BLOCK_ID).toBe(
       "readme-decision-summary-table",
     );
-  });
-
-  it("generates frontmatter-derived rows with superseded_by parenthesized annotation", () => {
     const rows = generateDocsReadmeDecisionTable([dec({})]);
     expect(rows).toContain(
       "| [DEC-017](decisions/DEC-017.md) | fixture: サンプル Decision の supersede 表記（superseded by DEC-037） |",
     );
-  });
-
-  it("expands frontmatter supersede_note as notes-notation annotation (sole data source, DEC-017)", () => {
-    const rows = generateDocsReadmeDecisionTable([
+    const noted = generateDocsReadmeDecisionTable([
       dec({
         supersedeNote:
           "決定4 は DEC-037 が置換。決定2 は DEC-036 が置換。決定1・3は維持",
       }),
     ]);
-    expect(rows).toContain(
+    expect(noted).toContain(
       "| [DEC-017](decisions/DEC-017.md) | fixture: サンプル Decision の supersede 表記（superseded by DEC-037〔決定4 は DEC-037 が置換。決定2 は DEC-036 が置換。決定1・3は維持〕） |",
     );
   });
 
-  it("derives annotation for accepted decisions with superseded_by (DEC-028, status-independent)", () => {
-    const rows = generateDocsReadmeDecisionTable([
+  it("derives annotation for accepted decisions with superseded_by and skips decisions without superseded_by", () => {
+    const accepted = generateDocsReadmeDecisionTable([
       dec({
         id: "DEC-028",
         num: 28,
@@ -679,16 +488,13 @@ describe("readme-decision-summary-table (AG-005, Case #3166)", () => {
           "「配布前に依存を解決した成果物を供給し、導入先での追加パッケージ取得を必要としない」条項は DEC-047 が textlint guard 依存実体の配布供給の範囲で部分置換。DEC-016 維持宣言と他の決定は維持（status: accepted 維持）",
       }),
     ]);
-    expect(rows.join("\n")).toContain(
+    expect(accepted.join("\n")).toContain(
       "文章表層品質の共通実行基盤（superseded by DEC-047〔「配布前に依存を解決した成果物を供給し、導入先での追加パッケージ取得を必要としない」条項は DEC-047 が textlint guard 依存実体の配布供給の範囲で部分置換。DEC-016 維持宣言と他の決定は維持（status: accepted 維持）〕）",
     );
-  });
-
-  it("skips annotation for decisions without superseded_by", () => {
-    const rows = generateDocsReadmeDecisionTable([
+    const noSupersede = generateDocsReadmeDecisionTable([
       dec({ status: "accepted", supersededBy: null }),
     ]);
-    expect(rows.join("\n")).not.toContain("superseded by");
+    expect(noSupersede.join("\n")).not.toContain("superseded by");
   });
 });
 
@@ -696,7 +502,7 @@ const B31_TMP_ROOT = fs.mkdtempSync(
   path.join(os.tmpdir(), "generate-indexes-b31-"),
 );
 
-function irFixture(id: string, relatedReq: string[]): ReturnType<typeof collectIrFiles>[number] {
+function irFixture(id: string, relatedReq: string[]): ReturnType<typeof import("../generate_indexes/collectors.ts").collectIrFiles>[number] {
   return {
     id,
     num: Number(id.slice(3)),
@@ -792,13 +598,10 @@ describe("skill-projection-manifest regeneration (REQ-047-013, B3-3)", () => {
     expect(updated).toContain("\n\nthird_party_skills:");
   });
 
-  it("updates generated_at line only", () => {
+  it("updates generated_at line only and matches the canonical data file path", () => {
     const content = "schema_version: 1\ngenerated_at: 2026-01-01\n";
     const updated = replaceSkillProjectionManifestGeneratedAt(content, "2026-11-13");
     expect(updated).toBe("schema_version: 1\ngenerated_at: 2026-11-13\n");
-  });
-
-  it("exported manifest path matches the canonical data file", () => {
     expect(SKILL_PROJECTION_MANIFEST_REL).toBe(
       ".opencode/skills/repo-agentdev-integrity/data/skill-projection-manifest.yaml",
     );

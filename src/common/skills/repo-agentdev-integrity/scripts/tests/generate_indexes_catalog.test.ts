@@ -16,9 +16,9 @@ import * as path from "path";
 import {
   CATALOG_BLOCK_ID,
   findAutogenBlocks,
-  generateCatalogEntries,
   replaceAutogenBlock,
-} from "../generate_indexes.ts";
+} from "../generate_indexes/markers.ts";
+import { generateCatalogEntries } from "../generate_indexes/integrity_indexes.ts";
 import { rules as registryRules } from "../../rules/index.ts";
 import { findRepoRoot } from "../../lib/cli_utils.ts";
 

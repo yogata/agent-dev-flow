@@ -34,6 +34,7 @@
     "../lib/workflow_trigger.ts",
     "./cli.ts",
     "./generate_indexes.ts",
+    "./generate_indexes/**/*.ts",
     "./check_autogen_freshness.ts",
     "./check_test_impact.ts",
     "./lint_skills.ts",

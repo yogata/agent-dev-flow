@@ -1,6 +1,6 @@
 // rules/ir-071.ts — integrity-rule-related-req-existence。
 // ルール詳細: docs/designs/integrity/rules/IR-071-integrity-rule-related-req-existence.md
-// related_req の本文表抽出は generate_indexes.ts parseBodyTableArray を再利用し、
+// related_req の本文表抽出は generate_indexes/markdown.ts parseBodyTableArray を再利用し、
 // rule-ownership.md AUTOGEN 派生表と単一情報源を維持する（I/O は IntegrityContext 経由）。
 
 import type {
@@ -8,7 +8,7 @@ import type {
   IntegrityRule,
   RuleViolation,
 } from "../engine/types.ts";
-import { parseBodyTableArray } from "../scripts/generate_indexes.ts";
+import { parseBodyTableArray } from "../scripts/generate_indexes/markdown.ts";
 import { buildReqRowIndex } from "./ir-067.ts";
 
 const ROW_ID_RE = /^REQ-(\d+)-(\d+)$/;
