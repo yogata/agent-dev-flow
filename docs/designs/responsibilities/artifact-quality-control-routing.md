@@ -5,6 +5,7 @@ created: 2026-08-09
 updated: 2026-11-18
 ---
 <!-- ADF-COVERS(implementation): REQ-017-004, REQ-017-005, REQ-017-006, REQ-054-003 -->
+<!-- ADF-COVERS(implementation): REQ-124-004（文書種別・配置モデル系基盤 Design の現行正本への現行化） -->
 
 # Artifact Quality Control Routing Design
 

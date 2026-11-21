@@ -1,0 +1,23 @@
+component: req-124-corpus-renewal
+implementation:
+  docs/requirements/REQ-041.md:
+    - REQ-124-001
+  docs/requirements/README.md:
+    - REQ-124-002
+  docs/designs/integrity/rules/IR-055-runtime-unresolved-reference.md:
+    - REQ-124-003
+  docs/designs/integrity/rules/IR-058-distribution-untracked-skill-reference.md:
+    - REQ-124-003
+  docs/requirements/REQ-030.md:
+    - REQ-124-006
+  docs/requirements/REQ-032.md:
+    - REQ-124-006
+  docs/requirements/REQ-038.md:
+    - REQ-124-006
+  docs/requirements/REQ-061.md:
+    - REQ-124-006
+  docs/requirements/REQ-110.md:
+    - REQ-124-006
+  src/common/skills/agentdev-req-analysis/references/pass-criteria-writing-guide.md:
+    - REQ-124-010
+    - REQ-004-077

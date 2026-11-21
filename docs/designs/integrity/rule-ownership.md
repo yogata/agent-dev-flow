@@ -6,6 +6,7 @@ updated: "2026-11-18"
 ---
 
 <!-- ADF-COVERS(design): REQ-047-013 -->
+<!-- ADF-COVERS(design): REQ-010-068（各 checker の回帰テストの責務分担設計） -->
 
 # ルール所有権マトリックス
 
