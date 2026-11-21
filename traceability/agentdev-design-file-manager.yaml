@@ -17,7 +17,6 @@ implementation:
     - REQ-021-026
     - REQ-032-025
 verification:
-  src/common/skills/agentdev-design-file-manager/scripts/tests/search-target-area.test.ts:
 
 
 
