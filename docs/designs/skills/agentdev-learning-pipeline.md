@@ -2,7 +2,7 @@
 title: `agentdev-learning-pipeline` Design
 status: accepted
 created: 2026-06-21
-updated: "2026-11-18"
+updated: "2026-11-21"
 ---
 <!-- ADF-COVERS(implementation): REQ-003-024, REQ-038-001, REQ-038-002, REQ-038-005 -->
 <!-- ADF-COVERS(design): REQ-038-007 -->
