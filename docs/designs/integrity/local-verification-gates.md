@@ -5,7 +5,6 @@ created: 2026-11-18
 updated: "2026-11-21"
 ---
 
-<!-- ADF-COVERS(design): REQ-122-009, REQ-122-010, REQ-122-015（pre-push のみのローカル検証ゲートの実行契約。REQ-116 型の covers 宣言） -->
 
 # ローカル検証ゲート Design
 

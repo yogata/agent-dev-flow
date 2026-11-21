@@ -1,14 +1,1 @@
 component: req-122-wave4-phase4
-# Issue #4156（Wave-4 / Phase 4: IR-075 新設・巨大コマンド分割・intake-triage と最終検証）。
-# docs 側正規成果物の REQ-122 対応は各ファイルの inline ADF-COVERS(implementation) 宣言へ追記し、
-# 既存配布物・repo-local 成果物の REQ-122 対応は各 artifact の正規 sidecar へ追記した
-# （inline 宣言優先規則・artifact × role 単位の情報源一元化）。
-# 本 sidecar は対応宣言の正規情報源が他に存在しない新設成果物のみを保持する。
-# REQ-122-015/016 の最終検証実行（pre-commit・pre-push）は scripts-git-hooks.yaml へ統合。
-# design 対応は REQ-122.md 冒頭の inline ADF-COVERS(design) 宣言（REQ-122-001〜016）が正のため
-# 本 sidecar では design を宣言しない。REQ-122-011〜016 は verification 必須（区分B）。
-# REQ-122-011 の verification は ir-075.test.ts（導出対応宣言。traceability/derivations.yaml の
-# 導出規約がテスト import 実測から導出）と pre-commit の IR-075 固有確認で成立する。
-implementation:
-  src/common/skills/repo-agentdev-integrity/rules/ir-075.ts:
-    - REQ-122-011

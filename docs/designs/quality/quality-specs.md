@@ -5,7 +5,6 @@ created: 2026-08-20
 updated: 2026-11-18
 ---
 <!-- ADF-COVERS(implementation): REQ-007-006, REQ-007-007, REQ-007-008, REQ-007-009 -->
-<!-- ADF-COVERS(design): REQ-122-011, REQ-122-012（コマンド・スキル本文・コマンド Design 文書の行数上限と references/ 分離の品質仕様。本文は ## 文書品質ルール 節） -->
 
 # 品質仕様
 

@@ -1,13 +1,3 @@
-# RA-010（Epic #4126 Wave-2、Issue #4132）: 削除 Design（v3-v4-crosswalk、
-# v4-migration-and-release、crosswalk-inventory、v4-v5-crosswalk）の covers 宣言消滅に伴う
-# missing-design 13 行の design 対応移管先を sidecar で宣言する。
-# 移管先の依拠根拠（adversarial-review 審議済み）:
-#   - 実験前提の3原則（design-principles.md「## 0. 実験前提の3原則（最上位ルール）」節、
-#     判断根拠の正は DEC-064）が移行・整理の上位設計原則（Git 履歴による復元・後方互換性の
-#     完全破棄・二択即決と決済記録）。
-#   - 現行正規モデル自体の定義は operating-model.md（三層責務モデル・中核文書モデル）。
-#   - 対応関係維持確認の標準関係構造は traceability-model.md「標準関係の構造」節
-#     （削除 Design v4-migration-and-release 本文が明示参照していた節）。
 component: ra010-traceability-modernization
 design:
   docs/designs/foundations/design-principles.md:

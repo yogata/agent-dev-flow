@@ -4,7 +4,7 @@ status: accepted
 created: 2026-08-20
 updated: 2026-11-21
 ---
-<!-- ADF-COVERS(implementation): REQ-001-033, REQ-122-014 -->
+<!-- ADF-COVERS(implementation): REQ-001-033 -->
 <!-- ADF-COVERS(implementation): REQ-002-009, REQ-002-010, REQ-002-012 -->
 <!-- ADF-COVERS(implementation): REQ-034-007 -->
 <!-- ADF-COVERS(design): REQ-032-029, REQ-009-052 -->

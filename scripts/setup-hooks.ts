@@ -1,4 +1,3 @@
-// ADF-COVERS(implementation): REQ-122-010
 // scripts/setup-hooks.ts — ローカル検証ゲートのセットアップ入口。
 // DEC-021（scripts 公開入口の2本固定）の3本への限定拡張（DEC-066 決定3）。
 // 実行契約は ACT-DESIGN-002「セットアップ（scripts/setup-hooks.ts）」が所有する。

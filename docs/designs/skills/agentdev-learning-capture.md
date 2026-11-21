@@ -5,7 +5,6 @@ created: 2026-06-21
 updated: 2026-11-18
 ---
 <!-- ADF-COVERS(implementation): REQ-038-001 -->
-<!-- ADF-COVERS(design): REQ-122-004（learning inbox の1トピック1ファイル構造スキーマ。本文は ## 提供する判断、操作 節） -->
 
 # `agentdev-learning-capture` Design
 

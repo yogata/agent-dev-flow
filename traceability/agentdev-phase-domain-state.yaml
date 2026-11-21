@@ -20,8 +20,6 @@ implementation:
     - REQ-110-014
     - REQ-111-013
     - REQ-111-034
-    - REQ-120-003
-    - REQ-122-004
 verification:
   src/common/skills/repo-agentdev-integrity/scripts/tests/phase_domain_state.test.ts:
     - REQ-110-001

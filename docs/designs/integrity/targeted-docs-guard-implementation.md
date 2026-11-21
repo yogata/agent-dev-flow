@@ -36,7 +36,7 @@ Phase 1-6 実装計画、report フィールド一覧、完了済み移行作業
 
 - モード使い分け: `--base-ref` によるコミット済み差分ベースの変更ファイル検出はコミット後・push 前の実行に限定し、コミット前（worktree 上での検証）は untracked ファイルを含む `--files` による明示指定を標準とする。`--files` と `--base-ref` の誤用による誤 pass・誤 FAILURE を防ぐため、起動時に対象ファイルが検出できる見込みを確認してから実行する
 - 検査対象 root の解決: worktree を検査対象とする場合は、検査 skill を host 側配置を起点として起動し、検査対象 worktree の絶対パスを `--root` で明示指定する。配置先起点の誤リポジトリ検査は検査見逃しとして扱う
-- 起動手段: `bun run src/common/skills/repo-agentdev-integrity/scripts/cli.ts --workflow <name>（--files または --base-ref による明示対象指定）` により起動する（スクリプト契約の共通 CLI 契約に従う）。本モードは検証エンジンの明示対象経路（targeted docs guard）であり、汎用差分実行 `--changed`（対象外のみ即時 Exit 0、REQ-122-006）とは独立に維持される。engine の終了コード単独で workflow の受入を決定せず、files_checked 空・不一致の fail-closed 判定はワークフロー側が行う（REQ-010-076、REQ-032-023）
+- 起動手段: `bun run src/common/skills/repo-agentdev-integrity/scripts/cli.ts --workflow <name>（--files または --base-ref による明示対象指定）` により起動する（スクリプト契約の共通 CLI 契約に従う）。本モードは検証エンジンの明示対象経路（targeted docs guard）であり、汎用差分実行 `--changed`（対象外のみ即時 Exit 0）とは独立に維持される。engine の終了コード単独で workflow の受入を決定せず、files_checked 空・不一致の fail-closed 判定はワークフロー側が行う（REQ-010-076、REQ-032-023）
 - PowerShell での引数形式: 複数パスの引数は引用符でまとめて1文字列として渡さず、配列変数経由（`$files = @("a.md","b.md"); --files $files`）または個別渡しとする。`--files "a.md b.md"` 形式の引用符まとめ渡しは split 失敗の恐れがあるため使用しない
 - USAGE 文言: cli.ts --workflow モードの `--help` 出力および guard 実行手続 references は上記使い分け・起動手段・引数形式を明記する
 
@@ -98,7 +98,7 @@ appliesTo は `docs/designs/**`, `docs/requirements/**`, `docs/decisions/**`, `d
 case-run プロファイルの対象範囲は、case-run で変更され得る docs 領域と traceability 領域を単一プロファイルで網羅し、REQ-010-077 の「対象範囲網羅 or 代替検査指定明記」を恒常充足する（CR-001 裁定。対象拡大を主方式とする判断）。`docs/knowledge/**`・traceability を含む case-run 変更で `files_checked` 空（TARGET-EMPTY）を恒常運用として発生させないこと。選定基準は、fail-closed 意味論の維持、検査見逃しゼロ、false-clean の発生なしである。
 
 <!-- ADF-COVERS(design): REQ-010-077 -->
-<!-- ADF-COVERS(implementation): REQ-010-077, REQ-122-014 -->
+<!-- ADF-COVERS(implementation): REQ-010-077 -->
 選定の適用結果（REQ-010-077、case 実行 RA-001 による確定 → CR-001 再裁定）: 主方式を appliesTo 対象拡大（`docs/knowledge/**`・traceability 追加）とし、guard 対象外領域を含む実行単位での代替検査指定の運用を併記して明記する。
 `docs/knowledge/**`・traceability 変更は appliesTo 対象内のため case-run プロファイル単独実行で検査される。appliesTo 対象外の領域を含む実行単位では、代替検査として docs-check profile（`--workflow docs-check --files <変更ファイル群>`。appliesTo: true 全件）を `--files` 明示指定で実行する運用を併記する。
 TARGET-EMPTY 検知条件と確認手順（REQ-010-076・REQ-032-023 準拠の運用補強）: `files_checked` 空（TARGET-EMPTY）は FAILURE として検知される。TARGET-EMPTY 検出時は (1) 指定した `--files` の実在と実行 workflow プロファイルの appliesTo への該当有無を確認し、(2) appliesTo 対象外領域の変更を含む場合は代替検査指定（docs-check profile の `--files` 明示指定実行）へ切替えて再実行し、(3) それでも空となる場合は検査対象の指定誤りまたは対象領域の適用漏れとして実行単位の検証計画を是正する。確認なく合格扱いにしない。
