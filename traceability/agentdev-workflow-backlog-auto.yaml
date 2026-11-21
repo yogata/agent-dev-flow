@@ -48,6 +48,7 @@ implementation:
     - REQ-114-014
     - REQ-114-016
     - REQ-114-017
+    - REQ-124-001
   src/common/skills/agentdev-workflow-backlog-auto/tests/fixtures/applied-projects/adf-self/manifest.json:
     - REQ-114-013
   src/common/skills/agentdev-workflow-backlog-auto/tests/fixtures/applied-projects/github-connected/manifest.json:

@@ -11,6 +11,7 @@ updated: "2026-11-21"
 <!-- ADF-COVERS(implementation): REQ-001-041, REQ-001-052, REQ-001-067, REQ-001-068, REQ-004-032（REQ 分類レイヤー・廃止候補判定基準・Design 分離基準・安定契約の例外・REQ 粒度判定テストの実体。document-model.md からの移管〔REQ-123-003〕） -->
 <!-- ADF-COVERS(design): REQ-001-067, REQ-001-068（REQ/Design 配分判断の正規所有移管。document-model.md から本 Design へ〔REQ-123-003〕） -->
 <!-- ADF-COVERS(design): REQ-094-001, REQ-094-002, REQ-094-003, REQ-094-004, REQ-094-005, REQ-094-006, REQ-094-007, REQ-094-009, REQ-094-010, REQ-094-011 -->
+<!-- ADF-COVERS(design): REQ-094-008, REQ-094-012（語彙管理の区別軸・訳語表4分類と用語選択原則の新規更新 Markdown への適用状態の設計対応） -->
 <!-- ADF-COVERS(design): REQ-001-003, REQ-001-014, REQ-001-015, REQ-001-069 -->
 <!-- ADF-COVERS(design): REQ-105-011, REQ-105-012, REQ-105-013（成果物の意味境界の運用面と工程別正式確定の運用面設計対応。「成果物の意味境界の運用面と工程別正式確定」節の増分対応） -->
 

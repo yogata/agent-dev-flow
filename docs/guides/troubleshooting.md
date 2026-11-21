@@ -1,4 +1,5 @@
 <!-- ADF-COVERS(implementation): REQ-052-012, REQ-008-010, REQ-008-011 -->
+<!-- ADF-COVERS(implementation): REQ-124-007（docs 入口・guides 層の現行化） -->
 
 # トラブルシューティング
 

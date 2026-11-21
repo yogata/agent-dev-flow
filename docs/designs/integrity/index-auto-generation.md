@@ -10,6 +10,7 @@ updated: "2026-11-18"
 <!-- ADF-COVERS(design): REQ-059-002, REQ-059-003 -->
 <!-- ADF-COVERS(implementation): REQ-103-022 -->
 <!-- ADF-COVERS(verification): REQ-103-022 -->
+<!-- ADF-COVERS(design): REQ-103-022（旧語彙・語彙追随変更時の AUTOGEN 再生成の機構契約） -->
 
 # 索引類自動生成 Design
 

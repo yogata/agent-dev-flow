@@ -16,6 +16,7 @@ updated: "2026-11-18"
 <!-- ADF-COVERS(implementation): REQ-007-001, REQ-007-002, REQ-007-003, REQ-007-004, REQ-007-005, REQ-031-001, REQ-031-002, REQ-031-003, REQ-031-004, REQ-031-005, REQ-031-006, REQ-031-009, REQ-031-010, REQ-031-011, REQ-031-012, REQ-031-015, REQ-031-016, REQ-031-017, REQ-031-018, REQ-031-019, REQ-031-020, REQ-031-021, REQ-031-022, REQ-031-023, REQ-031-024, REQ-035-011 -->
 <!-- ADF-COVERS(design): REQ-017-022 -->
 <!-- ADF-COVERS(implementation): REQ-104-009, REQ-104-010, REQ-104-011, REQ-104-012（採用規約の解決の実行経路接続節） -->
+<!-- ADF-COVERS(implementation): REQ-124-005（workflow・command 系 Design の現行構成への現行化。controlled_case_execution の単一 Issue 実行委譲への再定義を含む） -->
 
 # case-run Design
 

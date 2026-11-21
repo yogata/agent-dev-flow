@@ -909,6 +909,23 @@ verification:
   - REQ-116-004
   - REQ-116-005
   # （agentdev-workflow-intake-triage sidecar エントリ）が消失した行の追加登録。
+  # 区分C 追加（2026-11-21、backlog 一式 20261121-171426・Epic #4177）: corpus 現行化 10 作業単位
+  # （REQ-124-001〜010）と req-define 契約面 2 行（REQ-004-076/077）の登録。検証は Case 実行時の
+  # 一回限り検証（TS-001〜TS-010: rg 検索・verbatim 突合・coverage 確認・リンク到達確認、および
+  # 全体統合検証 TS-011: docs-check 全量・traceability check・検証エンジン テストスイート）で補完され、
+  # 恒常 checker を持たない corpus 現行化契約行の区分明示。2026-11-18 の REQ-117 系区分C 登録と同一判断。
+  - REQ-124-001
+  - REQ-124-002
+  - REQ-124-003
+  - REQ-124-004
+  - REQ-124-005
+  - REQ-124-006
+  - REQ-124-007
+  - REQ-124-008
+  - REQ-124-009
+  - REQ-124-010
+  - REQ-004-076
+  - REQ-004-077
 
 design:
   default: required
