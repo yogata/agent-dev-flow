@@ -1,4 +1,3 @@
-// ADF-COVERS(implementation): REQ-122-007
 // Side-effect-free distribution boundary detector pipeline.
 //
 // Minimal deterministic scan for the trust-root gate: concrete producer IDs,

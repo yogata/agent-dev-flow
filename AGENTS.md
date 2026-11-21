@@ -1,4 +1,4 @@
-<!-- ADF-COVERS(implementation): REQ-102-001, REQ-102-002, REQ-102-003, REQ-102-004, REQ-122-002 -->
+<!-- ADF-COVERS(implementation): REQ-102-001, REQ-102-002, REQ-102-003, REQ-102-004 -->
 # AGENTS.md
 
 AgentDevFlow を編集するエージェント向けのリポジトリガイドレール。

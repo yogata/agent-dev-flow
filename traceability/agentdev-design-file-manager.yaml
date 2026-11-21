@@ -10,12 +10,6 @@ implementation:
     - REQ-105-013
   src/common/skills/agentdev-design-file-manager/scripts/src/search-target-area.ts:
     - REQ-117-002
-
-
-
   src/common/skills/agentdev-design-file-manager/references/design-lifecycle-application.md:
     - REQ-021-026
     - REQ-032-025
-
-
-

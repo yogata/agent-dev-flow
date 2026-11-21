@@ -1,4 +1,3 @@
-// ADF-COVERS(implementation): REQ-122-007
 // Pipeline stage 4: decide (gate over many lines).
 //
 // Extracted from boundary-pipeline.ts to keep that module under the 250

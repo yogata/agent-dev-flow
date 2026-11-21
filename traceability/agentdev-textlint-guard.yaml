@@ -1,6 +1,3 @@
-# REQ-053 全面改訂（REQ-122、Case #4150）により廃止された要件行（REQ-053-004/006/011/012/016/021/022/024/025/026/027/028/031/032/035/039/041/042/043/044/045/046/047/048）への対応宣言を除去した。
-# 削除行の宣言・policy 追随は REQ-122 の Definition 変更（REQ-010-081/085 削除を含む）と同一の変更として実施した。
-# agentdev-textlint-guard Plugin 本体（src/opencode/plugins/agentdev-textlint-guard/）は配布資産として維持する（CR-007、RD-003）。
 component: agentdev-textlint-guard
 implementation:
   README-INSTALL.md:

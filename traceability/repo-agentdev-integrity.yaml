@@ -2,10 +2,6 @@ component: repo-agentdev-integrity
 implementation:
   src/common/skills/repo-agentdev-integrity/data/skill-projection-manifest.yaml:
     - REQ-010-079
-    - REQ-122-005
-    - REQ-122-014
-  src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/README.md:
-    - REQ-120-001
   src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/archive-zip.ts:
     - REQ-009-045
   src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/boundary-scan-scope.ts:
@@ -20,21 +16,9 @@ implementation:
     - REQ-123-001
   src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/text-binary.ts:
     - REQ-123-001
-  src/common/skills/repo-agentdev-integrity/engine/targeted-gate.ts:
-    - REQ-122-003
-    - REQ-122-005
-  src/common/skills/repo-agentdev-integrity/engine/context.ts:
-    - REQ-122-006
   src/common/skills/repo-agentdev-integrity/scripts/cli.ts:
-    - REQ-122-006
     - REQ-123-005
     - REQ-123-006
-  src/common/skills/repo-agentdev-integrity/rules/index.ts:
-    - REQ-122-003
-    - REQ-122-011
-  # REQ-123-002（traceability 試験の契約ベース再編・3統合ファイル構成と tim 圧縮）の
-  # 実装対応。統合後の試験資産本体（traceability_core / diff_and_policy / workflow /
-  # tim_declarations_contract）。Phase 2・Issue #4170・DEL-4170-1。
   src/common/skills/repo-agentdev-integrity/scripts/tests/traceability_core.test.ts:
     - REQ-123-002
   src/common/skills/repo-agentdev-integrity/scripts/tests/traceability_diff_and_policy.test.ts:
@@ -43,14 +27,6 @@ implementation:
     - REQ-123-002
   src/common/skills/repo-agentdev-integrity/scripts/tests/tim_declarations_contract.test.ts:
     - REQ-123-002
-  # REQ-123-004（generate_indexes.ts の責務別モジュール分割・デッドコード削除・
-  # inspect-skills 残存資産判定・自動生成インデックス最新化）の実装対応。
-  # 入口（scripts/generate_indexes.ts）の implementation / verification 宣言と
-  # テスト（tests/generate_indexes.test.ts）の verification 宣言は inline ADF-COVERS
-  # 宣言が正（inline 宣言優先規則・artifact × role 単位の単一情報源）。
-  # generate_indexes.test.ts の REQ-123-004 verification は導出対応宣言
-  # （traceability/derivations.yaml 規約・import 実測からの導出）で計上される。
-  # Phase 4・Issue #4172・DEL-4172-1。
   src/common/skills/repo-agentdev-integrity/scripts/generate_indexes/markers.ts:
     - REQ-123-004
   src/common/skills/repo-agentdev-integrity/scripts/generate_indexes/markdown.ts:
@@ -78,11 +54,5 @@ verification:
     - REQ-010-084
   src/common/skills/repo-agentdev-integrity/scripts/rules/rules.test.ts:
     - REQ-117-006
-  # REQ-123-002 の検証対応は tim_declarations_contract.test.ts の inline 宣言
-  # （REQ-012-026〜042 との和集合。duplicate-inconsistencies の単一情報源制約により
-  # sidecar とは二重登録しない）で計上される。
   src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/text-binary.test.ts:
     - REQ-123-001
-  # REQ-123-004 の検証対応は導出対応宣言（traceability/derivations.yaml 規約・
-  # import 実測からの導出）とテスト inline ADF-COVERS(verification) 宣言
-  # （REQ-123-005・REQ-123-006 を含む）が正のため、本 sidecar では計上しない。
