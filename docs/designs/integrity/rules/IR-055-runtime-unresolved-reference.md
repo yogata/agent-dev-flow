@@ -16,12 +16,12 @@ verification_path: src/common/skills/repo-agentdev-integrity/scripts/rules/rules
 | description | 配布物（`src/common/commands/agentdev/**/*.md`、`src/common/skills/agentdev-*/**/*.md`、`references/` 配下、`SKILL.md` 含む）内の導入先未解決参照（REQ/Decision ID、`src/opencode/`、`docs/designs/`、`docs/guides/`、`/repo/*`、`repo-*`、本体 docs URL、line number 付き内部参照）を機械的パターンマッチングで検出すること。REQ-029-003 で既に要件化された「配布成果物は producer 内部成果物への具体参照に依存しない」原則の機械検出であり、意味的診断（文意保持・構文健全性・責務整合）は対象外（3層検出構造: [integrity-contracts.md](../integrity-contracts.md)）。Decision ID は現行 `DEC-\d{3}` 命名を検出する。旧 `ADR-\d{4}` 参照は Decision 移行漏れ（residual）として検出する（DEC-009 AG-016）。履歴参照 `v2:ADR-\d{4}` は AG-010 保護対象であり検出対象外 |
 | severity | strict（REQ/Decision ID、`src/opencode/`、`/repo/*`、`repo-*`）、heuristic または observation（`docs/designs/`、`docs/guides/`、本体 docs URL、line number 付き参照）。パターンごとの分類は後述「IR-055 検出パターンと severity」参照 |
 | category | broken-reference |
-| detection_method | 正規表現パターンマッチング（walkMarkdown / collectAgentdevSkillMarkdown による走査）。Decision ID は `DEC-\d{3}`、旧形式 residual は `ADR-\d{4}` を検出。code block 内部、template placeholder（`{xxx}`）、vocabulary-registry.md / integrity-rule-catalog.md / rules/IR-055-*.md 自身等の正当使用例外パスは exemption 対象とする。`v2:ADR-\d{4}` は履歴参照保護（AG-010）のため `v2:` prefix ありは検出対象外 |
+| detection_method | 正規表現パターンマッチング（walkMarkdown / collectAgentdevSkillMarkdown による走査）。Decision ID は `DEC-\d{3}`、旧形式 residual は `ADR-\d{4}` を検出。code block 内部、template placeholder（`{xxx}`）、integrity-rule-catalog.md / rules/IR-055-*.md 自身等の正当使用例外パスは exemption 対象とする。`v2:ADR-\d{4}` は履歴参照保護（AG-010）のため `v2:` prefix ありは検出対象外 |
 | affected_artifacts | [src/common/commands/agentdev/**/*.md, src/common/skills/agentdev-*/**/*.md, src/common/skills/agentdev-*/references/**/*.md, src/common/skills/agentdev-*/SKILL.md] |
 | related_req | [REQ-029-003] |
 | related_design | [integrity-rule-catalog.md, integrity-contracts.md] |
 | gate_level | full-audit, delta-guard, impact-guard |
-| false_positive_risk | 中。code block 内部、template placeholder（`{xxx}`）、vocabulary-registry.md 等の正当使用例外パスは exemption 対象とする。`integrity-rule-catalog.md` 自身のルール記述も exemption 対象とする。exemption 設計を誤ると true positive が誤って免除される |
+| false_positive_risk | 中。code block 内部、template placeholder（`{xxx}`）、正当使用例外パスは exemption 対象とする。`integrity-rule-catalog.md` 自身のルール記述も exemption 対象とする。exemption 設計を誤ると true positive が誤って免除される |
 | regression_test | `scripts/rules/rules.test.ts`（ir055 インメモリケース）。各検出パターン（REQ-NNNN、REQ-NNNN-NNN、DEC-NNN、residual ADR-NNNN、`src/opencode/`、`docs/designs/`、`docs/guides/`、`/repo/*`、`repo-*`、本体 docs URL、line number 付き参照）を含む fixture で検出されること、exemption 対象が報告されないことを検証する |
 | finding_route | intake（既知違反の段階解消は別途処理） |
 | triage_action | 新規検出時は対象ファイル側の直接修正で解消する（baseline による免除管理は撤廃済み。REQ-010-074/079）。既存違反の段階解消は docs-check report / intake / backlog 経由で処理する |
@@ -58,7 +58,7 @@ verification_path: src/common/skills/repo-agentdev-integrity/scripts/rules/rules
 | code block 内部 | 例示、パターン説明は検出対象外（integrity-rule-catalog.md「対象ファイル設計」準拠） |
 | template placeholder（`{xxx}`） | プレースホルダーは実参照ではない |
 | `v2:ADR-\d{4}` 履歴参照 | AG-010 履歴参照保護。`v2:` prefix ありは検出対象外 |
-| `vocabulary-registry.md` / `integrity-rule-catalog.md` / `rules/IR-055-*.md` 自身 | 検出ルール自体の記述、正規語彙の対照表は正当使用 |
+| `integrity-rule-catalog.md` / `rules/IR-055-*.md` 自身 | 検出ルール自体の記述は正当使用 |
 
 ## 検出違反の現行運用（baseline 撤廃後）
 

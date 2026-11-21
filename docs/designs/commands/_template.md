@@ -78,7 +78,7 @@ command Design は command 定義ファイル（共通原本 `src/common/command
 | 利用 skill 責務 | command が利用する skill 名と委譲する責務 |
 
 Step 番号を持たない command Design（読み取り専用、分類系）は対応付けの対象外とし、その旨を当該 Design に文書化する。
-詳細は `../authoring/command-file-format.md`「command Design と command 定義の対応付け（v2:REQ-0143-005）」を参照。
+詳細は `agentdev-command-authoring` Design「command Design と command 定義の対応付け」を参照。
 
 ## See Also
 

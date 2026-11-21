@@ -110,7 +110,7 @@ updated: "2026-11-21"
 - 完了報告（work_type 別テンプレート選択）
 
 req-define は Workflow Skill と手順番号を複製せず、公開目的、入力、成果物、許可される副作用、安全境界、承認境界、停止状態、必須順序、利用 skill 責務によって対応付ける（v2:REQ-0143-005）。
-詳細は `command-file-format.md`「command Design と command 定義の対応付け（v2:REQ-0143-005）」参照。
+詳細は `agentdev-command-authoring` Design「command Design と command 定義の対応付け」参照。
 
 ### tentative_classification 最終確定のバリデーション（現行は REQ-008）
 
