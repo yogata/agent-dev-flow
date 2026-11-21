@@ -346,7 +346,7 @@ Design 記載項目と profile rules の厳密な 1:1 対応を維持するた�
 
 | test file | 責務 | 根拠 |
 |-----------|------|------|
-| scripts/tests/generate_indexes_catalog.test.ts | カタログ registry 単一ソース化検証（レジストリ 25 構成・再生成冪等性） | REQ-122-006 |
+| scripts/tests/generate_indexes_catalog.test.ts | カタログ registry 単一ソース化検証（レジストリ 25 構成・再生成冪等性） | （RETIRE 判定済み REQ の検証行） |
 | scripts/rules/rules.test.ts | 残存ルールの正常系・異常系インメモリ検証（IR-044 を含むルール適合検証）、保持3能力の回帰テスト | REQ-010-008 |
 
 両ファイルの使い分け基準（regression 検出 vs ルール適合検証）を明文化し、後続エージェントが誤ったファイルを編集するリスクを排除する。

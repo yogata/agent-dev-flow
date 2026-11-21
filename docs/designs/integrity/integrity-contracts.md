@@ -111,7 +111,7 @@ updated: 2026-11-18
 
 対象確定はコマンド側が行い、検証エンジン cli.ts --workflow は対象選定の十分性を判定しない。
 files_checked が空の場合は検証モード（--files / --base-ref）問わず FAILURE とする（REQ-010-076。旧仕様の「--base-ref 空 WARNING」の非対称は廃止済み）。
-汎用差分実行（--changed）は本モードと独立に維持され、対象外のみの変更は即時 Exit 0 する（REQ-122-006）。engine の終了コード単独で workflow の受入を決定せず、空・不一致の fail-closed 判定はワークフロー側が行う。
+汎用差分実行（--changed）は本モードと独立に維持され、対象外のみの変更は即時 Exit 0 する。engine の終了コード単独で workflow の受入を決定せず、空・不一致の fail-closed 判定はワークフロー側が行う。
 評価対象はフォーマット検査に限定し、意味評価を行わない。
 
 ## 適用範囲宣言

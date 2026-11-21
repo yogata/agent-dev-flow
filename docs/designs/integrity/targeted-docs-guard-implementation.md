@@ -36,7 +36,7 @@ Phase 1-6 実装計画、report フィールド一覧、完了済み移行作業
 
 - モード使い分け: `--base-ref` によるコミット済み差分ベースの変更ファイル検出はコミット後・push 前の実行に限定し、コミット前（worktree 上での検証）は untracked ファイルを含む `--files` による明示指定を標準とする。`--files` と `--base-ref` の誤用による誤 pass・誤 FAILURE を防ぐため、起動時に対象ファイルが検出できる見込みを確認してから実行する
 - 検査対象 root の解決: worktree を検査対象とする場合は、検査 skill を host 側配置を起点として起動し、検査対象 worktree の絶対パスを `--root` で明示指定する。配置先起点の誤リポジトリ検査は検査見逃しとして扱う
-- 起動手段: `bun run src/common/skills/repo-agentdev-integrity/scripts/cli.ts --workflow <name>（--files または --base-ref による明示対象指定）` により起動する（スクリプト契約の共通 CLI 契約に従う）。本モードは検証エンジンの明示対象経路（targeted docs guard）であり、汎用差分実行 `--changed`（対象外のみ即時 Exit 0、REQ-122-006）とは独立に維持される。engine の終了コード単独で workflow の受入を決定せず、files_checked 空・不一致の fail-closed 判定はワークフロー側が行う（REQ-010-076、REQ-032-023）
+- 起動手段: `bun run src/common/skills/repo-agentdev-integrity/scripts/cli.ts --workflow <name>（--files または --base-ref による明示対象指定）` により起動する（スクリプト契約の共通 CLI 契約に従う）。本モードは検証エンジンの明示対象経路（targeted docs guard）であり、汎用差分実行 `--changed`（対象外のみ即時 Exit 0）とは独立に維持される。engine の終了コード単独で workflow の受入を決定せず、files_checked 空・不一致の fail-closed 判定はワークフロー側が行う（REQ-010-076、REQ-032-023）
 - PowerShell での引数形式: 複数パスの引数は引用符でまとめて1文字列として渡さず、配列変数経由（`$files = @("a.md","b.md"); --files $files`）または個別渡しとする。`--files "a.md b.md"` 形式の引用符まとめ渡しは split 失敗の恐れがあるため使用しない
 - USAGE 文言: cli.ts --workflow モードの `--help` 出力および guard 実行手続 references は上記使い分け・起動手段・引数形式を明記する
 
