@@ -13,7 +13,7 @@ AgentDevFlow を編集するエージェント向けのリポジトリガイド�
 4. **Clean Deletion**: 削除した資産の不在証明テスト・番号記録・代替経路の分岐を残さない。削除後の参照は Git ログで解決する。
 5. **配布物ゼロ汚染**: 利用プロジェクトへ配布される領域（`src/` のコマンド・スキル・スクリプト等）に `REQ-ID`・`docs/` 参照・開発用トレーサビリティ情報を 1 文字も混入させない。
 
-機械強制: `scripts/git-hooks/minimal-gate.mjs`（agent-dev-flow 専用・配布物外・実行点は pre-commit のみ）が、恒久資産（`.agentdev/` 以外）の新規追加ファイルにおける単一ファイルサイズ上限（.md 20KB・.ts 25KB）超過のみをブロックする。`.agentdev/` 配下（工程の一時ワークスペース）の上限超過、既存の上限超過ファイルの編集、ガバナンス表面積（IR ルール 25 件・公開コマンド 15 件）は WARN 表示のみでブロックしない。backlog/intake/learning/inspect のキューは後から非同期に処理するため、滞留ゼロを強制せず、WIP キュー滞留（目安 10 件・`.gitkeep` は数えない）は合計 10 件超の WARN 表示のみとする。pre-push は minimal-gate を実行せず、整合性検査と試験の品質保証のみを担当する。
+機械強制: pre-push（`scripts/git-hooks/pre-push`・agent-dev-flow 専用・配布物外）が、既存の正規決定論的チェッカー（インデックス鮮度チェック・全量整合性チェック・検証エンジンのテストスイート）を呼ぶだけの薄いラッパーとして push を物理ブロックする。pre-commit は置かない（ローカルの実験・途中コミットの摩擦ゼロ）。backlog/intake/learning/inspect の非同期キューに対する滞留ゼロ強制・件数監視をフックで行わない。
 
 ## 基本規則
 
@@ -33,4 +33,4 @@ AgentDevFlow を編集するエージェント向けのリポジトリガイド�
 
 - oh-my-openagent を導入済みである。
 - Git 操作（push を含む）の認証は非対話経路で設定済みであり、対話認証の待機なしに完了する。認証失敗・対話要求・タイムアウトを検出した場合は待機を反復せず失敗として報告する。資格情報の値を解析証拠やログへ出力しない（詳細: `docs/knowledge/git-noninteractive-auth.md`）。
-- ローカルコミットは `scripts/git-hooks/`（pre-commit・pre-push・minimal-gate.mjs）の検証ゲート下で行う。
+- ローカル push は `scripts/git-hooks/`（pre-push）の検証ゲート下で行う。コミットに対するローカルゲートは置かない。

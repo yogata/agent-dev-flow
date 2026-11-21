@@ -132,16 +132,16 @@ bun run <host>/src/common/skills/repo-agentdev-integrity/scripts/cli.ts `
 
 ## ローカル検証ゲート（Git Hook）のセットアップ（本体リポジトリ）
 
-本体リポジトリ（agent-dev-flow 自己ホスト）では、バージョン管理された Git Hook による決定論的検証ゲート（pre-commit・pre-push）を利用できる。release archive には `scripts/setup-hooks.ts` を同梱しないため、この手順は本体リポジトリの checkout 環境で実行する（consumer 側では検証ゲートは動作しない）。
+本体リポジトリ（agent-dev-flow 自己ホスト）では、バージョン管理された Git Hook による決定論的検証ゲート（pre-push）を利用できる。release archive には `scripts/setup-hooks.ts` を同梱しないため、この手順は本体リポジトリの checkout 環境で実行する（consumer 側では検証ゲートは動作しない）。
 
-セットアップはリポジトリルート（または worktree root）で次のコマンドを実行する。実行対象は `git config core.hooksPath` の設定、両フックスクリプトへの実行権限付与、`.gitattributes` への `scripts/git-hooks/* text eol=lf` 追記の3処理であり、再実行しても設定済みの処理はスキップされる（冪等）。worktree 環境でも同じコマンドで動作する。
+セットアップはリポジトリルート（または worktree root）で次のコマンドを実行する。実行対象は `git config core.hooksPath` の設定、フックスクリプト（pre-push）への実行権限付与、`.gitattributes` への `scripts/git-hooks/* text eol=lf` 追記の3処理であり、再実行しても設定済みの処理はスキップされる（冪等）。worktree 環境でも同じコマンドで動作する。
 
 ```bash
 bun run scripts/setup-hooks.ts
 git config --get core.hooksPath   # scripts/git-hooks が返ることを確認
 ```
 
-`git config --get core.hooksPath` が `scripts/git-hooks` を返すと、以後の `git commit` で pre-commit（src/ ステージング時の投影自動実行と `.opencode/` 自動ステージング、差分整合性チェック、インデックス鮮度チェック）、`git push` で pre-push（全量整合性チェック、トレーサビリティ検証、検証エンジンのテストスイート実行）が動作する。検証ゲートが不合格になると commit / push は物理ブロックされ、エラーメッセージに対応方法が表示される。緊急時（ロールバック等）のバイパスは `git commit --no-verify` / `git push --no-verify` を使用する。
+`git config --get core.hooksPath` が `scripts/git-hooks` を返すと、以後の `git push` で pre-push（インデックス鮮度チェック、全量整合性チェック、検証エンジンのテストスイート実行）が動作する。検証ゲートが不合格になると push は物理ブロックされ、エラーメッセージに対応方法が表示される。緊急時（ロールバック等）のバイパスは `git push --no-verify` を使用する。pre-commit は構成しないため、ローカルコミットは検証ゲートなしで作成できる。
 
 ## 関連
 

@@ -221,7 +221,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | integrity/test-impact-detection-gate.md | accepted | テスト影響範囲検出 gate | リファクタリング PR で Design 変更に連動する周辺テストの陳腐化検出。変更 Design を参照し同一 PR で未更新のテストを陳腐化候補として報告、不合格時の処置契約（REQ-019） |
 | integrity/checker-execution-contracts.md | accepted | checker 実行契約と検出基盤規則 | checker 共通実行契約、検出対象除外規定、宣言的データ YAML の schema 原則、detector 命名規約 |
 | integrity/integrity-engine-plugin-architecture.md | accepted | 検証エンジン プラグインアーキテクチャ | repo-agentdev-integrity 検証エンジンのプラグイン型アーキテクチャ、共有コンテキストキャッシュ、差分実行、自動起票、カタログ自動生成の契約 |
-| integrity/local-verification-gates.md | draft | ローカル検証ゲート | バージョン管理された Git Hook による決定論的ローカル検証ゲート（pre-commit/pre-push/setup-hooks）の実行契約 |
+| integrity/local-verification-gates.md | draft | ローカル検証ゲート | ローカル検証ゲート（pre-push のみ・既存チェッカーの薄いラッパー、setup-hooks）の実行契約 |
 
 #### local/（ローカル版 Design）
 

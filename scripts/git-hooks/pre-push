@@ -1,107 +1,23 @@
 #!/usr/bin/env bash
-# ADF-COVERS(implementation): REQ-122-009, REQ-122-015, REQ-122-016
-# pre-push — 全量検証ゲート（DEC-066 決定2、ACT-DESIGN-002「pre-push」実行契約）。
-# シェル本体は薄いラッパー。実処理は検証エンジン（bun 実行）とトレーサビリティ checker へ委譲する。
+# ADF-COVERS(implementation): REQ-122-009, REQ-122-015
+# pre-push — 既存の正規決定論的チェッカーを呼ぶだけの薄いラッパー（agent-dev-flow 専用・配布物外）。
+# フック側に独自のしきい値判定・ファイルサイズ計算・非同期キューの滞留監視ロジックは持たない。
 # REPO_ROOT は git rev-parse --show-toplevel 起点（worktree 環境対応）。
-# 失敗時は非ゼロ終了で push を物理ブロックし、--no-verify 緊急バイパスを案内する。
 set -euo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
-# 検証エンジンの配置解決: source 側ツリー（SoT パス）を第一候補とし、
-# .opencode/ 投影先へフォールバックする（worktree では .opencode/skills/ の
-# agentdev-* junction が未再作成のため、worktree-operations.md「SoT パス起点実行」に従う）。
-if [ -f "$REPO_ROOT/src/common/skills/repo-agentdev-integrity/scripts/cli.ts" ]; then
-  INTEGRITY_DIR="$REPO_ROOT/src/common/skills/repo-agentdev-integrity/scripts"
-else
-  INTEGRITY_DIR="$REPO_ROOT/.opencode/skills/repo-agentdev-integrity/scripts"
-fi
-CLI="$INTEGRITY_DIR/cli.ts"
-TRACEABILITY_CHECK="$REPO_ROOT/src/common/skills/agentdev-traceability/scripts/src/check.ts"
-# REQ-060 bun test 実行形態: リポジトリルート cwd で `./` 付き相対パスを指定する。
-# テスト対象も SoT パス第一候補・.opencode フォールバック（上記 INTEGRITY_DIR と同一解決）。
-if [ -f "$REPO_ROOT/src/common/skills/repo-agentdev-integrity/scripts/cli.ts" ]; then
-  ENGINE_TEST_TARGET="./src/common/skills/repo-agentdev-integrity/scripts"
-else
-  ENGINE_TEST_TARGET="./.opencode/skills/repo-agentdev-integrity/scripts"
-fi
 
-fail_with_guidance() {
-  echo "" >&2
-  echo "[pre-push] 全量検証ゲートが失敗したため、この push を物理ブロックしました。" >&2
-  echo "  対応方法:" >&2
-  echo "  - 全量整合性チェック: bun run \"$CLI\" --root \"$REPO_ROOT\" で違反内容を確認して修正する" >&2
-  echo "  - トレーサビリティ検証: bun run \"$TRACEABILITY_CHECK\" --root \"$REPO_ROOT\" で fail 項目を確認して対応する" >&2
-  echo "  - 検証エンジンのテストスイート: cd \"$REPO_ROOT\" && bun test \"$ENGINE_TEST_TARGET\" で不合格テストを確認して修正する" >&2
-  echo "  緊急時のバイパス: git push --no-verify" >&2
-  exit 1
-}
+echo "[pre-push] Step 1/3: インデックス鮮度チェック（check_autogen_freshness.ts）を実行します。"
+(cd "$REPO_ROOT" && bun run .opencode/skills/repo-agentdev-integrity/scripts/check_autogen_freshness.ts --root "$REPO_ROOT")
 
-echo "[pre-push] Step 1/3: 全量整合性チェック（cli.ts 全量実行）を実行します。"
-if ! (cd "$REPO_ROOT" && bun run "$CLI" --root "$REPO_ROOT"); then
-  fail_with_guidance
-fi
+echo "[pre-push] Step 2/3: 全量整合性チェック（cli.ts）を実行します。"
+(cd "$REPO_ROOT" && bun run .opencode/skills/repo-agentdev-integrity/scripts/cli.ts --root "$REPO_ROOT")
 
-echo "[pre-push] Step 2/3: トレーサビリティ検証（check.ts 全体スコープ・corpus 完全性は advisory）を実行します。"
-# トレーサビリティ検証の検査 fail を traceability-model Design の二層規定（corpus completeness は
-# advisory・fail-open・lifecycle gate の判定に使用しない、REQ-021-031）に従い層別する:
-#   - lifecycle 構造検査（宣言形式・参照整合・重複・links 整合・policy 正当性等）: fail なら push を物理ブロック
-#   - corpus 完全性（missing-design / missing-implementation / missing-verification）: 件数を
-#     advisory として表示し、ブロック条件としない（到達目標・fail-open）
-# check.ts の実行エラー（終了コード 1）と JSON 解析不能はブロックする（fail-closed）。
-TRACE_STDERR="$(mktemp)"
-set +e
-TRACE_REPORT="$(cd "$REPO_ROOT" && bun run "$TRACEABILITY_CHECK" --root "$REPO_ROOT" 2>"$TRACE_STDERR")"
-TRACE_EXIT=$?
-set -e
-if [ "$TRACE_EXIT" -eq 1 ]; then
-  echo "[pre-push] トレーサビリティ検証の実行に失敗しました（終了コード 1）。stderr:" >&2
-  cat "$TRACE_STDERR" >&2 || true
-  rm -f "$TRACE_STDERR"
-  fail_with_guidance
-fi
-rm -f "$TRACE_STDERR"
-if [ -z "$TRACE_REPORT" ]; then
-  echo "[pre-push] トレーサビリティ検証の JSON 出力を取得できませんでした。" >&2
-  fail_with_guidance
-fi
-if ! printf '%s' "$TRACE_REPORT" | bun -e '
-  const corpusCompleteness = new Set(["missing-design", "missing-implementation", "missing-verification"]);
-  Bun.stdin.text().then((text) => {
-    const report = JSON.parse(text);
-    const checks = (report && report.checks) || {};
-    const hard = [];
-    const advisory = [];
-    for (const [name, check] of Object.entries(checks)) {
-      const count = check && Array.isArray(check.findings) ? check.findings.length : 0;
-      if (count === 0) continue;
-      if (corpusCompleteness.has(name)) advisory.push(name + ": " + count + " 件");
-      else hard.push(name + ": " + count + " 件");
-    }
-    for (const line of advisory) {
-      console.log("[pre-push]   corpus 完全性 advisory（fail-open・ブロック対象外）: " + line);
-    }
-    if (hard.length > 0) {
-      for (const line of hard) console.error("[pre-push]   トレーサビリティ構造検査 fail: " + line);
-      process.exit(1);
-    }
-  }).catch((err) => {
-    console.error("[pre-push]   トレーサビリティ検証結果の JSON 解析に失敗しました: " + err);
-    process.exit(1);
-  });
-'; then
-  echo "[pre-push] トレーサビリティ構造検査に fail があるか、結果を解析できません。修正してから push してください。" >&2
-  fail_with_guidance
-fi
-
-echo "[pre-push] Step 3/3: 検証エンジンのテストスイート（bun test、REQ-060 実行形態）を実行します。"
+echo "[pre-push] Step 3/3: 検証エンジンのテストスイート（bun test・REQ-060 実行形態）を実行します。"
 # git push はフックへ GIT_DIR・GIT_WORK_TREE・GIT_INDEX_FILE 等の環境変数をエクスポートする。
-# テストスイートはネストした git リポジトリのフィクスチャを生成して init・commit・push を実行するため、
-# これらの変数が残っているとフィクスチャの git 操作が外側の実リポジトリ（とそのリモート）へ横取りされ、
-# ブランチ・設定・リモートを破壊する。Step 3 の実行時のみこれらを無効化する
-# （Step 1・2 は実リポジトリ自身を検査するため無効化しない）。
-if ! (cd "$REPO_ROOT" && env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE -u GIT_QUARANTINE_PATH -u GIT_OBJECT_DIRECTORY -u GIT_ALTERNATE_OBJECT_DIRECTORIES -u GIT_PREFIX bun test "$ENGINE_TEST_TARGET"); then
-  fail_with_guidance
-fi
+# テストスイートはネストした git リポジトリのフィクスチャを生成して git 操作を行うため、
+# これらの変数が残っているとフィクスチャの操作が外側の実リポジトリへ横取りされる。
+# Step 3 の実行時のみこれらを無効化する（Step 1・2 は実リポジトリ自身を検査するため無効化しない）。
+(cd "$REPO_ROOT" && env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE -u GIT_QUARANTINE_PATH -u GIT_OBJECT_DIRECTORY -u GIT_ALTERNATE_OBJECT_DIRECTORIES -u GIT_PREFIX bun test ./src/common/skills/repo-agentdev-integrity/scripts/)
 
-echo "[pre-push] すべての全量検証ゲートを通過しました。"
-exit 0
+echo "[pre-push] すべての検証を通過しました。"

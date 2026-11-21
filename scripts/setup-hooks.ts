@@ -9,7 +9,7 @@
 //
 // 行う処理（冪等。再実行時は設定済みの処理をスキップして報告する）:
 //   1. git config core.hooksPath scripts/git-hooks の設定（設定済みはスキップ）
-//   2. scripts/git-hooks/pre-commit・pre-push への実行権限付与（fs.chmodSync 0o755。
+//   2. scripts/git-hooks/pre-push への実行権限付与（fs.chmodSync 0o755。
 //      git index 上の実行権限も best-effort で付与する。Unix クローン実効性のため）
 //   3. .gitattributes への scripts/git-hooks/* text eol=lf 追記（記載済みはスキップ。
 //      CRLF 混入による hook 実行エラー防止）
@@ -24,7 +24,7 @@ const EXIT_OK = 0;
 const EXIT_ERROR = 1;
 
 const HOOKS_PATH_SETTING = "scripts/git-hooks";
-const HOOK_FILES = ["pre-commit", "pre-push"] as const;
+const HOOK_FILES = ["pre-push"] as const;
 const GITATTRIBUTES_LINE = "scripts/git-hooks/* text eol=lf";
 
 function runGit(args: readonly string[], cwd: string): string {
@@ -153,7 +153,7 @@ function main(): number {
   console.log(
     "[setup-hooks] 確認: git config --get core.hooksPath が scripts/git-hooks を返すことを確認してください。",
   );
-  console.log("[setup-hooks] 完了しました。以後の commit / push でローカル検証ゲート（pre-commit・pre-push）が動作します。");
+  console.log("[setup-hooks] 完了しました。以後の push でローカル検証ゲート（pre-push）が動作します。");
   return EXIT_OK;
 }
 
