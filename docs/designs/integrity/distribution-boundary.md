@@ -2,7 +2,7 @@
 title: "配布依存境界"
 status: accepted
 created: "2026-08-11"
-updated: "2026-11-18"
+updated: "2026-11-21"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-045 -->
@@ -11,6 +11,7 @@ updated: "2026-11-18"
 <!-- ADF-COVERS(design): REQ-029-001, REQ-029-002, REQ-029-003, REQ-029-004, REQ-029-005, REQ-029-006, REQ-029-007, REQ-029-008 -->
 <!-- ADF-COVERS(design): REQ-031-032 -->
 
+<!-- ADF-COVERS(implementation): REQ-123-003（REQ-123-003 のスリム化編集の実装実体。ハブ化と重複排除・移管済み必須仕様の削除。REQ-123.md 冒頭 inline ADF-COVERS(design) 宣言と REQ-116 型 covers 宣言構成） -->
 # 配布依存境界 Design
 
 > **正規所有宣言**: 本 Design は REQ-029 が宣言する意味境界を検証するための意味モデル、分類、検出パイプライン、projection 契約、gate 契約に加え、ユーザーが確定した安定実装契約を一括して正規所有する。
@@ -125,6 +126,14 @@ clean として通過させない（DEC-014 決定5）。
 
 通常 checkout 版の `scripts/install.ps1` と release archive 版の `scripts/install.ps1` は同名で併存する。
 trust root / manifest の検証は projection スコープで実施し、両者を区別して扱う（REQ-050-010、REQ-050-012）。
+
+### 自己ホスト投影対称性検査の機械検査契約（runtime-package-boundary.md から移管〔REQ-123-003〕）
+
+repo-local Plugin の自己ホスト投影対称性検査を機械検査契約として所有する。
+- 検査対象: 原本（src/opencode/plugins/agentdev-textlint-guard/ 配下の投影対象構造）と自己ホスト投影（.opencode/plugins/ 配下）の対称性（投影欠落・余剰・shim 内容不一致）
+- 検出扱い: 対称性破れは [DIVERGENCE] 相当の検出として docs-check 系検査結果に報告する
+- 対称性の契約参照: runtime-package-boundary.md の投影契約、plugin README の配布宣言、self-sync.ps1 の動的列挙の 3 点
+- 投影の再同期（self-sync.ps1 再実行）は環境操作であり、検出時の対応は環境操作として完了報告等に実行指示を含める運用とする（検査自体は repo 内で完結する）
 
 ## 事前書き込み gate と最終 gate の契約
 

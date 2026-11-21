@@ -1,0 +1,16 @@
+component: req-123-wave3-phase3
+# Issue #4171（Wave-3 / Phase 3: 50KB超の巨大設計書3件のスリム化〔ハブ化と重複排除〕）。
+# REQ-123-003 の実装対応（3設計書のスリム化編集、document-type-responsibilities への
+# REQ 分類レイヤー等の移管、distribution-boundary への自己ホスト投影対称性検査契約の
+# 移管）は各 docs 側正規成果物の inline ADF-COVERS(implementation) 宣言へ追記した
+# （inline 宣言優先規則・artifact × role 単位の情報源一元化）。
+# design 対応は REQ-123.md 冒頭の inline ADF-COVERS(design) 宣言（REQ-123-001〜006）が
+# 正のため本 sidecar では design を宣言しない。
+# REQ-123-003 の verification（TS-003）: 3設計書のバイト数測定（node fs.statSync）と
+# check_knowledge_docs.ts / integrity-engine cli.ts（--workflow case-run を含む全量）の
+# 実行で成立する。検証正規形は src 側 ./ 付きパス指定・リポジトリルート cwd（REQ-060）。
+verification:
+  src/common/skills/repo-agentdev-integrity/scripts/check_knowledge_docs.ts:
+    - REQ-123-003
+  src/common/skills/repo-agentdev-integrity/scripts/cli.ts:
+    - REQ-123-003
