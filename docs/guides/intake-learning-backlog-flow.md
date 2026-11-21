@@ -138,4 +138,4 @@ RU は一時成果物であり、永続化未完了の場合は残置する。
 
 ## 状態モデルと `.agentdev/` の位置づけ
 
-パイプライン状態の表現方法や `.agentdev/` の位置づけなど、状態モデルの共通制約の正は [成果物、状態モデル](artifacts-and-state.md) を参照する。
+状態と配置の基準は [DEC-038](../decisions/DEC-038.md)、一時成果物の扱いは [REQ-008](../requirements/REQ-008.md) を参照する。概要は [成果物、状態モデル](artifacts-and-state.md) を参照する。

@@ -14,7 +14,7 @@ AgentDevFlow を構成する成果物の種別、配置、ライフサイクル�
 | Knowledge | `docs/knowledge/*.md` |
 | guides | `docs/guides/*.md` |
 
-各文書種別の役割、文書体系の読み方、優先順位、参照ルールの正は [プロジェクトドキュメントと Design](project-docs-and-specs.md) を参照する。
+文書種別の役割と参照ルールは [REQ-001](../requirements/REQ-001.md) と [文書モデル](../designs/foundations/document-model.md) を参照する。文書体系の読み方は [プロジェクトドキュメントと Design](project-docs-and-specs.md) を参照する。
 未解決事項の追跡は追跡Issue（GitHub Issue の管理単位・永続状態）で行い、docs/ 配下に課題ファイルの文書種別は設けない（REQ-049）。
 
 ## コマンド、スキル体系
@@ -144,7 +144,7 @@ RU 削除は case-ready（内部 lifecycle 段階）の Definition 確定 + VERI
 AgentDevFlow は全体横断の状態遷移モデルを持たない。
 各コマンドの入出力契約とディレクトリ配置が実際の状態表現である。
 
-工程駆動実行は、テーマ初回形成、テーマ更新、正規成果物への反映、独立レビューの4操作と利用者判断による工程遷移からなる経路であり、上記の3マクロフェーズを持つ変更駆動経路とは別経路として併存する。後継経路の実現・採用まで現行の変更駆動経路が正であり、変更駆動の実行に工程駆動の操作や遷移を前置しない。
+工程駆動実行と変更駆動経路の関係は、[工程遷移・独立レビューと双経路併存モデル](../designs/workflows/phase-transition-and-coexistence-model.md#双経路併存と移行) を参照する。
 
 ## 状態モデル制約
 
