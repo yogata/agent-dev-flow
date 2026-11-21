@@ -80,7 +80,7 @@ QG-2（agentdev-quality-gates）は次を検証する。
 
 - artifact-responsibilities.md は成果物責任表を所有する。
 - document-type-responsibilities.md は文書種別責務を所有し、本 Design は文書以外の成果物も対象にする。
-- textlint-quality-runtime は文章表層検査の共通基盤を所有し、本 Design は必要な品質能力の投影を所有する。
+- agentdev-textlint-guard Plugin（DEC-047）は文章表層検査の共通基盤を所有し、本 Design は必要な品質能力の投影を所有する。
 - 成果物固有の意味と構造の品質は能力キー定義に示した既存責務が所有する。
 - agentdev-skill-authoring は Skill の品質基準を所有する。
 - agentdev-command-authoring は Command の品質基準を所有する。

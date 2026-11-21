@@ -87,6 +87,6 @@ REQ、Decision、IR を廃止した場合、当該識別子は再利用しない
 ## ADR から Decision への移行（AG-007、AG-008）
 
 現行 `ADR-NNN` 識別子は番号部を維持したまま `DEC-NNN` へ1対1で移行する。
-`alloc-adr-number.ts`（implementation identifier、case-run OU-002 で `alloc-dec-number.ts` 等へ改名）は実装識別子のため本 Design では参照を維持し、実装と同期して更新する。
+Decision 番号採番スクリプトの現行実装は `alloc-decision-number.ts` であり、本 Design は現行スクリプト名を参照する。実装改名時は本 Design を同期して更新する。
 `docs/adr/` パスは `docs/decisions/` へ移行する。
 過去の `v2:ADR-*` 番号帯は AG-010 により維持し、`v2:DEC-*` は生成しない。

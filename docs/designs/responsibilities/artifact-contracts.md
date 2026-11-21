@@ -25,7 +25,7 @@ Command / Skill / Template / Script の入出力契約と依存方向を定義�
 | Skill | src/common/skills/（実行時: .opencode/skills/） | 再利用可能な判断基準、ドメイン知識 | Command からの参照 | 判断結果の参照提供 |
 | Template | src/common/skills/*/templates/ または src/common/commands/agentdev/templates/（実行時: .opencode/ 経由） | 出力構造とプレースホルダー | 変数バインド | Issue/PR 本文、コメント |
 | Script | src/common/skills/*/scripts/（実行時: .opencode/ 経由） | 決定的でテスト可能な解析・変換・検証・生成ロジック | コマンドライン引数 | 標準出力（JSON/Markdown） |
-| Custom Tool | src/opencode/tools/（実行時: .opencode/tools/ 経由。詳細構造は Design が所有） | Git / GitHub 等への構造化された副作用操作。操作契約（入力、出力、保証、失敗時）を公開し、文字コード・シェル・一時ファイル等の実装詳細を隠蔽 | 構造化引数 | 構造化結果（検証成功のみ成功） |
+| Custom Tool | src/common/tools/（実行時: .opencode/tools/ 経由〔ホスト接続領域は原本を投影する〕。詳細構造は Design が所有） | Git / GitHub 等への構造化された副作用操作。操作契約（入力、出力、保証、失敗時）を公開し、文字コード・シェル・一時ファイル等の実装詳細を隠蔽 | 構造化引数 | 構造化結果（検証成功のみ成功） |
 | Plugin / Hook | src/opencode/plugins/（実行時: .opencode/ 経由。詳細構造は Design が所有） | モデル遵守判断に委ねない実行前の拒否・強制、正規経路の迂回防止 | ツール実行イベント | 許可・拒否判定 |
 | リポジトリローカル Command | .opencode/commands/repo/（原本なし） | 本体リポジトリ専用入口（REQ-001） | ユーザー起動 | レポート、成果物 |
 | リポジトリローカル Skill | .opencode/skills/repo-*/（原本なし） | 本体リポジトリ専用判断基準（REQ-001） | Command からの参照 | 判断結果の参照提供 |
@@ -214,7 +214,7 @@ Template の配置先は以下の 2 種類を定義する（REQ-002-040）。
 | 完了報告 | `.opencode/commands/agentdev/templates/{command}/{variant}.md` | 各コマンド |
 
 - 実行時コマンドは上記実行時パス（`.opencode/...`）からテンプレートを参照すること
-- `src/opencode/...` は原本配置、install-sync 入力、執筆コンテキストに限定し、実行時の参照先として使用しない
+- `src/opencode/...` はホスト接続領域の投影配置、self-sync.ps1 入力、執筆コンテキストに限定し、実行時の参照先として使用しない（共通原本の正は src/common/ 正本〔DEC-049〕）
 
 ## 完了報告契約
 
@@ -284,7 +284,7 @@ Template の配置先は以下の 2 種類を定義する（REQ-002-040）。
 ## リポジトリローカルアーティファクト（REQ-001）
 
 配布対象外コマンド/スキルは AgentDevFlow の配布対象外である:
-- `.opencode/commands/repo/`（AgentDevFlow 本体リポジトリ専用コマンド）。`src/opencode/` に原本を持たず、sync-opencode.ps1 のジャンクション管理対象外
+- `.opencode/commands/repo/`（AgentDevFlow 本体リポジトリ専用コマンド）。`src/opencode/` に原本を持たず、self-sync.ps1 のジャンクション管理対象外
 - `.opencode/skills/repo-*/`（AgentDevFlow 本体リポジトリ専用スキル）。同上
 - `repo-*` プレフィックスは AgentDevFlow 配布コマンド体系（`agentdev-*`）とは独立に管理される
 
