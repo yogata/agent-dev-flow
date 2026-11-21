@@ -114,7 +114,7 @@ REQ-012-029（実装対応）、REQ-012-030（検証対応・policy が required
 
 ### corpus 債務方針
 
-missing-design 942 件と missing-implementation 111 件（2026-09-19 時点の baseline @54c0fde3）は既知債務である。missing-design の計上は、採用規約が独立 Design 文書を必須とする採用の場合の Design 対応欠落として語義づけられる（解釈 clause 参照）。corpus 値の是正は第13段 full validation で評価し、lifecycle gate を阻害しない。corpus 計数の増減は診断指標として追跡する。
+missing-design 942 件と missing-implementation 111 件（2026-09-19 時点の baseline @54c0fde3）は既知債務である。missing-design の計上は、採用規約が独立 Design 文書を必須とする採用の場合の Design 対応欠落として語義づけられる（解釈 clause 参照）。corpus 値の是正は既存の診断経路（inspect 系）と case-close の検証で評価し、lifecycle gate を阻害しない。corpus 計数の増減は診断指標として追跡する。
 
 ## Evidence 第一級の位置づけ
 

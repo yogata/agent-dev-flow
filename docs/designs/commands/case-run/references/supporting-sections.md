@@ -13,7 +13,7 @@ updated: "2026-11-19"
 
 - public contract（公開目的、入力、出力、副作用、安全境界、承認・HITL 境界、停止状態、外部から意味のある順序）の正規文書は本 Design であり、case-auto の orchestration による Workflow Skill load 時に本 Design が読み込まれる（DEC-010。第4段以降は command 定義の実行時投影ではなく直接読込）。
 - workflow 実装本体は Workflow Skill（`agentdev-workflow-case-run`）が所有し、本 Design は内部手順、STEP 構成、reference 構成を複製しない。
-- case-run の Workflow Skill は、単一 Issue 実行（single workflow）のみを所有する（REQ-031-015、DEC-041）。かつて single workflow と epic-wave workflow の2 workflow 構成に分離されていた構造は、Epic Wave 実行モード（case-run #epic）の実行契約廃止により single workflow へ収斂した。旧 epic-wave workflow が所有していた実行契約差異6軸（target cardinality、parallelism、fan-out・fan-in、child task recovery、partial result、Wave-level completion）の実行契約は case-auto orchestration stage 3 へ移転済みであり、Workflow Skill は保持しない（`<workflows/workflow-skill-model>` Design「1:N 分割基準の適用実例（case-run）」参照）。
+- case-run の Workflow Skill は、単一 Issue 実行（single workflow）のみを所有する（REQ-031-015、DEC-041）。Wave 実行制御（Wave 構成の読み取り、fan-out・fan-in、子 Issue 並列起動等の実行契約差異6軸相当）は case-auto orchestration stage 3 が単一所有し、Workflow Skill は保持しない（`<workflows/workflow-skill-model>` Design「1:N 分割基準の適用実例（case-run）」参照）。
 - Workflow Skill の単独起動防止（soft guard）は、case-auto orchestration の委譲制御と Workflow Skill description の DO NOT USE FOR トリガーにより実効する。case-auto が case-run をインライン実行する場合も同一の Workflow Skill を正規情報源として読み込む。
 - Capability Skill は See Also 記載のとおり名レベルで参照し、その内部構造へ依存しない。
 

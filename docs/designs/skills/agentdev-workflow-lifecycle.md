@@ -16,7 +16,7 @@ AgentDevFlow のフェーズ定義、SSoT 遷移、work_type 判定基準、ス�
 
 - ライフサイクル判定、ワークフローフェーズ判定
 - work_type 分類（bugfix / feature / maintenance / docs_chore）
-- スケール判定（feature のみ standard / large）
+- スケール判定（全 work_type を対象に standard / large を判定する。canonical は本 SKILL 本体宣言）
 - 前工程からの引き継ぎ判定、停止条件
 - SSoT 遷移に関する共通判断
 
@@ -24,7 +24,7 @@ AgentDevFlow のフェーズ定義、SSoT 遷移、work_type 判定基準、ス�
 
 - フェーズ定義（マクロ: 壁打ち、構造的実行、レビュー完了 / マイクロ: requirement、analyzed、created、in_progress、review、done）
 - work_type 分類（4値）
-- スケール判定（feature のみ、3条件: 複数モジュール跨ぎ、PR 肥大化リスク、段階的リリース）
+- スケール判定（全 work_type を対象に 3条件〔複数モジュール跨ぎ、PR 肥大化リスク、段階的リリース〕で判定する）
 - 実装スコープシグナル確認（ドラフト内実装詳細セクション検出時の scale: large 昇格判定、REQ-004-018）
 - 前工程からの引き継ぎ判定、停止条件（`agentdev_handoff: true` 検出時）
 - SSoT 遷移
@@ -51,7 +51,7 @@ AgentDevFlow のフェーズ定義、SSoT 遷移、work_type 判定基準、ス�
 ## 検証観点
 
 - work_type 分類が正しいか（4値のいずれか）
-- スケール判定が正しいか（feature のみ、3条件のいずれか）
+- スケール判定が正しいか（全 work_type、3条件のいずれか）
 - 前工程からの引き継ぎ判定が正しいか
 - フェーズ定義に従っているか
 

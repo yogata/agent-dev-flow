@@ -9,7 +9,7 @@ updated: "2026-11-19"
 
 # QG-3 前置 staleness check と targeted docs guard
 
-## QG-3 前置 staleness check 手順（新規セクション）
+## QG-3 前置 staleness check 手順
 
 case-run は実装作業開始前に QG-3 本体とは独立した前置検査として staleness check を実行する（REQ-031-009〜034）。
 本検査は QG-3 deviation 分類（spec-bug 等）運用を変更せず、deviation 発生前の予防層として位置づける。

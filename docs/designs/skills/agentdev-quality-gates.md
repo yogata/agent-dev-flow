@@ -45,7 +45,7 @@ Design 保存は独自 QG を持たず QG-1、QG-4 で担保される。
 - ファイル編集、Issue 作成、PR 作成、マージ、テスト実行は行わない
 - 自動ループバック禁止（QG-3 / QG-4 fail 時は推奨アクション提示、ユーザー決定）
 
-## QG-2 拡張: artifact-specific quality control 投影検証（新規セクション）
+## QG-2 拡張: artifact-specific quality control 投影検証
 
 QG-2 は REQ-017 execution contract 確定を支援するため、次の検証を追加する。
 

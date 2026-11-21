@@ -67,7 +67,7 @@ case-run から実行担当サブエージェントへの委譲契約を以下�
 
 処理段階（外部から意味のある順序）。
 各段階の詳細手順は Workflow Skill（`agentdev-workflow-case-run`）が正規情報源である。
-Workflow Skill は常に単一 Issue 実行（single workflow）として動作する。Epic Wave 実行（epic-wave workflow）の実行契約は廃止され、Wave 実行制御は case-auto の orchestration stage 3 が単一所有する（REQ-031-015、DEC-041）。
+Workflow Skill は常に単一 Issue 実行（single workflow）として動作する。Wave 実行制御は case-auto の orchestration stage 3 が単一所有する（REQ-031-015、DEC-041）。
 
 ### フェーズ判定（再開ポイント検出、実行モード分岐）
 
@@ -116,7 +116,7 @@ Workflow Skill は常に単一 Issue 実行（single workflow）として動作�
 ## 所有関係と委譲
 
 詳細は references/supporting-sections.md を参照（遅延読み込み）。
-## QG-3 前置 staleness check 手順（新規セクション）
+## QG-3 前置 staleness check 手順
 
 詳細は references/qg3-and-docs-guard.md を参照（遅延読み込み）。
 ## docs/** 変更時の targeted docs guard（REQ-031-011）
@@ -134,7 +134,7 @@ Workflow Skill は常に単一 Issue 実行（single workflow）として動作�
 ## 参照する横断 Design
 
 詳細は references/traceability-usage.md を参照（遅延読み込み）。
-## execution contract 消費境界（新規セクション）
+## execution contract 消費境界
 
 詳細は references/execution-contract-consumption.md を参照（遅延読み込み）。
 ## 採用規約の解決の実行経路接続（REQ-104）
@@ -217,7 +217,7 @@ Workflow Skill は常に単一 Issue 実行（single workflow）として動作�
 - [case-open.md](case-open.md)（前段コマンド（Issue 作成））
 - [case-close.md](case-close.md)（後続コマンド（PR マージ、Issue クローズ））
 - [case-auto.md](case-auto.md)（自走モード）
-- `agentdev-workflow-case-run` skill（workflow 実装本体（single workflow、epic-wave workflow、6軸実行契約差異））
+- `agentdev-workflow-case-run` skill（workflow 実装本体（single workflow））
 - `agentdev-workflow-orchestration` skill（フェーズ判定、エラー処理）
 - `agentdev-case-run-execution-adapter` skill（委譲統合、result 契約）
 - `agentdev-git-worktree` skill（worktree 作成、precondition gate）
