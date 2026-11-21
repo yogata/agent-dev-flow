@@ -155,6 +155,7 @@ case-open が使用する検査ツール（[integrity-contracts.md](../integrity
 - 前工程からの引き継ぎ停止判定（`agentdev_handoff: true`、consumer リポジトリ）検出時（Root Case を作成せず停止する）。
 - adversarial-review 審議で unresolved なユーザー判断事項が残る場合（Root Case 作成へ進まない）。
 - canonical Definition との実変更判定が不能な場合（設計PRを作成せず停止し、判定不能の理由を報告する）。
+- 合意済み REQ 行の明示パス commit が IR-044 warning で物理ブロックされた場合（req-define の IR-044 シグナル語事前走査の記録候補〔REQ-004-076〕。走査対象から漏れた合意済み行が warning で block された事例を、停止報告に記録し req-define 側の走査適用漏れとして capture する。既存統制〔exemption・warning 扱い〕の変更は本記録の対象としない）。
 
 ## adversarial-review 挿入境界（case-open）
 

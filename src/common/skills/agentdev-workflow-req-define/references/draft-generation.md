@@ -52,6 +52,8 @@ STEP-5 の Decision禁止ゲート・STEP-4 の文書分類妥当性検証で分
 
 **design 対応事前確認**: 対象 REQ 行のうち既存行の意味変更を含む場合、`agentdev-traceability` の coverage --req により当該行の design 対応有無を事前確認する。design 対応が欠落する意味変更行を検出した場合は、当該行の design 対応を `artifact_actions`（`artifact: design`）へ組込んだ上で生成を完了する。事前確認を省略した draft を入力とする Case は後段の case-ready lifecycle gate completeness（fail-closed）で停止し得る（missing-design 0 件ゲートが増分ベース〔新規行のみ〕であることへの予防手順。正規所有は case-open Design「意味変更行の design 対応事前確認」節）。
 
+**シグナル語事前走査**: draft の産出・組立工程で、req-spec-boundary-violation-detection 検証ルール（整合性ルールカタログ配下の REQ 仕様境界違反検出ルール）が定めるシグナル語パターンによる事前走査を対象 REQ 行と追記行に対して実施する。走査で検出された行は、ドラフト確定の前に表記ガイダンス（段階名・機能名参照への置換）を適用してから確定する。シグナル語パターンの具体列挙は同検証ルールの定義を正とし、本手順へ複製しない。本走査は事前予防であり、走査対象ルールの exemption 条件整備・ゲート warning 扱いの変更は行わない（実害再発時は既存の仮説に基づく既存統制変更原則の手続で再評価する）。合意済み REQ 行に走査が届かないため明示パス commit が warning で物理ブロックされた場合の構造的再発防止は、case-open Design の停止理由分類の記録候補として扱う。
+
 **finding 由来 draft の target_design 実パス実在確認**: finding 由来の draft で design 操作を `artifact_actions` へ転記する前に、`target_design` の宣言と実配置（docs/designs/{domain}/ 配下の実ファイル）の一致を実パス実在確認（grep による本文一意性確認を含む）で検証する。宣言と実配置が不一致の場合は、slug・該当行番号・文言の3点一致による機械的照合で実配置を正と判定し、不在パスを正として採用しない（配置移動済み文書を旧配置の domain で参照する finding の機械的転記による誤パス更新の防止。正規所有は req-define command Design「finding 由来 draft の target_design 実パス実在確認」節）。
 
 各副ステップ（定義完全性ゲート QG-1、operation_units 生成、depends_on/recommended_order 定義、artifact_actions 生成、target_area/content 形式、Design action 分類根拠出力、test_strategy 生成、review_dispositions 生成）の詳細、フィールドスキーマ、委譲接続点は `agentdev-req-analysis` の req-define detailed gates、および req-define command Design（extension 経由）の各フィールドスキーマを参照。
