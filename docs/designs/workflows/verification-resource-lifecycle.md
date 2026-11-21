@@ -81,7 +81,7 @@ ADFの管理する作業に伴う一時的な副作用（検証用の一時資�
 - 終了判定記録の書出し・読取（close-acceptance.ts、runner-cli.ts、runner-local.ts）は判定内容を変更後の正規完了判定へ適合させて維持する
 - 撤去する機構のためのテスト（verification-resources-ledger.test.ts、verification-resource-register.test.ts、verification-resource-reclamation.test.ts、deletion-confirmation.test.ts）は削除し、維持機構のテストは維持する。full integrity suite の実行形態契約（3 cwd 分割正規形、REQ-060）は変更しない
 - 実行委譲の adapter SKILL（agentdev-case-run-execution-adapter）の作成・報告文言は本Designの修正後境界へ再整合する（投影同期 src/common → .opencode を含む）
-- ヘッダの ADF-COVERS 宣言ブロックは design 保存工程の更新確認手順に従い、design 対応（REQ-118-001〜009。行IDは安定IDとして維持）と実装対応（REQ-119-004 は履歴対応として整理）の過不足を反映する
+- ヘッダの ADF-COVERS 宣言ブロックは design 保存工程の更新確認手順に従い、design 対応（REQ-118-001〜009。行IDは安定IDとして維持）と実装対応（ は履歴対応として整理）の過不足を反映する
 
 ## 実装面
 

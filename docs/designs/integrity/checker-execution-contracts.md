@@ -5,7 +5,7 @@ created: 2026-08-15
 updated: "2026-11-18"
 ---
 <!-- ADF-COVERS(design): REQ-010-009 -->
-<!-- ADF-COVERS(implementation): REQ-002-035, REQ-122-014 -->
+<!-- ADF-COVERS(implementation): REQ-002-035 -->
 <!-- ADF-COVERS(implementation): REQ-010-062 -->
 <!-- ADF-COVERS(implementation): REQ-010-010 -->
 <!-- ADF-COVERS(design): REQ-018-004 -->
