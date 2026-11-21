@@ -25,7 +25,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 REQ: 79件
 <!-- AUTOGEN:END -->
 
-現行要件は78件である。
+現行要件は79件である。
 各 REQ の詳細は各 REQ ファイル本文を参照。
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-table -->
