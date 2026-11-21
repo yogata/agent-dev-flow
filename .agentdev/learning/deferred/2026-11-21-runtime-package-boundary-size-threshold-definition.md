@@ -2,7 +2,8 @@
 id: learn-20261121-runtime-package-boundary-size-threshold-definition
 created_at: 2026-11-21
 source: case-run capture (PR #4175・Wave-3 #4171・Root Case #4167)
-status: inbox
+status: deferred
+moved_at: 2026-11-21
 ---
 
 # runtime-package-boundary.md のサイズ閾値「15KB前後」の合格圏の明示定義候補
@@ -15,3 +16,4 @@ status: inbox
 - ユーザー確認要否: なし（定義改善の提案として記録）
 - 影響範囲想定: docs/requirements/REQ-123.md の REQ-123-003・TS-003.1 の合格条件表現
 - 関連: REQ-123-003・PR #4175（Findings/Capture候補 3）
+- **再評価条件**: 後続 REQ 定義時（REQ-123 系の後続作業単位または req-define 執筆ガイダンス改訂時）に反映先の明確化（req-define 執筆ガイダンス化か後続 REQ 契約の合格範囲数値定義か）を含めて再評価する。次回 learning-promote 実行時にも再評価対象（living pool）
