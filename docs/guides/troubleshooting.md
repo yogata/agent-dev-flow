@@ -64,7 +64,7 @@ Custom Toolがgh CLIの実行と出力のエンコーディングを一元管理
 
 症状: PR本文に記録した検出事項がcase-closeで回収されない。
 
-確認: PR本文の「Findings / Capture候補」セクションに正しく記録されているか確認する。
+確認: PR本文の「Findings/ Capture候補」セクションに正しく記録されているか確認する。
 
 対処: case-closeはマージ済みPR本文の同セクションを回収する。
 セクション構造に不備がある場合はintake-promote workflowの intake capture 経路（agentdev-intake-pipeline スキル）で item を保存する。
