@@ -184,6 +184,10 @@ Design は 3 層構造（commands / skills / workflows）と基盤 6 ドメイ�
 - [ADF v4 標準ライフサイクル](designs/workflows/standard-lifecycle.md)
 - [ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応）](designs/workflows/lifecycle-state-machine.md)
 - [ADF v4 継続コラボレーションループ](designs/workflows/collaboration-loop.md)
+- [Case Issue 工程記録モデル](designs/workflows/issue-lifecycle-records.md)
+- [ADF 工程駆動コラボレーションモデル](designs/workflows/phase-driven-collaboration-model.md)
+- [ADF 工程遷移・独立レビューと双経路併存モデル](designs/workflows/phase-transition-and-coexistence-model.md)
+- [検証に伴う一時資材の取扱いと後片付け責任](designs/workflows/verification-resource-lifecycle.md)
 
 ### command Design / skill Design
 
@@ -242,6 +246,8 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 - [AUTOGEN ブロック鮮度検出 gate](designs/integrity/autogen-freshness-gate.md)
 - [テスト影響範囲検出 gate](designs/integrity/test-impact-detection-gate.md)
 - [checker 実行契約と検出基盤規則](designs/integrity/checker-execution-contracts.md)
+- [検証エンジン プラグインアーキテクチャ](designs/integrity/integrity-engine-plugin-architecture.md)
+- [ローカル検証ゲート（draft）](designs/integrity/local-verification-gates.md)
 
 #### local/（ローカル版 Design）
 
