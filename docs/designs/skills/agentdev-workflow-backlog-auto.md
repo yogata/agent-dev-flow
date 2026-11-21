@@ -136,7 +136,7 @@ REQ-114-013（3 採用形態での共通 E2E 挙動確認）の実装・検証�
 ## 対象外
 
 - 子ワークフロー内部の分類基準、評価基準、昇格基準、RU 生成ロジック（各子 Workflow Skill の責務）
-- 既存5コマンドの廃止、置換、単独実行契約の変更
+- 既存5処理（内部 workflow）の廃止、置換、単独実行契約の変更
 - capture 系コマンド（learning-capture、intake-capture、intake-from-github）、inspect-skills の自動起動
 
 ## 検証観点

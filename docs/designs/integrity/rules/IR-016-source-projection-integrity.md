@@ -16,7 +16,7 @@ verification_path: src/common/skills/repo-agentdev-integrity/scripts/rules/rules
 | description | src/opencode/ と .opencode/ (projection) の間に内容の不一致がないこと |
 | severity | strict |
 | category | canonical-conflict |
-| detection_method | sync-opencode.ps1 -Mode check 相当の比較 |
+| detection_method | self-sync.ps1 -Mode check 相当の比較 |
 | affected_artifacts | [commands, skills, templates] |
 | related_req | [REQ-002-048-052] |
 | related_design | [system.md] |
@@ -24,5 +24,5 @@ verification_path: src/common/skills/repo-agentdev-integrity/scripts/rules/rules
 | false_positive_risk | 低。ジャンクション（junction）破損は確実な NG |
 | regression_test | (sync script で検証) |
 | finding_route | intake |
-| triage_action | sync-opencode.ps1 -Mode apply を実行 |
+| triage_action | self-sync.ps1 -Mode apply を実行 |
 | last_verified | 2026-06-06 |

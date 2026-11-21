@@ -17,11 +17,11 @@ updated: "2026-11-21"
 
 `/agentdev/backlog-auto` 公開コマンド。backlog 整理サイクル（inspect-docs → 昇格3系統 → backlog-review）を1 回起動で実行する薄いオーケストレータの公開 interface を定義する。workflow 実装本体は `agentdev-workflow-backlog-auto` Workflow Skill が所有する。対象は、backlog 整理サイクルに加えて RU 一式の要件定義・実行・検証・統合・全体完了判定・パッチリリース作成への接続（一気通貫実行）まで拡張する。一気通貫実行の実行契約は REQ-114 が所有する。
 
-既存5コマンド（inspect-docs、learning-promote、intake-promote、inspect-promote、backlog-review）は置換しない。backlog-auto は backlog-driven の要求入口であり、整理結果（RU）は req-define → case-auto へ接続する。
+既存5処理（内部 workflow: inspect-docs、learning-promote、intake-promote、inspect-promote、backlog-review）は置換しない。backlog-auto は backlog-driven の要求入口であり、整理結果（RU）は req-define → case-auto へ接続する。
 
 ## 入力
 
-- 引数なし（対象状態は各子コマンドと set-state の永続状態から解決する）
+- 引数なし（対象状態は各子ワークフローと set-state の永続状態から解決する）
 
 ## 出力
 
@@ -90,7 +90,7 @@ REQ-041-017の成立は系統別の起動と活動区間の実観測で確認す
 
 ## 対象外
 
-- 既存5コマンドの定義変更を行わない
+- 既存5処理（内部 workflow）の定義変更を行わない
 - inspect-promote --auto を暗黙的に有効化しない
 - 子ワークフロー内部の分類、評価、昇格、RU 生成ロジックの再実装（Workflow Skill の責務範囲）
 - 一気通貫実行に係る対象外事項は REQ-114 対象外節（docs/requirements/REQ-114.md 適用範囲）を参照
@@ -98,9 +98,9 @@ REQ-041-017の成立は系統別の起動と活動区間の実観測で確認す
 ## 検証観点
 
 - 工程別結果と停止理由が共通実行契約形式で報告されること
-- 既存5コマンドの公開契約に差分がないこと
+- 既存5処理（内部 workflow）の公開契約に差分がないこと
 - 一気通貫の実行結果報告が共通実行契約形式で報告されること
-- 既存子コマンドの公開契約に差分がないこと
+- 既存子ワークフローの公開契約に差分がないこと
 
 ## 重要変更の通知と結果説明
 
