@@ -152,7 +152,7 @@ HITL 確定フェーズではユーザー判断が必要な項目のみを提示
 
 ## See Also
 
-- [intake-capture.md](intake-capture.md), [intake-from-github.md](intake-from-github.md)（前段コマンド）
+- intake capture 前段処理は `agentdev-intake-pipeline` skill が所有する（前段コマンドの Design は現行構造では存在せず、単独 command としては呼び出さない）
 - [backlog-review.md](backlog-review.md)（後続コマンド（RU 生成））
 - `agentdev-workflow-intake-promote` skill（workflow 実装本体）
 - `agentdev-intake-pipeline` skill（inbox スキャン、レビュー評価、分類提示、整形保存）

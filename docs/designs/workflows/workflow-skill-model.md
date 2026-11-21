@@ -45,7 +45,7 @@ Workflow Skill は STEP model の適用有無により次の4型に分類され�
 | 型 | 対象 | STEP model | resume point / export / import |
 |---|---|---|---|
 | 標準型 | req-define、case-open、case-ready、case-revise、case-run、case-close、case-auto、intake-promote、learning-promote、backlog-review、backlog-auto、inspect-promote | 対象 | 持つ（DEC-011） |
-| capture-only 型 | intake-capture、intake-from-github、third-party-sync | 対象外 | 持たない。工程は逐次実行し、中断時は先頭から再実行する |
+| capture-only 型 | third-party-sync | 対象外 | 持たない。工程は逐次実行し、中断時は先頭から再実行する。intake capture 前段処理は intake-promote 内部 workflow の入力経路であり、単独 command としては存在しない |
 | read-only-diagnostic 型 | inspect-docs、inspect-skills | 対象外 | 持たない。工程一覧のラベルは順序ラベルであり、中断時は先頭から再実行する |
 | 対話操作完結型 | issue | 対象外 | 持たない。各操作が1完結単位であり、追跡Issue自体が durable state（管理単位・永続状態）であるため、中断時は同一指示から再実行して現在状態を再構成できる |
 
@@ -232,7 +232,7 @@ Workflow Skill の単独起動防止（soft guard）は OpenCode 1.18.15 が ski
 | 層 | 実装 | 全 Workflow Skill での実装有無 |
 |---|---|---|
 | Skill 層 | Workflow Skill description の DO NOT USE FOR に置く簡潔なトリガー項（「単独起動（対応する /agentdev/* コマンド経由で利用すること）」） | 全18 Workflow Skill で実装（実効の主層・checker 実測 18 = 公開 command 13 + 内部 lifecycle 5） |
-| Command 層 | command 定義本文 workflow 節の soft guard 宣言節（grep 可能な `soft guard` マーカー） | core Command（req-define、case-open、case-ready、case-revise、case-run、case-close、case-auto）と inspect 3 Command（inspect-docs、inspect-skills、inspect-promote）、issue Command で実装。intake / learning / backlog 5 Command（intake-capture、intake-from-github、intake-promote、learning-promote、backlog-review）は command 定義本文に宣言節を持たず、Skill 層のみで実効する |
+| Command 層 | command 定義本文 workflow 節の soft guard 宣言節（grep 可能な `soft guard` マーカー） | 公開 8 Command（req-define、backlog-auto、case-auto、phase-tasks-create、phase-tasks-update、phase-artifacts-update、phase-review、phase-transition）で実装。inspect / learning / intake 系 5 処理および backlog-review は backlog-auto が Workflow Skill として駆動する内部 workflow であり command 定義本文を持たず、Skill 層のみで実効する。公開コマンド集合の正は正規参照表（src/common/commands/agentdev/README.md）である |
 
 マーカー語、内部 ID、運用規則の散文は description に置かない。
 
