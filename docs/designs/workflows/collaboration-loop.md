@@ -40,8 +40,8 @@ Integrate は case-close における PR マージ・正規成果物の確定・
 
 | 循環段 | 実現手段（既存コマンド・スキル） |
 |---|---|
-| Observe | inspect-docs / inspect-skills / intake-from-github / case-close Capture 回収 |
-| Intake | intake-capture / intake-from-github / intake-promote |
+| Observe | inspect-docs / inspect-skills / case-close Capture 回収 |
+| Intake | intake-promote（intake capture 前段処理を含む内部 workflow・backlog-auto 駆動） |
 | Learning | learning capture（case-close・ワークフロー内） / learning-promote |
 | Backlog | backlog-review / backlog-auto |
 | req-define・case-auto | req-define / case-auto |

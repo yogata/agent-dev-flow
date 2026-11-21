@@ -103,7 +103,7 @@ v2:ADR-0127（case-auto 構成工程の委譲）と v2:ADR-0137（case-run イ�
 ### 委譲契約（Command→Skill 依存方向）
 
 各 command は Command→Skill 依存方向（`docs/designs/responsibilities/artifact-contracts.md`「依存方向」参照）に従い、capture 成果物の生成を Skill へ委譲する。
-command は `intake-capture` 等の他 command を呼び出さない。
+command は capture 成果物の生成を他 command へ移管せず、Skill への委譲のみで完結させる（単独 command の不存在な内部処理を別 command として呼び出さない）。
 
 | 種別 | 委譲先 Skill | 役割 |
 |---|---|---|
