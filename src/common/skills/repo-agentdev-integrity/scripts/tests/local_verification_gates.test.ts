@@ -167,17 +167,27 @@ function runGate(cwd: string, mode: "pre-commit" | "pre-push" = "pre-commit"): {
   return { status: result.status ?? -1, out: `${result.stdout ?? ""}\n${result.stderr ?? ""}` };
 }
 
-test("REQ-122-008: pre-push は inbox 滞留をブロックしない（非同期キュー前提・WARN 表示のみ）", () => {
+test("REQ-122-008: 非同期キュー（learning/intake/backlog/inspect）のいずれにファイルがあっても pre-commit はブロックしない", () => {
   const dir = makeFixtureRepo();
   try {
-    // ワークフロー自身が learning/inbox へ自動保存した記録1件があっても push 相当の検査は通る。
     writeFixtureFile(dir, ".agentdev/learning/inbox/2026-11-21-learning-note.md", "# learning\n");
-    const r = runGate(dir, "pre-push");
+    writeFixtureFile(dir, ".agentdev/intake/inbox/2026-11-21-intake-note.md", "# intake\n");
+    writeFixtureFile(dir, ".agentdev/backlog/req-units/RU-9999.md", "# ru\n");
+    writeFixtureFile(dir, ".agentdev/inspect/inbox/2026-11-21-inspect-note.md", "# inspect\n");
+    stageFixtureFile(dir, "one.txt", "x\n");
+    const r = runGate(dir);
     expect(r.status).toBe(0);
     expect(r.out).toContain("検査合格");
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
+});
+
+test("REQ-122-008: pre-push は minimal-gate を実行しない（品質保証のみ担当）", () => {
+  const content = fs.readFileSync(PRE_PUSH_PATH, "utf-8");
+  expect(content).not.toContain("minimal-gate");
+  expect(content).toContain("cli.ts");
+  expect(content).toContain("bun test");
 });
 
 test("REQ-122-008: minimal-gate.mjs は総数検査・語彙スキャン・墓標監視を持たない", () => {

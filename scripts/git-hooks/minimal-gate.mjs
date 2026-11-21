@@ -1,17 +1,19 @@
 // scripts/git-hooks/minimal-gate.mjs — Minimal-by-Default ゲート（決定論的・ローカル）。
 // agent-dev-flow ソースリポジトリ専用。配布物（配布アーカイブ・consumer リポジトリ）には
 // 含めない（配布写像は trusted-distribution-gate/manifest.ts の限定列挙で scripts/git-hooks/ は対象外）。
+// 実行点は pre-commit のみ（単一の正本）。pre-push は本ゲートを実行しない（整合性・試験の品質保証のみ担当）。
 // 2 検査: (a) 単一ファイルサイズ上限（LLM コンテキスト・1モジュール1責務の目安）
-//        (b) アクティブ WIP キューの滞留監視（WARN 表示のみ。pre-commit と pre-push の両方で実行）
+//        (b) アクティブ WIP キューの滞留監視（WARN 表示のみ）
 // 強制度合い: block は「恒久資産（.agentdev/ 以外）の新規追加ファイルが単一ファイルサイズ上限を
 // 超える場合」のみ。.agentdev/ 配下（drafts/・backlog/ 等）は工程の一時ワークスペースであるため、
 // 上限超過は新規・既存を問わず WARN 表示のみで終了コード 0 とする。恒久資産の既存の上限超過
 // ファイルを編集する場合も WARN 表示のみとし、リファクタリング途中のコミットを妨げない。
-// backlog/inbox は後から非同期に処理するキューであるため、滞留ゼロを強制しない
-// （ワークフロー自身の learning 自動保存が push を自己ブロックする構造欠陥の解消。2026-11-20）。
+// backlog/intake/learning/inspect のキューは後から非同期に処理するため、滞留ゼロを強制しない
+// （合計 10 件超のみ WARN 表示。ワークフロー自身の learning 自動保存が push を自己ブロックした
+// 構造欠陥の解消。2026-11-20）。
 // 存在しない過去資産の監視（禁止パス・追加行の禁止語スキャン）は置かない（Zero-Base Filter。
 // 歴史は Git ログが唯一の正本である）。
-// 呼び出し: bun scripts/git-hooks/minimal-gate.mjs pre-commit | pre-push
+// 呼び出し: bun scripts/git-hooks/minimal-gate.mjs pre-commit
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
@@ -157,14 +159,12 @@ function checkGovernance() {
   }
 }
 
-// --- (d) WIP キュー滞留の WARN は pre-commit と pre-push の両方で共通実行 ---
+// --- WIP キュー滞留の WARN 監視は pre-commit のみで実行（pre-push は本ゲートを持たない） ---
 
 if (mode === "pre-commit") {
   checkFileSizes();
   checkWipQueues();
   checkGovernance();
-} else if (mode === "pre-push") {
-  checkWipQueues();
 } else {
   console.error(`[minimal-gate] 未知のモード: ${mode}`);
   process.exit(2);

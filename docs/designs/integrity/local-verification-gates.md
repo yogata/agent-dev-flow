@@ -44,10 +44,10 @@ git rev-parse --show-toplevel を起点とする（worktree 環境対応）。
 
 ## pre-push（scripts/git-hooks/pre-push、目標10秒）
 
-- Step 0（WIP キュー滞留の監視: scripts/git-hooks/minimal-gate.mjs pre-push）: backlog/inbox は
-  後から非同期に処理するキューであるため、滞留ゼロを強制しない。pre-commit と同じ合計 10 件超の
-  WARN 表示のみを行う（ワークフロー自身の learning 自動保存が push を自己ブロックする構造欠陥の
-  解消、2026-11-20）。
+リモート反映前の整合性・試験の品質保証のみを担当する。minimal-gate は実行しない
+（実行点は pre-commit のみに一本化。キュー滞留ゼロの強制は非同期キューの前提と矛盾するため
+全廃、2026-11-20）。
+
 - Step 1: cli.ts 全量実行（全24+IR-075 ルールをリポジトリ全体へ適用）。
 - Step 2: トレーサビリティ検証（bun run "$REPO_ROOT/src/common/skills/agentdev-traceability/scripts/src/check.ts"
   または投影先スクリプト）。check.ts の検査 fail を traceability-model Design の二層規定に従い層別する:
