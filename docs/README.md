@@ -22,7 +22,7 @@ AgentDevFlow の基本原則と管理方式は [DEC-001](decisions/DEC-001.md) �
 ## 要件
 
 <!-- AUTOGEN:BEGIN:id=readme-req-summary-count -->
-REQ: 79件
+REQ: 76件
 <!-- AUTOGEN:END -->
 
 現行要件は79件である。
@@ -105,9 +105,6 @@ REQ: 79件
 | [REQ-116](requirements/REQ-116.md) | GitHub 版隔離検証環境の管理者事前準備常備方針 |
 | [REQ-117](requirements/REQ-117.md) | docs 整合・検査体系と機械工程の堅牢化（15 作業単位） |
 | [REQ-118](requirements/REQ-118.md) | 検証に伴う一時資材の取扱いと後片付け責任 |
-| [REQ-119](requirements/REQ-119.md) | backlog 一式 20261107T161204JST の整合是正と機械工程堅牢化（6 作業単位） |
-| [REQ-120](requirements/REQ-120.md) | ADF 全体簡素化 C-α2 小修正（配布ゲート README 集約・evidence 拡張子規則・状態表約束範囲） |
-| [REQ-122](requirements/REQ-122.md) | 整合性検証体制の刷新（IR 減量・検証エンジン分割・ローカル Git Hook ゲート・巨大コマンド分割・自動トリアージ）（16 作業単位） |
 | [REQ-123](requirements/REQ-123.md) | 構造スリム化リファクタリング（trusted-distribution-gate 過剰防御の解体・traceability 試験再編・巨大設計書スリム化・大型スクリプト分割）（6 作業単位） |
 | [REQ-124](requirements/REQ-124.md) | backlog 一式 20261121 の corpus 現行化と req-define 面強化（10 作業単位） |
 <!-- AUTOGEN:END -->

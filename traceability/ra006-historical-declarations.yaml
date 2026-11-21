@@ -7,5 +7,3 @@
 # phase-transition-and-coexistence-model.md）の履歴対応宣言は inline 維持。
 component: ra006-historical-declarations
 implementation:
-  docs/designs/workflows/verification-resource-lifecycle.md:
-    - REQ-119-004

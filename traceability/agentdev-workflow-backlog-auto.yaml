@@ -25,7 +25,6 @@ implementation:
     - REQ-114-016
     - REQ-114-017
     - REQ-114-018
-    - REQ-120-002
   src/common/skills/agentdev-workflow-backlog-auto/SKILL.md:
     - REQ-094-001
     - REQ-094-002

@@ -2,10 +2,6 @@ component: repo-agentdev-integrity
 implementation:
   src/common/skills/repo-agentdev-integrity/data/skill-projection-manifest.yaml:
     - REQ-010-079
-    - REQ-122-005
-    - REQ-122-014
-  src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/README.md:
-    - REQ-120-001
   src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/archive-zip.ts:
     - REQ-009-045
   src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/boundary-scan-scope.ts:
@@ -20,18 +16,9 @@ implementation:
     - REQ-123-001
   src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/text-binary.ts:
     - REQ-123-001
-  src/common/skills/repo-agentdev-integrity/engine/targeted-gate.ts:
-    - REQ-122-003
-    - REQ-122-005
-  src/common/skills/repo-agentdev-integrity/engine/context.ts:
-    - REQ-122-006
   src/common/skills/repo-agentdev-integrity/scripts/cli.ts:
-    - REQ-122-006
     - REQ-123-005
     - REQ-123-006
-  src/common/skills/repo-agentdev-integrity/rules/index.ts:
-    - REQ-122-003
-    - REQ-122-011
   # REQ-123-002（traceability 試験の契約ベース再編・3統合ファイル構成と tim 圧縮）の
   # 実装対応。統合後の試験資産本体（traceability_core / diff_and_policy / workflow /
   # tim_declarations_contract）。Phase 2・Issue #4170・DEL-4170-1。

@@ -1,11 +1,4 @@
 component: scripts-git-hooks
 implementation:
   scripts/git-hooks/pre-push:
-    - REQ-122-009
-    - REQ-122-015
-    - REQ-122-016
 verification:
-  scripts/git-hooks/pre-push:
-    - REQ-122-014
-    - REQ-122-015
-    - REQ-122-016
