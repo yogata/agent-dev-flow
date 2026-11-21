@@ -2,12 +2,13 @@
 title: backlog-auto Design
 status: accepted
 created: 2026-08-17
-updated: 2026-11-18
+updated: "2026-11-21"
 ---
 <!-- ADF-COVERS(implementation): REQ-041-001, REQ-041-002, REQ-041-003, REQ-041-004, REQ-041-005, REQ-041-006, REQ-041-007, REQ-041-008, REQ-041-009, REQ-041-010, REQ-041-011, REQ-041-012, REQ-041-013, REQ-041-014, REQ-041-015, REQ-041-016 -->
 <!-- ADF-COVERS(design): REQ-108-011 -->
 <!-- ADF-COVERS(design): REQ-108-018, REQ-108-019, REQ-108-020, REQ-108-021, REQ-108-024（重要変更の通知と結果説明節。AG-004〜006 に対応。REQ-108-024 は一気通貫経路での検証構造） -->
 <!-- ADF-COVERS(design): REQ-041-017 -->
+<!-- ADF-COVERS(design): REQ-041-016（子処理の内部 workflow 化の構造判断。OU-001 実行時の現行所有者付け替えを含む） -->
 <!-- ADF-COVERS(design): REQ-114-001, REQ-114-010, REQ-114-011, REQ-114-012, REQ-114-014 -->
 
 # backlog-auto Design

@@ -19,8 +19,9 @@ implementation:
   src/common/skills/agentdev-git-worktree/references/worktree-operations.md:
     - REQ-007-012
     - REQ-018-005
-    - REQ-018-006
-    - REQ-018-007
+
+
+
     - REQ-018-008
     - REQ-018-009
     - REQ-029-012
@@ -30,6 +31,7 @@ implementation:
 verification:
   src/common/skills/agentdev-git-worktree/references/worktree-operations.md:
     - REQ-018-005
-    - REQ-018-007
+
+
     - REQ-018-008
     - REQ-018-009

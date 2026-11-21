@@ -8,6 +8,7 @@
 基本原則、管理方式、リリース条件は DEC-001 を基準とする。
 個別 REQ/Design は憲章の原則へ照らして位置づく。
 DEC-018 は欠番であり、対応する Decision ファイルは存在しない。
+DEC-064 は欠番であり、対応する Decision ファイルは存在しない。実験前提に基づく既存統制変更原則の採用に関する判断であったが、現行の判断実体は DEC-067（仮説に基づく既存統制変更原則）が部分置換・継承しており、ファイルはスリム化整理で削除された。削除後の参照解決は Git 履歴で行う。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
 現行の承認済み Decision は45件、提案中の Decision は0件である。
@@ -251,8 +252,8 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-061 | [REQ-114](../requirements/REQ-114.md) | - |
 | DEC-062 | [REQ-004](../requirements/REQ-004.md), [REQ-009](../requirements/REQ-009.md), [REQ-012](../requirements/REQ-012.md), [REQ-051](../requirements/REQ-051.md) | - |
 | DEC-063 | - | - |
-| DEC-065 | [REQ-122](../requirements/REQ-122.md) | - |
-| DEC-066 | [REQ-122](../requirements/REQ-122.md) | - |
+| DEC-065 | - | - |
+| DEC-066 | - | - |
 | DEC-067 | [REQ-048](../requirements/REQ-048.md), [REQ-109](../requirements/REQ-109.md) | - |
 <!-- AUTOGEN:END -->
 

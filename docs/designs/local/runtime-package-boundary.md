@@ -16,6 +16,7 @@ updated: "2026-11-21"
 <!-- ADF-COVERS(design): REQ-029-012, REQ-029-013（本体リポジトリ sync 節と 3rd-party 依存の通知小節が design 実体） -->
 <!-- 注: install/self-sync 各 ps1（scripts/）は走査対象拡張子外のため、導入器実装行の宣言は本 Design（正規仕様所有者）へ配置。実装実体は scripts/install.ps1、scripts/self-sync.ps1（内部処理は scripts/consumer/、scripts/self/ 配下） -->
 <!-- ADF-COVERS(design): REQ-002-047 -->
+<!-- ADF-COVERS(design): REQ-009-002（同期とインストール分離と REQ-050-001 3本構成の現行化の構造判断） -->
 <!-- ADF-COVERS(design): REQ-050-009 -->
 <!-- ADF-COVERS(design): REQ-091-001, REQ-091-002, REQ-091-003, REQ-091-004, REQ-091-005 -->
 <!-- ADF-COVERS(design): REQ-112-001, REQ-112-002, REQ-112-003（local ツール package の tsconfig 参照共有と typecheck 検査契約節が design 実体） -->

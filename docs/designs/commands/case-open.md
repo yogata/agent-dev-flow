@@ -2,7 +2,7 @@
 title: case-open Design
 status: accepted
 created: 2026-06-21
-updated: "2026-11-18"
+updated: "2026-11-21"
 ---
 
 <!-- ADF-COVERS(implementation): REQ-030-001, REQ-030-002, REQ-030-003, REQ-030-004, REQ-030-005, REQ-030-006, REQ-030-007, REQ-030-008, REQ-030-009, REQ-030-010, REQ-030-011, REQ-030-015, REQ-122-012 -->
@@ -12,6 +12,7 @@ updated: "2026-11-18"
 <!-- ADF-COVERS(implementation): REQ-049-005 -->
 <!-- ADF-COVERS(implementation): REQ-083-002 -->
 <!-- ADF-COVERS(design): REQ-030-014, REQ-030-017, REQ-030-018, REQ-030-022 -->
+<!-- ADF-COVERS(design): REQ-030-012（横断依存検査の検出源限定と機械的比較の構造判断。行文言の段階名参照化は意味不変） -->
 <!-- ADF-COVERS(design): REQ-030-025, REQ-030-026, REQ-030-028, REQ-030-029, REQ-030-030, REQ-030-031 -->
 <!-- ADF-COVERS(design): REQ-030-027 -->
 <!-- ADF-COVERS(design): REQ-030-019, REQ-030-020, REQ-030-021, REQ-030-024 -->
