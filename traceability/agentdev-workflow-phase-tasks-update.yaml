@@ -1,5 +1,6 @@
 component: agentdev-workflow-phase-tasks-update
 implementation:
+  src/common/skills/agentdev-workflow-phase-tasks-update/SKILL.md:
   - REQ-110-003
   - REQ-110-004
   - REQ-110-005
@@ -14,6 +15,7 @@ implementation:
   - REQ-111-029
   - REQ-111-030
   - REQ-111-031
+  src/common/commands/agentdev/phase-tasks-update.md:
   - REQ-110-003
   - REQ-110-004
   - REQ-110-005
@@ -29,6 +31,7 @@ implementation:
   - REQ-111-030
   - REQ-111-031
 verification:
+  src/common/skills/agentdev-workflow-phase-tasks-update/SKILL.md:
   - REQ-110-003
   - REQ-110-004
   - REQ-110-005
@@ -43,6 +46,7 @@ verification:
   - REQ-111-029
   - REQ-111-030
   - REQ-111-031
+  src/common/commands/agentdev/phase-tasks-update.md:
   - REQ-110-003
   - REQ-110-004
   - REQ-110-005

@@ -5,6 +5,7 @@ component: req-106-111-s5-verification
 # agentdev-phase-theme-collaboration revision-record 公開 CLI）で実行し、
 # 観測証跡は PR 本文の検証差分セクションと一時検証環境の Git 履歴・改訂実行記録から到達できる。
 verification:
+  docs/reports/req-106-111-s5-endtoend-case-3916.md:
   - REQ-106-012
   - REQ-106-013
   - REQ-106-014
