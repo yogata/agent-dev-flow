@@ -162,6 +162,8 @@ bun test によるフル suite 実行は、次の環境前提を踏まえて実�
        - 削除の正規手段は node fs.rmdirSync。junction エントリのみを削除し、参照先実体を破壊しない
        - Git Bash の `rmdir` は junction を空でないディレクトリとして扱い削除を拒否する。補記であり正規手段ではない
        - PowerShell の `Remove-Item` は環境・対象の内容により確認プロンプトが出ることがあり、手順転記では応答待ちの停止要因になる。補記であり正規手段ではない
+       - junction 存在判定は Dirent ベース判定（`fs.readdirSync` のエントリ種別・`dirent.isSymbolicLink()` 等）では使用不可（Windows の junction は Dirent 種別で symlink として報告されない実装差がある）。判定には `fs.lstatSync` の `isSymbolicLink()` または PowerShell `Get-Item` の `LinkType -eq 'Junction'` を使用する（出典: docs/knowledge/windows-junction-detection-not-symlink-in-dirent.md）
+       - junction 列挙・復元系スクリプト手順では、列挙結果の期待件数突合を実施し、期待件数が 1 件以上である手順で 0 件が観測された場合は異常として fail-fast で停止する（判定方法の欠陥や参照先不在を 0 件の正常とみなさない）。期待件数の根拠（対象の実在・手順の前提）を環境ラベルへ記録する
 
   - **bun install の --frozen-lockfile 前置（Case #4083）**: worktree 内で `bun install` を実行する場合、lock ファイルを変更しない検証では `--frozen-lockfile` を前置する（bun.lock を検証によって意図せず書き換えない）。lock 変更を伴う実装 Case では `--frozen-lockfile` を前置せず、bun.lock 差分を変更対象として明示する。--frozen-lockfile 規律の正規配置先は本節（worktree 運用手順の管轄）であり、QG-4 は依存解決状態の状態契約を所有する（配置判断の記録は Case #4083 の検証差分を参照）
   - **bun run --cwd の .bin 解決要件**: `bun run --cwd <dir>` のスクリプト実行は `<dir>` の package 直下 `node_modules/.bin` を解決する。親ディレクトリの `.bin` は解決対象外であるため、実行対象 package の配下に依存整備（対象ディレクトリ集合の両方・前述）が適用済みであることを前置で確認する
