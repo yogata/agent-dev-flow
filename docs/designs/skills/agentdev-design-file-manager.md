@@ -6,7 +6,6 @@ updated: 2026-11-18
 ---
 
 <!-- ADF-COVERS(design): REQ-021-013, REQ-021-026, REQ-012-031（Design action 不在の要件行の保存処理を Design 保存内部責務が阻害しない設計判断） -->
-<!-- ADF-COVERS(design): REQ-004-066, REQ-004-067（search-target-area.ts 見出し走査のコード囲み認識規則の契約設計） -->
 
 # agentdev-design-file-manager Design
 

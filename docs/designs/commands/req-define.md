@@ -8,7 +8,7 @@ updated: 2026-11-18
 <!-- ADF-COVERS(implementation): REQ-119-004 -->
 <!-- ADF-COVERS(design): REQ-008-058, REQ-008-059, REQ-008-060, REQ-008-061, REQ-008-062, REQ-004-056, REQ-004-057, REQ-004-058, REQ-004-059, REQ-004-060, REQ-004-062, REQ-004-063 -->
 <!-- ADF-COVERS(design): REQ-004-064, REQ-004-065（draft 保存後 git 永続化手順と oldText 転記規約の組立手順設計） -->
-<!-- ADF-COVERS(design): REQ-004-066, REQ-004-067, REQ-004-068（コード囲み認識規則の組立・検査規律と target_area 検索・採番の同一記述設計） -->
+<!-- ADF-COVERS(design): REQ-004-076, REQ-004-077（IR-044 シグナル語事前走査と検索型合格条件の解釈注記指針の req-define 契約面の組立手順設計。対応する Design 更新は OU-008・OU-010 実行時の draft-generation.md 更新） -->
 <!-- ADF-COVERS(design): REQ-004-071, REQ-004-072, REQ-004-075（判断根拠の維持・採用範囲の維持・両経路共通原則節。AG-003、AG-004、AG-007 に対応） -->
 <!-- ADF-COVERS(design): REQ-108-014, REQ-108-015, REQ-108-016, REQ-108-017（重要変更の通知と結果説明節。AG-001〜003 に対応） -->
 

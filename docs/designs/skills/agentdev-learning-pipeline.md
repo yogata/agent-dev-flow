@@ -6,6 +6,7 @@ updated: "2026-11-18"
 ---
 <!-- ADF-COVERS(implementation): REQ-003-024, REQ-038-001, REQ-038-002, REQ-038-005 -->
 <!-- ADF-COVERS(design): REQ-038-007 -->
+<!-- ADF-COVERS(design): REQ-038-006（deferred 読込の委譲表現化の構造判断） -->
 
 # `agentdev-learning-pipeline` Design
 

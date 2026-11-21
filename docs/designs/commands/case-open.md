@@ -12,6 +12,7 @@ updated: "2026-11-18"
 <!-- ADF-COVERS(implementation): REQ-049-005 -->
 <!-- ADF-COVERS(implementation): REQ-083-002 -->
 <!-- ADF-COVERS(design): REQ-030-014, REQ-030-017, REQ-030-018, REQ-030-022 -->
+<!-- ADF-COVERS(design): REQ-030-012（横断依存検査の検出源限定と機械的比較の構造判断。行文言の段階名参照化は意味不変） -->
 <!-- ADF-COVERS(design): REQ-030-025, REQ-030-026, REQ-030-028, REQ-030-029, REQ-030-030, REQ-030-031 -->
 <!-- ADF-COVERS(design): REQ-030-027 -->
 <!-- ADF-COVERS(design): REQ-030-019, REQ-030-020, REQ-030-021, REQ-030-024 -->

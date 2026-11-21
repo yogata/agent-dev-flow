@@ -8,6 +8,7 @@ updated: 2026-11-18
 <!-- ADF-COVERS(implementation): REQ-021-021 -->
 <!-- ADF-COVERS(implementation): REQ-036-001, REQ-036-002, REQ-036-006, REQ-036-007, REQ-036-008, REQ-036-010, REQ-036-011, REQ-036-024 -->
 <!-- ADF-COVERS(implementation): REQ-036-001, REQ-036-004, REQ-036-006, REQ-036-008, REQ-036-010 -->
+<!-- ADF-COVERS(design): REQ-036-002（正規参照表モデルへの現行化の構造判断。OU-001 実行時の現行所有者付け替えを含む） -->
 <!-- ADF-COVERS(design): REQ-036-028, REQ-036-029, REQ-036-030, REQ-036-031, REQ-036-032, REQ-036-033, REQ-036-034 -->
 <!-- ADF-COVERS(implementation): REQ-036-028, REQ-036-029, REQ-036-030, REQ-036-031, REQ-036-032, REQ-036-033 -->
 
