@@ -14,6 +14,10 @@ agentdev-req-analysis Design「pass_criteria 記述基準」を正規原本と�
 数値閾値（LF 数、行数、件数等）の策定は [test-strategy-numeric-threshold-guide.md](test-strategy-numeric-threshold-guide.md) を参照。
 本ガイドは表現、検証対象の使い分けに限定する。
 
+## 検索型合格条件の解釈注記指針
+
+検索型合格条件（rg 等の検索で合格判定する条件）を作成する際は、REQ 本体の定義行・網羅範囲外領域（docs/reports/ 等・完了条件文言に従う領域）を計上対象外とする解釈注記を条件へ事前に含める。解釈注記を欠く検索型条件は、REQ 本体や検証手順そのものへの自己ヒットを不合格として計上し、機械的達成不能となる。対象の範囲（追跡対象全体か、対象の範囲の明示か）と必須の成果物が同じ語を含む場合の扱いを条件の定義時に解決しておく。解体系 REQ 実行時の Findings 根拠記録必須運用（検証実行の根拠を出し、case-close で確認する運用）の明文化先は req-define 契約面とする。
+
 ## pipeline stage モデル
 
 AgentDevFlow では REQ content が以下の pipeline stage 間で表現を変える（ワークフロー契約 Design「マクロフェーズ」参照）:
