@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "setIdentifier": "20261121-171426",
+  "createdAt": "2026-11-21T18:24:49+09:00",
+  "backlogAutoStartedAt": "2026-11-21T17:14:26+09:00",
+  "obligationSnapshot": {
+    "description": "元 RU 一式（RU-20261121-01〜10・backlog-review 2026-11-18 承認確定分）の必須要求と受け入れ義務のスナップショット。RU 本文の要件化の方向から抽出。完了突合の正の一つであり、RU・要件doc 削除の影響を受けない。",
+    "units": [
+      {
+        "ru": "RU-20261121-01",
+        "title": "公開コマンド集合・内部 workflow モデルへの現行化",
+        "sourceType": "inspect",
+        "integratedFindings": 7,
+        "mandatoryRequirements": [
+          "REQ-036-002・REQ-041-016 を正規参照表モデル（公開8コマンド・内部 workflow 5処理）へ現行化する",
+          "Design・配布 command 本体・guides の旧記述を現行所有者へ付け替え、リンク切れ2件と不存在 inspect-skills.md Design リンクを解消する",
+          "DEC-006 の扱い（reaffirm または supersede）を req-define の変更影響分析で利用者判断として確定する",
+          "各 Workflow Skill soft guard の宣言と正規参照表の整合を検収条件に含める",
+          "DESIGN-14 の intake-capture / intake-from-github 許可プロファイル行（RU-20261121-03 対象）の除去と整合させる"
+        ]
+      },
+      {
+        "ru": "RU-20261121-02",
+        "title": "完了済み作業パッケージ REQ-119/120/122 の RETIRE 判定",
+        "sourceType": "inspect",
+        "integratedFindings": 5,
+        "mandatoryRequirements": [
+          "REQ-119・REQ-120・REQ-122 の RETIRE 要否を req-define で判定する（traceability YAML の実行済み記録を根拠とする完了済み作業パッケージの RETIRE 判定）",
+          "RETIRE 判定の場合、同根の intake-triage Design 幽霊参照（integrity-engine-plugin-architecture.md の対象外条項）を同時に除去する",
+          "行単位の部分現行化はしない",
+          "REQ-122 自体が完了済み作業パッケージである旨の状態整理を REQ 変更に含める"
+        ]
+      },
+      {
+        "ru": "RU-20261121-03",
+        "title": "integrity 系 Design corpus の陳腐化参照現行化",
+        "sourceType": "inspect",
+        "integratedFindings": 13,
+        "mandatoryRequirements": [
+          "各参照を現行所有者（quality-specs・integrity-rule-catalog 現行インデックス・cli.ts ＋ engine ＋ rules/ レジストリ・src/common 正本パス等）へ付け替え、または参照除去する",
+          "IR-055/058 の vocabulary-registry 除外リストの現行化を含める",
+          "DESIGN-07 の「後継レジストリ復元 vs 参照除去」の判断と DOC-02 の DEC-064 欠番整理を req-define 入口の利用者判断として記録する",
+          "DESIGN-14 の intake-capture / intake-from-github 許可プロファイル行の除去は RU-20261121-01 の現行化と整合させる",
+          "baseline 関連（DESIGN-03・DESIGN-08）は integrity-contracts.md の baseline 廃止宣言を正としてテーブル・宣言を現行化する（IR-055 の更新済みテーブルを形式模範とする）"
+        ]
+      },
+      {
+        "ru": "RU-20261121-04",
+        "title": "文書種別・配置モデル系基盤 Design の現行化",
+        "sourceType": "inspect",
+        "integratedFindings": 7,
+        "mandatoryRequirements": [
+          "原本配置・Custom Tool 原本パス・scripts 名を現行正本（src/common/・src/common/tools/・現行3本スクリプト）へ付け替ける（DEC-049・runtime-package-boundary.md を正とする）",
+          "幽霊所有者を現行基盤（agentdev-textlint-guard）へ付け替える",
+          "完了済み移行の記述を現行時制へ書き換え、空見出し・計画残骸を除去する",
+          "DESIGN-19 の固定件数記述は同ファイルの固定件数埋め込み禁止規則に従って除去する"
+        ]
+      },
+      {
+        "ru": "RU-20261121-05",
+        "title": "workflow・command 系 Design の現行化",
+        "sourceType": "inspect",
+        "integratedFindings": 9,
+        "mandatoryRequirements": [
+          "移管済み節への参照を現行所有 references（case-auto/references/parallel-orchestration.md 等）へ付け替える",
+          "scale 判定・workflow-lifecycle の references 列挙・実数記述を canonical（standard-lifecycle・SKILL 本体宣言）へ現行化する",
+          "廃止 STEP-W* 識別子を現行 STEP-S1〜S6 へ付け替え、編集ラベルを除去する",
+          "controlled_case_execution の現行用途（単一 Issue 実行委譲）への再定義は req-define で利用者判断を経る",
+          "DESIGN-32 の (2)〜(5) は現行化または削除、(1) は phase 系 Design 整備の要否判断条件付きで記録する",
+          "DESIGN-33 の債務記述は完遂済み歴史段階への参照を解除する（Minimal-by-Default 原則に従い現行の姿のみを残す）"
+        ]
+      },
+      {
+        "ru": "RU-20261121-06",
+        "title": "REQ 行の現行化・参照整合・文書分類（MOVE）判定",
+        "sourceType": "inspect",
+        "integratedFindings": 12,
+        "mandatoryRequirements": [
+          "REQ-13 は REQ-050-001 を現行正（source_of_truth）として REQ-009-002 の要約更新と DEC-021 の状態整理（後継 Decision または注記）をセットで扱う。DEC-021 の後継判断は req-define 入口の利用者判断とする",
+          "REQ-09 は Case #3779 処置完遂後に歴史化する条件付きで扱う",
+          "REQ-14/15/17 の MOVE 判定は document-type-responsibilities.md 配置基準で req-define が実施する。REQ-17 は REQ-122 RETIRE（RU-20261121-02）実行時に併せて実施する調整注記を記録する（硬依存ではないため depends_on とはしない）",
+          "REQ-11 は対象ファイル群の直接列挙または現行 Design への委譲表現へ変更する",
+          "REQ-19 の現行化（機能名・段階名参照への置換）は RU-20261121-08 と req-define で相互参照する",
+          "REQ-21 は宣言を文書先頭へ移動する（配置のみ修正）"
+        ]
+      },
+      {
+        "ru": "RU-20261121-07",
+        "title": "docs 入口・guides 層の現行化",
+        "sourceType": "inspect",
+        "integratedFindings": 6,
+        "mandatoryRequirements": [
+          "docs/README.md 索引5行補完（DOC-01）と authoring 所有者記述の正本整合（DOC-10）は同時実施する",
+          "guides の所有語・履歴叙述は REQ へのリンク付与または要約への縮約に寄せる（guides 層は規範的権限を持たない前提を維持）",
+          "DOC-06 はテンプレート側の見出し表記統合を含めて一括是正する",
+          "DOC-05 は正規記録箇所（decisions/README.md）への参照導線に置き換える"
+        ]
+      },
+      {
+        "ru": "RU-20261121-08",
+        "title": "req-define draft 組立時の IR-044 シグナル語事前走査（機能追加候補）",
+        "sourceType": "learning",
+        "integratedFindings": 1,
+        "mandatoryRequirements": [
+          "req-define の draft 産出・組立工程への IR-044 シグナル語事前走査（IR-044 ルール定義のシグナル語パターンに従う）と表記ガイダンス適用の要否を req-define で確定する（REQ-004 / REQ-030 系実行契約面の反映候補）",
+          "IR-044 ルール Design の exemption 条件・前例整備とゲート warning 扱い変更は DEC-066 / REQ-122-008/009 の既存統制変更判断を伴うため、利用者判断として req-define の変更影響分析に委ねる",
+          "case-open Design の停止理由分類への IR-044 由来物理ブロックの記録候補を含める",
+          "対象外: 合意済み REQ 行（REQ-123-003〜005）の表記修正・pre-commit / pre-push hook 実装自体の変更・Root Case #4167 の後始末",
+          "関連: RU-20261121-06（REQ-19。IR-044 / REQ-001-049 系の既存 REQ 行現行化）"
+        ]
+      },
+      {
+        "ru": "RU-20261121-09",
+        "title": "worktree-operations.md への junction 判定規約補記",
+        "sourceType": "learning",
+        "integratedFindings": 1,
+        "mandatoryRequirements": [
+          "src/common/skills/agentdev-git-worktree/references/worktree-operations.md の junction 作成・削除手順節へ「Dirent ベース判定は使用不可・fs.lstatSync または PowerShell Get-Item の LinkType -eq 'Junction' を使用」の補記を追加する",
+          "junction 列挙・復元系スクリプト手順に期待件数突合（0件を異常扱いする fail-fast）の観点を明示する",
+          "知識面の詳細は docs/knowledge/windows-junction-detection-not-symlink-in-dirent.md（同バッチ新規保存）を参照する",
+          "対象外: Linux/macOS 環境の symlink 判定・junction 構造自体の変更"
+        ]
+      },
+      {
+        "ru": "RU-20261121-10",
+        "title": "検索型合格条件の解釈注記指針（req-define 面）",
+        "sourceType": "learning",
+        "integratedFindings": 1,
+        "mandatoryRequirements": [
+          "req-define の検索型合格条件作成ガイダンスに「REQ 本体の定義行・網羅範囲外領域（docs/reports/ 等・完了条件文言に従う領域）を除外する解釈注記を事前に含める」指針の反映要否を req-define で確定する",
+          "解体系 REQ 実行時の Findings 根拠記録必須化運用（case-close で確認）の明文化先を req-define 契約面で判断する",
+          "知識面の解釈基準詳細は docs/knowledge/grep-zero-criteria-legacy-term-quotation.md（同バッチ更新）を参照する",
+          "対象外: 検査側（grep 0 件基準・IR）の実装変更（exemption 設計は別議論）・REQ-123 本体の完了条件文言変更"
+        ]
+      }
+    ]
+  },
+  "correspondence": {
+    "requirementsDoc": ".agentdev/drafts/req-draft-corpus-renewal-20261121.md",
+    "operationUnits": {
+      "OU-001": "公開コマンド集合・内部 workflow モデル現行化（REQ-036-002/REQ-041-016・DEC-006 部分置換注記・配布物・guides）",
+      "OU-002": "REQ-119/120/122 RETIRE + REQ-058 契約による参照一括解消",
+      "OU-003": "integrity 系 Design corpus 現行化（vocabulary-registry 参照除去・DEC-064 欠番整理を含む）",
+      "OU-004": "文書種別・配置モデル系基盤 Design 現行化",
+      "OU-005": "workflow・command 系 Design 現行化（controlled_case_execution 再定義・phase 系不整備）",
+      "OU-006": "REQ 11ファイルの行現行化・MOVE 判定・DEC-021 部分置換注記",
+      "OU-007": "docs 入口・guides 層の現行化",
+      "OU-008": "req-define 組立工程への IR-044 シグナル語事前走査（exemption 整備なし）",
+      "OU-009": "worktree-operations.md への junction 判定規約補記",
+      "OU-010": "検索型合格条件の解釈注記指針の req-define 契約面への反映"
+    },
+    "executionUnits": [],
+    "ruMapping": {
+      "RU-20261121-01": "OU-001",
+      "RU-20261121-02": "OU-002",
+      "RU-20261121-03": "OU-003",
+      "RU-20261121-04": "OU-004",
+      "RU-20261121-05": "OU-005",
+      "RU-20261121-06": "OU-006",
+      "RU-20261121-07": "OU-007",
+      "RU-20261121-08": "OU-008",
+      "RU-20261121-09": "OU-009",
+      "RU-20261121-10": "OU-010"
+    },
+    "note": "stage 4 で要件doc（draft・feature/large・auto_gate auto_ready）を確定。RU → OU は 1:1 対応（review_dispositions RD-001〜010 で全件 covered）。executionUnits は stage 5 で追記する。"
+  },
+  "baseline": {
+    "lastFormalRelease": {
+      "version": "5.2.3",
+      "tagName": "v5.2.3",
+      "commit": "b905130abf24c8ad4dc3e67279b9002ba34f3d22"
+    },
+    "startCommitId": "5872539bc726a573c1f9f2e7e225a4e4ba88c081",
+    "determinedAt": "2026-11-21T18:24:49+09:00",
+    "evidence": {
+      "procedure": "正式 SemVer タグ列挙 → 祖先到達判定（main HEAD から）→ SemVer 順序比較（数値比較）による最大版算出",
+      "formalTagsTotal": 46,
+      "reachableFormalTags": 45,
+      "excludedTags": {
+        "unreachable": ["v1.0.0"],
+        "nonFormal": ["v4.0.0-rc.1", "v4.0.0-rc.2", "baseline-v4-canonical-convergence-20261007", "v3-baseline", "list"]
+      },
+      "maxVersion": "v5.2.3",
+      "maxVersionBasis": "SemVer 数値順序比較で v5.2.3 が最大（v5.2.3 > v5.2.2 > … > v1.1.0）"
+    }
+  },
+  "progress": {
+    "stage1_inspectDocs": { "status": "completed", "at": "2026-11-21T17:42:00+09:00" },
+    "stage2_promotion": { "status": "completed", "at": "2026-11-21T18:01:22+09:00" },
+    "stage3_backlogReview": { "status": "completed", "at": "2026-11-21T18:23:12+09:00", "commit": "5872539bc" },
+    "stage4_requirementsDefinition": {
+      "status": "completed",
+      "at": "2026-11-21T19:07:58+09:00",
+      "requirementsDoc": ".agentdev/drafts/req-draft-corpus-renewal-20261121.md",
+      "workType": "feature",
+      "scale": "large",
+      "activity": "18:14:00-19:07:58（HITL 停止 18:32:09〜回答受領 18:46:44 含む。壁打ち Q1〜Q8 回答: Q1=B/Q2=A/Q3=A/Q4=A/Q5=A/Q6=B/Q7=A/Q8=A・RETIRE 提案異議なし）"
+    },
+    "stage5_execution": { "status": "not_started" },
+    "stage6_completionJudgment": { "status": "not_started" },
+    "stage7_release": { "status": "not_started" }
+  },
+  "releaseState": {
+    "status": "not_started"
+  }
+}
