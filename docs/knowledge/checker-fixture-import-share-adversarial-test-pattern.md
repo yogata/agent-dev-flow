@@ -1,7 +1,7 @@
 ---
 title: 自己完結 checker への決定的実装共有は同一形式リーダー複製 + 対決テストで機械担保する
 created: 2026-09-23
-updated: 2026-09-23
+updated: 2026-11-21
 ---
 
 # 自己完結 checker への決定的実装共有は同一形式リーダー複製 + 対決テストで機械担保する
@@ -36,4 +36,5 @@ repo-local checker（`.opencode/skills/repo-*` 配下）は自己完結実行が
 
 ## 関連知識
 
-- 直接の関連知識なし。checker の実行環境系の知見（[checker-cli-stdout-loss-on-windows-bun.md](checker-cli-stdout-loss-on-windows-bun.md) 等）は実行時の stdout 取得の話であり、本知識は checker の構成設計（fixture 進行テスト構成との実装共有方式）の話として区別する
+- [テストの解析ロジック再実装は producer 正規解析 import へ一本化する](test-analysis-logic-producer-import-over-reimplementation.md)（使い分けの相手方パターン。import 可能な通常テストでは producer 正規解析関数を import し、fixture 進行テスト構成では本パターン〔複製＋対決テスト〕を使う。境界は「import 解決が成立する構成か否か」）
+- checker の実行環境系の知見（[checker-cli-stdout-loss-on-windows-bun.md](checker-cli-stdout-loss-on-windows-bun.md) 等）は実行時の stdout 取得の話であり、本知識は checker の構成設計（fixture 進行テスト構成との実装共有方式）の話として区別する
