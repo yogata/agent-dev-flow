@@ -7,8 +7,12 @@
 import { describe, expect, test } from "bun:test";
 import {
   classifyBytes,
+  classifyByExtension,
   decodeStrictUtf8,
   isBinaryBytes,
+  isBinaryFile,
+  isTextFile,
+  isUnknownExtension,
 } from "./text-binary.ts";
 
 describe("text-binary / decodeStrictUtf8", () => {
@@ -94,5 +98,60 @@ describe("text-binary / classifyBytes", () => {
     const r = classifyBytes(new TextEncoder().encode("配布物"));
     expect(r.kind).toBe("text");
     expect(r.text).toBe("配布物");
+  });
+
+  test("never returns the unknown kind (bytes are always decidable)", () => {
+    const samples = [
+      new TextEncoder().encode("text"),
+      new Uint8Array([0x00]),
+      new Uint8Array([0xff, 0xfe]),
+      new Uint8Array([]),
+    ];
+    for (const s of samples) {
+      expect(classifyBytes(s).kind === "unknown").toBe(false);
+    }
+  });
+});
+
+describe("text-binary / extension classification tri-state", () => {
+  test("known text extensions are text", () => {
+    expect(isTextFile("SKILL.md")).toBe(true);
+    expect(isTextFile("cli.ts")).toBe(true);
+    expect(isTextFile("config.yaml")).toBe(true);
+    expect(isTextFile("bun.lock")).toBe(true);
+    expect(isBinaryFile("SKILL.md")).toBe(false);
+    expect(isUnknownExtension("SKILL.md")).toBe(false);
+  });
+
+  test("binary extensions are binary", () => {
+    expect(isBinaryFile("logo.png")).toBe(true);
+    expect(isBinaryFile("archive.zip")).toBe(true);
+    expect(isTextFile("logo.png")).toBe(false);
+    expect(isUnknownExtension("logo.png")).toBe(false);
+  });
+
+  test("unrecognized extensions are unknown (fail closed at the gate layer)", () => {
+    expect(isUnknownExtension("blob.xyz")).toBe(true);
+    expect(isTextFile("blob.xyz")).toBe(false);
+    expect(isBinaryFile("blob.xyz")).toBe(false);
+  });
+
+  test("extensionless names are text", () => {
+    expect(isTextFile("README")).toBe(true);
+    expect(classifyByExtension("README").kind).toBe("text");
+  });
+
+  test("classifyByExtension maps the tri-state", () => {
+    expect(classifyByExtension("a.md").kind).toBe("text");
+    expect(classifyByExtension("a.png").kind).toBe("binary");
+    const unknown = classifyByExtension("a.xyz");
+    expect(unknown.kind).toBe("unknown");
+    expect(unknown.reason).toContain("unrecognized extension");
+  });
+
+  test("extension comparison is case-insensitive", () => {
+    expect(isTextFile("A.MD")).toBe(true);
+    expect(isBinaryFile("A.PNG")).toBe(true);
+    expect(isUnknownExtension("A.XYZ")).toBe(true);
   });
 });

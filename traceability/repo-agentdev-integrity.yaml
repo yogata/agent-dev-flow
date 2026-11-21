@@ -12,6 +12,14 @@ implementation:
     - REQ-029-002
   src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/boundary-runner.ts:
     - REQ-029-002
+  src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/boundary-candidate-model.ts:
+    - REQ-123-001
+  src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/boundary-candidate-ownership.ts:
+    - REQ-123-001
+  src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/distribution-boundary.ts:
+    - REQ-123-001
+  src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/text-binary.ts:
+    - REQ-123-001
   src/common/skills/repo-agentdev-integrity/engine/targeted-gate.ts:
     - REQ-122-003
     - REQ-122-005
@@ -27,3 +35,5 @@ verification:
     - REQ-010-084
   src/common/skills/repo-agentdev-integrity/scripts/rules/rules.test.ts:
     - REQ-117-006
+  src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/text-binary.test.ts:
+    - REQ-123-001
