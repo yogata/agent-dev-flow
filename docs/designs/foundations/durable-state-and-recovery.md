@@ -60,9 +60,6 @@ ADF は複数 store にわたる原子トランザクションを前提としな
 
 repo 外の一時証跡退避先（OS 一時ディレクトリ等）はローカル実行環境状態に分類し、正規状態・証跡として扱わない。恒久的な証跡は Issue コメントまたは PR 本文へ記録する。
 
-## v3 関連 Design の処遇
-
-
 ## フェーズ境界と SSoT 遷移
 
 マクロフェーズ境界を跨ぐ情報は次フェーズが参照する成果物へ永続化する（REQ-005-002/003/004 被覆）。durable state は権威記録先へ遷移する。エラー回復はデータ損失を伴わず、部分失敗は権威順調整で処理する。
@@ -78,6 +75,6 @@ workflow-contracts Design から移行した契約（REQ-048-001〜005 被覆）
 検証差分の checker 別必須要素は次のとおり。
 
 - textlint 系 checker: hard findings の集合を JSON 形式で実測退避する（対象ファイル数・violation 数・内訳の機械的再構成が可能な形式）。
-- traceability 系 checker: summary（pass/fail 計数）と 9 種の検出分類をすべて列挙する（0 件の分類も省略しない）。
+- traceability 系 checker: `summary`（pass/fail 計数）と、`agentdev-traceability` の `check` が出力する検出分類をすべて列挙する（0 件の分類も省略しない）。
 
 上記要素は検証差分記録の必須構成であり、checker 出力側の契約（検証エンジン cli.ts 等）と区分を保って相互参照する。件数突合系 gate の個別実行記録と証跡退避（case-close 検証差分）は本節の記録契約に従って完結する。

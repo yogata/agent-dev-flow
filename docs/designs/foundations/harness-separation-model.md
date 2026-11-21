@@ -99,8 +99,7 @@ bg task API、実行エージェント選定、実行担当サブエージェン
 - `SKILL.md`: 業務ワークフロー契約（result 4状態契約、test-fix ループ、worktree 隔離、Findings 配置等）
 - `references/harness-delegation.md`: harness 固有の実行制御具体
 
-他 skill も同一モデルへ整理する。
-`agentdev-architecture-advisory` は `references/architecture-review-delegation.md` を新設し同モデルへ移行する。
+`agentdev-architecture-advisory` も同じ分離モデルに従い、相談の契約を `SKILL.md` に、起動方法の詳細を `references/architecture-review-delegation.md` に置く。
 
 ## v4 Harness/Backend adapter 境界への接続
 
@@ -108,7 +107,7 @@ bg task API、実行エージェント選定、実行担当サブエージェン
 
 OpenCode を first-class reference harness と位置づける。他 harness へのアダプターは必要になった時点で追加し、未使用の Harness/Backend adapter を先回りして実装しない。Senpi（OmO Native v5）接続はこの契機に従って追加された最初の追加ホスト接続であり、共通原本とホスト別接続領域の分離（src/common/、src/opencode/、src/senpi/）として具現化する。配備形態（原本配置・投影モデル）の原本は Decision「ADF 共通原本とホスト接続領域の分離」およびマルチホスト原本モデル Design が所有し、責務境界（semantic contract と実行機構の分離）と adapter 追加契機は DEC-036 のまま維持する。
 
-tools/（agentdev-gh・agentdev-third-party）と plugins/（tool 登録配線・guard 3 本）はこの境界の OpenCode 側実装例である（engine 部は共通原本へ、登録・配線は src/opencode/ 側へ配置する）。いずれも配布物の harness 非依存原則（本 Design 既有）に従い、Senpi 側の接続も同一原則に従う。
+Custom Tool（`agentdev-gh`、`agentdev-third-party`）とガードはこの境界の OpenCode 側実装例である。共通処理は共通原本に、OpenCode への登録・配線は `src/opencode/` に置く。Senpi 側の接続も配布物の harness 非依存原則に従う。
 
 定義の所有は responsibility-boundaries と DEC-036 にあり、本節は参照にとどまる。既存節は不変とする。
 

@@ -84,9 +84,8 @@ REQ、Decision、IR を廃止した場合、当該識別子は再利用しない
 - 関連 SKILL: `agentdev-req-file-manager`、`agentdev-decision-file-manager`
 - 根拠監査台帳項目: F-003（v2:REQ-0157）、F-004（IR-045）
 
-## ADR から Decision への移行（AG-007、AG-008）
+## 現行 Decision の識別子と配置（AG-007、AG-008）
 
-現行 `ADR-NNN` 識別子は番号部を維持したまま `DEC-NNN` へ1対1で移行する。
-Decision 番号採番スクリプトの現行実装は `alloc-decision-number.ts` であり、本 Design は現行スクリプト名を参照する。実装改名時は本 Design を同期して更新する。
-`docs/adr/` パスは `docs/decisions/` へ移行する。
+現行の Decision は `DEC-NNN` 識別子を使用し、`docs/decisions/` に配置する。旧 `ADR-NNN` から移行した Decision は、旧識別子と番号部が1対1で対応する（DEC-009）。
+Decision の採番には `alloc-decision-number.ts` を使用する。スクリプト名が変わる場合は本 Design の参照も更新する。
 過去の `v2:ADR-*` 番号帯は AG-010 により維持し、`v2:DEC-*` は生成しない。
