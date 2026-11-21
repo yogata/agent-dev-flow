@@ -89,7 +89,7 @@ Command は Skill を参照して判断を利用し、Skill は必要な詳細�
 
 同一の判断基準、出力構造、決定的処理を Command と Skill、Template、Script の複数箇所で正規定義しない。
 
-原本は `src/opencode/` に置き、`.opencode/` は実行時配置先として原本を投影する。
+原本は `src/common/` に置き、ホスト接続領域（`src/opencode/`・`src/senpi/`）と `.opencode/`（実行時配置先）は原本を投影する（DEC-049・multi-host-canonical-model）。
 
 ## 成果物責務表（Workflow Architecture 追加）
 
