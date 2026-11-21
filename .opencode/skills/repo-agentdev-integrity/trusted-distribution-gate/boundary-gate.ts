@@ -19,8 +19,7 @@ import type {
   LineInput,
   Projection,
 } from "./types.ts";
-import { classifyLine, type DetectorConfig, type LineClassification } from "./boundary-pipeline.ts";
-import { MAX_LINE_SCAN } from "./boundary-reconstruction.ts";
+import { classifyLine, MAX_LINE_SCAN, type DetectorConfig, type LineClassification } from "./boundary-pipeline.ts";
 import { projectionOverflowDetection } from "./boundary-candidate-model.ts";
 
 export interface ClassifyFileInput {

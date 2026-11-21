@@ -223,7 +223,7 @@ describe("3能力の統合（coverage・impact・check）", () => {
         }
       };
       walk(join(REPO_ROOT, "docs"));
-      walk(join(REPO_ROOT, ".opencode", "skills", "repo-agentdev-integrity", "scripts"));
+      walk(join(REPO_ROOT, "src", "common", "skills", "repo-agentdev-integrity", "scripts"));
       return files.flatMap((f) =>
         parseDeclarations(
           f.slice(REPO_ROOT.length + 1).replaceAll("\\", "/"),

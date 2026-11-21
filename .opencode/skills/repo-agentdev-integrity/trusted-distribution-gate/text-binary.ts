@@ -1,8 +1,10 @@
-// Strict UTF-8 text / binary classifier for trust-root blob bytes.
+// Text / binary / unknown classification for distribution artifacts.
 //
 // Distribution artifacts are validated as strict UTF-8 text so the boundary
 // detector can scan them line-by-line. Disguised binaries must be rejected
-// (treated as binary) so the detector never silently skips them.
+// (treated as binary) so the detector never silently skips them. Unknown
+// extensions or missing extensions must NOT silently pass — they fail
+// closed at the gate layer via the explicit `unknown` tri-state.
 //
 // Strict UTF-8 specifically rejects:
 //   - NUL bytes (0x00)
@@ -17,12 +19,72 @@
 
 export type ByteSource = Uint8Array;
 
-export interface Classification {
-  readonly kind: "text" | "binary";
+export interface ByteClassification {
+  readonly kind: "text" | "binary" | "unknown";
   /** Present only when kind is "text". */
   readonly text?: string;
-  /** Present only when kind is "binary". Brief reason. */
+  /** Present only when kind is "binary" or "unknown". */
   readonly reason?: string;
+}
+
+export const TEXT_EXTENSIONS = new Set([
+  ".md", ".markdown", ".txt", ".text",
+  ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".mts", ".cts",
+  ".yaml", ".yml",
+  ".json", ".jsonc",
+  ".ps1", ".psm1", ".psd1",
+  ".sh", ".bash", ".zsh",
+  ".py",
+  ".rs",
+  ".go",
+  ".xml", ".html", ".htm", ".css", ".scss", ".sass",
+  ".toml", ".ini", ".cfg", ".conf",
+  ".gitignore", ".gitattributes",
+  ".env",
+  // Well-known text formats enumerated because the unknown-extension
+  // fallback is fail-closed.
+  ".lock",
+  ".svg",
+  ".csv",
+  ".map",
+]);
+
+export const BINARY_EXTENSIONS = new Set([
+  ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".ico", ".webp", ".tiff", ".svgz",
+  ".pdf",
+  ".zip", ".gz", ".tar", ".tgz", ".bz2", ".7z", ".rar",
+  ".exe", ".dll", ".so", ".dylib", ".bin",
+  ".class", ".jar",
+  ".woff", ".woff2", ".ttf", ".otf", ".eot",
+  ".mp3", ".mp4", ".avi", ".mov", ".webm",
+  ".lockb", ".bin",
+  ".DS_Store",
+]);
+
+export function isTextFile(filename: string): boolean {
+  const lower = filename.toLowerCase();
+  const lastDot = lower.lastIndexOf(".");
+  if (lastDot < 0) return true;
+  const ext = lower.slice(lastDot);
+  if (BINARY_EXTENSIONS.has(ext)) return false;
+  if (TEXT_EXTENSIONS.has(ext)) return true;
+  return false;
+}
+
+export function isBinaryFile(filename: string): boolean {
+  const lower = filename.toLowerCase();
+  const lastDot = lower.lastIndexOf(".");
+  if (lastDot < 0) return false;
+  const ext = lower.slice(lastDot);
+  return BINARY_EXTENSIONS.has(ext);
+}
+
+export function isUnknownExtension(filename: string): boolean {
+  const lower = filename.toLowerCase();
+  const lastDot = lower.lastIndexOf(".");
+  if (lastDot < 0) return false;
+  const ext = lower.slice(lastDot);
+  return !TEXT_EXTENSIONS.has(ext) && !BINARY_EXTENSIONS.has(ext);
 }
 
 /**
@@ -143,11 +205,13 @@ export class InvalidUtf8Error extends Error {
 }
 
 /**
- * Classify bytes as text or binary. When text, the decoded string is included.
- * When binary, a brief reason is included. Empty bytes are classified as text
- * with an empty string (empty text file).
+ * Classify bytes as text or binary using strict UTF-8 validation. Empty bytes
+ * are text with an empty string. Never returns `unknown` — bytes are always
+ * decidable. The `unknown` tri-state is reserved for extension-based
+ * classification (see {@link classifyByExtension}) where the gate layer must
+ * fail closed.
  */
-export function classifyBytes(bytes: ByteSource): Classification {
+export function classifyBytes(bytes: ByteSource): ByteClassification {
   if (hasNul(bytes)) {
     return { kind: "binary", reason: "NUL byte present" };
   }
@@ -155,4 +219,26 @@ export function classifyBytes(bytes: ByteSource): Classification {
     return { kind: "binary", reason: "invalid UTF-8 sequence" };
   }
   return { kind: "text", text: decodeStrictUtf8(bytes) };
+}
+
+/**
+ * Classify a file by its extension. Binary extensions return binary, known
+ * text extensions and extensionless names (README, LICENSE) return text, and
+ * unrecognized extensions return `unknown` so the gate layer fails closed
+ * instead of silently scanning or silently skipping.
+ */
+export function classifyByExtension(filename: string): ByteClassification {
+  if (isBinaryFile(filename)) {
+    return { kind: "binary", reason: "binary extension" };
+  }
+  const lower = filename.toLowerCase();
+  const lastDot = lower.lastIndexOf(".");
+  if (lastDot < 0) {
+    return { kind: "text" };
+  }
+  const ext = lower.slice(lastDot);
+  if (TEXT_EXTENSIONS.has(ext)) {
+    return { kind: "text" };
+  }
+  return { kind: "unknown", reason: `unrecognized extension ${ext}` };
 }

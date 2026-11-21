@@ -1,5 +1,5 @@
-// ADF-COVERS(verification): REQ-001-026, REQ-001-028
-// ADF-COVERS(implementation): REQ-010-059
+// ADF-COVERS(verification): REQ-001-026, REQ-001-028, REQ-123-005, REQ-123-006
+// ADF-COVERS(implementation): REQ-010-059, REQ-123-005, REQ-123-006
 /**
  * check_autogen_freshness.ts — AUTOGEN ブロック鮮度検出 gate (REQ-010-059).
  *
