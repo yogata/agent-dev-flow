@@ -149,7 +149,24 @@
       "OU-009": "worktree-operations.md への junction 判定規約補記",
       "OU-010": "検索型合格条件の解釈注記指針の req-define 契約面への反映"
     },
-    "executionUnits": [],
+    "rootCase": {
+      "number": 4177,
+      "kind": "epic",
+      "canonicalRequirements": "REQ-124",
+      "definitionPr": 4178
+    },
+    "executionUnits": [
+      { "operationUnit": "OU-001", "issue": 4179, "mergedImplementationPr": 4192 },
+      { "operationUnit": "OU-002", "issue": 4180, "mergedImplementationPr": 4197 },
+      { "operationUnit": "OU-003", "issue": 4181, "mergedImplementationPr": 4193 },
+      { "operationUnit": "OU-004", "issue": 4182, "mergedImplementationPr": 4194 },
+      { "operationUnit": "OU-005", "issue": 4183, "mergedImplementationPr": 4196 },
+      { "operationUnit": "OU-006", "issue": 4184 },
+      { "operationUnit": "OU-007", "issue": 4185, "mergedImplementationPr": 4195 },
+      { "operationUnit": "OU-008", "issue": 4186, "mergedImplementationPr": 4191 },
+      { "operationUnit": "OU-009", "issue": 4187, "mergedImplementationPr": 4189 },
+      { "operationUnit": "OU-010", "issue": 4188, "mergedImplementationPr": 4190 }
+    ],
     "ruMapping": {
       "RU-20261121-01": "OU-001",
       "RU-20261121-02": "OU-002",
@@ -162,7 +179,7 @@
       "RU-20261121-09": "OU-009",
       "RU-20261121-10": "OU-010"
     },
-    "note": "stage 4 で要件doc（draft・feature/large・auto_gate auto_ready）を確定。RU → OU は 1:1 対応（review_dispositions RD-001〜010 で全件 covered）。executionUnits は stage 5 で追記する。"
+    "note": "RU → OU は 1:1 対応（review_dispositions RD-001〜010 で全件 covered）。要件doc と RU は case-ready で消費済み。全実行単位の受入評価と終了は未完了。"
   },
   "baseline": {
     "lastFormalRelease": {
@@ -196,7 +213,39 @@
       "scale": "large",
       "activity": "18:14:00-19:07:58（HITL 停止 18:32:09〜回答受領 18:46:44 含む。壁打ち Q1〜Q8 回答: Q1=B/Q2=A/Q3=A/Q4=A/Q5=A/Q6=B/Q7=A/Q8=A・RETIRE 提案異議なし）"
     },
-    "stage5_execution": { "status": "not_started" },
+    "stage5_execution": {
+      "status": "in_progress",
+      "at": "2026-11-22T02:15:00+09:00",
+      "phase": "case-close",
+      "resume": {
+        "resumedFrom": {
+          "status": "blocked",
+          "at": "2026-11-21T21:16:23+09:00",
+          "reasonCode": "verification-incomplete",
+          "missingAcceptanceRecord": ".agentdev/close-acceptance/issue-4179.json",
+          "observedMainCommit": "ad39482d03ce1700d5f9987dea75e0634b66dd55"
+        },
+        "traceabilityRemediationPr": 4198,
+        "acceptanceRemediationPr": 4199,
+        "integrationVerification": {
+          "testStrategy": "TS-011",
+          "status": "passed_with_adjudication",
+          "evidenceCommit": "e91544ce2",
+          "components": {
+            "integrityEngine": "PASS (exit 0)",
+            "autogenFreshness": "PASS (exit 0)",
+            "bunTestSrc": "PASS 3683/151",
+            "traceabilityCorpus": "missing-design 0・参照切れ 0",
+            "lintSkills": "WARNING 1件 (description 総量 19263 > 18550・over 713)"
+          },
+          "adjudication": {
+            "lintSkillsWarning": "既知 corpus 負債として記録し合格扱い（baseline 5872539bc と同一数値・本一式由来なし・HITL 質問 que_1fe4d7421001L4IvUXwnw1haDt で利用者確定・回答受領 2026-11-22）",
+            "followUp": "description トリム 713 文字削減は別タスク（追跡Issue）として切り出し"
+          }
+        }
+      },
+      "inputCleanupCommit": "b9f793fbe"
+    },
     "stage6_completionJudgment": { "status": "not_started" },
     "stage7_release": { "status": "not_started" }
   },
