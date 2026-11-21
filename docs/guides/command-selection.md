@@ -32,7 +32,7 @@
 | 正規成果物群を独立レビューしたい、工程全体像を再構成したい | `/agentdev/phase-review` | 4区分に分けた所見と工程全体像（セッション内出力） |
 | 工程を完了として次へ進めたい | `/agentdev/phase-transition` | 遷移の記録結果 |
 
-> 工程駆動実行は標準経路とは別経路として併存する。後継経路の実現・採用まで現行の変更駆動経路が正であり、変更駆動の実行に工程駆動の操作や遷移を前置しない。各操作は単独で起動でき、他の工程操作や遷移操作を前置しない。
+> 工程駆動実行と変更駆動経路の関係は、[工程遷移・独立レビューと双経路併存モデル](../designs/workflows/phase-transition-and-coexistence-model.md#双経路併存と移行) を参照する。各操作は単独で起動でき、他の工程操作や遷移操作を前置しない。
 
 ## リポジトリメンテナンス（AgentDevFlow 本体リポジトリのみ）
 
@@ -68,4 +68,4 @@ work_type（bugfix / feature / maintenance / docs_chore）による固定判定�
 - `/agentdev/case-auto` は標準実行コマンド。要求入口 2 つ（`/agentdev/req-define`、`/agentdev/backlog-auto`）から合流する標準経路（`/agentdev/req-define` → `/agentdev/case-auto`）を構成する
 - `/agentdev/backlog-auto` は backlog 整理サイクル（検出→昇格→統合）を1回で実行する backlog-driven の要求入口。承認確定した RU 一式がある場合、一気通貫実行として `/agentdev/req-define` → `/agentdev/case-auto` へ自動接続し、一式全体の完了判定とパッチリリース作成まで進める（利用者判断境界は維持。手動の `/agentdev/req-define` 起動も従来どおり利用可能）
 - inspect-docs、learning-promote、intake-promote、inspect-promote、backlog-review は公開コマンドではなく、backlog-auto が Workflow Skill として駆動する内部 workflow である（単独の公開起動入口は持たない）
-- 工程駆動実行の入口は上の「工程駆動実行（変更駆動経路と併存する別経路）」節の表である。変更駆動の実行に工程駆動の操作や遷移を前置しない
+- 工程駆動実行の入口は上の「工程駆動実行（変更駆動経路と併存する別経路）」節の表を参照する

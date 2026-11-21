@@ -398,4 +398,4 @@ Custom Tool（`.opencode/tools/agentdev-*/`）と Plugin / Hook（`.opencode/plu
 
 ### 対応を確認した組合せの記録（REQ-099-018）
 
-対応を確認した ADF／adapter／ホスト／OmO 版の組合せ、バックエンド、Command 対応表、導入・切替手順は本ガイドと [マルチホスト運用ガイド](multi-host-operations.md) に記録する。組合せと Command 対応表の現行値はマルチホスト運用ガイドが正とする。導入系スクリプト自身は対応済み宣言を出力せず、対応済みの組合せは検証済みの記録に限定される。試験結果の記録状況（REQ-099-007）は Epic の統合検証成果物を参照すること。
+対応を確認した ADF／adapter／ホスト／OmO 版の組合せ、バックエンド、Command 対応表、導入・切替手順は本ガイドと [マルチホスト運用ガイド](multi-host-operations.md) に記録する。導入系スクリプト自身は対応済み宣言を出力せず、対応済みの組合せは検証済みの記録に限定される。試験結果の記録状況（[REQ-099-007](../requirements/REQ-099.md)）は Epic の統合検証成果物を参照すること。

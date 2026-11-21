@@ -19,13 +19,13 @@ updated: "2026-11-19"
 review 挿入位置は「Scale 判断後・Decision判断前・要件doc生成前」と一意に特定可能である。
 処理段階への対応付けを次に示す。
 
-| 条件 | feature の場合 | feature 以外（bugfix, maintenance, docs_chore）の場合 |
-|---|---|---|
-| Scale 判断後 | Scale判断完了後 | work_type 判定完了後。Scale判断 は全 work_type に対して実行するため、work_type 判定完了をもって意味的完成とする |
-| Decision判断前 | Decision判断の判断結果がドラフト保存で永続化される前 | 同左 |
-| 要件doc生成前 | 要件doc生成の成果物がドラフト保存で永続化される前 | 同左 |
+| 条件 | 全 work_type 共通 |
+|---|---|
+| Scale 判断後 | `agentdev-workflow-lifecycle` の判定基準に従い、Scale 判断が完了した後 |
+| Decision判断前 | Decision判断の判断結果がドラフト保存で永続化される前 |
+| 要件doc生成前 | 要件doc生成の成果物がドラフト保存で永続化される前 |
 
-review は Scale判断（feature 以外は work_type 判定）完了後、ドラフト保存の前に挿入する。
+review は全 work_type で Scale 判断完了後、ドラフト保存の前に挿入する。
 Decision判断および要件doc生成は当該時点で実行済みであるが、その成果物はドラフト保存で永続化されるまで確定扱いとならない。
 review の finding は Decision判断、要件doc生成の成果物へ反映可能であり、Decision finding は Decision判断へ戻す。
 

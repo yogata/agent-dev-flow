@@ -97,6 +97,7 @@ worktree を削除する前に、未追跡ファイルだけを対象とする c
 ### Epic Wave クローズ（REQ-032-015〜022）
 
 詳細は references/close-procedures.md を参照（遅延読み込み）。
+並列実行制御と委譲起動は case-auto の [並列 orchestration](case-auto/references/parallel-orchestration.md) を参照する。
 ### Epic Issue 完了条件チェックボックス最終評価・更新
 
 詳細は references/close-procedures.md を参照（遅延読み込み）。

@@ -28,7 +28,7 @@ Command / Skill / Template / Script の入出力契約と依存方向を定義�
 | Custom Tool | src/common/tools/（実行時: .opencode/tools/ 経由〔ホスト接続領域は原本を投影する〕。詳細構造は Design が所有） | Git / GitHub 等への構造化された副作用操作。操作契約（入力、出力、保証、失敗時）を公開し、文字コード・シェル・一時ファイル等の実装詳細を隠蔽 | 構造化引数 | 構造化結果（検証成功のみ成功） |
 | Plugin / Hook | src/opencode/plugins/（実行時: .opencode/ 経由。詳細構造は Design が所有） | モデル遵守判断に委ねない実行前の拒否・強制、正規経路の迂回防止 | ツール実行イベント | 許可・拒否判定 |
 | リポジトリローカル Command | .opencode/commands/repo/（原本なし） | 本体リポジトリ専用入口（REQ-001） | ユーザー起動 | レポート、成果物 |
-| リポジトリローカル Skill | .opencode/skills/repo-*/（原本なし） | 本体リポジトリ専用判断基準（REQ-001） | Command からの参照 | 判断結果の参照提供 |
+| リポジトリローカル Skill | `src/common/skills/repo-agentdev-integrity/`（実行時: `.opencode/skills/repo-agentdev-integrity/` へのコピー投影） | 本体リポジトリ専用判断基準（REQ-001、DEC-065） | Command からの参照 | 判断結果の参照提供 |
 
 種別ごとの正規所有内容と所有しない内容の一意判別、標準継承と差分記述原則、決定的処理の配置基準の詳細は
 REQ-002-037〜040 が要求水準を所有し、本 Design が配置・構造の詳細を所有する。
@@ -60,9 +60,9 @@ Command ──→ Skill ──→ Reference (references/)
 
 ## コマンドフロントマター契約
 
-command frontmatter 契約を description 単一へ同期する（ACT-DESIGN-001 と整合）。
+Command の frontmatter は `description` のみとする。
 配布物自己完結と内部ID/内部パス排除の境界宣言を REQ-001-031/032 と整合させ、配布物の producer 内部依存・harness 固有詳細非依存は REQ-029-003..007 へ参照を分ける（旧配布物品質契約行群 `REQ-002-021..029` 相当は RETIRE/MOVE 済み。現行は `REQ-029-001..008`）。
-「不一致時は本体Designを正とする」実行時契約を廃止し開発時 checker が Design と配布物の適合を保証する構造へ変更する旨を明記する。
+Design と配布物の適合は開発時の checker が検証する。実行時の Command は本体 Design を参照せずに動作する。
 詳細 normative は本 Design の各節と責任表（artifact-responsibilities.md）が所有する。
 
 ## スキル構造契約
@@ -107,6 +107,8 @@ Command 固有の実行順序、Issue 作成、保存、更新、削除、完了
 | 操作用 Skill | GitHub 操作等の横断的操作の安全手順 |
 
 ## Script 所有権と委譲契約
+
+リポジトリの `scripts/` 直下の公開入口は、利用先向けの `install.ps1`、本体の自己同期用の `self-sync.ps1`、開発環境セットアップ用の `setup-hooks.ts` に限る（REQ-050-001）。
 
 各 script の正規所有者を文書種別ごとに定義する（REQ-002-040、REQ-002-035）。
 同一 script または共有 lib を複数 skill へ複製せず、正規所有者を一つに定める。

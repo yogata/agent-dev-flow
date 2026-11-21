@@ -204,7 +204,7 @@ Workflow Skill は常に単一 Issue 実行（single workflow）として動作�
 | 条件 | 読む reference |
 |---|---|
 | case-run gate 意味論（前置 gate と最終 gate）と Epic Wave 実行モードの廃止 の詳細が必要な場合 | references/gate-semantics.md |
-| 所有関係と委譲・作業用 worktree 作成元と PR base・検証義務と検証手段の分離・v3 epic-wave-model 吸収 の詳細が必要な場合 | references/supporting-sections.md |
+| 所有関係と委譲・作業用 worktree 作成元と PR base・検証義務と検証手段の分離・単一 Issue の競合情報利用の詳細が必要な場合 | references/supporting-sections.md |
 | QG-3 前置 staleness check と targeted docs guard の詳細が必要な場合 | references/qg3-and-docs-guard.md |
 | verification-only PR（実装差分なし、検証のみ） の詳細が必要な場合 | references/verify-only-pr.md |
 | トレーサビリティ能力の利用・cleanup 判定・参照する横断 Design と検査ツール の詳細が必要な場合 | references/traceability-usage.md |
@@ -223,7 +223,7 @@ Workflow Skill は常に単一 Issue 実行（single workflow）として動作�
 - `agentdev-git-worktree` skill（worktree 作成、precondition gate）
 - `agentdev-workflow-lifecycle` skill（work_type 判定）
 - `agentdev-req-analysis` skill（チェックボックス品質基準）
-- `agentdev-epic-tracker` skill（実行構成表の読取と子状態更新）
+- [case-auto の並列 orchestration](case-auto/references/parallel-orchestration.md)（Wave 実行制御）
 - REQ-006（case-run / 実装パイプライン）
 - REQ-003（外部エージェント統合契約）
 - REQ-011（case-auto 最大自走モード）
@@ -232,9 +232,6 @@ Workflow Skill は常に単一 Issue 実行（single workflow）として動作�
 ## adversarial-review 挿入境界（case-run: adapter 委譲内）
 
 詳細は references/adversarial-review-insertion.md を参照（遅延読み込み）。
-## v3 epic-wave-model Design からの吸収
-
-詳細は references/supporting-sections.md を参照（遅延読み込み）。
 ## 重要変更の通知と結果説明
 
 実行担当サブエージェントへの委譲契約に、重要変更の識別と報告を含める。委譲先が実行中に重要変更を判明した場合は、その内容と影響を親側へ報告させ、その時点で未反映の重要変更は正規反映前に、判明時点ですでに反映済みの内容は反映済みである事実を区別して、利用者へ追加通知する。

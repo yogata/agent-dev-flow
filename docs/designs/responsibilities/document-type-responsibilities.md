@@ -22,7 +22,7 @@ updated: "2026-11-21"
 > 文書種別の基準境界（REQ/Decision/Design/guides の役割定義、ライフサイクル、優先順位、参照規則、投影方向、Design内部論理区分、文書7分類、局所物理分離、ドメイン別体系化規範）は `../foundations/document-model.md` の原本を参照する。
 > 本 Design は文書種別配置の執筆時判定基準、実行主体分類、要件行書き方、SKILL構造、用語政策を扱う。
 > 共通文書モデル規約（frontmatter、ID 体系、命名規則、URL 参照形式、共通フォーマット規約）は `../foundations/patterns.md` を参照する。
-> 新規ファイル分割は行わず、既存2ファイル（本 Design と document-model.md）間の重複削除で運用する。
+> 文書モデルは `document-model.md`、文書種別の責務と配置判断は本 Design を参照する。新規ファイルに分割せず、同じ規則は所有する文書にだけ記載する。
 > 両 Design の境界変更時は相互参照を更新し、同一関心の説明が重複・矛盾しない状態を維持する。
 
 docs/ 配下の文書（REQ/Decision/Design/guides/README）および AGENTS.md の日本語執筆における文書種別責務、配置基準、用語政策を示す。
@@ -347,7 +347,7 @@ SKILL.md の節構成は以下の役割分担に従う。
 SKILL.md 査読時（`agentdev-inspect-skills`）に概要節と機能節の重複を検出し、概要節を簡潔な導入へ縮退するよう指示する。
 
 **適用対象**: `src/common/skills/agentdev-*/SKILL.md`（配布 agentdev-* skill 全件）。
-件数は固定値を埋め込まず、実ディレクトリ構成により動的に追従する（旧「全27ファイル」等の固定件数は構成変更時に陳腐化するため廃止）。
+対象は実ディレクトリ構成から特定し、件数を固定値として埋め込まない。
 
 ### SKILL.md 原本節フォーマット（REFERENCE関係）
 
@@ -402,7 +402,7 @@ ADF 本体も同じ仕組みを利用する。
 
 ### 訳語表
 
-訳語表は4分類の語例と推奨訳語を掲載する。語例は網羅列挙ではなく判定の典型例であり、語彙管理の実体データは「語彙管理の3層分担」節に従い repo-local 語彙レジストリ実体が所有する。
+訳語表は用語分類の典型例と推奨訳語を示す。機械置換に用いる用語の実体は、プロジェクトの prh 辞書が所有する。
 
 | 原語 | 分類 | 推奨表現 | 備考 |
 |---|---|---|---|
@@ -468,9 +468,8 @@ runtime-package-boundary.md「5 種のリポジトリ種別」表の Type ID 列
 - inline code の内側の字句。既にバッククォートで囲まれているため二重付与しない。
 - URL、ファイルパスそのもの（リンクテキスト部は自然言語記述として扱う）。
 
-この対象外範囲は src/opencode/{commands,skills}/**/SKILL.md 等の配布物原本 frontmatter にも適用する。
-PR #1334 では src/opencode/skills/agentdev-*/SKILL.md の frontmatter `name:` 行に誤ってバッククォートが付与され、opencode がスキル名を不正に認識する不具合を引き起こした。
-本条項により同種の回帰を防止する。frontmatter `name:` 行の検出基準の詳細は `agentdev-inspect-skills` skill の「SKILL.md frontmatter `name:` バッククォート検出」診断観点を参照する。
+この対象外範囲は、`src/common/commands/agentdev/` の Command 原本と `src/common/skills/agentdev-*/SKILL.md` の Skill 原本の frontmatter にも適用する（DEC-049）。
+`SKILL.md` の frontmatter `name:` 行の検出基準は、`agentdev-inspect-skills` の「SKILL.md frontmatter `name:` バッククォート検出」診断観点を参照する。
 
 ### 意味説明すべき概念の文章説明方針
 
@@ -480,17 +479,13 @@ canonical、deterministic、semantic、owner、fail-open、fail-closed 等の意
 
 ADF の正式なモデル名・成果物名（Decision、Design、Case、Epic、Wave、Definition 等）は変更しない。人間向けの日本語文章では、日本語で意味を説明することを基本形とし、正式名称を明示する必要がある箇所だけ正式名称を併記する。正式名称を裸の英単語として日本語文章へ直接混在させることを基本形としない。
 
-### 語彙管理の3層分担
+### 語彙の所有境界
 
-語彙管理は次の3層で分担する。
-
-| 層 | 実体 | 所有内容 |
-|---|---|---|
-| 政策表 | 本 Design 用語政策節 | 4分類定義、訳語表、英字許容リスト |
+本 Design は用語分類、訳語表、英字許容リストを所有する。文脈に依存せず機械置換できる語は、プロジェクトの prh 辞書で管理する。
 
 prh 機械辞書への新語登録は、文脈非依存性と誤検出ゼロの実測立証を前提とする（DEC-047 の限定例外）。実測立証は case 実行側のフェーズで行う。
 
-設計PR・設計修正PR・実装PR の語彙管理: 旧来の Definition 用語を設計PR・設計修正PRへ、`実装 PR` 等の揺れを実装PRへ統一する。ブランチ名・worktree 名の識別子（definition/issue-{N} 等）と履歴成果物の旧表現は置換対象外とする。prh 固定置換として登録済みである。
+設計PR・設計修正PR・実装PR の語彙管理: 旧来の Definition 用語を設計PR・設計修正PRへ、`実装 PR` 等の揺れを実装PRへ統一する。ブランチ名・worktree 名の識別子（definition/issue-{N} 等）と履歴成果物の旧表現は置換対象外とする。
 
 ### 関連参照
 
@@ -520,9 +515,7 @@ prh 機械辞書への新語登録は、文脈非依存性と誤検出ゼロの�
 配布物への concrete ID（REQ/Decision/Design の具象参照）の inline 記載排除と対応宣言（ADF-COVERS）の正規配置先（docs 配下の正規成果物）は REQ-029-003、REQ-029-004、および [../skills/agentdev-skill-authoring.md](../skills/agentdev-skill-authoring.md)「配布物執筆時の ID 衛生」が正規所有する。
 本節は、配布物編集時に参照表記として定性参照を採用する運用を正文化するものである。
 
-本規約は配布物 inline の concrete REQ-ID 表記を肯定しない。
-したがって、配布物執筆時の ID 衛生ガイダンス（concrete ID inline 排除・実行手順のプレースホルダ表記を配布物執筆ガイダンスへ明記する後続対応）と矛盾せず、同一方向である。
-後続の ID 衛生ガイダンス対応は本節を参照点として整合を保つ。
+配布物の本文・コメントには具象 REQ-ID を記載しない。実行手順の記入例には、配布物執筆時の ID 衛生に従いプレースホルダーを用いる。
 
 ### prh 用語置換の適用境界
 
@@ -582,9 +575,4 @@ Decision の要否は既存の判断能力が、文書保存は既存のファ�
 
 ## SKILL.md 見出し言語方針
 
-SKILL.md の見出し言語は日本語に統一する（ユーザー判断確定）。
-
-### 方針
-
-- 英語見出し `## references/` を使用する9件を `## 参考文献` へ修正する
-- 新規 SKILL.md は日本語見出しをデフォルトとし、運用を標準化する
+`SKILL.md` の見出しは日本語に統一する（ユーザー判断確定）。`references/` 配下の資料を案内する見出しには `## 参考文献` を用いる。

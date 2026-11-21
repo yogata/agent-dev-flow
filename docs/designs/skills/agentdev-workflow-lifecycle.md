@@ -22,9 +22,9 @@ AgentDevFlow のフェーズ定義、SSoT 遷移、work_type 判定基準、ス�
 
 ## 提供する判断、操作
 
-- フェーズ定義（マクロ: 壁打ち、構造的実行、レビュー完了 / マイクロ: requirement、analyzed、created、in_progress、review、done）
+- 工程対応（マクロ: `req-define` による要求合意と `case-auto` による標準実行。マイクロ: `case-auto` が駆動する内部 lifecycle 段階。Definition 構成ごとの段階の対応は SKILL 本体の「経路一覧」を参照し、各段階内の STEP は各 Workflow Skill が所有する）
 - work_type 分類（4値）
-- スケール判定（全 work_type を対象に 3条件〔複数モジュール跨ぎ、PR 肥大化リスク、段階的リリース〕で判定する）
+- スケール判定（全 work_type を対象に、SKILL 本体の「スケール判定基準」に従い要件の複雑さと実装スコープシグナルで判定する）
 - 実装スコープシグナル確認（ドラフト内実装詳細セクション検出時の scale: large 昇格判定、REQ-004-018）
 - 前工程からの引き継ぎ判定、停止条件（`agentdev_handoff: true` 検出時）
 - SSoT 遷移
@@ -32,7 +32,9 @@ AgentDevFlow のフェーズ定義、SSoT 遷移、work_type 判定基準、ス�
 
 ## 参照する references
 
-- `references/upstream-handoff.md`
+- `references/upstream-handoff.md`（上位への引き継ぎ判定）
+- `references/structured-stage-handoff.md`（工程間構造化文脈引き継ぎ）
+- `references/reference-resolution.md`（source / projection の参照先解決）
 
 ## 現在の動作
 
@@ -51,7 +53,7 @@ AgentDevFlow のフェーズ定義、SSoT 遷移、work_type 判定基準、ス�
 ## 検証観点
 
 - work_type 分類が正しいか（4値のいずれか）
-- スケール判定が正しいか（全 work_type、3条件のいずれか）
+- スケール判定が正しいか（全 work_type、SKILL 本体の standard / large 判定基準）
 - 前工程からの引き継ぎ判定が正しいか
 - フェーズ定義に従っているか
 

@@ -23,7 +23,7 @@ updated: "2026-11-18"
 | Skill Template | `src/common/skills/*/templates/` | 原本優先 | `.opencode/skills/*/templates/` | ドキュメント生成テンプレート |
 | REQ | `docs/requirements/REQ-*.md` | - | - | 要件定義（基準） |
 | Decision | `docs/decisions/DEC-*.md` | - | - | 意思決定記録（基準） |
-| Design | `docs/designs/**/*.md` | - | - | 現在設計（リポジトリ内部）。commands/skills/workflows の3層と基盤6ドメイン（foundations/responsibilities/quality/integrity/local/authoring）で構成 |
+| Design | `docs/designs/**/*.md` | - | - | 現在設計（リポジトリ内部）。command・skill・workflow の各層と基盤ドメインの配置は [Design インデックス](../README.md) を参照 |
 | Guide | `docs/guides/*.md` | - | - | 参照用読み物（ナビゲーション層） |
 | 追跡Issue | GitHub Issue（GitHub 版）/ `.agentdev/issues/issue-{NNNN}.md`（ローカル版） | - | - | 未解決事項の管理単位・永続状態（docs/ 配下の文書種別ではない、REQ-049-019）。検知、起票、検索、更新、保留、再評価、解決、反映確認、クローズ、再オープンは Tool 操作契約経由で行い、論理スキーマの正は `agentdev-issue-tracking` skill Design が一元管理する。反映先成果物の更新は当該成果物を所有する ADF 能力へ委譲し、追跡Issue側は反映要否の追跡に徹する |
 | ドメイン状態 | `.agentdev/` | - | - | Intake / Learning / Backlog / Integrity 永続状態 |
@@ -89,7 +89,7 @@ Command は Skill を参照して判断を利用し、Skill は必要な詳細�
 
 同一の判断基準、出力構造、決定的処理を Command と Skill、Template、Script の複数箇所で正規定義しない。
 
-原本は `src/common/` に置き、ホスト接続領域（`src/opencode/`・`src/senpi/`）と `.opencode/`（実行時配置先）は原本を投影する（DEC-049・multi-host-canonical-model）。
+共通原本は `src/common/` に置く。ホスト固有の登録・配線は `src/opencode/` と `src/senpi/` が所有し、OpenCode の実行時配置先である `.opencode/` には該当する原本を投影する（DEC-049・multi-host-canonical-model）。
 
 ## 成果物責務表（Workflow Architecture 追加）
 

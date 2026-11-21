@@ -181,7 +181,6 @@ Design は 3 層構造（commands / skills / workflows）と基盤 6 ドメイ�
 - [ADF v4 標準ライフサイクル](designs/workflows/standard-lifecycle.md)
 - [ADF v4 ライフサイクル状態機械（二層状態モデル・階層合成・内部 lifecycle 対応）](designs/workflows/lifecycle-state-machine.md)
 - [ADF v4 継続コラボレーションループ](designs/workflows/collaboration-loop.md)
-- [Case Issue 工程記録モデル](designs/workflows/issue-lifecycle-records.md)
 - [ADF 工程駆動コラボレーションモデル](designs/workflows/phase-driven-collaboration-model.md)
 - [ADF 工程遷移・独立レビューと双経路併存モデル](designs/workflows/phase-transition-and-coexistence-model.md)
 - [検証に伴う一時資材の取扱いと後片付け責任](designs/workflows/verification-resource-lifecycle.md)
@@ -255,7 +254,7 @@ status（draft / accepted）を含む完全一覧は [Design インデックス]
 
 #### authoring/（執筆規約）
 
-2026-11-18 時点で配下 Design なし（command-file-format.md・vocabulary-registry.md は DEC-065 により廃止。執筆規約は [品質仕様](designs/quality/quality-specs.md) が所有する）。
+共通の文章品質基準は [品質仕様](designs/quality/quality-specs.md) が所有する。Skill と Command に固有の執筆規約は、それぞれ [Skill 執筆 Design](designs/skills/agentdev-skill-authoring.md) と [Command 執筆 Design](designs/skills/agentdev-command-authoring.md) が所有する。
 
 ## 知識（Knowledge）
 

@@ -67,6 +67,6 @@ accepted な v5 基盤と v5.1 の基準への導線は次のとおりである�
 
 | ガイド | 内容 |
 |--------|------|
-| [成果物、状態モデル](artifacts-and-state.md) | 成果物の種別、配置、ライフサイクル（状態モデル制約、`.agentdev/` の位置づけの正） |
+| [成果物、状態モデル](artifacts-and-state.md) | 成果物の種別、配置、ライフサイクルの案内。状態と配置の基準は [DEC-038](../decisions/DEC-038.md)、一時成果物の扱いは [REQ-008](../requirements/REQ-008.md) を参照 |
 | [プロジェクトドキュメントと Design](project-docs-and-specs.md) | REQ / Decision / Design の関係と文書体系の読み方 |
 | [用語集](glossary.md) | AgentDevFlow の用語定義 |
