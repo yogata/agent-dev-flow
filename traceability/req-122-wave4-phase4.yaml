@@ -9,4 +9,3 @@ component: req-122-wave4-phase4
 # 本 sidecar では design を宣言しない。REQ-122-011〜016 は verification 必須（区分B）。
 # REQ-122-011 の verification は ir-075.test.ts（導出対応宣言。traceability/derivations.yaml の
 # 導出規約がテスト import 実測から導出）と pre-commit の IR-075 固有確認で成立する。
-implementation:

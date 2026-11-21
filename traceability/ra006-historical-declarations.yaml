@@ -6,4 +6,3 @@
 # inline から sidecar へ移設した。他の 4 対象ファイル（case-auto.md・case-run.md・req-define.md・
 # phase-transition-and-coexistence-model.md）の履歴対応宣言は inline 維持。
 component: ra006-historical-declarations
-implementation:

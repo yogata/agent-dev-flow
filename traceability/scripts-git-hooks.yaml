@@ -1,4 +1,1 @@
 component: scripts-git-hooks
-implementation:
-  scripts/git-hooks/pre-push:
-verification:
