@@ -95,7 +95,7 @@ Capability Skill は workflow STEP を所有しない。
 
 - **配置**: `src/common/skills/agentdev-*/` 配下（REQ-002-008、REQ-002-019）
 - **原本と投影**: 原本は `src/common/skills/`、実行時投影先は `.opencode/skills/`（REQ-002-007。配備形態の正は DEC-049）
-- **命名**: `agentdev-{機能領域名}` 形式を推奨する。`agentdev-workflow-*` プレフィックスは歴史的経緯で Capability Skill にも残存する（後述「workflow-* プレフィックスを持つ Capability Skill 的スキル」）。Workflow/Capability 区別は命名ではなく本節の判定基準に基づく。新規作成は機能領域名（`req-*`、`spec-*`、`intake-*`、`learning-*`、`git-*`、`gh-*`、`quality-gates` 等）を推奨する
+- **命名**: `agentdev-{機能領域名}` 形式を推奨する。`agentdev-workflow-*` プレフィックスは Capability Skill にも残存する（後述「workflow-* プレフィックスを持つ Capability Skill 的スキル」）。Workflow/Capability 区別は命名ではなく本節の判定基準に基づく。新規作成は機能領域名（`req-*`、`spec-*`、`intake-*`、`learning-*`、`git-*`、`gh-*`、`quality-gates` 等）を推奨する
 
 ### Capability Skill の参照契約（過剰共通 reference 化の回避）
 
@@ -150,7 +150,7 @@ checker 実装と本表は同一規則を反映し、乖離は検査で検出対
 | workflow STEP の所有 | SKILL.md に STEP 一覧と遷移を記述する | 記述しない（宣言的定義のみ） |
 | 対応 Command | dispatch 元 Command を1以上に持つ | 特定 Command 固有の dispatch を持たない |
 | 制御構造の記述 | STEP 順序、分岐、停止条件を本文で所有する | workflow 制御構造を本文に持たない |
-| 呼称の例外 | なし | `agentdev-workflow-*` プレフィックスの一部スキルは歴史的経緯で Capability Skill として運用する（「workflow-* プレフィックスを持つ Capability Skill 的スキル」節） |
+| 呼称の例外 | なし | `agentdev-workflow-*` プレフィックスの一部スキルは Capability Skill として運用する（「workflow-* プレフィックスを持つ Capability Skill 的スキル」節） |
 
 case-open、case-ready、case-revise、case-run、case-close は内部工程であり（DEC-055）、公開コマンドがなくても Workflow Skill に分類する。
 
@@ -198,8 +198,7 @@ DEC-010 の Workflow Architecture Inventory が Capability Skill 横断抽出候
 
 以下のスキルは `agentdev-workflow-*` プレフィックスを持つが、実態は Capability Skill の判定基準（workflow STEP 非所有、複数 workflow からの参照、workflow 制御構造からの分離）を満たす。
 各スキルは本文で「本スキル自身は workflow STEP を所有せず、各 command の Workflow Skill が所有する STEP から参照される」と宣言する。
-命名は歴史的経緯で維持し、Capability Skill として運用する。
-将来の rename は別 Issue スコープとする。
+現行のスキル名を維持し、Capability Skill として運用する。
 
 | スキル | 提供能力 | 参照元 Workflow Skill |
 |---|---|---|

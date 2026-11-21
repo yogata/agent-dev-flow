@@ -107,7 +107,7 @@ delegation_type は参考分類であり、Command 本文での使用は任意�
 | `classification` | 成果物 / 検出事項 / intake / learning の分類 | 禁止 | - |
 | `extraction` | 候補、論点、未回収事項の抽出 | 禁止 | - |
 | `draft_generation` | Issue本文、PR本文、レポート案などの草案生成 | 禁止 | - |
-| `controlled_case_execution` | case-run Epic / 複数Issue実行 | 条件付き | case-run のみ |
+| `controlled_case_execution` | case-run から実行担当サブエージェントへの単一 Issue の実装実行委譲。既存の result 4状態（`completed-pr` / `blocked` / `failed` / `delegation-unavailable`）を使用する | 条件付き | case-run のみ |
 | `step_execution` | case-auto からの構成工程（case-open / case-ready / case-run / case-close）の実行担当サブエージェント起動 | 許可 | case-auto からの工程委譲のみ。各工程のコマンド定義ガードレールに従う。委譲起動不能時の扱いは `delegation-unavailable` 状態として報告する（REQ-002-003/004）。起動手段、実行制御パラメータは AGENTS.md および references/<harness>.md 参照 |
 
 ※ step_execution の委譲起動手段（起動方法、実行制御パラメータ）は harness の責務として AGENTS.md および references/<harness>.md に配置する（REQ-002-002）。
@@ -146,7 +146,7 @@ case 実行に関わる責務は 4 用語へ分解され、各委譲種別は対
 | 用語 | 定義 | 正規所有者 | 関連する委譲種別 |
 |---|---|---|---|
 | orchestration stage | case-auto が管理する command 間進行 | REQ-006 / case-auto | `step_execution`、case-auto からの工程委譲 |
-| case-run internal lifecycle | 単一 Issue または Wave 内の準備、実行、提出 | REQ-006 / case-run | `controlled_case_execution` |
+| case-run internal lifecycle | 単一 Issue の準備、実行、提出。Epic・Wave の実行制御は含まない | REQ-006 / case-run | `controlled_case_execution` |
 | harness execution mechanism | agent 起動、background task、並列実行、context 管理 | harness 責務（ADF 規範所有対象外、REQ-011-018） | なし（委譲対象外、配布物から抽象化） |
 | external execution boundary | REQ-011 が所有する外部バックエンド接続 | REQ-011（REQ-011-017） | `controlled_case_execution`、`step_execution` 経由で REQ-011 へ委譲 |
 
@@ -306,7 +306,7 @@ case-run 委譲時に上位工程（case-auto orchestration・委譲 prompt 生�
 - [lifecycle-state-machine.md](lifecycle-state-machine.md)（result 4 状態・resume point の正）
 - [../foundations/runtime-execution-model.md](../foundations/runtime-execution-model.md)（authority 格子・直列化単位・冪等経路の正）
 - [../foundations/harness-separation-model.md](../foundations/harness-separation-model.md)（harness execution mechanism の ADF 規範所有対象外）
-- [../commands/case-run.md](../commands/case-run.md)（Epic Wave 実行モデル〔v3 epic-wave-model Design 吸収先〕）
+- [../commands/case-run.md](../commands/case-run.md)（単一 Issue の実行委譲と result の処理）
 - v2:ADR-0112（サブエージェント委譲の一般概念）
 - v2:ADR-0127（case-auto の工程委譲）
 - v2:ADR-0128（case-run 外部実行委譲）
