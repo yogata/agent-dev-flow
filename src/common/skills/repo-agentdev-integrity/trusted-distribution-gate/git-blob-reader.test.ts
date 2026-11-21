@@ -15,10 +15,15 @@ import {
   parseLsTreeOutput,
   readBlob,
   listTreeEntries,
+  makeProductionAdapter,
+  readBlobsBatched,
   type RawGitAdapter,
   GitAdapterError,
 } from "./git-blob-reader.ts";
-import { PathSafetyError, assertGitOid } from "./types.ts";
+import { PathSafetyError, assertGitOid, type RepoPath } from "./types.ts";
+import { loadAndClassify, type LoadedBlob } from "./blob-loader.ts";
+import { checkBlobPresent, readBlob as readBlobBatch, parseBatchedResponse } from "./git-blob-batch.ts";
+import { makeFixtureRepo, disposeRepo, headOid as fixtureHeadOid, makeTmpDir } from "./launcher-fixture.ts";
 
 const TMP_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), "trust-gbr-"));
 
@@ -163,3 +168,224 @@ function makeRealAdapter(): RawGitAdapter {
     },
   };
 }
+
+// =============================================================================
+// Blob loader — consolidated from blob-loader.test.ts.
+// =============================================================================
+
+const BL_FAKE_OID = assertGitOid("0".repeat(40));
+
+function blEntry(path: string): Parameters<typeof loadAndClassify>[2][number] {
+  return { mode: "100644", object_kind: "blob", oid: BL_FAKE_OID, path };
+}
+
+function blAdapter(blobs: Record<string, Uint8Array>): RawGitAdapter {
+  return {
+    cwd: "/fake",
+    spawnGit(args: readonly string[]): Buffer {
+      const last = args[args.length - 1] ?? "";
+      const colon = last.indexOf(":");
+      const path = colon >= 0 ? last.substring(colon + 1) : last;
+      const bytes = blobs[path];
+      if (!bytes) {
+        throw new Error(`cat-file: path not found: ${path}`);
+      }
+      return Buffer.from(bytes);
+    },
+    spawnGitWithInput(args: readonly string[], input: Buffer): Buffer {
+      const cmd = args[1];
+      const lines = input.toString("utf-8").split("\n").filter((l) => l.length > 0);
+      if (cmd === "--batch-check") {
+        const out: string[] = [];
+        for (const line of lines) {
+          const colon = line.indexOf(":");
+          const p = colon >= 0 ? line.substring(colon + 1) : line;
+          const bytes = blobs[p];
+          if (bytes) {
+            out.push(`${line.substring(0, colon)} blob ${bytes.length}`);
+          } else {
+            out.push(`${line} missing`);
+          }
+        }
+        return Buffer.from(out.join("\n") + "\n", "utf-8");
+      }
+      const chunks: Buffer[] = [];
+      for (const line of lines) {
+        const colon = line.indexOf(":");
+        const p = colon >= 0 ? line.substring(colon + 1) : line;
+        const bytes = blobs[p];
+        if (bytes) {
+          chunks.push(Buffer.from(`${line.substring(0, colon)} blob ${bytes.length}\n`, "utf-8"));
+          chunks.push(Buffer.from(bytes));
+          chunks.push(Buffer.from("\n"));
+        } else {
+          chunks.push(Buffer.from(`${line} missing\n`));
+        }
+      }
+      return Buffer.concat(chunks);
+    },
+  };
+}
+
+describe("blob-loader / loadAndClassify", () => {
+  test("loads text blobs with UTF-8 content and runtime subset", () => {
+    const adapter = blAdapter({
+      "src/common/commands/agentdev/case-run.md": new TextEncoder().encode("# case-run\n"),
+    });
+    const r = loadAndClassify(adapter, BL_FAKE_OID, [blEntry("src/common/commands/agentdev/case-run.md")]);
+    expect(r.kind).toBe("ok");
+    if (r.kind !== "ok") return;
+    expect(r.blobs).toHaveLength(1);
+    const b: LoadedBlob = r.blobs[0]!;
+    expect(b.text).toBe("# case-run\n");
+    expect(b.subset).toBe("runtime");
+  });
+
+  test("skips entries outside known projections", () => {
+    const adapter = blAdapter({ "README.md": new TextEncoder().encode("# readme\n") });
+    const r = loadAndClassify(adapter, BL_FAKE_OID, [blEntry("README.md")]);
+    expect(r.kind).toBe("ok");
+    if (r.kind !== "ok") return;
+    expect(r.blobs).toHaveLength(0);
+  });
+
+  test("accepts allowlisted binary .lock entry (text stays null)", () => {
+    const bytes = new Uint8Array([0x00, 0x01, 0x02]);
+    const adapter = blAdapter({ "src/common/skills/agentdev-foo/scripts/bun.lock": bytes });
+    const r = loadAndClassify(adapter, BL_FAKE_OID, [blEntry("src/common/skills/agentdev-foo/scripts/bun.lock")]);
+    expect(r.kind).toBe("ok");
+    if (r.kind !== "ok") return;
+    expect(r.blobs[0]?.text).toBeNull();
+  });
+
+  test("rejects NUL byte in shipped runtime .md (EncodingViolation)", () => {
+    const bytes = new Uint8Array([0x23, 0x00, 0x61]);
+    const adapter = blAdapter({ "src/common/skills/agentdev-foo/SKILL.md": bytes });
+    const r = loadAndClassify(adapter, BL_FAKE_OID, [blEntry("src/common/skills/agentdev-foo/SKILL.md")]);
+    expect(r.kind).toBe("error");
+    if (r.kind !== "error") return;
+    expect(r.code).toBe(6);
+  });
+
+  test("rejects unknown binary extension in shipped projection", () => {
+    const bytes = new Uint8Array([0x00, 0x01, 0x02, 0x03]);
+    const adapter = blAdapter({ "src/common/skills/agentdev-foo/assets/data.bin": bytes });
+    const r = loadAndClassify(adapter, BL_FAKE_OID, [blEntry("src/common/skills/agentdev-foo/assets/data.bin")]);
+    expect(r.kind).toBe("error");
+    if (r.kind !== "error") return;
+    expect(r.code).toBe(6);
+  });
+});
+
+// =============================================================================
+// Batched reads — consolidated from batched-reads.test.ts (representative
+// cases) and launcher-blockers.test.ts (typed failure routing).
+// =============================================================================
+
+function asRepoPath(p: string): RepoPath {
+  return p as RepoPath;
+}
+
+function adapterReturning(rawResponse: Buffer): RawGitAdapter {
+  return {
+    cwd: "/fake",
+    spawnGit(): Buffer {
+      throw new Error("unexpected spawnGit");
+    },
+    spawnGitWithInput(): Buffer {
+      return rawResponse;
+    },
+  };
+}
+
+describe("git-blob-reader / batched reads integration", () => {
+  test("readBlobsBatched returns all present blobs in ONE subprocess", () => {
+    const repo = makeFixtureRepo();
+    try {
+      const head = fixtureHeadOid(repo);
+      const adapter = makeProductionAdapter(asRepoPath(repo));
+      const entries = listTreeEntries(adapter, assertGitOid(head), "candidate");
+      const interesting = entries
+        .map((e) => e.path)
+        .filter((p) => p.startsWith("src/common/") || p.startsWith("scripts/install-"))
+        .slice(0, 5);
+      expect(interesting.length).toBeGreaterThan(0);
+      const requests = interesting.map((p) => `${head}:${p}`);
+      const result = readBlobsBatched(adapter, requests);
+      expect(result.found.size + result.missing.length).toBe(requests.length);
+      expect(result.found.size).toBeGreaterThan(0);
+    } finally {
+      disposeRepo(repo);
+    }
+  }, 60000);
+
+  test("adapter failure (bad repo root) raises GitAdapterError, not silent missing", () => {
+    const notARepo = makeTmpDir("trust-not-a-repo-");
+    try {
+      const adapter = makeProductionAdapter(asRepoPath(notARepo));
+      const fakeOid = assertGitOid("0".repeat(40));
+      expect(() => readBlobsBatched(adapter, [`${fakeOid}:foo.md`])).toThrow();
+    } finally {
+      try { fs.rmSync(notARepo, { recursive: true, force: true }); } catch { void 0; }
+    }
+  }, 60000);
+});
+
+describe("git-blob-batch / strict protocol validation", () => {
+  const REQ = "deadbeefcafe00000000000000000000000000ff:docs/foo.md";
+
+  test("explicit valid missing response is recorded in missing", () => {
+    const buf = Buffer.from(`${REQ} missing\n`);
+    const r = readBlobsBatched(adapterReturning(buf), [REQ]);
+    expect(r.missing).toEqual([REQ]);
+    expect(r.found.size).toBe(0);
+  });
+
+  test("explicit valid blob response is recorded in found", () => {
+    const body = Buffer.from("# hi\n");
+    const header = `deadbeefcafe00000000000000000000000000ff blob ${body.length}\n`;
+    const buf = Buffer.concat([Buffer.from(header), body, Buffer.from("\n")]);
+    const r = readBlobsBatched(adapterReturning(buf), [REQ]);
+    expect(r.found.size).toBe(1);
+    expect(r.missing).toEqual([]);
+  });
+
+  test("truncated header (no newline) throws GitAdapterError", () => {
+    const buf = Buffer.from("deadbeefcafe00000000000000000000000000ff blob 5");
+    expect(() => readBlobsBatched(adapterReturning(buf), [REQ])).toThrow(GitAdapterError);
+  });
+
+  test("wrong object kind (commit instead of blob) throws GitAdapterError", () => {
+    const buf = Buffer.from("deadbeefcafe00000000000000000000000000ff commit 5\nabcde\n");
+    expect(() => readBlobsBatched(adapterReturning(buf), [REQ])).toThrow(GitAdapterError);
+  });
+
+  test("checkBlobPresent distinguishes present and missing with strict echo", () => {
+    const oid = assertGitOid("a".repeat(40));
+    const present = Buffer.from(`${oid} blob 5\n`);
+    expect(checkBlobPresent(adapterReturning(present), oid, "docs/foo.md").kind).toBe("present");
+    const missing = Buffer.from(`${oid}:docs/absent.md missing\n`);
+    expect(checkBlobPresent(adapterReturning(missing), oid, "docs/absent.md").kind).toBe("missing");
+    const mismatch = Buffer.from(`not-a-valid-oid blob 5\n`);
+    expect(checkBlobPresent(adapterReturning(mismatch), oid, "docs/foo.md").kind).toBe("error");
+  });
+
+  test("parseBatchedResponse accepts a valid 64-char SHA-256 resolved OID", () => {
+    const req = `${"a".repeat(40)}:a.md`;
+    const body = Buffer.from("# hi\n");
+    const header = `${"b".repeat(64)} blob ${body.length}\n`;
+    const buf = Buffer.concat([Buffer.from(header), body, Buffer.from("\n")]);
+    const r = parseBatchedResponse(buf, [req]);
+    expect(r.found.size).toBe(1);
+  });
+
+  test("readBlobBatch throws GitAdapterError when adapter lacks spawnGitWithInput", () => {
+    const brokenAdapter = {
+      cwd: "/fake",
+      spawnGit(): Buffer {
+        throw new Error("should not be called");
+      },
+    } as unknown as RawGitAdapter;
+    expect(() => readBlobBatch(brokenAdapter, assertGitOid("a".repeat(40)), "lbl", "a.md")).toThrow(GitAdapterError);
+  });
+});

@@ -20,6 +20,7 @@ import { spawn, type ChildProcess } from "child_process";
 import {
   computeSha256,
   buildArchiveFromBlobs,
+  assertSafeArchivePath,
   type BlobSource,
 } from "./archive-builder.ts";
 import { verifyArchive } from "./archive-verify.ts";
@@ -28,7 +29,10 @@ import {
   publishStagedArchive,
   ArchiveBuilderError,
   type StagedArchive,
+  type StagingRemover,
 } from "./archive-publish.ts";
+import { safeStageCleanup, applyCleanupWarnings } from "./launcher.ts";
+import { PathSafetyError } from "./types.ts";
 
 const EXTERNAL_PROCESS_TIMEOUT_MS = 60000;
 
@@ -412,3 +416,71 @@ function compressDir(src: string, dst: string): void {
     execFileSync("zip", ["-r", "-q", dst, "."], { cwd: src });
   }
 }
+
+// =============================================================================
+// Cleanup warning preservation + path safety — consolidated from
+// cleanup-warnings.test.ts (unit cases) and launcher-blockers.test.ts
+// (archive-path segment safety).
+// =============================================================================
+
+const CW_THROWING_REMOVER: StagingRemover = () => {
+  throw new Error("INJECTED CLEANUP FAIL");
+};
+
+describe("cleanup warnings / per-call injected remover", () => {
+  test("prepare primary PathSafetyError + per-call remover throw: same class, warning appended", () => {
+    const out = fs.mkdtempSync(path.join(os.tmpdir(), "trust-cw-inj-"));
+    try {
+      let caught: unknown;
+      try {
+        prepareStagedArchive(
+          [{ archivePath: "../escape.md", bytes: new TextEncoder().encode("x") }],
+          out,
+          CW_THROWING_REMOVER,
+        );
+      } catch (e) {
+        caught = e;
+      }
+      expect(caught).toBeInstanceOf(PathSafetyError);
+      const msg = caught instanceof Error ? caught.message : String(caught);
+      expect(msg).toMatch(/path traversal|traversal segment/);
+      expect(msg).toContain("INJECTED CLEANUP FAIL");
+    } finally {
+      try {
+        fs.rmSync(out, { recursive: true, force: true });
+      } catch {
+        void 0;
+      }
+    }
+  });
+
+  test("safeStageCleanup returns warning string when cleanup throws", () => {
+    const throwingStage: StagedArchive = {
+      stagedZip: "/nonexistent/staged.zip",
+      stageDir: "/nonexistent/stage",
+      cleanup: (): never => {
+        throw new Error("INJECTED CLEANUP FAIL");
+      },
+    };
+    const warnings = safeStageCleanup(throwingStage);
+    expect(warnings.length).toBe(1);
+    expect(warnings[0]).toContain("INJECTED CLEANUP FAIL");
+  });
+
+  test("applyCleanupWarnings appends when non-empty, returns primary when empty", () => {
+    expect(applyCleanupWarnings("primary", [])).toBe("primary");
+    const r = applyCleanupWarnings("primary", ["w1", "w2"]);
+    expect(r).toContain("primary");
+    expect(r).toContain("w1");
+    expect(r).toContain("w2");
+  });
+});
+
+describe("archive path safety / exact segment matching", () => {
+  test("legitimate '..'-containing filename is accepted; traversal segments are rejected", () => {
+    expect(() => assertSafeArchivePath("foo..bar.md")).not.toThrow();
+    expect(() => assertSafeArchivePath("../escape.md")).toThrow();
+    expect(() => assertSafeArchivePath("a/../../b.md")).toThrow();
+    expect(() => assertSafeArchivePath("..")).toThrow();
+  });
+});

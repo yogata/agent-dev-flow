@@ -1,15 +1,12 @@
 // ADF-COVERS(implementation): REQ-122-007
 // Side-effect-free distribution boundary detector pipeline.
 //
-// This module is the trust-root's port of the detector design reviewed in
-// PR #2094 (Stage B). Stage A requirement: it must NOT be a closed
-// `(REQ|ADR|DEC)` list. It must handle arbitrary producer-internal ID
-// families, concrete producer docs paths (slash / backslash / URI-encoded),
-// producer-repository fixed URLs (by configured repository identity),
-// generic/template allowances, and fail-closed on unclassified entries.
+// Minimal deterministic scan for the trust-root gate: concrete producer IDs,
+// concrete docs paths, and producer-repository GitHub URLs are extracted by
+// plain regexes and resolved by the candidate model.
 //
 // Pipeline stages (owned here):
-//   1. extract  — detectCandidates: regex + reconstruction + ownership
+//   1. extract  — detectCandidates: regex URL/docs-path/direct-ID extraction
 //   2. classify — classifyLine: assemble Detection records
 // Resolution (candidate -> classification) and the candidate model live in
 // boundary-candidate-model.ts; the gate (decideProjection) lives in
@@ -18,7 +15,6 @@
 // Side-effect-free: no I/O imports; all functions pure.
 
 import type { Detection, LineInput } from "./types.ts";
-import { detectReconstructedIds, MAX_LINE_SCAN } from "./boundary-reconstruction.ts";
 import {
   ownershipMask,
   type OwnershipEntry,
@@ -32,8 +28,10 @@ import {
   type DetectorConfig,
   type OverflowReason,
 } from "./boundary-candidate-model.ts";
-import { extractUrls } from "./boundary-url-parser.ts";
 import { extractDocsPaths } from "./boundary-docs-path-parser.ts";
+
+// Per-line scan budget shared with the gate's bounded line classification.
+export const MAX_LINE_SCAN = 65536;
 
 // Re-export so consumers import from the pipeline barrel without a cycle.
 export type {
@@ -52,10 +50,6 @@ export {
   isConcreteDocsPath,
   normalizePathToken,
 } from "./boundary-candidate-model.ts";
-export {
-  detectReconstructedIds,
-  MAX_LINE_SCAN,
-} from "./boundary-reconstruction.ts";
 
 // ---------------------------------------------------------------------------
 // Detection patterns (pipeline-local)
@@ -65,6 +59,13 @@ export {
 // UTF-8, UTF-16, UTF-32 are encoding labels and must NOT match as IDs.
 export const GENERIC_ID_PATTERN = /\b([A-Z]{2,})-(\d{1,})\b/;
 const UTF_ENCODING_LABELS = new Set(["UTF-8", "UTF-16", "UTF-32"]);
+
+// Candidate GitHub blob/raw URLs on the two recognized hosts. Word-boundary
+// guard rejects host lookalikes (nongithub.com/...); the owner/repo/(blob|raw)
+// requirement mirrors the canonical detector's URL candidate shape, and
+// classification by repository identity happens in the candidate model.
+const URL_TOKEN_PATTERN =
+  /\b(?:github\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+\/(?:blob|raw)\/|raw\.githubusercontent\.com\/[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+\/)[^\s()[\]|"'`<>{}]+/gi;
 
 function trimSnippet(line: string, maxLen: number): string {
   const t = line.trim();
@@ -78,7 +79,7 @@ function trimSnippet(line: string, maxLen: number): string {
 const MAX_TEXT_LEN = 200;
 const MAX_CANDIDATES_PER_LINE = 64;
 
-type SpannedCandidate = Exclude<Candidate, { type: "overflow" }>;
+type SpannedCandidate = Extract<Candidate, { type: "direct-id" | "path" | "url" }>;
 
 function isInsideAnySpan(span: Span, keepers: readonly Span[]): boolean {
   for (const k of keepers) {
@@ -87,12 +88,29 @@ function isInsideAnySpan(span: Span, keepers: readonly Span[]): boolean {
   return false;
 }
 
-export function detectCandidates(line: string, cfg: DetectorConfig): Candidate[] {
-  // Line-scan cap fires BEFORE any extraction (fail-closed contract).
-  if (line.length > MAX_LINE_SCAN) {
-    return [{ type: "overflow", reason: "line-scan-exceeded" }];
+function extractUrls(line: string, cap: number): {
+  readonly urls: readonly { value: string; span: Span; ownershipSpan: Span }[];
+  readonly overflow: boolean;
+} {
+  const urls: { value: string; span: Span; ownershipSpan: Span }[] = [];
+  for (const m of line.matchAll(URL_TOKEN_PATTERN)) {
+    if (urls.length >= cap) return { urls, overflow: true };
+    const start = m.index ?? 0;
+    const value = m[0];
+    // Ownership covers the path component only: query/fragment content is
+    // outside the URL's suppression range so embedded IDs stay visible.
+    const q = value.search(/[?#]/);
+    const ownershipEnd = start + (q === -1 ? value.length : q);
+    urls.push({
+      value,
+      span: { start, end: start + value.length },
+      ownershipSpan: { start, end: ownershipEnd },
+    });
   }
+  return { urls, overflow: false };
+}
 
+export function detectCandidates(line: string, cfg: DetectorConfig): Candidate[] {
   const cap = MAX_CANDIDATES_PER_LINE - 1;
   const owners: SpannedCandidate[] = [];
   const lows: SpannedCandidate[] = [];
@@ -103,17 +121,15 @@ export function detectCandidates(line: string, cfg: DetectorConfig): Candidate[]
   if (cfg.repository_identity.owner_slash_name.length > 0) {
     const r = extractUrls(line, cap - owners.length);
     for (const u of r.urls) {
-      owners.push({ type: "url", value: u.value, span: u.span, ownershipSpan: u.ownershipSpan, malformed: u.malformed });
-      if (u.ownershipSpan !== null) {
-        urlSpans.push(u.ownershipSpan);
-      }
+      owners.push({ type: "url", value: u.value, span: u.span, ownershipSpan: u.ownershipSpan });
+      urlSpans.push(u.ownershipSpan);
     }
     if (r.overflow) overflowReason = "candidate-cap-exceeded";
   }
 
   // Stage 1b: extract bounded docs-path owners. Overflow never suppressed.
-  // Pass URL ownership spans so docs paths fully contained by valid URLs are
-  // skipped before the cap check (D7: URL ownership prevents cap consumption).
+  // Pass URL ownership spans so docs paths fully contained by URLs are
+  // skipped before the cap check.
   if (overflowReason === null) {
     const r = extractDocsPaths(line, cap - owners.length, urlSpans);
     for (const p of r.paths) owners.push({ type: "path", value: p.value, span: p.span });
@@ -137,20 +153,7 @@ export function detectCandidates(line: string, cfg: DetectorConfig): Candidate[]
     }
   }
 
-  if (overflowReason === null) {
-    const recon = detectReconstructedIds(line, ownedSpans);
-    if (recon.overflow) overflowReason = recon.overflowReason ?? "token-ids-exceeded";
-    if (overflowReason === null) {
-      for (const r of recon.ids) {
-        const span: Span = { start: r.srcStart, end: r.srcEnd };
-        if (isInsideAnySpan(span, ownedSpans)) continue;
-        if (owners.length + lows.length >= cap) { overflowReason = "candidate-cap-exceeded"; break; }
-        lows.push({ type: "reconstructed-id", value: r.decoded, original: r.original, span });
-      }
-    }
-  }
-
-  // Stage 2: ownership mask resolves recon-vs-direct overlap. Overflow is
+  // Stage 2: ownership mask resolves URL/path-vs-direct overlap. Overflow is
   // appended AFTER the mask so ownership never suppresses the typed signal.
   const entries: OwnershipEntry[] = [];
   for (const o of owners) {

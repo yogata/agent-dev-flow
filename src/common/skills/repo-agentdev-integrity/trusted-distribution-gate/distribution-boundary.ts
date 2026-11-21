@@ -9,9 +9,8 @@
 //
 // The detector core lives in distribution-boundary-detector.ts (patterns,
 // config, candidate extraction, classification). Text/binary classification
-// lives in distribution-boundary-text-binary.ts. This file owns only the
-// shared types and the gate decision. The split keeps each focused module
-// under the 250 pure-LOC ceiling.
+// lives in text-binary.ts. This file owns only the shared types and the gate
+// decision. The split keeps each focused module under the 250 pure-LOC ceiling.
 //
 // Side-effect-free contract (DEC-014 decision 2):
 //   - No imports of "fs" or "path" or any I/O library.
@@ -162,4 +161,4 @@ export {
   InvalidUtf8Error,
   type ByteSource,
   type ByteClassification,
-} from "./distribution-boundary-text-binary.ts";
+} from "./text-binary.ts";

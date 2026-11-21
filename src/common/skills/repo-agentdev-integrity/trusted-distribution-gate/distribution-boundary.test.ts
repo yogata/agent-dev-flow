@@ -37,6 +37,32 @@ import {
   type DetectorConfig,
   type ByteClassification,
 } from "./distribution-boundary.ts";
+// Trust-root boundary pipeline (Stage B) domain — aliased imports to stay
+// collision-free with the canonical detector API above.
+import {
+  classifyLine as tbClassifyLine,
+  detectCandidates as tbDetectCandidates,
+  normalizePathToken as tbNormalizePathToken,
+  isConcreteDocsPath as tbIsConcreteDocsPath,
+  type DetectorConfig as TbDetectorConfig,
+} from "./boundary-pipeline.ts";
+import { decideProjection, type ClassifyFileInput } from "./boundary-gate.ts";
+import {
+  extractOwnerRepo as tbExtractOwnerRepo,
+  isProducerOwnedUrl as tbIsProducerOwnedUrl,
+  resolveCandidate as tbResolveCandidate,
+  matchedForCandidate as tbMatchedForCandidate,
+} from "./boundary-candidate-model.ts";
+import {
+  ownershipMask as tbOwnershipMask,
+  type OwnershipEntry as TbOwnershipEntry,
+} from "./boundary-candidate-ownership.ts";
+import {
+  isBoundaryScanTarget,
+  isConsumerProjectionScanTarget,
+} from "./boundary-scan-scope.ts";
+import { runBoundaryDetector } from "./boundary-runner.ts";
+import type { LoadedBlob } from "./blob-loader.ts";
 
 describe("classifyLine - concrete-id detection", () => {
   test("flags ADR-NNNN and REQ-NNNN as producer-internal", () => {
@@ -532,6 +558,7 @@ describe("Stage B regression: arbitrary producer-internal ID families", () => {
       repository_identity: DEFAULT_REPOSITORY_IDENTITY,
       producer_internal_id_prefixes: ["ADR", "REQ", "DEC", "OU", "TS", "AG"],
       distributed_workflow_control_prefixes: ["STEP", "QG"],
+      producer_metadata_enforcement: "enforce",
     };
     expect(
       resolveCandidateConfig({ type: "id", value: "OU-3" }, cfg).classification,
@@ -628,6 +655,7 @@ describe("Stage B regression: repository-identity URL classification", () => {
       },
       producer_internal_id_prefixes: ["ADR", "REQ", "DEC"],
       distributed_workflow_control_prefixes: ["STEP", "QG"],
+      producer_metadata_enforcement: "enforce",
     };
     const r = resolveCandidateConfig(
       {
@@ -647,6 +675,7 @@ describe("Stage B regression: repository-identity URL classification", () => {
       repository_identity: { owner_slash_name: "", default_branch: "" },
       producer_internal_id_prefixes: ["ADR", "REQ", "DEC"],
       distributed_workflow_control_prefixes: ["STEP", "QG"],
+      producer_metadata_enforcement: "enforce",
     };
     const r = resolveCandidateConfig(
       {
@@ -805,6 +834,7 @@ describe("Stage B regression: classifier config plumbing", () => {
       repository_identity: DEFAULT_REPOSITORY_IDENTITY,
       producer_internal_id_prefixes: ["ADR", "REQ", "DEC", "OU"],
       distributed_workflow_control_prefixes: ["STEP", "QG"],
+      producer_metadata_enforcement: "enforce",
     };
     const d = classifyContentConfig("ref OU-3", "x.md", "source", cfg);
     expect(d.length).toBe(1);
@@ -821,6 +851,7 @@ describe("Stage B regression: empty repository_identity no longer skips URL extr
     repository_identity: { owner_slash_name: "", default_branch: "" },
     producer_internal_id_prefixes: ["ADR", "REQ", "DEC"],
     distributed_workflow_control_prefixes: ["STEP", "QG"],
+    producer_metadata_enforcement: "enforce",
   };
 
   test("detectCandidates emits a url candidate even when identity is empty", () => {
@@ -1266,7 +1297,7 @@ describe("Stage B regression: Unicode / hex evasion detection", () => {
 // =============================================================================
 
 describe("producer metadata detection signal (DEC-030 decision 5)", () => {
-  const REPORT_CONFIG = { ...DEFAULT_DETECTOR_CONFIG, producer_metadata_enforcement: "report" };
+  const REPORT_CONFIG: DetectorConfig = { ...DEFAULT_DETECTOR_CONFIG, producer_metadata_enforcement: "report" };
 
   test("whole-line HTML declaration comment is detected as producer-metadata without failing the report-mode gate", () => {
     const d = classifyLineConfig(
@@ -1599,5 +1630,283 @@ describe("distribution-boundary-fs junction / symlink traversal (REQ-029-006)", 
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }
+  });
+});
+
+// =============================================================================
+// Trust-root boundary pipeline (Stage B) — minimal deterministic scan.
+// Consolidated from boundary-pipeline / boundary-pipeline-helpers /
+// boundary-candidate-model / boundary-candidate-ownership / boundary-gate /
+// boundary-scan-scope .test.ts.
+// =============================================================================
+
+const tbIdent: { owner_slash_name: string; default_branch: string } = {
+  owner_slash_name: "yogata/agent-dev-flow",
+  default_branch: "main",
+};
+const tbConfig: TbDetectorConfig = {
+  repository_identity: tbIdent,
+  producer_internal_id_prefixes: ["ADR", "REQ", "DEC", "SPEC", "IR", "RU", "TS", "AG", "OU", "EC"],
+  distributed_workflow_control_prefixes: ["STEP", "QG"],
+};
+const TB_S = { start: 0, end: 1 };
+
+function tbCls(text: string) {
+  return tbClassifyLine({ text, lineNumber: 1, filePath: "f.md", projection: "source" }, tbConfig);
+}
+
+function tbGate(text: string) {
+  const files: ClassifyFileInput[] = [{ filePath: "f.md", projection: "source", text }];
+  return decideProjection(files, "source", tbConfig).gate;
+}
+
+describe("trust-root pipeline / classifyLine", () => {
+  test("clean line yields no detections", () => {
+    expect(tbCls("Just prose, no references.").detections).toEqual([]);
+  });
+
+  test("producer-internal concrete ID is a violation", () => {
+    const r = tbCls("See ADR-0135 for the decision.");
+    expect(r.detections).toHaveLength(1);
+    expect(r.detections[0]?.classification).toBe("producer-internal");
+    expect(r.detections[0]?.category).toBe("concrete-id");
+    expect(r.detections[0]?.matched).toBe("ADR-0135");
+  });
+
+  test("unknown ID family fails closed (unclassified)", () => {
+    const r = tbCls("Track via JIRA-123.");
+    expect(r.detections[0]?.classification).toBe("unclassified");
+    expect(r.detections[0]?.category).toBe("unclassified-entry");
+  });
+
+  test("distributed workflow control labels pass the gate", () => {
+    expect(tbGate("STEP-3 and QG-2 are workflow labels.").pass).toBe(true);
+  });
+
+  test("ID template and glob placeholders pass", () => {
+    expect(tbGate("Pattern REQ-{NNNN} is fine.").pass).toBe(true);
+    expect(tbGate("Pattern REQ-* matches all.").pass).toBe(true);
+  });
+
+  test("UTF encoding labels are not ID candidates", () => {
+    expect(tbDetectCandidates("UTF-8 and UTF-16 encodings", tbConfig)).toHaveLength(0);
+  });
+
+  test("concrete docs path is a violation; README index and template pass the gate", () => {
+    const r = tbCls("Bad: docs/requirements/REQ-0149.md is concrete.");
+    const pathDet = r.detections.find((d) => d.category === "concrete-path");
+    expect(pathDet?.classification).toBe("producer-internal");
+    expect(tbGate("See docs/adr/README.md for the index.").pass).toBe(true);
+    expect(tbGate("Pattern docs/specs/<domain>/<spec>.md is fine.").pass).toBe(true);
+  });
+
+  test("backslash and percent-encoded docs paths normalize to concrete", () => {
+    const backslash = tbCls("Bad: docs\\requirements\\REQ-0001.md is concrete.");
+    expect(backslash.detections.some((d) => d.category === "concrete-path" && d.classification === "producer-internal")).toBe(true);
+    const encoded = tbCls("Bad: docs%2Frequirements%2FREQ-0001.md is encoded.");
+    expect(encoded.detections.some((d) => d.category === "concrete-path" && d.classification === "producer-internal")).toBe(true);
+  });
+
+  test("path helpers", () => {
+    expect(tbNormalizePathToken("docs\\x%2fy.md")).toBe("docs/x/y.md");
+    expect(tbIsConcreteDocsPath("docs/adr/ADR-1.md")).toBe(true);
+    expect(tbIsConcreteDocsPath("docs/adr/README.md")).toBe(false);
+    expect(tbIsConcreteDocsPath("docs/specs/<d>/x.md")).toBe(false);
+  });
+});
+
+describe("trust-root pipeline / URL classification by repository identity", () => {
+  test("producer URL is producer-internal regardless of path", () => {
+    const r = tbCls("See https://github.com/yogata/agent-dev-flow/blob/main/scripts/install.ps1");
+    const urlDet = r.detections.find((d) => d.category === "fixed-url");
+    expect(urlDet?.classification).toBe("producer-internal");
+  });
+
+  test("external repo URL is consumer-resolvable and passes the gate", () => {
+    const r = tbCls("See https://github.com/vercel/next.js/blob/main/docs/tutorial.md");
+    const urlDet = r.detections.find((d) => d.category === "fixed-url");
+    expect(urlDet?.classification).toBe("consumer-resolvable");
+    expect(tbGate("See https://github.com/vercel/next.js/blob/main/docs/tutorial.md").pass).toBe(true);
+  });
+
+  test("producer URL match is case-insensitive", () => {
+    const r = tbCls("See https://GITHUB.COM/Yogata/Agent-Dev-Flow/blob/main/x.md");
+    expect(r.detections.some((d) => d.category === "fixed-url" && d.classification === "producer-internal")).toBe(true);
+  });
+
+  test("raw.githubusercontent producer URL is detected", () => {
+    const r = tbCls("Raw: raw.githubusercontent.com/yogata/agent-dev-flow/main/docs/specs/system.md");
+    expect(r.detections.some((d) => d.category === "fixed-url" && d.classification === "producer-internal")).toBe(true);
+  });
+
+  test("userinfo deception github.com@evil.com is not a URL candidate", () => {
+    expect(tbCls("https://github.com@evil.com/yogata/agent-dev-flow/x.md").detections).toEqual([]);
+  });
+
+  test("host-suffix lookalike is not a URL candidate (left-boundary guard)", () => {
+    expect(tbCls("See notgithub.com/yogata/agent-dev-flow/blob/main/x.md").detections).toEqual([]);
+  });
+
+  test("empty repository identity suppresses URL extraction (fail-closed upstream)", () => {
+    const cfg: TbDetectorConfig = {
+      ...tbConfig,
+      repository_identity: { owner_slash_name: "", default_branch: "main" },
+    };
+    const r = tbClassifyLine(
+      { text: "See https://github.com/yogata/agent-dev-flow/blob/main/docs/foo.md", lineNumber: 1, filePath: "f.md", projection: "source" },
+      cfg,
+    );
+    expect(r.detections.find((d) => d.category === "fixed-url")).toBeUndefined();
+  });
+
+  test("URL ownership suppresses embedded IDs; query IDs after ? stay visible", () => {
+    const producer = tbCls("See https://github.com/yogata/agent-dev-flow/blob/main/docs/specs/ADR-0001.md");
+    expect(producer.detections.filter((d) => d.category === "concrete-id")).toHaveLength(0);
+    const external = tbCls("https://github.com/vercel/next.js/blob/main?ref=ADR-1");
+    expect(external.detections.some((d) => d.matched === "ADR-1" && d.classification === "producer-internal")).toBe(true);
+  });
+
+  test("scheme-less producer URL at a valid left boundary is extracted", () => {
+    const r = tbCls("See github.com/yogata/agent-dev-flow/blob/main/docs/foo.md");
+    expect(r.detections.some((d) => d.category === "fixed-url" && d.classification === "producer-internal")).toBe(true);
+  });
+
+  test("host token without blob/raw shape emits no URL (contained IDs stay visible)", () => {
+    const r = tbCls("See github.com/ADR-0001/docs/adr/ADR-0002.md");
+    expect(r.detections.filter((d) => d.category === "fixed-url")).toHaveLength(0);
+    expect(r.detections.filter((d) => d.category === "concrete-id")).toHaveLength(2);
+  });
+});
+
+describe("trust-root pipeline / candidate model", () => {
+  test("direct producer ID resolves producer-internal/concrete-id", () => {
+    expect(tbResolveCandidate({ type: "direct-id", value: "ADR-1", span: TB_S }, tbConfig)).toEqual({
+      classification: "producer-internal", category: "concrete-id",
+    });
+  });
+
+  test("unknown ID prefix resolves unclassified (fail-closed)", () => {
+    expect(tbResolveCandidate({ type: "direct-id", value: "MYSTERY-99", span: TB_S }, tbConfig)).toEqual({
+      classification: "unclassified", category: "unclassified-entry",
+    });
+  });
+
+  test("typed overflow resolves unclassified/evasion-attempt", () => {
+    expect(tbResolveCandidate({ type: "overflow", reason: "candidate-cap-exceeded" }, tbConfig)).toEqual({
+      classification: "unclassified", category: "evasion-attempt",
+    });
+  });
+
+  test("overflow matched carries the typed reason", () => {
+    expect(tbMatchedForCandidate({ type: "overflow", reason: "projection-detections-exceeded" })).toContain("[overflow");
+  });
+
+  test("extractOwnerRepo parses owner/repo from recognized hosts", () => {
+    expect(tbExtractOwnerRepo("https://github.com/vercel/next.js/blob/main/x.ts")).toBe("vercel/next.js");
+    expect(tbExtractOwnerRepo("https://evil.example/vercel/next.js/blob/main/x.ts")).toBeNull();
+  });
+
+  test("isProducerOwnedUrl matches own repo case-insensitively and fails closed on empty identity", () => {
+    expect(tbIsProducerOwnedUrl("https://github.com/Yogata/Agent-Dev-Flow/blob/main/x.md", tbIdent)).toBe(true);
+    expect(tbIsProducerOwnedUrl("https://github.com/vercel/next.js/blob/main/x.md", tbIdent)).toBe(false);
+    expect(tbIsProducerOwnedUrl("https://github.com/vercel/next.js/blob/main/x.md", { owner_slash_name: "", default_branch: "" })).toBe(false);
+  });
+});
+
+describe("trust-root pipeline / ownership", () => {
+  test("URL suppresses a contained direct ID; standalone ID survives next to a URL", () => {
+    const cs = tbDetectCandidates("See ADR-0001 and https://github.com/vercel/next.js/blob/main/x.md", tbConfig);
+    expect(cs.some((c) => c.type === "direct-id" && c.value === "ADR-0001")).toBe(true);
+    const owned = tbDetectCandidates("https://github.com/vercel/next.js/blob/main/docs/ADR-0002.md", tbConfig);
+    expect(owned.map((c) => c.type)).toEqual(["url"]);
+  });
+
+  test("ownershipMask keeps containment order url > path > direct", () => {
+    const entries: TbOwnershipEntry[] = [
+      { span: { start: 0, end: 10 }, ownershipSpan: { start: 0, end: 10 }, precedence: "url" },
+      { span: { start: 2, end: 6 }, ownershipSpan: { start: 2, end: 6 }, precedence: "direct" },
+    ];
+    expect(tbOwnershipMask(entries)).toEqual([true, false]);
+  });
+});
+
+describe("trust-root pipeline / gate (decideProjection)", () => {
+  test("producer URL fails with fixed-url failure and no errors", () => {
+    const g = tbGate("https://github.com/yogata/agent-dev-flow/blob/main/docs/foo.md");
+    expect(g.pass).toBe(false);
+    expect(g.errors).toHaveLength(0);
+    expect(g.failures[0]?.classification).toBe("producer-internal");
+    expect(g.failures[0]?.category).toBe("fixed-url");
+  });
+
+  test("unknown ID family lands in errors (gate-not-passed)", () => {
+    const g = tbGate("Track via JIRA-123.");
+    expect(g.pass).toBe(false);
+    expect(g.errors.some((d) => d.category === "unclassified-entry")).toBe(true);
+  });
+
+  test("standalone IDs beyond the candidate cap produce a typed overflow error", () => {
+    const line = Array.from({ length: 100 }, (_, i) => `ADR-${String(2000 + i).padStart(4, "0")}`).join(" ");
+    const g = tbGate(line);
+    expect(g.pass).toBe(false);
+    expect(g.errors.some((d) => d.category === "evasion-attempt")).toBe(true);
+  });
+
+  test("IDs inside an external URL do not consume the candidate cap", () => {
+    const ids = Array.from({ length: 75 }, (_, i) => `ADR-${String(1000 + i).padStart(4, "0")}`).join("/");
+    const g = tbGate(`https://github.com/vercel/next.js/blob/main/${ids}`);
+    expect(g.pass).toBe(true);
+  });
+});
+
+describe("trust-root pipeline / scan scope", () => {
+  test("tests/ and tools local/ regions are not scan targets", () => {
+    expect(isBoundaryScanTarget("src/common/skills/agentdev-x/scripts/tests/foo.test.ts")).toBe(false);
+    expect(isBoundaryScanTarget("src/common/skills/agentdev-x/tests/foo.test.ts")).toBe(false);
+    expect(isBoundaryScanTarget("src/common/tools/agentdev-gh/local/runner-local.ts")).toBe(false);
+    expect(isBoundaryScanTarget("src/common/skills/agentdev-x/SKILL.md")).toBe(true);
+    expect(isBoundaryScanTarget("scripts/install.ps1")).toBe(true);
+    expect(isBoundaryScanTarget("src/common/skills/agentdev-x/retests/foo.md")).toBe(true);
+  });
+
+  test("repo-local plugin originals are excluded from consumer projections", () => {
+    expect(isConsumerProjectionScanTarget("src/common/skills/agentdev-x/SKILL.md")).toBe(true);
+    expect(isConsumerProjectionScanTarget("src/opencode/plugins/agentdev-distribution-boundary-guard/plugin.ts")).toBe(false);
+  });
+});
+
+describe("trust-root pipeline / runner projection routing", () => {
+  function tbBlob(subset: LoadedBlob["subset"], path: string, text: string): LoadedBlob {
+    return {
+      subset,
+      entry: { path, sha256: "a".repeat(64), size: text.length },
+      bytes: new Uint8Array(text.length),
+      text,
+    };
+  }
+
+  test("excluded regions produce no detections; scan targets are detected per projection", () => {
+    const blobs: readonly LoadedBlob[] = [
+      tbBlob("runtime", "src/common/skills/agentdev-x/SKILL.md", "See ADR-0135 for the decision."),
+      tbBlob("runtime", "src/common/skills/agentdev-x/scripts/tests/stimulus.test.ts", "See ADR-0136 stimulus."),
+      tbBlob("runtime", "src/common/tools/agentdev-gh/local/runner-local.ts", "See ADR-0137 local."),
+      tbBlob("bootstrap", "scripts/install.ps1", "See ADR-0138 bootstrap."),
+    ];
+    const results = runBoundaryDetector({ blobs }, tbConfig);
+    expect(results).toHaveLength(4);
+    for (const r of results) {
+      for (const d of [...r.failures, ...r.errors]) {
+        expect(d.file).not.toContain("/tests/");
+        expect(d.file).not.toMatch(/tools\/agentdev-gh\/local\//);
+      }
+    }
+    const byProjection = new Map(results.map((r) => [r.projection, r]));
+    const source = byProjection.get("source");
+    expect(source?.failures.map((d) => d.file).sort()).toEqual([
+      "scripts/install.ps1",
+      "src/common/skills/agentdev-x/SKILL.md",
+    ]);
+    const link = byProjection.get("link");
+    expect(link?.failures.map((d) => d.file)).toEqual([".opencode/skills/agentdev-x/SKILL.md"]);
   });
 });
