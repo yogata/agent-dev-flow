@@ -30,10 +30,24 @@ implementation:
   src/common/skills/repo-agentdev-integrity/rules/index.ts:
     - REQ-122-003
     - REQ-122-011
+  # REQ-123-002（traceability 試験の契約ベース再編・3統合ファイル構成と tim 圧縮）の
+  # 実装対応。統合後の試験資産本体（traceability_core / diff_and_policy / workflow /
+  # tim_declarations_contract）。Phase 2・Issue #4170・DEL-4170-1。
+  src/common/skills/repo-agentdev-integrity/scripts/tests/traceability_core.test.ts:
+    - REQ-123-002
+  src/common/skills/repo-agentdev-integrity/scripts/tests/traceability_diff_and_policy.test.ts:
+    - REQ-123-002
+  src/common/skills/repo-agentdev-integrity/scripts/tests/traceability_workflow.test.ts:
+    - REQ-123-002
+  src/common/skills/repo-agentdev-integrity/scripts/tests/tim_declarations_contract.test.ts:
+    - REQ-123-002
 verification:
   src/common/skills/repo-agentdev-integrity/scripts/rules/untracked-residue.test.ts:
     - REQ-010-084
   src/common/skills/repo-agentdev-integrity/scripts/rules/rules.test.ts:
     - REQ-117-006
+  # REQ-123-002 の検証対応は tim_declarations_contract.test.ts の inline 宣言
+  # （REQ-012-026〜042 との和集合。duplicate-inconsistencies の単一情報源制約により
+  # sidecar とは二重登録しない）で計上される。
   src/common/skills/repo-agentdev-integrity/trusted-distribution-gate/text-binary.test.ts:
     - REQ-123-001
