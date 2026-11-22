@@ -85,6 +85,7 @@ implementation:
     - REQ-032-044
     - REQ-032-047
     - REQ-032-048
+    - REQ-125-001
 verification:
   src/common/skills/agentdev-workflow-case-close/scripts/tests/verification-evidence-record.test.ts:
     - REQ-118-007

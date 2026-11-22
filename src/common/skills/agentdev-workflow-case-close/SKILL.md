@@ -141,6 +141,7 @@ case-close は、完了判定（STEP-2 QG-4）と完了記録（記録コメン�
 ## 共通制約
 
 - **完了条件チェックボックス評価・更新は case-close の専任責務**: case-run/ driver/ 外部実行バックエンドは更新しない。case-close は別コンテキストで Issue 本文を再読込し、PR 本文を capture 入力源として最終完了判定する
+- **委譲結果サマリとゲート確認の退避先参照**: 委譲実行（case-run）の結果は、ステータス（報告用 completed / blocked / failed）、副作用有無を含む判定要約、変更ファイルパス一覧、コミット SHA、Issue/PR 番号、テスト結果の pass/fail 件数、未達事項/ブロッカー、詳細成果物パスの八項目からなる構造化サマリ（UTF-8 上限目安 3〜4 KB 以内）として受け取りうる。完了判定（QG-4）はサマリ本文を根拠とせず、サマリが参照する退避先（PR 本文の検証差分セクション・検証証跡、Issue コメント SSoT、実際の検証記録）の原文・証拠を既存権限で参照して行う。報告用ステータスの completed から PR 完了・ゲート合格・要件充足を導出しない
 - **工程記録の完了契機反映**: QG-4 合格後のクローズ契機で、判定主体として完了記録（記録種別=完了、判定根拠必須）を記録コメントとして投稿し、本文結果セクション（成果物、最終判定と根拠、残件の扱い）を更新する。検証詳細は成果物（PR 本文、対応記録コメント）を参照し、本文・コメント・PR 本文へ重複して記載しない。反映は記録コメント検証スクリプト（`agentdev-workflow-case-run/scripts/record-comments.ts`、決定的処理。種別別必須項目検証、結果セクション構築と既存本文への適用）による事前検査を経由し、Custom Tool `agentdev_gh` の comment_create / issue_update で行う。実行の申告だけで完了扱いにしない（実行担当は報告、case-close は完了条件と証拠を照合する）。手順詳細は references/cleanup-and-capture.md の STEP-5 参照
 - **Epic Issue 本文実行構成表の更新は case-close 単一書き手**: case-run は読み取りのみ、case-auto は Wave 反復制御のみで直接書き込まない（last-write-wins 競合防止）。Case Issue 工程記録の取りまとめによる記録契機別の Epic 反映（子状態集約・全体条件評価）は、case-close と同一の per-Epic 排他制御・局所直列化の下で Epic Issue 本文へ書き込む（手順の正は `agentdev-epic-tracker`）。E5 の closing 書き込みは直列化区間内での最新取得→マージ→更新により行い、取りまとめ反映の集約セクションを消去しない
 - **Capture 境界**: intake/ learning を別々の成果物として扱い、PR 本文のみを capture 入力源とする（一時会話コンテキスト不入力）

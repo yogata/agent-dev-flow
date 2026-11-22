@@ -4,7 +4,9 @@
 // case-auto（orchestration stage・stage 内並列・stage 間 fan-in・Wave 反復）、
 // および実行担当サブエージェントの adapter 契約（3点ゲート・成果物未確認の
 // 成功禁止）の workflow skill 定義が既存契約の必須要素を保持していることを
-// 構造照合で検証する。本 Issue（Wave 3）では live な case 全体の再実行ではなく、
+// 構造照合で検証する。TS-001 委譲結果返却サマリ契約（八項目・UTF-8 上限目安
+// 3〜4 KB・詳細退避・4状態非変更・雛形バイト数測定）の pin を含む。
+// 本 Issue（Wave 3）では live な case 全体の再実行ではなく、
 // 工程契約の適合確認を対象とする。
 
 import { describe, expect, test } from "bun:test";
@@ -33,7 +35,10 @@ function resolveRepoRoot(fromDir: string): string {
 const repoRoot = resolveRepoRoot(import.meta.dir);
 const caseRunSkill = readFileSync(join(repoRoot, "src", "common", "skills", "agentdev-workflow-case-run", "SKILL.md"), "utf8");
 const caseAutoSkill = readFileSync(join(repoRoot, "src", "common", "skills", "agentdev-workflow-case-auto", "SKILL.md"), "utf8");
+const caseCloseSkill = readFileSync(join(repoRoot, "src", "common", "skills", "agentdev-workflow-case-close", "SKILL.md"), "utf8");
+const backlogAutoSkill = readFileSync(join(repoRoot, "src", "common", "skills", "agentdev-workflow-backlog-auto", "SKILL.md"), "utf8");
 const adapterSkill = readFileSync(join(repoRoot, "src", "common", "skills", "agentdev-case-run-execution-adapter", "SKILL.md"), "utf8");
+const delegationReference = readFileSync(join(repoRoot, "src", "common", "skills", "agentdev-case-run-execution-adapter", "references", "harness-delegation.md"), "utf8");
 const ghToolReadme = readFileSync(join(repoRoot, "src", "common", "tools", "agentdev-gh", "README.md"), "utf8");
 
 describe("TS-009 case-run 工程契約（委譲1件・result 4状態・成果物検証つき成功）", () => {
@@ -82,5 +87,61 @@ describe("TS-009 adapter 委譲契約（3点ゲート・成果物検証）", () 
 
   test("副作用操作は読み戻し検証（VERIFY）を通過した場合のみ成功を返す（Tool 操作契約の維持）", () => {
     expect(ghToolReadme).toContain("副作用操作（side-effect）は読み戻し照合（VERIFY）を通過した場合のみ成功を返す");
+  });
+});
+
+describe("TS-001 委譲結果返却サマリ契約（八項目・3〜4 KB 上限・詳細退避）", () => {
+  const summaryItems = [
+    "ステータス",
+    "判定要約",
+    "変更ファイルパス一覧",
+    "コミット SHA",
+    "Issue/PR 番号",
+    "pass/fail 件数",
+    "未達事項",
+    "詳細成果物パス",
+  ];
+
+  test("adapter 返却契約に八項目・UTF-8 上限目安 3〜4 KB・詳細退避・4状態非変更を保持する", () => {
+    for (const item of summaryItems) {
+      expect(adapterSkill).toContain(item);
+    }
+    expect(adapterSkill).toContain("最終返却本文のサマリ上限");
+    expect(adapterSkill).toContain("3〜4 KB");
+    expect(adapterSkill).toContain("退避先のパス/URL 参照のみを含める");
+    for (const state of ["completed-pr", "blocked", "failed", "delegation-unavailable"]) {
+      expect(adapterSkill).toContain(state);
+    }
+    expect(adapterSkill).toContain("実行未試行のため実行担当のサマリ返却対象外");
+    expect(adapterSkill).toContain("サマリの `completed` から PR 完了やゲート合格を導出しない");
+  });
+
+  test("4 workflow の受領側契約に返却サマリ上限と退避先参照を保持する", () => {
+    expect(caseRunSkill).toContain("委譲応答の返却サマリ上限");
+    for (const skill of [caseRunSkill, caseAutoSkill, caseCloseSkill, backlogAutoSkill]) {
+      for (const item of summaryItems) {
+        expect(skill).toContain(item);
+      }
+      expect(skill).toContain("3〜4 KB");
+      expect(skill).toContain("退避先");
+    }
+    expect(caseAutoSkill).toContain("必要なゲート判定は退避先の原文・証拠を参照して行う");
+    expect(caseCloseSkill).toContain("完了判定（QG-4）はサマリ本文を根拠とせず");
+    expect(backlogAutoSkill).toContain("完遂判定は既存の突合手続（義務スナップショット・対応表）で行う");
+  });
+
+  test("返却サマリ雛形の八項目構造を保持し、雛形本文の UTF-8 バイト数が上限目安 3〜4 KB 以内である", () => {
+    expect(delegationReference).toContain("返却サマリ雛形");
+    for (const item of summaryItems) {
+      expect(delegationReference).toContain(item);
+    }
+    expect(delegationReference).toContain("雛形本文に展開しない");
+    const templateStart = delegationReference.indexOf("## 委譲結果サマリ");
+    expect(templateStart).toBeGreaterThanOrEqual(0);
+    const templateEnd = delegationReference.indexOf("```", templateStart);
+    expect(templateEnd).toBeGreaterThan(templateStart);
+    const templateBody = delegationReference.slice(templateStart, templateEnd);
+    const bytes = Buffer.byteLength(templateBody, "utf8");
+    expect(bytes).toBeLessThanOrEqual(4096);
   });
 });

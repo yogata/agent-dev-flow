@@ -84,6 +84,14 @@ case-run は result から PR URL（PR番号）を取り出す。
 - **`failed`**: repository context で回答不能な blocker の内容。実行担当サブエージェントが Issue コメントに構造化記録済み。case-run はエラー処理に従い停止、ユーザー報告
 - **`delegation-unavailable`**: 実行インフラが委譲を起動できなかった状態。実行未試行のため `pending` に戻す
 
+### 返却本文のサマリ上限（八項目・詳細退避）
+
+実行担当サブエージェントから case-run への最終返却本文は、ステータス（報告用 `completed` / `blocked` / `failed`）、副作用有無を含む判定要約、変更ファイルパス一覧、コミット SHA、Issue/PR 番号、テスト結果の pass/fail 件数、未達事項/ブロッカー、詳細成果物パスの八項目で構成し、UTF-8 本文の上限目安を 3〜4 KB 以内とする。該当のない項目はその旨を記し、未確認の結果を成功に置換しない。
+
+- 長大な詳細は返却本文に含めず、PR 本文・Issue コメント等の既存権限で参照できる場所へ退避し、返却本文には退避先のパス/URL 参照のみを含める
+- 報告用ステータスは result 4状態を変更しない。case-run は返却本文のサマリと3点ゲートの必須欄（commit hash・PR URL または停止理由と再開情報）を突合して進行を判定し、サマリの `completed` から PR 完了やゲート合格を導出しない
+- 契約の正は委譲契約 Design「親セッション向け委譲結果サマリ」節、配布物側の正は `agentdev-case-run-execution-adapter` SKILL.md「最終返却本文のサマリ上限（八項目・3〜4 KB・詳細退避）」節。受領・返却の雛形は後述「返却サマリ雛形（委譲契約必須テンプレート）」参照
+
 ### 終了コード、異常終了の活用
 
 - 委譲 result が空、エラー含み、異常終了時は、即 `failed` とせず「実装完了、検証未完了」として扱う。詳細は本ファイル後述「委譲起動失敗、異常終了時事後処理」参照
@@ -266,6 +274,25 @@ structured_context の生成（委譲 prompt 構築）は、次の抽出制約�
 
 case-run は委譲プロンプト構築時に本テンプレート構造を維持し、実行担当サブエージェントからの result に含まれる回収項目を PR 本文に転記する。
 
+## 返却サマリ雛形（委譲契約必須テンプレート）
+
+実行担当サブエージェントが case-run へ返す最終返却本文は次の雛形に従う。上限目安は UTF-8 本文で 3〜4 KB 以内である。該当のない項目は「該当なし」と記す。長大な詳細（実装過程、検証ログ全体、調査過程等）は退避先（PR 本文・Issue コメント等の既存権限で参照できる場所）のパス/URL 参照へ置き換え、雛形本文に展開しない。
+
+```markdown
+## 委譲結果サマリ
+
+- ステータス: {completed / blocked / failed（報告用。result 4状態契約は変更しない）}
+- 判定要約（副作用有無を含む）: {1〜3行}
+- 変更ファイルパス一覧: {パス一覧、または退避先参照}
+- コミット SHA: {SHA}
+- Issue/PR 番号: {番号と URL}
+- テスト結果 pass/fail 件数: {件数、または退避先参照}
+- 未達事項/ブロッカー: {該当なし または 要約}
+- 詳細成果物パス: {PR URL、Issue コメント、退避先のパス/URL 参照}
+```
+
+報告用ステータスの `completed` は result `completed-pr` に対応するが、PR 完了やゲート合格の導出は3点ゲート（commit hash・PR URL の必須欄検査）で行う。`delegation-unavailable` は実行未試行のため本雛形の対象外である。
+
 ## 委譲契約必須要約（雛形埋め込み）
 
 委譲プロンプトには次の必須契約要約を埋め込む。委譲先が毎回参照資料を読み直さなくても済む程度の要約であり、正規契約の代替ではない。各項目の正規原本への参照先を明示し、委譲先は詳細判断時に参照先へ戻る。要約の記述が原本と矛盾して読める場合は常に原本を正とする。
@@ -277,6 +304,7 @@ case-run は委譲プロンプト構築時に本テンプレート構造を維�
 - worktree 隔離: 引き渡された worktree root 配下でのみ作業する。メインリポジトリ・他 worktree でのファイル編集は禁止（検知時は直ちに停止し failed、詳細は Issue コメントに構造化記録）。実装開始前に worktree 内判定で自己検証する。正: adapter skill「worktree 隔離の遵守（禁止事項）」節
 - PR 本文の必須セクション: Refs（Issue 番号）、実行識別情報（adf_delegation へ委譲単位識別子を転記）、検証差分（実行工程 case-run の行ごとに観測証跡を記録）、Findings / Capture候補、Design確定候補。正: adapter skill「実行担当サブエージェントの責務」節、agentdev-workflow-templates の実行識別情報・検証差分セクション規約
 - SSoT チャネル: 成功（completed-pr）は PR 本文、blocked / failed は Issue コメント。一時 session 通信・ローカル変数・中間ファイルは SSoT ではない。正: adapter skill「Result 契約（最小契約）」節の SSoT 表
+- 返却サマリ上限: 最終返却本文はステータス（報告用 completed / blocked / failed）、副作用有無を含む判定要約、変更ファイルパス一覧、コミット SHA、Issue/PR 番号、テスト結果 pass/fail 件数、未達事項/ブロッカー、詳細成果物パスの八項目で構成し、UTF-8 上限目安 3〜4 KB 以内。長大な詳細は PR 本文・Issue コメント等の既存権限で参照できる場所へ退避し、返却本文には退避先のパス/URL 参照のみを含める。報告用ステータスは result 4状態を変更しない。正: adapter skill「最終返却本文のサマリ上限（八項目・3〜4 KB・詳細退避）」節、委譲契約 Design「親セッション向け委譲結果サマリ」節
 - 禁止事項の要点: 完了条件チェックボックス更新（case-close 専任）、Issue 進行状況更新（取りまとめ専任）、raw gh CLI による GitHub 書込み（Custom Tool 経由）、配布物本文への concrete ID 直書き（対応関係は traceability/ sidecar へ）、`.agentdev/intake/` `.agentdev/learning/` の直接変更、生 gh WRITE 迂回、スイープ stage（`git add -A` 等）。正: 委譲 prompt の MUST NOT DO セクション、capture-boundaries reference
 - 検証用一時資材と後片付け: 検証用remote、clone、bare repository、退避ログ、補助スクリプト、専用server・process等の検証用一時資材（worktree クリーンアップとは別の検証作業の資材）は、許可された範囲で作成・利用し、安全条件が成立する範囲で回収する。後片付けの実施結果、確認根拠、未処理事項（未回収・確認不能・引継ぎ）を報告へ含め、継続利用する資材は引継ぎ事項として報告する。許可範囲を超える必要副作用は既存の停止・判断経路を利用する。正: delegation-contracts Design「検証用一時資材の作成・報告義務」節、検証に伴う一時資材の取扱いと後片付け責任 Design「一時資材の配置・利用・回収」節
 </delegation-contract-summary>
