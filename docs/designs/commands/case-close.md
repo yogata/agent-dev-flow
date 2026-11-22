@@ -21,6 +21,7 @@ updated: "2026-11-18"
 <!-- ADF-COVERS(design): REQ-032-040, REQ-032-041（QG-4 file-level split 標準化と bun 版更新時再検証の実行構成設計） -->
 <!-- ADF-COVERS(design): REQ-030-032 -->
 <!-- ADF-COVERS(design): REQ-032-047, REQ-032-048（QG-4 最終受け入れの検証義務に基づく試験範囲選択と最終受け入れ判定の design 実体） -->
+<!-- ADF-COVERS(design): REQ-125-001 -->
 
 # case-close Design
 
@@ -50,6 +51,10 @@ case-run / 実行担当サブエージェント / 外部実行バックエンド
 
 - Issue番号（単一 Issue または Epic Issue）
 - PR番号（または自動検出、Epic Wave クローズ時は各子Issue の PR を Epic Issue 本文から特定）
+
+## 完了判定と委譲結果サマリ
+
+子への委譲と親への返却には [委譲結果サマリ](../workflows/delegation-contracts.md#親セッション向け委譲結果サマリ) を適用する。QG-4 を含む完了判定の確認対象は既存の正規証拠とし、子の判定や要約で独立再検査を代替しない。
 
 ## 出力
 
