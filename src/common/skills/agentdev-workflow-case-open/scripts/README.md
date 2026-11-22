@@ -1,6 +1,6 @@
-# `agentdev-workflow-case-open` scripts（横断依存検査エンジン・定義PR準備機械工程）
+# `agentdev-workflow-case-open` scripts（横断依存検査エンジン・定義PR準備機械工程・定型状態確認集約）
 
-本ディレクトリは case-open の機械工程 script 群（`scripts/src/prepare_definition_pr.ts`〔定義PR準備〕と `scripts/src/inspect_cross_dependencies.ts`〔横断依存検査エンジン〕）の script 契約を定める。横断依存検査エンジンは case-open（STEP-5 冪等確認）と case-ready（トレーサビリティ完全性ゲート）の両 workflow skill が共有する単一実装である。
+本ディレクトリは case-open の機械工程 script 群（`scripts/src/prepare_definition_pr.ts`〔定義PR準備〕と `scripts/src/inspect_cross_dependencies.ts`〔横断依存検査エンジン〕と `scripts/src/collect_status_summary.ts`〔定型状態確認集約〕）の script 契約を定める。横断依存検査エンジンは case-open（STEP-5 冪等確認）と case-ready（トレーサビリティ完全性ゲート）の両 workflow skill が共有する単一実装である。定型状態確認集約は case-open・case-run・case-close・backlog-review・req-define の各 workflow skill から共有される単一実装である。
 
 ## 構成
 
@@ -11,9 +11,16 @@ scripts/
 ├── lib/
 │   ├── cross_dependency_types.ts   # 入力・報告の型とパス正規化
 │   ├── cross_dependency_engine.ts  # 検出条件 (a)(b) の比較ロジック（純粋関数）
-│   └── shared_area_registration.ts # 共有領域実ファイルの登録状態の機械的読取
-└── src/
-    └── inspect_cross_dependencies.ts # CLI 入口
+│   ├── shared_area_registration.ts # 共有領域実ファイルの登録状態の機械的読取
+│   ├── definition-traceability-gate.ts # 定義トレーサビリティゲートの判定
+│   ├── gate-execution.ts           # 正規所有共有 lib への shim（再エクスポートのみ）
+│   ├── status_summary_types.ts     # 定型状態確認集約の入力・報告の型
+│   └── status_summary.ts           # 定型状態確認集約のコア（純粋関数）
+├── src/
+│   ├── prepare_definition_pr.ts      # 定義PR準備
+│   ├── inspect_cross_dependencies.ts # 横断依存検査 CLI 入口
+│   └── collect_status_summary.ts     # 定型状態確認集約 CLI 入口
+└── tests/                            # producer 側リポジトリのテストスイート
 ```
 
 ## I/O 契約
@@ -22,6 +29,37 @@ scripts/
 - 出力: stdout に報告 JSON
 - 終了コード: 検査成立時 0（警告の有無にかかわらず。警告はエラーではなくゲート遷移判定に影響しない）、引数・入力の形式エラー時 1
 - 決定性: 同一入力から同一の JSON を返す（冪等再実行時の警告再提示の一貫性）
+
+## 定型状態確認集約（collect_status_summary.ts）
+
+git 作業状態・対象ファイル群の整合・滞留キュー・GitHub 状態の確認を 1 回の実行で構造化 JSON サマリへ集約する。読取専用であり、gh は読取サブコマンド（issue/pr × list/view）の許可リストに限定する（許可外サブコマンドは実行前に拒否する）。
+
+### 入出力
+
+- 入力:
+  - `--sections`（集約対象セクションの comma 区切り: `git,files,staleness,issues`。既定 `git`）
+  - `--files`（files セクションの対象相対パス comma 区切り）
+  - `--staleness`（staleness セクションのキューディレクトリ相対パス comma 区切り）
+  - `--issues-args`（issues セクションの gh 引数文字列。例: `issue list --state open --json number,title,updatedAt --limit 50`）
+  - `--root`（基準ディレクトリ。省略時 cwd）、`--limit`（既定 10）、`--offset`（既定 0）、`--max-bytes`（既定 15360）、`--jq`（出力の dot path 限定）
+- 出力: stdout へ報告 JSON（`--jq` 指定時は `{ path: 値 }` の抽出 JSON）
+- 終了コード: 集約成立時 0（セクション単位の empty / partial を含む）、集約不成立（出力上限超過・全セクション取得不能）または引数形式エラー時 1
+
+### セクション状態の区別
+
+| 状態 | 意味 |
+|---|---|
+| `ok` | 取得成立。滞留ゼロなど対象 0 件が正常なセクションは ok |
+| `empty` | 検索系の結果 0 件。空を対象なし・成功の証拠に使わない（読取補完規律の機械的保持） |
+| `partial` | 一部読取失敗を含む。`error` に内訳 |
+| `unavailable` | セクション全体の取得不能。他セクションの集約を妨げない |
+| `skipped` | 要求されていないセクション |
+
+`total` と `returned` を別々に報告し、`offset`/`limit` で部分集合を取得できる。出力バイト数が `--max-bytes` を超えた場合は集約自体を不成立（ok: false、終了コード 1）とし、切り詰め後の再読込経路を提供しない（呼出側は `--limit`/`--files`/`--jq` で対象を絞り直す）。
+
+### 検証専用経路
+
+本 CLI は読取と純粋集計のみで副作用を持たない（gate_effect: none）。単体テスト（`tests/collect-status-summary.test.ts`）が偽 collectors 注入により、全セクション成立・大量結果の件数上限・空検索と滞留ゼロの区別・部分取得不能の区別・出力上限超過の fail-closed・範囲指定・gh 許可リスト拒否を検証する。
 
 ## 検出条件
 

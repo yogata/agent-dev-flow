@@ -84,6 +84,7 @@ req-define workflow は次の11 STEP で構成する。
 - `agentdev-adversarial-review`: req-define の review 呼出
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
 - `agentdev-traceability`: トレーサビリティ能力（coverage、impact。既存の明示的な対応関係と変更影響候補の確認。fail-open）
+- 定型状態確認集約（case-open スキル配下の読取専用の単一実装。実行時パス `.opencode/skills/agentdev-workflow-case-open/scripts/src/collect_status_summary.ts`）: git 作業状態・対象ファイル整合・滞留キュー・GitHub 状態の定型確認の機械的集約。本スキルは複製実装を持たない（重複実装禁止）
 
 ## トレーサビリティ能力の利用
 

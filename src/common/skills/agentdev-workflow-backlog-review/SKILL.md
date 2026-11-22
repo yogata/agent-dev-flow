@@ -89,6 +89,7 @@ RU 実ファイルと docs/knowledge/ の知識文書実ファイル（STEP-7 �
 - `agentdev-adversarial-review`: backlog-review の review 呼出（共通契約の正規所有者は adversarial-review Design、adversarial-review caller integration 共通契約）
 - `agentdev-git-worktree`: ドメイン状態永続化プロシージャ（並列実行安全ステージング、構造化エラー形式）
 - `agentdev-project-extensions`: project extension 読込（5セクション、fail-open。document-model Design の文書7分類モデルは extension 経由で参照）
+- 定型状態確認集約（case-open スキル配下の読取専用の単一実装。実行時パス `.opencode/skills/agentdev-workflow-case-open/scripts/src/collect_status_summary.ts`）: git 作業状態・対象ファイル整合・滞留キュー・GitHub 状態の定型確認の機械的集約。本スキルは複製実装を持たない（重複実装禁止）
 
 ## 候補探索（独立探索手段）
 

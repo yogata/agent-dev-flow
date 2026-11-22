@@ -55,6 +55,7 @@ implementation:
     - REQ-118-002
     - REQ-118-004
     - REQ-125-004
+    - REQ-125-006
   src/common/skills/agentdev-workflow-case-open/references/traceability-and-open-dependency.md:
     - REQ-125-004
   src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md:
@@ -107,6 +108,7 @@ implementation:
     - REQ-061-030
   src/common/skills/agentdev-workflow-case-open/scripts/README.md:
     - REQ-009-053
+    - REQ-125-006
   src/common/skills/agentdev-workflow-case-open/scripts/src/inspect_cross_dependencies.ts:
     - REQ-029-016
     - REQ-030-012

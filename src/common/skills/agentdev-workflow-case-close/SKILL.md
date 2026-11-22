@@ -49,3 +49,4 @@ QG-4 と完了記録には、case-run の Issue 記録と PR 本文に照らし�
 - 各検証を対応記録コメントへ記録する。形式は検証差分セクション規約に従い、case-run の PR 本文を比較元として、新規、修正済み、既出、撤回、無効を区別する。
 - Epic 本文は case-close の単一書込みとし、closing 書込みと取りまとめを同一の per-Epic 排他制御・局所直列化の下で最新取得・マージ・更新する。Wave の Design 判定は直列集約し、既存の取りまとめ記録を消さない。
 - Capture は PR 本文のみを入力に intake / learning を分離し、各経路の規則で永続化する。コミットは Issue の意図しない自動終了を起こさない参照形式を使う。
+- 定型状態確認集約（case-open スキル配下の読取専用の単一実装。実行時パス `.opencode/skills/agentdev-workflow-case-open/scripts/src/collect_status_summary.ts`）: git 作業状態・対象ファイル整合・滞留キュー・GitHub 状態の定型確認の機械的集約。本スキルは複製実装を持たない（重複実装禁止）

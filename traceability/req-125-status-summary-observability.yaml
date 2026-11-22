@@ -1,0 +1,15 @@
+component: req-125-status-summary-observability
+implementation:
+  src/common/skills/agentdev-workflow-case-open/scripts/lib/status_summary_types.ts:
+    - REQ-125-006
+  src/common/skills/agentdev-workflow-case-open/scripts/lib/status_summary.ts:
+    - REQ-125-006
+  src/common/skills/agentdev-workflow-case-open/scripts/src/collect_status_summary.ts:
+    - REQ-125-006
+  scripts/self/observability/collect-opencode-metrics.ts:
+    - REQ-125-007
+verification:
+  src/common/skills/agentdev-workflow-case-open/scripts/tests/collect-status-summary.test.ts:
+    - REQ-125-006
+  scripts/self/observability/collect-opencode-metrics.test.ts:
+    - REQ-125-007

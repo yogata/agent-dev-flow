@@ -64,6 +64,7 @@ case-open command は公開 interface と本スキルへの dispatch のみを�
 - `agentdev-adversarial-review`（review 呼出）、`agentdev-learning-capture` / `agentdev-intake-pipeline`（deviation capture 委譲）、`agentdev-git-worktree`（並列実行安全ステージング）、`agentdev-project-extensions`（extension 読込、fail-open）
 - 横断依存検査エンジン（`scripts/src/inspect_cross_dependencies.ts`）: STEP-5 比較の単一実装。case-ready 完全性ゲートも同一実装を共有（重複実装禁止）
 - 検証用一時資材の後片付け責任: 配置規則と権限に従い作成・利用し、終了時に安全条件が成立する範囲で回収し、結果・根拠・未処理事項を作業記録経路へ返す（詳細は references/traceability-and-open-dependency.md。該当時のみ読む）
+- 定型状態確認集約（本スキル配下 `scripts/src/collect_status_summary.ts`）: git 作業状態・対象ファイル整合・滞留キュー・GitHub 状態の定型確認を 1 回の実行で構造化 JSON サマリへ集約する読取専用の単一実装（gh 引数は読取サブコマンドの許可リストに限定。script 契約は本スキル配下 scripts/README.md）。case-run・case-close・backlog-review・req-define も同一実装を共有する（重複実装禁止）
 
 ## トレーサビリティ能力の利用
 

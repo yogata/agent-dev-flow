@@ -43,6 +43,7 @@ worktree・ブランチの作成はべき等。Epic の子 Issue では STEP-S3 
 - **blocked 正規再開経路**: 既存 Issue scope 内で処理可能な内部実装上の影響は自律処理する。Issue scope、完了条件、REQ/Decision/Design、必須品質統制の追加変更が必要な場合は blocked とし、Root Case 指定による正規再開経路（経路解決は Root Case の正規状態、Epic 実行構成、既存成果物、実行の生存状況の照合で行う。人間に留保された判断の新規確定が必要な場合は req-define、再合意済みの場合は case-revise）に従う。staleness check で差異を検出した場合も Issue 本文を単独で書き換えず、差異を報告して blocked とし同一の正規再開経路に従う。
 - STEP-S4 で一時資材の作成・利用・回収義務を渡し、STEP-S5 で片付け結果・根拠・残件を確認する。権限外の副作用は停止する。Findings と Design 確定候補は PR 本文の別節に記録する。
 - **docs 整合性検査連携**: 文書変更時は対象 root で docs 整合性検査を実行し、結果を PR 本文に記録して case-close へ連携する。
+- 定型状態確認集約（case-open スキル配下の読取専用の単一実装。実行時パス `.opencode/skills/agentdev-workflow-case-open/scripts/src/collect_status_summary.ts`）: git 作業状態・対象ファイル整合・滞留キュー・GitHub 状態の定型確認の機械的集約。本スキルは複製実装を持たない（重複実装禁止）
 
 ## トレーサビリティ能力の利用
 
