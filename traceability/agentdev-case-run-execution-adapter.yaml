@@ -21,6 +21,7 @@ implementation:
     - REQ-118-005
     - REQ-118-008
     - REQ-125-001
+    - REQ-125-004
   src/common/skills/agentdev-case-run-execution-adapter/references/adversarial-review-integration.md:
     - REQ-014-016
   src/common/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md:

@@ -3,245 +3,56 @@ name: agentdev-case-run-execution-adapter
 description: "case-run external execution adapter. USE FOR: connecting case-run issue execution to 実行担当サブエージェント via adapter skill delegation, handling completed-pr/blocked/failed/delegation-unavailable results. DO NOT USE FOR: workflow state management, Issue completion checkbox evaluation."
 ---
 
-
 # case-run 外部実行アダプター（External Execution Adapter）
 
-本スキルは骨格（制御フロー）と references/ 詳細仕様の2層構成である。実行手順の詳細規律、用語境界、回復手順、STEP model 連携は references/ 配下へ分離している。通常経路で全 reference を無条件読込せず、必要な条件に応じて遅延読み込みする。
-case-run が1 Issue 単位（または1 Wave 単位）の実装作業を実行担当サブエージェントへ接続する際のアダプタープロトコル（adapter protocol）を定義する知識ベースである。
-adapter skill 経由での委譲起動、委譲 prompt 内で実行 command を指定する委譲に基づく。
-対象を case-run に限定する。
+case-run が1 Issue 単位の実装作業を実行担当サブエージェントへ接続する際のアダプタープロトコルを定義する。委譲起動に基づき、詳細は references/ へ分離し遅延読み込みする。Epic/Wave orchestration、worktree 管理、完了条件チェックボックス評価は対象外。
 
-- **参照元**: `case-run`（実行担当サブエージェント起動時）
-- **特性**: アダプタープロトコルの宣言的定義のみ提供する。Epic/Wave orchestration、worktree 管理、完了条件チェックボックス評価は本スキルの対象外。
+## 入力/出力/副作用と実行モデル
 
-## 入力
+**入力**: case-run から引き渡される worktree root（相対パス）、ブランチ名、対象 Issue 番号、実行 command 指定。**出力**: result 契約の4状態いずれか（`completed-pr` は PR番号/ PR URL を伴う）。**副作用**: worktree root 配下でのみファイル編集。PR 作成・Issue コメント追加は実行担当が Custom Tool `agentdev_gh` 経由で実施。
 
-- case-run から引き渡される worktree root（相対パス）、ブランチ名、対象 Issue 番号、委譲 prompt 内の実行 command 指定
-
-## 出力
-
-- result 契約の4状態いずれか（`completed-pr` は PR番号/ PR URL を伴う）
-
-## 副作用
-
-- worktree root 配下でのみファイル編集を行う（メインリポジトリには触れない）
-- PR 作成、Issue コメント追加（comment_create）は実行担当サブエージェントが実施（Custom Tool `agentdev_gh` 経由）
-
-## 実行モデル
-
-```
-case-run (orchestration)
-  └── adapter skill を読み込んだ実行担当サブエージェントへ委譲（委譲 prompt 内で実行 command を指定）
-        ├── Issue 本文・受け入れ基準読込（実行 command が success criteria に分解）
-        ├── Decision / REQ / Design / docs / repository context 再確認
-        ├── 実行 command による evidence-backed 実装・品質ゲート（code review + QA review + gate review）
-        ├── test strategy 項目の test-fix ループ（項目ごと検証、不合格時 fix-and-reverify / record-in-findings、全項目処理まで反復）
-        ├── blocker 処理
-        ├── PR 作成操作（agentdev_gh pr_create）による PR 作成（PR URL を result に格納）
-        └── result を case-run へ返却
-```
-
-- **case-run 本体**: 単一 Issue で実行担当サブエージェントを委譲起動し（委譲1件。Epic・Wave の実行制御は case-auto orchestration stage 3 が単一所有し、case-run に独立実行枠は存在しない）、result を処理する。実装実行そのものは行わない。起動手段は AGENTS.md および references/harness-delegation.md 参照。
-- **実行担当サブエージェント**: 外部実行基盤（AGENTS.md で選定）が提供するエージェント型。1 Issue あたり1起動。adapter skill（`agentdev-case-run-execution-adapter`）を読み込み、委譲 prompt 内で実行 command を起動する。仕様を再解釈、再設計しないアダプターである。
-- **実行 command（harness が提供）**: 委譲 prompt 内で指定される実行 command（skill ではない）。Issue を success criteria に分解、各 criterion に observable evidence を要求、品質ゲートを実行する。各ツール呼び出しの保護（timeout 等）は harness 側が提供する。command の具体名、起動手段は AGENTS.md および references/harness-delegation.md 参照。
-- **外部実行基盤（external execution boundary）**: 実行担当サブエージェントの背後で実行エンジンとして振る舞う外部実行境界。本境界は I/O 境界要件により I/O 境界 Design が正規所有し、case-run は自身で所有せず I/O 境界 Design へ委譲する。plan artifact 等の中間成果物の内部構造には依存しない。最終結果は **PR URL** で受領する（透明）。
-
-## external execution boundary と harness execution mechanism
-
-本 adapter skill は external execution boundary への委譲契約を使用し、harness execution mechanism を ADF 規範所有対象外として扱う。区分と正規所有者の一覧、外部成果物（PR URL 受領・中間成果物非依存）の取扱いの詳細は [references/execution-boundary-terms.md](references/execution-boundary-terms.md) を参照（遅延読み込み）。用語の正規定義と所有者は delegation-contracts Design「case 実行責務の 4 用語と委譲」を SSoT とする。
+case-run 本体は単一 Issue で実行担当サブエージェントを委譲起動し（委譲1件、Epic・Wave の実行制御は case-auto orchestration stage 3 が単一所有）、result を処理する。実装実行は行わない。実行担当サブエージェント（外部実行基盤〔AGENTS.md で選定〕のエージェント型、1 Issue あたり1起動、再解釈・再設計しないアダプター）は委譲 prompt 内で実行 command（harness 提供。success criteria へ分解・observable evidence 要求・品質ゲート実行）を起動する。外部実行基盤は I/O 境界 Design 正規所有で、中間成果物に依存せず PR URL で受領する（透明）。起動手段・用語境界・正規所有者は references/harness-delegation.md・references/execution-boundary-terms.md 参照（用語 SSoT: delegation-contracts Design「case 実行責務の 4 用語と委譲」）。
 
 ## 実行担当サブエージェントの責務
 
-実行担当サブエージェントは以下を順に実行する:
+1. **Issue 読込と context 再確認**: Issue 本文・受け入れ基準を読み込み（実行 command が success criteria に分解）、Decision/ REQ/ Design/ docs/ repository context を再確認して矛盾を排除（詳細は references/execution-procedure-details.md 参照）
+2. **実装、検証、PR 作成**: 実行 command に従い evidence-backed に実装し、品質ゲートを通して `agentdev_gh` の pr_create で PR を作成する
+   - 対応宣言（実装・検証対応を sidecar または inline で明示、変更ファイル理由の自動対応付け禁止）等の詳細は references/execution-procedure-details.md 参照
+   - PR 本文に実行識別情報セクションと検証差分セクション（5分類: 新規、修正済み、既出、撤回、無効）を記録する。形式は `agentdev-workflow-templates` の実行識別情報セクション規約・検証差分セクション規約に従い、各検証ごとに実行工程 case-run の行として記録する
+   - PR 作成前に `agentdev-traceability` の check で対象要件を9検出項目（findings 種別）で検査する: `malformed-declarations`、`unknown-roles`、`unknown-req-refs`、`invalid-artifact-paths`、`missing-design`、`missing-implementation`、`missing-verification`、`policy-invalid`、`duplicate-inconsistencies`。Decision 対応の欠落は検出対象に含めない。対象範囲内なら修正して再検証し、それ以外が必要なら blocked で報告する
+   - plan artifact 等の中間成果物は解釈せず PR URL で受領する。tsconfig 系（tsconfig*.json）変更検出時は意図した変更とコンパイラによるメタデータ書き戻しの区別を確認する警告として扱う（自動破棄しない）
+   - 実装完了後、テスト戦略セクションの各項目（verification / pass_criteria / on_failure）を全項目処理まで反復: `verification` で検証し `pass_criteria` を確認、不合格時は `on_failure` に従い **fix-and-reverify**（合格まで反復）または **record-in-findings**（対応困難なら不合格理由とともに PR 本文の `## Findings / Capture候補` へ記録）
+3. **blocker 処理と result 返却**: 回答可能な blocker は実行 command 内で再評価でき、result 契約に従い case-run へ返却する
 
-1. **Issue 読込**: 対象 Issue 本文、受け入れ基準を読み込む。実行 command が Issue を success criteria に分解する
-2. **context 再確認**: Decision/ REQ/ Design/ docs/ repository context を再確認し、実装が既存の決定事項に矛盾しないことを担保する。
-context 再確認の詳細規律（実現面投影契約、採用根拠の実読取照合、未決判断の保留と試作の区別、トレーサビリティ能力の利用限界と fail-open 代替探索）は [references/execution-procedure-details.md](references/execution-procedure-details.md)「context 再確認の詳細規律」を参照（遅延読み込み）。
+## 報告契約（記録契機向け）と background 委譲の回復
 
-3. **実装、検証、PR 作成**: 実行 command に従い evidence-backed に実装を実行し、品質ゲートを通して `agentdev_gh` の pr_create 操作で PR を作成する。
-実際に要件を実現する成果物へ実装対応を、実際に要件を検証する恒常的な検証手段へ検証対応を、対応先の配置層に応じて sidecar（配布対象成果物）または inline（producer 側文書）により明示する（単に変更されたファイルであることを理由に、そのファイルを要件へ自動的に対応付けない）。
-対応宣言の配置層判定と、新規配布物を作成する委譲での作成時予防としての配布物記述規約（producer 側トレーサビリティ metadata の直書き禁止と traceability/ sidecar 登録）の詳細は [references/execution-procedure-details.md](references/execution-procedure-details.md)「対応宣言と配布物記述規約」を参照（遅延読み込み）。
-PR 本文には実行識別情報セクション（対象 Case、実行単位、委譲単位識別子）を記録する。形式は `agentdev-workflow-templates` の実行識別情報セクション規約に従い、委譲 prompt の委譲識別情報ブロックから `adf_delegation` へ転記する。
-PR 本文には検証差分セクション（実行工程、検証種別、検証結果、finding 差分の5分類: 新規、修正済み、既出、撤回、無効）を記録する。形式は `agentdev-workflow-templates` の検証差分セクション規約に従い、実施した各検証（test strategy 項目検証、品質ゲート等）ごとに実行工程 case-run の行として記録する。
-各検証行の観測証跡（退避先、終了コード、版、検査範囲、実行環境）の必須要素と保持経路の詳細は [references/execution-procedure-details.md](references/execution-procedure-details.md)「検証証跡の保持経路」を参照（遅延読み込み）。
-PR 作成前に `agentdev-traceability` の check を実行し、対象要件について次の9検出項目（check の findings 種別）を検査する: `malformed-declarations`（対応宣言の形式・構文違反）、`unknown-roles`（未知の成果物役割）、`unknown-req-refs`（存在しない要件行への参照）、`invalid-artifact-paths`（存在しない・取得不能な artifact パス）、`missing-design`（Design 対応の欠落）、`missing-implementation`（実装対応の欠落）、`missing-verification`（policy が required と判定する要件行の検証対応の欠落。required 行のみ計上）、`policy-invalid`（検証スコープポリシーの不正）、`duplicate-inconsistencies`（同一論理関係の不整合な重複）。Decision 対応の欠落は検出対象に含めない。check の不合格が承認済み対象範囲内で修正可能な場合は修正して再検証し、要件変更、対象範囲拡大、追加設計判断、外部依存解消が必要な場合は blocked として判断事項を報告する。
-ハーネスの plan artifact 等の中間成果物は解釈せず、PR URL で最終結果を受領する。
-コミット前の tsconfig 系ファイル（tsconfig*.json）変更検出時は、意図した変更と TypeScript コンパイラによるメタデータ書き戻しの区別を確認する警告として扱う（自動破棄・自動 checkout は行わない）。詳細は [references/execution-procedure-details.md](references/execution-procedure-details.md)「tsconfig 系変更の書き戻し警告」を参照（遅延読み込み）。
+取りまとめ（case-run）の記録反映用の報告で、記録反映自体は実行担当の責務外。報告要素は事実・結果、停止（再開条件を含む）、判断変更の影響対象。重要変更は判明時点で内容と影響とともに報告し、利用者に留保された判断が必要なら `blocked` で報告する。result 確定を待たない途中報告ができ、result の確定値は代替せず確定時に必ず返却する。本報告契約は result 4状態を追加・変更しない。background 委譲の起動消失時は durable state（worktree の git status・commit、PR の存在、Issue コメント）で帰属確認して回復する。詳細（委譲起動と実着手の区別、一時資材の回収・引継ぎ、docs-chore 委譲の参照追随）は references/recovery-and-step-model.md・references/execution-procedure-details.md 参照。
 
-実装完了後、test strategy 項目の test-fix ループ（後述）を実行する
-4. **blocker 処理**: 回答可能な blocker（Decision/REQ/Design/docs/Issue本文で回答できるもの）は自律的に実行 command 内で再評価できる
-5. **result 返却**: 後述の result 契約に従い case-run へ返却する
+## Result 契約と3点ゲート
 
-## 実行担当の報告契約（記録契機向け）
+実行担当は `completed-pr`（実装完了、PR作成済み。**PR番号**を伴う。case-run の成功成果は PR 作成）、`blocked`（回答可能な blocker。詳細本文は **Issue コメント** に SSoT 記録）、`failed`（repository context で回答不能な blocker。詳細本文は **Issue コメント** に構造化記録）、`delegation-unavailable`（委譲起動不能。実行未試行のため `pending` に戻し case-run を停止）のいずれか1状態を返す。SSoT: 成功は **PR 本文**、blocked/ failed は **Issue コメント**。一時コンテキスト、ローカル変数、中間ファイルは SSoT としない。
 
-実行担当サブエージェントは、取りまとめ（case-run）が記録契機に応じて記録コメント投稿と本文進行状況・結果セクション更新を行うための報告を行う。記録反映（Issue 本文・コメントへの書込み）は取りまとめの責務であり、実行担当は Issue 本文・コメントへの記録反映を行わない。
-
-- **報告要素**: 事実・結果、停止（再開条件を含む）、判断変更の影響対象を含める。取りまとめは報告を受けて記録へ構造化・反映する
-- **重要変更の識別と報告**: 実装・検証中に判明した既存正規成果物や既存前提への重要変更、外部仕様・互換性・データ・セキュリティへの重要な影響、進行中の別作業への重大な影響、当初想定からの重大な変更を、内容と影響とともに判明した時点で報告する。利用者に留保された判断が必要な場合は `blocked` として判断事項を報告する。詳細は [references/recovery-and-step-model.md](references/recovery-and-step-model.md)「実行担当の報告契約の詳細」を参照（遅延読み込み）
-- **委譲要求と実着手の区別**: 委譲起動（委譲要求）は実着手と同一視されない。実装着手の事実を報告するのは実行担当の責務であり、取りまとめの着手記録はその報告を契機に行われる
-- **工程終了を待たない途中報告**: 工程終了（result 確定）を待たず、確定した停止・判断待ち・判断変更影響を報告できる。途中報告は取りまとめが受領時点で対応する記録契機の反映（停止等）に使われる。途中報告は result 契約（4状態）の最終確定値を代替せず、result は確定時に必ず返却する
-- **検証用一時資材の作成報告**: 検証用一時資材は許可された範囲で作成・利用し、利用終了時に安全条件が成立する範囲で回収する。継続利用する資材は引継ぎ事項として報告する。詳細は [references/recovery-and-step-model.md](references/recovery-and-step-model.md)「実行担当の報告契約の詳細」を参照（遅延読み込み）
-- **result 契約との独立性**: 本報告契約は result 4状態（completed-pr / blocked / failed / delegation-unavailable）の追加・変更を行わない。報告は result の生成・受領に付随する情報であり、result 契約（最小契約）は維持する
-
-物理削除を伴う docs-chore 系の委譲では、削除対象への extensions・templates 等の実行時設定からの参照を追随確認する（原本は `<workflows/references/execution-unit-construction>` Design「docs-chore OUの削除起因参照追随」節）。詳細は [references/execution-procedure-details.md](references/execution-procedure-details.md)「docs-chore 委譲の削除起因参照追随」を参照（遅延読み込み）。
-
-## test strategy 項目の test-fix ループ（REQ）
-
-実行担当サブエージェントは実装完了後、Issue 本文のテスト戦略セクションに含まれる各 test strategy 項目（3要素構造: verification / pass_criteria / on_failure）について以下のループを実行する。
-全項目の処理が完了するまで反復する。
-
-1. **項目ごとの検証**: 各 test strategy 項目の `verification` 手順に従い検証を実行し、`pass_criteria` を満たすか確認する
-2. **不合格時の処置**: 検証結果が `pass_criteria` を満たさない場合、当該項目の `on_failure` に従い以下いずれかを実行する:
-   - **fix-and-reverify**: 実装を修正し、当該項目の検証を再実行する。再検証で合格するまで修正と再検証を反復する
-   - **record-in-findings**: 実装修正で対応困難な場合（仕様上の制約、スコープ外の原因等）、当該項目を不合格理由とともに PR 本文の `## Findings / Capture候補` セクションに記録する
-3. **全項目処理までの反復**: 未処理の test strategy 項目が残る場合、1〜2 を繰り返す。全項目が「合格」または「Findings 記録済み」のいずれかに分類されるまで反復を完了しない
-
-## Result 契約（最小契約）
-
-実行担当サブエージェントは以下のいずれか1状態を返す:
-
-| result | 意味 | 成果物 |
-|---|---|---|
-| `completed-pr` | 実装完了、PR作成済み | **PR番号**を伴う。case-run の成功成果は PR 作成である |
-| `blocked` | 回答可能な blocker に遭遇 | 詳細本文は **Issue コメント** に SSoT として記録される |
-| `failed` | repository context で回答不能な blocker | 詳細本文は **Issue コメント** に構造化して記録される |
-| `delegation-unavailable` | 実行インフラが委譲を起動できなかった状態 | 実行未試行のため `pending` に戻す |
-
-### SSoT（信頼できる情報源）
-
-| 状態 | SSoT |
-|---|---|
-| 成功（completed-pr） | **PR 本文** |
-| blocked/ failed | **Issue コメント** |
-
-一時会話コンテキスト、ローカル変数、中間ファイルは SSoT としない。
+case-run は4状態 result と状態別必須欄を検査する（`completed-pr`: commit hash、PR URL。停止: 理由と再開情報〔SSoT 記録先含む〕）。停止に PR URL・commit hash は不要。必須欄欠落の応答を `completed-pr` として扱わない。実装・検証の要約は3点検査の通過を代替しない。不足時は再開して欠落情報を求める。PR も carrier commit もない verify-only closure は SSoT コメントで判定し、不足扱いにしない。起動手段とインライン代替は references/harness-delegation.md、異常終了時は references/recovery-and-step-model.md を参照。
 
 ### 最終返却本文のサマリ上限（八項目・3〜4 KB・詳細退避）
 
-case-run への最終返却本文（result の報告本文）は、ステータス（報告用 `completed` / `blocked` / `failed`）、副作用有無を含む判定要約、変更ファイルパス一覧、コミット SHA、Issue/PR 番号、テスト結果の pass/fail 件数、未達事項/ブロッカー、詳細成果物パスの八項目で構成し、UTF-8 本文の上限目安を 3〜4 KB 以内とする。該当のない項目はその旨を記し、未確認の結果を成功に置換しない。
+case-run への最終返却本文（result の報告本文）は、ステータス（報告用 `completed` / `blocked` / `failed`）、副作用有無を含む判定要約、変更ファイルパス一覧、コミット SHA、Issue/PR 番号、テスト結果の pass/fail 件数、未達事項/ブロッカー、詳細成果物パスの八項目で構成し、UTF-8 本文の上限目安を 3〜4 KB 以内とする。該当のない項目はその旨を記し、未確認の結果を成功に置換しない。長大な詳細は退避し、返却本文には退避先のパス/URL 参照のみを含める。報告用ステータスは4状態を変更せず、サマリの `completed` から PR 完了やゲート合格を導出しない。`delegation-unavailable` は実行未試行のため実行担当のサマリ返却対象外。雛形と詳細は references/harness-delegation.md「返却サマリ雛形」を参照。
 
-- **長大な詳細の退避**: 実装過程の説明、検証ログ全体、調査過程等の長大な詳細は返却本文に含めず、PR 本文・Issue コメント等の既存権限で参照できる場所（ファイル/Issue）へ退避し、返却本文には退避先のパス/URL 参照のみを含める。退避先は SSoT チャネル（成功は PR 本文、blocked / failed は Issue コメント）と一致させる
-- **4状態の非変更**: 報告用サマリのステータス（`completed` / `blocked` / `failed`）は、正規の委譲実行結果 4 状態（`completed-pr` / `blocked` / `failed` / `delegation-unavailable`）を変更しない。サマリの `completed` から PR 完了やゲート合格を導出しない（導出は3点ゲートで行う）。子の返却なしに起動不能を確定する場合は既存契約に従う
-- **起動不能**: `delegation-unavailable` は実行未試行のため実行担当のサマリ返却対象外であり、既存契約どおり `pending` に戻す。実行担当が返却する最終本文は、該当項目が少ない結果と退避参照を含む結果のいずれの形態でも本上限に従う
-- **親の参照範囲**: 親（case-run）はサマリと該当ゲートに必要な証拠（退避先の原文・証跡）を参照して3点ゲートと進行判定を行う
+## 責務境界と worktree 隔離
 
-契約の正は委譲契約 Design「親セッション向け委譲結果サマリ」節であり、本節はその adapter 投影である。
+workflow state 管理は case-run、Epic orchestration は case-auto/ case-run、チェックボックスの評価・更新と最終完了判定は case-close、req-define のアーキテクチャ確認は `agentdev-architecture-advisory` の責務。実行担当サブエージェント、外部実行基盤はチェックボックスを更新しない（case-close が別コンテキストで評価する）。実行担当サブエージェントは引き渡された worktree root（`.worktrees/{N}-{type}/` 相対パス）配下でのみ作業しメインリポジトリ等では編集しない。作業検知時は直ちに停止し `failed` を返却、詳細は Issue コメントに SSoT 記録。実装開始前に `agentdev-git-worktree` の検証ヘルパー（`worktree-operations.md`「worktree 内判定ヘルパー」参照）で自己検証し、メインリポジトリと判定された場合は開始せず `failed` を返却する。
 
-## 委譲結果受領の最終ゲート（3点ゲート）
+## 配置契約と STEP model 連携、委譲抽象IF
 
-case-run（受領側）は、委譲結果の受領時に最終ゲートとして4状態 result（`completed-pr` / `blocked` / `failed` / `delegation-unavailable`）の必須検査と状態別の必須欄検査を行う:
-
-| result 状態 | 必須欄 |
-|---|---|
-| `completed-pr` | 委譲内作業の commit hash、作成された PR の URL |
-| `blocked` / `failed` / `delegation-unavailable` | 停止理由と再開情報（SSoT 記録先を含む） |
-
-- 開始前・途中の停止結果に PR URL・commit hash を要求しない
-- 必須欄のいずれかが欠ける委譲応答を「要約で完結した `completed-pr`」として扱わない。実装・検証の要約は3点検査の通過を代替しない
-- 不足する委譲応答は `completed-pr` として扱わず再開（再委譲または継続指示）する。継続指示の場合、委譲先へ欠落している情報（commit hash、PR URL 等）の提出を指示する
-- **verify-only closure との整合**: PR も carrier commit も存在しない Issue 完了（verify-only closure）は、SSoT コメント（Issue コメント）契約の別経路として既存どおり扱う。3点ゲートの不足判定が正当な verify-only closure を再開扱いにしない。verify-only closure の完了証跡は SSoT コメントに記録された検証結果であり、PR URL・carrier commit の不在は不足判定の対象としない
-
-## background 委譲の起動消失の回復手順
-
-background 委譲の起動直後消失を検知した場合は、委譲先の会話応答（一時コンテキスト）に依存せず、durable state（worktree の git status・commit、PR の存在、Issue コメント）で実行の帰属を確認して回復する。帰属確認・実行未試行と実行中断の判定・再委譲形態限定（staggered background）の詳細は [references/recovery-and-step-model.md](references/recovery-and-step-model.md)「background 委譲の起動消失の回復手順」を参照（遅延読み込み）。
-
-## 責務境界（非対象）
-
-本プロトコルは以下を扱わない。各責務主体に委譲する:
-
-| 非対象 | 責務主体 |
-|---|---|
-| workflow state 管理（Issue/PR/worktree） | case-run |
-| 複数 Issue/ Epic orchestration | case-auto/ case-run |
-| Issue 完了条件チェックボックスの評価、更新 | case-close |
-| 完了条件チェックボックスの最終完了判定 | case-close |
-| req-define のアーキテクチャ確認 | `agentdev-architecture-advisory` |
-
-実行担当サブエージェント、外部実行基盤は Issue 本文の完了条件チェックボックスを更新しない（PR 作成後に case-close が別コンテキストで評価する）。
-
-## worktree 隔離の遵守（禁止事項）
-
-実行担当サブエージェントは worktree root（`.worktrees/{N}-{type}/`）以外のパスでファイル編集を行わない。
-case-run から引き渡された worktree root（相対パス）配下でのみ作業する。
-
-| 禁止事項 | 違反時の対応 |
-|---|---|
-| worktree root 以外のパス（メインリポジトリルート直下、他 worktree 等）でのファイル編集 | メインリポジトリでの作業を検知した場合は直ちに作業を停止し、`failed` として result を返却する。詳細本文は Issue コメントに SSoT として構造化して記録する |
-| メインリポジトリパスを引き渡し、使用すること | case-run は worktree root（相対パス）のみを引き渡す。実行担当サブエージェントは受け取った worktree root 配下でのみ作業する |
-
-**自己検証**: 実装作業開始前に `agentdev-git-worktree` の検証ヘルパー（`.opencode/skills/agentdev-git-worktree/references/worktree-operations.md`「worktree 内判定ヘルパー」参照）で現在 worktree 内にいることを自己検証する。
-メインリポジトリにいると判定された場合は実装を開始せず `failed` として result を返却する。
-
-## Findings/ Capture 配置
-
-本筋外の検出事項（Findings）/ Capture 候補（intake/ learning）は **PR 本文** の `## Findings / Capture候補` セクションに記述する。
-capture 境界の詳細は `agentdev-workflow-orchestration` を参照。
-実行担当サブエージェントは `.agentdev/intake/`、`.agentdev/learning/` を直接変更しない。
-
-## Design確定候補配置
-
-実装時に発見された Design レベルの詳細（Design に記載すべき schema、enum、判定表、内部アルゴリズム等）は PR 本文の `## Design確定候補` セクションに記録する。
-`## Findings / Capture候補` とは別セクションとし、混在させない。
-実行担当サブエージェントが記録し、case-close STEP-3 の Design 確定チェックの入力となる。
-
-## STEP model 連携
-
-本スキルは Capability Skill として、case-run Workflow Skill の `execute` STEP（`agentdev-workflow-orchestration` 参照）から委譲起動される（`<workflows/workflow-skill-model>` Design）。本スキル自身は case-run workflow の STEP を所有せず、委譲契約（4状態 result）で case-run 側 STEP へ接合する。委譲コンテキストと Input Resolution、委譲内シーケンスと result 接合の詳細は [references/recovery-and-step-model.md](references/recovery-and-step-model.md)「STEP model 連携」を参照（遅延読み込み）。
-
-## 委譲抽象IF
-
-- case-run は adapter skill（`agentdev-case-run-execution-adapter`）を読み込んだ実行担当サブエージェントへ委譲を起動する（委譲 prompt 内で実行 command を指定）。起動手段、実行制御パラメータは AGENTS.md および references/harness-delegation.md に配置する。
-- 委譲起動方式の具体的な実装（実行担当サブエージェント起動、委譲 prompt 構築、evidence 確認、result 受領、timeout/ retry、category 設計）は `references/harness-delegation.md` 参照
-- 実行担当サブエージェントが利用不可の場合は委譲起動失敗として検知される（後述「委譲起動不能時の取扱い」および references/harness-delegation.md「委譲起動失敗、異常終了時事後処理」参照）
-- Issue 本文に req-define 壁打ち合意の実行計画方向性（参考情報）が含まれ得る。実行担当サブエージェントはこれを参考情報として扱い、束縛されない
-- **内蔵ツール使用規律**: 実行担当サブエージェントのファイル検索・内容検索・ディレクトリ列挙は実行基盤の内蔵ツールを標準手順とする。詳細は [references/execution-procedure-details.md](references/execution-procedure-details.md)「内蔵ツール使用規律」を参照（遅延読み込み）
-
-## 委譲起動不能時の取扱い
-
-委譲起動不能時（実行担当サブエージェント型が不許可、起動 API 異常等）は、result 契約の `delegation-unavailable` を返し、Issue を `pending` に戻して case-run を停止する（委譲契約 Design「委譲種別」注記）。
-
-インラインフォールバック（case-run が自ら実装・検証を実行する逐次パス）は harness 固有の実行制御として配布 Design および本 SKILL から除外する。委譲起動手段、能力検出、インライン代替の有無は harness execution mechanism に属し、harness の責務として AGENTS.md および `references/harness-delegation.md` に配置する（委譲契約 Design「委譲種別」注記）。委譲起動後の異常終了の事後処理との対象段階の区別は [references/recovery-and-step-model.md](references/recovery-and-step-model.md)「委譲起動後の異常終了との対象段階の区別」を参照（遅延読み込み）。
-
-## reference選択表
-
-通常経路で全 reference を無条件読込しない。
-必要な条件に応じて読む reference を選択する。
-
-| 条件 | 読む reference |
-|---|---|
-| 委譲起動の具象実装（起動方式、worktree 取り扱い、PR 作成と URL 受領、result 受領、evidence 確認、timeout/ 中断、委譲プロンプト構築例、委譲プロンプト雛形）が必要な場合 | [references/harness-delegation.md](references/harness-delegation.md) |
-| 委譲プロトコルと category 設計（`writing` category と発火スキルの相互作用、`unspecified-high` 推奨根拠、category 選定ガイドライン、MUST NOT DO 必須化）が必要な場合 | [references/harness-delegation.md](references/harness-delegation.md) |
-| 委譲起動失敗、異常終了時の事後処理（worktree git status 確認、変更残留時の分類、残留箇所の grep 検出、手動修正または PR 化）が必要な場合 | [references/harness-delegation.md](references/harness-delegation.md) |
-| adapter 委譲内 adversarial-review 統合（実装方針形成、review 呼出、結果反映、blocked 遷移の実行時詳細手順、候補判断基準、呼出失敗時の取扱い）が必要な場合 | [references/adversarial-review-integration.md](references/adversarial-review-integration.md) |
-| context 再確認・対応宣言・検証証跡・tsconfig 警告・docs-chore 参照追随・内蔵ツール規律の実行手順詳細が必要な場合 | [references/execution-procedure-details.md](references/execution-procedure-details.md) |
-| external execution boundary と harness execution mechanism の用語境界、外部成果物の取扱いが必要な場合 | [references/execution-boundary-terms.md](references/execution-boundary-terms.md) |
-| 報告契約の詳細、background 委譲の回復手順、STEP model 連携が必要な場合 | [references/recovery-and-step-model.md](references/recovery-and-step-model.md) |
+- Findings/ Capture 候補は PR 本文の `## Findings / Capture候補` に記述する（capture 境界は `agentdev-workflow-orchestration` 参照）。`.agentdev/intake/`、`.agentdev/learning/` を直接変更しない
+- Design レベルの詳細（schema、enum、判定表等）は PR 本文の `## Design確定候補` に記録する（`## Findings / Capture候補` とは別セクション）。case-close STEP-3 の入力
+- 本スキルは case-run Workflow Skill の `execute` STEP から委譲起動され、委譲契約で接合する（STEP を所有しない。詳細は references/recovery-and-step-model.md 参照）。**委譲抽象IF**: 起動手段、実行制御パラメータ、具体実装と委譲起動失敗・異常終了時事後処理は AGENTS.md および references/harness-delegation.md 参照。実行計画方向性は参考情報。内蔵ツール規律は references/execution-procedure-details.md 参照
 
 ## adversarial-review 統合（case-run: adapter 委譲内）
 
-本スキルは case-run の adapter 委譲内（case-run 実行契約の実装担当サブエージェント委譲規律）における adversarial-review 統合（実装方針形成、review 呼出、結果反映、blocked 遷移）の実行時参照を提供する。
-正規原本は `agentdev-case-run-execution-adapter` Design「adversarial-review 統合（実装方針→review→結果反映）」節である（caller 統合要件の case-run 実装方針条項、重複定義禁止〔一つの意味を一つの正本へ〕）。
-本 SKILL.md は重複定義せず、詳細は `references/adversarial-review-integration.md`（adversarial-review 統合実行手続の正本。case-run adapter 委譲内適用範囲を含む）を参照。
-
-呼出元（case-run command）と本スキルの主な契約（詳細は Design と reference を正とする）:
-
-| 契約 | 要件 | 概要 |
-|---|---|---|
-| 実装方針の形成と限定 | caller 統合要件・case-run 実装方針限定条項 | 委譲内で既確定 Issue/REQ/Decision/Design を実現する内部選択として実装方針を形成する。case-run 本体は形成しない |
-| 実施位置 | caller 統合要件・実装変更前実施条項 | 最初の実装変更前に実施する（実装、検証、PR 作成より前） |
-| 委譲内 review 呼出 | caller 統合要件・Step 分離条項 | adapter 委譲内で実行担当サブエージェントが発動条件判定（ユーザー明示指定）と review 呼出を分離して実施する |
-| blocked 遷移（実装方針限定違反） | caller 統合要件・実装方針限定 blocked 条項 | 実装方針が既確定文書の変更、追加、撤回を必要とする場合は blocked へ遷移する |
-| blocked 遷移（要件/仕様問題） | caller 統合要件・case-run blocked 経路条項 | 要件、仕様問題を検出した場合は勝手に仕様変更せず blocked へ遷移する |
-| blocked 遷移（unresolved 残存） | caller 統合共通契約・unresolved 時不可逆処理禁止条項 | unresolved な本質的争点またはユーザー判断事項が残る場合は実装の最初の変更へ進まず blocked へ遷移する |
-| 従来フロー維持 | caller 統合共通契約・silent skip 禁止と従来フロー維持条項 | 発動条件非該当時、呼出失敗時は委譲内の従来フロー（実装方針形成、実装、検証、PR 作成）を維持する |
-| accepted finding 反映 | caller 統合共通契約・accepted finding 反映条項 | accepted finding の実装方針への反映は adapter 委譲内の実行担当サブエージェント責務 |
-| 再 review 条件 | caller 統合共通契約・再 review 条件条項 | 意味内容変更時のみ再発動可能、同一 finding 再起票禁止（正は adversarial-review Design） |
-| 呼出失敗時の扱い | caller 統合共通契約・呼出失敗時条項 | silent skip 禁止、従来フロー維持（正は adversarial-review Design） |
-| 副作用境界 | caller 統合共通契約・副作用禁止条項 | `semantic_review`（書き込み禁止型）、新規 artifact 非生成（正は adversarial-review Design、delegation-contracts Design） |
+実装方針形成、review 呼出、結果反映、blocked 遷移の実行時参照。正規原本は `agentdev-case-run-execution-adapter` Design「adversarial-review 統合（実装方針→review→結果反映）」節、実行手続の正本は references/adversarial-review-integration.md（本 SKILL.md は重複定義しない）。要点（正は Design と reference）: 最初の実装変更前に実施し、既確定文書を実現する内部選択として実装方針を形成（case-run 本体は形成しない、発動条件判定〔ユーザー明示指定〕と review 呼出は分離）。既確定文書の変更・追加・撤回が必要な場合、要件・仕様問題検出時、unresolved な争点が残る場合は blocked へ遷移（勝手に仕様変更しない）。非該当時・呼出失敗時は silent skip せず従来フローを維持し、accepted finding の反映は実行担当の責務（再発動は意味内容変更時のみ、同一 finding 再起票禁止）。副作用境界は `semantic_review`（書き込み禁止型）、新規 artifact 非生成。
 
 ## See Also
 
 - **agentdev-workflow-orchestration**: サブエージェントプロトコル、capture 境界
-- **agentdev-workflow-templates**: PR 本文、コメント SSoT のテンプレート構造
-- **Design `delegation-contracts.md`**: 委譲契約横断 Design、case 実行責務の 4 用語と所有者 SSoT
-- **references/harness-delegation.md**: 委譲起動、category 設計、異常終了回復の具象実装ノート
+- **Design `delegation-contracts.md`**: 委譲契約横断 Design

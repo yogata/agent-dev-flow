@@ -100,3 +100,11 @@ Definition 変更が docs 文言を期待するテスト（リポジトリ固有
 - case-ready 完了報告テンプレートに従い、結果（ready 遷移、execution contract 確定、実行構造、設計PR merge の有無、横断依存検査結果（警告の提示記録または検出不能報告）、capture 結果）を報告する
 - Capture結果: 自工程で実観測した deviation を capture 委譲した場合、保存した成果物のパス・分類・保存結果を含める
 - 停止時は停止理由の分類（HITL 判断事項、CI 失敗、構成不備、受理不能 Decision、missing-design / policy 不正残存、同期不一致、infra-transient（ツール基盤故障））と再開条件を報告する。infra-transient と分類した場合は、Case 失敗と区別して報告し、停止報告に回復経路（supervisor 等による harness 再起動による回復の見込みと durable state からの冪等再開）を含める。判定条件の正規所有は case-auto Design「停止理由分類」節である
+
+## QG-2 判定の実行と記録
+
+検証ゲート（STEP-6）で QG-2（Acceptance Criteria Coverage）の判定を実行する。判定基準と検査観点は `agentdev-quality-gates` の QG-2 reference が所有する。観点6（数値閾値到達可能性検証）には、その案件が作る・変更する成果物との整合性の確認（完了条件の検証手順に書かれた grep 系のコマンドを、確定済みの成果物に対して事前に実行する検査を含む）を含める。判定の結果は工程の記録コメント（または報告 JSON）へ残し、判定が実行されなかった場合は case-ready を完了として扱わない（観点1〜5・7〜9 の機械化は対象外）。
+
+## v5 有限実行モードにおける設計確定の独立終了
+
+本スキルが確定する設計（設計PR受入・Decision 受理・canonical Definition 確定）は、v5 責務分割における設計確定の責務である。v5 有限実行モード（case-auto 実行契約）では、この設計確定は後続の実装構築・Issue 協調を強制されずに独立終了できる。段階案件では本工程の確定完了をもって工程単独の確定・終了が成立し、設計確定と最終的な要求充足の判定は別に扱う。現行 v4 標準モードでは ready 遷移後に case-run へ進行する現行実行経路を維持する。

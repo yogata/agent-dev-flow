@@ -3,158 +3,59 @@ name: agentdev-workflow-case-run
 description: "内部 lifecycle 段階 case-run の workflow 実装本体。単一 Issue 実行への収斂（実行担当サブエージェント委譲1件、result 4状態処理、前置/最終 gate）を所有する。Epic・Wave を処理対象とする実行契約は廃止され、Wave 実行制御は case-auto の orchestration stage 3 が単一所有する。USE FOR: case-run 実行時の workflow 制御（単一 Issue 実行・再開フェーズ判定・委譲・前置/最終 gate）。DO NOT USE FOR: 実装実行そのもの（委譲内の実行担当サブエージェントが担う）、Epic や Wave の実行制御（case-auto orchestration stage 3 の責務）、単独起動（case-auto の内部 lifecycle orchestration から起動される内部段階である）。"
 ---
 
-
 # case-run workflow スキル
 
-case-run command の workflow 実装本体である。
-与えられた単一 Issue の実行を実行担当サブエージェントへ委譲し、その result を処理する制御構造を所有する。
-case-run 本体は orchestration に専念し、実装実行そのものは行わない。
+単一 Issue の番号または URL とブランチ名を受け取り、実行担当サブエージェント1件へ委譲する。Wave は case-auto stage 3 が所有し、case-run 経由で case-auto の管理外の実行枠（独立実行枠）を生成できない。実装・検証・PR 作成は委譲先が実行する。
 
-case-run は常に単一 Issue を処理し、Epic や Wave を処理対象とする実行契約は廃止されている。
-Wave 実行制御（Wave 構成の読み取り、現在 Wave 判定、fan-out/fan-in、子 Issue 並列起動、共有 active Issue task 枠）は case-auto の orchestration stage 3 が単一所有し、case-run 経由で case-auto の管理外の実行枠（独立実行枠）を生成できない。
-委譲内では実行範囲、入力、権限、検証条件を当該 Issue 本文と正規契約から実行中に確認できる。
-
-case-run command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する。これは、Command が公開入口、Workflow Skill が工程の実装、Capability Skill が共通能力を所有する責務3層分化に従う。
-
-## 入力
-
-- Issue番号またはURL（単一 Issue 実行モード。case-run が受理するのは常に単一 Issue 入力であり、Epic Issue 入力経由の Wave 実行制御は case-auto の orchestration stage 3 へ移転済み。Epic Issue 入力の扱いは case-auto 経由の正規呼出へ限定する）
-- ブランチ名（自動生成または指定）
-
-## 出力
-
-- 成功: 実装済みブランチ + GitHub PR（実行担当サブエージェントが作成）。**case-run の成功成果は PR 作成である**
-- blocked / failed / delegation-unavailable: blocker 詳細は Issue コメントに SSoT として記録される（実行担当サブエージェント責務）
-
-## 副作用
-
-- worktree・ブランチ作成（`agentdev-git-worktree` 経由）
-- 実行担当サブエージェント起動（adapter skill 読込、委譲 prompt 内で実行 command 指定。委譲1件、並列委譲なし）
-- 親Epic 実行構成表の子状態更新・取りまとめ反映（STEP-S3、`agentdev-epic-tracker` 経由。対象 Issue が Epic の子 Issue の場合。本文書込みはしない）
-- 当該 Workflow Skill は worktree root 配下以外を編集しない（case-run command の worktree 隔離に従う）
-
-## Workflow 構成（単一 Issue 実行への収斂）
-
-case-run は単一 Issue 実行（single workflow）のみを所有する。
-かつて single workflow と epic-wave workflow の 2 workflow に分離していた構成は、Epic Wave 実行モード（case-run #epic）の実行契約廃止により single workflow へ収斂した。
-旧 epic-wave workflow が所有していた6契約軸（target cardinality、parallelism、fan-out・fan-in、child task recovery、partial result、Wave-level completion）の実行契約は case-auto orchestration stage 3 へ移転済みであり、本スキルは保持しない（`<workflows/workflow-skill-model>` Design「1:N 分割基準の適用実例（case-run）」参照）。
-
-- **single workflow**: 対象1 Issue。準備・委譲・クリーンアップの3フェーズを順次実行する
-
-Epic Issue 入力時も case-run 自身の Wave 構成の読み取り、現在 Wave 判定、fan-out/fan-in、子 Issue 並列起動を行わない。Epic 全体の進行管理・未完了 Wave の処理は case-auto が所有する。
-
-## 単独工程からの実装・検証接続（v5 有限実行モード）
-
-v5 有限実行モード（case-auto workflow 実装本体「v5 有限実行モード」節）の「確定済み設計からの実装接続」経路では、確定済み詳細設計と有限な実装対象・既存検証条件を入力として、実装・検証のみの単独工程を本スキルの委譲契約（result 4状態、worktree 隔離、3点ゲート、PR 本文の検証証拠記録）で実行する。入力の上流成果物（canonical REQ/Decision/Design）は要件・設計の正規情報として参照し、実行境界が要求・設計の正規情報を再所有せず、要件確定・設計確定の再形成を一律に要求しない。接続時の実行基準は、プロジェクトの採用済み工程・工程間関係・必須成果物の解決結果（採用規約の解決の公開操作契約を経て参照。正規対応は repository top-level `traceability/` 配下 sidecar を参照）と実際の正規状態の双方で確認する。完了判定は検証証拠の成立確認に基づき、実行した事実だけを完了の根拠にしない。中断・再開は「再開プロトコル（resume protocol）」に従い、採用済み・未決・試作・成立済み作業の4区分を正規情報から再構成し、成立済み作業を不当に重複実行しない。詳細工程を採用しないプロジェクトでは標準案（参照モデルの詳細工程）を未採用候補として扱い、未採用の参照工程を実行・完了判定の基準へ含めない。
+**case-run の成功成果は PR 作成である**。例外の verify-only closure は検証証跡を Issue コメントに保存して終了する。ファイル編集は対象 worktree 内に限定し、worktree 作成元・PR base・同期基準は main とする。
 
 ## 制御平面（STEP 一覧）
 
-各 STEP は再開ポイント（resume point）を持つ。安定した STEP 識別子と永続情報から再開点を決定し、会話記憶を権威情報源としない。
-会話コンテキストに依存せず、永続状態（GitHub Issue/PR、Issue コメント、worktree・ブランチの存在、PR URL）から再開点を再構成する。
+| STEP | 実行・出口条件 | 手順 |
+|---|---|---|
+| STEP-S1 | 単一 Issue を確認し、再開点と引き継ぎ停止を判定 | [single](references/single.md) |
+| STEP-S2 | 要件・受け入れ基準・関連 Decision・work_type を照合し、採用根拠照合（依拠する正規成果物の採用根拠を既存の採用基準へ照合）と実行境界を適用 | [single](references/single.md) |
+| STEP-S3 | worktree とブランチを準備し、precondition・staleness・targeted docs・配布依存境界の前置 gate と AUTOGEN 索引再生成を適用 | [single](references/single.md) |
+| STEP-S4 | 前置 gate 合格後に adapter 経由で1件を委譲。並列兄弟 branch の実差分交差確認は委譲内の commit・push 直前に実施 | [delegation-and-result](references/delegation-and-result.md)、交差確認は [single](references/single.md) |
+| STEP-S5 | 3点ゲートと result 4状態の処理。`completed-pr` は配布依存境界の最終 gate へ | [delegation-and-result](references/delegation-and-result.md) |
+| STEP-S6 | 最終 gate 合格後、未コミット変更と当該実行の `.agentdev/tmp/` 残存を確認し報告。停止結果では報告のみ | [single](references/single.md) |
 
-### single workflow（単一 Issue 実行モード）
+worktree・ブランチの作成はべき等。Epic の子 Issue では STEP-S3 で `agentdev-epic-tracker` を利用し、Epic 本文は case-close のみが書き込む。`agentdev_handoff: true` の停止判定は `agentdev-workflow-lifecycle` に従う。worktree precondition が不合格なら起動前に停止する。最終 gate 違反は PR 本文の `### distribution-boundary` に記録して停止し、adapter result を上書きしない。
 
-| STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
-|---|---|---|---|---|
-| STEP-S1 | フェーズ判定・再開ポイント検出 | case-run 起動（Issue番号受領） | 単一 Issue 実行モード確定、再開フェーズ判定、引き継ぎ停止判定 | [references/single.md](references/single.md) |
-| STEP-S2 | Issue 抽出・確認・判定 | 実行モード確定（single） | 要件doc・受け入れ基準抽出、関連Decision 確認、確定事項・未決事項・採用判断の照合（実装開始境界）、work_type metadata 整合確認、execution contract 消費境界適用、採用根拠照合（依拠する正規成果物の採用根拠を既存の採用基準へ照合） | [references/single.md](references/single.md) |
-| STEP-S3 | Worktree 作成・ブランチ準備・前置 gate 群 | Issue 判定完了 | worktree+ブランチ作成（べき等）、前置 gate 群（precondition / staleness / targeted docs / 配布依存境界 事前 gate / AUTOGEN 索引再生成）合格、L2 計測 | [references/single.md](references/single.md) |
-| STEP-S4 | 実行担当サブエージェント委譲 | STEP-S3 合格（worktree 内検証済み） | 委譲起動、L2 計測、adapter 委譲内 adversarial-review、並列兄弟 branch 実差分交差確認（commit・push 前置） | [references/delegation-and-result.md](references/delegation-and-result.md)（交差確認手順は references/single.md） |
-| STEP-S5 | result 処理・配布依存境界 最終 gate | 委譲 result 受領 | 委譲応答の3点ゲート（4状態 result 必須検査・状態別必須欄検査）、result 4状態処理、配布依存境界 最終 gate 判定、L2 受け渡し | [references/delegation-and-result.md](references/delegation-and-result.md) |
-| STEP-S6 | worktree クリーンアップ確認・完了報告 | result 処理完了（completed-pr 時は最終 gate 合格後） | 未コミット変更確認、tmp/ 残存確認、完了報告（L2 内訳含む） | [references/single.md](references/single.md) |
-
-### STEP 間の依存と分岐
-
-- **single**: STEP-S1 → STEP-S2 → STEP-S3 → STEP-S4 → STEP-S5 → STEP-S6。worktree+ブランチ既存時は STEP-S3 の作成をスキップ（べき等）。result が blocked / failed / delegation-unavailable 時は STEP-S5 で停止（STEP-S6 の報告のみ）
-- **並列兄弟 branch 実差分交差確認**: 同一 Wave 内で並列実行する子 Issue は、STEP-S4 委譲内で実行担当サブエージェントが commit・push する直前（commit 前 3 検査と同一位置）に、並列実行中の兄弟 branch の変更ファイルとの実差分交差確認を行う。前置 gate 群（STEP-S3）では実施しない（委譲開始前は自 branch の変更ファイルが存在しないため）。手順は references/single.md「並列兄弟 branch 実差分交差確認（commit・push 前置）」参照
-- **最終 gate 違反**: STEP-S5 で配布依存境界 最終 gate 違反時、PR 本文に `### distribution-boundary` を記録して停止（adapter result は上書きしない）
+- **並列兄弟 branch 実差分交差確認**: STEP-S4 委譲内で行い、前置 gate 群（STEP-S3）では実施しない。references/single.md「並列兄弟 branch 実差分交差確認（commit・push 前置）」を参照する。
 
 ### 再開プロトコル（resume protocol）
 
-- 再開点は永続状態から再構成する: worktree・ブランチの存在（準備フェーズ完了）、PR の存在と PR URL（委譲完了）、Issue コメント（blocked/failed の SSoT、verify-only closure の検証証跡 SSoT コメント）
-- 採用・未決・試作の区別は中断や再実行によって失われない。再開時は実際の正規情報（Issue 本文、Issue コメント SSoT、PR 本文、正規成果物）と有効な判断から採用・未決・試作の状態を再構成し、未決事項を無断で解決済みにせず、試作を正式採用へ変化させず、実施済みの独立作業を不当に重複実行せず完了扱いを消失させない（中断・再開時の採用・未決・試作状態維持の要件行の実装。既有義務の採用・未決・試作状態への適用であり、既存義務の再実装ではない。正規対応は repository top-level `traceability/` 配下 sidecar を参照）
-- フェーズ再開条件: 準備フェーズ（worktree+ブランチが存在しない）、委譲フェーズ（PR 未作成かつ result 未確定）、クリーンアップフェーズ（result が completed-pr。verify-only closure では SSoT コメントの記録有無で検証・記録工程の再開点を判定する）
-- 会話コンテキスト・自然言語の前 STEP result のみを再開の根拠（resume source）としない
+安定した STEP ID と永続状態で再開点を復元する。worktree・ブランチ未準備なら準備へ、PR 未作成かつ result 未確定なら委譲へ、`completed-pr` 後は cleanup へ進む。verify-only closure は検証証跡の SSoT コメントを確認して再開する。会話記憶や外部ハーネスの中間成果物を根拠にしない。
 
-### 終了条件（termination）
+**未決依存の保留と実行継続の区別**: 前置 gate と委譲では未決判断に依存する部分を保留し、未決事項の存在だけを理由に依存しない作業を停止しない。明示的に許可した試作は正式採用・正規成果物の確定・本番適用と区別する。試作の実施、成果物の存在、試験の成功を当該候補の正式採用や未決事項の解決として扱わない。未決の設計候補について試作として実施するには利用者の明示的な指示または許可を要し、明示的な指示・許可がない試作を開始しない。明示的な指示・許可がない限り、当該部分は未決判断に依存する実装として保留する。
 
-- 正常終了: single は PR 作成確認とクリーンアップ完了報告まで。verify-only closure（PR を作成しない完了）は検証完了と SSoT コメント記録まで（references/single.md「verify-only closure の検証実行と SSoT コメント記録」参照）
-- 一時ファイル残存: 正常終了の前提として、当該実行で `.agentdev/tmp/` に作成した一時ファイルが残存していないこと（STEP-S6 で確認。一時ファイル cleanup 規定（workflow 側で生成した `.agentdev/tmp/` 一時ファイルは当該実行内で削除する。Custom Tool 内部の一時ファイルは Tool が操作ごとに自動削除する））
-- 停止終了: blocked / failed（Issue コメント SSoT）、delegation-unavailable（Issue を pending へ戻す）、配布依存境界 最終 gate 違反（PR 本文 SSoT）、worktree precondition gate 失敗（実行担当サブエージェント起動前に停止）
-- 引き継ぎ停止: Issue 本文に `agentdev_handoff: true` を含む場合、リポジトリ種別に応じた停止判定（`agentdev-workflow-lifecycle` runtime-package-boundary）
+## 単独工程からの実装・検証接続（v5 有限実行モード）
 
-## 主要 Capability Skill 連携
+確定済み設計、有限な実装対象、既存の検証条件を入力に、実装・検証だけを同じ委譲契約で実行する。実行境界が要求・設計の正規情報を再所有せず、要件確定・設計確定の再形成を一律に要求しない。採用規約の解決結果と正規状態で実行基準を確認し、未採用の参照工程を基準に含めない。検証証拠を確認し、実行した事実だけを完了の根拠にしない。再開時は採用済み・未決・試作・成立済み作業の4区分を正規情報から再構成し、成立済み作業を不当に重複実行しない。
 
-本スキルは次の Capability Skill を名レベルで参照する。他 Skill の内部構造（protocol 名、Step 名、Section 名、見出し名、references 内部パス）へ直接依存しない。
+## 委譲結果と停止
 
-- `agentdev-workflow-orchestration`: 再開ポイント判定、状態機械、CI 対応ループ、capture 境界、障害伝播
-- `agentdev-case-run-execution-adapter`: 実行担当サブエージェント委譲の adapter protocol、result 4状態契約、adapter 委譲内 adversarial-review
-- `agentdev-git-worktree`: worktree 作成・削除、worktree 内判定ヘルパー、並列実行安全ステージング
-- `agentdev-workflow-lifecycle`: work_type 判定、引き継ぎ停止判定（runtime-package-boundary）
-- `agentdev-epic-tracker`: 親Epic 実行構成表の子状態更新と取りまとめ反映（STEP-S3-1。Epic Issue 本文読取は参照のみ）
-- `agentdev-req-analysis`: チェックボックス品質基準
-- `agentdev-quality-gates`: QG-3 前置の鮮度検出、QG-4 bun test フル suite 正規形（機械受理基準）
-- Custom Tool `agentdev_gh`: Issue 本文読取等の I/O 操作
-- `agentdev-project-extensions`: project extension 読込（5セクション、fail-open）
-- `agentdev-workflow-templates`: 工程記録コメントテンプレート（記録種別別3種）の選定と様式
-- `agentdev-traceability`: トレーサビリティ能力（coverage、check。委譲内の対応関係確認と PR 作成前検査。fail-open）
-- integrity checker skill（リポジトリ固有・配布対象外）: cli.ts --workflow モード（targeted docs guard）、check_extensions.ts（Project Extensions の構造・配置・ID・参照パス・委譲先 Skill・旧機構残存・上書き意図の検査）、check_distribution_boundary.ts（配布依存境界、source / link 両 profile）、generate_indexes.ts（AUTOGEN 索引再生成）
-- 検証用一時資材の後片付け責任（検証に伴う一時資材の取扱いと後片付け責任 Design）: STEP-S4 委譲の作成・利用・回収の義務接続と、STEP-S5 委譲結果受領時の後片付けの実施結果・確認根拠・未処理事項の報告受領（「共通制約」の検証用一時資材の節参照）
+- result は `completed-pr`、`blocked`、`failed`、`delegation-unavailable`。前者には commit hash と PR URL、停止結果には理由と再開情報（SSoT 記録先）を求める。不足は再委譲または継続指示で解消し、要約を証拠に代用しない。起動不能は `pending` に戻す。
+- **委譲応答の返却サマリ上限**: 委譲応答（実行担当から case-run への最終返却本文）は、ステータス（報告用 `completed` / `blocked` / `failed`）、副作用有無を含む判定要約、変更ファイルパス一覧、コミット SHA、Issue/PR 番号、テスト結果の pass/fail 件数、未達事項/ブロッカー、詳細成果物パスの八項目からなる構造化サマリとし、UTF-8 上限目安 3〜4 KB 以内。長大な詳細は退避先（PR 本文・Issue コメント等）へ退避し、返却本文には退避先のパス/URL 参照のみを含める。case-run はサマリと退避先の証拠を参照して進行判定を行い、報告用ステータスから PR 完了やゲート合格を導出しない（詳細は `agentdev-case-run-execution-adapter` 参照）。
+- completed の SSoT は PR 本文、`blocked` / `failed` は Issue コメント。verify-only closure では PR・carrier commit を要求せず、必要な検証を省略しない。3検査と検証結果、実行・非実行の範囲と根拠、再実行可能なコマンドを Issue コメントに保存する。
+- 起動直後に background 委譲が消失したら、worktree・PR・Issue コメントで未試行と中断を区別する。未試行なら親の起動間隔契約に従い background で再委譲し、起動失敗の継続は再試行計上契約に従って `delegation-unavailable` に確定する。
+- **blocked 正規再開経路**: 既存 Issue scope 内で処理可能な内部実装上の影響は自律処理する。Issue scope、完了条件、REQ/Decision/Design、必須品質統制の追加変更が必要な場合は blocked とし、Root Case 指定による正規再開経路（経路解決は Root Case の正規状態、Epic 実行構成、既存成果物、実行の生存状況の照合で行う。人間に留保された判断の新規確定が必要な場合は req-define、再合意済みの場合は case-revise）に従う。staleness check で差異を検出した場合も Issue 本文を単独で書き換えず、差異を報告して blocked とし同一の正規再開経路に従う。
+- STEP-S4 で一時資材の作成・利用・回収義務を渡し、STEP-S5 で片付け結果・根拠・残件を確認する。権限外の副作用は停止する。Findings と Design 確定候補は PR 本文の別節に記録する。
+- **docs 整合性検査連携**: 文書変更時は対象 root で docs 整合性検査を実行し、結果を PR 本文に記録して case-close へ連携する。
 
 ## トレーサビリティ能力の利用
 
-case-run の実行担当（委譲内サブエージェント）は、対象要件について `agentdev-traceability` の coverage で既存の対応関係を確認しながら、実際に要件を実現する成果物へ実装対応を、実際に要件を検証する恒常的な検証手段へ検証対応を作成・更新する（STEP-S2 の関連Decision確認、委譲内 context 再確認）。対応宣言の作成先は成果物の配布境界で決定する。consumer distribution closure に含まれる配布対象成果物（command、skill、template、runtime script 等）の対応関係は、repository top-level の `traceability/` 配下の component / package 単位 sidecar へ作成・更新する。producer 側の開発管理成果物（docs 配下の正規成果物）の対応関係は、inline `ADF-COVERS` 宣言または sidecar へ作成・更新でき、sidecar と inline declaration は同じ論理的な対応関係へ正規化される。
-実行担当は PR 作成前に対象要件行に scope を限定した check（`--req`）を実行し、Design 対応欠落、implementation 対応欠落、policy が required と判定する要件行の verification 対応欠落、verification policy の不正、sidecar / inline declaration の構文不正、同一論理関係の不整合な重複を検出対象として検査する。Decision 対応の欠落は検出対象に含めない。
-対応宣言の表記仕様は `agentdev-traceability` Design「対応宣言の表記」が正規所有し、本スキルは表記仕様を再定義しない。
+委譲内で `agentdev-traceability` の coverage を利用し、実現成果物と恒常的な検証手段へ対応を付ける。変更された事実だけで対応付けず、再開時は保存済み宣言を再利用する。consumer distribution closure に含まれる成果物はリポジトリ直下の `traceability/` の component / package 単位 sidecar、producer 側の正規成果物は inline `ADF-COVERS` 宣言または sidecar を用いる。新規配布物ではこの規約を委譲 prompt へ渡し、前置・最終 gate も維持する。
 
-- 単に変更されたファイルであることを理由に、そのファイルを要件へ自動的に対応付けない
-- 上記の作成先規約は、新規配布物の作成を含む委譲において、委譲 context へ作成時の予防観点として引き渡される（委譲手順の項目は delegation-and-result reference の「配布物対応宣言の作成先規約の予防観点引き渡し」参照）。引き渡しは作成時予防であり、配布依存境界 checker による事後検知（事前書き込み gate・最終 gate）と両面運用で両立する。予防観点の引き渡しは検知機構の代替にも検知機構の変更にもしない
-- check の不合格が承認済み対象範囲内で修正可能な場合は修正して再検証する。要件変更、対象範囲拡大、追加設計判断、外部依存解消が必要な場合は blocked として必要な判断事項を報告する
-- 検証対応は「何が要件を検証するか」という検証手段との恒常的な対応関係であり、「今回その検証を実行して合格したか」という実行結果は Issue、PR、QG 側で扱う
-- 中断後の再実行では、正規成果物に保存済みの対応関係を再利用し、同じ対応宣言を重複生成しない
-- トレーサビリティ能力を利用して新規の依存関係、実行構成、Wave 構成、実行順序を設計しない。依存関係と実行構成の決定責務は上流工程（case-open の execution_unit 構成）が所有し、Wave 実行制御（共有 active Issue task 枠、Wave 収束と依存充足の gate）は case-auto orchestration stage 3 が所有する
-- agentdev-traceability の不在、実行失敗、空結果、候補過多だけを理由として workflow を停止しない（fail-open）。README 索引、正規成果物の直接読取、`rg` 等の独立探索手段で継続し、正規成果物そのものの異常とトレーサビリティ機能側の異常を区別する
+PR 前に対象要件に限定した `check --req` を実施し、対応欠落・宣言不正・検証ポリシー不正・不整合な重複を検査する。Decision 対応の欠落は検出対象に含めない。承認範囲なら修正して再検証し、変更判断が必要なら `blocked` とする。機能の不在・失敗・空結果・候補過多では独立探索に切り替える。対応関係を依存構成や Wave 設計に転用せず、今回の検証結果は Issue・PR・QG に記録する。
 
 ## 工程記録の取りまとめ反映（記録契機）
 
-case-run は記録契機に応じて、実行担当の報告を受けた取りまとめとして Case Issue の記録コメント投稿と本文進行状況・結果セクション更新を実行する。実行担当の報告だけで反映済みとせず、取りまとめが本文・コメントへの反映を担い、Epic 反映待ちの間も子 Issue の最新記録を読み取れる状態にする。記録コメント様式の正は `workflows/issue-lifecycle-records` Design、テンプレート投影と選定は `agentdev-workflow-templates` とする。
-
-- **記録契機**: 停止、判断変更、検証証拠の3種とする。着手・引き渡し・再開を契機とするコメント生成は廃止しており、着手は進行状況の開始日時（初回実着手）、引き渡しと再開は本文・PR で表現する。内部の全手順、全ツール実行、思考、定期投稿を記録契機に追加しない。短い複数の変化はまとめて記録でき、停止の通知を遅らせない
-- **委譲要求と実着手の区別**: STEP-S4 の委譲起動（委譲要求）は実着手と同一視しない。進行状況の開始日時は、実行担当から実装または検証に実着手した事実を報告された時点で初回設定する（停止・再開で上書きしない）
-- **工程終了を待たない途中報告**: 実行担当からの途中報告（確定した停止・判断待ち・判断変更影響）は result 確定を待たず、受領時点で対応する記録契機の反映（停止等の記録コメント投稿と本文進行状況の更新）を行う。途中報告は result 契約（4状態）の最終確定値を代替しない
-- **反映経路**: 記録コメントは記録種別に応じた工程記録コメントテンプレート（`agentdev-workflow-templates` 選定）を用い、Custom Tool `agentdev_gh` の comment_create で投稿する。本文進行状況・結果セクション更新は Custom Tool `agentdev_gh` の issue_update で行う。投稿・更新の本文は事前に記録コメント検証スクリプト（scripts/record-comments.ts、決定的処理。種別別必須項目検証、進行状況・結果セクション構築と既存本文への適用を提供）で検査し、検証不備の本文を投稿しない（fail-closed）。Custom Tool の操作契約（VERIFY つき fail-closed）は変更しない
-- **Epic 反映待ちの読取規律**: Epic 本文への反映が完了するまでの間は、子 Issue 本文の進行状況（開始・終了日時）と記録コメントが最新の情報として読み取れる状態を維持する（Epic 本文の書込みは case-close 単一書き手。case-run は書込まない）
-- **完了契機**: 完了判定と本文結果セクション更新の確定は case-close が判定主体として担当する（本スキル「共通制約」参照）。case-run は完了判定を行わず、完了条件チェックボックスを更新しない
+記録契機は停止・判断変更・検証証拠。着手・引き渡し・再開ではコメントを生成しない。実着手報告で進行状況の開始日時を一度だけ設定する。停止・判断変更の途中報告は result 確定を待たず反映する。`scripts/record-comments.ts` 合格後に `agentdev_gh` の `comment_create` と `issue_update` を用いる。Epic 反映待ちでも子 Issue の最新記録を維持する。完了判定・結果確定・完了条件チェックボックス更新は case-close の責務とする。
 
 ## 重要変更の通知と結果説明
 
-case-run は、実行担当サブエージェントへの委譲契約に重要変更の識別と報告を含める（委譲契約の正は `agentdev-case-run-execution-adapter`「実行担当の報告契約」節）。委譲先が実行中に重要変更を判明した場合は、その内容と影響を親側へ報告させる。case-run は報告を受けた重要変更を、工程記録の取りまとめ（記録契機）経由で利用者へ提示する。正規反映（PR 作成・マージ相当の確定操作）の前に判明した未反映の重要変更は、正規反映の前に利用者へ提示する。判明時点ですでに反映済みの内容は、反映済みである事実を区別して提示し、事後説明を事前通知として扱わない。
+委譲契約に重要変更の識別と報告を含める。未反映の重要変更は正規反映の前に利用者へ提示する。反映済みなら区別し、事後説明を事前通知として扱わない。裁量の範囲内は追加承認なしで継続し、通知のみを理由とする新たな一律停止を設けない。利用者判断が必要なら `blocked` に従う。照合・影響評価・更新・再検証を通知で代替しない。
 
-完了報告（STEP-S6）には、実際に変更した重要事項、事前の見込みと実績の違い、残る影響、未完了事項を含める。事前通知したが実施しなかった変更を実施済みと報告せず、一部成功・一部失敗・未確認・中断を実際の成立状況に応じて区別して報告する。委譲された裁量の範囲内の実行は通知後に追加承認なしで継続し、通知のみを理由とする新たな一律停止を設けない。利用者に留保された判断が必要な場合は、既存の blocked 正規再開経路に従う。既存の合意内容との照合、差分・影響評価、必要な更新・再検証を通知で代替しない。
-
-## 共通制約
-
-- **スコープ**: 単一 Issue のみを処理する。Epic や Wave を処理対象とする実行契約は廃止されており、Wave 実行制御は case-auto orchestration stage 3 が単一所有する。Epic 全体（複数 Wave）の一括実行、Wave 境界（PR マージ）は扱わない。Epic 再指定時の次 Wave 処理も引き受けない（Epic 全体の進行管理は case-auto が所有）
-- **統合先基準（作業起点・PR base）**: worktree の作成元と PR の base は main を参照する。rebase・同期基準、鮮度確認、Epic 後続 Wave の作業起点も main を参照する
-- **実装実行の非所有**: case-run 本体は work plan 生成、実装、TDD、乖離検出、specs 更新、PR 本文作成、PR 作成を行わない（実行担当サブエージェント責務、adapter protocol 参照）
-- **SSoT**: blocked/failed の詳細本文 SSoT は Issue コメント。completed の SSoT は PR 本文。verify-only closure（PR も carrier commit も存在しない Issue 完了）ではこの例外として、検証証跡（3検査と実行した検証の結果〔検証義務がリポジトリ全体の試験を要求する場合は integrity suite 全件〕、実行する検証と実行しない検証の範囲およびその根拠、再実行可能な実行コマンド列）を SSoT コメント（Issue コメント）へ記録する。変更が存在しないことのみを理由に必要な検証を省略せず、検証完了のために carrier commit を作成しない。一時会話コンテキスト、中間ファイルは SSoT としない
-- **委譲応答の3点ゲート**: 委譲結果の受領時に最終ゲートとして4状態 result（completed-pr / blocked / failed / delegation-unavailable）を必須検査し、状態別の必須欄を検査する（completed-pr は commit hash・PR URL、blocked・failed・delegation-unavailable は停止理由と再開情報〔SSoT 記録先を含む〕。開始前・途中の停止結果に PR URL・commit hash を要求しない）。不足する委譲応答を completed-pr として扱わず再開（再委譲または継続指示）する。実装・検証の要約は3点検査の通過を代替しない。verify-only closure は SSoT コメント契約の別経路として既存どおり扱い、3点の不足判定を適用しない（詳細は `agentdev-case-run-execution-adapter` 参照）
-- **委譲応答の返却サマリ上限**: 委譲応答（実行担当から case-run への最終返却本文）は、ステータス（報告用 completed / blocked / failed）、副作用有無を含む判定要約、変更ファイルパス一覧、コミット SHA、Issue/PR 番号、テスト結果の pass/fail 件数、未達事項/ブロッカー、詳細成果物パスの八項目で構成する構造化サマリとし、UTF-8 本文の上限目安を 3〜4 KB 以内とする。長大な詳細は PR 本文・Issue コメント等の既存権限で参照できる場所へ退避し、返却本文には退避先のパス/URL 参照のみを含める。case-run はサマリと3点ゲートに必要な証拠（退避先の原文・証跡）を参照して進行判定を行い、報告用ステータスから PR 完了やゲート合格を導出しない（報告用ステータスは result 4状態を変更しない。詳細は `agentdev-case-run-execution-adapter`「最終返却本文のサマリ上限（八項目・3〜4 KB・詳細退避）」節参照）
-- **background 委譲の起動消失の回復**: background 委譲の起動直後消失を検知した場合、durable state（worktree の git status、PR 存在、Issue コメント）で実行の帰属を確認し、実行未試行と判定した場合は同期実行によらず background での再委譲（親 orchestration が所有する起動間隔契約に従う）を行う。background 再委譲の起動失敗が継続する場合は、Design が所有する再試行計上契約に基づき delegation-unavailable として再開可能な停止報告へ確定する。実行中断と判定した場合の継続判断も当該 durable state に基づく。実行並列上限（共有 active Issue task 枠）は case-auto orchestration stage 3 が単一所有し、case-run は独立した実行枠を持たない
-- **blocked 正規再開経路**: 実装中に新たな変更影響候補を発見した場合、既存 Issue scope 内で処理可能な内部実装上の影響は自律処理する。Issue scope、完了条件、REQ/Decision/Design、必須品質統制の追加変更が必要な場合は blocked とし、Root Case 指定による正規再開経路（経路解決は Root Case の正規状態、Epic 実行構成、既存成果物、実行の生存状況の照合で行う。人間に留保された判断の新規確定が必要な場合は req-define、再合意済みの場合は case-revise）に従う。staleness check で差異を検出した場合も Issue 本文を単独で書き換えず、差異を報告して blocked とし同一の正規再開経路に従う
-- **未決依存の保留と実行継続の区別、試作の区別**: 実行契約に未決判断に依存する部分（保留）と依存しない部分の区別が含まれる場合、前置 gate と委譲では依存する部分を保留し、依存しない部分は他の実行条件を満たす限り実行を継続する（未決事項の存在だけを理由に依存しない作業を停止しない）。利用者が明示的に許可した試作は、正式採用・正規成果物の確定・本番適用と区別して実施し、試作の実施、成果物の存在、試験の成功を当該候補の正式採用や未決事項の解決として扱わない。未決の設計候補について試作として実施するには利用者の明示的な指示または許可を要し、明示的な指示・許可がない試作を開始しない（明示的な指示・許可がない限り、当該部分は未決判断に依存する実装として保留する）。消費境界適用の詳細は references/single.md、最終受け入れ確認は references/delegation-and-result.md を参照する
-- **docs 整合性検査連携**: PR 対象ファイルに docs 変更を含む場合は docs 整合性検査を実行し、結果を PR 本文に記録して case-close へ連携する。検査対象 root の誤解決（配置先起点の誤リポジトリ検査）は検査見逃しとして扱う
-- **完了条件チェックボックス**: case-run、実行担当サブエージェントは完了条件チェックボックスを更新しない（case-close QG-4 の責務）
-- **工程記録の取りまとめ反映**: 委譲 result 受領時・途中報告受領時は「工程記録の取りまとめ反映（記録契機）」節に従い、記録コメント投稿と本文進行状況・結果セクション更新を実行する（手順詳細は references/delegation-and-result.md）
-- **Findings / Design確定候補**: 実行担当サブエージェントが PR 本文の `## Findings / Capture候補` と `## Design確定候補` に記録する（別セクション、混在させない）。case-run の capture 責務は記録のみ
-- **外部実行ハーネスの中間成果物**: plan artifact 等を AgentDevFlow の永続成果物として扱わず、最終結果は PR URL で受領する
-- **検証用一時資材の作成・報告義務の委譲と後片付け結果の受領**: STEP-S4 の委譲 prompt には、一時資材の作成・利用・回収に関する義務を含める（delegation-contracts Design「検証用一時資材の作成・報告義務」節。委譲先は既存の配置規則と権限に従う標準的な一時領域・リポジトリ内の作業領域・許可された外部環境で作成・利用し、利用終了時に安全条件が成立する範囲で回収する。継続利用する資材は引継ぎ事項として報告する）。STEP-S5 で委譲結果を受領した場合、検証結果に加え、後片付けの実施結果、確認根拠、未処理事項（未回収・確認不能・引継ぎ）が既存の報告経路で返されていることを確認する。必要な副作用が許可範囲を超える場合は既存の停止・判断経路を利用する（許可境界の正は委譲時の判断・承認・副作用境界の REQ。対応関係は repository top-level `traceability/` 配下 sidecar を参照）
-- **L2 タイムスタンプ**: worktree 設定、実行担当サブエージェント実行、worktree クリーンアップの各開始・終了時刻（JST）を計測し、完了報告の L2 内訳に含める（case-auto の L1 内訳の入力）
-
-## See Also
-
-- **`<workflows/workflow-skill-model>` Design**: Workflow Skill 固有契約の正規所有者
-- **`<foundations/durable-state-and-recovery>` Design**: STEP reference 構造、resume point
-- **責務3層分化と1:N分割原則**: Command は公開入口、Workflow Skill は工程の実装、Capability Skill は共通能力を所有する。Workflow Skill の分割は制御構造の実質差異に基づき評価し、操作の違いだけでは分割しない。
-- **STEP resume point と会話記憶非依存**: 安定した STEP 識別子と永続情報から再開点を再構成する。再開点を決める契約と、実行基盤による現在 STEP の選択処理を区別する。
-- **case-run command**: 本スキルの呼出元（公開 interface・ガードレール・dispatch を所有）
+STEP-S6 の報告には実際に変更した重要事項、事前の見込みと実績の違い、残る影響、未完了事項を含める。事前通知したが実施しなかった変更を実施済みと報告せず、一部成功・一部失敗・未確認・中断を実際の成立状況に応じて区別して報告する。worktree 準備・委譲実行・cleanup の L2 計測（JST）も報告する。
