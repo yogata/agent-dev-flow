@@ -1,6 +1,6 @@
 ---
 name: agentdev-workflow-case-revise
-description: "内部 lifecycle 段階 case-revise の workflow 実装本体。再合意済み Definition 変更の受入確認（未合意変更の req-define 差し戻し）、canonical Definition との実変更判定、冪等キーによる既存 Definition Amendment PR の検出と再利用、設計修正PR作成、Epic 完了済み Issue の影響再評価（巻き戻し禁止）、合意変更の受領確認経路、Case 関連 Issue 本文更新、case-ready 引き継ぎ、中断済み成果物の再利用による収束を所有する。USE FOR: case-revise 実行時の workflow 制御。DO NOT USE FOR: 新しい要求・Decision・対象範囲の決定と Definition の意味判断（req-define 側の責務）、execution contract / execution structure の再確定（case-ready 側の責務）、実装実行（case-run 側の責務）、単独起動（case-auto の内部 lifecycle orchestration から起動される内部段階である）。"
+description: "内部 lifecycle 段階 case-revise の workflow 実装本体。再合意済み Definition 変更の受入確認（未合意変更は req-define へ差し戻し）、実変更判定、冪等キーによる既存 Amendment PR の検出と再利用、設計修正PR作成、Epic 完了済み Issue の影響再評価（巻き戻し禁止）、Case 関連 Issue 本文更新、case-ready 引き継ぎ、中断済み成果物の再利用による収束を所有する。USE FOR: case-revise 実行時の workflow 制御。DO NOT USE FOR: 新規要求と Definition の意味判断（req-define）、execution contract の再確定（case-ready）、実装実行（case-run）、単独起動（case-auto の内部段階）。"
 ---
 
 

@@ -1,6 +1,6 @@
 ---
 name: repo-agentdev-integrity
-description: Repo-local integrity validation for agent-dev-flow self-hosting artifacts. Plugin-based verification engine (cli.ts: --changed/--emit-intake/--rule/--workflow) for REQ/Decision/Design/skill/command consistency, index auto-generation, and the trusted distribution gate. USE FOR: running integrity checks, validating frontmatter and cross-references, differential verification of staged changes, changed-docs verification for workflows, auto-ticketing warnings, regenerating index AUTOGEN blocks. DO NOT USE FOR: semantic content evaluation, user approval, requirement analysis, ADR necessity judgment.
+description: "Repo-local integrity validation for agent-dev-flow. Plugin verification engine for REQ/Decision/Design/skill/command consistency, index generation, and distribution gate. USE FOR: integrity checks, frontmatter/cross-reference validation, staged-change verification, index regeneration, auto-ticketing warnings. DO NOT USE FOR: semantic evaluation, user approval, requirement analysis, ADR judgment."
 ---
 
 # repo-agentdev-integrity
