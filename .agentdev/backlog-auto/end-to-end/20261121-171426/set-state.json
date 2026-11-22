@@ -286,9 +286,32 @@
         "consumption": "要件doc・RU は case-ready で消費済み（commit b9f793fbe）・draft 残存なし・Epic #4177 closed"
       }
     },
-    "stage7_release": { "status": "not_started" }
+    "stage7_release": {
+      "status": "completed",
+      "at": "2026-11-22T04:55:00+09:00",
+      "targetCommit": "412986b65d9ef07fbadd304fc3ed8cdac7d28a5c",
+      "version": "v5.2.4",
+      "preReleaseTests": {
+        "atCommit": "412986b65d9ef07fbadd304fc3ed8cdac7d28a5c",
+        "integrityScripts": "1443 pass / 0 fail / 38 files",
+        "bunTestSrc": "3683 pass / 0 fail / 151 files",
+        "pluginsAndScripts": "738 pass / 3 fail / 1 error / 741 tests / 42 files（既知欠陥・baseline 5872539bc と同一再現・PR #4201 検証差分に由來登録済み）",
+        "cliFull": "PASS exit 0（OK 24・NG 0・Warning 0・Error 0）",
+        "autogenFreshness": "PASS exit 0",
+        "traceabilityCorpus": "missing-design 0・参照切れ 0（missing-impl 53・missing-verif 87 は baseline 起因 advisory）",
+        "lintSkills": "WARNING 1 件（19263 > 18550・baseline 同一・#4200 追跡）"
+      },
+      "commitAttribution": "5872539bc..412986b65 の 22 コミット全てを一式帰属と確認（無関係コミット混入なし）",
+      "tag": "v5.2.4（annotated・tag object 61bd1ee14・push 済み）",
+      "release": "https://github.com/yogata/agent-dev-flow/releases/tag/v5.2.4"
+    }
   },
   "releaseState": {
-    "status": "not_started"
+    "status": "completed",
+    "version": "v5.2.4",
+    "publishedAt": "2026-11-22T01:55:03Z",
+    "publicationMode": "workflow実行",
+    "approvalBasis": "HITL 質問 ID: #4186 仲裁質問（2026-11-22・回答「案A」）+ 利用者中継指示 2026-11-22（v5.2.4 タグ・Release 完了と公開権限の明示付与）",
+    "notes": "全版タグと Release 1:1 読戻し確認済み（draft 残存なし・prerelease=false）"
   }
 }
