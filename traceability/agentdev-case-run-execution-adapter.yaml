@@ -41,6 +41,7 @@ implementation:
     - REQ-118-008
     - REQ-125-001
     - REQ-125-003
+    - REQ-125-008
 verification:
   src/common/skills/agentdev-case-run-execution-adapter/tests/startup-cadence-pins.test.ts:
     - REQ-125-003

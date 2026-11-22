@@ -22,6 +22,7 @@ updated: "2026-11-18"
 <!-- ADF-COVERS(design): REQ-030-032 -->
 <!-- ADF-COVERS(design): REQ-032-047, REQ-032-048（QG-4 最終受け入れの検証義務に基づく試験範囲選択と最終受け入れ判定の design 実体） -->
 <!-- ADF-COVERS(design): REQ-125-001 -->
+<!-- ADF-COVERS(verification): REQ-125-008（Epic 横断最終検証義務 TS-007 の照合を QG-4 独立再検査と Epic Wave クローズ手続きで実施する design 実体） -->
 
 # case-close Design
 
