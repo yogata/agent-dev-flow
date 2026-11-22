@@ -6,6 +6,7 @@ updated: 2026-11-18
 ---
 <!-- ADF-COVERS(implementation): REQ-002-001, REQ-002-002, REQ-002-003, REQ-002-004, REQ-002-017, REQ-002-018, REQ-002-034 -->
 <!-- ADF-COVERS(implementation): REQ-027-001, REQ-027-002, REQ-027-003 -->
+<!-- ADF-COVERS(design): REQ-125-004, REQ-125-005, REQ-125-008 -->
 
 # Workflow Skill Model
 
@@ -228,6 +229,12 @@ Workflow Skill の単独起動防止（soft guard）は OpenCode 1.18.15 が ski
 
 command 定義本文に宣言節を持たない構成でも Skill 層の DO NOT USE FOR トリガーにより soft guard は実効する。
 Command Design の delegated responsibility 記述は、当該 command の実効層構成（二層または Skill 層のみ）を反映する。
+
+## 実行時 SKILL 本文と条件付き参照
+
+対象の本文は入口判定、必須ステップ順序、禁止事項、ゲート条件、詳細参照の発火条件とリンクを保持する。例外処理、復旧、稀なエッジケース、詳細例とテンプレートは、対応する `references/` に置き、該当時だけ読む。通常経路の一括読込や参照先への規範の置き忘れを生じさせない。
+
+`lint_skills` は frontmatter と分離した本文の UTF-8 バイト数を検査し、目安の上端 10 KB を超える場合を本文予算の警告として示す。既存の description の個別・集約予算と警告契約を変更せず、この警告を新たな工程停止条件にしない。正本と投影は現在の同期方式を維持する。
 
 ## artifact-contracts.md からの委譲
 

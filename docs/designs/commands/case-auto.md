@@ -18,6 +18,7 @@ updated: "2026-11-18"
 <!-- ADF-COVERS(design): REQ-101-017, REQ-032-038 -->
 <!-- ADF-COVERS(design): REQ-108-002, REQ-108-008, REQ-108-012 -->
 <!-- ADF-COVERS(implementation): REQ-104-009, REQ-104-010, REQ-104-011, REQ-104-012（採用規約の解決の実行経路接続節） -->
+<!-- ADF-COVERS(design): REQ-125-002, REQ-125-003 -->
 
 # case-auto Design
 
@@ -151,6 +152,12 @@ orchestration 中の警告・確認・選択肢提示に由来する HITL questi
 ## Phase 0 commit スコープ設計運用
 
 詳細は references/observability-and-commit-scope.md を参照（遅延読み込み）。
+## 工程・投入境界のハンドオフ
+
+複数 Issue の工程境界または投入バッチ境界では、起動時対象の安定識別子、Root Case、関連 Issue/PR 番号、適用可能な `.agentdev/` 状態ファイルと git 側の参照、再開入口を引き渡す。新規セッションは当該正規状態から最早の未収束段階を再構成し、完了済み対象を再実行せず、稼働中のタスクを二重起動しない。case-ready 後の再開は削除された draft/RU に依存しない。実行中や未確認を収束と扱わず、ハンドオフを完了報告に置換しない。
+
+工程の子結果には [委譲結果サマリ](../workflows/delegation-contracts.md#親セッション向け委譲結果サマリ) を使う。待機は現行の起動間隔、最初の起動、共有枠およびスロット型補充を維持し、既存処理との同一ターンまたは実行側スケジューリングに組み合わせる。固定バッチの全件完了待ち、同時一括起動、同期逐次フォールバックに切り替えない。
+
 ## 停止状態
 
 停止状態の詳細（停止理由分類、伝播契約）は「adversarial-review 由来の停止伝播（case-auto の停止伝播受領）」「bounded parent decision resolution」節、および Workflow Skill（`agentdev-workflow-case-auto`）の停止条件分類が正規所有する。

@@ -17,6 +17,7 @@ updated: "2026-11-18"
 <!-- ADF-COVERS(design): REQ-017-022 -->
 <!-- ADF-COVERS(implementation): REQ-104-009, REQ-104-010, REQ-104-011, REQ-104-012（採用規約の解決の実行経路接続節） -->
 <!-- ADF-COVERS(implementation): REQ-124-005（workflow・command 系 Design の現行構成への現行化。controlled_case_execution の単一 Issue 実行委譲への再定義を含む） -->
+<!-- ADF-COVERS(design): REQ-125-001 -->
 
 # case-run Design
 
@@ -50,6 +51,10 @@ case-run から実行担当サブエージェントへの委譲契約を以下�
 
 - Issue番号またはURL（要件doc埋め込み済み）（単一 Issue 実行モード。case-run が受理するのは常に単一 Issue 入力であり、Epic Issue 入力経由の Wave 実行制御は case-auto の orchestration stage 3 へ移転済み（REQ-031-015、DEC-041）。Epic Issue 入力の扱いは現行実装に沿って case-auto 経由の正規呼出へ限定し、case-run 自身の Wave 構成読み取り・fan-out を行わない）
 - ブランチ名（自動生成または指定）
+
+## 委譲結果サマリの受領
+
+実行担当の最終本文は [委譲結果サマリ](../workflows/delegation-contracts.md#親セッション向け委譲結果サマリ) として受領する。実行状態の判定・前置/最終ゲートは従来どおり正規結果と必須証拠に基づき、詳細確認では該当する参照先だけを読む。
 
 ## 出力
 
