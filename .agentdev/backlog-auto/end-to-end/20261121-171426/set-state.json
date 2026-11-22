@@ -260,10 +260,32 @@
           "reason": "本番相当の実 workflow 実行証拠が工程境界（新規一式禁止・単独 req-define 起動）内で取得不能。条件2（成果物の IR-044 検出 0 件）は pass。",
           "pendingArbitration": "HITL で (a) 実 req-define 実行の新規承認 / (b) 検証方法解釈変更の承認 / (c) 完遂判定からの除外 を仲裁予定"
         },
-        "epicTable": "9 completed・1 blocked 反映済み（#4177 実行構成表）"
+        "epicTable": "9 completed・1 blocked 反映済み（#4177 実行構成表）",
+        "epicClosed": {
+          "at": "2026-11-22T03:55:00+09:00",
+          "note": "Epic #4177 を accepted=true で終了（完了条件2条件とも pass・TS-011 は横断義務 satisfied・#4186 除外は利用者仲裁案Aを判定根拠として記録・仲裁記録コメント 7072325514）"
+        },
+        "frictionLog": {
+          "at": "2026-11-22T03:45:00+09:00",
+          "note": "利用者指示の摩擦2件（実行側出力の中国語混入・REQ-055 本番相当証跡の隔離取得不能ギャップ）と PR 由来 Learning 候補2件（#4191 配布物参照 slug 置換・#4197 sidecar 構造保持編集）を learning inbox へ記録（commit 2cd63e678）"
+        },
+        "cleanup": {
+          "at": "2026-11-22T04:00:00+09:00",
+          "note": "worktree 15件（run 9件・fix 3件・remediation2・definition・baseline587）とローカルブランチ 13本を削除。.agentdev/tmp 233 件を削除"
+        }
       }
     },
-    "stage6_completionJudgment": { "status": "not_started" },
+    "stage6_completionJudgment": {
+      "status": "completed",
+      "at": "2026-11-22T04:05:00+09:00",
+      "verdict": "fulfilled",
+      "basis": {
+        "obligationMapping": "義務スナップショット RU-20261121-01〜10 → OU-001〜010（1:1・ruMapping）→ 子 Issue #4179〜#4188 の全対応確認",
+        "executionOutcome": "9 件 accepted=true で終了・#4186 は blocked（利用者仲裁案A・2026-11-22 で完遂判定から除外・条件2と実装は有効・再開条件を #4186 に記録）",
+        "verificationOutcome": "TS-001〜TS-010 は各子 Issue の受入評価で実測成立。TS-011 は passed_with_adjudication（検証エンジン PASS・autogen PASS・bun test ./src/ 3683 pass・traceability corpus missing-design 0/参照切れ 0・lint WARNING 1 件は既知負債として HITL 合格・#4200 追跡）",
+        "consumption": "要件doc・RU は case-ready で消費済み（commit b9f793fbe）・draft 残存なし・Epic #4177 closed"
+      }
+    },
     "stage7_release": { "status": "not_started" }
   },
   "releaseState": {
