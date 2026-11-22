@@ -74,6 +74,7 @@ implementation:
     - REQ-111-017
     - REQ-111-018
     - REQ-110-033
+    - REQ-125-006
   src/common/skills/agentdev-workflow-req-define/references/requirement-development.md:
     - REQ-004-070
     - REQ-008-062

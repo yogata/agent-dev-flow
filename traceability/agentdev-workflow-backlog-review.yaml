@@ -3,6 +3,7 @@ implementation:
   src/common/skills/agentdev-workflow-backlog-review/SKILL.md:
     - REQ-096-012
     - REQ-096-020
+    - REQ-125-006
   src/common/skills/agentdev-workflow-backlog-review/references/analysis-composition-and-review.md:
     - REQ-096-007
     - REQ-096-008
