@@ -25,7 +25,7 @@ case-ready command は公開 interface（入出力契約・ガードレール）
 ## 副作用
 
 - 設計PR merge、Epic / 子 Issue 作成、Root Case 本文更新、コメント追加（`agentdev_gh` 経由。VERIFY は Tool 内部）
-- Decision の proposed → accepted 遷移（委譲）、draft / RU の削除（成功時のみ。失敗・中断時は保持）
+- Decision の proposed → accepted 遷移（委譲）、draft / RU の削除（成功時のみ。blocked、failed、中断時は保持）
 - deviation capture 保存: 実観測した deviation を委譲スキル経由で Split Rule に従い `.agentdev/intake/` または `.agentdev/learning/` へ保存（git 永続化は明示パス指定）
 - 行わない副作用: Epic 実行構成表更新（単一書き手は case-close）、実装実行、完了条件チェックボックス評価
 
@@ -57,6 +57,7 @@ case-ready command は公開 interface（入出力契約・ガードレール）
 
 - 再開点は永続状態から再構成し、merge 済み設計PR検出後は merge を巻き戻さず、canonical Definition（merge 済み main の docs 永続文書）を基準として再開する
 - 冪等キー（case-open / case-ready Design）で既存成果物を検出し再利用する
+- 後続工程への状態引渡し: case-ready 完了時点で、後続工程（case-run）と新規セッションからの再開に必要な正規状態（Root Case 本文の execution contract、Epic Issue 本文の実行構成、Child Issue、Wave / 依存構造）は Issue と canonical 成果物上で成立する。STEP-7 の draft / RU 削除後に後続の実行または再開が削除された draft/RU に依存せず成立することを、本工程の状態引渡しとして担保する（正規原本は case-auto Design「工程・投入境界のハンドオフ」節）
 
 ### 終了条件（termination）
 

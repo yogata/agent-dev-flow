@@ -59,6 +59,7 @@ implementation:
     - REQ-108-015
     - REQ-108-016
     - REQ-108-017
+    - REQ-125-002
     - REQ-125-004
   src/common/skills/agentdev-workflow-case-ready/references/decision-acceptance.md:
     - REQ-096-003
@@ -125,6 +126,8 @@ implementation:
     - REQ-061-043
     - REQ-061-052
 verification:
+  src/common/skills/agentdev-workflow-case-ready/scripts/tests/handoff-state-transfer-pins.test.ts:
+    - REQ-125-002
   src/common/skills/agentdev-workflow-case-ready/scripts/tests/accept-validate-input.test.ts:
     - REQ-009-053
     - REQ-117-010

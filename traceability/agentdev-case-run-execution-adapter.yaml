@@ -40,7 +40,10 @@ implementation:
     - REQ-118-005
     - REQ-118-008
     - REQ-125-001
+    - REQ-125-003
 verification:
+  src/common/skills/agentdev-case-run-execution-adapter/tests/startup-cadence-pins.test.ts:
+    - REQ-125-003
   src/common/skills/agentdev-case-run-execution-adapter/SKILL.md:
     - REQ-003-030
   src/common/skills/agentdev-case-run-execution-adapter/references/harness-delegation.md:
