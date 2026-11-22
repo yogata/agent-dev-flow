@@ -43,6 +43,11 @@ implementation:
     - REQ-111-031
     - REQ-111-032
     - REQ-117-008
+    - REQ-125-004
+  src/common/skills/agentdev-workflow-phase-artifacts-update/references/input-and-records.md:
+    - REQ-125-004
+  src/common/skills/agentdev-workflow-phase-artifacts-update/references/restructure-and-revise.md:
+    - REQ-125-004
   src/common/commands/agentdev/phase-artifacts-update.md:
     - REQ-110-007
     - REQ-110-008

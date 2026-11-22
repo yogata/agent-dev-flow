@@ -8,6 +8,7 @@ implementation:
     - REQ-107-001
     - REQ-107-002
     - REQ-107-007
+    - REQ-125-004
   src/common/skills/agentdev-traceability/references/check-interpretation.md:
     - REQ-012-058
     - REQ-107-005

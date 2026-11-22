@@ -1,5 +1,4 @@
 // ADF-COVERS(verification): REQ-002-013, REQ-002-014, REQ-002-015, REQ-002-018, REQ-050-016
-// ADF-COVERS(implementation): REQ-010-082
 /**
  * Skill structure linter for AgentDevFlow.
  * Validates all skill directories under .opencode/skills/ for structural
@@ -101,6 +100,8 @@ const AG005_CATEGORY = "AG-005";
 const DESC_INDIVIDUAL_LIMIT = 600;
 const DESC_SPEC_LIMIT = 1024;
 const DESC_AVERAGE_BUDGET = 350;
+const BODY_BUDGET_BYTES = 10 * 1024;
+const BODY_BUDGET_CATEGORY = "BodyBudget";
 const REFERENCES_TOC_LINE_LIMIT = 300;
 // soft guard マーカー語（AG-001）。簡潔トリガー項の「単独起動」はマーカー語ではない。
 const DESC_MARKER_WORD_RE = /soft guard|直接起動/i;
@@ -384,7 +385,7 @@ function buildSummaryNotes(
   aggregateBudgetWarning: boolean,
 ): string[] {
   const notes: string[] = [
-    "NG は検証不通過、Warning は傾向管理として区別して報告する（REQ-010-082）。Warning 存在時も無視・抑制による隠蔽は行わず、Warning も exit code 1 を駆動する。",
+    "NG は検証不通過、Warning は傾向管理として区別して報告する（REQ-010-082）。本文予算の警告は報告のみとし、それ以外の Warning は exit code 1 を駆動する。",
   ];
   if (aggregateBudgetWarning) {
     notes.push(
@@ -731,6 +732,16 @@ function main(): void {
         ...lintDescriptionAg005(sd.name, frontMatter, content, workflowBound),
       );
       allResults.push(...lintReferencesTocAg005(sd.fullPath, sd.name));
+      const body = content.replace(/^\uFEFF?---\r?\n[\s\S]*?(?<=\n)---(?:\r?\n|$)/, "");
+      const bodyBytes = Buffer.byteLength(body, "utf8");
+      if (bodyBytes > BODY_BUDGET_BYTES) {
+        allResults.push(warn(
+          BODY_BUDGET_CATEGORY,
+          "SKILL.md body budget",
+          `${bodyBytes} UTF-8 bytes exceeds ${BODY_BUDGET_BYTES} bytes`,
+          sd.name,
+        ));
+      }
     }
   }
   allResults.push(aggregateBudgetResultAg005(agTotalChars, agSkillCount));
@@ -770,7 +781,9 @@ function main(): void {
   } else {
     console.log(formatMarkdownReport(report));
   }
-  process.exit(determineExitCode(summary));
+  process.exit(determineExitCode(computeSummary(
+    allResults.filter((result) => result.category !== BODY_BUDGET_CATEGORY),
+  )));
 }
 
 if (import.meta.main) {

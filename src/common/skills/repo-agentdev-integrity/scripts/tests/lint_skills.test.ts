@@ -296,6 +296,29 @@ describe("lint_skills.ts", () => {
   });
 
   describe("--json flag", () => {
+    it("reports only over-budget UTF-8 bodies without failing the run", async () => {
+      const bodyAtLimit = "あ".repeat(3413) + "a";
+      const skills = [
+        { name: "agentdev-at-limit", body: bodyAtLimit },
+        { name: "agentdev-over-limit", body: bodyAtLimit + "a" },
+      ].map(({ name, body }) => ({
+        name,
+        content: `---\r\nname: ${name}\r\ndescription: "USE FOR: fixtures. DO NOT USE FOR: production."\r\n---\r\n${body}`,
+      }));
+      const env = setupSrcEnv({ skills, commands: [] });
+      try {
+        const result = await runScript(env.scriptPath, ["--json"]);
+        expect(result.exitCode).toBe(0);
+        const report: JsonReport = JSON.parse(result.stdout);
+        expect(report.results.filter((row) => row.category === "BodyBudget")).toEqual([
+          expect.objectContaining({ file: "agentdev-over-limit", level: "warning" }),
+        ]);
+        expect(report.summary.warning).toBe(1);
+      } finally {
+        fs.rmSync(env.tempDir, { recursive: true, force: true });
+      }
+    });
+
     it("outputs valid JSON with expected structure", async () => {
       const result = await runScript(validEnv.scriptPath, ["--json"]);
       expect(result.exitCode).toBe(0);

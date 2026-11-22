@@ -173,3 +173,7 @@ STEP-4 の機械工程（専用 worktree 作成、Definition branch 作成、REQ
 
 - 前: STEP-2 / STEP-3（root-case-and-definition-package）
 - 次: STEP-6（capture-and-completion）
+
+## issue_list の絞り込み規律
+
+STEP-5 の冪等検出（既存 Root Case・既存設計PR検出、横断依存検査の未クローズ Case 群取得）で issue_list を使用する場合、search トークンは検索対象を実効的に絞り込める選択性を持つ語（冪等キー語、REQ 番号、topic_slug 等）を用い、同一バッチ兄弟 Case 本文に頻出する相互参照トークン（兄弟 Case の RU 番号等）を単独の絞り込み根拠にしない（`agentdev-issue-management` の issue-operation-safety.md「issue_list の絞り込み規律と上限到達時 contingency」節の search トークン選択性指針参照）。

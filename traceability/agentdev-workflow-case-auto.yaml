@@ -44,6 +44,9 @@ implementation:
     - REQ-003-031
     - REQ-117-008
     - REQ-125-001
+    - REQ-125-004
+  src/common/skills/agentdev-workflow-case-auto/references/finite-execution.md:
+    - REQ-125-004
   src/common/skills/agentdev-workflow-case-auto/scripts/src/records-report.ts:
     - REQ-034-021
     - REQ-101-008

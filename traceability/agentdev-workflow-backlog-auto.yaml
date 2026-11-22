@@ -41,6 +41,7 @@ implementation:
     - REQ-114-018
     - REQ-117-008
     - REQ-125-001
+    - REQ-125-004
   src/common/commands/agentdev/backlog-auto.md:
     - REQ-114-001
     - REQ-114-010
