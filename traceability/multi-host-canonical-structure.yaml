@@ -66,3 +66,4 @@ verification:
   src/common/skills/agentdev-workflow-case-run/scripts/tests/process-conformance.test.ts:
     - REQ-099-015
     - REQ-099-016
+    - REQ-125-001
