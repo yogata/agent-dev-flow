@@ -94,6 +94,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [commands/inspect-docs.md](commands/inspect-docs.md) | accepted | inspect-docs（内部 workflow、backlog-auto 駆動） |
 | [commands/inspect-promote.md](commands/inspect-promote.md) | accepted | inspect-promote（内部 workflow、backlog-auto 駆動） |
 | [commands/backlog-auto.md](commands/backlog-auto.md) | accepted | `/agentdev/backlog-auto` |
+| [commands/migrate.md](commands/migrate.md) | draft | `/agentdev/migrate`（構成移行の公開入口。版別差分仕様と正規構造に基づく推論移行と決定論的検証） |
 
 `/repo/docs-check` は repo-local、配布対象外のため対象外。
 
@@ -134,6 +135,7 @@ Design は commands / skills / workflows の 3 層ディレクトリ構造と、
 | [skills/agentdev-git-worktree-test-fallback.md](skills/agentdev-git-worktree-test-fallback.md) | accepted | 補助 | worktree 構造系テスト fallback 契約（junction 未設定時の src/opencode/ fallback、構造的制約の明示） |
 | [skills/agentdev-workflow-backlog-auto.md](skills/agentdev-workflow-backlog-auto.md) | accepted | 中核 | backlog-auto workflow 実装本体（orchestration stage 構成、直列化契約、fan-in 判定、resume 契約） |
 | [skills/agentdev-issue-tracking.md](skills/agentdev-issue-tracking.md) | accepted | 中核 | 追跡Issue論理スキーマの一元管理（role/kind/状態遷移、物理マッピング表、本文標準構造、反映追跡） |
+| [skills/agentdev-workflow-migrate.md](skills/agentdev-workflow-migrate.md) | draft | 中核 | migrate workflow 実装本体（差分仕様の解決、移行実行、削除判断のユーザー確認、決定論的事後検証への接続） |
 
 `repo-agentdev-integrity` は repo-local、配布対象外のため対象外。
 

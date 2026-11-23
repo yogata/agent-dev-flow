@@ -177,7 +177,77 @@ $LocalModeRedirectToolRel = 'tools\agentdev-gh'
 $TextlintGuardBundleRel = 'plugins\agentdev-textlint-guard\vendor\textlint-engine.bundle.json'
 $TextlintGuardDictRel = 'plugins\agentdev-textlint-guard\vendor\kuromoji-dict'
 
+# 配布版マーカーと版状態記録（REQ-126-003）。src/common/VERSION（1行・semantic version）
+# が配布版の正本であり、apply 完了時に .agentdev/install-state.json へ記録する。
+# check は記録版と配布版の一致・旧構造痕跡の不在を検証する。
+$DistributionVersionFile = Join-Path $CommonSourceDir 'VERSION'
+$InstallStatePath = Join-Path $RepoRoot '.agentdev\install-state.json'
+# 旧構造痕跡検知の正本定数。廃止済み配置ディレクトリの存在検知に使う。
+$LegacyStructureRels = @(
+    '.agentdev\blocked',
+    '.agentdev\phase',
+    '.agentdev\intake',
+    '.agentdev\learning',
+    '.agentdev\inspect',
+    '.agentdev\backlog-auto'
+)
+$DistributionVersion = $null
+if (Test-Path -LiteralPath $DistributionVersionFile) {
+    $DistributionVersion = [System.IO.File]::ReadAllText($DistributionVersionFile).Trim()
+    if ([string]::IsNullOrEmpty($DistributionVersion)) { $DistributionVersion = $null }
+}
+
 # --- Helper Functions ---
+
+function Read-InstallState {
+    <#
+    .SYNOPSIS
+    .agentdev/install-state.json を読み、解析結果を返す。
+    .DESCRIPTION
+    不在・解析不能・schema 不一致のいずれかは $null を返す（呼び出し側で fail-closed 判定する）。
+    #>
+    if (-not (Test-Path -LiteralPath $InstallStatePath)) { return $null }
+    try {
+        $raw = [System.IO.File]::ReadAllText($InstallStatePath)
+        $state = $raw | ConvertFrom-Json
+        if ($null -eq $state -or -not ($state.distributionVersion -is [string])) { return $null }
+        return $state
+    } catch {
+        return $null
+    }
+}
+
+function Get-LegacyStructureRels {
+    <#
+    .SYNOPSIS
+    旧構造痕跡（$LegacyStructureRels のうち実在するもの）の相対パス一覧を返す。
+    #>
+    $found = @()
+    foreach ($rel in $LegacyStructureRels) {
+        if (Test-Path -LiteralPath (Join-Path $RepoRoot $rel)) { $found += $rel }
+    }
+    return $found
+}
+
+function Write-InstallStateRecord {
+    <#
+    .SYNOPSIS
+    apply 完了時に .agentdev/install-state.json へ配布版を記録する。
+    #>
+    $parentDir = Split-Path -Parent $InstallStatePath
+    if (-not (Test-Path -LiteralPath $parentDir)) {
+        New-Item -ItemType Directory -Path $parentDir -Force | Out-Null
+    }
+    $record = [ordered]@{
+        distributionVersion = $DistributionVersion
+        recordedAt = (Get-Date).ToUniversalTime().ToString('o')
+    }
+    [System.IO.File]::WriteAllText($InstallStatePath, ($record | ConvertTo-Json) + "`n")
+}
+
+function Show-MigrateGuidance {
+    Write-Host '移行手順: /agentdev/migrate を実行し、版別差分仕様に沿った構成移行と決定論的検証を行ってください。'
+}
 
 function Invoke-InstallWizard {
     <#
@@ -790,6 +860,43 @@ if ($Mode -eq 'check') {
         }
     }
 
+    # 2d. Distribution version state（REQ-126-003）: 配布版マーカーの存在、
+    # install-state.json の記録版一致、旧構造痕跡の不在。
+    # ADF 管理投影物が1つも存在しない場合は未導入とみなし、版状態の検査対象外とする。
+    if ([string]::IsNullOrEmpty($DistributionVersion)) {
+        Write-Host "[DIVERGENCE] Distribution version marker not found or empty: $PluginDir/src/common/VERSION (checkout が破損しています)"
+        $divergences++
+    } else {
+        $legacyRels = @(Get-LegacyStructureRels)
+        $adfManagedProjectionPresent = $false
+        foreach ($relPath in $targets) {
+            if (Test-Junction -Path (Join-Path $ProjectionDir $relPath)) { $adfManagedProjectionPresent = $true; break }
+        }
+        if (-not $adfManagedProjectionPresent) {
+            Write-Host "[INFO] No ADF-managed projections placed yet; version state is not verified (distribution version: $DistributionVersion)"
+        } else {
+            $installState = Read-InstallState
+            if ($null -eq $installState) {
+                Write-Host '[DIVERGENCE] Install state record missing or unreadable: .agentdev/install-state.json'
+                Show-MigrateGuidance
+                $divergences++
+            } elseif ($installState.distributionVersion -ne $DistributionVersion) {
+                Write-Host "[DIVERGENCE] Install state version divergence: recorded=$($installState.distributionVersion), checkout=$DistributionVersion"
+                Show-MigrateGuidance
+                $divergences++
+            } else {
+                Write-Host "[OK] Install state version matches checkout: $DistributionVersion"
+            }
+            if ($legacyRels.Count -gt 0) {
+                Write-Host "[DIVERGENCE] Legacy structure traces detected: $($legacyRels -join ', ')"
+                Show-MigrateGuidance
+                $divergences++
+            } else {
+                Write-Host '[OK] No legacy structure traces detected'
+            }
+        }
+    }
+
     # 4. Projection roots must be real directories (.opencode/ for OpenCode, .senpi/ for Senpi)
     if ($ResolvedHosts -contains 'opencode') {
         if (Test-Junction -Path $ProjectionDir) {
@@ -1268,6 +1375,28 @@ if ($Mode -eq 'dry-run') {
         Write-Host '[OK] No stale managed junctions to remove'
     }
 
+    # 配布版状態の予測表示（変更はしない）。
+    Write-Host ''
+    Write-Host '--- Distribution version state ---'
+    if ([string]::IsNullOrEmpty($DistributionVersion)) {
+        Write-Host "[ERROR] Distribution version marker not found or empty: $PluginDir/src/common/VERSION (checkout が破損しています)"
+    } else {
+        Write-Host "[INFO] Distribution version: $DistributionVersion"
+        $legacyRels = @(Get-LegacyStructureRels)
+        if ($legacyRels.Count -gt 0) {
+            Write-Host "[WOULD REPORT] Legacy structure traces detected: $($legacyRels -join ', ')"
+            Show-MigrateGuidance
+        } else {
+            Write-Host '[OK] No legacy structure traces detected'
+        }
+        $installState = Read-InstallState
+        if ($null -eq $installState) {
+            Write-Host '[INFO] Install state record not present (apply would create .agentdev/install-state.json)'
+        } else {
+            Write-Host "[INFO] Install state recorded version: $($installState.distributionVersion)"
+        }
+    }
+
     # 実行環境診断（REQ-099-011）。予測表示と区別して報告する。
     Show-RuntimeDiagnostics
 
@@ -1522,6 +1651,23 @@ if ($Mode -eq 'apply') {
             ForEach-Object {
                 Write-Host "[INFO] Skipping repo-local skill: skills\$($_.Name)"
             }
+    }
+
+    # 配布版の記録（REQ-126-003）。旧構造痕跡が残る場合は版記録を更新せず移行を案内する
+    # （ジャンクション同期自体は完了しているため apply は成功で終了する）。
+    Write-Host ''
+    Write-Host '--- Distribution version record ---'
+    if ([string]::IsNullOrEmpty($DistributionVersion)) {
+        Write-Host "[ERROR] Distribution version marker not found or empty: $PluginDir/src/common/VERSION; cannot record install state"
+        exit 1
+    }
+    $legacyRels = @(Get-LegacyStructureRels)
+    if ($legacyRels.Count -gt 0) {
+        Write-Host "[WARNING] Legacy structure traces detected: $($legacyRels -join ', '); install state version record was not updated"
+        Show-MigrateGuidance
+    } else {
+        Write-InstallStateRecord
+        Write-Host "[OK] Install state recorded: .agentdev/install-state.json (distribution version: $DistributionVersion)"
     }
 
     Write-Host ''

@@ -6,7 +6,7 @@ description: agentdev コマンドリファレンス
 
 AgentDevFlow の各コマンドの入力、出力、次アクションを一覧化する。
 
-公開コマンドは要求入口、標準実行コマンド、工程駆動実行のいずれかに分類する。
+公開コマンドは要求入口、標準実行コマンド、工程駆動実行、構成移行のいずれかに分類する。
 要求入口は req-define（手動要求入口）と backlog-auto（要求蓄積入口）の2つであり、両経路の実行は case-auto へ合流する。
 case-open、case-ready、case-run、case-close、case-revise は公開コマンドではなく内部 lifecycle 段階であり、case-auto が駆動する。
 intake・learning・inspect 系の処理（inspect-docs、learning-promote、intake-promote、inspect-promote、backlog-review）も公開コマンドではなく、backlog-auto が Workflow Skill（`agentdev-workflow-inspect-docs`、`agentdev-workflow-learning-promote`、`agentdev-workflow-intake-promote`、`agentdev-workflow-inspect-promote`、`agentdev-workflow-backlog-review`）として駆動する内部 workflow である。intake item の作成は会話経由で intake pipeline 能力（`agentdev-intake-pipeline`）が担う。
@@ -26,6 +26,7 @@ REQ/Decision/Design の保存は内部 lifecycle の case-ready（初回確定�
 | `/agentdev/phase-review` | 工程駆動実行: 自然言語によるレビュー・全体像の指示 | 4区分（確定違反・証拠不足・推測・未採用改善候補）に分けた所見と工程全体像（セッション内テキスト出力。保存しない） | 継続利用（テーマ更新、成果物反映、工程遷移） |
 | `/agentdev/phase-transition` | 工程駆動実行: 自然言語による遷移の指示 | 遷移の記録結果（記録先、後続工程の解決結果、前工程の過去工程化の伝達） | 継続利用または次工程の `/agentdev/phase-tasks-create`（遷移後の初回形成は遷移の成立と独立） |
 | `/agentdev/backlog-auto` | 要求蓄積入口: なし（durable state から解決） | 検出事項、採用済み成果物、`RU-*.md`（backlog整理サイクル一巡）、一気通貫の実行結果報告（全体完了判定結果、リリース結果または保留理由） | RU がある場合: `/agentdev/req-define` → `/agentdev/case-auto` が一気通貫実行として自動接続される（利用者判断境界は維持。手動の `/agentdev/req-define` 起動も従来どおり利用可能） |
+| `/agentdev/migrate` | 構成移行: 移行の指示（省略時は install.ps1 -Check の検知結果から解決） | 移行の結果（適用した差分仕様、旧新対応、引き継いだ情報とその内容・処理状態、決定論的検証の結果） | 完了（install.ps1 -Check の合格を確認） |
 
 ## 各コマンドの定義ファイル
 
@@ -37,6 +38,7 @@ REQ/Decision/Design の保存は内部 lifecycle の case-ready（初回確定�
 - [phase-artifacts-update.md](./phase-artifacts-update.md)
 - [phase-review.md](./phase-review.md)
 - [phase-transition.md](./phase-transition.md)
+- [migrate.md](./migrate.md)
 
 ## 廃止コマンドの移行案内
 
