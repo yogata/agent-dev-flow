@@ -12,7 +12,7 @@ agent-dev-flow リポジトリ（self-hosting repo）の artifact 整合性検�
 - agent-dev-flow repo artifact（REQ、Decision、Design、skill、command）の整合性検査（残存24 IR ルール、integrity-rule-catalog.md が正）
 - 差分実行（`--changed`）: ステージング変更に対応するルールのみ実行し、対象外のみの変更は即時 Exit 0
 - 明示対象 targeted docs guard（`--workflow <name>` + `--files` / `--base-ref`）: 保存工程（req-save / design-save）・case-run・case-close・docs-check の変更文書限定検査。files_checked・unchecked_reasons・更新要否フラグを報告する（対象契約は targeted-docs-guard-implementation Design）
-- warning の自動起票（`--emit-intake`）: `.agentdev/intake/inbox/YYYY-MM-DD-auto-<rule-id-lower>.md` へ起票（同一 rule-id で冪等スキップ）
+- warning の自動起票（`--emit-intake`）: `.agentdev/backlog/intake/inbox/YYYY-MM-DD-auto-<rule-id-lower>.md` へ起票（同一 rule-id で冪等スキップ）
 - 索引類の再生成（`generate_indexes.ts`）と AUTOGEN ブロック鮮度検査（`check_autogen_freshness.ts`）
 - 配布依存境界の検査（IR-059、`--profile source` 相当の trusted-distribution-gate 実行）
 - 検出結果の Markdown / JSON レポート生成

@@ -6,28 +6,28 @@ description: "inspect-promote workflow 本体。finding を promote/defer/reject
 # inspect-promote workflow スキル
 
 inspect-promote workflow の実装本体である（backlog-auto stage 2 が Workflow Skill 連携で駆動する内部 workflow）。
-`.agentdev/inspect/inbox/` の検出事項を分類（promote/defer/reject）し、採用した検出事項を `.agentdev/inspect/promoted/` へ保存、却下した検出事項を即時削除、見送りを inbox に残置する。
-`--auto` 明示 opt-in 時は自動 promote 対象カテゴリに合致する検出事項を `.agentdev/intake/promoted/` へ自動投入する。
+`.agentdev/backlog/inspect/inbox/` の検出事項を分類（promote/defer/reject）し、採用した検出事項を `.agentdev/backlog/inspect/promoted/` へ保存、却下した検出事項を即時削除、見送りを inbox に残置する。
+`--auto` 明示 opt-in 時は自動 promote 対象カテゴリに合致する検出事項を `.agentdev/backlog/intake/promoted/` へ自動投入する。
 finding disposition を STEP resume point として所有する。
 
 inspect-promote の呼出元は backlog-auto workflow（stage 2 inspect 系統）であり、入出力契約・ガードレールは本スキルと inspect-promote Design が所有する（責務3層分化と1:N分割原則、検出と診断の要件〔命名統一・diagnostics 命名限定・inbox 出力と reject 即時削除〕）。
 
 ## 入力
 
-- `.agentdev/inspect/inbox/*.md`（検出事項ファイル群）
+- `.agentdev/backlog/inspect/inbox/*.md`（検出事項ファイル群）
 - `--auto`（省略可能）: 自動 promote 対象カテゴリに合致する検出事項の自動 promote を有効化する明示 opt-in。省略時は従来の手動分類フローのみ
 
 ## 出力
 
-- `.agentdev/inspect/promoted/*.md`（手動 promote 採用済み、RU 化対象）
+- `.agentdev/backlog/inspect/promoted/*.md`（手動 promote 採用済み、RU 化対象）
 - reject 検出事項は即時削除（reject 時の commit message に却下理由を含める、監査証跡の補強）
-- `.agentdev/intake/promoted/inspect-auto-*.md`（`--auto` 時の自動 promote 成果物。backlog-review へ流入）
-- `.agentdev/inspect/promoted/auto-promote-log.md`（`--auto` 実行ログ。append-only）
+- `.agentdev/backlog/intake/promoted/inspect-auto-*.md`（`--auto` 時の自動 promote 成果物。backlog-review へ流入）
+- `.agentdev/backlog/inspect/promoted/auto-promote-log.md`（`--auto` 実行ログ。append-only）
 - セッション内完了報告
 
 ## 副作用
 
-- `.agentdev/inspect/`（inbox 削除・残置、promoted/ 保存、auto-promote-log 更新）と `.agentdev/intake/`（promoted/ 投入）配下のファイル作成・削除
+- `.agentdev/backlog/inspect/`（inbox 削除・残置、promoted/ 保存、auto-promote-log 更新）と `.agentdev/backlog/intake/`（promoted/ 投入）配下のファイル作成・削除
 - 上記配下に限る git commit/push（commit message: `chore(agentdev): promote inspect findings`）
 - 検出事項の分類確定状態とユーザー承認状態は永続状態（ファイル配置）として保持する
 
@@ -43,7 +43,7 @@ inspect-promote の呼出元は backlog-auto workflow（stage 2 inspect 系統�
 
 inspect-promote workflow は次の8 STEP で構成する。
 各 STEP は再開ポイント（resume point）を持つ（STEP resume point と会話記憶非依存、`docs/designs/<foundations/durable-state-and-recovery>.md`）。
-会話コンテキストに依存せず、永続状態（`.agentdev/inspect/inbox/`、`.agentdev/inspect/promoted/`、`.agentdev/intake/promoted/`、auto-promote-log）から再開点を再構成する。
+会話コンテキストに依存せず、永続状態（`.agentdev/backlog/inspect/inbox/`、`.agentdev/backlog/inspect/promoted/`、`.agentdev/backlog/intake/promoted/`、auto-promote-log）から再開点を再構成する。
 **finding disposition（STEP-3〜STEP-7 の分類・採用・保留・却下）は独立した resume point 群を構成する。**
 
 | STEP | 名称 | 開始条件 | 結果 | 詳細 reference |
@@ -51,7 +51,7 @@ inspect-promote workflow は次の8 STEP で構成する。
 | STEP-1 | 実行前同期 | command 実行開始 | `git pull --ff-only` 完了 | [references/inbox-scan-and-classification.md](references/inbox-scan-and-classification.md) |
 | STEP-2 | inbox スキャン | 同期完了 | 検出事項一覧（空時は「対象なし」で終了） | [references/inbox-scan-and-classification.md](references/inbox-scan-and-classification.md) |
 | STEP-3 | 検出事項分類（暫定分類） | 検出事項一覧確定 | 暫定分類結果（promote/defer/reject と根拠） | [references/inbox-scan-and-classification.md](references/inbox-scan-and-classification.md) |
-| STEP-4 | 自動 promote（`--auto` fast path） | `--auto` 指定かつ暫定分類確定 | `.agentdev/intake/promoted/inspect-auto-*.md` 投入、auto-promote-log 記録 | [references/auto-promote-and-review.md](references/auto-promote-and-review.md) |
+| STEP-4 | 自動 promote（`--auto` fast path） | `--auto` 指定かつ暫定分類確定 | `.agentdev/backlog/intake/promoted/inspect-auto-*.md` 投入、auto-promote-log 記録 | [references/auto-promote-and-review.md](references/auto-promote-and-review.md) |
 | STEP-5 | adversarial-review | 挿入境界（暫定分類後・HITL 前）到達、発動条件成立 | review 結果の暫定分類反映、または unresolved 停止、または従来フロー継続 | [references/auto-promote-and-review.md](references/auto-promote-and-review.md) |
 | STEP-6 | 確定（自律確定判定と HITL 確定） | review 完了または skip | 確定済み分類結果（自律確定分とユーザー承認分） | [references/hitl-and-disposition.md](references/hitl-and-disposition.md) |
 | STEP-7 | 処理実行（promote / reject / defer） | 確定完了（自律確定または HITL 承認） | promoted/ 保存、inbox 削除（promote）、即時削除（reject）、inbox 残置（defer） | [references/hitl-and-disposition.md](references/hitl-and-disposition.md) |
@@ -68,7 +68,7 @@ inspect-promote workflow は次の8 STEP で構成する。
 ## resume protocol（STEP resume point と会話記憶非依存）
 
 - 各 STEP の再開点は永続状態から再構成する（`<foundations/durable-state-and-recovery>` Design の優先順位に従う）
-- **検出事項ごとの分類確定状態の再構成**: inbox に残存する検出事項は未確定（STEP-3 分類から再開）、`.agentdev/inspect/promoted/` に保存済みの検出事項は promote 確定（再保存しない）、auto-promote-log 記載済みかつ `.agentdev/intake/promoted/inspect-auto-*.md` 投入済みは自動 promote 確定（再投入しない）、inbox から削除済みは reject 確定（復元しない）、inbox 残置かつ処理実行済み報告があるものは defer 確定
+- **検出事項ごとの分類確定状態の再構成**: inbox に残存する検出事項は未確定（STEP-3 分類から再開）、`.agentdev/backlog/inspect/promoted/` に保存済みの検出事項は promote 確定（再保存しない）、auto-promote-log 記載済みかつ `.agentdev/backlog/intake/promoted/inspect-auto-*.md` 投入済みは自動 promote 確定（再投入しない）、inbox から削除済みは reject 確定（復元しない）、inbox 残置かつ処理実行済み報告があるものは defer 確定
 - **HITL 承認状態**: 承認は処理実行（STEP-7）の完了状態から逆算して再構成する。処理実行が済んでいない検出事項は未確定と扱い、確定（STEP-6 の自律確定判定と HITL 確定）から再開する。自律確定項目にユーザー承認は存在しないため、再開時は判定基準に従い再判定する
 - 自然言語の前 STEP result のみに依存した再開を行わない
 
@@ -85,9 +85,9 @@ inspect-promote workflow は次の8 STEP で構成する。
 
 - **HITL 承認必須**: 自動 promote 対象（`--auto`）と自律確定対象（次節の判定基準に従う）を除き、ユーザーの明示的な承認なしに採用済み成果物を生成しない（`POL-promoted-artifact-requires-approval`）
 - **reject は即時削除**: `archive/rejected/` への移動は廃止。即時削除以外の取扱を禁止し、reject 時の commit message に却下理由を含める（command 不変条件）
-- **defer は inbox 残置**: defer となった検出事項を `.agentdev/inspect/inbox/` から移動しない（command 不変条件）
+- **defer は inbox 残置**: defer となった検出事項を `.agentdev/backlog/inspect/inbox/` から移動しない（command 不変条件）
 - **`--auto` は明示 opt-in の場合のみ有効**: 省略時は自動 promote を一切行わない。自動 promote 対象は responsibility-boundaries Design（extension 経由）が定義する自動 promote 対象カテゴリに合致する検出事項のみとし、意味判断、曖昧な分類、Decision 要否判断を含む検出事項は手動分類へ回す（command 不変条件）
-- **実行ログ**: `--auto` 実行の都度、投入対象、根拠を `.agentdev/inspect/promoted/auto-promote-log.md` に記録する（command 不変条件）
+- **実行ログ**: `--auto` 実行の都度、投入対象、根拠を `.agentdev/backlog/inspect/promoted/auto-promote-log.md` に記録する（command 不変条件）
 - **adversarial-review は任意助言手段**: 必須工程、QG、承認ゲート、統制ゲートとして導入しない。呼出失敗時は silent skip を禁止し、従来フロー（HITL 確定）を維持する
 
 ## 自律確定の判定位置とHITLフォールバック
@@ -102,7 +102,7 @@ inspect-promote workflow は次の8 STEP で構成する。
 ## 終了条件（termination）
 
 - 全検出事項が promote（promoted/ 保存 + inbox 削除）/ reject（即時削除）/ defer（inbox 残置）/ 自動 promote（intake/promoted/ 投入 + ログ記録）のいずれかに確定している
-- `.agentdev/inspect/` と `.agentdev/intake/` 配下の変更が commit/push 済みである（変更なし時は「変更なし」報告済み）
+- `.agentdev/backlog/inspect/` と `.agentdev/backlog/intake/` 配下の変更が commit/push 済みである（変更なし時は「変更なし」報告済み）
 - 完了報告 template（`.opencode/commands/agentdev/templates/inspect-promote/standard.md`）に従い、promote/defer/reject/auto-promote の判定結果と後続 route（`--auto` 実行時は投入件数、投入先一覧、ログパスを含む）を報告した
 - 自律確定した検出事項の判定結果、主要根拠、HITL不要と判断した理由を完了報告に含めている（新規永続成果物を必須としない）
 

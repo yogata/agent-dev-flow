@@ -66,7 +66,7 @@ backlog-review を実行し、採用済み成果物の分析、統合、ユー�
 
 ### Input Resolution
 
-1. SSoT 再構成: `.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/inspect/promoted/*.md`、`.agentdev/backlog/req-units/` の `RU-*.md`
+1. SSoT 再構成: `.agentdev/backlog/intake/promoted/*.md`、`.agentdev/backlog/learning/promoted/*.md`、`.agentdev/backlog/inspect/promoted/*.md`、`.agentdev/backlog/req-units/` の `RU-*.md`
 2. identifier 保持: なし
 3. 最小 scalar: stage 3 の開始時刻、終了時刻
 4. runtime artifact: なし

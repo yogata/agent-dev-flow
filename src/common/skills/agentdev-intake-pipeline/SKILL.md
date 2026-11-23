@@ -42,7 +42,7 @@ intake-from-github と intake-promote コマンドの知識ベースである。
 
 ### 永続成果物と Input Resolution
 
-本スキルが扱う intake item（`.agentdev/intake/inbox/*.md`）、採用済み成果物（`.agentdev/intake/promoted/*.md`）は永続状態の優先順位に従う。
+本スキルが扱う intake item（`.agentdev/backlog/intake/inbox/*.md`）、採用済み成果物（`.agentdev/backlog/intake/promoted/*.md`）は永続状態の優先順位に従う。
 (1) SSoT 再構成（inbox/ promoted/ 配下の永続ファイル、REQ/Decision/Design は docs/ 配下）、(2) identifier 保持（item path、promoted item path）、(3) 最小 scalar、(4) runtime artifact（暫定分類、評価結果、adversarial-review findings、caller 統合共通契約の finding lifecycle）。
 優先順位の詳細は `<foundations/durable-state-and-recovery>` Design 参照。
 

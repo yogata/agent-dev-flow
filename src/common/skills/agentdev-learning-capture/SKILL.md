@@ -5,7 +5,7 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 # `agentdev-learning-capture`
 
-会話中にエージェントが自律的に検知、回避、修正した問題から学びを抽出し、ユーザー承認なしで自律的に `.agentdev/learning/inbox/` に蓄積するスキルである。
+会話中にエージェントが自律的に検知、回避、修正した問題から学びを抽出し、ユーザー承認なしで自律的に `.agentdev/backlog/learning/inbox/` に蓄積するスキルである。
 
 ## 入力
 
@@ -13,11 +13,11 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 ## 出力
 
-- `.agentdev/learning/inbox/` への1トピック1ファイル形式エントリ保存、ユーザーへの保存通知
+- `.agentdev/backlog/learning/inbox/` への1トピック1ファイル形式エントリ保存、ユーザーへの保存通知
 
 ## 副作用
 
-- `.agentdev/learning/inbox/` 配下への1トピック1ファイル（`YYYY-MM-DD-<slug>.md`）の保存を行う
+- `.agentdev/backlog/learning/inbox/` 配下への1トピック1ファイル（`YYYY-MM-DD-<slug>.md`）の保存を行う
 - **git永続化（commit/push）は呼出元コマンドの責務**。本スキル内で `git add`/ `git commit`/ `git push` を実行してはならない
 - `deferred/` は参照・作成しない（learning-promote workflow（backlog-auto stage 2 駆動）のみが管理）
 
@@ -46,8 +46,8 @@ description: Agent-first extraction and capture of learnings from problems auton
 
 ## Prerequisites
 
-学びの保存先: `.agentdev/learning/inbox/`（最新の学び。常にここに追加）。
-学び1件ごとに `.agentdev/learning/inbox/` 配下へ1ファイル（`YYYY-MM-DD-<slug>.md`、frontmatter 4フィールド `id`/`created_at`/`source`/`status`、本文は13フィールド形式）として保存する。
+学びの保存先: `.agentdev/backlog/learning/inbox/`（最新の学び。常にここに追加）。
+学び1件ごとに `.agentdev/backlog/learning/inbox/` 配下へ1ファイル（`YYYY-MM-DD-<slug>.md`、frontmatter 4フィールド `id`/`created_at`/`source`/`status`、本文は13フィールド形式）として保存する。
 
 ## 禁止事項
 

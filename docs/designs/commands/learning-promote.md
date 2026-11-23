@@ -59,19 +59,19 @@ learning-promote は change_nature と併せて、observed_evidence（根拠と�
 
 ## 入力
 
-- `.agentdev/learning/inbox/`（必須、未処理学びエントリ）
-- `.agentdev/learning/deferred/`（任意、過去エントリ参照）
+- `.agentdev/backlog/learning/inbox/`（必須、未処理学びエントリ）
+- `.agentdev/backlog/learning/deferred/`（任意、過去エントリ参照）
 
 ## 出力
 
-- `.agentdev/learning/evaluation-report.md`（8軸評価レポート）
-- `.agentdev/learning/promoted/{category}-{name}.md`（採用済み成果物、フラット構造）
-- `.agentdev/learning/deferred/`（inbox 移動分追記）
-- `.agentdev/learning/inbox/`（処理済みエントリファイルの削除）
+- `.agentdev/backlog/learning/evaluation-report.md`（8軸評価レポート）
+- `.agentdev/backlog/learning/promoted/{category}-{name}.md`（採用済み成果物、フラット構造）
+- `.agentdev/backlog/learning/deferred/`（inbox 移動分追記）
+- `.agentdev/backlog/learning/inbox/`（処理済みエントリファイルの削除）
 
 ## 副作用
 
-- git commit/push: `.agentdev/learning/` 配下のみ（明示パスステージング。並行 Case git 規律は REQ-030-017）
+- git commit/push: `.agentdev/backlog/learning/` 配下のみ（明示パスステージング。並行 Case git 規律は REQ-030-017）
 - 実行前同期: `git pull --ff-only`
 - 昇華時 prune: 自動実行（REQ-003-006、staged/rejected/duplicate のみ。deferred/未処理は非対象 REQ-003-007）
 - `.opencode/` 直接反映: 禁止

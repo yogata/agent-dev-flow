@@ -11,8 +11,8 @@
 ## 結果
 
 - 配布物整合性診断結果、docs-check route 候補、未処理 artifact 確認結果
-- 検出事項ファイル（`.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md`）
-- `.agentdev/inspect/` 配下の commit/push、完了報告
+- 検出事項ファイル（`.agentdev/backlog/inspect/inbox/inspect-docs-finding-{timestamp}.md`）
+- `.agentdev/backlog/inspect/` 配下の commit/push、完了報告
 
 ## 手順
 
@@ -37,8 +37,8 @@
 
 ### STEP-4-1: 検出事項出力
 
-検出事項を `.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md` へ出力する。
-検出事項ファイルの生成と `.agentdev/inspect/` 配下の git 永続化は親の単一 writer が実施する（STEP-2 の診断担当は書き込まない。診断担当の戻り値は中間成果として親が統合した結果のみを出力する）。
+検出事項を `.agentdev/backlog/inspect/inbox/inspect-docs-finding-{timestamp}.md` へ出力する。
+検出事項ファイルの生成と `.agentdev/backlog/inspect/` 配下の git 永続化は親の単一 writer が実施する（STEP-2 の診断担当は書き込まない。診断担当の戻り値は中間成果として親が統合した結果のみを出力する）。
 source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides。
 NG 分類（false positive/ pre-existing/ 今回修正対象）は docs-spec-rebuild-integrity Design（extension 経由）の NG 分類表に従い、各検出事項に分類、理由、後続対象を付ける。
 
@@ -47,9 +47,9 @@ NG 分類（false positive/ pre-existing/ 今回修正対象）は docs-spec-reb
 - `git pull --ff-only` を実行する
 - **失敗時**: 共通 template（`.opencode/commands/agentdev/templates/common/git-error-messages.md`）の該当形式で表示して停止する（自動解消しない）
 
-### STEP-4-3: .agentdev/inspect/ 変更の commit と push
+### STEP-4-3: .agentdev/backlog/inspect/ 変更の commit と push
 
-`agentdev-git-worktree` の「ドメイン状態永続化プロシージャ」（並列実行安全ステージングプロシージャ含む）に従い、`.agentdev/inspect/` 配下の変更を commit/ push する。
+`agentdev-git-worktree` の「ドメイン状態永続化プロシージャ」（並列実行安全ステージングプロシージャ含む）に従い、`.agentdev/backlog/inspect/` 配下の変更を commit/ push する。
 commit message は `chore(agentdev): capture inspect-docs finding`（Conventional Commits 形式）。
 変更なし時は commit/push せず完了報告で「変更なし」と報告する。
 push 失敗時は同プロシージャの構造化エラー形式で停止する（完了扱いにしない）。
@@ -82,7 +82,7 @@ push 失敗時は同プロシージャの構造化エラー形式で停止する
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- ガードレール（`.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成のみ例外許可、他のファイル変更禁止）
+- ガードレール（`.agentdev/backlog/inspect/inbox/inspect-docs-finding-*.md` の生成のみ例外許可、他のファイル変更禁止）
 - ガードレール（GitHub Issue/PR を作成、更新しない）
 - ガードレール（worktree/ブランチを作成しない）
 - ガードレール（intake/learning/RU の処理を行わない）

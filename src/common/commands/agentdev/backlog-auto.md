@@ -13,7 +13,7 @@ backlog 整理サイクル（inspect-docs による文書診断、learning、int
 
 ## 出力
 
-- 各子コマンドの既存出力（`.agentdev/inspect/inbox/` の検出事項、各 promoted/、`.agentdev/backlog/req-units/RU-*.md` 等、子コマンド公開契約どおり）
+- 各子コマンドの既存出力（`.agentdev/backlog/inspect/inbox/` の検出事項、各 promoted/、`.agentdev/backlog/req-units/RU-*.md` 等、子コマンド公開契約どおり）
 - backlog-auto 全体の実行結果報告（工程別結果、停止理由、再開コマンド提示を含む共通実行契約形式）
 - 一気通貫の実行結果報告（工程別結果、全体完了判定結果、リリース結果または保留理由、再開経路を含む共通実行契約形式）
 

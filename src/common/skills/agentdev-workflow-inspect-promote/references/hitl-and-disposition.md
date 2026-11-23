@@ -23,9 +23,9 @@
 - **Input Resolution**: STEP-6 の確定済み分類結果、`--auto` 時は STEP-4 の自動 promote 確定状態（auto-promote-log との突合）
 - **Preconditions**: STEP-6 完了（確定対象）、STEP-4 完了（自動 promote 対象）
 - **Procedure**:
-  - **promote 処理**: 確定済みの promote 対象検出事項（自律確定分を含む）を `.agentdev/inspect/promoted/` へ保存する。元の inbox file は削除する
+  - **promote 処理**: 確定済みの promote 対象検出事項（自律確定分を含む）を `.agentdev/backlog/inspect/promoted/` へ保存する。元の inbox file は削除する
   - **reject 処理**: 確定済みの reject 対象検出事項（自律確定分を含む）は即時削除する。reject 時の commit message に却下理由を含める（監査証跡の補強）
-  - **defer 処理**: defer となった検出事項は `.agentdev/inspect/inbox/` に残置する。intake/ learning 送付の推奨を報告する
+  - **defer 処理**: defer となった検出事項は `.agentdev/backlog/inspect/inbox/` に残置する。intake/ learning 送付の推奨を報告する
 - **Result**: 全検出事項の配置確定（promoted/ 保存済み、削除済み、inbox 残置）
 - **Evidence**: 配置後のファイル構成（promoted/、inbox/）、reject を含む commit message
 - **Completion Verification**: 全検出事項が promote（promoted/ 保存 + inbox 削除）/ reject（削除）/ defer（残置）/ 自動 promote（投入済み）のいずれかに確定していること
@@ -34,12 +34,12 @@
 ## STEP-8: 完了報告・永続化
 
 - **Purpose**: 分類結果と後続 route を報告し、`.agentdev/` 配下の変更を永続化する
-- **Input Resolution**: STEP-7 の配置確定状態（`git diff --name-only` で `.agentdev/inspect/` および `.agentdev/intake/` 配下の変更を確認）
+- **Input Resolution**: STEP-7 の配置確定状態（`git diff --name-only` で `.agentdev/backlog/inspect/` および `.agentdev/backlog/intake/` 配下の変更を確認）
 - **Preconditions**: STEP-7 完了
 - **Procedure**:
-  1. `git diff --name-only` で `.agentdev/inspect/` および `.agentdev/intake/` 配下の変更を確認する（auto-promote の intake/promoted/ 投入、promoted/ への保存、reject に伴う inbox 削除、auto-promote-log 更新を含む）
+  1. `git diff --name-only` で `.agentdev/backlog/inspect/` および `.agentdev/backlog/intake/` 配下の変更を確認する（auto-promote の intake/promoted/ 投入、promoted/ への保存、reject に伴う inbox 削除、auto-promote-log 更新を含む）
   2. **変更なし時**: commit/push せず「変更なし」と報告する
-  3. **変更あり時**: `git add` は `.agentdev/inspect/` と `.agentdev/intake/` を対象とする。
+  3. **変更あり時**: `git add` は `.agentdev/backlog/inspect/` と `.agentdev/backlog/intake/` を対象とする。
 commit message は `chore(agentdev): promote inspect findings`（reject を含む場合は却下理由を含める）。
 `git push` を実行する。
 push 失敗時は共通 template（`.opencode/commands/agentdev/templates/common/git-error-messages.md`）の該当形式で表示して停止する（完了扱いにしない）
@@ -72,5 +72,5 @@ push 失敗時は共通 template（`.opencode/commands/agentdev/templates/common
 
 - ガードレール（ユーザーの明示的な承認なしに採用済み成果物を生成しない。`--auto` による自動 promote 対象、および判定基準に従い自律確定した検出事項を除く、`POL-promoted-artifact-requires-approval`）
 - 不変条件（reject された検出事項は即時削除される。即時削除以外の取扱を禁止する）
-- 不変条件（defer された検出事項は `.agentdev/inspect/inbox/` に残す）
+- 不変条件（defer された検出事項は `.agentdev/backlog/inspect/inbox/` に残す）
 - 不変条件（docs-check ルール／検査データ追加候補は独立 route とせず、採用済み成果物の要件化方向または受け入れ条件に含める）

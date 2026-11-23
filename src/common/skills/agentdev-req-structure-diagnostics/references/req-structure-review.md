@@ -238,9 +238,9 @@ Design は 3 層構造（commands、skills、workflows）を持ち、横断 Desi
 
 未処理の intake/learning/RU が存在する場合、その存在と影響のみを報告する:
 
-- **(a) intake inbox**: `.agentdev/intake/inbox/` に未処理 item が存在するか
-- **(b) learning inbox**: `.agentdev/learning/inbox/` に未処理 entry が存在するか
-- **(c) 採用済み成果物**: `.agentdev/intake/promoted/`, `.agentdev/learning/promoted/` に未処理成果物が存在するか
+- **(a) intake inbox**: `.agentdev/backlog/intake/inbox/` に未処理 item が存在するか
+- **(b) learning inbox**: `.agentdev/backlog/learning/inbox/` に未処理 entry が存在するか
+- **(c) 採用済み成果物**: `.agentdev/backlog/intake/promoted/`, `.agentdev/backlog/learning/promoted/` に未処理成果物が存在するか
 - **(d) RU**: `.agentdev/backlog/req-units/` に未処理 RU が存在するか
 
 存在する場合は件数と診断への潜在的影響を提示する。

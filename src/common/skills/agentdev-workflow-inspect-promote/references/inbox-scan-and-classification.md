@@ -6,7 +6,7 @@
 ## STEP-1: 実行前同期
 
 - **Purpose**: リモートの最新状態を取り込み、検出事項の分類処理を最新の inbox 状態に対して実行する
-- **Input Resolution**: durable state 優先順位に従い `.agentdev/inspect/inbox/` の現状を読み込む前にリポジトリ状態を同期する
+- **Input Resolution**: durable state 優先順位に従い `.agentdev/backlog/inspect/inbox/` の現状を読み込む前にリポジトリ状態を同期する
 - **Preconditions**: inspect-promote command の実行開始
 - **Procedure**: `git pull --ff-only` を実行する。失敗時は共通 template（`.opencode/commands/agentdev/templates/common/git-error-messages.md`）の該当形式で表示して停止する（自動解消しない）
 - **Result**: fast-forward 済みの最新リポジトリ状態
@@ -17,9 +17,9 @@
 ## STEP-2: inbox スキャン
 
 - **Purpose**: 処理対象となる検出事項の一覧を確定する
-- **Input Resolution**: `.agentdev/inspect/inbox/*.md`（durable state）を読み込む。自然言語の前 STEP result に依存しない
+- **Input Resolution**: `.agentdev/backlog/inspect/inbox/*.md`（durable state）を読み込む。自然言語の前 STEP result に依存しない
 - **Preconditions**: STEP-1 完了
-- **Procedure**: `.agentdev/inspect/inbox/*.md` を読み込む。空の場合は「対象なし」と報告して終了する
+- **Procedure**: `.agentdev/backlog/inspect/inbox/*.md` を読み込む。空の場合は「対象なし」と報告して終了する
 - **Result**: 検出事項一覧（ファイルパス、内容）
 - **Evidence**: 読み込んだ検出事項ファイルの一覧
 - **Completion Verification**: inbox 配下の全 `.md` ファイルを読み込んだこと
@@ -51,5 +51,5 @@
 
 ## 関連ガードレール（command 側で宣言、本 reference は詳細実装）
 
-- ガードレール（promote された検出事項のみを `.agentdev/inspect/promoted/` へ保存する）
+- ガードレール（promote された検出事項のみを `.agentdev/backlog/inspect/promoted/` へ保存する）
 - 不変条件（`--auto` は自動 promote 対象カテゴリ（responsibility-boundaries Design 参照、extension 経由）に合致する高確信度検出事項のみを投入し、意味判断、曖昧な分類、Decision 要否判断を含む検出事項は手動分類へ回す）

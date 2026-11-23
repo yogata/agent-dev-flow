@@ -23,8 +23,8 @@ capture は作業本筋を進めるための副作用管理機構であり、主
 
 | 領域 | 定義 | 保存先 | 目的 |
 |---|---|---|---|
-| **intake** | 今回の作業本筋では扱わないが、後で対応要否を判断すべき具体的な作業候補、不整合、規約違反、未回収課題 | `.agentdev/intake/inbox/` | 積み残し作業の回収、Issue化 |
-| **learning** | 作業中の失敗、回避、修正、判断ミス、手順漏れから次回以降の再発防止に使う知見 | `.agentdev/learning/` | 知見の分類、昇華、反映 |
+| **intake** | 今回の作業本筋では扱わないが、後で対応要否を判断すべき具体的な作業候補、不整合、規約違反、未回収課題 | `.agentdev/backlog/intake/inbox/` | 積み残し作業の回収、Issue化 |
+| **learning** | 作業中の失敗、回避、修正、判断ミス、手順漏れから次回以降の再発防止に使う知見 | `.agentdev/backlog/learning/` | 知見の分類、昇華、反映 |
 
 ## 分割ルール（Split Rule）
 
@@ -43,7 +43,7 @@ case-run で発見した本筋外検出事項（Finding）の永続化チャネ�
 
 - 書込み元: case-run 経由の実行担当サブエージェント（STEP-S4/STEP-S5 委譲先）
 - 読取り元: case-close（STEP-6）
-- 各 case-run は自身の PR にのみ書込み。`.agentdev/intake/inbox/` は直接変更しない
+- 各 case-run は自身の PR にのみ書込み。`.agentdev/backlog/intake/inbox/` は直接変更しない
 - capture 候補を intake 候補と learning 候補に分け、別々の成果物として扱う（Split Rule に準拠）
 - Epic 横断回収: Epic モード時、case-close は関連子 Issue PR 群の本文を横断走査して検出事項を回収
 
@@ -94,10 +94,10 @@ v2:ADR-0127（case-auto 構成工程の委譲）と v2:ADR-0137（case-run イ�
 
 | 工程 | capture 責務 | 保存先 | git 永続化担当 |
 |---|---|---|---|
-| case-ready / case-revise | REQ 再構成 intake + 自工程 deviation capture（REQ-006-106 / REQ-006-107） | `.agentdev/intake/inbox/`、`.agentdev/learning/` | case-ready / case-revise command |
-| case-open | 自工程 deviation capture（case-close への委譲を廃止、`REQ-006-105..111` への集約（旧 `REQ-006-021` は retired）） | `.agentdev/intake/inbox/`、`.agentdev/learning/` | case-open command |
+| case-ready / case-revise | REQ 再構成 intake + 自工程 deviation capture（REQ-006-106 / REQ-006-107） | `.agentdev/backlog/intake/inbox/`、`.agentdev/backlog/learning/` | case-ready / case-revise command |
+| case-open | 自工程 deviation capture（case-close への委譲を廃止、`REQ-006-105..111` への集約（旧 `REQ-006-021` は retired）） | `.agentdev/backlog/intake/inbox/`、`.agentdev/backlog/learning/` | case-open command |
 | case-run | PR 本文記録のみ（`.agentdev/` 直接変更禁止） | PR 本文 `## Findings / Capture候補` | 実行担当サブエージェント（PR 作成時） |
-| case-close | PR 本文から回収 + 自工程 deviation capture（REQ-006-105、Epic 横断回収含む） | `.agentdev/intake/inbox/`、`.agentdev/learning/` | case-close command |
+| case-close | PR 本文から回収 + 自工程 deviation capture（REQ-006-105、Epic 横断回収含む） | `.agentdev/backlog/intake/inbox/`、`.agentdev/backlog/learning/` | case-close command |
 | case-auto | 各工程の保存結果参照と件数集計のみ（REQ-006-108）。capture 本文の再分類、再保存は行わない | （保存しない） | （git 永続化なし） |
 
 ### 委譲契約（Command→Skill 依存方向）
@@ -127,7 +127,7 @@ Epic Issue 本文（実行構成表）の書き込みは per-Epic の単一書�
 
 記載内容:
 
-- 保存先パス（`.agentdev/intake/inbox/*.md`、`.agentdev/learning/inbox/`）
+- 保存先パス（`.agentdev/backlog/intake/inbox/*.md`、`.agentdev/backlog/learning/inbox/`）
 - 分類（intake / learning）
 - 保存結果（成功/失敗、件数、コミットハッシュ等）
 
@@ -140,7 +140,7 @@ capture 本文は完了報告に含めない。
 
 | 状態 | パス |
 |---|---|
-| inbox | `.agentdev/intake/inbox/req-restructure/` |
+| inbox | `.agentdev/backlog/intake/inbox/req-restructure/` |
 | 却下 | 即時削除（`archive/rejected/` 廃止）。reject commit message に却下理由を含めることで監査証跡を確保 |
 
 req-define の明示入力としてルーティングする（backlog-review 経由ではない）。検知カテゴリ: SPLIT / MERGE / MOVE / DUPLICATE / RETIRE / DRIFT

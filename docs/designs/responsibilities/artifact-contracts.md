@@ -323,7 +323,7 @@ req-define の組立・検査作業の中間生成物（抽出本文、組立部
 
 標準 draft type は `req_draft` の 1 種のみとする（REQ-008-006）。
 `requirements-review-finding` および旧 `skill_review_finding` は標準 draft type に含めない。
-Skill/Command 参照妥当性の検出結果は inspect lifecycle（`.agentdev/inspect/inbox/`、REQ-036-012-151）へ出力する。
+Skill/Command 参照妥当性の検出結果は inspect lifecycle（`.agentdev/backlog/inspect/inbox/`、REQ-036-012-151）へ出力する。
 
 ### ドラフトファイルフロントマター
 
@@ -353,7 +353,7 @@ frontmatter の基本フィールドは `draft_type`、`topic`、`status`、`cre
 ### inspect-skills 副作用境界
 
 `inspect-skills` は検査対象（Command/Skill 定義ファイル）を直接修正しない診断コマンドとする。
-許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-*.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit / push）のみとし、それ以外の原本文書変更、REQ/Decision/Design 変更、Command/Skill/Template/Script 変更、RU 保存、Issue 作成、PR 作成、許可範囲外の commit/push を行わない（inspect lifecycle、REQ-036-012-151、REQ-010-007）。
+許可される副作用は `.agentdev/backlog/inspect/inbox/inspect-skills-finding-*.md` の生成、および `.agentdev/backlog/inspect/` 配下の git 永続化（commit / push）のみとし、それ以外の原本文書変更、REQ/Decision/Design 変更、Command/Skill/Template/Script 変更、RU 保存、Issue 作成、PR 作成、許可範囲外の commit/push を行わない（inspect lifecycle、REQ-036-012-151、REQ-010-007）。
 最終判断（promote / defer / reject）は `inspect-promote` が行う。
 検出事項（inspect finding）は `inspect-promote` による promote/defer/reject ライフサイクルの対象となる。
 

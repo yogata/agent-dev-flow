@@ -25,8 +25,11 @@
 | `.agentdev/phase/revisions/` | `.agentdev/project/change-log/` | 移動・改名 |
 | `.agentdev/phase/adoptions/` | `.agentdev/project/decision-log/` | 移動・改名 |
 | `.agentdev/intake/inbox/` | `.agentdev/backlog/intake/inbox/` | 移動 |
+| `.agentdev/intake/promoted/` | `.agentdev/backlog/intake/promoted/` | 移動 |
 | `.agentdev/learning/inbox/` | `.agentdev/backlog/learning/inbox/` | 移動 |
 | `.agentdev/learning/deferred/` | `.agentdev/backlog/learning/deferred/` | 移動 |
+| `.agentdev/learning/promoted/` | `.agentdev/backlog/learning/promoted/` | 移動 |
+| `.agentdev/learning/evaluation-report.md` | `.agentdev/backlog/learning/evaluation-report.md` | 移動 |
 | `.agentdev/inspect/inbox/` | `.agentdev/backlog/inspect/inbox/` | 移動 |
 | `.agentdev/inspect/promoted/` | `.agentdev/backlog/inspect/promoted/` | 移動 |
 | `.agentdev/backlog-auto/end-to-end/<一式識別子>/set-state.json`（evidence 配下に検証証跡） | `.agentdev/backlog/runs/<一式識別子>/set-state.json` | 移動（evidence/ を含む）。全体完了・リリース完了済みの一式は、継続保存の要否をユーザーと確認し、不要確認後に削除する |

@@ -24,9 +24,9 @@ case-close への capture 委譲は廃止済みである。draft / RU は削除�
 ### STEP-6-1: deviation capture
 
 1. 実観測した deviation の保存を `agentdev-learning-capture` skill または `agentdev-intake-pipeline`（自動capture向け item 生成操作）へ委譲する
-2. 保存先は capture 境界 Design（`<workflows/capture-boundaries>`）の Split Rule に従う（`.agentdev/intake/inbox/` または `.agentdev/learning/`）
+2. 保存先は capture 境界 Design（`<workflows/capture-boundaries>`）の Split Rule に従う（`.agentdev/backlog/intake/inbox/` または `.agentdev/backlog/learning/`）
 3. git 永続化は `agentdev-git-worktree` の並列実行安全ステージングプロシージャに従い、明示パス指定で commit / push する
-4. 委譲範囲を超える `.agentdev/intake/`、`.agentdev/learning/` の直接変更を行わない
+4. 委譲範囲を超える `.agentdev/backlog/intake/`、`.agentdev/backlog/learning/` の直接変更を行わない
 
 ### STEP-6-2: 完了報告
 

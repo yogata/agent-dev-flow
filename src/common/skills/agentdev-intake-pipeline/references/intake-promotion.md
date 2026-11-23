@@ -1,12 +1,12 @@
 # Intake Promote 詳細手順
 
-intake-promote が `.agentdev/intake/inbox/` 内の item を review、分類、整形、振り分けする際の詳細手順を定義する。
+intake-promote が `.agentdev/backlog/intake/inbox/` 内の item を review、分類、整形、振り分けする際の詳細手順を定義する。
 親エージェントは分類確定、保存、移動、commit、push、完了報告を担当する。
 サブエージェントへ委譲する場合は item 読解、分類候補、根拠、capture 候補の抽出のみを依頼する。
 
 ## Inbox 確認
 
-1. `.agentdev/intake/inbox/` 内のファイル一覧を取得する。
+1. `.agentdev/backlog/intake/inbox/` 内のファイル一覧を取得する。
 2. item 数をカウントする。
 3. inbox が空の場合はその旨を報告して終了する。
 4. 各 intake item を読み込み、内容を把握する。
@@ -53,26 +53,26 @@ learning 分岐は `agentdev-workflow-orchestration` の intake/learning 境界�
 2. backlog-review が分析しやすい形式に構造化する。
 3. 既存要件との関連、差分を明記する。
 4. 複数 item を束ねる場合は統合内容を整理する。
-5. 成果物は `.agentdev/intake/promoted/` 直下にフラット配置する。
+5. 成果物は `.agentdev/backlog/intake/promoted/` 直下にフラット配置する。
 6. 成果物の frontmatter に route や status を記録しない。
 
 ## 保存と振り分け
 
-1. `.agentdev/intake/promoted/` が存在しない場合は作成する。
+1. `.agentdev/backlog/intake/promoted/` が存在しない場合は作成する。
 2. ファイル名は `YYYY-MM-DD-{topic-slug}.md` とする。
 元 item 名を維持するか、束ねた内容に応じた名前にする。
-3. 採用 item の元 inbox item は削除する（`.agentdev/intake/archive/promoted/` への移動を廃止）。
-4. 保留 item は `.agentdev/intake/inbox/` に残す。
-5. 却下 item は即時削除する（`.agentdev/intake/archive/rejected/` への移動を廃止）。
+3. 採用 item の元 inbox item は削除する（`.agentdev/backlog/intake/archive/promoted/` への移動を廃止）。
+4. 保留 item は `.agentdev/backlog/intake/inbox/` に残す。
+5. 却下 item は即時削除する（`.agentdev/backlog/intake/archive/rejected/` への移動を廃止）。
 reject 時の commit message に却下理由を含める（監査証跡の補強）。
 
 ## Git 永続化
 
 1. `git pull --ff-only` を実行する。
 2. pull が失敗した場合は構造化エラーメッセージを表示して停止し、自動解消しない。
-3. `git diff --name-only` で `.agentdev/intake/` 配下の変更ファイルを確認する。
+3. `git diff --name-only` で `.agentdev/backlog/intake/` 配下の変更ファイルを確認する。
 4. 変更なしの場合は commit/push せず、完了報告で「変更なし」と報告する。
-5. 変更ありの場合、`git add` は `.agentdev/intake/` 配下の変更ファイルのみを対象とする。
+5. 変更ありの場合、`git add` は `.agentdev/backlog/intake/` 配下の変更ファイルのみを対象とする。
 6. commit message は採用・保留のみの場合 `chore(agentdev): review and promote intake items` とする。
 reject item を含む場合は当該 item の却下理由を commit message に含める（監査証跡の補強）。
 7. `git push` を実行する。

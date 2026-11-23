@@ -182,7 +182,7 @@ export function emitIntake(
     const filePath = path.join(inboxDir, fileName);
     const body = buildIntakeItem(date, ruleId, ruleViolations);
     fs.writeFileSync(filePath, body, "utf-8");
-    written.push({ ruleId, filePath: `.agentdev/intake/inbox/${fileName}` });
+    written.push({ ruleId, filePath: `.agentdev/backlog/intake/inbox/${fileName}` });
   }
   return { written, skipped };
 }

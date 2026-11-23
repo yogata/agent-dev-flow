@@ -143,7 +143,7 @@ FLAGS:
                    changes (git diff --cached; falls back to git diff --name-only HEAD).
                    Non-target-only changes exit 0 immediately.
   --emit-intake    Auto-ticket severity: warning violations to
-                   .agentdev/intake/inbox/YYYY-MM-DD-auto-<rule-id-lower>.md
+                   .agentdev/backlog/intake/inbox/YYYY-MM-DD-auto-<rule-id-lower>.md
                    (idempotent: an existing auto ticket for the same rule id is skipped).
   --rule <id>      Run a single rule (e.g. --rule IR-001).
   --json           JSON report output.

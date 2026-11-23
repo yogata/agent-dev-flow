@@ -1,7 +1,7 @@
 ✅ learning-promote 完了
 
 完了ワークフロー:learning-promote workflow（backlog-auto stage 2）
-対象: .agentdev/learning/promoted/
+対象: .agentdev/backlog/learning/promoted/
 結果:
  - 生成成果物: {N}件（{file_list}）
  - 整理結果: 除去 {N}件/ 残存 {N}件

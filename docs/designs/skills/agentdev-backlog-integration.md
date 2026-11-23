@@ -15,7 +15,7 @@ backlog-review における採用済み成果物の統合、分割判定、矛�
 
 ## 適用対象
 
-- 採用済み成果物（`.agentdev/intake/promoted/`、`.agentdev/learning/promoted/`、`.agentdev/inspect/promoted/`）の統合、分割判定
+- 採用済み成果物（`.agentdev/backlog/intake/promoted/`、`.agentdev/backlog/learning/promoted/`、`.agentdev/backlog/inspect/promoted/`）の統合、分割判定
 - 矛盾検出
 - RU 生成ルール
 - depends_on 依存解決

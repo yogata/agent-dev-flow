@@ -67,7 +67,7 @@ case-run / 実行担当サブエージェント / 外部実行バックエンド
 - GitHub API: squash merge（Custom Tool `agentdev_gh` の pr_merge、リトライ最大5回、フォールバック手順あり）、Issue クローズ（Custom Tool `agentdev_gh` の issue_close、reason: completed）、Issue 本文更新（Custom Tool `agentdev_gh` の issue_update、VERIFY 付き）、mergeable 状態取得（Custom Tool `agentdev_gh` の pr_mergeable、squash merge 前の mergeable UNKNOWN ポーリング、REQ-031-017、最大60秒・10秒間隔）
 - git 操作: `git pull --ff-only`、`git fetch origin main:main`（非 main ブランチ占有時の代替同期、REQ-031-008）、`git add` / `git commit` / `git push`（`.agentdev/` 配下、明示パスステージング。並行 Case git 規律は REQ-030-017）
 - worktree / ローカルブランチ削除: `agentdev-git-worktree` 手順に従う。リモートブランチ削除は GitHub の deleteBranchOnMerge 自動削除に委譲し case-close は実行しない（REQ-032-029、REQ-009-052）
-- capture 回収: PR 本文から intake / learning を分離回収し `.agentdev/intake/inbox/`、`.agentdev/learning/inbox/` へ保存
+- capture 回収: PR 本文から intake / learning を分離回収し `.agentdev/backlog/intake/inbox/`、`.agentdev/backlog/learning/inbox/` へ保存
 - deviation capture（自工程）: case-close 実行中に実観測した deviation を agentdev-learning-capture skill または
   agentdev-intake-pipeline（自動capture向け item 生成操作）へ委譲して保存。
   保存先は capture-boundaries.md の Split Rule に従う。

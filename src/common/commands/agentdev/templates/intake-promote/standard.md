@@ -1,7 +1,7 @@
 ✅ intake-promote 完了
 
 完了ワークフロー:intake-promote workflow（backlog-auto stage 2）
-対象: .agentdev/intake/promoted/（{N}件）
+対象: .agentdev/backlog/intake/promoted/（{N}件）
 結果:
  - 整形対象: {N}件
  - 分類結果: 採用 {N}件/ 保留 {N}件/ 却下 {N}件

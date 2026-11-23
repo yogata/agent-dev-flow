@@ -170,7 +170,7 @@ learning-promote はこの観点で実現先を分類・確定しない。
 
 ## プロジェクト固有知識の反映先振り分け
 
-project knowledge を一律 `.agentdev/learning/project-knowledge.md` に保存せず、内容に応じて振り分ける。
+project knowledge を一律 `.agentdev/backlog/learning/project-knowledge.md` に保存せず、内容に応じて振り分ける。
 技術固有知識（リスク判断知識）の恒久所有先は、Project Knowledge の所有と workflow 利用の要件が正規所有する所有面の契約に従い、Design（現在のシステム事実）と docs/knowledge/ 配下の知識文書（プロジェクト知識の正規知識層）に分担する。
 
 | 内容の性質 | 反映先 |

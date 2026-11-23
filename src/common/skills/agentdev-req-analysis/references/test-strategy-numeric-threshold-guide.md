@@ -20,7 +20,7 @@ QG-2（[qg-2-acceptance-criteria-coverage.md](../../agentdev-quality-gates/refer
 
 - 例: Markdown ファイルの LF 数 → 同ディレクトリの既存 Markdown ファイル群
 - 例: command ファイル行数 → `.opencode/commands/agentdev/` 配下の既存 command 群
-- 例: NG 件数 → 過去の検出事項データ（`.agentdev/intake/`、過去 PR 等）
+- 例: NG 件数 → 過去の検出事項データ（`.agentdev/backlog/intake/`、過去 PR 等）
 
 同種例が存在しない場合、類似種別から推定する。
 類似すらない場合は本 Step で「閾値設定根拠が薄弱」を明示する。

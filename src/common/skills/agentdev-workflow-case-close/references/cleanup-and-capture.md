@@ -133,15 +133,15 @@ worktree/ローカルブランチ削除、親Epic 自動クローズ判定、実
 
 `agentdev-learning-capture` スキル（manual reference）に従い、エージェントが自ら学びの有無を判断（**ユーザーに学びの有無を問うことは禁止**）。
 
-- 学びあり → `.agentdev/learning/inbox/` に直接追記 → 通知
+- 学びあり → `.agentdev/backlog/learning/inbox/` に直接追記 → 通知
 - 採用済み成果物取り込み判定 → `agentdev-learning-pipeline`（manual reference）の deferred ルール
 
 ##### Capture 回収責務
 
 PR 本文の `## Findings / Capture候補` セクションから intake/ learning を分離回収する。
 
-- **intake 候補**: `.agentdev/intake/inbox/`
-- **learning 候補**: `.agentdev/learning/inbox/`
+- **intake 候補**: `.agentdev/backlog/intake/inbox/`
+- **learning 候補**: `.agentdev/backlog/learning/inbox/`
 - **Epic 横断回収**: Epic 単位で一括回収
 - **Capture 境界**: intake/ learning 境界は `agentdev-workflow-orchestration`（capture-boundaries）を参照。intake と learning を別々の成果物として扱う
 - **一時会話コンテキスト不入力**: case-run の一時会話コンテキスト（ローカル変数、中間ファイル等）を capture の入力として使用しない。capture 情報の入力源は PR 本文のみ

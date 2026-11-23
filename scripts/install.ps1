@@ -574,7 +574,7 @@ function New-MechanicalStepProbeInput {
                 traceabilityGate = @{ name = 'traceability-check'; command = 'bun'; args = @($traceChecker, '--root', $RepoRoot, '--req', $probeReqId); cwd = $RepoRoot }
                 integrityGates = @(@{ name = 'full-integrity-suite'; command = 'bun'; args = @($traceChecker); cwd = $RepoRoot })
                 textlintGate = @{ name = 'textlint-final-check'; command = 'bun'; args = @($traceChecker); cwd = $RepoRoot }
-                contractStateCheck = @{ contractStatePaths = @('.agentdev/learning/inbox/'); approvalEntries = @() }
+                contractStateCheck = @{ contractStatePaths = @('.agentdev/backlog/learning/inbox/'); approvalEntries = @() }
                 issueUpdatedAt = '2025-01-01T00:00:00Z'
                 issueNumber = 1
                 verificationScope = @{ scopeKind = 'full-repository'; selectionBasis = 'probe fixture (full-repository representative input)' }

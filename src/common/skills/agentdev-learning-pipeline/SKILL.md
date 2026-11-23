@@ -59,7 +59,7 @@ pipeline 各層を構成する 4 成果物の役割、性格、command 間の振
 
 ## 副作用
 
-- `.agentdev/learning/` 配下の inbox.md、deferred.md、evaluation-report.md、promoted/ を更新する
+- `.agentdev/backlog/learning/` 配下の inbox.md、deferred.md、evaluation-report.md、promoted/ を更新する
 - git 永続化（commit/push）は呼出元 command の責務
 
 ## 常に守る不変条件

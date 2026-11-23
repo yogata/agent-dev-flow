@@ -6,7 +6,7 @@ description: "intake-promote workflow 本体（backlog-auto stage 2 が駆動）
 # intake-promote workflow スキル
 
 intake-promote workflow の実装本体である（backlog-auto stage 2 が Workflow Skill 連携で駆動する内部 workflow）。
-`.agentdev/intake/inbox/` 内の intake item を直接読み込み、内部 review フェーズで分類したのち、採用 item を `backlog-review` に渡せる採用済み成果物に整形する制御構造を所有する。
+`.agentdev/backlog/intake/inbox/` 内の intake item を直接読み込み、内部 review フェーズで分類したのち、採用 item を `backlog-review` に渡せる採用済み成果物に整形する制御構造を所有する。
 classification → review → HITL → persistence → destructive handling の各段階を独立 resume point として構成する。
 
 intake-promote の呼出元は backlog-auto workflow（stage 2 intake 系統）であり、入出力契約・ガードレール・分類値契約は本スキルと intake-promote Design が所有する（責務3層分化と1:N分割原則、intake pipeline 要件〔蓄積・capture 整理・分類確定・配置先限定〕）。
@@ -14,20 +14,20 @@ intake-promote の呼出元は backlog-auto workflow（stage 2 intake 系統）�
 
 ## 入力
 
-- backlog-auto stage 2（workflow 連携）から渡される intake item 群（`.agentdev/intake/inbox/` 内の Markdown ファイル）
+- backlog-auto stage 2（workflow 連携）から渡される intake item 群（`.agentdev/backlog/intake/inbox/` 内の Markdown ファイル）
 - ユーザーによる追加コンテキスト、分類修正指示（対話的に）
 
 ## 出力
 
-- 採用 item の採用済み成果物（`.agentdev/intake/promoted/*.md`、フラット構造、`backlog-review` 用）
+- 採用 item の採用済み成果物（`.agentdev/backlog/intake/promoted/*.md`、フラット構造、`backlog-review` 用）
 - 分類結果レポート（採用/ 保留/ 却下）
 - git 永続化結果を含む完了報告
 
 ## 副作用
 
-- `.agentdev/intake/promoted/` 配下へのファイル作成
+- `.agentdev/backlog/intake/promoted/` 配下へのファイル作成
 - 採用 item の inbox 元ファイル削除、reject item の即時削除（保留 item は inbox に残置）
-- `.agentdev/intake/` 配下の変更の commit / push
+- `.agentdev/backlog/intake/` 配下の変更の commit / push
 - 当該 Workflow Skill は worktree root 配下以外を編集しない（intake-promote command の worktree 隔離に従う）
 
 ## 制御平面（STEP 一覧）
@@ -41,7 +41,7 @@ intake-promote workflow は次の6 STEP で構成する。
 | STEP-1 | classification（inbox 確認・item 読込・評価・暫定分類提示・自律確定候補判定） | inbox item 存在 | 暫定分類表（採用/保留/却下、根拠、自律確定候補/ユーザー判断必要の判定） | [references/classification-and-review.md](references/classification-and-review.md) |
 | STEP-2 | review（adversarial-review） | 暫定分類の意味的決定が存在、またはユーザー明示指定 | review 経由を要する自律確定候補は review 完了後に確定。反映済み暫定分類（skip 時は STEP-1 結果をそのまま継承） | [references/classification-and-review.md](references/classification-and-review.md) |
 | STEP-3 | HITL（ユーザー確認・分類承認） | ユーザー判断必要 item が残存（全 item 自律確定時は HITL 提示を省略し確定内容を報告） | 分類確定（自律確定 item は根拠に基づく確定、ユーザー判断必要 item はユーザー承認済み） | [references/hitl-persistence-and-destructive.md](references/hitl-persistence-and-destructive.md) |
-| STEP-4 | persistence（採用 item 整形・promoted 保存） | 分類確定（採用 item あり） | `.agentdev/intake/promoted/` 配下の採用済み成果物 | [references/hitl-persistence-and-destructive.md](references/hitl-persistence-and-destructive.md) |
+| STEP-4 | persistence（採用 item 整形・promoted 保存） | 分類確定（採用 item あり） | `.agentdev/backlog/intake/promoted/` 配下の採用済み成果物 | [references/hitl-persistence-and-destructive.md](references/hitl-persistence-and-destructive.md) |
 | STEP-5 | destructive handling（振り分け・削除・git 永続化） | 分類確定 + 採用済み成果物保存済み（保留のみ確定時は振り分けから） | inbox 振り分け完了（採用削除・保留残置・reject 即時削除）、commit/push 済み | [references/hitl-persistence-and-destructive.md](references/hitl-persistence-and-destructive.md) |
 | STEP-6 | 完了報告 | 振り分け・永続化完了 | 分類結果と git 永続化結果を含む完了報告 | [references/hitl-persistence-and-destructive.md](references/hitl-persistence-and-destructive.md) |
 
@@ -73,7 +73,7 @@ intake-promote workflow は次の6 STEP で構成する。
 会話コンテキストを権威情報源とせず、永続状態から current STEP を再構成する（STEP resume point と会話記憶非依存）。
 優先順位は `<foundations/durable-state-and-recovery>` Design に従う。
 
-1. SSoT 再構成: `.agentdev/intake/inbox/` と `.agentdev/intake/promoted/` の実ファイル状態
+1. SSoT 再構成: `.agentdev/backlog/intake/inbox/` と `.agentdev/backlog/intake/promoted/` の実ファイル状態
 2. identifier 保持: item ファイルパス、採用済み成果物パス
 3. 最小 scalar: 採用・保留・却下の件数
 4. runtime artifact: 暫定分類表、adversarial-review findings（caller 統合共通契約の finding lifecycle）
@@ -106,10 +106,10 @@ HITL（STEP-3）の承認状態は単独では永続状態に記録されない�
 
 - **分類承認後の自動実行**: 分類が確定した場合（STEP-3 のユーザー承認、または STEP-1/STEP-2 での自律確定）、STEP-4〜STEP-5（採用 item 整形 / promoted 保存 / inbox 削除 / git pull / commit-push）は追加確認なしで自動実行する。分類未確定、修正中の場合は進まない
 - **破壊的変更の明示承認**: inbox 大量削除、重要 item の誤分類是正等の破壊的変更は STEP-3 の分類承認とは別に明示承認を維持する（`POL-destructive-change-explicit-approval` の詳細実装）
-- **保存先**: `.agentdev/intake/promoted/` 直下のみ（フラット構造）。整形結果に frontmatter（route/status 等）、重複排除キー、後続成果物参照を含めない（command 不変条件）
+- **保存先**: `.agentdev/backlog/intake/promoted/` 直下のみ（フラット構造）。整形結果に frontmatter（route/status 等）、重複排除キー、後続成果物参照を含めない（command 不変条件）
 - **元 item 不変**: intake item の元の内容は改変しない（整理、構造化のみ、command 不変条件）。元 item の本文に整形結果を書き込まない
-- **accepted/ 廃止**: `.agentdev/intake/accepted/` を参照、使用しない（command 不変条件）
-- **git 永続化**: `.agentdev/intake/` 配下の変更のみを対象とする。commit message は `chore(agentdev): review and promote intake items`（Conventional Commits 形式）。reject item を含む場合は commit message に却下理由を含める（監査証跡の補強。現行の正本は intake-promote command Design の監査証跡条項）。変更なし時は commit/push せず「変更なし」と報告。push 失敗時は構造化エラー形式で停止（完了扱いにしない）
+- **accepted/ 廃止**: `.agentdev/backlog/intake/accepted/` を参照、使用しない（command 不変条件）
+- **git 永続化**: `.agentdev/backlog/intake/` 配下の変更のみを対象とする。commit message は `chore(agentdev): review and promote intake items`（Conventional Commits 形式）。reject item を含む場合は commit message に却下理由を含める（監査証跡の補強。現行の正本は intake-promote command Design の監査証跡条項）。変更なし時は commit/push せず「変更なし」と報告。push 失敗時は構造化エラー形式で停止（完了扱いにしない）
 - **実行前同期**: `git pull --ff-only` 失敗時は構造化エラーメッセージを表示して停止する（自動解消しない）
 - **完了報告**: template は `.opencode/commands/agentdev/templates/intake-promote/standard.md` に従う。分類結果（採用、保留、却下の件数、一覧。自律確定 item は主要根拠とHITL不要理由を含む）と git 永続化結果を含める
 

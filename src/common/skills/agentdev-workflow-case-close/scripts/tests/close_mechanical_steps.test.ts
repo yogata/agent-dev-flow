@@ -67,7 +67,7 @@ function preMergeInput(overrides: Partial<CloseMechanicalInput> = {}): CloseMech
     integrityGates: [gate("check_integrity"), gate("check_autogen_freshness")],
     textlintGate: gate("textlint-final-check"),
     contractStateCheck: {
-      contractStatePaths: [".agentdev/intake/inbox", ".agentdev/learning/inbox/"],
+      contractStatePaths: [".agentdev/backlog/intake/inbox", ".agentdev/backlog/learning/inbox/"],
       approvalEntries: [],
     },
     verificationScope: {
@@ -224,7 +224,7 @@ describe("入力検証（品質ゲートの省略禁止）", () => {
     const badEntries = {
       ...base,
       contractStateCheck: {
-        contractStatePaths: [".agentdev/intake/inbox"],
+        contractStatePaths: [".agentdev/backlog/intake/inbox"],
         approvalEntries: [null],
       },
     };
@@ -232,7 +232,7 @@ describe("入力検証（品質ゲートの省略禁止）", () => {
     const badConfirmed = {
       ...base,
       contractStateCheck: {
-        contractStatePaths: [".agentdev/intake/inbox"],
+        contractStatePaths: [".agentdev/backlog/intake/inbox"],
         approvalEntries: [],
         humanConfirmedPaths: [{ path: "stray.txt" }],
       },
@@ -414,24 +414,24 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
   test("決定的判定: 状態記録配下・承認一覧・人間確認済み・帰属不能の4分類", () => {
     const evaluation = evaluateContractStateResidue(
       {
-        contractStatePaths: [".agentdev/learning/deferred"],
-        approvalEntries: [".agentdev/intake/inbox"],
+        contractStatePaths: [".agentdev/backlog/learning/deferred"],
+        approvalEntries: [".agentdev/backlog/intake/inbox"],
         humanConfirmedPaths: [
           { path: "notes/stray.txt", basis: "Issue #100 コメントで本 Case 無関係と確認" },
         ],
       },
-      "?? .agentdev/learning/deferred/item-1.json\n",
+      "?? .agentdev/backlog/learning/deferred/item-1.json\n",
       [
-        ".agentdev/learning/deferred/item-1.json",
-        ".agentdev/intake/inbox/item-a.md",
+        ".agentdev/backlog/learning/deferred/item-1.json",
+        ".agentdev/backlog/intake/inbox/item-a.md",
         "notes/stray.txt",
         "notes/unattributed.txt",
       ].join("\n"),
     );
     expect(evaluation.committed).toBe(false);
-    expect(evaluation.uncommittedStateRecords).toEqual([".agentdev/learning/deferred/item-1.json"]);
+    expect(evaluation.uncommittedStateRecords).toEqual([".agentdev/backlog/learning/deferred/item-1.json"]);
     expect(evaluation.approvedAllowances).toEqual([
-      { path: ".agentdev/intake/inbox/item-a.md", entry: ".agentdev/intake/inbox" },
+      { path: ".agentdev/backlog/intake/inbox/item-a.md", entry: ".agentdev/backlog/intake/inbox" },
     ]);
     expect(evaluation.humanConfirmed).toEqual([
       { path: "notes/stray.txt", basis: "Issue #100 コメントで本 Case 無関係と確認" },
@@ -466,8 +466,8 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
       "status",
       "--porcelain",
       "--",
-      ".agentdev/intake/inbox",
-      ".agentdev/learning/inbox/",
+      ".agentdev/backlog/intake/inbox",
+      ".agentdev/backlog/learning/inbox/",
     ]);
     const untrackedCall = runner.calls.find(
       (c) => c.command === "git" && c.args[0] === "ls-files" && !c.args.includes("-i"),
@@ -481,7 +481,7 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
   test("実経路: 未コミット契約状態記録の検出時は失敗で完了扱いにしない", () => {
     const runner = fakeRunner({
       issueBody: "- [x] 条件1\n",
-      contractStateStatus: "?? .agentdev/intake/inbox/item-1.json\n",
+      contractStateStatus: "?? .agentdev/backlog/intake/inbox/item-1.json\n",
     });
     const report = runCloseMechanicalSteps(
       preMergeInput({ acceptanceVerdicts: [soundPass(CID1)] }),
@@ -496,7 +496,7 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
       reason: "contract-state-residue-unresolved",
     });
     const residue = report.diff.contractStateResidue as { uncommittedStateRecords: string[] };
-    expect(residue.uncommittedStateRecords).toEqual([".agentdev/intake/inbox/item-1.json"]);
+    expect(residue.uncommittedStateRecords).toEqual([".agentdev/backlog/intake/inbox/item-1.json"]);
   });
 
   test("実経路: 帰属不能の未追跡残存は人間確認事項として報告し、確認なしに完了判定へ進めない", () => {
@@ -527,7 +527,7 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
       preMergeInput({
         acceptanceVerdicts: [soundPass(CID1)],
         contractStateCheck: {
-          contractStatePaths: [".agentdev/intake/inbox", ".agentdev/learning/inbox/"],
+          contractStatePaths: [".agentdev/backlog/intake/inbox", ".agentdev/backlog/learning/inbox/"],
           approvalEntries: [],
           humanConfirmedPaths: [
             { path: "stray.txt", basis: "対応記録コメントで本 Case 由来・起票済みと確認" },
@@ -558,7 +558,7 @@ describe("契約状態記録・未追跡残存検査（完了判定工程）", (
       preMergeInput({
         acceptanceVerdicts: [soundPass(CID1)],
         contractStateCheck: {
-          contractStatePaths: [".agentdev/intake/inbox", ".agentdev/learning/inbox/"],
+          contractStatePaths: [".agentdev/backlog/intake/inbox", ".agentdev/backlog/learning/inbox/"],
           approvalEntries: ["sandbox"],
         },
       }),

@@ -44,7 +44,7 @@ workflow state 管理は case-run、Epic orchestration は case-auto/ case-run�
 
 ## 配置契約と STEP model 連携、委譲抽象IF
 
-- Findings/ Capture 候補は PR 本文の `## Findings / Capture候補` に記述する（capture 境界は `agentdev-workflow-orchestration` 参照）。`.agentdev/intake/`、`.agentdev/learning/` を直接変更しない
+- Findings/ Capture 候補は PR 本文の `## Findings / Capture候補` に記述する（capture 境界は `agentdev-workflow-orchestration` 参照）。`.agentdev/backlog/intake/`、`.agentdev/backlog/learning/` を直接変更しない
 - Design レベルの詳細（schema、enum、判定表等）は PR 本文の `## Design確定候補` に記録する（`## Findings / Capture候補` とは別セクション）。case-close STEP-3 の入力
 - 本スキルは case-run Workflow Skill の `execute` STEP から委譲起動され、委譲契約で接合する（STEP を所有しない。詳細は references/recovery-and-step-model.md 参照）。**委譲抽象IF**: 起動手段、実行制御パラメータ、具体実装と委譲起動失敗・異常終了時事後処理は AGENTS.md および references/harness-delegation.md 参照。実行計画方向性は参考情報。内蔵ツール規律は references/execution-procedure-details.md 参照
 

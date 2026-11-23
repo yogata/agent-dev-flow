@@ -8,9 +8,9 @@
 - **Purpose**: 機械的に特定可能で移行先が一意に定まる高確信度検出事項を、HITL を経ずに intake/promoted/ へ自動投入する（fast path）
 - **Input Resolution**: STEP-3 の暫定分類結果。自動 promote 対象カテゴリ、安定契約例外、否定文脈の判定基準は responsibility-boundaries Design（extension 経由で解決）を正とする
 - **Preconditions**: `--auto` が明示指定されていること、STEP-3 完了
-- **Procedure**: 分類結果のうち responsibility-boundaries Design（extension 経由）の自動 promote 対象カテゴリに合致し、かつ安定契約例外および否定文脈を満たさない高確信度検出事項を `.agentdev/intake/promoted/inspect-auto-{timestamp}-{slug}.md` へ投入する。各投入を `.agentdev/inspect/promoted/auto-promote-log.md` に追記する（対象検出事項、カテゴリ、投入先ファイル、根拠）。`--auto` 未指定時は本 STEP をスキップし、自動投入を行わない
+- **Procedure**: 分類結果のうち responsibility-boundaries Design（extension 経由）の自動 promote 対象カテゴリに合致し、かつ安定契約例外および否定文脈を満たさない高確信度検出事項を `.agentdev/backlog/intake/promoted/inspect-auto-{timestamp}-{slug}.md` へ投入する。各投入を `.agentdev/backlog/inspect/promoted/auto-promote-log.md` に追記する（対象検出事項、カテゴリ、投入先ファイル、根拠）。`--auto` 未指定時は本 STEP をスキップし、自動投入を行わない
 - **Result**: 自動投入済み検出事項、auto-promote-log 記録
-- **Evidence**: `.agentdev/intake/promoted/inspect-auto-*.md` ファイルと auto-promote-log の追記エントリ
+- **Evidence**: `.agentdev/backlog/intake/promoted/inspect-auto-*.md` ファイルと auto-promote-log の追記エントリ
 - **Completion Verification**: 自動投入対象が全て投入済みで、各投入がログに記録済みであること
 - **Resume-Idempotency**: auto-promote-log 記載済みかつ投入先ファイルが存在する検出事項は自動 promote 確定として再投入しない。再開時はログと投入先ファイルの突合により未投入分のみを処理する
 
@@ -48,4 +48,4 @@ adversarial-review は任意助言手段であり、必須工程、QG、承認�
 
 - ガードレール（ユーザーの明示的な承認なしに採用済み成果物を生成しない。`--auto` による自動 promote 対象を除く、`POL-promoted-artifact-requires-approval`）
 - ガードレール（`--auto` は明示 opt-in の場合のみ有効。省略時は自動 promote を一切行わない）
-- 不変条件（`--auto` 実行の都度、投入対象、根拠を `.agentdev/inspect/promoted/auto-promote-log.md` に記録する。誤検知 revoke 手順は同 Design 参照）
+- 不変条件（`--auto` 実行の都度、投入対象、根拠を `.agentdev/backlog/inspect/promoted/auto-promote-log.md` に記録する。誤検知 revoke 手順は同 Design 参照）

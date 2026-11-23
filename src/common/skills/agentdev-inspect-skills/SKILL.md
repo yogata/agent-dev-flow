@@ -10,14 +10,14 @@ Command→Skill 参照妥当性、Skill 粒度、Skill 構造、実行主体分�
 
 ## 検査対象を直接修正しない制約
 
-- ファイル変更（canonical docs、REQ/Decision/Design、Command/Skill/Template/Script）、Issue 作成、PR 作成、RU 保存、branch/ worktree 操作を行わない。許可される副作用は `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md` の生成、および `.agentdev/inspect/` 配下の git 永続化（commit/ push）のみ
+- ファイル変更（canonical docs、REQ/Decision/Design、Command/Skill/Template/Script）、Issue 作成、PR 作成、RU 保存、branch/ worktree 操作を行わない。許可される副作用は `.agentdev/backlog/inspect/inbox/inspect-skills-finding-{topic}.md` の生成、および `.agentdev/backlog/inspect/` 配下の git 永続化（commit/ push）のみ
 - 診断結果はセッション内テキストで提示する
 - 修正案は経路として提示し、実装、保存、自動整形は行わない
 
 ## 検出事項のエクスポート
 
-診断結果を `inspect-promote` に引き継ぐ必要がある場合、`.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md` に検出事項を書き出すことができる。
-この検出事項は inspect ライフサイクル（`.agentdev/inspect/` inbox/promoted）の対象であり、`inspect-promote` への参照専用中間成果物である。
+診断結果を `inspect-promote` に引き継ぐ必要がある場合、`.agentdev/backlog/inspect/inbox/inspect-skills-finding-{topic}.md` に検出事項を書き出すことができる。
+この検出事項は inspect ライフサイクル（`.agentdev/backlog/inspect/` inbox/promoted）の対象であり、`inspect-promote` への参照専用中間成果物である。
 
 検出事項には以下を含める:
 - 概要（Summary）
@@ -127,7 +127,7 @@ cleanup モデルと処置契約の SSoT は document-model Design であり、�
 
 ## 出力形式
 
-検出事項の報告形式は次の3要素（診断レポート: セッション内テキスト、検出事項リスト: 対象・観点・分類・根拠・推奨経路、検出事項ファイル: `.agentdev/inspect/inbox/inspect-skills-finding-{topic}.md`）に適合させる。
+検出事項の報告形式は次の3要素（診断レポート: セッション内テキスト、検出事項リスト: 対象・観点・分類・根拠・推奨経路、検出事項ファイル: `.agentdev/backlog/inspect/inbox/inspect-skills-finding-{topic}.md`）に適合させる。
 セッション内テキストによる診断レポートは本セクション形式で提示し、検出事項ファイルへのエクスポートは「検出事項のエクスポート」セクションに従う。
 
 各検出事項は次の形で報告する（「検出事項リスト」形式: 対象・観点・分類・根拠・推奨経路）。

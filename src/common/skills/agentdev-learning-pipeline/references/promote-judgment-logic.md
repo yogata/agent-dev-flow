@@ -29,7 +29,7 @@ learning-promote コマンドの Steps における判定ロジック（旧フ�
 
 ### evaluation-report.md の生成、更新
 
-- パス: `.agentdev/learning/evaluation-report.md`（毎回上書き、追記しない）
+- パス: `.agentdev/backlog/learning/evaluation-report.md`（毎回上書き、追記しない）
 - スキーマは `agentdev-learning-pipeline` skill の `references/inbox-and-evaluation-schema.md`（Evaluation-Report Schema）に従う
 - evaluation-report.md は本コマンドの評価根拠中間成果物であり、外部コマンドの入力としての依存関係を持たない
 

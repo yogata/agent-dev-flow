@@ -50,7 +50,7 @@ cli.ts --changed は git diff --cached --name-only（ステージング空の場
 変更ファイル一覧を取得し、各ルールの targetGlobs と照合し、マッチするルール（と globalScan: true の最小限の
 相互参照ルール）のみを並列実行する。変更ファイルが対象外のみの場合は即座に Exit Code 0 で終了する。
 cli.ts --emit-intake は severity: warning の RuleViolation を
-.agentdev/intake/inbox/YYYY-MM-DD-auto-<rule-id-lower>.md として自動生成し、同一 rule-id の自動起票
+.agentdev/backlog/intake/inbox/YYYY-MM-DD-auto-<rule-id-lower>.md として自動生成し、同一 rule-id の自動起票
 ファイルが既に存在する場合は新規作成せずスキップする（冪等性）。
 
 ## カタログ自動生成（単一ソース）
