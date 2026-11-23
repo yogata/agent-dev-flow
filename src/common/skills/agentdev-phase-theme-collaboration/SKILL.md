@@ -47,7 +47,7 @@ Workflow Skill 群（テーマ形成・テーマ更新・成果物反映）か�
 
 操作対象の取組・対象版・現在工程は既存の正規状態から特定する。
 
-- `identity.yaml` の実ファイル（undertaking、target_version、current_phase）を読み、現在の対象を復元する
+- `identity.yaml` の実ファイル（project、target_version、current_phase）を読み、現在の対象を復元する
 - 同一取組の再開では確定済みの対象版・現在工程を復元し、別取組へ旧工程や未決テーマを無条件に引き継がない
 - 対象を一意に解決できない場合は、対象への変更・書込みを実行せず、候補と不足を報告する（判断の代理確定をしない）
 
