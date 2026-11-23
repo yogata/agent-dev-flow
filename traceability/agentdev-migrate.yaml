@@ -2,12 +2,17 @@ component: agentdev-migrate
 implementation:
   src/common/commands/agentdev/migrate.md:
     - REQ-126-002
+    - REQ-126-007
+    - REQ-126-008
   src/common/skills/agentdev-workflow-migrate/SKILL.md:
     - REQ-126-002
+    - REQ-126-007
+    - REQ-126-008
   src/common/skills/agentdev-workflow-migrate/references/version-deltas.md:
     - REQ-126-002
     - REQ-126-005
     - REQ-126-006
+    - REQ-126-007
   src/common/skills/agentdev-workflow-migrate/references/target-structure.md:
     - REQ-126-002
     - REQ-126-005

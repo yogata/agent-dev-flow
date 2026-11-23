@@ -926,6 +926,18 @@ verification:
   - REQ-124-010
   - REQ-004-076
   - REQ-004-077
+  # 区分C 追加（2026-11-23、.agentdev/ の正規構造と版をまたぐ移行基盤・Case #4214）:
+  # REQ-126 の移行基盤契約 6 行（REQ-126-001/002/003/004/007/008）の登録。検証は Case 実行時の
+  # 一回限り検証（TS-001 対話承認記録照合・TS-004 rg 検索・TS-007/008 隔離環境実証・TS-009 報告突合、
+  # および全体統合検証: docs-check 全量・traceability check・検証エンジン テストスイート）で補完され、
+  # 恒常 checker を持たない行の区分明示。REQ-126-005/006 は工程・backlog の pin テスト実体を
+  # sidecar・inline 宣言で維持するため optional へ登録しない。2026-11-21 の REQ-124 系区分C 登録と同一判断。
+  - REQ-126-001
+  - REQ-126-002
+  - REQ-126-003
+  - REQ-126-004
+  - REQ-126-007
+  - REQ-126-008
 
 design:
   default: required

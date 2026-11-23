@@ -1,4 +1,4 @@
-// ADF-COVERS(verification): REQ-110-001, REQ-110-004, REQ-110-010, REQ-110-013, REQ-110-014
+// ADF-COVERS(verification): REQ-110-001, REQ-110-004, REQ-110-010, REQ-110-013, REQ-110-014, REQ-126-005
 //
 // .agentdev/project/ 工程駆動ドメイン状態領域の保存契約検証。
 // 実領域の構造（許可ファイル集合、identity フィールド、project/README.md 契約の様式トークン）を

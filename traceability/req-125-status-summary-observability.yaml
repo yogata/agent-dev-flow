@@ -11,5 +11,6 @@ implementation:
 verification:
   src/common/skills/agentdev-workflow-case-open/scripts/tests/collect-status-summary.test.ts:
     - REQ-125-006
+    - REQ-126-006
   scripts/self/observability/collect-opencode-metrics.test.ts:
     - REQ-125-007
