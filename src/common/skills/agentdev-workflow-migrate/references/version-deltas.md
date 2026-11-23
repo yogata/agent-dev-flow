@@ -1,7 +1,7 @@
 # 版別差分仕様
 
 本ファイルは、旧構成から配布版の正規構造（references/target-structure.md）への移行差分を定義する。
-適用する差分は、install.ps1 -Check の検知結果と .agentdev/ 配下の実在配置の観測から決定する。版ラベルではなく観測事実で差分を選択するため、配布版の版番号（src/common/VERSION の値）に依存しない。
+適用する差分は、install.ps1 -Mode check の検知結果と .agentdev/ 配下の実在配置の観測から決定する。版ラベルではなく観測事実で差分を選択するため、配布版の版番号（src/common/VERSION の値）に依存しない。
 
 ## 差分: 統合構成への移行
 
@@ -35,6 +35,19 @@
 | `.agentdev/backlog-auto/end-to-end/<一式識別子>/set-state.json`（evidence 配下に検証証跡） | `.agentdev/backlog/runs/<一式識別子>/set-state.json` | 移動（evidence/ を含む）。全体完了・リリース完了済みの一式は、継続保存の要否をユーザーと確認し、不要確認後に削除する |
 | 上記の移動・改名の後に空になる旧ディレクトリ | （廃止） | 旧痕跡としてユーザー確認後に削除する |
 | `.agentdev/install-state.json` | （新設） | 移行後の install.ps1 apply 完了時に記録される（移行操作では作成しない） |
+
+### 移行で更新されない文書
+
+対応表の移動・改名と identity.yaml のキー改名以外に、文書の内容は更新しない。次の文書は移行後も旧配置・旧名称の記述を保持するため、ユーザーの更新が必要な範囲として結果報告で案内する。
+
+| 文書 | 移行後に残る記述 | 現行の名称 |
+|---|---|---|
+| `.agentdev/README.md` の状態表とディレクトリ構成 | 旧配置 `intake/`、`learning/`、`inspect/`、`phase/`、`backlog-auto/`、`blocked/` | 対応表の新配置（`blocked/` は廃止） |
+| `.agentdev/project/README.md` の見出し | `phase/` | `project/` |
+| 同「identity.yaml の様式」 | キー `undertaking` | `project` |
+| 同「保存モデル」・各様式の節・別セッション再開 | `pending.md`、`adoptions/`、`revisions/`、`transitions/` | `issue-log.md`、`decision-log/`、`change-log/`、`phase-gates/` |
+
+`.agentdev/project/README.md` の現行様式の正本は `agentdev-phase-theme-collaboration` の `templates/project-readme.md` である。
 
 ### 引き継ぎの規律
 

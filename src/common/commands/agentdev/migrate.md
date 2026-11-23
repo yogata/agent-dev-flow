@@ -12,7 +12,7 @@ description: .agentdev/ の構成を配布版の正規構造へ移行する公�
 
 - 移行の指示（自然言語。省略時は検知結果から対象を解決する）
 - .agentdev/install-state.json の記録版とチェックアウトの src/common/VERSION の差分
-- install.ps1 -Check の出力（旧構造痕跡・版不一致・未移行の検知結果）
+- install.ps1 -Mode check の出力（旧構造痕跡・版不一致・未移行の検知結果）
 
 ## 出力
 
