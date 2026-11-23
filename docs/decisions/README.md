@@ -11,7 +11,7 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 DEC-064 は欠番であり、対応する Decision ファイルは存在しない。実験前提に基づく既存統制変更原則の採用に関する判断であったが、現行の判断実体は DEC-067（仮説に基づく既存統制変更原則）が部分置換・継承しており、ファイルはスリム化整理で削除された。削除後の参照解決は Git 履歴で行う。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は45件、提案中の Decision は0件である。
+現行の承認済み Decision は45件、提案中の Decision は1件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -62,6 +62,7 @@ DEC-064 は欠番であり、対応する Decision ファイルは存在しな�
 | DEC-065 | 整合性検証体制の中核化（IR 24+IR-075 体系・プラグイン型検証エンジン・src 正本化） | accepted | 2026-11-18 |
 | DEC-066 | ローカル Git Hook による決定論的検証ゲート（CI 非依存） | accepted | 2026-11-18 |
 | DEC-067 | 仮説に基づく既存統制変更原則 | accepted | 2026-11-19 |
+| DEC-068 | 適用先の構成移行の責務分離 | proposed | 2026-11-23 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -124,6 +125,7 @@ DEC-064 は欠番であり、対応する Decision ファイルは存在しな�
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
+- [DEC-068](DEC-068.md)（適用先の構成移行の責務分離）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -204,6 +206,8 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-014 | relates-to | DEC-013 | IR 存在条件モデルに従い、IR-059 の範囲変更を本 Decision で確定 |
 | DEC-051 | supersedes | DEC-041 | case-auto stage 3 のスロット型キュー移行による決定5（Wave 収束前提）の置換（決定1〜4は維持） |
 | DEC-062 | relates-to | DEC-001, DEC-009 | 現行 corpus の ID 形式記述（意味的不変）を参照する受理上限撤廃の新規決定。既存 ID・参照の改番は行わない |
+| DEC-068 | relates-to | DEC-016 | 導入系スクリプトのプロビジョニングとネットワークアクセスを行わない決定を維持し、構成移行との責務を分ける |
+| DEC-068 | relates-to | DEC-056 | 意味保存と検証の原則と整合する、将来の構成変更に対する移行手段の選択を定める |
 
 ## 関連 REQ
 
@@ -255,6 +259,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-065 | - | - |
 | DEC-066 | - | - |
 | DEC-067 | [REQ-048](../requirements/REQ-048.md), [REQ-109](../requirements/REQ-109.md) | - |
+| DEC-068 | [REQ-126](../requirements/REQ-126.md) | - |
 <!-- AUTOGEN:END -->
 
 ## 過去版の履歴基盤
