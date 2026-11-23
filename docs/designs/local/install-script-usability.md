@@ -2,7 +2,7 @@
 title: 導入スクリプトの使いやすさ詳細
 status: accepted
 created: 2026-08-02
-updated: "2026-11-21"
+updated: "2026-11-24"
 ---
 <!-- ADF-COVERS(implementation): REQ-050-006（誤実行防止の環境判定方式の判定材料と手順。runtime-package-boundary.md から移管〔REQ-123-003〕） -->
 <!-- ADF-COVERS(implementation): REQ-009-001, REQ-009-003, REQ-009-004, REQ-009-005, REQ-009-040, REQ-009-041, REQ-009-042, REQ-009-043, REQ-009-044, REQ-009-046, REQ-009-047, REQ-009-048, REQ-009-049 -->
@@ -62,6 +62,10 @@ clone コマンド例とソース ZIP 取得手順を案内表示する（REQ-00
   - 1) 同期実行 → apply
   - 2) 乖離確認 → check
   - 3) 変更予測 → dry-run
+
+### 導入先での Codex・Antigravity の選択
+
+OpenCode のみ、Senpi のみ、両方の選択と既定は既存ホスト用に維持する。導入先の対話選択と明示指定では Codex・Antigravity も選択対象とし、選択したリポジトリ内だけに投影する。ホーム全域と本体リポジトリは新ホストの導入先にしない。配置検査と各ホストの動作確認は区別する。
 
 ## dry-run/check/apply の技術的差
 

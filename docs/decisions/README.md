@@ -11,7 +11,7 @@ DEC-018 は欠番であり、対応する Decision ファイルは存在しな�
 DEC-064 は欠番であり、対応する Decision ファイルは存在しない。実験前提に基づく既存統制変更原則の採用に関する判断であったが、現行の判断実体は DEC-067（仮説に基づく既存統制変更原則）が部分置換・継承しており、ファイルはスリム化整理で削除された。削除後の参照解決は Git 履歴で行う。
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-count -->
-現行の承認済み Decision は46件、提案中の Decision は0件である。
+現行の承認済み Decision は46件、提案中の Decision は1件である。
 <!-- AUTOGEN:END -->
 
 <!-- AUTOGEN:BEGIN:id=decision-baseline-table -->
@@ -63,6 +63,7 @@ DEC-064 は欠番であり、対応する Decision ファイルは存在しな�
 | DEC-066 | ローカル Git Hook による決定論的検証ゲート（CI 非依存） | accepted | 2026-11-18 |
 | DEC-067 | 仮説に基づく既存統制変更原則 | accepted | 2026-11-19 |
 | DEC-068 | 適用先の構成移行の責務分離 | accepted | 2026-11-23 |
+| DEC-069 | Codex・Antigravity の限定配布とホスト既存能力の優先 | proposed | 2026-11-24 |
 <!-- AUTOGEN:END -->
 
 - [利用者向け要約（charter.md）](../guides/charter.md)
@@ -126,6 +127,7 @@ DEC-064 は欠番であり、対応する Decision ファイルは存在しな�
 ### 提案中（proposed）
 
 <!-- AUTOGEN:BEGIN:id=decision-status-proposed -->
+- [DEC-069](DEC-069.md)（Codex・Antigravity の限定配布とホスト既存能力の優先）
 <!-- AUTOGEN:END -->
 
 ### 置き換え済み（superseded）
@@ -260,6 +262,7 @@ Decision Map（現行 Decision と過去版 ADR の履歴上の関連）。
 | DEC-066 | - | - |
 | DEC-067 | [REQ-048](../requirements/REQ-048.md), [REQ-109](../requirements/REQ-109.md) | - |
 | DEC-068 | [REQ-126](../requirements/REQ-126.md) | - |
+| DEC-069 | [REQ-099](../requirements/REQ-099.md), [REQ-009](../requirements/REQ-009.md) | - |
 <!-- AUTOGEN:END -->
 
 ## 過去版の履歴基盤
