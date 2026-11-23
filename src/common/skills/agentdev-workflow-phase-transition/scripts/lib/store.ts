@@ -1,6 +1,6 @@
 /**
  * Transition record store: lookup and idempotent apply over the domain state
- * directory (.agentdev/phase/transitions/). Single-execution control: an apply
+ * directory (.agentdev/project/phase-gates/). Single-execution control: an apply
  * with an already-recorded key never writes a second record. Technical failures
  * throw; callers report them as failures, never as success.
  */

@@ -27,7 +27,7 @@ phase-transition command は公開 interface（入出力契約・ガードレー
 
 ## 副作用
 
-- 遷移記録（`.agentdev/phase/transitions/` 配下）の作成・読取。遷移記録の削除は行わない
+- 遷移記録（`.agentdev/project/phase-gates/` 配下）の作成・読取。遷移記録の削除は行わない
 - Decision、REQ、Design 等の正規成果物は更新しない
 
 ## workflow model（STEP model 対象外）
@@ -88,7 +88,7 @@ resume point / export / import を持たない。各遷移操作が1完結単位
 
 ## 遷移の記録と一度実行の制御
 
-遷移記録は `.agentdev/phase/transitions/` 配下の domain state とする（工程駆動の状態領域。テーマ正本・識別状態と共通の `.agentdev/phase/` 配下配置方針に従う）。遷移記録の物理形式・操作契約は本スキル配下の決定的処理 script が所有する。
+遷移記録は `.agentdev/project/phase-gates/` 配下の domain state とする（工程駆動の状態領域。テーマ正本・識別状態と共通の `.agentdev/project/` 配下配置方針に従う）。遷移記録の物理形式・操作契約は本スキル配下の決定的処理 script が所有する。
 
 終端の遷移（採用済みの工程関係に後続工程が存在しない遷移）は、架空の後続工程を作らない記録形式で保存する。終端の記録は toPhase に後続不在を表す表現（`null`）を記録し、保存された記録から終端であることを再構成できる。記録形式の正は決定的処理 script が所有する schema であり、I/O 契約の詳細は `scripts/README.md` を参照する。
 
@@ -114,7 +114,7 @@ resume point / export / import を持たない。各遷移操作が1完結単位
 - 初回テーマ形成が失敗しても、遷移の記録を取り消さない。形成の失敗は形成の再実行条件として報告する
 - 本スキルは初回テーマ形成を実行しない（形成は独立した公開操作。遷移記録の成立後に案内するのみ）
 
-遷移後の現在工程の特定・再開では、遷移記録と現在工程の識別状態（identity、`.agentdev/phase/identity.yaml`）を照合する。識別状態が遷移記録の内容と矛盾する場合は、遷移記録に依存する操作を保留し、矛盾の内容を報告する。矛盾を自動解消せず、解消は利用者判断の対象として保留する。初回テーマ形成が未実施・失敗でも、この照合と成立済み遷移・既知義務の再取得は成立する。identity.yaml は読み取り側の照合対象であり、本スキルはこれを変更しない。照合の決定的処理入口は本スキル配下 `scripts/src/lookup.ts`（`--identity-file` で identity.yaml を渡し、既存記録の復元前に undertaking↔scope と current_phase↔fromPhase/toPhase を逐語照合する。mismatch・確認不能は非ゼロ終了で保留を返す）であり、遷移先次工程側のテーマ一覧の導出は `agentdev-phase-theme-collaboration` の決定的処理 script が担う。
+遷移後の現在工程の特定・再開では、遷移記録と現在工程の識別状態（identity、`.agentdev/project/identity.yaml`）を照合する。識別状態が遷移記録の内容と矛盾する場合は、遷移記録に依存する操作を保留し、矛盾の内容を報告する。矛盾を自動解消せず、解消は利用者判断の対象として保留する。初回テーマ形成が未実施・失敗でも、この照合と成立済み遷移・既知義務の再取得は成立する。identity.yaml は読み取り側の照合対象であり、本スキルはこれを変更しない。照合の決定的処理入口は本スキル配下 `scripts/src/lookup.ts`（`--identity-file` で identity.yaml を渡し、既存記録の復元前に project↔scope と current_phase↔fromPhase/toPhase を逐語照合する。mismatch・確認不能は非ゼロ終了で保留を返す）であり、遷移先次工程側のテーマ一覧の導出は `agentdev-phase-theme-collaboration` の決定的処理 script が担う。
 
 遷移後に確定済み設計から実装・検証へ接続する場合の接続先は、確定済み詳細設計と有限な実装対象・既存検証条件を正規入力として実装・検証へ接続する case 系実行経路（`/agentdev/case-auto`）である。接続の実行は遷移の記録から独立し、本スキルは実装・検証を実行しない。
 
@@ -133,7 +133,7 @@ resume point / export / import を持たない。各遷移操作が1完結単位
 ## GitHub 版と Local 版の両対応
 
 本スキルは GitHub 版・Local 版のいずれの正規利用経路からも単独起動できる（対応する command 定義が共通原本から両版へ投影される）。
-遷移記録は `.agentdev/phase/transitions/`（両版共通の domain state 配置）に保存し、backend の物理表現に依存しない。
+遷移記録は `.agentdev/project/phase-gates/`（両版共通の domain state 配置）に保存し、backend の物理表現に依存しない。
 Local 版で遷移後の作業が実装作業を伴う場合は、実装接続先の case 系実行経路（`/agentdev/case-auto`）の突合契約（`agentdev-workflow-case-auto` の「Local 版での実装作業突合」。ローカル記録と実 Git 取り込み結果〔関連コミットの実在確認を含む〕の独立突合。成功報告だけでは取り込み完了としない）に従い、突合は実装接続先の実行経路が担う。本スキルは突合を実行しない。
 後継経路への切替は、移行の意味保存を定める既存契約に従い、切替前の保存状態（テーマ正本、識別状態、遷移記録）と切替後の正規情報・必要な参照・未処理情報の継続性を照合する（切替時の情報保全の接続）。旧経路は後継経路の実現・採用まで失効しない（移行期の権威継続の既存契約）。
 

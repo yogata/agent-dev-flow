@@ -1,6 +1,6 @@
 /**
- * themes.md / pending.md のセクション解析（決定的）。
- * 様式は .agentdev/phase/README.md の領域契約に従う。
+ * themes.md / issue-log.md のセクション解析（決定的）。
+ * 様式は .agentdev/project/README.md の領域契約に従う。
  * - テーマ1件 = `## THEME-{NNN}: テーマ名` セクション
  * - 未決1件 = `## PEND-{NNN}: 要約` セクション
  * 同一入力から同一の JSON を返す（実質変更なしの再実行で不当な再編を増やさない導出の基盤）。
@@ -104,7 +104,7 @@ function extractThemeId(value: string): string | null {
   return match !== null ? match[0] : null;
 }
 
-/** pending.md を解析する。未決識別の重複は例外で拒否する。 */
+/** issue-log.md を解析する。未決識別の重複は例外で拒否する。 */
 export function parsePending(text: string): readonly PendingSection[] {
   const seen = new Set<string>();
   const sections: PendingSection[] = [];

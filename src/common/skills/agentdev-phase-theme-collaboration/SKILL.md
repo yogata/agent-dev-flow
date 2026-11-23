@@ -1,6 +1,6 @@
 ---
 name: agentdev-phase-theme-collaboration
-description: "工程駆動コラボレーションの Capability Skill。テーマ正本（themes.md・pending.md・identity.yaml・received/）の管理操作知識と、外部検討の持出し・戻り受理の機械的処理を所有する。戻り入力の受理は fail-closed とし、採用根拠は利用者の明示判断に限定する。USE FOR: 対象の取組・対象版・現在工程の特定と再開、テーマ正本の読み書き規律と一覧導出、旧テーマ識別の後継解決、未決事項の引継ぎ参照、持出し文書の構成確認と機密混入検出、戻り入力の受理・採否記録生成、受領済み知見の再取得。DO NOT USE FOR: テーマ形成・更新の workflow 制御（agentdev-workflow-phase-tasks-create / phase-tasks-update）、正規成果物への反映判断（agentdev-workflow-phase-artifacts-update）、独立レビュー・工程遷移（phase-review / phase-transition）、採用規約の解決（agentdev-adopted-conventions）。"
+description: "工程駆動コラボレーションの Capability Skill。テーマ正本（themes.md・issue-log.md・identity.yaml・received/）の管理操作知識と、外部検討の持出し・戻り受理の機械的処理を所有する。戻り入力の受理は fail-closed とし、採用根拠は利用者の明示判断に限定する。USE FOR: 対象の取組・対象版・現在工程の特定と再開、テーマ正本の読み書き規律と一覧導出、旧テーマ識別の後継解決、未決事項の引継ぎ参照、持出し文書の構成確認と機密混入検出、戻り入力の受理・採否記録生成、受領済み知見の再取得。DO NOT USE FOR: テーマ形成・更新の workflow 制御（agentdev-workflow-phase-tasks-create / phase-tasks-update）、正規成果物への反映判断（agentdev-workflow-phase-artifacts-update）、独立レビュー・工程遷移（phase-review / phase-transition）、採用規約の解決（agentdev-adopted-conventions）。"
 ---
 
 # agentdev-phase-theme-collaboration
@@ -8,11 +8,11 @@ description: "工程駆動コラボレーションの Capability Skill。テー�
 工程駆動コラボレーションにおけるテーマ正本の管理と外部検討の持出し・戻り受理を所有する Capability Skill である。
 Workflow Skill 群（テーマ形成・テーマ更新・成果物反映）から参照される操作知識と決定的処理を提供し、判断の代理確定は行わない。
 
-保存領域の様式と領域契約は `.agentdev/phase/README.md` が正である。本スキルはその領域契約に従う操作知識と機械的処理を所有し、領域契約自体を再定義しない。
+保存領域の様式と領域契約は `.agentdev/project/README.md` が正である。本スキルはその領域契約に従う操作知識と機械的処理を所有し、領域契約自体を再定義しない。
 
 ## 領域契約文書の配布テンプレートと実体化
 
-工程領域の領域契約文書（`.agentdev/phase/README.md`）の正本は、本スキル配下の配布テンプレート（`templates/phase-readme.md`）である。
+工程領域の領域契約文書（`.agentdev/project/README.md`）の正本は、本スキル配下の配布テンプレート（`templates/project-readme.md`）である。
 初回保存経路（初回テーマ形成、テーマ更新の先行、直接採用による成果物作成）の Workflow Skill が、領域契約文書が存在しない場合にテンプレートから非破壊に実体化する。
 
 - 実体化は既存の領域契約文書を上書きしない。既存の場合は現行内容を維持する
@@ -22,7 +22,7 @@ Workflow Skill 群（テーマ形成・テーマ更新・成果物反映）か�
 ## 入力
 
 - Workflow Skill からの操作指示（対象テーマ識別、持出し文書、戻り入力テキスト、照会条件）
-- `.agentdev/phase/` 配下の実ファイル（identity.yaml、themes.md、pending.md、received/）
+- `.agentdev/project/` 配下の実ファイル（identity.yaml、themes.md、issue-log.md、received/）
 
 ## 出力
 
@@ -41,7 +41,7 @@ Workflow Skill 群（テーマ形成・テーマ更新・成果物反映）か�
 ## 副作用
 
 - received/ 配下への受領記録の作成（Workflow Skill の指示に従い、採用件数に比例する記録量で保存する）
-- themes.md / pending.md / identity.yaml の更新は本スキルでは行わない。正本の書込みは Workflow Skill が編集操作で行い、本スキルは様式の解析・導出・検証を担う
+- themes.md / issue-log.md / identity.yaml の更新は本スキルでは行わない。正本の書込みは Workflow Skill が編集操作で行い、本スキルは様式の解析・導出・検証を担う
 
 ## 対象の特定と再開（identity 解決）
 
@@ -56,7 +56,7 @@ Workflow Skill 群（テーマ形成・テーマ更新・成果物反映）か�
 - **一覧の導出**: テーマ一覧は themes.md のセクションから導出する。別の更新可能な恒久一覧を作らない。テーマと Issue・成果物の一対一対応を強制しない
 - **採用状態の照合**: テーマ内の採用を示す主張は、対象内容が有効な利用者判断または正規決定によって裏付けられることを照合してから扱う。参照先が存在することだけを根拠に採用を認定しない。有効な採用根拠がない内容を正式な採用済み要求として扱わず、根拠が不足する採用主張は確認不足または候補として示す。テーマと正規成果物で同一の判断対象の採用状態が異なる場合は不整合を検出し、根拠に基づく是正または未確認として扱う。テーマの記述だけを根拠に正規成果物の採用状態を書き換えない。採用判断の成立と正規成果物への反映の完了を区別し、反映が未完了の間は成果物反映まで完了したと扱わない。採用主張のない通常の参考テーマを根拠参照の不在だけで一律に無効にしない。この採用基準は実行境界側（req-define、case-open、case-run、委譲内 context 再確認）でも同一基準で照合される。機械的部分は `src/themes.ts --assess-adoption true`（採用主張の分類、`lib/sections.ts` の不整合検出と反映状態の導出）が担い、機械解析は採用の意味的な認定を行わない
 - **旧新対応**: 統合・分割・改名後の旧テーマ識別は後継チェーンを辿って解決する。機械的部分は `src/themes.ts --resolve-old` が担い、resolved / terminal / unknown / cycle を区別する。循環は解決せず報告する
-- **未決の引継ぎ**: 統合・廃止に際して継続対象の未決は後継テーマへ引き継ぎ（pending.md で状態を carried に更新し、引継ぎ元と後継の双方を関連テーマに残す）、対象外・不要とされた事項は判断根拠を pending.md に残す。未決事項を自動解消済みとして扱わない
+- **未決の引継ぎ**: 統合・廃止に際して継続対象の未決は後継テーマへ引き継ぎ（issue-log.md で状態を carried に更新し、引継ぎ元と後継の双方を関連テーマに残す）、対象外・不要とされた事項は判断根拠を issue-log.md に残す。未決事項を自動解消済みとして扱わない
 - **実質変更なしの再実行**: 同一入力の再実行では themes.md のセクションを不当に再編せず、変更報告を増やさない。導出が決定的であること（同一入力から同一 JSON）がこの規律の機械的基盤である
 - **テーマ識別の再利用禁止**: 廃止・統合されたテーマ識別を再利用しない。分割は旧テーマを deprecated にし、分割先を新識別で作成して旧新対応を保持する
 
@@ -78,7 +78,7 @@ Workflow Skill 群（テーマ形成・テーマ更新・成果物反映）か�
 - **fail-closed**: 不正または曖昧な入力（様式不備・空本文）は `rejected-invalid` として残し、確定しない。エントリ見出しが一切ない入力は単一の `rejected-invalid` として記録する
 - **線形走査**: 受理・解釈は入力サイズ n に対する単一の線形走査（時間計算量 O(n)）である。1回の行走査でエントリを抽出し、後戻り・再走査を行わない
 - **証跡量**: 採用・不採用の記録は明示採用件数に比例する証跡量である。エントリ本文を複写せず、採用分は根拠付きレコード、不採用分は id と分類の要約のみを記録する。受領内容全体を複写する恒久複本を作らない
-- **採否記録の保存**: 本 CLI は採否記録の保存を行わない（stdout への JSON 出力のみ）。採否記録の保存先は `.agentdev/phase/adoptions/`（1採用1ファイル。受領記録と同じ証跡規律〔由来と正式な採用根拠の区別、fail-closed、採用ごとの区別保存〕）であり、保存先への書込みは保存する操作（成果物反映 Workflow Skill）の責務である。様式は領域契約文書（`.agentdev/phase/README.md`）の「adoptions/ の様式」を正とする
+- **採否記録の保存**: 本 CLI は採否記録の保存を行わない（stdout への JSON 出力のみ）。採否記録の保存先は `.agentdev/project/decision-log/`（1採用1ファイル。受領記録と同じ証跡規律〔由来と正式な採用根拠の区別、fail-closed、採用ごとの区別保存〕）であり、保存先への書込みは保存する操作（成果物反映 Workflow Skill）の責務である。様式は領域契約文書（`.agentdev/project/README.md`）の「decision-log/ の様式」を正とする
 - **採否不明の部分**: 明示採用指示のない部分は `not-adopted` として記録し、採否不明の部分だけを利用者への確認対象とする
 - **再投入**: 書込失敗後の同一入力の再投入では、`--prior` で既存受領記録を照合し、同一エントリを `detected-duplicate` として検出する。実際の確定状態から必要な分だけ継続し、重複や消失を生まない
 
@@ -99,7 +99,7 @@ Workflow Skill 群（テーマ形成・テーマ更新・成果物反映）か�
 - **完了判定の機械規則**: 影響評価の入力の取得失敗・依拠版の解決不能、未確認、処理失敗、未処理、旧検証証拠の適用不能（stale・unconfirmed）は、変更反映完了の判定の完了側に含めない。完了側に含めない対象と、未成立の更新・再検証（再開対象）を出力に区別して含める
 - **fail-closed**: 承認範囲の記録なしでは記録を確定しない。更新・作成に実施した検証の結果がなければ記録を確定しない。語彙外の区分、識別の重複、根拠の空、通知の時点区分の重複・語彙外は非ゼロ終了で確定させない。様式違反は修正して再実行する
 - **記録量**: 記録は下流対象の列挙数に比例し、正規成果物や差分の本文を複写しない
-- **保存しない**: 本 CLI は改訂実行記録の保存を行わない（stdout への JSON 出力のみ）。保存先は `.agentdev/phase/revisions/`（1改訂1ファイル。受領記録・採否記録と同じ証跡規律）であり、保存先への書込みは保存する操作（成果物反映 Workflow Skill）の責務である。様式は領域契約文書（`.agentdev/phase/README.md`）の「revisions/ の様式」を正とする
+- **保存しない**: 本 CLI は改訂実行記録の保存を行わない（stdout への JSON 出力のみ）。保存先は `.agentdev/project/change-log/`（1改訂1ファイル。受領記録・採否記録と同じ証跡規律）であり、保存先への書込みは保存する操作（成果物反映 Workflow Skill）の責務である。様式は領域契約文書（`.agentdev/project/README.md`）の「change-log/ の様式」を正とする
 
 ## 決定的処理 script（公開操作契約）
 
@@ -119,7 +119,7 @@ Workflow Skill 群（テーマ形成・テーマ更新・成果物反映）か�
 |---|---|
 | テーマ形成・更新・成果物反映の workflow 制御 | 各 Workflow Skill（agentdev-workflow-phase-tasks-create / phase-tasks-update / phase-artifacts-update） |
 | テーマ正本の管理・外部検討の持出しと戻り受理の操作知識と決定的処理 | 本スキル |
-| phase/ 保存領域の様式・領域契約 | `.agentdev/phase/README.md`（領域契約） |
+| phase/ 保存領域の様式・領域契約 | `.agentdev/project/README.md`（領域契約） |
 | 採用規約（採用済み工程・工程間関係）の解決 | `agentdev-adopted-conventions` |
 | 正規成果物への反映判断と差分・品質確認 | 成果物反映 Workflow Skill は利用者が採用した内容を既存の有効な正規成果物へ意味のある増分として反映し、上流の依拠版と現行版を比較して影響候補を特定する。候補ごとに更新必要・更新不要・作成・未確認と根拠を示し、比較不能な場合は未確認として扱う。構造上の対応関係確認と要求内容の意味的品質検証は別の責務とし、対応関係の存在だけで内容品質を合格としない |
 | 独立レビュー・工程遷移 | `agentdev-workflow-phase-review` / `agentdev-workflow-phase-transition` |
@@ -129,7 +129,7 @@ Workflow Skill 群（テーマ形成・テーマ更新・成果物反映）か�
 - 判断の代理確定をしない。採用・不採用・対象解決の最終判断は利用者または Workflow Skill の実行契約が担う
 - 正規成果物（Decision、REQ、Design 等）を直接更新しない
 - decision 成果物の役割と正本の優先度（source-of-truth priority）への参照規律は、`agentdev-workflow-lifecycle` スキル「共通報告・Decision・自律確定規約」節「decision 成果物の役割と正本の優先度への参照」を正本として参照する（定義本文は複製しない）
-- themes.md / pending.md / identity.yaml の書込みは本スキルの操作に含めない（様式の解析・導出・検証を担う）
+- themes.md / issue-log.md / identity.yaml の書込みは本スキルの操作に含めない（様式の解析・導出・検証を担う）
 - GitHub 版・Local 版のいずれの正規利用経路からも同一の JSON を返す
 
 ## See Also

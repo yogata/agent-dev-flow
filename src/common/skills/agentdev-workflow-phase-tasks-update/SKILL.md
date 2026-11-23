@@ -6,7 +6,7 @@ description: "phase-tasks-update command workflow。テーマの追加・具体�
 # phase-tasks-update workflow スキル
 
 phase-tasks-update command の workflow 実装本体である。
-テーマの追加、具体化、分割、統合、廃止をテーマ正本（`.agentdev/phase/themes.md`）に対して独立して実行する制御構造を所有する。
+テーマの追加、具体化、分割、統合、廃止をテーマ正本（`.agentdev/project/themes.md`）に対して独立して実行する制御構造を所有する。
 テーマ一覧はテーマ正本から導出し、別の更新可能な恒久一覧を作らない。
 
 phase-tasks-update command は公開 interface（入出力契約・ガードレール）と本スキルへの dispatch のみを持ち、本スキルが workflow 実装本体を提供する。
@@ -27,9 +27,9 @@ phase-tasks-update command は公開 interface（入出力契約・ガードレ�
 
 ## 副作用
 
-- テーマ正本（`.agentdev/phase/themes.md`）と未決記録（`.agentdev/phase/pending.md`）への更新
-- 領域契約文書（`.agentdev/phase/README.md`）の非破壊実体化（下記「領域契約文書の非破壊実体化」）
-- identity（`.agentdev/phase/identity.yaml`）の値の確定（操作実行時に正規状態から解決して確定する）
+- テーマ正本（`.agentdev/project/themes.md`）と未決記録（`.agentdev/project/issue-log.md`）への更新
+- 領域契約文書（`.agentdev/project/README.md`）の非破壊実体化（下記「領域契約文書の非破壊実体化」）
+- identity（`.agentdev/project/identity.yaml`）の値の確定（操作実行時に正規状態から解決して確定する）
 
 ## workflow model（STEP model 対象外）
 
@@ -94,7 +94,7 @@ resume point / export / import を持たない。各更新操作が1完結単位
 
 ## 領域契約文書の非破壊実体化
 
-保存（テーマ正本・未決記録への更新の書込み）を実行する操作では、保存の前に領域契約文書（`.agentdev/phase/README.md`）の有無を確認し、存在しない場合のみ Capability Skill `agentdev-phase-theme-collaboration` の配布テンプレート（`.opencode/skills/agentdev-phase-theme-collaboration/templates/phase-readme.md`）から実体化する。
+保存（テーマ正本・未決記録への更新の書込み）を実行する操作では、保存の前に領域契約文書（`.agentdev/project/README.md`）の有無を確認し、存在しない場合のみ Capability Skill `agentdev-phase-theme-collaboration` の配布テンプレート（`.opencode/skills/agentdev-phase-theme-collaboration/templates/project-readme.md`）から実体化する。
 
 - 実体化は既存の領域契約文書を上書きしない。既存の場合は現行内容を維持し、再編や値の追加を行わない
 - 実体化の内容はテンプレートと一致させる。テンプレート更新を既存の実体へさかのぼって適用しない
@@ -110,7 +110,7 @@ resume point / export / import を持たない。各更新操作が1完結単位
 
 ## 共通制約
 
-- 正規成果物（Decision、REQ、Design 等）を直接更新しない（テーマ正本は `.agentdev/phase/` 配下の domain state である）
+- 正規成果物（Decision、REQ、Design 等）を直接更新しない（テーマ正本は `.agentdev/project/` 配下の domain state である）
 - decision 成果物の役割と正本の優先度（source-of-truth priority）への参照規律は、`agentdev-workflow-lifecycle` スキル「共通報告・Decision・自律確定規約」節「decision 成果物の役割と正本の優先度への参照」を正本として参照する（定義本文は複製しない）
 - 未決事項を自動解消済みとして扱わない
 - テーマと Issue・成果物の一対一対応を強制しない

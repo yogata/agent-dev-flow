@@ -33,13 +33,13 @@ REQ・Decision・Design 操作は各成果物管理スキルへ委譲する。�
 
 ## 記録の保存
 
-外部戻り入力がある場合は `.agentdev/phase/received/` に1受領1ファイルで保存する。直接採用時は `.agentdev/phase/adoptions/` に採否記録のみを1採用1ファイルで保存し、外部受領を装わない。採否記録の様式・生成は `agentdev-phase-theme-collaboration` が所有する。
+外部戻り入力がある場合は `.agentdev/project/received/` に1受領1ファイルで保存する。直接採用時は `.agentdev/project/decision-log/` に採否記録のみを1採用1ファイルで保存し、外部受領を装わない。採否記録の様式・生成は `agentdev-phase-theme-collaboration` が所有する。
 
-採否記録は受領記録と同じ証跡規律に従う。由来（provenance）と正式な採用根拠（adoptionBasis）を区別し、曖昧・不正な入力は確定しない（fail-closed）。同日の複数採用は連番で区別して既存記録を上書き・消失させない。保存先と様式は領域契約文書の「adoptions/ の様式」から発見できる。
+採否記録は受領記録と同じ証跡規律に従う。由来（provenance）と正式な採用根拠（adoptionBasis）を区別し、曖昧・不正な入力は確定しない（fail-closed）。同日の複数採用は連番で区別して既存記録を上書き・消失させない。保存先と様式は領域契約文書の「decision-log/ の様式」から発見できる。
 
 ## 領域契約文書の非破壊実体化
 
-対象の特定後、保存の前に `.agentdev/phase/README.md` を確認する。存在しない場合のみ `.opencode/skills/agentdev-phase-theme-collaboration/templates/phase-readme.md` から実体化し、テンプレートと一致させる。既存文書を上書きしない。不在を検査失敗として扱わない。実体化した場合は保存先一覧に含める。
+対象の特定後、保存の前に `.agentdev/project/README.md` を確認する。存在しない場合のみ `.opencode/skills/agentdev-phase-theme-collaboration/templates/project-readme.md` から実体化し、テンプレートと一致させる。既存文書を上書きしない。不在を検査失敗として扱わない。実体化した場合は保存先一覧に含める。
 
 ## 重要変更の通知と結果説明
 
