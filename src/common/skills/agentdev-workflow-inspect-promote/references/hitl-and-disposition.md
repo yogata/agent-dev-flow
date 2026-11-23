@@ -37,7 +37,7 @@
 - **Input Resolution**: STEP-7 の配置確定状態（`git diff --name-only` で `.agentdev/backlog/inspect/` および `.agentdev/backlog/intake/` 配下の変更を確認）
 - **Preconditions**: STEP-7 完了
 - **Procedure**:
-  1. `git diff --name-only` で `.agentdev/backlog/inspect/` および `.agentdev/backlog/intake/` 配下の変更を確認する（auto-promote の intake/promoted/ 投入、promoted/ への保存、reject に伴う inbox 削除、auto-promote-log 更新を含む）
+  1. `git diff --name-only` で `.agentdev/backlog/inspect/` および `.agentdev/backlog/intake/` 配下の変更を確認する（auto-promote の backlog/intake/promoted/ 投入、promoted/ への保存、reject に伴う inbox 削除、auto-promote-log 更新を含む）
   2. **変更なし時**: commit/push せず「変更なし」と報告する
   3. **変更あり時**: `git add` は `.agentdev/backlog/inspect/` と `.agentdev/backlog/intake/` を対象とする。
 commit message は `chore(agentdev): promote inspect findings`（reject を含む場合は却下理由を含める）。

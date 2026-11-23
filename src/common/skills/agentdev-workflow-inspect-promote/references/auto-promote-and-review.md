@@ -5,7 +5,7 @@
 
 ## STEP-4: 自動 promote（`--auto` opt-in 時のみ）
 
-- **Purpose**: 機械的に特定可能で移行先が一意に定まる高確信度検出事項を、HITL を経ずに intake/promoted/ へ自動投入する（fast path）
+- **Purpose**: 機械的に特定可能で移行先が一意に定まる高確信度検出事項を、HITL を経ずに backlog/intake/promoted/ へ自動投入する（fast path）
 - **Input Resolution**: STEP-3 の暫定分類結果。自動 promote 対象カテゴリ、安定契約例外、否定文脈の判定基準は responsibility-boundaries Design（extension 経由で解決）を正とする
 - **Preconditions**: `--auto` が明示指定されていること、STEP-3 完了
 - **Procedure**: 分類結果のうち responsibility-boundaries Design（extension 経由）の自動 promote 対象カテゴリに合致し、かつ安定契約例外および否定文脈を満たさない高確信度検出事項を `.agentdev/backlog/intake/promoted/inspect-auto-{timestamp}-{slug}.md` へ投入する。各投入を `.agentdev/backlog/inspect/promoted/auto-promote-log.md` に追記する（対象検出事項、カテゴリ、投入先ファイル、根拠）。`--auto` 未指定時は本 STEP をスキップし、自動投入を行わない

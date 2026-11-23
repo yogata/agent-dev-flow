@@ -284,7 +284,7 @@ Template の配置先は以下の 2 種類を定義する（REQ-002-040）。
 `結果` フィールド内に任意の `Capture結果` 小節を定義する（新規トップレベルフィールドは追加しない）。
 `Capture結果` 小節の共通意味契約を本 Design で定義する。
 
-- 保存した capture 成果物のパス（`intake/inbox/*.md` または `learning/inbox/` への相対パス）
+- 保存した capture 成果物のパス（`backlog/intake/inbox/*.md` または `backlog/learning/inbox/` への相対パス）
 - 分類（intake/learning）
 - 保存結果（成功/失敗、失敗時は理由）
 
