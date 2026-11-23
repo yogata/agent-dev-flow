@@ -11,13 +11,15 @@
 //
 // 指標の定義（前後比較では同一の定義と母集団を用いる）:
 // 1. turns_per_session             : セッションあたり user メッセージ数の平均（呼出回数近似）
-// 2. turn1_input_tokens_avg        : セッションの最初の assistant メッセージの入力トークン平均
-// 3. context_tokens_avg            : assistant メッセージの入力トークン平均（コンテキストサイズ近似）
+// 2. turn1_input_tokens_avg        : 最初の assistant メッセージのコンテキストトークン（input + cache）の平均
+// 3. context_tokens_avg            : assistant メッセージのコンテキストトークン（input + cache）平均（コンテキストサイズ近似）
 // 4. tool_parts_per_assistant_msg  : assistant メッセージあたり tool part 数の平均
 // 5. background_output_bytes_avg   : background_output ツール出力のバイト数平均
 // 6. tool_output_reread_total      : 同一セッション内の同一 (tool, 入力) 重複出現の超過件数合計（再読込近似）
 
 import { Database } from "bun:sqlite";
+import { existsSync } from "node:fs";
+import { homedir } from "node:os";
 import { join } from "node:path";
 
 export interface MetricsOptions {
@@ -66,7 +68,7 @@ interface PartRow {
 
 interface MessageData {
   role?: unknown;
-  tokens?: { input?: unknown };
+  tokens?: { input?: unknown; cache?: { read?: unknown; write?: unknown } };
 }
 
 interface PartData {
@@ -165,11 +167,18 @@ export function collectOpencodeMetrics(
       continue;
     }
     if (parsed.role !== "assistant") continue;
-    const input = parsed.tokens?.input;
+    const tokens = parsed.tokens;
+    const input = tokens?.input;
     if (typeof input !== "number") continue;
-    assistantInputs.push(input);
+    const cacheRead = tokens?.cache?.read;
+    const cacheWrite = tokens?.cache?.write;
+    const contextTokens =
+      input +
+      (typeof cacheRead === "number" ? cacheRead : 0) +
+      (typeof cacheWrite === "number" ? cacheWrite : 0);
+    assistantInputs.push(contextTokens);
     if (!firstAssistantInput.has(m.session_id)) {
-      firstAssistantInput.set(m.session_id, input);
+      firstAssistantInput.set(m.session_id, contextTokens);
     }
   }
 
@@ -209,12 +218,42 @@ export function collectOpencodeMetrics(
   return report;
 }
 
-function defaultDbPath(): string | null {
-  const fromEnv = process.env.OPENCODE_DB;
+function homeDirFromEnv(env: Record<string, string | undefined>): string | null {
+  for (const key of ["USERPROFILE", "HOME"] as const) {
+    const value = env[key];
+    if (value !== undefined && value.length > 0) return value;
+  }
+  const fallback = homedir();
+  return fallback.length > 0 ? fallback : null;
+}
+
+export function resolveDefaultDbPath(
+  env: Record<string, string | undefined>,
+  exists: (path: string) => boolean,
+): string | null {
+  const fromEnv = env.OPENCODE_DB;
   if (fromEnv !== undefined && fromEnv.length > 0) return fromEnv;
-  const localAppData = process.env.LOCALAPPDATA;
-  if (localAppData === undefined || localAppData.length === 0) return null;
-  return join(localAppData, "opencode", "opencode.db");
+  const home = homeDirFromEnv(env);
+  const homeDefault =
+    home === null ? null : join(home, ".local", "share", "opencode", "opencode.db");
+  const candidates: string[] = [];
+  const xdg = env.XDG_DATA_HOME;
+  if (xdg !== undefined && xdg.length > 0) {
+    candidates.push(join(xdg, "opencode", "opencode.db"));
+  }
+  if (homeDefault !== null) candidates.push(homeDefault);
+  const localAppData = env.LOCALAPPDATA;
+  if (localAppData !== undefined && localAppData.length > 0) {
+    candidates.push(join(localAppData, "opencode", "opencode.db"));
+  }
+  for (const candidate of candidates) {
+    if (exists(candidate)) return candidate;
+  }
+  return homeDefault;
+}
+
+function defaultDbPath(): string | null {
+  return resolveDefaultDbPath(process.env, existsSync);
 }
 
 function parseTime(value: string, flag: string): { ms: number } | { error: string } {
@@ -273,7 +312,7 @@ export function parseCliArgs(argv: string[]):
     return { error: `--since (${args.since}) must be earlier than --until (${args.until})` };
   }
   if (args.db === null) {
-    return { error: "database path unresolved: set --db or OPENCODE_DB (LOCALAPPDATA unavailable)" };
+    return { error: "database path unresolved: set --db or OPENCODE_DB" };
   }
   return { args };
 }
