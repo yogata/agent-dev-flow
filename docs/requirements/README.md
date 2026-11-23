@@ -3,7 +3,7 @@
 ## 現行要件
 
 <!-- AUTOGEN:BEGIN:id=req-active-count -->
-現在の要件判断では、以下77件を第一参照先とする。
+現在の要件判断では、以下78件を第一参照先とする。
 <!-- AUTOGEN:END -->
 
 各 REQ の詳細関心は各 REQ ファイル本文を参照のこと。
@@ -89,6 +89,7 @@
 | [REQ-123](REQ-123.md) | 構造スリム化リファクタリング（trusted-distribution-gate 過剰防御の解体・traceability 試験再編・巨大設計書スリム化・大型スクリプト分割）（6 作業単位） |
 | [REQ-124](REQ-124.md) | backlog 一式 20261121 の corpus 現行化と req-define 面強化（10 作業単位） |
 | [REQ-125](REQ-125.md) | ADF ワークフローのトークン消費構造改善 |
+| [REQ-126](REQ-126.md) | .agentdev/ の正規構造と版をまたぐ移行基盤 |
 <!-- AUTOGEN:END -->
 
 ## 基準構造
