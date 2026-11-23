@@ -1,8 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import { Database } from "bun:sqlite";
+import { join } from "node:path";
 import {
   collectOpencodeMetrics,
   parseCliArgs,
+  resolveDefaultDbPath,
 } from "./collect-opencode-metrics.ts";
 
 function fixtureDb(): Database {
@@ -153,5 +155,83 @@ describe("collect_opencode_metrics: CLI 引数の検証", () => {
     expect("error" in parseCliArgs(["--unknown", "x"])).toBe(true);
     const reversed = parseCliArgs(["--db", "x.db", "--since", "2000", "--until", "1000"]);
     expect("error" in reversed).toBe(true);
+  });
+});
+
+describe("collect_opencode_metrics: cache トークンの合算", () => {
+  test("cache.read + cache.write を turn1/context の双方に合算する", () => {
+    const db = new Database(":memory:");
+    try {
+      db.run(
+        "CREATE TABLE session(id TEXT PRIMARY KEY, parent_id TEXT, time_created INTEGER)",
+      );
+      db.run(
+        "CREATE TABLE message(id TEXT PRIMARY KEY, session_id TEXT, time_created INTEGER, data TEXT)",
+      );
+      db.run(
+        "CREATE TABLE part(id TEXT PRIMARY KEY, session_id TEXT, message_id TEXT, data TEXT)",
+      );
+      db.query("INSERT INTO session(id, parent_id, time_created) VALUES (?, ?, ?)").run(
+        "ses1",
+        null,
+        1000,
+      );
+      const msg = db.query(
+        "INSERT INTO message(id, session_id, time_created, data) VALUES (?, ?, ?, ?)",
+      );
+      msg.run("u1", "ses1", 1100, JSON.stringify({ role: "user" }));
+      msg.run(
+        "m1",
+        "ses1",
+        1200,
+        JSON.stringify({
+          role: "assistant",
+          tokens: { input: 100, cache: { read: 1000, write: 200 } },
+        }),
+      );
+      msg.run("m2", "ses1", 1300, JSON.stringify({ role: "assistant", tokens: { input: 50 } }));
+      const report = collectOpencodeMetrics(db, ":memory:", baseOpts);
+      expect(report.metrics.turn1_input_tokens_avg).toBe(100 + 1000 + 200);
+      expect(report.metrics.context_tokens_avg).toBeCloseTo((1300 + 50) / 2, 10);
+    } finally {
+      db.close();
+    }
+  });
+});
+
+describe("resolveDefaultDbPath: 既定 DB パス解決", () => {
+  test("候補がすべて未存在のとき ~/.local/share/opencode/opencode.db を既定解決する", () => {
+    const path = resolveDefaultDbPath(
+      {
+        OPENCODE_DB: undefined,
+        XDG_DATA_HOME: undefined,
+        LOCALAPPDATA: undefined,
+        USERPROFILE: join("C:", "Users", "fake"),
+      },
+      () => false,
+    );
+    expect(path).toBe(join("C:", "Users", "fake", ".local", "share", "opencode", "opencode.db"));
+  });
+
+  test("OPENCODE_DB 最優先、存在候補を XDG_DATA_HOME → home → LOCALAPPDATA の順で採用する", () => {
+    const home = join("C:", "Users", "fake");
+    const localAppData = join(home, "AppData", "Local");
+    const xdgDefault = join("C:", "xdg", "opencode", "opencode.db");
+    const localDefault = join(localAppData, "opencode", "opencode.db");
+    expect(resolveDefaultDbPath({ OPENCODE_DB: join("C:", "custom", "db.sqlite") }, () => true)).toBe(
+      join("C:", "custom", "db.sqlite"),
+    );
+    expect(
+      resolveDefaultDbPath(
+        { XDG_DATA_HOME: "C:\\xdg", LOCALAPPDATA: localAppData, USERPROFILE: home },
+        (p) => p === xdgDefault || p === localDefault,
+      ),
+    ).toBe(xdgDefault);
+    expect(
+      resolveDefaultDbPath(
+        { LOCALAPPDATA: localAppData, USERPROFILE: home },
+        (p) => p === localDefault,
+      ),
+    ).toBe(localDefault);
   });
 });
