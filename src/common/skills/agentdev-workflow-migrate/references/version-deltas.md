@@ -33,6 +33,7 @@
 | `.agentdev/inspect/inbox/` | `.agentdev/backlog/inspect/inbox/` | 移動 |
 | `.agentdev/inspect/promoted/` | `.agentdev/backlog/inspect/promoted/` | 移動 |
 | `.agentdev/backlog-auto/end-to-end/<一式識別子>/set-state.json`（evidence 配下に検証証跡） | `.agentdev/backlog/runs/<一式識別子>/set-state.json` | 移動（evidence/ を含む）。全体完了・リリース完了済みの一式は、継続保存の要否をユーザーと確認し、不要確認後に削除する |
+| 上記の移動・改名の後に空になる旧ディレクトリ | （廃止） | 旧痕跡としてユーザー確認後に削除する |
 | `.agentdev/install-state.json` | （新設） | 移行後の install.ps1 apply 完了時に記録される（移行操作では作成しない） |
 
 ### 引き継ぎの規律
