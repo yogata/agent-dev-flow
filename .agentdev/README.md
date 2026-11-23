@@ -24,7 +24,7 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-001�
 | `issues/issue-*.md` | ローカルIssue（追跡Issue / Case Issue。ローカル版のみ） | 会話経由の追跡Issue操作（`agentdev-issue-tracking` スキル）、case-open/run/close（Tool 操作契約経由） | 会話経由の追跡Issue操作、`/agentdev/req-define`（実行確定時の要件化経路） | なし（永続。Issue/PR 相当の永続情報として git 管理対象、REQ-009-026） |
 | `phase/identity.yaml`、`phase/themes.md`、`phase/pending.md`、`phase/received/*.md`、`phase/adoptions/*.json`、`phase/transitions/*` | 工程駆動の保存状態（取組・対象版・現在工程の最小識別、検討テーマ正本、未決事項と判断根拠、受領済み途中検討知見の受領記録、直接採用の採否記録、工程遷移の遷移記録） | 工程駆動の4操作（phase-tasks-create、phase-tasks-update、phase-artifacts-update、phase-review）と利用者判断による工程遷移（phase-transition） | 同4操作と工程遷移、別セッション再開 | 永続。テーマ一覧と工程全体像は正本と正規成果物群から導出し、一覧・閲覧像を恒久保存するファイルを作らない（各ファイルの様式と導出規律は `phase/README.md`） |
 | `backlog-auto/end-to-end/<一式識別子>/set-state.json`（evidence 配下に検証証跡） | backlog-auto 一気通貫実行の状態記録（義務スナップショット、対応表、基準点情報、進捗、リリース状態） | backlog-auto（同一実行の単一書き手） | backlog-auto 再開・全体完了突合・リリース手順 | 全体完了とリリース完了まで保持する。リリース完了後の削除可否は結果報告に記録する（配置・形式・単一書き手の規約は backlog-auto の workflow skill references「set-state 永続化契約」節） |
-| `blocked/*.md` | case 停止時の状態保持（停止した Case の実行状態・再開情報の保持ファイル） | case 実行系（case-auto・case-run の停止時） | 再開判断と再開入口の参照 | 停止中は保持 |
+| `install-state.json` | 導入済み配布版の記録 | install.ps1 apply（完了時に記録） | install.ps1 check（記録版と配布版の版比較） | 永続。旧痕跡がある間は記録を更新しない（/agentdev/migrate の案内対象） |
 
 状態表の約束対象は上記の正規状態の領域に限定する。正規状態でない実行時キャッシュ・検証記録・設定・拡張・一時領域（`cache/`・`close-acceptance/`・`config/`・`extensions/`・`tmp/`）は本表の約束対象外とする。
 
@@ -41,6 +41,7 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-001�
 
 ```
 .agentdev/
+├── install-state.json     ← 導入済み配布版の記録（install.ps1 apply 完了時に記録、check が記録版と配布版の版比較）
 ├── intake/
 │   ├── inbox/           ← 会話経由の intake capture（agentdev-intake-pipeline スキル）が raw item を保存
 │   └── promoted/        ← intake-promote workflow が派生 artifact を出力（フラット）
@@ -57,7 +58,6 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-001�
 │       └── <一式識別子>/
 │           ├── set-state.json
 │           └── evidence/
-├── blocked/             ← case 停止時の状態保持（停止した Case の実行状態・再開情報）
 ├── drafts/              ← req-define が要件ドラフトを保存（case-open / case-ready / case-revise で消費、case-ready 成功後に削除）
 ├── inspect/
 │   ├── inbox/           ← inspect-docs workflow が未分類 finding を保存
