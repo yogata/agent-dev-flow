@@ -72,7 +72,7 @@ agreed_items:
       AC-7。配布境界検査、整合性チェック等のリポジトリ標準検証を実施する。利用者による動作確認は確認項目を明記し、実施者と証拠を標準検証から区別する。
   - id: AG-014
     content: >-
-      AC-8。RU の対象外8項目すべてを守る。特に .agentdev/drafts/req-draft-agents-md-principles-20261123.md とその由来作業、および feature/issue-4214 と .worktrees/4214-feature を変更・消費しない。
+      AC-8。RU の対象外8項目すべてを守る。特に別案件（Issue #4218、PR #4219）とその由来作業、および feature/issue-4214 と .worktrees/4214-feature を変更・消費しない。
 
 artifact_actions:
   - id: ACT-REQ-001
@@ -203,12 +203,11 @@ artifact_actions:
     operation: append
     target: docs/designs/foundations/multi-host-canonical-model.md
     target_design: {operation: update, domain: foundations, slug: multi-host-canonical-model}
-    target_area: 新ホスト対応の検証
-    anchor: 関連
+    target_area: 関連
     placement: before_anchor
     source_items: [AG-002, AG-003, AG-004, AG-005, AG-006, AG-007, AG-008, AG-010, AG-012, AG-013, AG-014]
     execution_scope_constraints:
-      - 別案件 .agentdev/drafts/req-draft-agents-md-principles-20261123.md とその由来作業を変更・消費しない（対象外1）。
+      - "別案件（Issue #4218、PR #4219）とその由来作業を変更・消費しない（対象外1）。"
       - feature/issue-4214、.worktrees/4214-feature とその並行作業を変更・消費しない（対象外7）。
     content: |
       ## 新ホスト対応の検証
@@ -451,13 +450,13 @@ assembly_evidence:
     executed_at: "2026-11-23T13:13:03.174Z"
   - target_file: docs/designs/foundations/multi-host-canonical-model.md
     target_content_sha256: *multi_host
-    check_scope: {heading: "## Command 対応表", start_line: 62, end_line: 65}
+    check_scope: {heading: "## 関連", start_line: 66, end_line: 73}
     execution_conditions: {operation: append, edit_sha256: a0212f7fd101d1473d49b02084bc397a0bc3f184dc6f06e37c322a5ddd6a46e4, expected_old_count: null}
     checker: *assembler
     result_affecting_references: *assembly_refs
     checks_summary: *append_checks
     diff_compact: {changed_lines_count: 6, added: 6, removed: 0}
-    executed_at: "2026-11-23T13:25:44.039Z"
+    executed_at: "2026-11-23T21:59:07.897Z"
   - target_file: docs/designs/local/install-script-usability.md
     target_content_sha256: 2cc45caa6c11eb7d2585e31ac1ce1e414d48c779e8f8c5ebbd5a4132300e6dea
     check_scope: {heading: "## 対話ウィザード", start_line: 19, end_line: 65}
@@ -494,6 +493,9 @@ boundary_risks:
 definition_evidence:
   existing_design_coverage: {REQ-099-010: ACT-DESIGN-002, REQ-009-040: ACT-DESIGN-002}
   requirement_table_projection: ACT-REQ-001 の9行は要件表専用の追記として、既存末尾行に続く二列の連続行になることをメモリ上で照合した。
+  append_anchor_check: >-
+    append 系6件（ACT-REQ-001、ACT-REQ-004、ACT-DESIGN-001、ACT-DESIGN-003、ACT-DESIGN-004、ACT-DESIGN-005）の target_area は、いずれも対象文書に一意に存在する見出しであることを組立検査で確認した。
+    ACT-DESIGN-004 は placement: before_anchor により「## 関連」の直前に本文5行が挿入され、挿入後も末尾の H2 は「## 関連」のままとなることをメモリ上で照合した。同 action の組立証拠の check_scope は anchor である「## 関連」節を示す。
   github_skill_inventory: >-
     共通スキル領域を第一階層で集計し、agentdev_gh 参照は18ディレクトリ、うち repo-agentdev-integrity を除く配布スキルは17と再確認した。
     各スキル本文の用途別の調査・操作対応は TS-006 と TS-007 で照合する。
@@ -501,5 +503,8 @@ definition_evidence:
     共通スキル領域（repo-local 除外）で .opencode/ 参照を含む Markdown 60ファイル、TypeScript 3ファイルを確認した。
     コマンドや導入基盤を含む変更対象全体について、共通利用に必要な資産解決と OpenCode 固有の接続を区別する。参照の一括削除や OpenCode 併用の固定は行わず、用途別の扱いは ACT-DESIGN-001、実物の照合は TS-011 に従う。
   runtime_limit: この draft の検証は要件・文書・静的調査に限る。Codex・Antigravity や GitHub プラグインの実行結果は得ていない。
-  adversarial_review: 独立2系統で RU との一致と ACT 適用を再検討した。置換節全文、明示指定の維持、Decision 部分置換関係、Case 限定制約の配置、17件の基準版の明示、REQ の適用範囲、出典の区別を反映した。追加の利用者判断はない。
+  adversarial_review: >-
+    独立2系統で RU との一致と ACT 適用を再検討した。置換節全文、明示指定の維持、Decision 部分置換関係、Case 限定制約の配置、17件の基準版の明示、REQ の適用範囲、出典の区別を反映した。追加の利用者判断はない。
+    ACT-DESIGN-004 の追記位置と対象外1の識別子を修正した後は、変更部分を独立2系統で再検討し、収束監査で未解決の指摘がないことを確認した。
+    前提: Issue #4218 と PR #4219 は対象外1の別案件を指す（監督の指定による）。
 ```
