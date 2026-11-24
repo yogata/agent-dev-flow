@@ -280,7 +280,7 @@ function Invoke-Ts002MechanicalPrerequisites {
         Assert-True 'TS-002 (2) git diff --quiet exits 0 after the check run (no managed-file change)' `
             (Test-GitTreeUnchanged -Root $root) $r.Output
         Assert-True 'TS-006 (2) probe input temp area leaves no residue under .agentdev' `
-            (-not (Test-Path -LiteralPath (Join-Path $root '.agentdev'))) (Join-Path $root '.agentdev')
+            (-not (Test-Path -LiteralPath (Join-Path $root '.agentdev\integrity'))) (Join-Path $root '.agentdev\integrity')
         Assert-True 'TS-003 (2) directory state is identical before and after the check run' `
             ((Get-DirectorySnapshot -Root $root) -eq $dirBefore) 'directory snapshot differs'
     } finally {
@@ -445,13 +445,17 @@ function Invoke-Ts002MechanicalPrerequisites {
         if ($prov.ExitCode -ne 0) { throw 'apply failed for containment test' }
         [System.IO.File]::WriteAllText((Join-Path $outside 'sentinel.txt'), 'unchanged', [System.Text.Encoding]::UTF8)
         $before = Get-DirectorySnapshot -Root $outside
-        New-TestJunction -LinkPath (Join-Path $root '.agentdev') -TargetPath $outside
+        $stateDir = Join-Path $root '.agentdev'
+        $stateBackup = Join-Path $root 'agentdev-state-backup'
+        Move-Item -LiteralPath $stateDir -Destination $stateBackup
+        New-TestJunction -LinkPath $stateDir -TargetPath $outside
         $r = Invoke-Check -Cwd $root
         Assert-True 'TS-006 (9) rejects ancestor junction before any probe writes' `
             (($r.ExitCode -ne 0) -and ($r.Output -match 'probe ancestor is a junction/reparse point')) $r.Output
         Assert-True 'TS-002 (9) external target content and directories are unchanged' `
             ((Get-DirectorySnapshot -Root $outside) -eq $before) 'external target changed'
-        [System.IO.Directory]::Delete((Join-Path $root '.agentdev'), $false)
+        [System.IO.Directory]::Delete($stateDir, $false)
+        Move-Item -LiteralPath $stateBackup -Destination $stateDir
     } finally {
         Remove-TempRepo $root
         Remove-TempRepo $outside

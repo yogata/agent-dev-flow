@@ -140,6 +140,7 @@ function New-CanonicalCheckout {
     New-Item -ItemType Directory -Path (Join-Path $common 'commands\agentdev') -Force | Out-Null
     New-Item -ItemType Directory -Path (Join-Path $common 'skills\agentdev-testskill') -Force | Out-Null
     New-Item -ItemType Directory -Path (Join-Path $common 'tools\agentdev-testtool') -Force | Out-Null
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'src\common\VERSION') -Destination (Join-Path $common 'VERSION')
     New-Item -ItemType Directory -Path (Join-Path $opencode 'plugins\agentdev-testplugin') -Force | Out-Null
     New-Item -ItemType Directory -Path (Join-Path $senpi 'connection-demo') -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $common 'commands\agentdev\test.md') -Value '# test'

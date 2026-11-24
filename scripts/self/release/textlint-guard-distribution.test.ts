@@ -178,6 +178,7 @@ describe("agentdev-textlint-guard distribution / consumer install (TS-005 / TS-0
         // check モードは .opencode/tools の存在を期待するため既存テストと同じ最小 tools エントリを置く
         fs.mkdirSync(path.join(srcCommon, "tools", "agentdev-gh"), { recursive: true });
         fs.writeFileSync(path.join(srcCommon, "tools", "agentdev-gh", "index.ts"), "// tool\n", "utf8");
+        fs.copyFileSync(path.join(REPO_ROOT, "src", "common", "VERSION"), path.join(srcCommon, "VERSION"));
         fs.mkdirSync(path.join(srcSenpi, "connection-demo"), { recursive: true });
         fs.writeFileSync(path.join(srcSenpi, "connection-demo", "connection.ts"), "// senpi connection\n", "utf8");
         fs.writeFileSync(path.join(srcSenpi, "README.md"), "# src/senpi/ (Senpi host connection area)\n", "utf8");

@@ -175,6 +175,7 @@ function New-SourceTree {
     New-Item -ItemType Directory -Path (Join-Path $CommonSourceDir 'commands\agentdev') -Force | Out-Null
     New-Item -ItemType Directory -Path (Join-Path $CommonSourceDir 'skills\agentdev-testskill') -Force | Out-Null
     New-Item -ItemType Directory -Path (Join-Path $CommonSourceDir 'tools\agentdev-testtool') -Force | Out-Null
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'src\common\VERSION') -Destination (Join-Path $CommonSourceDir 'VERSION')
     New-Item -ItemType Directory -Path (Join-Path $OpencodeSourceDir 'plugins\agentdev-testplugin') -Force | Out-Null
     New-Item -ItemType Directory -Path (Join-Path $SenpiSourceDir 'connection-demo') -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $CommonSourceDir 'commands\agentdev\test.md') -Value '# test'
