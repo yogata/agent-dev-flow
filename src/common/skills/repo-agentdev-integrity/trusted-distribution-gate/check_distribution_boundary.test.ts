@@ -12,6 +12,7 @@ import {
 } from "./check_distribution_boundary.ts";
 import { loadDistributionTargets } from "./distribution-boundary-rules.ts";
 import { DEFAULT_DETECTOR_CONFIG } from "./distribution-boundary.ts";
+import { collectTargets } from "./distribution-boundary-fs.ts";
 import * as path from "path";
 import * as fs from "fs";
 
@@ -474,3 +475,74 @@ function findRepoRoot(startDir: string): string {
     current = parent;
   }
 }
+
+describe("checkDistributionBoundary: host connection areas of the source projection", () => {
+  const HOST_ROOT = path.join(
+    process.cwd(),
+    ".worktrees-tmp-test-distribution-boundary-hosts",
+  );
+  const HOST_AREAS = ["src/codex", "src/antigravity"];
+
+  function writeHost(rel: string, content: string): void {
+    const full = path.join(HOST_ROOT, ...rel.split("/"));
+    fs.mkdirSync(path.dirname(full), { recursive: true });
+    fs.writeFileSync(full, content, "utf-8");
+  }
+
+  function listedTextFiles(projection: "source" | "link"): string[] {
+    return collectTargets(HOST_ROOT, projection).textFiles.map((f) =>
+      f.replace(/\\/g, "/"),
+    );
+  }
+
+  beforeAll(() => {
+    fs.rmSync(HOST_ROOT, { recursive: true, force: true });
+    writeHost(
+      "src/common/commands/agentdev/case-run.md",
+      "# case-run\nNo concrete refs here.\n",
+    );
+    for (const area of HOST_AREAS) {
+      writeHost(area + "/README.md", "# host connection\n");
+      writeHost(area + "/skill-discovery/discovery.ts", "export const discovery = 1;\n");
+    }
+  });
+
+  afterAll(() => {
+    fs.rmSync(HOST_ROOT, { recursive: true, force: true });
+  });
+
+  for (const area of HOST_AREAS) {
+    test(`source projection enumerates ${area}`, () => {
+      const listed = listedTextFiles("source");
+      expect(listed.some((f) => f.endsWith(`/${area}/README.md`))).toBe(true);
+      expect(
+        listed.some((f) => f.endsWith(`/${area}/skill-discovery/discovery.ts`)),
+      ).toBe(true);
+    });
+
+    test(`concrete reference planted in ${area} fails the gate`, () => {
+      const planted = `${area}/guide.md`;
+      writeHost(planted, "Bad: docs/requirements/REQ-0149.md is a concrete ref.\n");
+      try {
+        const report = checkDistributionBoundary(HOST_ROOT, "source");
+        expect(report.ok).toBe(false);
+        const hit = report.failures.find(
+          (f) =>
+            f.category === "concrete-path" &&
+            f.matched === "docs/requirements/REQ-0149.md" &&
+            f.file.replace(/\\/g, "/").endsWith(`/${planted}`),
+        );
+        expect(hit).toBeDefined();
+      } finally {
+        fs.rmSync(path.join(HOST_ROOT, ...planted.split("/")), { force: true });
+      }
+    });
+  }
+
+  test("installed projection does not enumerate the host connection areas", () => {
+    const listed = listedTextFiles("link");
+    for (const area of HOST_AREAS) {
+      expect(listed.some((f) => f.includes(`/${area}/`))).toBe(false);
+    }
+  });
+});

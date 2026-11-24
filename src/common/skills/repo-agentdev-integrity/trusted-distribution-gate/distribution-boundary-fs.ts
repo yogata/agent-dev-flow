@@ -14,7 +14,8 @@
 // Projection semantics (source/link/archive/archive-installed) per
 // docs/designs/integrity/distribution-boundary.md "projection の分離":
 //   - source/archive        -> src/common/{commands,skills,tools}/** +
-//                              src/opencode/plugins/**
+//                              src/opencode/plugins/** +
+//                              src/codex/**, src/antigravity/**
 //   - link/archive-installed-> .opencode/**
 // The canonical content lives under src/common/ (host-agnostic canonical
 // tree, DEC-049); host-specific plugin/hook sources stay in their host
@@ -22,6 +23,10 @@
 // same logical content (consumer install copies the canonical tree and the
 // host connection area into .opencode/**); the directory choice reflects
 // where the scanner must look for that projection.
+// The limited-distribution host connection areas (src/codex, src/antigravity;
+// DEC-069) are canonical-tree roots only: neither the installer nor the
+// release archive carries them, so the installed projections do not
+// enumerate them.
 
 import * as path from "path";
 import * as fs from "fs";
@@ -37,8 +42,14 @@ export const PUBLIC_COMMAND_DIR = "src/common/commands/agentdev";
 export const PUBLIC_SKILLS_PARENT = "src/common/skills";
 export const PUBLIC_TOOLS_PARENT = "src/common/tools";
 export const PUBLIC_PLUGINS_PARENT = "src/opencode/plugins";
+// Limited-distribution host connection areas (DEC-069): canonical-tree
+// roots enumerated by the source/archive projection only.
+export const PUBLIC_HOST_CONNECTION_DIRS: readonly string[] = [
+  "src/codex",
+  "src/antigravity",
+];
 
-// ADF-COVERS(implementation): REQ-052-006, REQ-052-007, REQ-029-006
+// ADF-COVERS(implementation): REQ-052-006, REQ-052-007, REQ-029-006, REQ-099-029
 
 export type FailureCategory = BoundaryFailure["category"];
 
@@ -178,6 +189,18 @@ export function collectTargets(repoRoot: string, projection: Projection): Artifa
     : PUBLIC_SKILLS_PARENT;
 
   let merged: ArtifactListing = listArtifactsRec(path.join(repoRoot, commandRel));
+
+  // Host connection areas are absent from trees without them (installed
+  // projections, staged release archives); listArtifactsRec then returns an
+  // empty listing and those projections are unaffected.
+  if (!isInstalledProjection) {
+    for (const rel of PUBLIC_HOST_CONNECTION_DIRS) {
+      merged = appendListing(
+        merged,
+        listArtifactsRec(path.join(repoRoot, rel)),
+      );
+    }
+  }
 
   // agentdev-* and japanese-tech-writing both ship in archive; others ignored.
   const shippableSkills = (name: string): boolean =>
