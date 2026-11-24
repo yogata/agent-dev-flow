@@ -2,12 +2,12 @@
 //
 // The business rules of skill discovery and command entry live on the
 // common canonical side (skill-resolution lib). This connection only binds
-// the Antigravity public entry root (.agent/skills, as documented in
+// the Antigravity public entry root (.agents/skills, the default documented in
 // Antigravity's public material) and the designated workspace to that
 // contract; it does not re-implement any rule.
 //
 // Binding contract:
-//   - Entry root: <workspaceRoot>/.agent/skills/ is the Antigravity public
+//   - Entry root: <workspaceRoot>/.agents/skills/ is the Antigravity public
 //     entry projection (the installer populates it from the canonical
 //     skills).
 //   - Canonical root: <repoRoot>/src/common/skills/ and
@@ -39,7 +39,7 @@ import {
 } from "../../common/skills/agentdev-skill-resolution/scripts/src/command-entry.ts";
 
 /** Antigravity public entry skills dir, relative to the workspace root. */
-export const ANTIGRAVITY_ENTRY_SKILLS_DIR = ".agent/skills";
+export const ANTIGRAVITY_ENTRY_SKILLS_DIR = ".agents/skills";
 
 /** Common canonical skills dir, relative to the repo root. */
 export const ANTIGRAVITY_CANONICAL_SKILLS_DIR = "src/common/skills";

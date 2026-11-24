@@ -74,10 +74,10 @@ function buildFixture(): { ws: string; sibling: string } {
 }
 
 describe("Antigravity skill discovery binding", () => {
-  test("binds the .agent/skills entry root inside the designated workspace", () => {
+  test("binds the .agents/skills entry root inside the designated workspace", () => {
     const f = buildFixture();
     expect(path.resolve(antigravityEntrySkillsDir(f.ws))).toBe(
-      path.resolve(path.join(f.ws, ".agent", "skills")),
+      path.resolve(path.join(f.ws, ".agents", "skills")),
     );
     expect(path.resolve(antigravityCanonicalSkillsDir(f.ws))).toBe(
       path.resolve(path.join(f.ws, "src", "common", "skills")),

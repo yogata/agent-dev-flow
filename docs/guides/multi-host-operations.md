@@ -65,7 +65,7 @@ Codex と Antigravity への対応は限定配布である（DEC-069）。取り
 
 ### 公開典拠
 
-Codex の入口 root（`.agents/skills`）は Codex の公開文書に基づく。Antigravity の入口 root（`.agent/skills`）は Antigravity の公開資料に基づく。Antigravity は公開情報に基づく静的検討であり、実機確認は行っていない。
+Codex の入口 root（`.agents/skills`）は Codex の公開文書（[Build skills](https://learn.chatgpt.com/docs/build-skills)）に基づく。Antigravity の入口 root（`.agents/skills`）は Antigravity の公開資料（[Agent skills](https://antigravity.google/docs/skills/)）が示す既定の root に基づく。Antigravity は公開情報に基づく静的検討であり、実機確認は行っていない。
 
 ### 利用者が行う動作確認項目と期待結果
 
@@ -141,7 +141,7 @@ bun <plugin 配置>/gate.ts --root <対象 worktree のパス>
 
 - OpenCode: `/agentdev/<業務名>`。slash command である。`.opencode/commands/agentdev/` に投影された command 本文が Workflow Skill へ委譲する
 - Senpi: `agentdev-workflow-<業務名>`。skill 名である。Skill 探索接続が Senpi 公開入口 `.senpi/skills/` を優先し、共通原本 `src/common/skills/` へ fallback する
-- Codex と Antigravity: Senpi と同じ `agentdev-workflow-<業務名>` を公開入口とする。入口 root は Codex が `.agents/skills`、Antigravity が `.agent/skills` である（限定配布）
+- Codex と Antigravity: Senpi と同じ `agentdev-workflow-<業務名>` を公開入口とする。入口 root は Codex・Antigravity とも `.agents/skills` である（限定配布）
 
 引数の意味は command 本文と Workflow Skill 本文が共通原本の単一原本であるため、両ホストで同一である。Custom Tool の引数も host 非依存の公開スキーマ（`src/common/tools/agentdev-*/public-schema.ts`）を共通参照する。
 

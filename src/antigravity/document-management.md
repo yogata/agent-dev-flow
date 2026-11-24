@@ -5,7 +5,7 @@ Antigravity 上で AgentDevFlow の command を適用する際の文書管理指
 ## 適用手順
 
 1. **workspace の確認**: 指定された workspace root（`.agentdev/` マーカーで識別されるディレクトリ）を確認する。読み書きの対象は指定 workspace 配下に限定し、workspace が解決できない場合は実行を開始しない。
-2. **公開入口の解決**: 業務名を `agentdev-workflow-<業務名>` スキル（Antigravity 公開入口 `.agent/skills/`）へ解決する。入口は command 全文（共通正本 `src/common/commands/agentdev/<業務名>.md`）と委譲先 Workflow Skill を返し、引数は無改変で渡す。
+2. **公開入口の解決**: 業務名を `agentdev-workflow-<業務名>` スキル（Antigravity 公開入口 `.agents/skills/`）へ解決する。入口は command 全文（共通正本 `src/common/commands/agentdev/<業務名>.md`）と委譲先 Workflow Skill を返し、引数は無改変で渡す。
 3. **command 全文の適用**: workflow を開始する前に、command 全文の入力・不変条件・ガードレールを最初に読み込む。入口が command 全文を返さない場合は workflow を開始しない。
 4. **workflow の開始**: command 全文を適用した後、委譲先 Workflow Skill を読み込み、返された引数をそのまま用いて workflow を開始する。
 
@@ -16,7 +16,7 @@ Antigravity 上で AgentDevFlow の command を適用する際の文書管理指
 
 ## 参照の読み替え
 
-- 共通正本の本文が OpenCode の投影経路で参照先を書いている場合は、対応する接続先へ読み替えて参照する。`.opencode/skills/` は公開入口 `.agent/skills/`（入口にない場合は共通正本 `src/common/skills/`）へ読み替える。`.opencode/commands/agentdev/` は共通正本 `src/common/commands/agentdev/` へ読み替える。
+- 共通正本の本文が OpenCode の投影経路で参照先を書いている場合は、対応する接続先へ読み替えて参照する。`.opencode/skills/` は公開入口 `.agents/skills/`（入口にない場合は共通正本 `src/common/skills/`）へ読み替える。`.opencode/commands/agentdev/` は共通正本 `src/common/commands/agentdev/` へ読み替える。
 - 読み替えた参照先が存在しない場合は推測せず、失敗として報告する。
 
 ## 拒否規則（副作用の前）
