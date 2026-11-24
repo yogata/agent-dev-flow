@@ -14,6 +14,11 @@
 //     stop install.ps1 / self-sync.ps1 with exit 7 and guide the acquisition
 //     CLI; environments without a declaration file skip the check; the
 //     consumer archive installer skips it on copy as well
+//   - agent host selection: -AgentHosts places the shared .agents/skills/
+//     entry projection for Codex / Antigravity; unselected installs place
+//     nothing, omitted selections maintain the recorded state, explicit
+//     none removes the managed entries, and the misexecution stop precedes
+//     placement (REQ-009-040)
 //
 // The consumer layout is exercised in both checkout forms accepted by
 // REQ-050 / REQ-009: git clone style (.git present) and source ZIP style
@@ -22,6 +27,7 @@
 // ADF-COVERS(verification): REQ-050-004, REQ-050-005, REQ-050-006
 // ADF-COVERS(verification): REQ-052-007
 // ADF-COVERS(verification): REQ-097-002
+// ADF-COVERS(verification): REQ-009-040
 
 import { describe, expect, test } from "bun:test";
 import * as crypto from "crypto";
@@ -602,5 +608,100 @@ describe("scripts behavior / distribution version state (REQ-126-003)", () => {
     } finally {
       rmrf(root);
     }
+  }, 120000);
+});
+
+// --- Codex / Antigravity agent host selection (REQ-009-040) ---
+describe("scripts behavior / agent host selection (REQ-009-040)", () => {
+  test("unselected new install places nothing under .agents/ and check stays clean", () => {
+    const root = makeConsumerRepo(false);
+    try {
+      const apply = runInstall(root, "apply");
+      expect(apply.exitCode).toBe(0);
+      expect(apply.stdout).toContain("[INFO] Agent host placement (Codex/Antigravity entry .agents/skills/): なし");
+      expect(fs.existsSync(path.join(root, ".agents"))).toBe(false);
+
+      const check = runInstall(root, "check");
+      expect(check.exitCode).toBe(0);
+    } finally {
+      rmrf(root);
+    }
+  }, 180000);
+
+  test("apply -AgentHosts codex junctions the shared entry projection and check verifies it", () => {
+    const root = makeConsumerRepo(false);
+    try {
+      const apply = runInstall(root, "apply", ["-AgentHosts", "codex"]);
+      expect(apply.exitCode).toBe(0);
+      expect(apply.stdout).toContain("[INFO] Agent host placement was set by explicit selection.");
+      expect(apply.stdout).toContain(".agents/skills/agentdev-*/");
+
+      const entry = path.join(root, ".agents", "skills", "agentdev-workflow-case-run");
+      expect(fs.existsSync(entry)).toBe(true);
+      expect(fs.existsSync(path.join(entry, "SKILL.md"))).toBe(true);
+      // The OpenCode projection is unaffected by the agent host selection.
+      expect(fs.existsSync(path.join(root, ".opencode", "skills", "agentdev-workflow-case-run", "SKILL.md"))).toBe(true);
+
+      const recordPath = path.join(root, ".agentdev", "install-state.json");
+      const record = JSON.parse(fs.readFileSync(recordPath, "utf-8")) as { agentHosts: string[] };
+      expect(record.agentHosts).toEqual(["codex"]);
+
+      const check = runInstall(root, "check");
+      expect(check.exitCode).toBe(0);
+      expect(check.stdout).toContain("Agent-entry junction: .agents/skills\\agentdev-workflow-case-run");
+    } finally {
+      rmrf(root);
+    }
+  }, 180000);
+
+  test("omitted -AgentHosts maintains the recorded selection and re-apply stays idempotent", () => {
+    const root = makeConsumerRepo(false);
+    try {
+      const first = runInstall(root, "apply", ["-AgentHosts", "both"]);
+      expect(first.exitCode).toBe(0);
+      const entryBefore = digestTree(path.join(root, ".agents"));
+
+      const second = runInstall(root, "apply");
+      expect(second.exitCode).toBe(0);
+      expect(second.stdout).toContain(
+        "inherited from the current selection or placement state (maintained)",
+      );
+      expect(digestTree(path.join(root, ".agents"))).toEqual(entryBefore);
+
+      const third = runInstall(root, "apply", ["-AgentHosts", "both"]);
+      expect(third.exitCode).toBe(0);
+      expect(digestTree(path.join(root, ".agents"))).toEqual(entryBefore);
+    } finally {
+      rmrf(root);
+    }
+  }, 240000);
+
+  test("explicit deselect (-AgentHosts none) removes the managed agent entry junctions", () => {
+    const root = makeConsumerRepo(false);
+    try {
+      const first = runInstall(root, "apply", ["-AgentHosts", "codex"]);
+      expect(first.exitCode).toBe(0);
+      const entry = path.join(root, ".agents", "skills", "agentdev-workflow-case-run");
+      expect(fs.existsSync(entry)).toBe(true);
+
+      const second = runInstall(root, "apply", ["-AgentHosts", "none"]);
+      expect(second.exitCode).toBe(0);
+      expect(second.stdout).toContain("Removing stale managed junction");
+      expect(fs.existsSync(entry)).toBe(false);
+
+      const check = runInstall(root, "check");
+      expect(check.exitCode).toBe(0);
+    } finally {
+      rmrf(root);
+    }
+  }, 240000);
+
+  test("misexecution stop precedes agent host placement on the self-hosting repo", () => {
+    const before = digestTree(path.join(REPO_ROOT, ".opencode"));
+    const r = runInstall(REPO_ROOT, "apply", ["-AgentHosts", "codex"]);
+    expect(r.exitCode).toBe(1);
+    expect(r.stdout).toContain("scripts/self-sync.ps1 を使ってください");
+    expect(fs.existsSync(path.join(REPO_ROOT, ".agents"))).toBe(false);
+    expect(digestTree(path.join(REPO_ROOT, ".opencode"))).toEqual(before);
   }, 120000);
 });

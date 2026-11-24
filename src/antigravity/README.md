@@ -15,7 +15,7 @@ Antigravity の入口構成（`.agents/skills/`）は公開資料に基づく静
 
 Antigravity の公開入口は `.agents/skills/` 配下のスキル投影である。公開8コマンド（req-define、backlog-auto、case-auto、phase 系5操作）は `agentdev-workflow-<業務名>` スキルを公開入口とする。入口は command 全文（`src/common/commands/agentdev/<業務名>.md`）と委譲先 Workflow Skill と無改変の引数を返す。
 
-導入先への実際の投影（installer）は後続の接続系実行単位が所有し、本領域は repo 内で検証可能な接続のみを配置する。GitHub 操作は Antigravity 既存の GitHub プラグイン能力を利用者が確認してから用いる（共通案内スキル `agentdev-host-github-guidance`）。Issue/PR 作成は OpenCode 側へ引き渡す。
+導入先への投影は installer の `-AgentHosts` 明示選択で行われる。選択時は共有入口 root `.agents/skills/` へ共通原本（`src/common/skills/`）の `agentdev-*` スキルがジャンクション投影される。本領域は repo 内で検証可能な接続のみを配置する。GitHub 操作は Antigravity 既存の GitHub プラグイン能力を利用者が確認してから用いる（共通案内スキル `agentdev-host-github-guidance`）。Issue/PR 作成は OpenCode 側へ引き渡す。
 
 ## 拘束条件
 

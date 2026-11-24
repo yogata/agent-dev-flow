@@ -31,6 +31,14 @@
       area .agentdev-plugin/src/senpi/ is projected as an individual junction.
       The enumeration depends on the placement contract (directory structure)
       only, never on individual implementation files under src/senpi/.
+    - Codex / Antigravity entry projection (into .agents/skills/): each
+      agentdev-* skill directory of .agentdev-plugin/src/common/skills/ is
+      projected as an individual junction (shared entry root for both hosts;
+      command bodies are resolved from the canonical
+      .agentdev-plugin/src/common/commands/agentdev/ at runtime, so no
+      command projection exists for these hosts). Selection is explicit-only
+      (-AgentHosts or the wizard); new installs place nothing when unselected,
+      and explicit none marks the placed projection stale.
     - Projections of different hosts are managed separately: updating or
       removing one host's placement never touches the other host's projection,
       repo-local assets (third-party Skill placements, .agentdev/extensions/**)
@@ -53,7 +61,7 @@
 
 .PARAMETER Mode
     One of: dry-run, check, apply
-    省略可能。引数なし起動時（-Mode 未指定）は対話ウィザードが起動し、Mode と環境と配置対象ホストを問う。
+    省略可能。引数なし起動時（-Mode 未指定）は対話ウィザードが起動し、Mode と環境と配置対象ホストと Codex/Antigravity の配置を問う。
 
 .PARAMETER Hosts
     One of: opencode, senpi, both
@@ -68,6 +76,19 @@
       削除対象にしない（非破壊境界、REQ-058-008）
     - 実行環境の CLI 導入有無（OpenCode / omo 相当）による配置対象の自動振分けは
       行わない（REQ-099-011）
+
+.PARAMETER AgentHosts
+    One of: none, codex, antigravity, both
+    Codex / Antigravity の配置選択（REQ-009-040）。投影先は .agents/skills/（両ホスト
+    共有の入口投影。スキルのみを投影し、コマンド本文は実行時に正本から解決される）。
+
+    判断基準:
+    - 新規導入で選択していなければ配置しない（省略時は none と同じ結果）
+    - 既存導入の更新では、本パラメータ省略時に install-state 記録の現在の選択を維持する
+    - 明示指定（パラメータまたはウィザード選択）した場合のみ配置対象を変更する。
+      none を明示指定した場合、.agents 配下の ADF 管理投影物は apply で除去対象
+      （stale）として報告され、check / dry-run では予測報告される。管理物と確定でき
+      ない投影物は削除対象にしない（非破壊境界、REQ-058-008）
 
 .PARAMETER LocalMode
     Switch. When set, the agentdev-gh Custom Tool implementation (.opencode/tools/agentdev-gh/)
@@ -97,6 +118,8 @@
     ./scripts/install.ps1 -Mode apply -LocalMode
     ./scripts/install.ps1 -Mode apply -Hosts both
     ./scripts/install.ps1 -Mode apply -Hosts senpi
+    ./scripts/install.ps1 -Mode apply -AgentHosts codex
+    ./scripts/install.ps1 -Mode apply -Hosts senpi -AgentHosts antigravity
 #>
 
 #Requires -Version 7.0
@@ -110,6 +133,10 @@ param(
     [ValidateSet('opencode', 'senpi', 'both')]
     [string]$Hosts,
 
+    [Parameter()]
+    [ValidateSet('none', 'codex', 'antigravity', 'both')]
+    [string]$AgentHosts,
+
     [switch]$LocalMode,
 
     [string]$PluginDir = '.agentdev-plugin'
@@ -121,8 +148,9 @@ $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'consumer\common.ps1')
 
 # 共有判定の単一定義モジュール（両公開入口共有。ジャンクション正本判定、所有権判定、
-# stale / 管理外投影の判定、正本解決、配置対象ホストの検出・確定、plugin loader shim
-# 内容、実行環境診断、third-party Skill 宣言の解決と drift 検知）
+# stale / 管理外投影の判定、正本解決、配置対象ホストの検出・確定、Codex/Antigravity
+# 配置選択の確定と .agents 共有投影の管理判定、plugin loader shim 内容、実行環境診断、
+# third-party Skill 宣言の解決と drift 検知）
 . (Join-Path $PSScriptRoot 'consumer\install-sync-common.ps1')
 
 # 配布除外の正本（repo-local Plugin の consumer 配布除外。3 consumer 配布経路の
@@ -148,6 +176,8 @@ $LegacyUnifiedSourceDir = Join-Path $PluginPath 'src\opencode'
 
 $ProjectionDir = Join-Path $RepoRoot '.opencode'
 $SenpiProjectionDir = Join-Path $RepoRoot '.senpi'
+# Codex / Antigravity 共有入口投影の root（.agents/skills/。REQ-009-040）。
+$AgentProjectionDir = Join-Path $RepoRoot '.agents'
 $CommandsDir = Join-Path $ProjectionDir 'commands'
 $SkillsDir = Join-Path $ProjectionDir 'skills'
 $ToolsDir = Join-Path $ProjectionDir 'tools'
@@ -233,6 +263,10 @@ function Write-InstallStateRecord {
     <#
     .SYNOPSIS
     apply 完了時に .agentdev/install-state.json へ配布版を記録する。
+    .DESCRIPTION
+    agentHosts（Codex / Antigravity の配置選択）は明示指定時、または既存記録に
+    フィールドがある場合のみ記録する（保守値・明示値）。一度も選択していない導入では
+    フィールドを書かない（既存導入の記録契約を維持する）。
     #>
     $parentDir = Split-Path -Parent $InstallStatePath
     if (-not (Test-Path -LiteralPath $parentDir)) {
@@ -241,6 +275,10 @@ function Write-InstallStateRecord {
     $record = [ordered]@{
         distributionVersion = $DistributionVersion
         recordedAt = (Get-Date).ToUniversalTime().ToString('o')
+    }
+    $existing = Read-InstallState
+    if ($AgentHosts -or ($null -ne $existing -and ($existing.PSObject.Properties.Name -contains 'agentHosts'))) {
+        $record.agentHosts = @($ResolvedAgentHosts)
     }
     [System.IO.File]::WriteAllText($InstallStatePath, ($record | ConvertTo-Json) + "`n")
 }
@@ -316,6 +354,36 @@ function Invoke-InstallWizard {
             exit 1
         }
     }
+
+    # Codex / Antigravity の配置選択（REQ-009-040）。現在の選択（install-state 記録・
+    # .agents 投影の検出）を案内し、既存導入では既定（空入力）で現在の選択を維持する。
+    # 新規導入で選択していなければ配置しない。
+    $wizardInstallState = Read-InstallState
+    $wizardAgentCurrent = 'なし'
+    if ($null -ne $wizardInstallState -and ($wizardInstallState.PSObject.Properties.Name -contains 'agentHosts')) {
+        $wizardAgentCurrent = Get-AgentHostsSelectionDisplay -HostsArray @($wizardInstallState.agentHosts)
+    } elseif (Test-HasAgentManagedProjection) {
+        $wizardAgentCurrent = '配置済み（選択記録なし）'
+    }
+    Write-Host 'Q4. Codex / Antigravity の配置を選んでください（番号を入力）:'
+    Write-Host "  現在の選択: $wizardAgentCurrent"
+    Write-Host '  何も入力せず Enter で現在の選択を維持します。変更する場合のみ番号を入力してください。'
+    Write-Host '  1) 配置しない（none）'
+    Write-Host '  2) Codex のみ（.agents/skills/ への投影）'
+    Write-Host '  3) Antigravity のみ（.agents/skills/ への投影）'
+    Write-Host '  4) 両方（Codex + Antigravity）'
+    $agentHostsChoice = Read-Host '番号'
+    switch ($agentHostsChoice) {
+        '' { }
+        '1' { $script:AgentHosts = 'none' }
+        '2' { $script:AgentHosts = 'codex' }
+        '3' { $script:AgentHosts = 'antigravity' }
+        '4' { $script:AgentHosts = 'both' }
+        default {
+            Write-Host "無効な選択です: $agentHostsChoice"
+            exit 1
+        }
+    }
     Write-Host ''
 }
 
@@ -373,6 +441,44 @@ function Get-ConsumerJunctionTargets {
         }
     }
 
+    return ($targets | Sort-Object)
+}
+
+function Get-AgentHostsSelectionDisplay {
+    <#
+    .SYNOPSIS
+        Codex / Antigravity の選択配列を表示用ラベルへ変換する（空配列は「なし」）。
+    #>
+    param([string[]]$HostsArray)
+    $items = @($HostsArray)
+    if ($items.Count -eq 0) { return 'なし' }
+    $labels = foreach ($agentHost in $items) {
+        if ($agentHost -eq 'codex') { 'Codex' }
+        elseif ($agentHost -eq 'antigravity') { 'Antigravity' }
+        else { $agentHost }
+    }
+    return ($labels -join ' + ')
+}
+
+function Get-AgentEntryJunctionTargets {
+    <#
+    .SYNOPSIS
+        Codex / Antigravity の配置（.agents/skills/ 共有入口投影）の管理列挙を正本
+        （src/common/skills/agentdev-*）から組み立てる（REQ-009-040）。
+
+    .DESCRIPTION
+        agents:skills\<name> エントリの配列を返す。配置が非アクティブ（選択なし・
+        保守対象なし）の場合は空配列を返す。列挙は OpenCode skills 列挙と同一の
+        agentdev-* 集合（repo-* は接頭辞で自然除外）。コマンド本文は実行時に正本
+        src/common/commands/agentdev/ から解決されるため投影対象に含めない。
+    #>
+    if (-not $AgentPlacementActive) { return @() }
+    $targets = [System.Collections.Generic.List[string]]::new()
+    $skillsSource = Join-Path $CommonSourceDir 'skills'
+    if (Test-Path -LiteralPath $skillsSource) {
+        Get-ChildItem -LiteralPath $skillsSource -Directory -Filter 'agentdev-*' |
+            ForEach-Object { $targets.Add("agents:skills\$($_.Name)") }
+    }
     return ($targets | Sort-Object)
 }
 
@@ -691,6 +797,21 @@ if ($Hosts) {
     Write-Host '[INFO] Placement targets were inherited from the current placement state (or defaulted to both for a new install). Use -Hosts to change them explicitly.'
 }
 
+# Codex / Antigravity の配置選択の確定（REQ-009-040）。明示指定（-AgentHosts
+# パラメータまたはウィザード選択）を最優先とし、未指定時は install-state 記録の選択を
+# 維持する。記録のない既存導入で .agents 管理投影が存在する場合は配置を維持する
+# （非破壊。選択の再確定は明示指定のみ）。新規導入で選択していなければ配置しない。
+$ResolvedInstallState = Read-InstallState
+$ResolvedAgentHosts = @(Resolve-TargetAgentHosts -ExplicitAgentHosts $AgentHosts -InstallState $ResolvedInstallState)
+$AgentPlacementActive = [bool]($ResolvedAgentHosts.Count -gt 0)
+if (-not $AgentHosts -and (Test-HasAgentManagedProjection)) { $AgentPlacementActive = $true }
+Write-Host "[INFO] Agent host placement (Codex/Antigravity entry .agents/skills/): $(if (-not $AgentPlacementActive) { 'なし' } elseif ($ResolvedAgentHosts.Count -gt 0) { Get-AgentHostsSelectionDisplay -HostsArray $ResolvedAgentHosts } else { '配置維持（選択記録なし）' })"
+if ($AgentHosts) {
+    Write-Host '[INFO] Agent host placement was set by explicit selection.'
+} elseif ($AgentPlacementActive) {
+    Write-Host '[INFO] Agent host placement is inherited from the current selection or placement state (maintained). Use -AgentHosts to change it explicitly.'
+}
+
 # LocalMode requires the OpenCode placement target (it redirects an .opencode/ projection)
 if ($LocalMode -and ($ResolvedHosts -notcontains 'opencode')) {
     Write-Host '[ERROR] -LocalMode は OpenCode 投影（.opencode/tools/agentdev-gh）のリンク先差し替えであり、OpenCode が配置対象に含まれていません。-Hosts opencode または -Hosts both を指定してください。'
@@ -740,6 +861,7 @@ if ($LocalMode) {
 }
 
 $targets = Get-ConsumerJunctionTargets
+$agentEntryTargets = @(Get-AgentEntryJunctionTargets)
 
 # ============================================================
 # CHECK MODE
@@ -874,6 +996,10 @@ if ($Mode -eq 'check') {
             $managedPath = if ($null -ne $senpiRel) { Join-Path $SenpiProjectionDir $senpiRel } else { Join-Path $ProjectionDir $relPath }
             if (Test-Junction -Path $managedPath) { $adfManagedProjectionPresent = $true; break }
         }
+        foreach ($agentEntry in $agentEntryTargets) {
+            $agentRel = Resolve-AgentEntryTargetRel -TargetEntry $agentEntry
+            if (Test-Junction -Path (Join-Path $AgentProjectionDir $agentRel)) { $adfManagedProjectionPresent = $true; break }
+        }
         if (-not $adfManagedProjectionPresent) {
             Write-Host "[INFO] No ADF-managed projections placed yet; version state is not verified (distribution version: $DistributionVersion)"
         } else {
@@ -920,6 +1046,29 @@ if ($Mode -eq 'check') {
             $divergences++
         } else {
             Write-Host '[OK] .senpi/ is a real directory'
+        }
+    }
+
+    # 4a. Codex / Antigravity entry projection roots (.agents/ for the shared entry projection)
+    if ($AgentPlacementActive) {
+        if (Test-Junction -Path $AgentProjectionDir) {
+            Write-Host '[DIVERGENCE] .agents/ is a junction (must be real directory)'
+            $divergences++
+        } elseif (-not (Test-Path -LiteralPath $AgentProjectionDir)) {
+            Write-Host '[DIVERGENCE] .agents/ does not exist'
+            $divergences++
+        } else {
+            Write-Host '[OK] .agents/ is a real directory'
+        }
+        $agentSkillsRoot = Join-Path $AgentProjectionDir 'skills'
+        if (Test-Junction -Path $agentSkillsRoot) {
+            Write-Host '[DIVERGENCE] .agents/skills/ is a junction (must be real directory)'
+            $divergences++
+        } elseif (-not (Test-Path -LiteralPath $agentSkillsRoot)) {
+            Write-Host '[DIVERGENCE] .agents/skills/ does not exist'
+            $divergences++
+        } else {
+            Write-Host '[OK] .agents/skills/ is a real directory'
         }
     }
 
@@ -985,6 +1134,28 @@ if ($Mode -eq 'check') {
         }
     }
 
+    # 6a. Check each expected agent-entry junction (Codex/Antigravity shared projection)
+    foreach ($agentEntry in $agentEntryTargets) {
+        $agentRel = Resolve-AgentEntryTargetRel -TargetEntry $agentEntry
+        $targetPath = Join-Path $AgentProjectionDir $agentRel
+        $expectedSource = Get-TargetSourcePath -RelPath $agentRel
+        if (-not (Test-Path -LiteralPath $targetPath)) {
+            Write-Host "[DIVERGENCE] Missing agent-entry junction: .agents/$agentRel"
+            $divergences++
+        } elseif (Test-Junction -Path $targetPath) {
+            $actualTarget = Get-JunctionTarget -Path $targetPath
+            if ($actualTarget -and (Test-Path -LiteralPath $actualTarget) -and ((Resolve-Path -LiteralPath $actualTarget).Path -eq (Resolve-Path -LiteralPath $expectedSource).Path)) {
+                Write-Host "[OK] Agent-entry junction: .agents/$agentRel -> $actualTarget"
+            } else {
+                Write-Host "[DIVERGENCE] Broken agent-entry junction: .agents/$agentRel (expected: $expectedSource, actual: $actualTarget)"
+                $divergences++
+            }
+        } else {
+            Write-Host "[DIVERGENCE] Exists but not a junction: .agents/$agentRel"
+            $divergences++
+        }
+    }
+
     # 7. Orphan detection (REQ-050-004 継承能力)。REQ-058:
     # 正本の管理対象から外れた ADF 管理投影物（stale）のみ乖離として検出・報告する
     # （検出のみでファイルシステムを変更しない。REQ-058-003）。
@@ -999,7 +1170,15 @@ if ($Mode -eq 'check') {
     foreach ($unmanagedRel in (Get-UnmanagedProjectionJunctionRels -CurrentTargets $targets -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir)) {
         Write-Host "[INFO] Junction not managed by AgentDevFlow (left untouched): $unmanagedRel"
     }
-    if ($staleJunctions.Count -eq 0) {
+    $staleAgentJunctions = @(Get-StaleManagedAgentJunctions -CurrentAgentEntryTargets $agentEntryTargets)
+    foreach ($staleAgentItem in $staleAgentJunctions) {
+        Write-Host "[ORPHAN] Stale managed junction (apply removes it): $($staleAgentItem.RelPath)"
+        $divergences++
+    }
+    foreach ($unmanagedAgentRel in (Get-UnmanagedAgentProjectionJunctionRels -CurrentAgentEntryTargets $agentEntryTargets)) {
+        Write-Host "[INFO] Junction not managed by AgentDevFlow (left untouched): $unmanagedAgentRel"
+    }
+    if ($staleJunctions.Count -eq 0 -and $staleAgentJunctions.Count -eq 0) {
         Write-Host '[OK] No orphan junctions detected'
     }
 
@@ -1266,6 +1445,23 @@ if ($Mode -eq 'dry-run') {
             Write-Host '[OK] .senpi/ is a real directory'
         }
     }
+    if ($AgentPlacementActive) {
+        if (Test-Junction -Path $AgentProjectionDir) {
+            Write-Host '[INFO] Migration required: .agents/ is a junction'
+        } elseif (-not (Test-Path -LiteralPath $AgentProjectionDir)) {
+            Write-Host '[INFO] .agents/ does not exist, would create as real directory'
+        } else {
+            Write-Host '[OK] .agents/ is a real directory'
+        }
+        $agentSkillsRoot = Join-Path $AgentProjectionDir 'skills'
+        if (Test-Junction -Path $agentSkillsRoot) {
+            Write-Host '[ERROR] .agents/skills/ is a junction (unexpected state)'
+        } elseif (-not (Test-Path -LiteralPath $agentSkillsRoot)) {
+            Write-Host '[INFO] .agents/skills/ does not exist, would create as real directory'
+        } else {
+            Write-Host '[OK] .agents/skills/ exists as real directory'
+        }
+    }
 
     # Parent directory status (OpenCode placement only)
     if ($ResolvedHosts -contains 'opencode') {
@@ -1337,6 +1533,34 @@ if ($Mode -eq 'dry-run') {
         }
     }
 
+    # Codex / Antigravity 共有投影（.agents/skills/）の配置予測（REQ-009-040）
+    foreach ($agentEntry in $agentEntryTargets) {
+        $agentRel = Resolve-AgentEntryTargetRel -TargetEntry $agentEntry
+        $targetPath = Join-Path $AgentProjectionDir $agentRel
+        $expectedSource = Get-TargetSourcePath -RelPath $agentRel
+        if (Test-Junction -Path $targetPath) {
+            $actualTarget = Get-JunctionTarget -Path $targetPath
+            if (Test-JunctionTargetMatchesSource -JunctionFullName $targetPath -SourcePath $expectedSource) {
+                Write-Host "[OK] Already junctioned: .agents/$agentRel"
+            } elseif (Test-ManagedProjectionJunction -JunctionRel $agentRel -JunctionFullName $targetPath) {
+                # wrong target（管理物）: 修復対象（REQ-058-004）
+                if ($actualTarget -and (Test-Path -LiteralPath (@($actualTarget) | Select-Object -First 1))) {
+                    Write-Host "[WOULD REMOVE] Wrong-target junction: .agents/$agentRel (actual: $actualTarget)"
+                } else {
+                    Write-Host "[WOULD REMOVE] Broken junction: .agents/$agentRel"
+                }
+                Write-Host "[WOULD ADD] Re-create junction: .agents/$agentRel -> $expectedSource"
+            } else {
+                # wrong target（管理物と確認できない）: 予測せず保持を報告する
+                Write-Host "[ERROR] Unmanaged junction at managed path (apply would keep it and report a conflict): .agents/$agentRel (actual: $actualTarget)"
+            }
+        } elseif (Test-Path -LiteralPath $targetPath) {
+            Write-Host "[ERROR] Path exists and is not a junction: .agents/$agentRel"
+        } else {
+            Write-Host "[WOULD ADD] Create junction: .agents/$agentRel -> $expectedSource"
+        }
+    }
+
     Write-Host ''
     Write-Host '--- Planned plugin loader shims ---'
     $dryRunPluginPackages = $targets | Where-Object { $_ -like 'plugins\*' } | ForEach-Object { ($_ -split '\\')[-1] }
@@ -1373,7 +1597,14 @@ if ($Mode -eq 'dry-run') {
     foreach ($unmanagedRel in (Get-UnmanagedProjectionJunctionRels -CurrentTargets $targets -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir)) {
         Write-Host "[INFO] Junction not managed by AgentDevFlow (would be left untouched): $unmanagedRel"
     }
-    if ($dryRunStale.Count -eq 0) {
+    $dryRunStaleAgent = @(Get-StaleManagedAgentJunctions -CurrentAgentEntryTargets $agentEntryTargets)
+    foreach ($staleAgentItem in $dryRunStaleAgent) {
+        Write-Host "[WOULD REMOVE] Stale managed junction: $($staleAgentItem.RelPath)"
+    }
+    foreach ($unmanagedAgentRel in (Get-UnmanagedAgentProjectionJunctionRels -CurrentAgentEntryTargets $agentEntryTargets)) {
+        Write-Host "[INFO] Junction not managed by AgentDevFlow (would be left untouched): $unmanagedAgentRel"
+    }
+    if ($dryRunStale.Count -eq 0 -and $dryRunStaleAgent.Count -eq 0) {
         Write-Host '[OK] No stale managed junctions to remove'
     }
 
@@ -1450,6 +1681,35 @@ if ($Mode -eq 'apply') {
             New-Item -ItemType Directory -Path $SenpiProjectionDir -Force | Out-Null
         } else {
             Write-Host '[OK] .senpi/ exists as real directory'
+        }
+    }
+
+    # Step 1b: Codex / Antigravity entry projection root (.agents/ for the shared
+    # entry projection)。非アクティブ時は作成しない（stale 除去は Step 3c が処理する）。
+    if ($AgentPlacementActive) {
+        if (Test-Junction -Path $AgentProjectionDir) {
+            Write-Host '[ACTION] Removing whole-directory junction .agents/'
+            $rmResult = cmd /c "rmdir `"$AgentProjectionDir`"" 2>&1
+            if ($LASTEXITCODE -ne 0) {
+                Write-Error "[ERROR] Failed to remove junction: $rmResult"
+                exit 1
+            }
+            Write-Host '[ACTION] Creating .agents/ as real directory'
+            New-Item -ItemType Directory -Path $AgentProjectionDir -Force | Out-Null
+        } elseif (-not (Test-Path -LiteralPath $AgentProjectionDir)) {
+            Write-Host '[ACTION] Creating .agents/ as real directory'
+            New-Item -ItemType Directory -Path $AgentProjectionDir -Force | Out-Null
+        } else {
+            Write-Host '[OK] .agents/ exists as real directory'
+        }
+        $agentSkillsRoot = Join-Path $AgentProjectionDir 'skills'
+        if (Test-Junction -Path $agentSkillsRoot) {
+            Write-Error '[ERROR] .agents/skills/ is a junction (must be real directory)'
+            exit 1
+        }
+        if (-not (Test-Path -LiteralPath $agentSkillsRoot)) {
+            Write-Host '[ACTION] Creating .agents/skills/ as real directory'
+            New-Item -ItemType Directory -Path $agentSkillsRoot -Force | Out-Null
         }
     }
 
@@ -1560,6 +1820,49 @@ if ($Mode -eq 'apply') {
         }
     }
 
+    # Step 3a: Codex / Antigravity shared entry junctions (.agents/skills/agentdev-*)
+    foreach ($agentEntry in $agentEntryTargets) {
+        $agentRel = Resolve-AgentEntryTargetRel -TargetEntry $agentEntry
+        $targetPath = Join-Path $AgentProjectionDir $agentRel
+        $sourcePath = Get-TargetSourcePath -RelPath $agentRel
+
+        if (Test-Junction -Path $targetPath) {
+            if (Test-JunctionTargetMatchesSource -JunctionFullName $targetPath -SourcePath $sourcePath) {
+                Write-Host "[OK] Already junctioned: .agents/$agentRel"
+                continue
+            } elseif (Test-ManagedProjectionJunction -JunctionRel $agentRel -JunctionFullName $targetPath) {
+                # wrong target（管理物）: 修復対象（REQ-058-004、REQ-099-012）
+                $actualTarget = Get-JunctionTarget -Path $targetPath
+                if ($actualTarget -and (Test-Path -LiteralPath (@($actualTarget) | Select-Object -First 1))) {
+                    Write-Host "[ACTION] Removing junction (wrong target): .agents/$agentRel"
+                } else {
+                    Write-Host "[ACTION] Removing broken junction: .agents/$agentRel"
+                }
+                cmd /c "rmdir `"$targetPath`"" 2>&1
+                if ($LASTEXITCODE -ne 0) {
+                    Write-Error "[ERROR] Failed to remove junction: .agents/$agentRel"
+                    exit 1
+                }
+            } else {
+                # wrong target（管理物と確認できない）: 自動置換せず保持して衝突報告する
+                $actualTarget = Get-JunctionTarget -Path $targetPath
+                Write-Host "[ERROR] Unmanaged junction at managed path (kept, not replaced): .agents/$agentRel (actual: $actualTarget)"
+                $applyConflicts.Add(".agents/$agentRel")
+                continue
+            }
+        } elseif (Test-Path -LiteralPath $targetPath) {
+            Write-Error "[ERROR] Path exists and is not a junction: .agents/$agentRel"
+            exit 1
+        }
+
+        Write-Host "[ACTION] Creating junction: .agents/$agentRel -> $sourcePath"
+        $result = cmd /c "mklink /J `"$targetPath`" `"$sourcePath`" 2>&1"
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "[ERROR] Failed to create junction .agents/${agentRel}: $result"
+            exit 1
+        }
+    }
+
     # Step 3b: Plugin loader shims (depth-1 re-export files)
     Write-Host ''
     Write-Host '--- Plugin loader shims ---'
@@ -1616,11 +1919,24 @@ if ($Mode -eq 'apply') {
             $applyRemoveFailures.Add($staleItem.RelPath)
         }
     }
+    # Codex / Antigravity 共有投影の stale 除去（明示的な none・正本スキル消失。REQ-009-040）
+    $applyStaleAgent = @(Get-StaleManagedAgentJunctions -CurrentAgentEntryTargets $agentEntryTargets)
+    foreach ($staleAgentItem in $applyStaleAgent) {
+        Write-Host "[ACTION] Removing stale managed junction: $($staleAgentItem.RelPath)"
+        $rmAgentResult = cmd /c "rmdir `"$($staleAgentItem.FullName)`"" 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "[ERROR] Failed to remove stale managed junction: $($staleAgentItem.RelPath) ($rmAgentResult)"
+            $applyRemoveFailures.Add($staleAgentItem.RelPath)
+        }
+    }
     # 管理物判定不能な junction は削除せず報告のみ（REQ-058-008）
     foreach ($unmanagedRel in (Get-UnmanagedProjectionJunctionRels -CurrentTargets $targets -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir)) {
         Write-Host "[INFO] Junction not managed by AgentDevFlow (left untouched): $unmanagedRel"
     }
-    if ($applyStale.Count -eq 0) {
+    foreach ($unmanagedAgentRel in (Get-UnmanagedAgentProjectionJunctionRels -CurrentAgentEntryTargets $agentEntryTargets)) {
+        Write-Host "[INFO] Junction not managed by AgentDevFlow (left untouched): $unmanagedAgentRel"
+    }
+    if ($applyStale.Count -eq 0 -and $applyStaleAgent.Count -eq 0) {
         Write-Host '[OK] No stale managed junctions to remove'
     }
     # REQ-058-011: 削除失敗が残る場合は成功として扱わず、判別可能な終了コードで報告する
@@ -1685,6 +2001,9 @@ if ($Mode -eq 'apply') {
     Write-Host '  .opencode/plugins/agentdev-*.ts'
     if ($ResolvedHosts -contains 'senpi') {
         Write-Host '  .senpi/'
+    }
+    if ($AgentPlacementActive) {
+        Write-Host '  .agents/skills/agentdev-*/'
     }
 
     # 実行環境診断（REQ-099-011）。配置結果の報告と区別して報告する。

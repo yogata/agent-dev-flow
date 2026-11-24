@@ -5,9 +5,10 @@
 
 .DESCRIPTION
     ジャンクション正本判定、管理物（所有権）判定、stale / 管理外投影の判定、
-    配置対象ホストの検出と確定、正本解決、plugin loader shim の固定内容、
-    実行環境診断、third-party Skill 宣言の解決と drift 検知という共有判定を、
-    両公開入口の同名重複関数の解消とともに1箇所で所有する（実行時パッケージ境界
+    配置対象ホストの検出と確定、Codex/Antigravity 配置選択の確定と .agents 共有
+    投影の管理判定、正本解決、plugin loader shim の固定内容、実行環境診断、
+    third-party Skill 宣言の解決と drift 検知という共有判定を、両公開入口の
+    同名重複関数の解消とともに1箇所で所有する（実行時パッケージ境界
     Design「導入方式ポリシー」節の共有定義化契約）。同じ規則に対して両入口が
     同じ結果を返すことを1箇所で管理する。
 
@@ -22,6 +23,11 @@
     $LocalMode 等）を動的スコープで参照する。呼び出し元スクリプトは本モジュール
     の読込前にこれらの変数を定義すること。入口固有の構成差（LocalMode
     リダイレクト、新規環境の既定配置対象）は関数パラメータで引き渡す。
+    Codex/Antigravity 系の判定（agents 管理列挙エントリの変換・.agents 共有投影の
+    配置検出・選択確定・stale / 管理外判定）は consumer 入口のみが呼び出す。
+    self-hosting 入口は新ホストの投影を持たないため $AgentProjectionDir を定義
+    せずこれらを呼ばない（$AgentProjectionDir を参照する関数は未定義時に
+    何も返さない）。
 
     配布除外の正本（repo-local Plugin の consumer 配布除外）は本モジュールでは
     なく scripts/consumer/distribution-exclusion.ps1 が単一定義として所有する。
@@ -92,6 +98,17 @@ function Resolve-SenpiTargetRel {
     return $null
 }
 
+function Resolve-AgentEntryTargetRel {
+    <#
+    .SYNOPSIS
+        管理列挙エントリ（'agents:<rel>'）を .agents 投影の相対パス（'<rel>'）に
+        変換する。agents エントリ以外は $null を返す。
+    #>
+    param([string]$TargetEntry)
+    if ($TargetEntry -like 'agents:*') { return $TargetEntry.Substring('agents:'.Length) }
+    return $null
+}
+
 function Test-ManagedSenpiJunction {
     <#
     .SYNOPSIS
@@ -130,6 +147,21 @@ function Test-HasSenpiManagedProjection {
     $found = Get-ChildItem -LiteralPath $SenpiProjectionDir -Directory -Force -ErrorAction SilentlyContinue |
         Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
         Where-Object { Test-ManagedSenpiJunction -JunctionName $_.Name -JunctionFullName $_.FullName }
+    return [bool]$found
+}
+
+function Test-HasAgentManagedProjection {
+    <#
+    .SYNOPSIS
+        .agents\skills 配下に管理物と確定できる ADF 管理投影（Codex / Antigravity
+        共有の入口投影）が存在するか判定する（配置維持の検出用）。
+    #>
+    if (-not $AgentProjectionDir) { return $false }
+    $skillsRoot = Join-Path $AgentProjectionDir 'skills'
+    if (-not (Test-Path -LiteralPath $skillsRoot)) { return $false }
+    $found = Get-ChildItem -LiteralPath $skillsRoot -Directory -Force -ErrorAction SilentlyContinue |
+        Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
+        Where-Object { Test-ManagedProjectionJunction -JunctionRel "skills\$($_.Name)" -JunctionFullName $_.FullName }
     return [bool]$found
 }
 
@@ -208,6 +240,39 @@ function Resolve-TargetHosts {
         'both'     { return @('opencode', 'senpi') }
     }
     return $FallbackHosts
+}
+
+function Resolve-TargetAgentHosts {
+    <#
+    .SYNOPSIS
+        Codex / Antigravity の配置選択を確定する（REQ-009-040）。
+
+    .DESCRIPTION
+        明示指定（-AgentHosts パラメータまたはウィザード選択）を最優先とし、
+        省略時は install-state 記録の選択を維持する。状態記録は呼び出し側が読み込んだ
+        install-state オブジェクトの引渡しで参照する（本モジュールは状態記録を
+        直接読まない）。記録のない既存導入で .agents 管理投影のみが残る場合の配置
+        維持は呼び出し側が Test-HasAgentManagedProjection の検出で補う。
+
+    .PARAMETER ExplicitAgentHosts
+        明示指定された配置選択（-AgentHosts パラメータ値。未指定は空）。
+
+    .PARAMETER InstallState
+        呼び出し側で読み込んだ install-state オブジェクト（未導入・未記録は $null）。
+    #>
+    param(
+        [string]$ExplicitAgentHosts,
+        [object]$InstallState = $null
+    )
+    if ($ExplicitAgentHosts) {
+        if ($ExplicitAgentHosts -eq 'both') { return @('codex', 'antigravity') }
+        if ($ExplicitAgentHosts -eq 'none') { return @() }
+        return @($ExplicitAgentHosts)
+    }
+    if ($null -ne $InstallState -and $InstallState.agentHosts -is [array]) {
+        return @($InstallState.agentHosts)
+    }
+    return @()
 }
 
 function Get-HostsDisplay {
@@ -385,6 +450,42 @@ function Get-StaleManagedJunctions {
     return $stale
 }
 
+function Get-StaleManagedAgentJunctions {
+    <#
+    .SYNOPSIS
+        Codex / Antigravity 共有投影（.agents\skills 配下）のうち正本の管理対象列挙
+        から外れたもの（stale、削除対象）を返す（REQ-058-002）。
+
+    .DESCRIPTION
+        返却要素は RelPath（agents:skills\<name>）と FullName（絶対パス）を持つ。
+        現行の配置選択で .agents 投影が非アクティブな場合（none の明示指定を含む）は
+        管理物と確定できる .agents\skills 配下の junction を全件 stale として返す
+        （配置対象から外れた新ホストの管理投影物の対象別除去）。正本から削除された
+        スキルの junction も stale として返す。省略解決（保守）で配置が維持される
+        場合は呼び出し側が現行の管理列挙を渡すため stale にならない。管理物判定
+        不能な junction は返さない（REQ-058-008 の非破壊境界）。
+
+    .PARAMETER CurrentAgentEntryTargets
+        現行の .agents 管理列挙（agents:skills\<name> エントリ。非アクティブ時は空）。
+    #>
+    param([string[]]$CurrentAgentEntryTargets = @())
+    $stale = [System.Collections.Generic.List[object]]::new()
+    if (-not $AgentProjectionDir) { return $stale }
+    $skillsRoot = Join-Path $AgentProjectionDir 'skills'
+    if (-not (Test-Path -LiteralPath $skillsRoot)) { return $stale }
+    Get-ChildItem -LiteralPath $skillsRoot -Directory -Force |
+        Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
+        ForEach-Object {
+            $entry = "agents:skills\$($_.Name)"
+            if ($entry -notin $CurrentAgentEntryTargets) {
+                if (Test-ManagedProjectionJunction -JunctionRel "skills\$($_.Name)" -JunctionFullName $_.FullName) {
+                    $stale.Add([PSCustomObject]@{ RelPath = $entry; FullName = $_.FullName })
+                }
+            }
+        }
+    return $stale
+}
+
 function Get-UnmanagedProjectionJunctionRels {
     <#
     .SYNOPSIS
@@ -428,6 +529,34 @@ function Get-UnmanagedProjectionJunctionRels {
                 }
             }
     }
+    return $unmanaged
+}
+
+function Get-UnmanagedAgentProjectionJunctionRels {
+    <#
+    .SYNOPSIS
+        .agents\skills 配下の junction のうち、現行の管理対象列挙にも stale 管理投影物
+        にも該当しない（管理物判定不能な）ものの agents: エントリ一覧を返す
+        （REQ-058-008）。
+
+    .PARAMETER CurrentAgentEntryTargets
+        現行の .agents 管理列挙（agents:skills\<name> エントリ。非アクティブ時は空）。
+    #>
+    param([string[]]$CurrentAgentEntryTargets = @())
+    $staleRels = @(Get-StaleManagedAgentJunctions -CurrentAgentEntryTargets $CurrentAgentEntryTargets) |
+        ForEach-Object { $_.RelPath }
+    $unmanaged = [System.Collections.Generic.List[string]]::new()
+    if (-not $AgentProjectionDir) { return $unmanaged }
+    $skillsRoot = Join-Path $AgentProjectionDir 'skills'
+    if (-not (Test-Path -LiteralPath $skillsRoot)) { return $unmanaged }
+    Get-ChildItem -LiteralPath $skillsRoot -Directory -Force |
+        Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
+        ForEach-Object {
+            $entry = "agents:skills\$($_.Name)"
+            if ($entry -notin $CurrentAgentEntryTargets -and $entry -notin $staleRels) {
+                $unmanaged.Add($entry)
+            }
+        }
     return $unmanaged
 }
 

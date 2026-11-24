@@ -41,7 +41,8 @@ function countFunctionDefs(text: string, name: string): number {
 
 // The 15 same-name judgment functions previously duplicated by the two
 // public entries, plus the entry-specific detection helpers that moved into
-// the shared module.
+// the shared module, plus the Codex / Antigravity agent-host selection and
+// shared-entry-projection judgment helpers (REQ-009-040).
 const UNIFIED_FUNCTIONS = [
   "Test-Junction",
   "Get-JunctionTarget",
@@ -56,6 +57,11 @@ const UNIFIED_FUNCTIONS = [
   "Test-ManagedSenpiJunction",
   "Get-StaleManagedJunctions",
   "Get-UnmanagedProjectionJunctionRels",
+  "Resolve-AgentEntryTargetRel",
+  "Test-HasAgentManagedProjection",
+  "Resolve-TargetAgentHosts",
+  "Get-StaleManagedAgentJunctions",
+  "Get-UnmanagedAgentProjectionJunctionRels",
   "New-PluginLoaderShimContent",
   "Show-RuntimeDiagnostics",
   "Get-ThirdPartyDeclaredNames",
@@ -221,5 +227,40 @@ describe("shared judgment module / judgment equality across entry configurations
     expect(report.explicitSenpiEqual).toBe(true);
     expect(report.fallbackConsumer).toBe(true);
     expect(report.unmanagedBogusEqual).toBe(true);
+  });
+
+  test("Resolve-TargetAgentHosts resolves explicit selection, record maintenance, and the new-install default (REQ-009-040)", () => {
+    const script = [
+      `$ErrorActionPreference='Stop'`,
+      `. '${SHARED_MODULE_PS1.replace(/\\/g, "/")}'`,
+      `$explicitBoth = @((Resolve-TargetAgentHosts -ExplicitAgentHosts 'both')) -join ','`,
+      `$explicitCodex = @((Resolve-TargetAgentHosts -ExplicitAgentHosts 'codex')) -join ','`,
+      `$explicitAntigravity = @((Resolve-TargetAgentHosts -ExplicitAgentHosts 'antigravity')) -join ','`,
+      `$explicitNone = @((Resolve-TargetAgentHosts -ExplicitAgentHosts 'none')) -join ','`,
+      `$withRecord = [pscustomobject]@{ agentHosts = @('codex') }`,
+      `$maintained = @((Resolve-TargetAgentHosts -InstallState $withRecord)) -join ','`,
+      `$noAgentRecord = [pscustomobject]@{ distributionVersion = '1.0.0' }`,
+      `$noRecord = @((Resolve-TargetAgentHosts -InstallState $noAgentRecord)) -join ','`,
+      `$newInstall = @((Resolve-TargetAgentHosts)) -join ','`,
+      `[pscustomobject]@{`,
+      `  explicitBoth = $explicitBoth`,
+      `  explicitCodex = $explicitCodex`,
+      `  explicitAntigravity = $explicitAntigravity`,
+      `  explicitNone = $explicitNone`,
+      `  maintained = $maintained`,
+      `  noRecord = $noRecord`,
+      `  newInstall = $newInstall`,
+      `} | ConvertTo-Json -Compress`,
+    ].join("\n");
+    const r = runPwshScript(script);
+    expect(r.exitCode).toBe(0);
+    const report = JSON.parse(r.stdout.trim());
+    expect(report.explicitBoth).toBe("codex,antigravity");
+    expect(report.explicitCodex).toBe("codex");
+    expect(report.explicitAntigravity).toBe("antigravity");
+    expect(report.explicitNone).toBe("");
+    expect(report.maintained).toBe("codex");
+    expect(report.noRecord).toBe("");
+    expect(report.newInstall).toBe("");
   });
 });

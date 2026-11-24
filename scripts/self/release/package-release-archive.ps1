@@ -17,6 +17,12 @@ param()
 #                                              guard dependency artifacts are
 #                                              resolved at install time from the
 #                                              shipped version pin metadata)
+#     src/codex/**                    (Codex host connection area; shipped for
+#                                      distribution completeness — collection
+#                                      into the archive is NOT an installation
+#                                      into the main repo)
+#     src/antigravity/**              (Antigravity host connection area; same
+#                                      distribution-completeness contract)
 #     scripts/install.ps1            (projected from scripts/consumer/archive/install.ps1)
 #     README-INSTALL.md
 #     THIRD-PARTY-NOTICES.md         (third-party dependency and license notices)
@@ -35,7 +41,7 @@ param()
 # .opencode/skills/repo-agentdev-integrity/, NOT the candidate copy that
 # travels inside the archive):
 #   1. archive projection on the staged src/common/ + src/opencode/plugins
-#      content
+#      + src/codex + src/antigravity content
 #   2. archive projection on the archive EXTRAS (README-INSTALL.md,
 #      scripts/install.ps1 archive edition) — these live outside src/common/
 #      so the host checker's archive profile would otherwise skip them
@@ -95,6 +101,11 @@ $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
 # stay in the OpenCode host connection area (src/opencode/plugins).
 $srcCommands = Join-Path $repoRoot "src\common\commands\agentdev"
 $srcSkills = Join-Path $repoRoot "src\common\skills"
+# New host connection areas (src/codex/, src/antigravity/). Shipped in the
+# archive for distribution completeness; collecting them is NOT an
+# installation into the main repo.
+$srcCodex = Join-Path $repoRoot "src\codex"
+$srcAntigravity = Join-Path $repoRoot "src\antigravity"
 # Archive-dedicated installer ORIGINAL (REQ-050-010). Travels inside the
 # archive under the projection name scripts/install.ps1.
 $installScript = Join-Path $repoRoot "scripts\consumer\archive\install.ps1"
@@ -117,6 +128,12 @@ if (-not (Test-Path -LiteralPath $installScript)) {
 }
 if (-not (Test-Path -LiteralPath $thirdPartyNotices)) {
     Fail-Exit 2 "package-release-archive: THIRD-PARTY-NOTICES.md missing at repo root: $thirdPartyNotices (the archive must carry the third-party dependency notices; fail-closed)"
+}
+if (-not (Test-Path -LiteralPath $srcCodex)) {
+    Fail-Exit 2 "package-release-archive: required source directory missing: $srcCodex (Codex host connection area; the archive must carry the distribution originals; fail-closed)"
+}
+if (-not (Test-Path -LiteralPath $srcAntigravity)) {
+    Fail-Exit 2 "package-release-archive: required source directory missing: $srcAntigravity (Antigravity host connection area; the archive must carry the distribution originals; fail-closed)"
 }
 
 # Trusted host checker (NOT the candidate copy inside the archive). Per
@@ -236,6 +253,19 @@ try {
         }
     }
 
+    # New host connection areas (src/codex/, src/antigravity/): staged as
+    # real-file recursive copies. Shipped for distribution completeness;
+    # the archive-edition installer does not consume them (its -AgentHosts
+    # placement projects from src/common/skills/).
+    foreach ($newHostArea in @(
+        @{ Name = "codex";       Source = $srcCodex },
+        @{ Name = "antigravity"; Source = $srcAntigravity }
+    )) {
+        $stageNewHostDir = Join-Path $stageSrc $newHostArea.Name
+        New-Item -ItemType Directory -Path $stageNewHostDir -Force | Out-Null
+        Copy-Item -Path (Join-Path $newHostArea.Source "*") -Destination $stageNewHostDir -Recurse -Force
+    }
+
     # node_modules は配布アーカイブに含めない (サイズ増大・consumer側のnpm installで解決)
     Get-ChildItem -LiteralPath $stageSrc -Recurse -Directory -Filter "node_modules" -ErrorAction SilentlyContinue |
         Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
@@ -285,8 +315,9 @@ try {
     Copy-Item -LiteralPath $thirdPartyNotices -Destination (Join-Path $stageArchiveRoot "THIRD-PARTY-NOTICES.md") -Force
 
     # Pre-publication boundary inspection #1: staged canonical tree
-    # (src/common/ + src/opencode/plugins/, DEC-049 layout).
-    Write-Host "package-release-archive: running archive projection boundary check on staged src/common/ + src/opencode/plugins"
+    # (src/common/ + src/opencode/plugins/ + src/codex/ + src/antigravity/,
+    # DEC-049 layout).
+    Write-Host "package-release-archive: running archive projection boundary check on staged src/common/ + src/opencode/plugins + src/codex + src/antigravity"
     & bun run $boundaryChecker --profile archive $stageArchiveRoot --json 2>&1 | Out-Host
     if ($LASTEXITCODE -ne 0) {
         Cleanup-Stage
@@ -371,7 +402,11 @@ try {
     # present above but never executed, so a mutated archive cannot run
     # arbitrary code through its installer (in particular it cannot mutate
     # $stagedZip between Compress-Archive and publication).
-    & powershell -NoProfile -ExecutionPolicy Bypass -File $installScript -Source $installedSrc -Target $installedTarget -Mode copy
+    # -AgentHosts both: the internal verification also exercises the
+    # Codex/Antigravity entry projection placement (.agents/skills/ real
+    # copies), so the archive-installed boundary check below covers the
+    # agent entry projection files too.
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $installScript -Source $installedSrc -Target $installedTarget -Mode copy -AgentHosts both
     if ($LASTEXITCODE -ne 0) {
         Cleanup-Stage
         Fail-Exit 9 "package-release-archive: trusted archive installer exited with $LASTEXITCODE"
