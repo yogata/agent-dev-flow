@@ -35,7 +35,7 @@ scripts/
 ### `src/lookup.ts` — 遷移記録の照会と identity 照合
 
 ```
-bun src/lookup.ts --dir <transitions-dir> --key <idempotency-key> --identity-file <identity.yaml>
+bun src/lookup.ts --dir <phase-gates-dir> --key <idempotency-key> --identity-file <identity.yaml>
 ```
 
 - `--identity-file` は必須（`.agentdev/project/identity.yaml`）。既存記録の復元は、現在工程の識別状態を記録と照合して矛盾がないことを確認した後でのみ行う（遷移後の現在工程の照合の規律）。照合は逐語一致のみで行い、正規化・部分一致・自動解消を行わない。照合対象は project↔scope と current_phase↔fromPhase/toPhase（current_phase は fromPhase または toPhase のいずれかと一致すればよく、終端記録 toPhase null は fromPhase のみ）。identity ファイルは読取専用であり、本 script はこれを変更しない
@@ -49,7 +49,7 @@ bun src/lookup.ts --dir <transitions-dir> --key <idempotency-key> --identity-fil
 ### `src/apply.ts` — 遷移記録の保存（冪等）
 
 ```
-bun src/apply.ts --dir <transitions-dir> --input <record.json | ->
+bun src/apply.ts --dir <phase-gates-dir> --input <record.json | ->
 ```
 
 - 入力 JSON（遷移記録。余分なフィールドは拒否）:

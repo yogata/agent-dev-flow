@@ -46,6 +46,8 @@
 | `.agentdev/project/README.md` の見出し | `phase/` | `project/` |
 | 同「identity.yaml の様式」 | キー `undertaking` | `project` |
 | 同「保存モデル」・各様式の節・別セッション再開 | `pending.md`、`adoptions/`、`revisions/`、`transitions/` | `issue-log.md`、`decision-log/`、`change-log/`、`phase-gates/` |
+| `.agentdev/project/themes.md` の様式と更新規律の参照先 | `phase/README.md` | `project/README.md` |
+| `.agentdev/project/issue-log.md` の様式と更新規律の参照先 | `phase/README.md` | `project/README.md` |
 
 `.agentdev/project/README.md` の現行様式の正本は `agentdev-phase-theme-collaboration` の `templates/project-readme.md` である。
 

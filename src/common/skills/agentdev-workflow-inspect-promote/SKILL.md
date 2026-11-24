@@ -101,7 +101,7 @@ inspect-promote workflow は次の8 STEP で構成する。
 
 ## 終了条件（termination）
 
-- 全検出事項が promote（promoted/ 保存 + inbox 削除）/ reject（即時削除）/ defer（inbox 残置）/ 自動 promote（intake/promoted/ 投入 + ログ記録）のいずれかに確定している
+- 全検出事項が promote（promoted/ 保存 + inbox 削除）/ reject（即時削除）/ defer（inbox 残置）/ 自動 promote（.agentdev/backlog/intake/promoted/ 投入 + ログ記録）のいずれかに確定している
 - `.agentdev/backlog/inspect/` と `.agentdev/backlog/intake/` 配下の変更が commit/push 済みである（変更なし時は「変更なし」報告済み）
 - 完了報告 template（`.opencode/commands/agentdev/templates/inspect-promote/standard.md`）に従い、promote/defer/reject/auto-promote の判定結果と後続 route（`--auto` 実行時は投入件数、投入先一覧、ログパスを含む）を報告した
 - 自律確定した検出事項の判定結果、主要根拠、HITL不要と判断した理由を完了報告に含めている（新規永続成果物を必須としない）

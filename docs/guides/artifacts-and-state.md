@@ -54,9 +54,9 @@ requirements/REQ-{NNN}.md     # 要件定義（基準）
   reports/**/*.md                   # 監査・評価・観測記録（Report、Design とは分離）
   guides/*.md                    # 参照用読み物（案内層、非基準）
 .agentdev/
-  intake/                        # Intake パイプラインのドメイン状態
+  backlog/intake/                # Intake パイプラインのドメイン状態
     inbox/ promoted/
-  learning/                      # Learning パイプラインのドメイン状態
+  backlog/learning/              # Learning パイプラインのドメイン状態
     inbox/ deferred/ evaluation-report.md promoted/
   backlog/req-units/RU-*.md      # Requirement Unit
   integrity/                     # 整合性検証レポート
@@ -85,9 +85,9 @@ scripts/
     skills/agentdev-*/           # Skill 原本
   src/opencode/                  # OpenCode 接続領域（clone 内）
 .agentdev/
-  intake/                        # Intake パイプラインのドメイン状態
+  backlog/intake/                # Intake パイプラインのドメイン状態
     inbox/ promoted/
-  learning/                      # Learning パイプラインのドメイン状態
+  backlog/learning/              # Learning パイプラインのドメイン状態
   backlog/req-units/RU-*.md      # Requirement Unit
   integrity/                     # 整合性検証レポート
 .opencode/                       # 実行時の配置先（ジャンクション → .agentdev-plugin/src/common/ + src/opencode/）
