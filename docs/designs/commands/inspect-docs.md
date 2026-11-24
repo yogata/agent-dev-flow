@@ -16,7 +16,7 @@ updated: "2026-11-21"
 
 ## 目的
 
-docs 全体（REQ/Decision/Design/guides）の意味整合性を診断し、検出事項を `.agentdev/inspect/inbox/` へ出力する。
+docs 全体（REQ/Decision/Design/guides）の意味整合性を診断し、検出事項を `.agentdev/backlog/inspect/inbox/` へ出力する。
 検査対象を直接修正しない診断専用コマンド。
 REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて Design、Decision、guides、README の意味診断を含む。
 
@@ -30,13 +30,13 @@ REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて De
 
 ## 出力
 
-- 診断結果（セッション内テキスト出力 + `.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md`）
+- 診断結果（セッション内テキスト出力 + `.agentdev/backlog/inspect/inbox/inspect-docs-finding-{timestamp}.md`）
 - 検出事項リスト（観点、対象、根拠、source-of-truth 判定、推奨 route）
 
 ## 副作用
 
-- ファイル作成: `.agentdev/inspect/inbox/inspect-docs-finding-*.md` のみ（診断専用の例外許可）
-- git commit/push: `.agentdev/inspect/` 配下のみ（commit message: `chore(agentdev): capture inspect-docs finding`）
+- ファイル作成: `.agentdev/backlog/inspect/inbox/inspect-docs-finding-*.md` のみ（診断専用の例外許可）
+- git commit/push: `.agentdev/backlog/inspect/` 配下のみ（commit message: `chore(agentdev): capture inspect-docs finding`）
 - 実行前同期: `git pull --ff-only`
 - 検査対象（docs/, .opencode/）のファイル変更: 禁止
 - GitHub Issue/PR 作成、更新: 禁止
@@ -61,12 +61,12 @@ REQ structure review（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）に加えて De
 - 配布物整合性検査。配布物（`src/common/commands/agentdev/`、`src/common/skills/agentdev-*/`）について、`docs/designs/integrity/docs-spec-rebuild-integrity.md` が定義する検査パターンに従い、構文健全性（frontmatter 重複、見出し重複、Markdown 構文破損）、文意保持（壊れた括弧、壊れた参照表現、主語/目的語欠落文）、責務整合（command 本体と Design 間の責務説明照合、case-open/run/close/auto の責務境界一致）を診断する（`agentdev-req-structure-diagnostics` 参照）
 - docs-check route 判定（意味的疑いのうち機械的検査に落とせるものを docs-check ルール／検査データ候補として提示）
 
-意味診断系の段階（REQ 参照 ID 整合性確認から文書分類一貫性検査までの、Workflow Skill の工程定義において STEP-2 に属する意味診断・構造診断群）は、範囲が重複しない診断担当への並列委譲で実行できる。各診断担当は読取専用で候補・file:line 形式の根拠・正規情報源・不確実性を親へ返し、親が fan-in して横断矛盾判定・候補の重複排除・6観点の網羅確認を行う。配布物整合性検査は並列化の対象外とし、STEP-2 完了後の後続工程（Workflow Skill の工程定義において STEP-3 に相当）で従来どおり実行して結果品質を維持する。委譲は同期方式（同期委譲で完了できる単位）または非同期方式（子の完了まで親の実行コンテキストを維持）を選択し、失敗した診断担当のみを識別して再実行または取得済みの結果から回収する。finding の生成と .agentdev/inspect/ 配下の git 永続化は親の単一 writer のまま維持する。担当分割、同期/非同期の選択基準、fan-in と再実行の詳細な実行手順は Workflow Skill（agentdev-workflow-inspect-docs）が正規情報源であり、本 Design は複製しない。
+意味診断系の段階（REQ 参照 ID 整合性確認から文書分類一貫性検査までの、Workflow Skill の工程定義において STEP-2 に属する意味診断・構造診断群）は、範囲が重複しない診断担当への並列委譲で実行できる。各診断担当は読取専用で候補・file:line 形式の根拠・正規情報源・不確実性を親へ返し、親が fan-in して横断矛盾判定・候補の重複排除・6観点の網羅確認を行う。配布物整合性検査は並列化の対象外とし、STEP-2 完了後の後続工程（Workflow Skill の工程定義において STEP-3 に相当）で従来どおり実行して結果品質を維持する。委譲は同期方式（同期委譲で完了できる単位）または非同期方式（子の完了まで親の実行コンテキストを維持）を選択し、失敗した診断担当のみを識別して再実行または取得済みの結果から回収する。finding の生成と .agentdev/backlog/inspect/ 配下の git 永続化は親の単一 writer のまま維持する。担当分割、同期/非同期の選択基準、fan-in と再実行の詳細な実行手順は Workflow Skill（agentdev-workflow-inspect-docs）が正規情報源であり、本 Design は複製しない。
 
 - 未処理 artifact 確認（`agentdev-req-structure-diagnostics`）
-- 検出事項出力（`.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md`）。source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides
+- 検出事項出力（`.agentdev/backlog/inspect/inbox/inspect-docs-finding-{timestamp}.md`）。source-of-truth priority: 現行 REQ > 承認済み Decision > Design > guides
 - 実行前同期（`git pull --ff-only`、失敗時は git-error-messages template で停止）
-- `.agentdev/inspect/` 変更の commit と push（変更なし時は commit/push せず「変更なし」報告、変更あり時は `.agentdev/inspect/` のみ `git add`、commit、push、push 失敗時は停止）
+- `.agentdev/backlog/inspect/` 変更の commit と push（変更なし時は commit/push せず「変更なし」報告、変更あり時は `.agentdev/backlog/inspect/` のみ `git add`、commit、push、push 失敗時は停止）
 - 完了報告
 
 ## 所有関係と委譲
@@ -92,7 +92,7 @@ agentdev-traceability の coverage, impact, check を一般文書探索、構造
 
 ## 対象外
 
-- ファイル変更、作成、削除（`.agentdev/inspect/inbox/inspect-docs-finding-*.md` 生成は例外）
+- ファイル変更、作成、削除（`.agentdev/backlog/inspect/inbox/inspect-docs-finding-*.md` 生成は例外）
 - GitHub Issue/PR 作成、更新
 - worktree/ブランチ作成
 - intake/learning/RU 処理
@@ -115,7 +115,7 @@ agentdev-traceability の coverage, impact, check を一般文書探索、構造
 ## 停止状態
 
 - 実行前同期（`git pull --ff-only`）失敗時（エラーを報告して停止する）。
-- `.agentdev/inspect/` 変更の push 失敗時（停止して報告する）。
+- `.agentdev/backlog/inspect/` 変更の push 失敗時（停止して報告する）。
 - スキャン対象ディレクトリ不存在、ファイル読込失敗は停止条件としない（「エラー処理」のとおり空扱い、スキップ継続）。
 
 ## See Also

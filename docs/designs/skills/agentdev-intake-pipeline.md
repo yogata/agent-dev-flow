@@ -56,7 +56,7 @@ Command→Skill 依存方向（[artifact-contracts.md](../responsibilities/artif
 #### 本操作の責務（呼出元に対する提供）
 
 - 実観測ベースで intake 該当分を判定する（[capture-boundaries.md](../workflows/capture-boundaries.md) Split Rule 準拠）
-- `.agentdev/intake/inbox/*.md` へ intake item を生成、保存する。REQ 再構成 intake は `.agentdev/intake/inbox/req-restructure/` 配下へ配置する（REQ-037）
+- `.agentdev/backlog/intake/inbox/*.md` へ intake item を生成、保存する。REQ 再構成 intake は `.agentdev/backlog/intake/inbox/req-restructure/` 配下へ配置する（REQ-037）
 - Split Rule に基づき learning 該当分を `agentdev-learning-capture` skill へ分割指示する（混在させない）
 
 #### 呼出元 command の責務（本操作が委譲しないもの）
@@ -85,7 +85,7 @@ Command→Skill 依存方向（[artifact-contracts.md](../responsibilities/artif
 
 - 抽出と promote の双方のロジックを提供
 - RU 生成は backlog-review に委譲
-- intake 系コマンドは `.agentdev/intake/` 更新前後に git 永続化を実行（REQ-037）
+- intake 系コマンドは `.agentdev/backlog/intake/` 更新前後に git 永続化を実行（REQ-037）
 
 ## 対象外
 
@@ -98,7 +98,7 @@ Command→Skill 依存方向（[artifact-contracts.md](../responsibilities/artif
 
 - 抽出ロジックの正確性（クローズ済み Issue/PR のみ対象）
 - 分類基準の適合性
-- 振り分け先の正確性（`.agentdev/intake/promoted/`）および inbox ファイル削除の検証
+- 振り分け先の正確性（`.agentdev/backlog/intake/promoted/`）および inbox ファイル削除の検証
 
 ## See Also
 

@@ -10,7 +10,7 @@ updated: 2026-11-18
 
 ## 目的
 
-エージェントが自律的に検知、回避、修正した問題から学びを抽出し、ユーザー承認なしで `.agentdev/learning/inbox/` に蓄積する。
+エージェントが自律的に検知、回避、修正した問題から学びを抽出し、ユーザー承認なしで `.agentdev/backlog/learning/inbox/` に蓄積する。
 
 ## 適用対象
 
@@ -20,9 +20,9 @@ updated: 2026-11-18
 ## 提供する判断、操作
 
 - 自律的検知、抽出
-- 1トピック1ファイル形式での learning item 生成: 保存先は .agentdev/learning/inbox/YYYY-MM-DD-<slug>.md
+- 1トピック1ファイル形式での learning item 生成: 保存先は .agentdev/backlog/learning/inbox/YYYY-MM-DD-<slug>.md
   （命名規則と YAML Frontmatter スキーマ〔id: learn-YYYYMMDD-<slug>、created_at: YYYY-MM-DD、source、
-  status: inbox〕は .agentdev/intake/inbox/ と同一構造とする）。ファイル本文は13フィールド形式
+  status: inbox〕は .agentdev/backlog/intake/inbox/ と同一構造とする）。ファイル本文は13フィールド形式
   （問題事象、発生局面、検知方法、根本原因、自律対応内容、ユーザー確認有無、Decision/REQ/spec 影響、
   横展開観点、再発条件、予防策候補、想定反映先、関連、タグ）を保持する
 - Split Rule（learning vs intake 分離）

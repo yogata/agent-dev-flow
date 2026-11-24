@@ -97,6 +97,7 @@ verification:
     - REQ-009-053
     - REQ-030-032
     - REQ-117-010
+    - REQ-126-006
   src/common/skills/agentdev-workflow-case-close/scripts/tests/close_mechanical_steps.test.ts:
     - REQ-029-014
     - REQ-029-015
@@ -115,6 +116,7 @@ verification:
     - REQ-032-043
     - REQ-032-044
     - REQ-032-046
+    - REQ-126-006
   src/common/skills/agentdev-workflow-case-close/scripts/tests/final-acceptance.test.ts:
     - REQ-032-031
     - REQ-032-032

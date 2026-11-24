@@ -84,7 +84,7 @@ function digestTree(root: string): Map<string, string> {
 /**
  * Minimal consumer fixture mirroring the multi-host canonical layout:
  *   <root>/.git                                      (present unless zipCheckout)
- *   <root>/.agentdev-plugin/src/common/{commands/agentdev,skills/...,tools/...}
+ *   <root>/.agentdev-plugin/src/common/{VERSION,commands/agentdev,skills/...,tools/...}
  *   <root>/.agentdev-plugin/src/opencode/plugins/...  (OpenCode host connection)
  *   <root>/.agentdev-plugin/src/senpi/                (Senpi host connection: placement contract)
  *   <root>/.agentdev-plugin/src/common/tools/agentdev-gh/local  (localSource only)
@@ -95,6 +95,7 @@ function makeConsumerRepo(zipCheckout: boolean, localSource = false): string {
   fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "common", "commands", "agentdev"), { recursive: true });
   fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "common", "skills", "agentdev-workflow-case-run"), { recursive: true });
   fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "common", "tools", "agentdev-gh"), { recursive: true });
+  fs.copyFileSync(path.join(REPO_ROOT, "src", "common", "VERSION"), path.join(root, ".agentdev-plugin", "src", "common", "VERSION"));
   fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode", "plugins", "agentdev-gh-write-guard"), { recursive: true });
   fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode", "plugins", "agentdev-gh-tool"), { recursive: true });
   fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "senpi", "connection-demo"), { recursive: true });
@@ -537,6 +538,67 @@ describe("scripts behavior / LocalMode runner selection missing-environment case
       expect(parsed.failure.kind).toBe("config-uninterpretable");
       expect(parsed.failure.detail).toContain("must not silently fall back to the GitHub implementation");
       expect(result.metadata?.ok).toBe(false);
+    } finally {
+      rmrf(root);
+    }
+  }, 120000);
+});
+
+// --- Distribution version state (REQ-126-003) ---
+describe("scripts behavior / distribution version state (REQ-126-003)", () => {
+  test("legacy structure remains: apply exits 0 with a warning and guidance without a record, and check exits 1 with guidance", () => {
+    const root = makeConsumerRepo(false);
+    try {
+      fs.mkdirSync(path.join(root, ".agentdev", "phase"), { recursive: true });
+
+      const apply = runInstall(root, "apply");
+      expect(apply.exitCode).toBe(0);
+      expect(apply.stdout + apply.stderr).toContain(
+        "[WARNING] Legacy structure traces detected: .agentdev\\phase; install state version record was not updated",
+      );
+      expect(apply.stdout + apply.stderr).toContain("/agentdev/migrate");
+      expect(fs.existsSync(path.join(root, ".agentdev", "install-state.json"))).toBe(false);
+
+      const check = runInstall(root, "check");
+      expect(check.exitCode).toBe(1);
+      expect(check.stdout + check.stderr).toContain("/agentdev/migrate");
+    } finally {
+      rmrf(root);
+    }
+  }, 120000);
+
+  test("canonical structure: apply records the distribution version and check exits 0", () => {
+    const root = makeConsumerRepo(false);
+    try {
+      const apply = runInstall(root, "apply");
+      expect(apply.exitCode).toBe(0);
+      const recordPath = path.join(root, ".agentdev", "install-state.json");
+      const record = JSON.parse(fs.readFileSync(recordPath, "utf-8")) as { distributionVersion: string };
+      expect(record.distributionVersion).toBe(
+        fs.readFileSync(path.join(root, ".agentdev-plugin", "src", "common", "VERSION"), "utf-8").trim(),
+      );
+
+      const check = runInstall(root, "check");
+      expect(check.exitCode).toBe(0);
+    } finally {
+      rmrf(root);
+    }
+  }, 120000);
+
+  test("recorded version shifted: check exits 1 with the version divergence and guidance", () => {
+    const root = makeConsumerRepo(false);
+    try {
+      const apply = runInstall(root, "apply");
+      expect(apply.exitCode).toBe(0);
+      const recordPath = path.join(root, ".agentdev", "install-state.json");
+      const record = JSON.parse(fs.readFileSync(recordPath, "utf-8")) as { distributionVersion: string };
+      record.distributionVersion = "0.0.0-shifted";
+      fs.writeFileSync(recordPath, JSON.stringify(record), "utf-8");
+
+      const check = runInstall(root, "check");
+      expect(check.exitCode).toBe(1);
+      expect(check.stdout + check.stderr).toContain("[DIVERGENCE] Install state version divergence");
+      expect(check.stdout + check.stderr).toContain("/agentdev/migrate");
     } finally {
       rmrf(root);
     }

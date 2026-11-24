@@ -79,12 +79,12 @@ Learning と Observation は無条件に REQ へ昇格しない（operating-mode
 
 | 実ディレクトリ・ファイル | durable state 5 分類 | 8 寿命 |
 |---|---|---|
-| .agentdev/intake/inbox/ | repo 内正規状態 | 未評価 Observation |
-| .agentdev/intake/promoted/ | repo 内正規状態 | 未評価 Observation（採用済み・RU 化待ち） |
-| .agentdev/learning/inbox/ | repo 内正規状態 | 未評価 Observation |
-| .agentdev/learning/promoted/ | repo 内正規状態 | 未評価 Observation（採用済み） |
-| .agentdev/learning/deferred/ | repo 内正規状態 | 未評価 Observation（living pool） |
-| .agentdev/inspect*/promoted/ | repo 内正規状態 | 未評価 Observation（採用済み） |
+| .agentdev/backlog/intake/inbox/ | repo 内正規状態 | 未評価 Observation |
+| .agentdev/backlog/intake/promoted/ | repo 内正規状態 | 未評価 Observation（採用済み・RU 化待ち） |
+| .agentdev/backlog/learning/inbox/ | repo 内正規状態 | 未評価 Observation |
+| .agentdev/backlog/learning/promoted/ | repo 内正規状態 | 未評価 Observation（採用済み） |
+| .agentdev/backlog/learning/deferred/ | repo 内正規状態 | 未評価 Observation（living pool） |
+| .agentdev/backlog/inspect/promoted/ | repo 内正規状態 | 未評価 Observation（採用済み） |
 | .agentdev/backlog/req-units/ | repo 内正規状態 | Change/Case lifetime（要件化後は Requirement lifetime） |
 
 ## ループ図の読み方

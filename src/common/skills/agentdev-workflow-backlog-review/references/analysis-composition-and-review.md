@@ -30,7 +30,7 @@
 
 1. `git pull --ff-only` を実行する。失敗時は構造化エラーメッセージを表示して停止する（`agentdev-git-worktree` と同一のエラー形式。自動解消しない）
 2. 引数の有無に応じて対象を切り替える。
-引数なしの場合は三ディレクトリ（`.agentdev/intake/promoted/*.md`、`.agentdev/learning/promoted/*.md`、`.agentdev/inspect/promoted/*.md`）から採用済み成果物を検出する。
+引数なしの場合は三ディレクトリ（`.agentdev/backlog/intake/promoted/*.md`、`.agentdev/backlog/learning/promoted/*.md`、`.agentdev/backlog/inspect/promoted/*.md`）から採用済み成果物を検出する。
 引数ありの場合は指定されたファイルパスのみを対象とし、存在しないパスはエラー報告してスキップする
 3. 検出結果を判定する。
 0件の場合は正常終了とする（エラー扱いとしない。完了報告で「対象なし」と報告）。

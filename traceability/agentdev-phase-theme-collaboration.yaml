@@ -24,7 +24,7 @@ implementation:
     - REQ-110-040
     - REQ-110-041
     - REQ-117-008
-  src/common/skills/agentdev-phase-theme-collaboration/templates/phase-readme.md:
+  src/common/skills/agentdev-phase-theme-collaboration/templates/project-readme.md:
     - REQ-106-016
     - REQ-111-025
     - REQ-111-026
@@ -117,4 +117,4 @@ links:
   upstream:
     src/common/skills/agentdev-phase-theme-collaboration/SKILL.md:
       - docs/designs/workflows/phase-driven-collaboration-model.md
-      - .agentdev/phase/README.md
+      - .agentdev/project/README.md

@@ -1,4 +1,4 @@
-<!-- ADF-COVERS(implementation): REQ-102-001, REQ-102-002, REQ-102-003, REQ-102-004 -->
+<!-- ADF-COVERS(implementation): REQ-102-001, REQ-102-002, REQ-102-003, REQ-102-004, REQ-126-001 -->
 # AGENTS.md
 
 AgentDevFlow を編集するエージェント向けのリポジトリガイドレール。
@@ -27,6 +27,7 @@ AgentDevFlow を編集するエージェント向けのリポジトリガイド�
 - 文書種別の配置基準と用語政策（英字許容リスト、訳語表）は `docs/designs/responsibilities/document-type-responsibilities.md` を参照する。
 - req-define に構造化された要件が渡された場合は別エージェントでの使用を想定し、AskUserQuestion を使用せずに質問する。
 - 本リポジトリは AgentDevFlow プラグインを管理する。
+- 構成移行は版別差分仕様と最新の正規構造に基づく `/agentdev/migrate` による推論移行と決定論的検証に限る。install.ps1 と通常コマンドには移行処理や互換シムを持たせない。
 
 ## Windows 環境のファイル入出力規律
 

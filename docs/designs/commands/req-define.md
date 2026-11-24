@@ -42,8 +42,8 @@ updated: "2026-11-21"
 - 外部課題（外部課題管理システムのチケット、障害報告書等）
 - ユーザーが明示した入力ファイル: 設計メモ、調査メモ、RU（`.agentdev/backlog/req-units/RU-*.md`）。全て参照専用入力
 - Definition 保存（case-ready / case-revise の内部責務）の SPLIT 検出時の検出事項（`.agentdev/drafts/requirements-review-finding-{topic-slug}.md`）
-- inspect-skills 診断結果の検出事項（`.agentdev/inspect/inbox/inspect-skills-finding-{topic-slug}.md`）。参照専用入力
-- promoted 直読み禁止: `.agentdev/intake/promoted/`、`.agentdev/learning/promoted/` は直接読み込まない
+- inspect-skills 診断結果の検出事項（`.agentdev/backlog/inspect/inbox/inspect-skills-finding-{topic-slug}.md`）。参照専用入力
+- promoted 直読み禁止: `.agentdev/backlog/intake/promoted/`、`.agentdev/backlog/learning/promoted/` は直接読み込まない
 
 ## 出力
 

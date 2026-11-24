@@ -16,7 +16,7 @@ inbox 内の intake item を読み込み、評価し、暫定分類（採用/ �
 
 ### Input Resolution
 
-- `.agentdev/intake/inbox/` 内の intake item ファイル群（durable state 最優先。SSoT 再構成）
+- `.agentdev/backlog/intake/inbox/` 内の intake item ファイル群（durable state 最優先。SSoT 再構成）
 - inbox 確認、item 読込、Review 観点、分類提示形式の判定基準は `agentdev-intake-pipeline` の公開操作契約に従う
 
 ### Preconditions
@@ -26,7 +26,7 @@ inbox 内の intake item を読み込み、評価し、暫定分類（採用/ �
 
 ### Procedure
 
-1. `.agentdev/intake/inbox/` 内のファイル一覧を取得し、item 数をカウントする。空の場合はその旨を報告して終了する（HITL を発生させない）
+1. `.agentdev/backlog/intake/inbox/` 内のファイル一覧を取得し、item 数をカウントする。空の場合はその旨を報告して終了する（HITL を発生させない）
 2. 各 intake item を読み込み、内容を把握する
 3. 各 item を Review 観点（観測内容の妥当性・重要性、影響、緊急度・優先度、既存要件との関連、対応方針、intake と learning の振り分け）で評価する
 4. 横断契約Design（extension 経由で解決）「HITL 判断確定原則」節（人間判断への引き上げ条件の完全な一覧と promote 系への適用）に照らし、各 item が取得可能な根拠から採用・保留・却下を正規契約からの導出または委譲された裁量の範囲で確定できるか（自律確定候補。intake 分類確定契約の自律確定と HITL 限定条項）、人間判断への引き上げ条件に該当しユーザー判断が必要かを判定する。モデルの自己申告による確信度や固定パーセンテージのみで可否を判定しない

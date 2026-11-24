@@ -10,7 +10,7 @@ AgentDevFlow コマンド群における Intake/ Learning キャプチャの責�
 具体的な修正対象が特定できる作業候補。
 
 - **性質**: 積み残し作業、バグ、設定不備、ドキュメント矛盾など、具体的なアクションアイテム
-- **保存先**: `.agentdev/intake/inbox/`（Intake ワークフロー経由のみ）
+- **保存先**: `.agentdev/backlog/intake/inbox/`（Intake ワークフロー経由のみ）
 - **後続ルート**: intake-promote workflow → backlog-review workflow → RU（backlog-auto が駆動）
 
 ### Learning 候補
@@ -18,7 +18,7 @@ AgentDevFlow コマンド群における Intake/ Learning キャプチャの責�
 再発防止に向けた知見、判断基準、運用ルール。
 
 - **性質**: 予防策、判断ミスの分析、手順漏レの気づきなど、汎用的な知見
-- **保存先**: `.agentdev/learning/inbox/`（learning-capture スキル経由のみ）
+- **保存先**: `.agentdev/backlog/learning/inbox/`（learning-capture スキル経由のみ）
 - **後続ルート**: learning-promote workflow → backlog-review workflow → RU（backlog-auto が駆動）
 
 ## 分割ルール（観測の分割）
@@ -80,9 +80,9 @@ AgentDevFlow コマンド群における Intake/ Learning キャプチャの責�
 
 | コマンド | キャプチャ関与 | 詳細 |
 |----------|-------------|------|
-| case-run | **記録のみ** | 本筋外の検出事項を PR 本文に記録。`.agentdev/intake/inbox/` と `.agentdev/learning/inbox/` の直接変更は禁止 |
+| case-run | **記録のみ** | 本筋外の検出事項を PR 本文に記録。`.agentdev/backlog/intake/inbox/` と `.agentdev/backlog/learning/inbox/` の直接変更は禁止 |
 | case-close | **回収、保存** | PR 本文から Intake/ Learning を分離回収。自身の実観測も分割ルールに基づいて保存。ユーザーに「学びがあるか」質問禁止 |
-| Definition 保存内部責務（case-ready / case-revise） | **原則非関与** | 通常はキャプチャを行わない。例外: REQ 再構成 Intake（`.agentdev/intake/inbox/req-restructure/**`）のみ生成可能 |
+| Definition 保存内部責務（case-ready / case-revise） | **原則非関与** | 通常はキャプチャを行わない。例外: REQ 再構成 Intake（`.agentdev/backlog/intake/inbox/req-restructure/**`）のみ生成可能 |
 | case-open | **非関与** | Intake/ Learning キャプチャを行わない |
 | case-auto | **委譲** | 構成コマンド（case-run/ case-close）の責務境界に従う。case-auto 固有のキャプチャ振る舞いは持たない |
 
@@ -93,7 +93,7 @@ subagent 委譲を実施する agentdev command（case-auto、case-open、case-r
 
 - **対象**: subagent 委譲する全場面。特定 command に限定しない
 - **必須記載項目**（キャプチャ境界に関わるもの）:
-  - `.agentdev/intake/`、`.agentdev/learning/` の直接変更の禁止（case-run/ case-close 責務外の command も含む）
+  - `.agentdev/backlog/intake/`、`.agentdev/backlog/learning/` の直接変更の禁止（case-run/ case-close 責務外の command も含む）
   - 当該 command 責務外のファイル作成、 REQ/ Design/ src の直接修正の禁止
   - capture 情報を一時会話コンテキスト、ローカル変数、中間ファイル経由で引き継ぐことの禁止（PR 本文経由のみ許可）
 - **由来**: Issue #1538 で case-open を `category=writing` で委譲した際、MUST NOT DO が未明示で subagent が `.agentdev/drafts/` 配下へ draft を作成した事象

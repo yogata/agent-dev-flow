@@ -1,16 +1,16 @@
 component: agentdev-phase-domain-state
 implementation:
-  .agentdev/phase/README.md:
+  .agentdev/project/README.md:
     - REQ-110-010
     - REQ-110-013
     - REQ-110-014
     - REQ-110-040
-  .agentdev/phase/identity.yaml:
+  .agentdev/project/identity.yaml:
     - REQ-110-001
-  .agentdev/phase/themes.md:
+  .agentdev/project/themes.md:
     - REQ-110-004
     - REQ-110-014
-  .agentdev/phase/pending.md:
+  .agentdev/project/issue-log.md:
     - REQ-110-004
   .agentdev/README.md:
     - REQ-110-001
@@ -20,6 +20,7 @@ implementation:
     - REQ-110-014
     - REQ-111-013
     - REQ-111-034
+    - REQ-126-004
 verification:
   src/common/skills/repo-agentdev-integrity/scripts/tests/phase_domain_state.test.ts:
     - REQ-110-001
@@ -27,13 +28,14 @@ verification:
     - REQ-110-010
     - REQ-110-013
     - REQ-110-014
+    - REQ-126-005
 links:
   upstream:
-    .agentdev/phase/README.md:
+    .agentdev/project/README.md:
       - docs/designs/workflows/phase-driven-collaboration-model.md
-    .agentdev/phase/identity.yaml:
+    .agentdev/project/identity.yaml:
       - docs/designs/workflows/phase-driven-collaboration-model.md
-    .agentdev/phase/themes.md:
+    .agentdev/project/themes.md:
       - docs/designs/workflows/phase-driven-collaboration-model.md
-    .agentdev/phase/pending.md:
+    .agentdev/project/issue-log.md:
       - docs/designs/workflows/phase-driven-collaboration-model.md

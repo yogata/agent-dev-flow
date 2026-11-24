@@ -282,6 +282,12 @@ cd .agentdev-plugin && git pull && cd ..
 
 apply は冪等であり、再実行で不要な登録を増やさない。`-Hosts` を省略した更新では現在の配置対象が維持されるため、既存環境の通常更新で配置対象が勝手に変わることはない。片方のホスト投影の更新・除去は、他ホスト投影・repo-local 資産（third-party Skill 配置、`.agentdev/extensions/**`）・ユーザー設定（AGENTS.md 等）に影響しない（REQ-099-012）。
 
+### 版記録と構成移行
+
+install.ps1 apply 完了時、配布版（チェックアウトの `src/common/VERSION` の値）が `.agentdev/install-state.json` に記録される。check は記録版と配布版の比較、旧構造痕跡の検知を行い、不一致や旧痕跡を検知した場合は `/agentdev/migrate` を案内する。
+
+構成移行（旧配置から正規構造への移行）は `/agentdev/migrate` が単独所有する。install.ps1 と通常コマンドは移行処理を持たず、検知と案内のみを行う。移行は `/agentdev/migrate` を実行し、検知結果から移行対象を解決して行う。
+
 ### 直接コピーによるインストール（非推奨）
 
 - 初回は手動コピーで動作するが、AgentDevFlow 更新時に再コピーが必要

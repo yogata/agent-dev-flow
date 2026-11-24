@@ -15,7 +15,7 @@
  *   同一区分の複数回指定可。実行中の追加通知は新たな影響の判明ごとに複数回あり得る）
  * - 様式違反・語彙外・空参照は非ゼロ終了（fail-closed。確定しない）
  * - 本 CLI は改訂実行記録の保存を行わない（stdout への JSON 出力のみ）。
- *   保存先は `.agentdev/phase/revisions/`（1改訂1ファイル）であり、
+ *   保存先は `.agentdev/project/change-log/`（1改訂1ファイル）であり、
  *   保存先への書込みは保存する操作（成果物反映 Workflow Skill）の責務である
  */
 import { readFile } from "node:fs/promises";

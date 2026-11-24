@@ -17,7 +17,7 @@ links:
       - docs/designs/integrity/rules/IR-056-project-extensions-integrity.md
     src/common/skills/agentdev-phase-theme-collaboration/scripts/README.md:
       - docs/requirements/REQ-060.md
-      - .agentdev/phase/themes.md
+      - .agentdev/project/themes.md
     src/common/skills/agentdev-workflow-case-auto/SKILL.md:
       - docs/requirements/REQ-108.md
     src/common/skills/agentdev-workflow-case-open/references/definition-pr-and-idempotency.md:

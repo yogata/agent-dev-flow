@@ -50,7 +50,7 @@ REQ 固有診断（`agentdev-req-structure-diagnostics`）、Command/Skill 診�
 
 - docs 横断診断カテゴリの定義（廃止 REQ/Design 由来記述残置、REQ/Design 境界違反、REQ 粒度過小 等）
 - 診断判定規則と証拠構造
-- 共通 finding 出力契約（`.agentdev/inspect/inbox/*.md`、severity 分類、信頼度）
+- 共通 finding 出力契約（`.agentdev/backlog/inspect/inbox/*.md`、severity 分類、信頼度）
 - 文書種別別診断へのルーティング表
 - inspect-docs command への診断カテゴリ、証拠、finding 形式の提供
 
@@ -74,7 +74,7 @@ inspect-docs の診断観点は正規の観点レジストリが所有する（�
 - inspect-docs command は診断の実行と finding 出力を担い、診断カテゴリ、証拠構造、出力契約、ルーティングは本 skill が一次所有する（REQ-039-004）
 - REQ 固有診断（SPLIT/MERGE/MOVE/DUPLICATE/RETIRE/DRIFT）は `agentdev-req-structure-diagnostics`、Command/Skill 診断は `agentdev-inspect-skills`、文章表層検査は `agentdev-textlint-guard` が担う。探索・導線は README 索引と独立探索手段（正規成果物の直接読取、`rg` 等）が担う（廃止済み探索順スキルの後継構成）
 - 本 skill は横断編成と結果統合のみを所有し、専門診断の再定義を行わない
-- 診断対象は読み取り専用とし、許可される副作用は `.agentdev/inspect/inbox/*.md` の生成と `.agentdev/inspect/` 配下の git 永続化（commit / push）のみ（REQ-036-012-151、inspect lifecycle 準拠）
+- 診断対象は読み取り専用とし、許可される副作用は `.agentdev/backlog/inspect/inbox/*.md` の生成と `.agentdev/backlog/inspect/` 配下の git 永続化（commit / push）のみ（REQ-036-012-151、inspect lifecycle 準拠）
 
 ## 境界
 
@@ -94,7 +94,7 @@ docs 横断診断は本 skill が正規の所有者となる（REQ-036-013 の d
 - 診断カテゴリ定義の完全性（廃止 REQ/Design 由来記述残置、REQ/Design 境界違反 等）
 - 共通証拠構造と finding 出力契約の適合性
 - 文書種別別診断へのルーティング精度
-- 読み取り専用制約の遵守（許可副作用は `.agentdev/inspect/inbox/*.md` 生成と git 永続化のみ）
+- 読み取り専用制約の遵守（許可副作用は `.agentdev/backlog/inspect/inbox/*.md` 生成と git 永続化のみ）
 - 既存専門診断 skill との責務重複なし
 
 ## Design 状態乖離 DRIFT 診断観点

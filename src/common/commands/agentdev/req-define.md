@@ -19,8 +19,8 @@ Case 確立後の Definition 変更も本コマンドで再合意し、再合意
 - **工程駆動で形成した成果物への後続変更**: 工程駆動経路で形成・反映済みの正規成果物（canonical REQ/Decision/Design）への後続変更要求。工程駆動の操作や遷移を前置必須とせず、本コマンドから直接受理する（canonical 成果物が入力の正。参照専用入力）
 - **ユーザーが明示した入力ファイル**: 設計メモ、調査メモ、RU（`.agentdev/backlog/req-units/RU-*.md`）等。全て参照専用入力
 - Definition 保存内部責務の SPLIT 検出時の検出事項（`.agentdev/drafts/requirements-review-finding-{topic-slug}.md`）
-- inspect-skills 診断結果の検出事項（`.agentdev/inspect/inbox/inspect-skills-finding-{topic-slug}.md`）。参照専用入力として扱い、未確認事項・採否未確定事項は要件本文と分離する（inspect ライフサイクルに従う）
-- **promoted の参照経路**: `.agentdev/intake/promoted/` 及び `.agentdev/learning/promoted/` は backlog-review による RU 化を経由して参照する
+- inspect-skills 診断結果の検出事項（`.agentdev/backlog/inspect/inbox/inspect-skills-finding-{topic-slug}.md`）。参照専用入力として扱い、未確認事項・採否未確定事項は要件本文と分離する（inspect ライフサイクルに従う）
+- **promoted の参照経路**: `.agentdev/backlog/intake/promoted/` 及び `.agentdev/backlog/learning/promoted/` は backlog-review による RU 化を経由して参照する
 
 ## 出力
 

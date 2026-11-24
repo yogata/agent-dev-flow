@@ -1,7 +1,7 @@
-// ADF-COVERS(verification): REQ-110-001, REQ-110-004, REQ-110-010, REQ-110-013, REQ-110-014
+// ADF-COVERS(verification): REQ-110-001, REQ-110-004, REQ-110-010, REQ-110-013, REQ-110-014, REQ-126-005
 //
-// .agentdev/phase/ 工程駆動ドメイン状態領域の保存契約検証。
-// 実領域の構造（許可ファイル集合、identity フィールド、phase/README.md 契約の様式トークン）を
+// .agentdev/project/ 工程駆動ドメイン状態領域の保存契約検証。
+// 実領域の構造（許可ファイル集合、identity フィールド、project/README.md 契約の様式トークン）を
 // 実ファイル読み取りで突合し、テンポラリ複製上で identity の保存・別セッション復元、
 // テーマ正本からの一覧導出、未決事項の判断根拠追跡、受領情報からの知見再取得を動的に検証する。
 // 実領域への書込みは行わない（動的検証はテンポラリ複製上で実施する）。
@@ -11,18 +11,18 @@ import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, write
 import { join } from "node:path";
 
 const REPO_ROOT = join(import.meta.dir, "..", "..", "..", "..", "..", "..");
-const PHASE_DIR = join(REPO_ROOT, ".agentdev", "phase");
-const PHASE_README = join(PHASE_DIR, "README.md");
+const PROJECT_DIR = join(REPO_ROOT, ".agentdev", "project");
+const PROJECT_README = join(PROJECT_DIR, "README.md");
 const TEMP_BASE = join("C:", "WINDOWS", "TEMP", "opencode");
 const TEMP_ROOT = join(TEMP_BASE, `phase-domain-state-${crypto.randomUUID().slice(0, 8)}`);
 
-// 必須存在エントリと許可エントリ集合を分離する。adoptions/（直接採用の採否記録。
-// 1採用1ファイル）と transitions/（工程遷移の遷移記録）と revisions/（正規改訂の
+// 必須存在エントリと許可エントリ集合を分離する。decision-log/（直接採用の採否記録。
+// 1採用1ファイル）と phase-gates/（工程遷移の遷移記録）と change-log/（正規改訂の
 // 改訂記録。1改訂1ファイル）は初回保存時に実体化する domain state であり、
 // 不在を失敗にせず、実在する場合の許可集合に含める。
-const REQUIRED_PHASE_ENTRIES = new Set(["README.md", "identity.yaml", "themes.md", "pending.md", "received"]);
-const ALLOWED_PHASE_ENTRIES = new Set([...REQUIRED_PHASE_ENTRIES, "adoptions", "transitions", "revisions"]);
-const IDENTITY_FIELDS = ["undertaking", "target_version", "current_phase"] as const;
+const REQUIRED_PROJECT_ENTRIES = new Set(["README.md", "identity.yaml", "themes.md", "issue-log.md", "received"]);
+const ALLOWED_PROJECT_ENTRIES = new Set([...REQUIRED_PROJECT_ENTRIES, "decision-log", "phase-gates", "change-log"]);
+const IDENTITY_FIELDS = ["project", "target_version", "current_phase"] as const;
 
 interface ThemeEntry {
   id: string;
@@ -78,7 +78,7 @@ function parsePendingEntries(content: string): Array<Record<string, string>> {
   return entries;
 }
 
-describe("phase domain state 領域の保存契約", () => {
+describe("project domain state 領域の保存契約", () => {
   beforeAll(() => {
     mkdirSync(join(TEMP_ROOT, "received"), { recursive: true });
   });
@@ -88,52 +88,52 @@ describe("phase domain state 領域の保存契約", () => {
   });
 
   it("実領域が許可ファイル集合のみで構成される（一覧・閲覧像の恒久保存ファイルが存在しない）", () => {
-    expect(existsSync(PHASE_DIR)).toBe(true);
-    for (const required of REQUIRED_PHASE_ENTRIES) {
-      expect(existsSync(join(PHASE_DIR, required))).toBe(true);
+    expect(existsSync(PROJECT_DIR)).toBe(true);
+    for (const required of REQUIRED_PROJECT_ENTRIES) {
+      expect(existsSync(join(PROJECT_DIR, required))).toBe(true);
     }
-    const entries = readdirSync(PHASE_DIR).filter((entry) => entry !== "received");
+    const entries = readdirSync(PROJECT_DIR).filter((entry) => entry !== "received");
     for (const entry of entries) {
-      expect(ALLOWED_PHASE_ENTRIES.has(entry)).toBe(true);
+      expect(ALLOWED_PROJECT_ENTRIES.has(entry)).toBe(true);
     }
   });
 
-  it("revisions/（改訂記録）が実体化しても許可集合検査に合格する", () => {
-    // 領域契約（phase/README.md「revisions/ の様式」・revision-record.ts の保存先）に沿った
+  it("change-log/（改訂記録）が実体化しても許可集合検査に合格する", () => {
+    // 領域契約（project/README.md「change-log/ の様式」・revision-record.ts の保存先）に沿った
     // 保存が最初の改訂記録作成時に試験不合格にならないことを、テンポラリ複製で検証する。
-    const replica = join(TEMP_ROOT, "phase-replica-with-revisions");
+    const replica = join(TEMP_ROOT, "project-replica-with-change-log");
     rmSync(replica, { recursive: true, force: true });
     mkdirSync(join(replica, "received"), { recursive: true });
-    for (const required of REQUIRED_PHASE_ENTRIES) {
+    for (const required of REQUIRED_PROJECT_ENTRIES) {
       if (required === "received") continue;
       writeFileSync(join(replica, required), "");
     }
-    mkdirSync(join(replica, "revisions"));
-    writeFileSync(join(replica, "revisions", "2026-11-10-rev-1.md"), "# 改訂記録（様式は README 契約）");
+    mkdirSync(join(replica, "change-log"));
+    writeFileSync(join(replica, "change-log", "2026-11-10-rev-1.md"), "# 改訂記録（様式は README 契約）");
     const entries = readdirSync(replica).filter((entry) => entry !== "received");
     for (const entry of entries) {
-      expect(ALLOWED_PHASE_ENTRIES.has(entry)).toBe(true);
+      expect(ALLOWED_PROJECT_ENTRIES.has(entry)).toBe(true);
     }
-    expect(entries).toContain("revisions");
+    expect(entries).toContain("change-log");
     rmSync(replica, { recursive: true, force: true });
   });
 
   it("identity.yaml が取組・対象版・現在工程の3フィールドを持つ", () => {
-    const identity = parseIdentityYaml(readFileSync(join(PHASE_DIR, "identity.yaml"), "utf-8"));
+    const identity = parseIdentityYaml(readFileSync(join(PROJECT_DIR, "identity.yaml"), "utf-8"));
     for (const field of IDENTITY_FIELDS) {
       expect(field in identity).toBe(true);
     }
   });
 
   it("実領域の初期 identity が未設定の空値である", () => {
-    const identity = parseIdentityYaml(readFileSync(join(PHASE_DIR, "identity.yaml"), "utf-8"));
+    const identity = parseIdentityYaml(readFileSync(join(PROJECT_DIR, "identity.yaml"), "utf-8"));
     for (const field of IDENTITY_FIELDS) {
       expect(identity[field]).toBe("");
     }
   });
 
-  it("phase/README.md 契約が様式トークンを保持する", () => {
-    const readme = readFileSync(PHASE_README, "utf-8");
+  it("project/README.md 契約が様式トークンを保持する", () => {
+    const readme = readFileSync(PROJECT_README, "utf-8");
     expect(readme).toContain("## 導出規則");
     expect(readme).toContain("一覧を恒久保存する別ファイルを作らない");
     expect(readme).toContain("第二の正本として管理しない");
@@ -150,11 +150,11 @@ describe("phase domain state 領域の保存契約", () => {
 
   it("identity に確定値を保存し、別セッションの読み戻しで復元できる", () => {
     const tempIdentity = join(TEMP_ROOT, "identity.yaml");
-    cpSync(join(PHASE_DIR, "identity.yaml"), tempIdentity);
-    const settled = { undertaking: "T-UT", target_version: "v5.1.0", current_phase: "基本設計" };
+    cpSync(join(PROJECT_DIR, "identity.yaml"), tempIdentity);
+    const settled = { project: "T-UT", target_version: "v5.1.0", current_phase: "基本設計" };
     writeFileSync(tempIdentity, `${Object.entries(settled).map(([k, v]) => `${k}: "${v}"`).join("\n")}\n`, "utf-8");
     const restored = parseIdentityYaml(readFileSync(tempIdentity, "utf-8"));
-    expect(restored["undertaking"]).toBe(settled.undertaking);
+    expect(restored["project"]).toBe(settled.project);
     expect(restored["target_version"]).toBe(settled.target_version);
     expect(restored["current_phase"]).toBe(settled.current_phase);
   });
@@ -196,7 +196,7 @@ describe("phase domain state 領域の保存契約", () => {
   });
 
   it("未決事項の判断根拠が保存され、追跡できる", () => {
-    const tempPending = join(TEMP_ROOT, "pending.md");
+    const tempPending = join(TEMP_ROOT, "issue-log.md");
     writeFileSync(
       tempPending,
       [

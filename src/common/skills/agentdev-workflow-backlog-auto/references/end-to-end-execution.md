@@ -20,7 +20,7 @@
 
 ### 配置
 
-- set-state は `.agentdev/backlog-auto/end-to-end/<一式識別子>/set-state.json` に配置する
+- set-state は `.agentdev/backlog/runs/<一式識別子>/set-state.json` に配置する
 - `.agentdev/` 配下でありながら req-units と draft の配置外とする。ドラフト残存・RU 残存を検証するクリーンアップ検証ゲートの対象外である
 - 全体完了とリリース完了まで保持する。リリース完了後の削除可否は結果報告に記録する
 

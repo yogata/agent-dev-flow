@@ -222,7 +222,7 @@ describe("SKILL.md の一気通貫実行 pin", () => {
 
 describe("end-to-end-execution reference の手順 pin", () => {
   test("set-state 永続化契約が配置・形式要素表・単一書き手を定義している", () => {
-    expect(END_TO_END).toContain("set-state は `.agentdev/backlog-auto/end-to-end/<一式識別子>/set-state.json` に配置する");
+    expect(END_TO_END).toContain("set-state は `.agentdev/backlog/runs/<一式識別子>/set-state.json` に配置する");
     expect(END_TO_END).toContain("| 義務スナップショット |");
     expect(END_TO_END).toContain("| 対応表 | RU・要件doc・operation_unit・実行単位（Case Issue / Issue / Epic）の対応（統合・分割を含む）");
     expect(END_TO_END).toContain("| 基準点情報 | 実行開始時に確定した最後の正式リリース（版番号、タグ名、タグ対象コミット）と開始コミット ID |");

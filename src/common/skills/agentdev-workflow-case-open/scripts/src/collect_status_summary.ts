@@ -8,7 +8,7 @@
 //   bun scripts/src/collect_status_summary.ts \
 //     --sections git,files,issues \
 //     --files "README.md,src/common/skills/agentdev-workflow-case-open/SKILL.md" \
-//     --staleness ".agentdev/intake/inbox,.agentdev/learning/inbox" \
+//     --staleness ".agentdev/backlog/intake/inbox,.agentdev/backlog/learning/inbox" \
 //     --issues-args "issue list --state open --json number,title,updatedAt --limit 50" \
 //     [--root <dir>] [--limit 10] [--offset 0] [--max-bytes 15360] \
 //     [--jq sections.git.head_commit,sections.files.total]

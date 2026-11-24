@@ -6,13 +6,13 @@ agent: sisyphus
 
 # Repo Self-Audit: Docs Check
 
-agent-dev-flow リポジトリの自己監査コマンド。AgentDevFlow 管理下の artifact（REQ、Decision、skill、command、design）の整合性を検査し、結果をレポートとして出力する。検査対象 artifact を直接修正せず、許可出力は `.agentdev/integrity/reports/` のレポートと `.agentdev/intake/inbox/` の intake item のみ。
+agent-dev-flow リポジトリの自己監査コマンド。AgentDevFlow 管理下の artifact（REQ、Decision、skill、command、design）の整合性を検査し、結果をレポートとして出力する。検査対象 artifact を直接修正せず、許可出力は `.agentdev/integrity/reports/` のレポートと `.agentdev/backlog/intake/inbox/` の intake item のみ。
 
 > **Note**: このコマンドは repo-local であり、AgentDevFlow の配布対象外である。Consumer project では利用しない。
 
 ## 基本原則: 検査対象を直接修正しない制約
 
-検査対象 artifact を変更しない。許容する新規作成は `.agentdev/integrity/reports/` のレポート生成と `.agentdev/intake/inbox/` の intake item（実行＝保存承認、REQ-0108-225）。
+検査対象 artifact を変更しない。許容する新規作成は `.agentdev/integrity/reports/` のレポート生成と `.agentdev/backlog/intake/inbox/` の intake item（実行＝保存承認、REQ-0108-225）。
 
 ## 入力
 
@@ -21,7 +21,7 @@ agent-dev-flow リポジトリの自己監査コマンド。AgentDevFlow 管理�
 ## 出力
 
 - `.agentdev/integrity/reports/YYYY-MM-DD-integrity-report.md` — 検出結果レポート（非永続、commit/push対象外）
-- `.agentdev/intake/inbox/YYYY-MM-DD-{topic-slug}.md` — 通常 intake item（NG/WARNING finding から自動生成、0件以上）
+- `.agentdev/backlog/intake/inbox/YYYY-MM-DD-{topic-slug}.md` — 通常 intake item（NG/WARNING finding から自動生成、0件以上）
 
 ## workflow
 
@@ -31,8 +31,8 @@ agent-dev-flow リポジトリの自己監査コマンド。AgentDevFlow 管理�
 |---|---|---|---|
 | STEP-1 スクリプト実行 | なし（コマンド実行時に全 artifact を自動スキャン） | 検査スクリプト群の実行結果（exit code・検出結果） | 検査スクリプト群をすべて `bun run` 形式で起動・実行していること。strict failure を示す終了コード1は docs-check 全体の失敗として扱っていること |
 | STEP-2 レポート確認・Finding整理 | 検査スクリプト実行済み | 重複・誤検出・根拠を確認した整理済み finding 群 | report の NG/WARNING finding のみを対象とし（INFO は対象外、REQ-0108-224）、同一是正方針で統合可能かの判断を経ていること（REQ-0108-222。固定単位での機械的分割を行っていないこと） |
-| STEP-3 Intake Item 自動生成 | finding 整理済み | `.agentdev/intake/inbox/` へ保存された通常 intake item（0件以上） | intake item の通常形式（frontmatter・route・dedup keyなし）に従い、各 item が自己完結（非永続 report への参照なしで後続処理成立）であること。原因分類が確認済/仮説/不明で区別されていること（実行＝保存承認、REQ-0108-225。採否は intake-promote workflow へ委譲） |
-| STEP-4 Git 永続化（条件付き） | intake item 作成あり | commit・push（`.agentdev/intake/` 配下のみ） | intake item 作成時のみ commit/push を行い、`git add` が `.agentdev/intake/` 配下に限定されていること（integrity report は commit 対象外、REQ-0108-229） |
+| STEP-3 Intake Item 自動生成 | finding 整理済み | `.agentdev/backlog/intake/inbox/` へ保存された通常 intake item（0件以上） | intake item の通常形式（frontmatter・route・dedup keyなし）に従い、各 item が自己完結（非永続 report への参照なしで後続処理成立）であること。原因分類が確認済/仮説/不明で区別されていること（実行＝保存承認、REQ-0108-225。採否は intake-promote workflow へ委譲） |
+| STEP-4 Git 永続化（条件付き） | intake item 作成あり | commit・push（`.agentdev/backlog/intake/` 配下のみ） | intake item 作成時のみ commit/push を行い、`git add` が `.agentdev/backlog/intake/` 配下に限定されていること（integrity report は commit 対象外、REQ-0108-229） |
 | STEP-5 完了報告 | 永続化処理済み（intake item 未作成時は STEP-3 で 0 件確認済み） | 完了報告 | 完了報告 template（.opencode/commands/repo/templates/docs-check/standard.md）に従って出力していること |
 
 **STEP-1 検査スクリプト群の実行詳細**:
@@ -48,7 +48,7 @@ agent-dev-flow リポジトリの自己監査コマンド。AgentDevFlow 管理�
 ## ガードレール
 
 - 検査対象 artifact を変更しない。レポート・intake item の新規作成のみ許容
-- `git` コマンドは intake item 作成時にのみ `.agentdev/intake/` 配下に限定
+- `git` コマンドは intake item 作成時にのみ `.agentdev/backlog/intake/` 配下に限定
 - finding は intake 対象（原則）。learning item の直接作成は行わない（MUST NOT）
 - finding 分類・ルートを付与すること（REQ-0101）
 - intake item は NG/WARNING finding から自動生成する。実行＝保存承認（REQ-0108-225）。採否は intake-promote に委譲（REQ-0108-226）。learning/RU/REQ の直接生成禁止（MUST NOT、REQ-0108-227）

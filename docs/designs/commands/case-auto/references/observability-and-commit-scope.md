@@ -53,7 +53,7 @@ Phase 0 の枝PR に含まれるコミット構成運用を規定する。
 
 - 永続性の違い: 成果物は配布対象の永続状態、ドメイン state はケース固有の一時状態。同一コミットに混在すると revert、cherry-pick の単位が曖昧になる
 - レビュー単位の分離: 成果物変更は Design 品質査読の対象、ドメイン state はキャプチャ境界（intake/learning）の対象。査読観点が異なるため分離する
-- capture 境界の遵守: `.agentdev/intake/`、`.agentdev/learning/` の直接編集は case-run 委譲内では禁止（委譲内の対象外制約、`agentdev-case-run-execution-adapter` SKILL）。実行担当サブエージェントは PR 本文の `## Findings / Capture候補` へ記録し、case-close が intake/learning pipeline へ引き継ぐ。よって case-run 委譲内でドメイン state をコミットへ含めることは原則として発生しない
+- capture 境界の遵守: `.agentdev/backlog/intake/`、`.agentdev/backlog/learning/` の直接編集は case-run 委譲内では禁止（委譲内の対象外制約、`agentdev-case-run-execution-adapter` SKILL）。実行担当サブエージェントは PR 本文の `## Findings / Capture候補` へ記録し、case-close が intake/learning pipeline へ引き継ぐ。よって case-run 委譲内でドメイン state をコミットへ含めることは原則として発生しない
 
 **例外**: `.agentdev/drafts/` と RU の削除（case-ready 完了後のクリーンアップ）は、成果物変更とは独立したクリーンアップコミットとして扱う。
 本運用が禁止する同一コミット混在には該当しない。

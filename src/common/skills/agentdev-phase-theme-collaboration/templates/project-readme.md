@@ -1,4 +1,4 @@
-# 工程駆動ドメイン状態（phase/）
+# 工程駆動ドメイン状態（project/）
 
 工程駆動コラボレーションが使用するテーマ正本と最小識別状態の保存領域。
 工程駆動の4操作（phase-tasks-create、phase-tasks-update、phase-artifacts-update、phase-review）、利用者判断による工程遷移（phase-transition）と、操作をまたぐ別セッション再開が読み書きする。
@@ -9,11 +9,11 @@
 |---|---|---|
 | `identity.yaml` | 取組・対象版・現在工程の最小識別状態 | YAML |
 | `themes.md` | 検討テーマの正本 | Markdown（テーマ1件を1セクション） |
-| `pending.md` | 未決事項と判断根拠 | Markdown（未決1件を1セクション） |
+| `issue-log.md` | 未決事項と判断根拠 | Markdown（未決1件を1セクション） |
 | `received/` | 受領済み途中検討知見の受領記録（1受領1ファイル） | Markdown |
-| `adoptions/` | 直接採用の採否記録（1採用1ファイル） | JSON（採否記録生成の決定的処理 script 出力） |
-| `revisions/` | 完了済み過去工程の改訂の実行記録（1改訂1ファイル） | JSON（改訂実行記録生成の決定的処理 script 出力） |
-| `transitions/` | 工程遷移の遷移記録（1遷移1ファイル） | 遷移記録の操作契約（`agentdev-workflow-phase-transition`）が所有する物理形式 |
+| `decision-log/` | 直接採用の採否記録（1採用1ファイル） | JSON（採否記録生成の決定的処理 script 出力） |
+| `change-log/` | 完了済み過去工程の改訂の実行記録（1改訂1ファイル） | JSON（改訂実行記録生成の決定的処理 script 出力） |
+| `phase-gates/` | 工程遷移の遷移記録（1遷移1ファイル） | 遷移記録の操作契約（`agentdev-workflow-phase-transition`）が所有する物理形式 |
 
 保存状態は書込対象の解決、再開、受領済み検討知見の継続に必要な最小情報に限る。
 進行度・完了率・残作業を記録する恒久台帳を設けない。
@@ -28,7 +28,7 @@
 フィールドは次の3つとする（空文字の初期状態で配置する）。
 
 ```yaml
-undertaking: ""
+project: ""
 target_version: ""
 current_phase: ""
 ```
@@ -47,7 +47,7 @@ current_phase: ""
 - 状態: active | merged | deprecated
 - 後継: （merged / deprecated 時に継承先テーマの識別）
 - 具体化: テーマの内容、参照元の正規成果物
-- 未決: （pending.md の未決エントリ識別。存在しない場合は省略）
+- 未決: （issue-log.md の未決エントリ識別。存在しない場合は省略）
 ```
 
 - 統合・廃止では状態と後継を更新し、旧新対応をセクション内に保持する。テーマ識別を再利用しない。
@@ -55,7 +55,7 @@ current_phase: ""
 - 初回形成は、更新操作が先行していた場合でも、既存のテーマセクション、手修正、未決参照を保存し、必要な参考候補だけを追加する。
 - 実質的な変更がない同一入力の再実行では、セクションを不当に再編せず、変更報告を増やさない。
 
-## pending.md の様式
+## issue-log.md の様式
 
 未決1件を1セクションで記録する。
 
@@ -84,12 +84,12 @@ received/YYYY-MM-DD-{テーマ識別}.md
 - 不正または曖昧な内容は不採用・保留として記録し、確定済みとして扱わない。
 - 別セッションでは受領情報から受領済み知見を再取得する。一度も受領していない内容を復元したと扱わない。
 
-## adoptions/ の様式
+## decision-log/ の様式
 
 直接採用の採否記録を、1採用を1ファイルで保存する。
 
 ```
-adoptions/YYYY-MM-DD-{採用対象の識別}-{連番}.json
+decision-log/YYYY-MM-DD-{採用対象の識別}-{連番}.json
 ```
 
 1ファイルは1件の明示採用指示に対応する採否記録（採用レコード）を記録する。
@@ -101,12 +101,12 @@ adoptions/YYYY-MM-DD-{採用対象の識別}-{連番}.json
 - 採用・不採用の記録は明示採用件数に比例する量にする。採用内容本文を複写する恒久複本を作らない
 - 同日の複数採用は連番で区別し、既存の記録を上書き・消失させない
 
-## revisions/ の様式
+## change-log/ の様式
 
 完了済み過去工程の改訂の実行記録を、1改訂を1ファイルで保存する。
 
 ```
-revisions/YYYY-MM-DD-{改訂対象の識別}-{連番}.json
+change-log/YYYY-MM-DD-{改訂対象の識別}-{連番}.json
 ```
 
 1ファイルは1件の完了済み過去工程の改訂に対応する実行記録を記録する。改訂対象の識別は反映対象の正規成果物の識別等であり、同日の複数改訂は連番で区別する。
@@ -129,6 +129,6 @@ revisions/YYYY-MM-DD-{改訂対象の識別}-{連番}.json
 
 ## 別セッション再開
 
-再開は本領域の実ファイル（`identity.yaml`、`themes.md`、`pending.md`、`received/`、`adoptions/`、`revisions/`、`transitions/`）から行う。
+再開は本領域の実ファイル（`identity.yaml`、`themes.md`、`issue-log.md`、`received/`、`decision-log/`、`change-log/`、`phase-gates/`）から行う。
 外部検討の結果の到着や正規成果物への反映がなくても、実ファイルだけから、確定済みの対象版・現在工程・テーマ・未決・受領済み知見・採否記録・改訂実行記録・遷移記録を復元できる。
 値が変わらない再開では、実ファイルを再編せず、変更報告を生まない。

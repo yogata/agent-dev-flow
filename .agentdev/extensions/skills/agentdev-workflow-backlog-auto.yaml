@@ -7,7 +7,7 @@ context:
     when: "stage 1 で docs-check を実行するとき"
     paths:
       - ".opencode/commands/repo/docs-check.md"
-    purpose: "repo-local docs 整合性検査コマンド（自己ホスト専用）の公開契約の確認。検査スクリプト実行、finding 整理、intake item 生成、条件付き Git 永続化（.agentdev/intake/ 配下のみ）、完了報告の各工程を同コマンド本文どおりに実行する"
+    purpose: "repo-local docs 整合性検査コマンド（自己ホスト専用）の公開契約の確認。検査スクリプト実行、finding 整理、intake item 生成、条件付き Git 永続化（.agentdev/backlog/intake/ 配下のみ）、完了報告の各工程を同コマンド本文どおりに実行する"
 
 rules: []
 

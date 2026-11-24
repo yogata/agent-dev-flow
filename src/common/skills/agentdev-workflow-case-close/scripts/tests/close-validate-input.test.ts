@@ -18,7 +18,7 @@ function consumerFixture(): CloseMechanicalInput {
   traceabilityGate: mk("traceability-check", [gateScript, "--root", cwd, "--req", "REQ-001-001"]),
   integrityGates: [mk("full-integrity-suite", [gateScript])],
   textlintGate: mk("textlint-final-check", [gateScript]),
-  contractStateCheck: { contractStatePaths: [".agentdev/learning/inbox/"], approvalEntries: [] },
+  contractStateCheck: { contractStatePaths: [".agentdev/backlog/learning/inbox/"], approvalEntries: [] },
 };
 }
 

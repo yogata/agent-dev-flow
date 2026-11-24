@@ -18,7 +18,7 @@ intake items:
     - {path2}
   - {0件の場合: 該当なし（NG/WARNING finding なし）}
 git 永続化:
-  - {intake item 作成あり・成功時: commit {hash}、push 済み（.agentdev/intake/ 配下）}
+  - {intake item 作成あり・成功時: commit {hash}、push 済み（.agentdev/backlog/intake/ 配下）}
   - {intake item 未作成時: 変更なし（intake item 未作成のため）}
   - {intake item 作成あり・失敗時: 失敗工程（{STEP-N ラベル}）+ エラー内容}
 次のコマンド:

@@ -41,7 +41,7 @@ function baseInput(): CollectInput {
   return {
     root: "/repo",
     files: ["a.md", "b.md"],
-    stalenessQueues: [".agentdev/intake/inbox"],
+    stalenessQueues: [".agentdev/backlog/intake/inbox"],
     issuesArgs: ["issue", "list", "--json", "number"],
     limit: 10,
     offset: 0,

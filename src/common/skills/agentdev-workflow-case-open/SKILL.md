@@ -25,7 +25,7 @@ case-open command は公開 interface と本スキルへの dispatch のみを�
 
 - Root Case 作成、設計PR作成（Custom Tool `agentdev_gh` 経由。VERIFY は Tool 内部）
 - 前提整備の commit（Root Case 作成前）: 未追跡分は明示パス指定で commit（スイープ禁止）。手順は references/root-case-and-definition-package.md（sidecar 対応関係は top-level `traceability/` 配下）
-- deviation capture 保存: 実観測した deviation を `agentdev-learning-capture` / `agentdev-intake-pipeline` へ委譲し、Split Rule に従い `.agentdev/intake/` または `.agentdev/learning/` へ保存（git 永続化は明示パス指定）
+- deviation capture 保存: 実観測した deviation を `agentdev-learning-capture` / `agentdev-intake-pipeline` へ委譲し、Split Rule に従い `.agentdev/backlog/intake/` または `.agentdev/backlog/learning/` へ保存（git 永続化は明示パス指定）
 - worktree root 配下以外を編集しない（case-open command の worktree 隔離に従う）
 
 ## 制御平面（STEP 一覧）

@@ -72,6 +72,7 @@ skills:
   - agentdev-workflow-intake-promote
   - agentdev-workflow-learning-promote
   - agentdev-workflow-lifecycle
+  - agentdev-workflow-migrate
   - agentdev-workflow-orchestration
   - agentdev-workflow-phase-artifacts-update
   - agentdev-workflow-phase-review

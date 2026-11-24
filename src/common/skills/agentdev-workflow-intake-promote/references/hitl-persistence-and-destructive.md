@@ -58,7 +58,7 @@
 
 ### Purpose
 
-採用と判定された item を backlog-review 向けに整形し、`.agentdev/intake/promoted/` に保存する。
+採用と判定された item を backlog-review 向けに整形し、`.agentdev/backlog/intake/promoted/` に保存する。
 
 ### Input Resolution
 
@@ -75,13 +75,13 @@
 1. 観測内容、影響、課題を整理する
 2. backlog-review が分析しやすい形式に構造化する（観測内容、影響、課題、既存要件との関連）
 3. 複数 item を束ねる場合は統合内容を整理する
-4. `.agentdev/intake/promoted/` が存在しない場合は作成する
+4. `.agentdev/backlog/intake/promoted/` が存在しない場合は作成する
 5. ファイル名は `YYYY-MM-DD-{topic-slug}.md` とする（元 item 名を維持するか、束ねた内容に応じた名前にする）
-6. 成果物を `.agentdev/intake/promoted/` 直下にフラット配置する。frontmatter に route や status を記録しない
+6. 成果物を `.agentdev/backlog/intake/promoted/` 直下にフラット配置する。frontmatter に route や status を記録しない
 
 ### Result
 
-- `.agentdev/intake/promoted/` 配下の採用済み成果物
+- `.agentdev/backlog/intake/promoted/` 配下の採用済み成果物
 
 ### Evidence
 
@@ -115,12 +115,12 @@
 
 ### Procedure
 
-1. 採用 item の元 inbox item を削除する（`.agentdev/intake/archive/promoted/` への移動は廃止）
-2. 保留 item は `.agentdev/intake/inbox/` に残す
-3. 却下 item は即時削除する（`.agentdev/intake/archive/rejected/` への移動は廃止）
+1. 採用 item の元 inbox item を削除する（`.agentdev/backlog/intake/archive/promoted/` への移動は廃止）
+2. 保留 item は `.agentdev/backlog/intake/inbox/` に残す
+3. 却下 item は即時削除する（`.agentdev/backlog/intake/archive/rejected/` への移動は廃止）
 4. `git pull --ff-only` を実行する。失敗時は構造化エラーメッセージを表示して停止する（自動解消しない）
-5. `git diff --name-only` で `.agentdev/intake/` 配下の変更ファイルを確認する。変更なしの場合は commit/push せず完了報告で「変更なし」と報告する
-6. `git add` は `.agentdev/intake/` 配下の変更ファイルを対象とする（明示パス指定）
+5. `git diff --name-only` で `.agentdev/backlog/intake/` 配下の変更ファイルを確認する。変更なしの場合は commit/push せず完了報告で「変更なし」と報告する
+6. `git add` は `.agentdev/backlog/intake/` 配下の変更ファイルを対象とする（明示パス指定）
 7. commit message は `chore(agentdev): review and promote intake items`（Conventional Commits 形式）。reject item を含む場合は当該 item の却下理由を commit message に含める（監査証跡の補強）
 8. `git push` を実行する。push 失敗時は構造化エラーメッセージを表示し、完了扱いにしない
 

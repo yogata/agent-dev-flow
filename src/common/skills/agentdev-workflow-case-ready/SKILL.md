@@ -26,7 +26,7 @@ case-ready command は公開 interface（入出力契約・ガードレール）
 
 - 設計PR merge、Epic / 子 Issue 作成、Root Case 本文更新、コメント追加（`agentdev_gh` 経由。VERIFY は Tool 内部）
 - Decision の proposed → accepted 遷移（委譲）、draft / RU の削除（成功時のみ。blocked、failed、中断時は保持）
-- deviation capture 保存: 実観測した deviation を委譲スキル経由で Split Rule に従い `.agentdev/intake/` または `.agentdev/learning/` へ保存（git 永続化は明示パス指定）
+- deviation capture 保存: 実観測した deviation を委譲スキル経由で Split Rule に従い `.agentdev/backlog/intake/` または `.agentdev/backlog/learning/` へ保存（git 永続化は明示パス指定）
 - 行わない副作用: Epic 実行構成表更新（単一書き手は case-close）、実装実行、完了条件チェックボックス評価
 
 ## 制御平面（STEP 一覧）

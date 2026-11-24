@@ -12,7 +12,7 @@ updated: "2026-11-18"
 
 ## 目的
 
-`.agentdev/inspect/inbox/` の検出事項を分類、採用し、採用済み成果物として `.agentdev/inspect/promoted/` へ出力する。
+`.agentdev/backlog/inspect/inbox/` の検出事項を分類、採用し、採用済み成果物として `.agentdev/backlog/inspect/promoted/` へ出力する。
 `--auto` オプションで高確信度検出事項の自動 promote を有効化する。
 
 ## 承認・HITL 境界
@@ -22,21 +22,21 @@ updated: "2026-11-18"
 
 ## 入力
 
-- `.agentdev/inspect/inbox/*.md`（検出事項ファイル群）
+- `.agentdev/backlog/inspect/inbox/*.md`（検出事項ファイル群）
 - `--auto`（省略可能）（高確信度検出事項の自動 promote を有効化）
 
 ## 出力
 
-- `.agentdev/inspect/promoted/*.md`（手動 promote 採用済み、RU 化対象）
+- `.agentdev/backlog/inspect/promoted/*.md`（手動 promote 採用済み、RU 化対象）
 - reject 検出事項は即時削除（`archive/rejected/` 廃止）。reject 時の commit message に却下理由を含める（監査証跡の補強）
-- `.agentdev/intake/promoted/inspect-auto-*.md`（`--auto` 時の自動 promote 成果物）
-- `.agentdev/inspect/promoted/auto-promote-log.md`（`--auto` 実行ログ、append-only）
+- `.agentdev/backlog/intake/promoted/inspect-auto-*.md`（`--auto` 時の自動 promote 成果物）
+- `.agentdev/backlog/inspect/promoted/auto-promote-log.md`（`--auto` 実行ログ、append-only）
 - セッション内完了報告
 
 ## 副作用
 
-- ファイル移動、作成、削除: `.agentdev/inspect/` および `.agentdev/intake/` 配下
-- git commit/push: `.agentdev/inspect/` および `.agentdev/intake/` 配下
+- ファイル移動、作成、削除: `.agentdev/backlog/inspect/` および `.agentdev/backlog/intake/` 配下
+- git commit/push: `.agentdev/backlog/inspect/` および `.agentdev/backlog/intake/` 配下
 - 実行前同期: `git pull --ff-only`
 
 ## 現在の動作
@@ -50,12 +50,12 @@ updated: "2026-11-18"
 - 自動 promote（`--auto` opt-in 時のみ）:
  - 自動 promote 対象: Design分離基準違反（high-specificity）、構造的即時是正
  - 自動 promote 対象外: 命名、分類の意味判断、Decision 要否判断（手動分類へ回す）
- - 投入先: `.agentdev/intake/promoted/inspect-auto-{timestamp}-{slug}.md`
- - 実行ログ: `.agentdev/inspect/promoted/auto-promote-log.md` に投入対象記録
+ - 投入先: `.agentdev/backlog/intake/promoted/inspect-auto-{timestamp}-{slug}.md`
+ - 実行ログ: `.agentdev/backlog/inspect/promoted/auto-promote-log.md` に投入対象記録
 - HITL 確定（手動分類対象）
-- promote 処理: `.agentdev/inspect/promoted/` へ保存
+- promote 処理: `.agentdev/backlog/inspect/promoted/` へ保存
 - reject 処理: 即時削除（`archive/rejected/` 廃止）
-- defer 処理: `.agentdev/inspect/inbox/` に残す
+- defer 処理: `.agentdev/backlog/inspect/inbox/` に残す
 - 完了報告
 - `.agentdev/` 変更の commit と push
 
@@ -94,9 +94,9 @@ updated: "2026-11-18"
 ## 対象外
 
 - ユーザーの明示的な承認なしの採用済み成果物生成（`--auto` による自動 promote 対象を除く、`POL-promoted-artifact-requires-approval`）
-- promote 検出事項以外の `.agentdev/inspect/promoted/` 保存
+- promote 検出事項以外の `.agentdev/backlog/inspect/promoted/` 保存
 - reject 検出事項の即時削除以外の取扱
-- defer 検出事項の `.agentdev/inspect/inbox/` からの移動
+- defer 検出事項の `.agentdev/backlog/inspect/inbox/` からの移動
 - docs-check ルール、検査データ追加候補の独立 route 化（要件化方向または受け入れ条件に含める）
 - `--auto` の明示 opt-in なしの有効化
 - `--auto` による意味判断、曖昧分類、Decision 要否判断の自動投入（手動分類へ回す）
@@ -106,7 +106,7 @@ updated: "2026-11-18"
 
 - ユーザー明示承認の確保（`--auto` 対象除く）
 - 分類の正確性: promote / defer / reject
-- 投入先、形式の正確性: `.agentdev/intake/promoted/inspect-auto-{timestamp}-{slug}.md`（`--auto` 時）
+- 投入先、形式の正確性: `.agentdev/backlog/intake/promoted/inspect-auto-{timestamp}-{slug}.md`（`--auto` 時）
 - 自動 promote 対象カテゴリの遵守: Design分離基準違反（high-specificity）、構造的即時是正のみ
 - 自動 promote 対象外の手動分類回し: 命名、分類の意味判断、Decision 要否判断
 - 実行ログ記録の完備
@@ -148,7 +148,7 @@ review 挿入位置は「暫定分類後・HITL 前」へ一意に特定する�
 ### --auto 経路の review 挿入迂回（fast path）（REQ-015-005）
 
 `--auto` opt-in により自動 promote された検出事項は HITL を経由しない fast path となり、review 挿入境界を迂回する。
-当該検出事項は `.agentdev/intake/promoted/inspect-auto-*.md` へ直接投入され、adversarial-review の対象外となる。
+当該検出事項は `.agentdev/backlog/intake/promoted/inspect-auto-*.md` へ直接投入され、adversarial-review の対象外となる。
 
 - fast path 対象: 自動 promote された検出事項（高確信度、自動 promote 対象カテゴリ合致）
 - review 対象（fast path 外）: 自動 promote 対象外で手動分類へ回された検出事項

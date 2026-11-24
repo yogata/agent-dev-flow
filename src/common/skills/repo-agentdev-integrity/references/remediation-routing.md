@@ -34,7 +34,7 @@ docs-check の finding のうち、意味判断が必要なもの（heuristic / 
 | 要件変更が必要（実装済み） | RU 化 → `/agentdev/req-define` | REQ 変更を RU として backlog に登録し req-define で処理 |
 | 実装のみが逸脱している場合 | case workflow へ戻し | REQ / Design の変更は不要とし case-run で修正（実装修正は case-run 契約） |
 | 再現可能な検査に落とせるもの | docs-check rule 追加 | 意味レビュー結果を機械的検査ルール / fixture に変換（REQ-0115-026） |
-| 再発防止の知見 | learning / backlog | `.agentdev/learning/inbox/` または intake inbox へ保存 |
+| 再発防止の知見 | learning / backlog | `.agentdev/backlog/learning/inbox/` または intake inbox へ保存 |
 
 ### docs-review → docs-check Rule フィードバック
 

@@ -97,7 +97,7 @@ case-revise workflow は次の5 STEP で構成する。
 - **再確定の委譲**: execution contract / execution structure の再確定は case-ready が行う。case-revise 完了後は case-ready を経由し、case-revise 専用の Case 状態は追加しない
 - **本文 verbatim**: Root Case 本文、Issue 本文は Custom Tool `agentdev_gh` の操作引数としてそのまま渡す（文字コード・一時ファイルの実装詳細は Tool 内部）（`POL-gh-io-delegation`）
 - **Issue 本文のテンプレート構造維持**: Case 関連 Issue 本文を更新する際、作成時のテンプレート構造と必須セクションを維持する（Markdown 行構造（LF、セクション間空行、インデント）の byte 単位保持を含む）
-- **capture 境界**: 自工程で実観測した deviation は `agentdev-learning-capture` skill または `agentdev-intake-pipeline`（自動capture向け item 生成操作）へ委譲して保存する（保存先は Split Rule（`agentdev-workflow-orchestration` 参照）に従う）。実行担当サブエージェントではなく本 workflow 自身が `.agentdev/intake/`、`.agentdev/learning/` を直接変更しない
+- **capture 境界**: 自工程で実観測した deviation は `agentdev-learning-capture` skill または `agentdev-intake-pipeline`（自動capture向け item 生成操作）へ委譲して保存する（保存先は Split Rule（`agentdev-workflow-orchestration` 参照）に従う）。実行担当サブエージェントではなく本 workflow 自身が `.agentdev/backlog/intake/`、`.agentdev/backlog/learning/` を直接変更しない
 
 ## See Also
 

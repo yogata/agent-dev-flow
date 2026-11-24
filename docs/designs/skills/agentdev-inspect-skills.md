@@ -33,7 +33,7 @@ Command→Skill 参照妥当性と Skill 構造を、ファイル修正なしで
 
 ## 現在の動作
 
-- 検出事項を `.agentdev/inspect/inbox/` にエクスポート可能
+- 検出事項を `.agentdev/backlog/inspect/inbox/` にエクスポート可能
 - ファイル修正は行わない
 - 推奨 route 提示に留める（自動修正禁止）
 

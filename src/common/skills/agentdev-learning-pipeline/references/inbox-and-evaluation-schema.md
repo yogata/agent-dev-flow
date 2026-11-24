@@ -104,7 +104,7 @@ learning-promote は除外した item について、evaluation-report に除外
 
 ## Evaluation-Report Schema
 
-パス: `.agentdev/learning/evaluation-report.md`（毎回上書き、追記しない）
+パス: `.agentdev/backlog/learning/evaluation-report.md`（毎回上書き、追記しない）
 
 ```markdown
 # 評価レポート

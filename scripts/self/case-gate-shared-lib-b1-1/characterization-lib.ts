@@ -352,10 +352,10 @@ export function buildCliSkillCases(tmpDir: string = TMP_DIR): Record<string, rea
       { id: "classify-gate-unavailable-missing-file", compare: true, args: ["./src/common/skills/agentdev-artifact-semantics/scripts/src/classify.ts", "--root", ".", "--files", `${tmpDir}/missing-file.md`] },
     ],
     "agentdev-phase-theme-collaboration": [
-      { id: "themes-valid-empty-themes", compare: false, args: ["./src/common/skills/agentdev-phase-theme-collaboration/scripts/src/themes.ts", "--themes-file", ".agentdev/phase/themes.md"] },
+      { id: "themes-valid-empty-themes", compare: false, args: ["./src/common/skills/agentdev-phase-theme-collaboration/scripts/src/themes.ts", "--themes-file", ".agentdev/project/themes.md"] },
       { id: "themes-invalid-missing-flag", compare: true, args: ["./src/common/skills/agentdev-phase-theme-collaboration/scripts/src/themes.ts"] },
       { id: "themes-gate-unavailable-missing-file", compare: true, args: ["./src/common/skills/agentdev-phase-theme-collaboration/scripts/src/themes.ts", "--themes-file", `${tmpDir}/missing-themes.md`] },
-      { id: "received-valid-empty-dir", compare: false, args: ["./src/common/skills/agentdev-phase-theme-collaboration/scripts/src/received.ts", "--dir", ".agentdev/phase/received"] },
+      { id: "received-valid-empty-dir", compare: false, args: ["./src/common/skills/agentdev-phase-theme-collaboration/scripts/src/received.ts", "--dir", ".agentdev/project/received"] },
       { id: "received-gate-unavailable-missing-dir", compare: true, args: ["./src/common/skills/agentdev-phase-theme-collaboration/scripts/src/received.ts", "--dir", `${tmpDir}/missing-received-dir`] },
     ],
   };

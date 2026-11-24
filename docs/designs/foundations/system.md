@@ -59,7 +59,7 @@ AgentDevFlow（`/agentdev/*` コマンド体系）は req/case、intake、learni
 | case-close（内部 lifecycle 段階） | case-auto 駆動 | Issue + PR | マージ済み + クローズ済み（QG-4 完了ゲート付き） | [commands/case-close.md](../commands/case-close.md) |
 | `/agentdev/case-auto` | req/case（標準実行コマンド） | 要件doc / Issue番号 | マージ済み + クローズ済み（blocked 部分停止あり） | [commands/case-auto.md](../commands/case-auto.md) |
 | intake-promote（内部 workflow） | backlog-auto stage 2 駆動 | inbox item | `promoted/` 成果物 | [commands/intake-promote.md](../commands/intake-promote.md) |
-| `agentdev-learning-capture`（スキル） | learning（キャプチャ層） | エージェント主体での学び検知 | `.agentdev/learning/inbox/` | [skills/agentdev-learning-capture.md](../skills/agentdev-learning-capture.md) |
+| `agentdev-learning-capture`（スキル） | learning（キャプチャ層） | エージェント主体での学び検知 | `.agentdev/backlog/learning/inbox/` | [skills/agentdev-learning-capture.md](../skills/agentdev-learning-capture.md) |
 | learning-promote（内部 workflow） | backlog-auto stage 2 駆動 | `inbox/` + `deferred/` | `promoted/` 成果物 | [commands/learning-promote.md](../commands/learning-promote.md) |
 | backlog-review（内部 workflow） | backlog-auto stage 3 駆動 | `promoted/` 成果物 | `RU-*.md` | [commands/backlog-review.md](../commands/backlog-review.md) |
 | `/agentdev/backlog-auto` | backlog | なし（durable state から解決） | 検出事項、採用済み成果物、`RU-*.md` | [commands/backlog-auto.md](../commands/backlog-auto.md) |

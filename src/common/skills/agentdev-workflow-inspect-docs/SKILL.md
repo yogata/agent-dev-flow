@@ -6,7 +6,7 @@ description: "inspect-docs workflow 本体。docs 全体の意味整合性と配
 # inspect-docs workflow スキル
 
 inspect-docs workflow の実装本体である（backlog-auto stage 1 が Workflow Skill 連携で駆動する内部 workflow）。
-docs 全体（REQ/Decision/Design/guides/README）と配布物の意味整合性診断から、検出事項の `.agentdev/inspect/inbox/` 出力、`.agentdev/inspect/` 配下の git 永続化、完了報告までの制御構造を所有する。
+docs 全体（REQ/Decision/Design/guides/README）と配布物の意味整合性診断から、検出事項の `.agentdev/backlog/inspect/inbox/` 出力、`.agentdev/backlog/inspect/` 配下の git 永続化、完了報告までの制御構造を所有する。
 
 inspect-docs の呼出元は backlog-auto workflow（stage 1）であり、入出力契約・ガードレールは本スキルと inspect-docs Design が所有する（責務3層分化と1:N分割原則、検出と診断の要件〔命名統一・diagnostics 命名限定・inbox 出力と reject 即時削除〕）。
 
@@ -24,13 +24,13 @@ inspect-docs の呼出元は backlog-auto workflow（stage 1）であり、入�
 
 ## 出力
 
-- 診断結果（セッション内テキスト出力 + `.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md`）
+- 診断結果（セッション内テキスト出力 + `.agentdev/backlog/inspect/inbox/inspect-docs-finding-{timestamp}.md`）
 - 検出事項リスト（観点、対象、根拠、source-of-truth 判定、推奨経路）
 
 ## 副作用
 
-- `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成
-- `.agentdev/inspect/` 配下の変更に限る git commit/push（commit message: `chore(agentdev): capture inspect-docs finding`）
+- `.agentdev/backlog/inspect/inbox/inspect-docs-finding-*.md` の生成
+- `.agentdev/backlog/inspect/` 配下の変更に限る git commit/push（commit message: `chore(agentdev): capture inspect-docs finding`）
 - 検査対象（docs/、`.opencode/`）のファイル変更は行わない
 
 ## 3層責務（deterministic check / semantic diagnosis / finding disposition）
@@ -51,7 +51,7 @@ STEP ラベルは工程順序の整理ラベルであり、**resume point では
 | STEP-1 | スキャン対象の収集 | command 実行開始 | 収集済み対象一覧 | [references/scan-and-doc-diagnostics.md](references/scan-and-doc-diagnostics.md) |
 | STEP-2 | REQ 体系・文書種別別意味診断 | 対象一覧確定 | REQ/Decision/Design/guides/README の診断結果（診断担当への並列委譲と fan-in 統合後） | [references/scan-and-doc-diagnostics.md](references/scan-and-doc-diagnostics.md) |
 | STEP-3 | 配布物整合性検査・route 判定 | STEP-2 完了 | 配布物診断結果、docs-check route 候補、未処理 artifact 確認結果 | [references/distribution-check-and-output.md](references/distribution-check-and-output.md) |
-| STEP-4 | 検出事項出力・永続化・完了報告 | STEP-1〜3 の診断結果確定 | 検出事項ファイル、`.agentdev/inspect/` commit/push、完了報告 | [references/distribution-check-and-output.md](references/distribution-check-and-output.md) |
+| STEP-4 | 検出事項出力・永続化・完了報告 | STEP-1〜3 の診断結果確定 | 検出事項ファイル、`.agentdev/backlog/inspect/` commit/push、完了報告 | [references/distribution-check-and-output.md](references/distribution-check-and-output.md) |
 
 ### 工程間の依存と分岐
 
@@ -95,14 +95,14 @@ agentdev-traceability の coverage、impact、check を一般文書探索、構�
 
 ## 共通制約
 
-- **診断専用**: 許可される副作用は `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成と `.agentdev/inspect/` 配下の git 永続化のみ（command ガードレールの範囲）
+- **診断専用**: 許可される副作用は `.agentdev/backlog/inspect/inbox/inspect-docs-finding-*.md` の生成と `.agentdev/backlog/inspect/` 配下の git 永続化のみ（command ガードレールの範囲）
 - **source-of-truth priority**: 現行 REQ > 承認済み Decision > Design > guides の順で矛盾を判定する（command 不変条件）
 - **Design 参照は extension 経由**: document-model Design、docs-spec-rebuild-integrity Design 等の分類ポリシー・検査パターンは extension 経由で解決し、Design 内部パスを固定知識として参照しない
 
 ## 終了条件（termination）
 
-- 検出事項ファイル（`.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md`）の出力が完了している
-- `.agentdev/inspect/` 配下の変更が commit/push 済みである（変更なし時は「変更なし」報告済み）
+- 検出事項ファイル（`.agentdev/backlog/inspect/inbox/inspect-docs-finding-{timestamp}.md`）の出力が完了している
+- `.agentdev/backlog/inspect/` 配下の変更が commit/push 済みである（変更なし時は「変更なし」報告済み）
 - 完了報告 template（`.opencode/commands/agentdev/templates/inspect-docs/standard.md`）に従った報告を出力した（待ち行列滞留期間〔最古エントリ経過日数〕を付帯情報として含める）
 
 ## See Also

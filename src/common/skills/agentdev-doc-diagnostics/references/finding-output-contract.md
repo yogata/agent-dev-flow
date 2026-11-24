@@ -68,7 +68,7 @@ inspect-docs command は本スキルが定める schema に従い検出事項を
 
 ### 出力先
 
-`.agentdev/inspect/inbox/inspect-docs-finding-{timestamp}.md`。
+`.agentdev/backlog/inspect/inbox/inspect-docs-finding-{timestamp}.md`。
 ファイル名の `{timestamp}` は ISO 8601 形式（`YYYYMMDDTHHMMSSZ` 等のタイムゾーン付き）。
 
 ### 出力構成
@@ -95,9 +95,9 @@ inspect-docs command は本スキルが定める schema に従い検出事項を
 
 ### inspect lifecycle との協調
 
-- 検出事項ファイルは `.agentdev/inspect/inbox/` に配置し、`inspect-promote` への入力となる
+- 検出事項ファイルは `.agentdev/backlog/inspect/inbox/` に配置し、`inspect-promote` への入力となる
 - reject された検出事項は即時削除する
-- promote された検出事項は `.agentdev/inspect/promoted/` へ保存し、`backlog-review` の入力となる
+- promote された検出事項は `.agentdev/backlog/inspect/promoted/` へ保存し、`backlog-review` の入力となる
 - 検出事項の source_type は `inspect`
 
 ## NG 分類
@@ -130,8 +130,8 @@ NG 分類は recommended_route とは別軸で付ける。
 
 | 副作用 | 許可 |
 |--------|------|
-| `.agentdev/inspect/inbox/inspect-docs-finding-*.md` の生成 | 許可 |
-| `.agentdev/inspect/` 配下の git 永続化（commit/push） | 許可（commit message: `chore(agentdev): capture inspect-docs finding`） |
+| `.agentdev/backlog/inspect/inbox/inspect-docs-finding-*.md` の生成 | 許可 |
+| `.agentdev/backlog/inspect/` 配下の git 永続化（commit/push） | 許可（commit message: `chore(agentdev): capture inspect-docs finding`） |
 | 検査対象（docs/、配布物ルート）のファイル編集 | 禁止 |
 | Issue/PR 作成、worktree 作成、branch 操作 | 禁止 |
 | intake/learning/RU の処理 | 禁止 |

@@ -1,7 +1,7 @@
 ✅ inspect-promote 完了
 
 完了ワークフロー:inspect-promote workflow（backlog-auto stage 2）
-対象: .agentdev/inspect/inbox/
+対象: .agentdev/backlog/inspect/inbox/
 結果:
  - 採用: {N}件（{file_list}）
  - 保留: {N}件

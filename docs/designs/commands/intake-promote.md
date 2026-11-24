@@ -53,18 +53,18 @@ intake-promote は change_nature と併せて、observed_evidence（根拠とな
 
 ## 入力
 
-- intake item 群（`.agentdev/intake/inbox/` 内 Markdown）
+- intake item 群（`.agentdev/backlog/intake/inbox/` 内 Markdown）
 - ユーザーによる追加コンテキスト、分類修正指示（対話的）
 
 ## 出力
 
 - 採用 item の採用済み成果物（backlog-review 用）
-- `.agentdev/intake/promoted/*.md`（整形済み item、フラット構造、frontmatter なし）
+- `.agentdev/backlog/intake/promoted/*.md`（整形済み item、フラット構造、frontmatter なし）
 - 分類結果レポート（採用/保留/却下）
 
 ## 副作用
 
-- git commit/push: `.agentdev/intake/` 配下のみ（commit message: `chore: promote intake items`）
+- git commit/push: `.agentdev/backlog/intake/` 配下のみ（commit message: `chore: promote intake items`）
 - 採用 item の inbox 元ファイルを削除（`archive/promoted/` への移動を廃止）
 - reject item の inbox 元ファイルを削除（`archive/rejected/` への移動を廃止）。reject 時の commit message に却下理由を含める（監査証跡の補強）
 - 実行前同期: `git pull --ff-only`
@@ -78,7 +78,7 @@ intake-promote は change_nature と併せて、observed_evidence（根拠とな
 - フェーズ1 inbox スキャン: inbox 確認、intake item 読込
 - フェーズ2 内部レビュー: レビュー評価、暫定分類の生成と提示
 - フェーズ3 HITL 確定（判断の確定、REQ-003-003）: ユーザー確認（ユーザー明示的承認必須、分類結果の提示と確認修正機会提供）
-- フェーズ4 振り分け（分類承認後の自動実行、REQ-003-008）: 採用 item 整形、保存（`.agentdev/intake/promoted/`、フラット構造、frontmatter なし）、振り分け（inbox 削除含む）
+- フェーズ4 振り分け（分類承認後の自動実行、REQ-003-008）: 採用 item 整形、保存（`.agentdev/backlog/intake/promoted/`、フラット構造、frontmatter なし）、振り分け（inbox 削除含む）
 - フェーズ5 git 操作完了報告（自動実行）: git pull、commit/push、完了報告
 
 **自動実行の前提**（REQ-003-008）: フェーズ3 で分類が確定（採用/保留/却下のいずれか）している場合のみ、フェーズ4、5 を自動実行する。
@@ -133,15 +133,15 @@ HITL 確定フェーズではユーザー判断が必要な項目のみを提示
 - 整形結果への frontmatter 含有
 - 整形結果への重複排除キー、後続成果物参照含有
 - 元 item 本文への整形結果書込
-- `.agentdev/intake/accepted/` の参照使用
-- 保存先 `.agentdev/intake/promoted/` 直下以外
+- `.agentdev/backlog/intake/accepted/` の参照使用
+- 保存先 `.agentdev/backlog/intake/promoted/` 直下以外
 - 破壊的変更（inbox 全体強制クリア、大量エントリ一括削除等）の分類承認とは別系統の明示承認の省略（`POL-destructive-change-explicit-approval`）
 
 ## 検証観点
 
 - HITL 承認の確実性（採用済み成果物生成の承認、分類結果の提示、分類未確定時の自動進行禁止）
 - 整形結果の frontmatter / 重複排除キー / 後続成果物参照を含まないこと
-- 保存先が `.agentdev/intake/promoted/` 直下のみであること
+- 保存先が `.agentdev/backlog/intake/promoted/` 直下のみであること
 - 採用 item 元ファイルの inbox 削除（`archive/promoted/` への移動を廃止）
 
 ## 停止状態

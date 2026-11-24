@@ -19,8 +19,8 @@ deferred.md はインデックススキャン → 候補エントリ本文読込
 
 ### Input Resolution
 
-- `.agentdev/learning/inbox/`（必須。durable state 最優先）
-- `.agentdev/learning/deferred/`（任意。不存在は空として扱う）
+- `.agentdev/backlog/learning/inbox/`（必須。durable state 最優先）
+- `.agentdev/backlog/learning/deferred/`（任意。不存在は空として扱う）
 - 正規化ルール、entry schema は `agentdev-learning-pipeline` の公開操作契約に従う
 
 ### Preconditions
