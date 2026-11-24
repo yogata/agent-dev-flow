@@ -138,6 +138,12 @@ function makeFakeRepo(): RepoPaths {
   // THIRD-PARTY-NOTICES.md は release archive の必須同梱物（不在時 fail-closed、exit 2）。
   // fake repo も必須同梱の前提を満たすよう配置する。
   fs.writeFileSync(path.join(root, "THIRD-PARTY-NOTICES.md"), "# THIRD-PARTY-NOTICES\nProbe notices.\n");
+  // src/codex/・src/antigravity/ も release archive の必須同梱物（不在時 fail-closed、exit 2）。
+  // fake repo に最小の接続領域原本を配置して前提を満たす。
+  fs.mkdirSync(path.join(root, "src", "codex"), { recursive: true });
+  fs.writeFileSync(path.join(root, "src", "codex", "README.md"), "# probe codex connection area\n");
+  fs.mkdirSync(path.join(root, "src", "antigravity"), { recursive: true });
+  fs.writeFileSync(path.join(root, "src", "antigravity", "README.md"), "# probe antigravity connection area\n");
 
   fs.copyFileSync(REAL_SCRIPT, path.join(root, "scripts", "self", "release", "package-release-archive.ps1"));
   fs.copyFileSync(REAL_INSTALLER, path.join(root, "scripts", "consumer", "archive", "install.ps1"));

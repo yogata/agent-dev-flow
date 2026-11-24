@@ -2,7 +2,8 @@
 param(
     [Parameter(Mandatory = $true)][string]$Source,
     [Parameter(Mandatory = $true)][string]$Target,
-    [Parameter(Mandatory = $true)][ValidateSet("copy")][string]$Mode
+    [Parameter(Mandatory = $true)][ValidateSet("copy")][string]$Mode,
+    [ValidateSet("none", "codex", "antigravity", "both")][string]$AgentHosts
 )
 
 # archive 専用 installer 原本。release archive 内では scripts/install.ps1 の名で
@@ -12,6 +13,12 @@ param(
 # src/opencode/plugins/ host connection area) into the projection directory
 # (.opencode/) as real files.
 # Junctions are NOT created; release archives must be junction-free.
+# Codex / Antigravity entry projection: the shared entry root
+# .agents/skills/ (sibling of the Target directory) receives real-file
+# copies of the canonical agentdev-* skills when -AgentHosts explicitly
+# selects codex/antigravity/both (same explicit-selection contract as
+# scripts/install.ps1). Omitted: no placement, the existing placement is
+# kept. "none": stale agentdev-* copies under .agents/skills/ are removed.
 # 対応宣言（ADF-COVERS）の正規配置先は docs 配下の正規成果物である。
 #
 # Exit codes:
@@ -108,6 +115,42 @@ foreach ($skillDir in $skillDirs) {
         $rel = $f.FullName.Substring($skillsSrc.Length).TrimStart('\', '/')
         $dst = Join-Path $skillsDst $rel
         Place-File -SrcFile $f.FullName -DstFile $dst
+    }
+}
+
+# Codex / Antigravity entry projection (shared .agents/skills/ root, real
+# copies: release archives stay junction-free). Explicit selection only
+# (same contract as scripts/install.ps1): omitted keeps the current state
+# (no placement, no removal); "none" removes stale agentdev-* copies;
+# codex/antigravity/both place the shared projection (both hosts share the
+# same entry root, so the projected content is identical for any non-none
+# selection). Keep the messages ASCII-only: Windows PowerShell 5.1
+# constraint above.
+$agentRoot = Split-Path -Parent $Target
+$agentSkillsDst = Join-Path $agentRoot ".agents\skills"
+if ($AgentHosts -eq "none") {
+    if (Test-Path -LiteralPath $agentSkillsDst) {
+        $agentSkillDirs = Get-ChildItem -LiteralPath $agentSkillsDst -Directory | Where-Object {
+            $_.Name -like "agentdev-*"
+        }
+        foreach ($dir in $agentSkillDirs) {
+            try {
+                Remove-Item -LiteralPath $dir.FullName -Recurse -Force
+                Write-Host "install-from-archive: removed stale agent entry skill: .agents/skills/$($dir.Name)"
+            } catch {
+                Write-Host "install-from-archive: failed to remove agent entry skill '$($dir.FullName)': $($_.Exception.Message)" -ForegroundColor Red
+                exit 5
+            }
+        }
+    }
+} elseif ($AgentHosts) {
+    foreach ($skillDir in $skillDirs) {
+        $agentSkillFiles = Get-ChildItem -LiteralPath $skillDir.FullName -Recurse -File
+        foreach ($f in $agentSkillFiles) {
+            $rel = $f.FullName.Substring($skillsSrc.Length).TrimStart('\', '/')
+            $dst = Join-Path $agentSkillsDst $rel
+            Place-File -SrcFile $f.FullName -DstFile $dst
+        }
     }
 }
 
@@ -283,5 +326,8 @@ if ($null -eq $thirdPartyDeclPath) {
     }
 }
 
+if ($AgentHosts -and $AgentHosts -ne "none") {
+    Write-Host "install-from-archive: placed agent entry skills into $agentSkillsDst"
+}
 Write-Host "install-from-archive: placed commands, skills, tools, and plugins into $Target"
 exit 0

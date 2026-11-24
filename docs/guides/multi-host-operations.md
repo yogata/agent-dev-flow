@@ -15,11 +15,11 @@ AgentDevFlow は共通原本とホスト別接続領域に分かれる。
 | Codex 接続 | `src/codex/` | Codex 用 Skill 探索接続、入口構成、文書管理の接続指示 |
 | Antigravity 接続 | `src/antigravity/` | Antigravity 用 Skill 探索接続、入口構成、文書管理の接続指示 |
 
-導入時の投影は installer が行う。OpenCode 配置対象では `.opencode/` 配下の commands、skills、tools、plugins が共通原本へのジャンクションになる。Senpi 配置対象では `.senpi/` 直下へ `src/senpi/` 配下の各サブディレクトリが個別ジャンクションとして投影される。投影の選択と切替手順は [Consumer Project 導入](consumer-project-setup.md) を参照する。
+導入時の投影は installer が行う。OpenCode 配置対象では `.opencode/` 配下の commands、skills、tools、plugins が共通原本へのジャンクションになる。Senpi 配置対象では `.senpi/` 直下へ `src/senpi/` 配下の各サブディレクトリが個別ジャンクションとして投影される。Codex・Antigravity 配置対象（`-AgentHosts` による明示選択）では共有入口 root `.agents/skills/` へ共通原本の `agentdev-*` スキルがジャンクションとして投影される。投影の選択と切替手順は [Consumer Project 導入](consumer-project-setup.md) を参照する。
 
 両ホストの公開入口は同じ共通原本を参照する。ホスト別の業務手順のコピーは存在せず、共通原本への編集が両ホストへ反映される。
 
-Codex 接続と Antigravity 接続は限定配布である（DEC-069）。installer の投影対象とリリースアーカイブの同梱対象からは外れており、接続領域は原本リポジトリでの整備に留まる。
+Codex 接続と Antigravity 接続は限定配布である（DEC-069）。接続領域の原本（`src/codex/`、`src/antigravity/`）はリリースアーカイブに同梱され、installer は `-AgentHosts` による導入先リポジトリ単位の明示選択に応じて共有入口 root（`.agents/skills/`）へ共通原本の `agentdev-*` スキルを投影する。移管しない4機構と GitHub 操作の境界は「Codex と Antigravity の限定配布」節のとおりである。
 
 ## 対応を確認した組合せ
 
@@ -30,8 +30,8 @@ Codex 接続と Antigravity 接続は限定配布である（DEC-069）。instal
 | ADF | Wave 2 接続実装を統合した main（2026-10-02 時点） | 各 Wave 2 PR の検証記録 |
 | OpenCode | OmO v4.19.4 を想定した接続（first-class reference harness） | 共通 resolver 契約テスト、installer projection テスト |
 | Senpi | OmO Native v5 を想定した接続 | senpi-skill-discovery 契約テスト、Senpi Tool 登録テスト、guard 接続テスト |
-| Codex | 限定配布（Skill 探索と入口構成のみ。Tool 登録・hook・guard・取得機構なし） | codex-skill-discovery 契約テスト、構造テスト（実機での組合せ検証なし） |
-| Antigravity | 限定配布（同上。公開情報に基づく静的検討） | antigravity-skill-discovery 契約テスト、構造テスト（実機での組合せ検証なし） |
+| Codex | 限定配布（Skill 探索と入口構成のみ。Tool 登録・hook・guard・取得機構なし。installer は `-AgentHosts` による選択投影） | codex-skill-discovery 契約テスト、構造テスト、installer 選択投影の振る舞い試験（実機での組合せ検証なし） |
+| Antigravity | 限定配布（同上。公開情報に基づく静的検討） | antigravity-skill-discovery 契約テスト、構造テスト、installer 選択投影の振る舞い試験（実機での組合せ検証なし） |
 | バックエンド | GitHub 実装とローカルIssue実現（操作契約は Custom Tool 操作契約に限定） | Tool engine の共通契約テスト |
 
 実ランタイムでの全組合せ試験の試験記録は Epic #3316 の統合検証（Issue #3324）を参照する。対象は REQ-099-007 の OpenCode×GitHub、OpenCode×ローカルIssue、Senpi×GitHub、Senpi×ローカルIssue である。配置の完了や契約テストの結果をもって、全組合せの実行対応済みと報告しない。Codex と Antigravity の GitHub 操作は、各ホスト既存の GitHub プラグインの能力を利用者が確認してから用いる（詳細は「Codex と Antigravity の限定配布」節）。
@@ -61,7 +61,7 @@ Codex と Antigravity への対応は限定配布である（DEC-069）。取り
 | 公開入口 | `/agentdev/<業務名>` slash command | `agentdev-workflow-<業務名>` スキル | `agentdev-workflow-<業務名>` スキル |
 | Custom Tool（`agentdev_gh` 等） | 登録あり | 登録あり | 登録なし（ホスト既存 GitHub プラグインを利用者確認の上で使用） |
 | guard・hook | 接続あり | 接続あり | なし |
-| installer 投影・リリース同梱 | 対象 | 対象 | 対象外（原本リポジトリに接続領域のみ整備） |
+| installer 投影・リリース同梱 | 対象 | 対象 | 限定（`-AgentHosts` 明示選択時に共有入口 root のみ投影。接続領域原本はリリースアーカイブに同梱） |
 
 ### 取り込みとその根拠
 

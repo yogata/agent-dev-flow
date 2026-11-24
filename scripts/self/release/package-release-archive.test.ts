@@ -12,6 +12,11 @@
 //     commands/skills/tools + src/opencode/plugins) and places them into the
 //     .opencode/ projection as real files (junction-free), matching the
 //     boundary checker's archive-installed semantics (.opencode/**).
+//   - the new host connection areas (src/codex/, src/antigravity/) are
+//     staged into the release archive and the internal installer
+//     verification exercises -AgentHosts both; the archive-edition installer
+//     places the shared .agents/skills/ entry projection as real copies on
+//     explicit -AgentHosts selection (REQ-009-040).
 
 // ADF-COVERS(verification): REQ-099-020
 
@@ -61,6 +66,15 @@ describe("package-release-archive canonical collection (REQ-099-020)", () => {
     expect(text).not.toContain('Join-Path $repoRoot "src\\opencode\\commands\\agentdev"');
     expect(text).not.toContain('Join-Path $repoRoot "src\\opencode\\skills"');
     expect(text).not.toContain('Join-Path $repoRoot "src\\opencode\\$kind"');
+  });
+
+  test("new host connection areas are staged and the internal installer verification uses -AgentHosts both (REQ-009-040)", () => {
+    const text = fs.readFileSync(PACKAGE_ARCHIVE_PS1, "utf-8");
+    expect(text).toContain('Join-Path $repoRoot "src\\codex"');
+    expect(text).toContain('Join-Path $repoRoot "src\\antigravity"');
+    expect(text).toContain('@{ Name = "codex"');
+    expect(text).toContain('@{ Name = "antigravity"');
+    expect(text).toContain("-AgentHosts both");
   });
 
   test("archive-bundled install guide documents the canonical bundled layout", () => {
@@ -120,4 +134,35 @@ describe("archive-edition installer places the canonical projection (REQ-099-020
       rmrf(root);
     }
   }, 120000);
+
+  test("-AgentHosts selection places real-file skill copies under .agents/skills/ and none removes stale copies (REQ-009-040)", () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "adf-arch-agent-"));
+    try {
+      const src = path.join(root, "src");
+      fs.mkdirSync(path.join(src, "common", "commands", "agentdev"), { recursive: true });
+      fs.mkdirSync(path.join(src, "common", "skills", "agentdev-x"), { recursive: true });
+      fs.writeFileSync(path.join(src, "common", "commands", "agentdev", "case-run.md"), "# case-run\n", "utf-8");
+      fs.writeFileSync(path.join(src, "common", "skills", "agentdev-x", "SKILL.md"), "# x\n", "utf-8");
+      const target = path.join(root, ".opencode");
+
+      // Omitted -AgentHosts: neither placement nor removal under .agents/.
+      const plain = runPwsh(["-File", ARCHIVE_INSTALLER, "-Source", src, "-Target", target, "-Mode", "copy"], root);
+      expect(plain.exitCode).toBe(0);
+      expect(fs.existsSync(path.join(root, ".agents"))).toBe(false);
+
+      // Explicit selection: junction-free real-file copies under .agents/skills/.
+      const placed = runPwsh(["-File", ARCHIVE_INSTALLER, "-Source", src, "-Target", target, "-Mode", "copy", "-AgentHosts", "codex"], root);
+      expect(placed.exitCode).toBe(0);
+      const entry = path.join(root, ".agents", "skills", "agentdev-x", "SKILL.md");
+      expect(fs.existsSync(entry)).toBe(true);
+
+      // Explicit deselect: stale agentdev-* copies are removed.
+      const removed = runPwsh(["-File", ARCHIVE_INSTALLER, "-Source", src, "-Target", target, "-Mode", "copy", "-AgentHosts", "none"], root);
+      expect(removed.exitCode).toBe(0);
+      expect(removed.stdout).toContain("removed stale agent entry skill: .agents/skills/agentdev-x");
+      expect(fs.existsSync(path.join(root, ".agents", "skills", "agentdev-x"))).toBe(false);
+    } finally {
+      rmrf(root);
+    }
+  }, 240000);
 });

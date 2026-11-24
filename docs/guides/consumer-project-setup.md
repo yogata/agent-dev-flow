@@ -30,8 +30,8 @@ AgentDevFlow は5種のリポジトリ種別を定義する（詳細は Design [
 src/common/          → 共通原本（host 非依存の業務契約・本文、template、Tool engine、guard 共通判定）
 src/opencode/        → OpenCode 接続領域の原本（plugin/hook 原本）
 src/senpi/           → Senpi 接続領域の原本（配置契約。明示指定時に .senpi/ へ投影）
-src/codex/           → Codex 接続領域の原本（限定配布。投影対象外）
-src/antigravity/     → Antigravity 接続領域の原本（限定配布。投影対象外）
+src/codex/           → Codex 接続領域の原本（限定配布。リリースアーカイブに同梱、self-sync の投影対象外）
+src/antigravity/     → Antigravity 接続領域の原本（限定配布。リリースアーカイブに同梱、self-sync の投影対象外）
 scripts/
   self-sync.ps1      → AgentDevFlow 本体リポジトリ用同期スクリプト（self-hosting 向け公開入口）
 ```
@@ -47,8 +47,8 @@ scripts/
   src/common/                    → 共通原本（commands・skills・tools の投影元）
   src/opencode/                  → OpenCode 接続領域（plugins の投影元）
   src/senpi/                     → Senpi 接続領域（Senpi 配置対象選択時の投影元。配置契約は同 README）
-  src/codex/                     → Codex 接続領域（限定配布。投影元ではない）
-  src/antigravity/               → Antigravity 接続領域（限定配布。投影元ではない）
+  src/codex/                     → Codex 接続領域（限定配布。`-AgentHosts` 投影の投影元ではない）
+  src/antigravity/               → Antigravity 接続領域（限定配布。`-AgentHosts` 投影の投影元ではない）
   scripts/install.ps1            → 適用プロジェクト用公開入口（install・check・dry-run。配置対象ホスト選択を含む）
   scripts/consumer/              → install.ps1 の内部処理（単体実行しない）
 .opencode/
@@ -58,12 +58,16 @@ scripts/
   skills/{local}-*/               → プロジェクト独自スキル（実ディレクトリ）
 .senpi/                           → Senpi 配置対象選択時のみ作成。.agentdev-plugin/src/senpi/ 配下の
                                      各サブディレクトリへの個別ジャンクション投影
+.agents/skills/agentdev-*/        → Codex・Antigravity 配置対象選択時（-AgentHosts codex / antigravity /
+                                     both）のみ作成。.agentdev-plugin/src/common/skills/agentdev-* への
+                                     ジャンクション投影（両ホスト共通の共有入口 root）
 ```
 
 - `.agentdev-plugin/` に agent-dev-flow のチェックアウトを配置する（git clone またはソース ZIP 展開、`.agentdev/` ではない）
 - `.agentdev/` は AgentDevFlow のドメイン状態用（Intake, Learning, Backlog 等）として予約
 - `.opencode/` は AgentDevFlow 提供 command/skill とプロジェクト独自設定の混在場所
 - 配置対象ホスト（OpenCode のみ / Senpi のみ / 両方）は `install.ps1 -Hosts` または対話ウィザードで選択する。`-Hosts` 未指定の更新では現在の配置対象が維持され、明示指定時のみ変更される（REQ-099-010）。ホスト別の投影（`.opencode/` と `.senpi/`）は管理範囲が分離され、片方の更新・除去は他方を壊さない（REQ-099-012）
+- Codex・Antigravity は `-AgentHosts`（`codex` / `antigravity` / `both` / `none`）またはウィザードの選択で導入先リポジトリ単位で選択する。新規導入で選択しなければ配置されず、既存導入で省略した場合は現在の配置が維持され、明示指定でのみ変更・解除される。投影先は両ホスト共通の共有入口 root `.agents/skills/` であり、OpenCode・Senpi の投影（`.opencode/`、`.senpi/`）とは管理範囲が分離される（REQ-099-012）
 - AgentDevFlow 提供ファイルは ジャンクション（更新時にチェックアウトを更新すれば自動反映）
 - プロジェクト独自ファイルは直接管理する
 
@@ -200,6 +204,11 @@ git clone https://github.com/yogata/agent-dev-flow.git .agentdev-plugin
 ./.agentdev-plugin/scripts/install.ps1 -Mode apply -Hosts both
 ./.agentdev-plugin/scripts/install.ps1 -Mode apply -Hosts opencode
 ./.agentdev-plugin/scripts/install.ps1 -Mode apply -Hosts senpi
+
+# Codex / Antigravity の明示選択（別の選択軸。省略時は新規導入で配置なし・既存導入で現状維持）
+./.agentdev-plugin/scripts/install.ps1 -Mode apply -AgentHosts codex
+./.agentdev-plugin/scripts/install.ps1 -Mode apply -AgentHosts antigravity
+./.agentdev-plugin/scripts/install.ps1 -Mode apply -AgentHosts both
 ```
 
 ### 配置対象ホストの選択（REQ-099-010）
@@ -218,7 +227,7 @@ git clone https://github.com/yogata/agent-dev-flow.git .agentdev-plugin
 >
 > スクリプトを `./scripts/` として導入先リポジトリに置く場合は、`.agentdev-plugin/` と同一のチェックアウトから scripts/ ディレクトリ全体をコピーする（公開入口 `install.ps1` は内部処理 `scripts/consumer/` に依存する）。
 
-Codex と Antigravity は配置対象ホストの選択肢に含まれない。両ホストの対応は限定配布であり（[DEC-069](../decisions/DEC-069.md)）、`install.ps1` と `self-sync.ps1` の投影対象とリリースアーカイブの同梱対象から外れている。チェックアウトに含まれる接続領域（`src/codex/`、`src/antigravity/`）は導入先では使用されない。境界と GitHub 操作の案内は [マルチホスト運用](multi-host-operations.md) の「Codex と Antigravity の限定配布」節を参照する。
+Codex と Antigravity は `-Hosts`（OpenCode / Senpi / 両方）の選択肢には含まれず、`-AgentHosts` による別の選択軸である。両ホストの対応は限定配布であり（[DEC-069](../decisions/DEC-069.md)）、Tool 登録・hook・guard・取得機構の4機構は投影しない。`self-sync.ps1`（本体リポジトリ）は両ホストを投影対象としない。リリースアーカイブは接続領域の原本（`src/codex/`、`src/antigravity/`）を同梱する。境界と GitHub 操作の案内は [マルチホスト運用](multi-host-operations.md) の「Codex と Antigravity の限定配布」節を参照する。
 
 ### GitHub repo 設定 deleteBranchOnMerge（必須導入条件）
 
@@ -307,7 +316,7 @@ scripts/ 直下の公開入口は consumer 向け `scripts/install.ps1` と self
 | スクリプト | 対象リポジトリ種別 | 役割 |
 |--------|---------------|------|
 | `scripts/self-sync.ps1` | `self-hosting` | `src/common/` + `src/opencode/` → `.opencode/` の同期（apply / check / dry-run）。`-Hosts` 明示指定時は `src/senpi/` → `.senpi/` 投影を含められる（REQ-099-010）。省略時は現在の配置対象を維持 |
-| `scripts/install.ps1` | `consumer-with-agentdev`, `consumer-generated` | チェックアウト済み `.agentdev-plugin/` を前提としたジャンクション作成（apply / check / dry-run）。配置対象ホスト（OpenCode のみ / Senpi のみ / 両方）の選択を含む。check は状態確認（link mode 自動検出、版報告は `.git` 存在時のみ、orphan 検出、実行環境診断を含む）を兼ねる |
+| `scripts/install.ps1` | `consumer-with-agentdev`, `consumer-generated` | チェックアウト済み `.agentdev-plugin/` を前提としたジャンクション作成（apply / check / dry-run）。配置対象ホスト（OpenCode のみ / Senpi のみ / 両方）と新ホスト選択（`-AgentHosts`: codex / antigravity / both / none）の選択を含む。check は状態確認（link mode 自動検出、版報告は `.git` 存在時のみ、orphan 検出、実行環境診断を含む）を兼ねる |
 | （link 設定: `-LocalMode`） | `consumer-generated` | `install.ps1 -Mode apply -LocalMode` が Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）のみ `src/common/tools/agentdev-gh/local/` へ接続し、それ以外を原本（`src/common/` 配下 + `src/opencode/plugins/`）へ接続する（REQ-011-006）。決定的な変換ロジックを実装したスクリプトは使用しない |
 
 ### 本体リポジトリ（self-hosting）での同期
@@ -360,6 +369,8 @@ scripts/ 直下の公開入口は consumer 向け `scripts/install.ps1` と self
 .opencode/plugins/agentdev-*.ts
 # Senpi 配置対象選択時（-Hosts senpi / both）の投影先
 .senpi/
+# Codex / Antigravity 配置対象選択時（-AgentHosts codex / antigravity / both）の投影先
+.agents/skills/agentdev-*/
 ```
 
 `.agentdev/` は AgentDevFlow のドメイン状態（Intake, Learning, Backlog 等）を保持し、git 管理対象であるため gitignore に**含めない**こと。
@@ -377,7 +388,7 @@ Custom Tool（`.opencode/tools/agentdev-*/`）と Plugin / Hook（`.opencode/plu
 3. GitHub repo 設定 `deleteBranchOnMerge=true` を設定し、確認コマンドで `true` を確認する（上記「GitHub repo 設定 deleteBranchOnMerge（必須導入条件）」参照。設定が無効・照会不能の場合も Case 開始は停止しないが、リモートブランチの自動削除が機能しない・確認できない運用上の帰結は同節に記載する）
 4. `./.agentdev-plugin/scripts/install.ps1 -Mode check` で動作確認（配置検査と実行環境診断が区別されて報告される）
 5. `.agentdev/` ディレクトリが存在することを確認（Intake/Learning 用）
-6. `.gitignore` に推奨エントリを追加（Senpi 選択時は `.senpi/` を含める）
+6. `.gitignore` に推奨エントリを追加（Senpi 選択時は `.senpi/` を、Codex・Antigravity 選択時は `.agents/skills/agentdev-*/` を含める）
 
 ### 既存プロジェクトへの導入手順
 

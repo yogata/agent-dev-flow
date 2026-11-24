@@ -1631,6 +1631,43 @@ describe("distribution-boundary-fs junction / symlink traversal (REQ-029-006)", 
       fs.rmSync(root, { recursive: true, force: true });
     }
   });
+
+  test("installed projections enumerate the shared agent entry projection (.agents/skills/, REQ-009-040)", () => {
+    const root = makeTempRepo();
+    try {
+      if (!createSkillJunction(root, "agentdev-demo")) {
+        console.log("skipping: junction / symlink unavailable on this environment");
+        return;
+      }
+      const agentParent = path.join(root, ".agents", "skills");
+      fs.mkdirSync(agentParent, { recursive: true });
+      const kind = process.platform === "win32" ? "junction" : "dir";
+      fs.symlinkSync(
+        path.join(root, "src", "common", "skills", "agentdev-demo"),
+        path.join(agentParent, "agentdev-demo"),
+        kind,
+      );
+
+      for (const projection of ["link", "archive-installed"] as const) {
+        const listing = collectTargets(root, projection).textFiles
+          .map((f) => f.replace(/\\/g, "/"));
+        expect(
+          listing.some((f) => f.endsWith(".agents/skills/agentdev-demo/SKILL.md")),
+        ).toBe(true);
+        expect(
+          listing.some((f) => f.endsWith(".agents/skills/agentdev-demo/references/guide.md")),
+        ).toBe(true);
+      }
+      // Producer-side projections never scan the installed entry projection.
+      for (const projection of ["source", "archive"] as const) {
+        const listing = collectTargets(root, projection).textFiles
+          .map((f) => f.replace(/\\/g, "/"));
+        expect(listing.some((f) => f.includes("/.agents/"))).toBe(false);
+      }
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
 });
 
 // =============================================================================

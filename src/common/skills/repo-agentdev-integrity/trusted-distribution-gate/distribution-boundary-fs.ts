@@ -16,7 +16,7 @@
 //   - source/archive        -> src/common/{commands,skills,tools}/** +
 //                              src/opencode/plugins/** +
 //                              src/codex/**, src/antigravity/**
-//   - link/archive-installed-> .opencode/**
+//   - link/archive-installed-> .opencode/** + .agents/skills/**
 // The canonical content lives under src/common/ (host-agnostic canonical
 // tree, DEC-049); host-specific plugin/hook sources stay in their host
 // connection area (src/opencode/plugins). Both projections enumerate the
@@ -24,9 +24,12 @@
 // host connection area into .opencode/**); the directory choice reflects
 // where the scanner must look for that projection.
 // The limited-distribution host connection areas (src/codex, src/antigravity;
-// DEC-069) are canonical-tree roots only: neither the installer nor the
-// release archive carries them, so the installed projections do not
-// enumerate them.
+// DEC-069) are canonical-tree roots: the source/archive projections
+// enumerate them (the release archive stages them for distribution
+// completeness), but the installed projections do not enumerate the
+// connection areas themselves — the installer places only their shared
+// entry projection (.agents/skills/agentdev-*, projected from the
+// canonical skills), which the installed projections enumerate.
 
 import * as path from "path";
 import * as fs from "fs";
@@ -209,11 +212,20 @@ export function collectTargets(repoRoot: string, projection: Projection): Artifa
   // (REQ-052); other entries under these parents are repo-local and ignored.
   const shippableDistribution = (name: string): boolean => name.startsWith("agentdev-");
 
-  for (const [rel, accept] of [
+  // Shared entry projection (Codex / Antigravity entry root, DEC-069):
+  // installed projections only. The installer places agentdev-* skills at
+  // .agents/skills/ (junctions at checkout install, real copies at archive
+  // install); the shippable filter matches the skills parents above so the
+  // entry projection is scanned with the same semantics.
+  const scanParents: Array<[string, (name: string) => boolean]> = [
     [skillsRel, shippableSkills],
     [isInstalledProjection ? path.join(".opencode", "tools") : PUBLIC_TOOLS_PARENT, shippableDistribution],
     [isInstalledProjection ? path.join(".opencode", "plugins") : PUBLIC_PLUGINS_PARENT, shippableDistribution],
-  ] as const) {
+  ];
+  if (isInstalledProjection) {
+    scanParents.push([path.join(".agents", "skills"), shippableSkills]);
+  }
+  for (const [rel, accept] of scanParents) {
     const parent = path.join(repoRoot, rel);
     if (!dirExists(parent)) continue;
     let entries: Array<fs.Dirent>;
