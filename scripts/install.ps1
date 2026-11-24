@@ -870,7 +870,9 @@ if ($Mode -eq 'check') {
         $legacyRels = @(Get-LegacyStructureRels)
         $adfManagedProjectionPresent = $false
         foreach ($relPath in $targets) {
-            if (Test-Junction -Path (Join-Path $ProjectionDir $relPath)) { $adfManagedProjectionPresent = $true; break }
+            $senpiRel = Resolve-SenpiTargetRel -TargetEntry $relPath
+            $managedPath = if ($null -ne $senpiRel) { Join-Path $SenpiProjectionDir $senpiRel } else { Join-Path $ProjectionDir $relPath }
+            if (Test-Junction -Path $managedPath) { $adfManagedProjectionPresent = $true; break }
         }
         if (-not $adfManagedProjectionPresent) {
             Write-Host "[INFO] No ADF-managed projections placed yet; version state is not verified (distribution version: $DistributionVersion)"
