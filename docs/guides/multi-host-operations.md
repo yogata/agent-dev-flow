@@ -63,6 +63,16 @@ Codex と Antigravity への対応は限定配布である（DEC-069）。取り
 | guard・hook | 接続あり | 接続あり | なし |
 | installer 投影・リリース同梱 | 対象 | 対象 | 対象外（原本リポジトリに接続領域のみ整備） |
 
+### 取り込みとその根拠
+
+取り込みは次の3つである。ホストの既存能力に同等のものがあるかどうかと、取り込むと判断した根拠を併記する。ホストの能力は公開資料に基づき、公開資料に記載のないものは「記載なし」とする。取り込まない機構と GitHub 操作の扱いは、本節冒頭の4項目のとおりである。
+
+| 取り込み | ホスト既存の能力 | 不足と判断した根拠 | 対象契約 |
+|---|---|---|---|
+| Skill 探索の接続 | あり（`.agents/skills` 配下のスキルを name と description で発見し、選択時に `SKILL.md` を読み込む） | 指定 workspace への拘束と、共通原本 `src/common/skills/` への fallback の記載がない | `src/common/skills/agentdev-skill-resolution/`（skill-resolution） |
+| command 全文の適用 | 記載なし | スキルの読込前に command 本文を適用する機構の記載がない | `src/common/skills/agentdev-skill-resolution/`（command-entry） |
+| 終了時の品質ゲート | 未確認 | ホスト側に同等の最終検査があることを公開資料で確認できていないため、ADF 既存の `gate.ts` を使う | `src/opencode/plugins/agentdev-textlint-guard/gate.ts` |
+
 ### 公開典拠
 
 Codex の入口 root（`.agents/skills`）は Codex の公開文書（[Build skills](https://learn.chatgpt.com/docs/build-skills)）に基づく。Antigravity の入口 root（`.agents/skills`）は Antigravity の公開資料（[Agent skills](https://antigravity.google/docs/skills/)）が示す既定の root に基づく。Antigravity は公開情報に基づく静的検討であり、実機確認は行っていない。
