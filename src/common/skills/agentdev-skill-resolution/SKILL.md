@@ -1,13 +1,13 @@
 ---
 name: agentdev-skill-resolution
-description: Owns the host-independent deterministic contract for skill discovery, bundled asset resolution, and workspace root resolution. USE FOR: resolving parent/child skills via entry projections with canonical fallback and workspace containment checks. DO NOT USE FOR: host runtime bindings, skill content judgment, editing skills, installing distributions.
+description: Owns the host-independent deterministic contract for skill discovery, public command entry resolution, bundled asset resolution, and workspace root resolution. USE FOR: resolving parent/child skills via entry projections with canonical fallback, resolving the full command text and delegated Workflow Skill for a public entry, workspace containment checks. DO NOT USE FOR: host runtime bindings, skill content judgment, editing skills, installing distributions.
 ---
 
 # Skill 探索・読込と workspace 解決（skill-resolution）
 
-このスキルは、親と子の Skill 読込、同梱 reference・template・script の参照解決、実行時 workspace の解決を、ホスト差の背後で同一に保つ決定的契約の**正規所有者**として機能する。業務契約の正本は共通正本側に置かれ、ホスト接続領域（`src/opencode/`、`src/senpi/`）は公開入口の束縛のみを行い、解決規則を重複実装しない。
+このスキルは、親と子の Skill 読込、同梱 reference・template・script の参照解決、実行時 workspace の解決を、ホスト差の背後で同一に保つ決定的契約の**正規所有者**として機能する。業務契約の正本は共通正本側に置かれ、ホスト接続領域（`src/opencode/`、`src/senpi/`、`src/codex/`、`src/antigravity/`）は公開入口の束縛のみを行い、解決規則を重複実装しない。
 
-- **このスキル（契約本体）**: 探索・読込・同梱参照解決・workspace 解決の決定的 lib と対応 test、公開契約の記述
+- **このスキル（契約本体）**: 探索・読込・同梱参照解決・workspace 解決・公開 command 入口解決の決定的 lib と対応 test、公開契約の記述
 - **適用先**: 各ホスト接続領域の Skill 探索・読込接続（共通 lib への束縛）、Skill 読込経路の契約検証
 
 ---
@@ -19,6 +19,7 @@ description: Owns the host-independent deterministic contract for skill discover
 | 責務 | 本スキル | 対象外（他の責務） |
 |------|----------|--------------------|
 | 親・子 Skill の探索・読込契約 | ✓ | ホスト接続領域（entry root の束縛） |
+| 公開 command 入口の読取専用解決（command 全文と委譲先 Workflow Skill） | ✓ | command 本文の内容判断・自然言語解析 |
 | 同梱 reference・template・script の参照解決 | ✓ | Skill 本文の内容判断 |
 | 実行時 workspace root の解決と収束検証 | ✓ | 編集操作・Tool・guard の個別意味論 |
 | 破損した投影 entry（stale・未伝播リンク相当）の skip | ✓ | 投影の再構築（installer・運用） |
@@ -32,6 +33,7 @@ description: Owns the host-independent deterministic contract for skill discover
 4. **親と子**: 子 Skill は親 Skill ディレクトリ相対ではなく、親と同一のホスト契約で解決する。
 5. **同梱参照解決**: Skill に同梱された reference・template・script は Skill ディレクトリ相対で解決し、Skill ディレクトリの外へ越出しする参照は、ファイルシステムへ触れる前に拒否する。Skill root 内に収まる相対パスは合法であり、不在の場合は不在を返す。
 6. **決定性**: 存在確認以外の読み込みを行わず、環境に依存せず、結果は入力のみから決まる。
+7. **公開 command 入口**: 業務名は command ファイル名の語幹とし、Skill 名と同一の形状制約に従う。委譲先 Workflow Skill は command 本文の workflow 節から読み取り、節がちょうど1つの `agentdev-workflow-*` トークンを指し、かつその名前が `agentdev-workflow-<業務名>` と一致することを要請する。文章の言い回しは固定せず、引数は無改変で返す。
 
 ## 公開契約（`scripts/src/skill-resolution.ts`）
 
@@ -45,10 +47,18 @@ description: Owns the host-independent deterministic contract for skill discover
 
 各関数は成否を明示した判別結果（`ok` と失敗理由）を返し、例外を解決経路の制御に使わない。
 
+## 公開契約（`scripts/src/command-entry.ts`）
+
+| 関数 | 役割 |
+|------|------|
+| `resolveCommandEntry(commandsDir, businessName)` | command 本文全文と、workflow 節が指す委譲先 Workflow Skill 名を解決する |
+| `applyPublicEntry({ commandsDir, entrySkillsDirs, canonicalSkillsDir, businessName, args })` | command 全文・解決済み Workflow Skill・無改変の引数からなる適用結果を組み立てる |
+| `expectedWorkflowSkillName(businessName)` | 公開入口の Skill 名（`agentdev-workflow-<業務名>`）を導出する |
+
 ## 実行方法
 
 ```bash
-bun test ./src/common/skills/agentdev-skill-resolution/scripts/tests/skill-resolution.test.ts
+bun test ./src/common/skills/agentdev-skill-resolution/scripts/tests/
 ```
 
 テストは一時ディレクトリ配下に workspace を構成し、メインリポジトリや他 worktree に書き込まない。

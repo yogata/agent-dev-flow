@@ -26,7 +26,7 @@
 # （docs/designs/local/third-party-skill-management.md）。
 
 schema_version: 1
-generated_at: 2026-11-23
+generated_at: 2026-11-24
 
 skills:
   - agentdev-adopted-conventions
@@ -44,6 +44,7 @@ skills:
   - agentdev-doc-diagnostics
   - agentdev-epic-tracker
   - agentdev-git-worktree
+  - agentdev-host-github-guidance
   - agentdev-inspect-skills
   - agentdev-intake-pipeline
   - agentdev-issue-management

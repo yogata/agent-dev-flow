@@ -30,6 +30,8 @@ AgentDevFlow は5種のリポジトリ種別を定義する（詳細は Design [
 src/common/          → 共通原本（host 非依存の業務契約・本文、template、Tool engine、guard 共通判定）
 src/opencode/        → OpenCode 接続領域の原本（plugin/hook 原本）
 src/senpi/           → Senpi 接続領域の原本（配置契約。明示指定時に .senpi/ へ投影）
+src/codex/           → Codex 接続領域の原本（限定配布。投影対象外）
+src/antigravity/     → Antigravity 接続領域の原本（限定配布。投影対象外）
 scripts/
   self-sync.ps1      → AgentDevFlow 本体リポジトリ用同期スクリプト（self-hosting 向け公開入口）
 ```
@@ -45,6 +47,8 @@ scripts/
   src/common/                    → 共通原本（commands・skills・tools の投影元）
   src/opencode/                  → OpenCode 接続領域（plugins の投影元）
   src/senpi/                     → Senpi 接続領域（Senpi 配置対象選択時の投影元。配置契約は同 README）
+  src/codex/                     → Codex 接続領域（限定配布。投影元ではない）
+  src/antigravity/               → Antigravity 接続領域（限定配布。投影元ではない）
   scripts/install.ps1            → 適用プロジェクト用公開入口（install・check・dry-run。配置対象ホスト選択を含む）
   scripts/consumer/              → install.ps1 の内部処理（単体実行しない）
 .opencode/
@@ -213,6 +217,8 @@ git clone https://github.com/yogata/agent-dev-flow.git .agentdev-plugin
 > ZIP 展開チェックアウト（`.git` なし）は正規の provisioning 形態だが、サポート対象外の環境である（不具合報告の受け付け対象外、REQ-009-048）。
 >
 > スクリプトを `./scripts/` として導入先リポジトリに置く場合は、`.agentdev-plugin/` と同一のチェックアウトから scripts/ ディレクトリ全体をコピーする（公開入口 `install.ps1` は内部処理 `scripts/consumer/` に依存する）。
+
+Codex と Antigravity は配置対象ホストの選択肢に含まれない。両ホストの対応は限定配布であり（[DEC-069](../decisions/DEC-069.md)）、`install.ps1` と `self-sync.ps1` の投影対象とリリースアーカイブの同梱対象から外れている。チェックアウトに含まれる接続領域（`src/codex/`、`src/antigravity/`）は導入先では使用されない。境界と GitHub 操作の案内は [マルチホスト運用](multi-host-operations.md) の「Codex と Antigravity の限定配布」節を参照する。
 
 ### GitHub repo 設定 deleteBranchOnMerge（必須導入条件）
 

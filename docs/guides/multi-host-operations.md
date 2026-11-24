@@ -1,7 +1,7 @@
-# マルチホスト運用ガイド（OpenCode と Senpi の併存利用）
+# マルチホスト運用ガイド（OpenCode と Senpi の併存利用、Codex と Antigravity の限定配布）
 
-OpenCode と Senpi（OmO Native v5）を併存利用するための運用手順をまとめたガイドである。
-構造の正はマルチホスト原本モデル Design（[マルチホスト原本モデル](../designs/foundations/multi-host-canonical-model.md)）、意思決定の正は [DEC-049](../decisions/DEC-049.md)、成果の正は [REQ-099](../requirements/REQ-099.md) とする。本ガイドは基準を複製せず、手順と判断材料へ導く。
+OpenCode と Senpi（OmO Native v5）を併存利用するための運用手順に加え、Codex と Antigravity の限定配布についても案内するガイドである。
+構造の正はマルチホスト原本モデル Design（[マルチホスト原本モデル](../designs/foundations/multi-host-canonical-model.md)）、意思決定の正は [DEC-049](../decisions/DEC-049.md)、Codex と Antigravity の限定配布の意思決定は [DEC-069](../decisions/DEC-069.md)、成果の正は [REQ-099](../requirements/REQ-099.md) とする。本ガイドは基準を複製せず、手順と判断材料へ導く。
 
 ## 構造の全体像
 
@@ -12,10 +12,14 @@ AgentDevFlow は共通原本とホスト別接続領域に分かれる。
 | 共通原本 | `src/common/` | 業務契約・本文（commands、skills）、template、Tool engine、guard 共通判定 |
 | OpenCode 接続 | `src/opencode/` | OpenCode 用 plugin/hook の原本、Tool 登録配線、guard 接続 |
 | Senpi 接続 | `src/senpi/` | Senpi 用 Tool 登録単位、Skill 探索接続、guard 接続 |
+| Codex 接続 | `src/codex/` | Codex 用 Skill 探索接続、入口構成、文書管理の接続指示 |
+| Antigravity 接続 | `src/antigravity/` | Antigravity 用 Skill 探索接続、入口構成、文書管理の接続指示 |
 
 導入時の投影は installer が行う。OpenCode 配置対象では `.opencode/` 配下の commands、skills、tools、plugins が共通原本へのジャンクションになる。Senpi 配置対象では `.senpi/` 直下へ `src/senpi/` 配下の各サブディレクトリが個別ジャンクションとして投影される。投影の選択と切替手順は [Consumer Project 導入](consumer-project-setup.md) を参照する。
 
 両ホストの公開入口は同じ共通原本を参照する。ホスト別の業務手順のコピーは存在せず、共通原本への編集が両ホストへ反映される。
+
+Codex 接続と Antigravity 接続は限定配布である（DEC-069）。installer の投影対象とリリースアーカイブの同梱対象からは外れており、接続領域は原本リポジトリでの整備に留まる。
 
 ## 対応を確認した組合せ
 
@@ -26,9 +30,11 @@ AgentDevFlow は共通原本とホスト別接続領域に分かれる。
 | ADF | Wave 2 接続実装を統合した main（2026-10-02 時点） | 各 Wave 2 PR の検証記録 |
 | OpenCode | OmO v4.19.4 を想定した接続（first-class reference harness） | 共通 resolver 契約テスト、installer projection テスト |
 | Senpi | OmO Native v5 を想定した接続 | senpi-skill-discovery 契約テスト、Senpi Tool 登録テスト、guard 接続テスト |
+| Codex | 限定配布（Skill 探索と入口構成のみ。Tool 登録・hook・guard・取得機構なし） | codex-skill-discovery 契約テスト、構造テスト（実機での組合せ検証なし） |
+| Antigravity | 限定配布（同上。公開情報に基づく静的検討） | antigravity-skill-discovery 契約テスト、構造テスト（実機での組合せ検証なし） |
 | バックエンド | GitHub 実装とローカルIssue実現（操作契約は Custom Tool 操作契約に限定） | Tool engine の共通契約テスト |
 
-実ランタイムでの全組合せ試験の試験記録は Epic #3316 の統合検証（Issue #3324）を参照する。対象は REQ-099-007 の OpenCode×GitHub、OpenCode×ローカルIssue、Senpi×GitHub、Senpi×ローカルIssue である。配置の完了や契約テストの結果をもって、全組合せの実行対応済みと報告しない。
+実ランタイムでの全組合せ試験の試験記録は Epic #3316 の統合検証（Issue #3324）を参照する。対象は REQ-099-007 の OpenCode×GitHub、OpenCode×ローカルIssue、Senpi×GitHub、Senpi×ローカルIssue である。配置の完了や契約テストの結果をもって、全組合せの実行対応済みと報告しない。Codex と Antigravity の GitHub 操作は、各ホスト既存の GitHub プラグインの能力を利用者が確認してから用いる（詳細は「Codex と Antigravity の限定配布」節）。
 
 ## バックエンドとホストの選択
 
@@ -38,6 +44,64 @@ AgentDevFlow は共通原本とホスト別接続領域に分かれる。
 - Senpi 側の `agentdev_gh` 登録単位は既定で GitHub 実装へ接続する。Senpi 向け投影パス（`.senpi/tools/agentdev-gh/`）に Local 実装が存在する場合のみ、単一の runner として Local 実装へ差し替わる
 - 同じ Tool 名で両バックエンドを同時有効化しない。選択したバックエンドの1つに接続する
 - バックエンドの疎通確認と診断は「受入確認と診断」節を参照する
+
+## Codex と Antigravity の限定配布
+
+Codex と Antigravity への対応は限定配布である（DEC-069）。取り込みの根拠と境界は次のとおりである。
+
+- **取り込みの根拠**: ADF が補うのは共通原本への接続（Skill 探索、command 全文の適用）と品質の終了時確認に限定する。ホストが既に持つ能力（GitHub プラグイン等）を ADF で再実装しない
+- **移管しない機構**: Custom Tool 登録（`agentdev_gh`、`agentdev_third_party`）、hook、guard、third-party 取得機構の4機構は両ホストへ移管しない。MCP も実装しない
+- **GitHub 操作**: 各ホスト既存の GitHub プラグインの能力を利用者が確認してから用いる。Issue・PR・Release の作成と更新は OpenCode へ引き渡す（共通スキル `agentdev-host-github-guidance`）
+- **OpenCode の併用**: OpenCode を併用するのは GitHub 操作の引き渡しと終了時の品質ゲートの2つに限定する。それ以外の機能に OpenCode の併用を前提としない
+
+### 能力比較
+
+| 項目 | OpenCode | Senpi | Codex・Antigravity |
+|---|---|---|---|
+| 公開入口 | `/agentdev/<業務名>` slash command | `agentdev-workflow-<業務名>` スキル | `agentdev-workflow-<業務名>` スキル |
+| Custom Tool（`agentdev_gh` 等） | 登録あり | 登録あり | 登録なし（ホスト既存 GitHub プラグインを利用者確認の上で使用） |
+| guard・hook | 接続あり | 接続あり | なし |
+| installer 投影・リリース同梱 | 対象 | 対象 | 対象外（原本リポジトリに接続領域のみ整備） |
+
+### 取り込みとその根拠
+
+取り込みは次の3つである。ホストの既存能力に同等のものがあるかどうかと、取り込むと判断した根拠を併記する。ホストの能力は公開資料に基づき、公開資料に記載のないものは「記載なし」とする。取り込まない機構と GitHub 操作の扱いは、本節冒頭の4項目のとおりである。
+
+| 取り込み | ホスト既存の能力 | 不足と判断した根拠 | 対象契約 |
+|---|---|---|---|
+| Skill 探索の接続 | あり（`.agents/skills` 配下のスキルを name と description で発見し、選択時に `SKILL.md` を読み込む） | 指定 workspace への拘束と、共通原本 `src/common/skills/` への fallback の記載がない | `src/common/skills/agentdev-skill-resolution/`（skill-resolution） |
+| command 全文の適用 | 記載なし | スキルの読込前に command 本文を適用する機構の記載がない | `src/common/skills/agentdev-skill-resolution/`（command-entry） |
+| 終了時の品質ゲート | 未確認 | ホスト側に同等の最終検査があることを公開資料で確認できていないため、ADF 既存の `gate.ts` を使う | `src/opencode/plugins/agentdev-textlint-guard/gate.ts` |
+
+### 公開典拠
+
+Codex の入口 root（`.agents/skills`）は Codex の公開文書（[Build skills](https://learn.chatgpt.com/docs/build-skills)）に基づく。Antigravity の入口 root（`.agents/skills`）は Antigravity の公開資料（[Agent skills](https://antigravity.google/docs/skills/)）が示す既定の root に基づく。Antigravity は公開情報に基づく静的検討であり、実機確認は行っていない。
+
+### 利用者が行う動作確認項目と期待結果
+
+| 確認項目 | 期待結果 |
+|---|---|
+| 入口スキルの解決 | `agentdev-workflow-<業務名>` が各ホストの入口 root から解決できる |
+| command 本文の読込 | 業務名に対応する command 全文が読み込まれ、引数の意味が OpenCode・Senpi と同一である |
+| 書込先の拘束 | 共通原本領域外への書込が接続の判定で拒否される |
+| GitHub 操作の能力確認 | ホストの GitHub プラグイン能力が利用者により確認済みである。確認できない操作は blocked として報告される |
+| Issue/PR 作成の引き渡し | Issue・PR・Release の作成と更新が OpenCode 側で実行される |
+| 終了時の品質ゲート | 対象 worktree に対する最終検査（`gate.ts`）の終了コードが `0` である。違反がある場合は終了コード `1` となり、成功として扱われない |
+
+### 終了時の品質ゲート
+
+両ホストには書込み前 hook を登録しない。そのため作業に使った worktree を閉じる前に、OpenCode 向けの最終検査（`gate.ts`）を対象 worktree に対して実行し、不合格のまま閉じない。
+
+1. 対象 worktree で変更を確定させる
+2. AgentDevFlow が導入済みの配置にある `gate.ts` を、`--root` に対象 worktree のパスを指定して実行する（`gate.ts` の配置場所は plugin の README「導入時の依存生成手順」の表を参照）
+
+```bash
+bun <plugin 配置>/gate.ts --root <対象 worktree のパス>
+```
+
+期待結果は終了コード `0`（拒否対象の違反ゼロ）である。終了コード `1`（違反あり、検査不能、未完了、対象 0 件）と `2`（引数エラー）は不合格であり、成功として扱わない。検査対象は対象 worktree の `docs/` 配下の Markdown ファイルと、追加対象として設定したファイルである。plugin の依存成果物が未生成の場合は検査不能として不合格になるため、事前に plugin の README に従って生成する。
+
+接続領域の構成と手順の詳細は `src/codex/README.md` と `src/antigravity/README.md` を参照する。
 
 ## 運用責任（ユーザーに留保される判断）
 
@@ -87,6 +151,7 @@ AgentDevFlow は共通原本とホスト別接続領域に分かれる。
 
 - OpenCode: `/agentdev/<業務名>`。slash command である。`.opencode/commands/agentdev/` に投影された command 本文が Workflow Skill へ委譲する
 - Senpi: `agentdev-workflow-<業務名>`。skill 名である。Skill 探索接続が Senpi 公開入口 `.senpi/skills/` を優先し、共通原本 `src/common/skills/` へ fallback する
+- Codex と Antigravity: Senpi と同じ `agentdev-workflow-<業務名>` を公開入口とする。入口 root は Codex・Antigravity とも `.agents/skills` である（限定配布）
 
 引数の意味は command 本文と Workflow Skill 本文が共通原本の単一原本であるため、両ホストで同一である。Custom Tool の引数も host 非依存の公開スキーマ（`src/common/tools/agentdev-*/public-schema.ts`）を共通参照する。
 
@@ -124,6 +189,7 @@ backlog-review、intake-promote、learning-promote、inspect-docs、inspect-prom
 - [Consumer Project 導入](consumer-project-setup.md): 導入手順、配置対象ホストの選択と切替、`.gitignore` 推奨設定
 - [マルチホスト原本モデル](../designs/foundations/multi-host-canonical-model.md): 共通原本とホスト別接続の配置契約
 - [DEC-049](../decisions/DEC-049.md): マルチホスト配布モデルの意思決定
+- [DEC-069](../decisions/DEC-069.md): Codex・Antigravity の限定配布とホスト既存能力の優先
 - [REQ-099](../requirements/REQ-099.md): マルチホスト併存利用の要件
 - [durable state と再構成](../designs/foundations/durable-state-and-recovery.md): 永続状態の権威と再構成の契約
 - [コマンド選択](command-selection.md): 状態から次のコマンドを選ぶ入口表

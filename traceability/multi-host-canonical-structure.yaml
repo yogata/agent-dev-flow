@@ -35,9 +35,38 @@ implementation:
     - REQ-099-003
     - REQ-099-017
     - REQ-099-018
+    - REQ-099-023
+    - REQ-099-024
+    - REQ-099-025
+    - REQ-099-026
+    - REQ-099-027
+    - REQ-099-028
+    - REQ-099-029
   docs/reports/req-099-wave3-verification.md:
     - REQ-099-007
     - REQ-099-016
+  src/codex/README.md:
+    - REQ-099-021
+  src/codex/document-management.md:
+    - REQ-099-021
+    - REQ-099-022
+  src/codex/skill-discovery/codex-skill-discovery.ts:
+    - REQ-099-021
+    - REQ-099-022
+  src/antigravity/README.md:
+    - REQ-099-021
+    - REQ-099-024
+  src/antigravity/document-management.md:
+    - REQ-099-021
+    - REQ-099-022
+  src/antigravity/skill-discovery/antigravity-skill-discovery.ts:
+    - REQ-099-021
+    - REQ-099-022
+  src/common/skills/agentdev-skill-resolution/scripts/src/command-entry.ts:
+    - REQ-099-022
+  src/common/skills/agentdev-host-github-guidance/SKILL.md:
+    - REQ-099-023
+    - REQ-099-028
 verification:
   src/common/guards/gh-write/tests/gh-command-detector.test.ts:
     - REQ-099-013
@@ -50,6 +79,13 @@ verification:
     - REQ-099-003
     - REQ-099-017
     - REQ-099-018
+    - REQ-099-023
+    - REQ-099-024
+    - REQ-099-025
+    - REQ-099-026
+    - REQ-099-027
+    - REQ-099-028
+    - REQ-099-029
   src/opencode/plugins/agentdev-gh-tool/tests/four-combination.test.ts:
     - REQ-099-007
   src/senpi/tools/agentdev-gh-tool/tests/four-combination.test.ts:
@@ -67,3 +103,15 @@ verification:
     - REQ-099-015
     - REQ-099-016
     - REQ-125-001
+  src/codex/skill-discovery/tests/codex-skill-discovery.test.ts:
+    - REQ-099-021
+    - REQ-099-022
+  src/codex/tests/structure.test.ts:
+    - REQ-099-021
+  src/antigravity/skill-discovery/tests/antigravity-skill-discovery.test.ts:
+    - REQ-099-021
+    - REQ-099-022
+  src/antigravity/tests/structure.test.ts:
+    - REQ-099-021
+  src/common/skills/agentdev-skill-resolution/scripts/tests/command-entry.test.ts:
+    - REQ-099-022

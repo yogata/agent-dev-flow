@@ -44,6 +44,7 @@ skills:
   - agentdev-doc-diagnostics
   - agentdev-epic-tracker
   - agentdev-git-worktree
+  - agentdev-host-github-guidance
   - agentdev-inspect-skills
   - agentdev-intake-pipeline
   - agentdev-issue-management
