@@ -11,3 +11,4 @@ status: unreviewed
 - **期待する処分**: 別課題化（追跡 Issue 起票または RU 化）の判断。修正により bun test ./scripts/ が緑化し、fail 起源分類のノイズが減る
 - **出典**: PR #4208（case #4204）、PR #4211（case #4206）の検証差分
 - **実証根拠**: git diff base -- docs/ scripts/ が空（base と同一内容）で実証・単独実行 13 pass / 3 fail
+- **追記（2026-11-25・case #4223）**: base `7f998b086` の detached worktree でも同一の 3 fail を再確認（PR #4226 分割③、証跡 cc3-test-split3.txt）。本件（-AgentHosts 導入選択）の変更と無関係
