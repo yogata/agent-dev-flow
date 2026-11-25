@@ -12,3 +12,4 @@ status: unreviewed
 - **出典**: PR #4225 本文「Findings/ Capture候補」の intake 6 件目（取りまとめが最終 gate で追加した記録）。全文は PR コメント 7139211529「Findings と Design 確定候補の詳細記録」
 - **実証根拠**: 誤ったパスでの起動は `22 files were searched` で exit 1（`C/buntest-integrity-1.stderr`、`G/prhead-buntest-integrity.stderr.txt`）。正しいパスでは 1449 pass / 0 fail（`G/prhead-buntest-integrity2.*`）
 - **関連 learning**: `.agentdev/backlog/learning/inbox/2026-11-25-delegate-command-prelaunch-zero-target-check.md`
+- **追記（2026-11-25・Epic #4220 の case-close）**: case-auto の取りまとめの最終報告 (2026-11-25 09:52:50+09:00) も同じ 2 か所 (`agentdev-workflow-case-run/references/delegation-and-result.md:52`、`agentdev-quality-gates/references/qg-4-final-acceptance.md:331`) を指摘した。この Case では修正していない
