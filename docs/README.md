@@ -167,6 +167,8 @@ REQ: 78件
 | [DEC-067](decisions/DEC-067.md) | 仮説に基づく既存統制変更原則 |
 | [DEC-068](decisions/DEC-068.md) | 適用先の構成移行の責務分離 |
 | [DEC-069](decisions/DEC-069.md) | Codex・Antigravity の限定配布とホスト既存能力の優先 |
+| [DEC-070](decisions/DEC-070.md) | 利用先リポジトリの4エージェント配置対象選択 |
+| [DEC-071](decisions/DEC-071.md) | 新ホストの GitHub 接続と gh 経路切替 |
 <!-- AUTOGEN:END -->
 
 ## 設計（Design）

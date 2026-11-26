@@ -2,7 +2,7 @@
 title: Custom Tool 操作契約
 status: accepted
 created: 2026-08-24
-updated: "2026-11-18"
+updated: "2026-11-26"
 ---
 <!-- ADF-COVERS(design): REQ-011-022, REQ-011-025, REQ-011-026, REQ-011-033 -->
 <!-- ADF-COVERS(design): REQ-011-034, REQ-011-035（pr_create の対象識別契約と読戻し照合3項目。custom-tool-contracts「対象操作の境界（初期セット）」節対応） -->
@@ -126,6 +126,12 @@ Custom Tool の操作契約（本 Design 既有）は、v4 では Harness/Backen
 adapter の追加は必要になった時点で行い、未使用 adapter を先回りして実装しない。種別契約の正は REQ-052、操作契約の正は本 Design、境界定義の正は responsibility-boundaries が所有する。
 
 既存節（操作契約の構成要素・対象操作の境界・ローカル版実装差し替え・迂回防止・移管記録）は不変とする。
+
+### Codex・Antigravity の GitHub 接続
+
+- Custom Tool を登録できない Codex・Antigravity では、ホスト接続領域の adapter が本 Design の操作契約を各ホストの GitHub プラグインへ接続する。adapter には Tool と同じ VERIFY ならびに失敗時の意味を等しく適用し、操作前の承認と書込み後の読み戻しを維持する。
+- プラグインが無効または必要な操作を提供しない場合は、操作せず失敗を返して利用者の判断まで停止する。adapter が暗黙に gh CLI へ切り替えない。gh 経路への切替は scripts/switch-github-route.ps1 による利用者の明示判断だけで行う。
+- adapter を新たな抽象層にせず、操作契約の正は本 Design、種別契約の正は REQ-052、境界定義の正は responsibility-boundaries とする。agentdev_gh の MCP サーバー化と ADF 独自の MCP 接続は行わない。
 
 ## 移管記録（旧 `agentdev-gh-cli` Skill Design の廃止）
 
