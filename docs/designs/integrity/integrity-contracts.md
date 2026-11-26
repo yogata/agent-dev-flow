@@ -2,7 +2,7 @@
 title: 整合性契約
 status: accepted
 created: 2026-08-20
-updated: 2026-11-18
+updated: 2026-11-26
 ---
 <!-- ADF-COVERS(implementation): REQ-010-006 -->
 <!-- ADF-COVERS(implementation): REQ-036-022 -->
@@ -434,7 +434,7 @@ bun run 検証エンジン cli.ts（旧 check_integrity.ts は rules レジス�
 
 ### source profile
 
-原本（`src/common/`、`src/opencode/`（ホスト接続領域）、docs、repo-local checker/tests）を直接検査する。
+原本（`src/common/` と各ホスト接続領域（`src/opencode/`、`src/senpi/`、`src/codex/`、`src/antigravity/`）、docs、repo-local checker/tests）を直接検査する。各ホスト接続領域は選択対象となるエージェントの原本であり、欠落している場合は NG にする。
 
 - `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*` が存在しないことを NG にしない（worktree 等）
 - 原本ディレクトリや必須ファイルが欠落している場合は NG
@@ -443,9 +443,9 @@ bun run 検証エンジン cli.ts（旧 check_integrity.ts は rules レジス�
 
 ### installed profile
 
-原本（`src/common/` と `src/opencode/`（ホスト接続領域））と配置先（`.opencode/`）を比較し、配置漏れを検出する。
+原本（`src/common/` と各ホスト接続領域）と、導入先で選択したエージェントの配置先（`.opencode/`、`.senpi/`、`.agents/skills/`、`.agents/agentdev/`）を比較し、配置漏れを検出する。比較対象は導入先の .agentdev/install-state.json の選択の記録（`selectedAgents`）に従わせる。選択したエージェントごとに `projection_missing`、`projection_extra`、`content_mismatch` を報告する。選択されていないエージェントの配備物の欠落は NG にしないが、選択されていないエージェントの配置先に ADF の管理資産（`agentdev-*`、`.agents/agentdev/`）が残っている場合は `projection_extra` として報告する。利用者の資産は余分な管理資産に含めない。
 
-- `cmdDir` を `.opencode/commands/agentdev` へ直接解決し、原本 fallback を無効化する
+- 選択したエージェントの配置先ごとに原本と配置先を対応づける。`cmdDir` は OpenCode を選択した場合に `.opencode/commands/agentdev` へ、Codex・Antigravity を選択した場合に `.agents/agentdev/common/commands/agentdev` へ直接解決し、原本 fallback を無効化する。選択していない配置先の command ディレクトリは要求しない。
 - 次を NG として報告する: `projection_missing`（原本に有て配置先に無い）、`projection_extra`（配置先に有て原本に無い、`repo-*` repo-local skill は除く）、`content_mismatch`（原本と配置先で内容が異なる）、`broken_junction`（配置先の junction/symlink が解決不能）、`missing_required_dir`（原本必須ディレクトリ欠落）
 - 配置先が存在しない場合は NG とし、原本 fallback だけで成功扱いにしない
 - Windows junction は `realpath` で実体を比較する（健康な junction で `content_mismatch` が発火しないようにする）
@@ -458,19 +458,20 @@ archive は配布物の自己完結を保証するが、checker（`repo-agentdev
 処理順序:
 
 1. `--archive` で指定された ZIP を一時ディレクトリ `<temp>` へ展開する
-2. `<temp>/<root>/scripts/install.ps1 -Source <temp>/<root>/src -Target <temp>/<root>/.opencode -Mode copy` を実行する（archive 版 installer。原本は `scripts/consumer/archive/install.ps1` で、archive 内では投影名 `scripts/install.ps1` として配置される）
+2. `<temp>/<root>/scripts/install.ps1 -Source <temp>/<root>/src -Target <temp>/<root>/.opencode -Mode copy -Hosts <選択> -AgentHosts <選択>` を実行する（archive 版 installer。原本は `scripts/consumer/archive/install.ps1` で、archive 内では投影名 `scripts/install.ps1` として配置される）。空でない全15通りの選択をそれぞれ指定して実行し、選択したエージェントの配置先ごとに実ファイルを配置する
 3. host 側 checker を `--profile installed --root <temp>/<root> --json` で起動し、installed profile を実行する
 4. archive は docs/ を含まないため、exit code は `InstalledProfile` カテゴリ（projection_missing/extra/content_mismatch/broken_junction/missing_required_dir）の結果のみで判定する。全文結果は report へ転送する
 5. 成功・失敗の双方で `<temp>` を削除する（cleanup 失敗は warning、exit code は変えない）
 
 ZIP 自体に junction が保存されていなくても install 後に配置できれば通過する。
-install 後も配置先が欠落する場合は NG とする。
+install 後も、選択したエージェントの配置先が欠落する場合は NG とする。選択されていないエージェントの配備物の欠落は NG にしない。
+公開前検証では、配置対象エージェントの選択を指定して archive の展開、install、installed profile を実行し、選択に応じた欠落、余分な配置、内容不一致が個別に検出されることを確認する。
 
 ### archive 生成・導入コマンド（§7.5.1, §7.5.2）
 
-archive 生成: `scripts/self/release/package-release-archive.ps1`（原本 `src/common/` と `src/opencode/`（ホスト接続領域）配下を junction 解決済み実ファイルとして ZIP へ格納）。
+archive 生成: `scripts/self/release/package-release-archive.ps1`（原本 `src/common/` と各ホスト接続領域（`src/opencode/`、`src/senpi/`、`src/codex/`、`src/antigravity/`）配下を junction 解決済み実ファイルとして ZIP へ格納）。
 出力は `dist/agentdev-release-<commit-short>.zip`。
-archive 内レイアウトは `agentdev-release-<sha>/` ルートの下に `src/common/commands/agentdev/**`、`src/common/skills/agentdev-*/**`、`src/common/tools/agentdev-*/**`（Custom Tool 配布種別）、`src/opencode/plugins/agentdev-*/**`（Plugin / Hook 配布種別）、`scripts/install.ps1`（archive 版。原本 `scripts/consumer/archive/install.ps1` を投影名 `scripts/install.ps1` として格納）、`README-INSTALL.md`（原本 `scripts/consumer/archive/README-INSTALL.md`）を格納する。third-party Skill の本体は release archive へ含めず、利用者環境では宣言（skills.yaml）と取得機構経由で配置する（REQ-002-043、third-party-skill-management Design）。
+archive 内レイアウトは `agentdev-release-<sha>/` ルートの下に `src/common/commands/agentdev/**`、`src/common/skills/agentdev-*/**`、`src/common/tools/agentdev-*/**`（Custom Tool 配布種別）、`src/opencode/plugins/agentdev-*/**`（Plugin / Hook 配布種別）、`src/senpi/**`（Senpi 接続モジュール）、`src/codex/**`、`src/antigravity/**`（Codex・Antigravity ホスト接続領域）、`scripts/install.ps1`（archive 版。原本 `scripts/consumer/archive/install.ps1` を投影名 `scripts/install.ps1` として格納）、`scripts/switch-github-route.ps1`、`README-INSTALL.md`（原本はリポジトリルートの同名ファイル）を格納する。third-party Skill の本体は release archive へ含めず、利用者環境では宣言（skills.yaml）と取得機構経由で配置する（REQ-002-043、third-party-skill-management Design）。
 
 | 実行結果 | exit code |
 |---|---|
@@ -478,7 +479,7 @@ archive 内レイアウトは `agentdev-release-<sha>/` ルートの下に `src/
 | 原本欠落・必須ファイル不在 | 2 |
 | 既存 dist 上書き検出（`-Force` 無し） | 3 |
 
-archive 展開・install: archive 版 `scripts/install.ps1 -Source <src> -Target <.opencode> -Mode copy` が実ファイルを `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.opencode/tools/agentdev-*/`、`.opencode/plugins/agentdev-*/` 配下へ配置する（原本は `scripts/consumer/archive/install.ps1`）。third-party Skill の配置は本 install の対象外であり、third-party 取得機構（skills.yaml 宣言に基づく取得）が `.opencode/skills/<name>/` へ配置する（REQ-002-043）。
+archive 展開・install: archive 版 `scripts/install.ps1 -Source <src> -Target <.opencode> -Mode copy -Hosts <選択> -AgentHosts <選択>` が、指定された配置対象エージェントの選択に従って実ファイルを配置する。選択の指定と省略時の解決はチェックアウト版と同じ規則を使い、`-Hosts` と `-AgentHosts` を1つの選択集合へ解決する。`-Target` は配置先リポジトリの基準点であり、Senpi は Target の兄弟の `.senpi/` 配下、Codex・Antigravity は同じく兄弟の `.agents/skills/agentdev-*/` 配下へスキルを配置する。Codex・Antigravity を選択した場合は、command 本文、Skill 探索の共通 lib、agentdev_gh の engine と gh 用 runner、ホスト接続領域の adapter を、同じく兄弟の `.agents/agentdev/` 配下へ原本の `src/` と同じ相対構造で配置する。OpenCode を選択した場合は `.opencode/commands/agentdev/`、`.opencode/skills/agentdev-*/`、`.opencode/tools/agentdev-*/`、`.opencode/plugins/agentdev-*/` 配下へ配置し、選択されていないエージェントの配置先には配置しない（原本は `scripts/consumer/archive/install.ps1`）。配置の成功後に、選択と配置した管理対象コピーのパスと内容の要約を Target の兄弟の `.agentdev/install-state.json` へ記録する。更新では、導入の記録にありかつ記録した内容の要約と一致する配布コピーだけを更新と除去の対象とし、それ以外の不一致では上書きせず停止する。third-party Skill の配置は本 install の対象外であり、third-party 取得機構（skills.yaml 宣言に基づく取得）が `.opencode/skills/<name>/` へ配置する（REQ-002-043）。
 junction は作成しない。
 
 | 実行結果 | exit code |

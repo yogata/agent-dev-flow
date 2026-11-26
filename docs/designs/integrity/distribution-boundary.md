@@ -2,7 +2,7 @@
 title: "配布依存境界"
 status: accepted
 created: "2026-08-11"
-updated: "2026-11-21"
+updated: "2026-11-26"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-027 -->
 <!-- ADF-COVERS(implementation): REQ-009-045 -->
@@ -153,6 +153,8 @@ adapter を利用者または編集経路がバイパスしても、最終 gate 
 archive は公開前に検査する。
 違反が残存する場合は最終 archive と成功経路を残さない（DEC-014 決定7、REQ-009-045）。
 
+検査は導入先で選択したエージェントの集合ごとに、欠落、余分な配置、内容不一致を個別に検出する。原本、収録、設置後の検査をエージェント別に拡張し、候補 archive のスクリプトを実行せずに検証する既存の境界を維持する（REQ-099-042）。
+
 ## 安定実装契約
 
 ユーザーが本 Design 候補へ配置を確定した安定実装契約。
@@ -193,7 +195,7 @@ Epic 実装はこれに従う。
 
 ## repo-local Plugin の配布除外と自己ホスト投影（runtime-package-boundary.md から移管〔REQ-123-003〕）
 
-本節は runtime-package-boundary.md「Tools / Plugins の配布・投影」の repo-local Plugin 契約（REQ-002-045）を引き継ぐ。runtime-package-boundary.md は Custom Tool・Plugin / Hook を正規配布種別として扱う種別宣言（REQ-052）と公開入口2本固定（REQ-050-001、REQ-052-008）を維持する。
+本節は runtime-package-boundary.md「Tools / Plugins の配布・投影」の repo-local Plugin 契約（REQ-002-045）を引き継ぐ。runtime-package-boundary.md は Custom Tool・Plugin / Hook を正規配布種別として扱う種別宣言（REQ-052）と公開入口を REQ-050-001 の定める4本に限定する規則（REQ-050-001、REQ-052-008）を維持する。
 
 - 原本配置原則は `src/opencode/plugins/<agentdev-name>/` 配下。consumer 配布系全経路（install、archive installer、package-release-archive）は repo-local 配布除外を実装し、3ファイルの列挙条件を同期する義務を持つ。除外機構は明示的除外リスト等とし、REQ-002-011 の repo-* prefix 方式は plugin に採用しない
 - `scripts/self-sync.ps1` は repo-local Plugin を除外しない（自己ホスト投影を維持）。自己ホスト投影は canonical チェックアウト内部の source → projection 構成であり配布ではないため、配布除外機構の適用対象外である。textlint 検査基盤の保存済み結果（実行時データ）は配布対象外（Plugin 本体実装仕様が所有。DEC-065）

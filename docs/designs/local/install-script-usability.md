@@ -2,7 +2,7 @@
 title: 導入スクリプトの使いやすさ詳細
 status: accepted
 created: 2026-08-02
-updated: "2026-11-24"
+updated: "2026-11-26"
 ---
 <!-- ADF-COVERS(implementation): REQ-050-006（誤実行防止の環境判定方式の判定材料と手順。runtime-package-boundary.md から移管〔REQ-123-003〕） -->
 <!-- ADF-COVERS(implementation): REQ-009-001, REQ-009-003, REQ-009-004, REQ-009-005, REQ-009-040, REQ-009-041, REQ-009-042, REQ-009-043, REQ-009-044, REQ-009-046, REQ-009-047, REQ-009-048, REQ-009-049 -->
@@ -18,7 +18,7 @@ install.ps1 -Mode check は旧状態確認専用スクリプト（check-consumer
 
 ## 対話ウィザード
 
-install.ps1 は引数なし起動時、対話ウィザードにより実行モード（check/dry-run/apply）と環境（通常版/ローカル版）に加え、配置対象ホスト（OpenCode のみ、Senpi のみ、両方）を問う。配置対象ホストの選択はマルチホスト原本モデル Design（foundations/multi-host-canonical-model.md）の投影モデルに従い、新規導入では両ホストへの配置を推奨し、既存導入の更新では現在の配置対象を維持して明示指定により変更する。ヘルプには dry-run/check/apply の3モードの違い、-LocalMode の判断基準に加え、配置対象ホスト選択の判断基準を明示する（REQ-009-040/042、REQ-099-010）。CLI 未導入でも配置は可能とし、配置検査と実行環境の診断を区別する（REQ-099-011）。
+install.ps1 は引数なし起動時、対話ウィザードにより実行モード（check/dry-run/apply）と環境（通常版/ローカル版）に加え、配置対象エージェント（OpenCode、Senpi、Codex、Antigravity）を問う。4エージェントは個別に選び、全てを外した空の選択は受け付けない。配置対象エージェントの選択はマルチホスト原本モデル Design（foundations/multi-host-canonical-model.md）の投影モデルに従い、新規導入では選択を省略せずに求め、非対話で起動して選択が省略された場合は指定方法を案内し、既存導入の更新では記録された選択を維持して明示指定により変更する。ヘルプには dry-run/check/apply の3モードの違い、-LocalMode の判断基準に加え、配置対象エージェント選択の判断基準を明示する（REQ-009-040/042、REQ-099-010）。CLI 未導入でも配置は可能とし、配置検査と実行環境の診断を区別する（REQ-099-011）。
 
 ### scripts/install.ps1
 
@@ -65,7 +65,7 @@ clone コマンド例とソース ZIP 取得手順を案内表示する（REQ-00
 
 ### 導入先での Codex・Antigravity の選択
 
-OpenCode のみ、Senpi のみ、両方の選択と既定は既存ホスト用に維持する。導入先の対話選択と明示指定では Codex・Antigravity も選択対象とし、選択したリポジトリ内だけに投影する。ホーム全域と本体リポジトリは新ホストの導入先にしない。配置検査と各ホストの動作確認は区別する。
+OpenCode のみ、Senpi のみ、両方の選択と明示指定は既存ホスト用に維持する。導入先の対話選択と明示指定では Codex・Antigravity も選択対象とし、Codex と Antigravity は個別に選べる。選択したリポジトリ内だけに投影する。ホーム全域と本体リポジトリは新ホストの導入先にしない。配置検査と各ホストの動作確認は区別する。
 
 ## dry-run/check/apply の技術的差
 
