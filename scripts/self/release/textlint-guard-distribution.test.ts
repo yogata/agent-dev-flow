@@ -26,6 +26,7 @@
 
 // ADF-COVERS(verification): REQ-052-006, REQ-052-007
 // ADF-COVERS(verification): REQ-050-002, REQ-050-004
+// ADF-COVERS(verification): REQ-099-041
 
 import { describe, expect, test } from "bun:test";
 import * as fs from "fs";

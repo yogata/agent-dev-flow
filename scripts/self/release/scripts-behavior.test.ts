@@ -30,7 +30,7 @@
 // ADF-COVERS(verification): REQ-052-007
 // ADF-COVERS(verification): REQ-097-002
 // ADF-COVERS(verification): REQ-009-040
-// ADF-COVERS(verification): REQ-099-036, REQ-099-037, REQ-099-038
+// ADF-COVERS(verification): REQ-099-036, REQ-099-037, REQ-099-038, REQ-099-039
 
 import { describe, expect, test } from "bun:test";
 import * as crypto from "crypto";

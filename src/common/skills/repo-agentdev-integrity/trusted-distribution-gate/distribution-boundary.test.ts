@@ -13,6 +13,8 @@
  * text/binary/unknown tri-state where unknown fails closed.
  */
 
+// ADF-COVERS(verification): REQ-002-007
+
 import { expect, test, describe } from "bun:test";
 import {
   classifyLine,

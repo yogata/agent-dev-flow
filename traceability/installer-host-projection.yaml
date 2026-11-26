@@ -69,8 +69,6 @@ implementation:
     - REQ-052-006
   src/common/VERSION:
     - REQ-126-003
-  README-INSTALL.md:
-    - REQ-099-043
 verification:
   scripts/self/release/installer-host-projection.Tests.ps1:
     - REQ-099-010
@@ -90,9 +88,5 @@ verification:
     - REQ-099-036
     - REQ-099-037
     - REQ-099-040
-  scripts/self/release/scripts-behavior.test.ts:
-    - REQ-099-036
-    - REQ-099-037
-    - REQ-099-038
   scripts/self/release/stale-cleanup-behavior.Tests.ps1:
     - REQ-099-038
