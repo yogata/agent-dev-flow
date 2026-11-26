@@ -292,7 +292,8 @@ describe("agentdev-textlint-guard distribution / archive install (TS-005)", () =
     const root = fs.mkdtempSync(path.join(os.tmpdir(), "adftl-arc-"));
     try {
       // DEC-049 canonical archive layout: commands/skills under src/common/,
-      // plugins under src/opencode/plugins/.
+      // plugins under src/opencode/plugins/. The default selection (OpenCode +
+      // Senpi) also requires the src/senpi/ connection area in the archive.
       const stageSrc = path.join(root, "archive", "src");
       fs.mkdirSync(path.join(stageSrc, "common", "commands", "agentdev"), { recursive: true });
       fs.writeFileSync(path.join(stageSrc, "common", "commands", "agentdev", "case-run.md"), "# case-run\n", "utf8");
@@ -300,6 +301,8 @@ describe("agentdev-textlint-guard distribution / archive install (TS-005)", () =
       fs.writeFileSync(path.join(stageSrc, "common", "skills", "agentdev-workflow-case-run", "SKILL.md"), "# case-run\n", "utf8");
       fs.mkdirSync(path.join(stageSrc, "opencode", "plugins"), { recursive: true });
       placeRealPlugin(path.join(stageSrc, "opencode", "plugins"));
+      fs.mkdirSync(path.join(stageSrc, "senpi"), { recursive: true });
+      fs.writeFileSync(path.join(stageSrc, "senpi", "README.md"), "# senpi\n", "utf8");
 
       const target = path.join(root, "consumer", ".opencode");
       const installerArgs = ["-Source", stageSrc, "-Target", target, "-Mode", "copy"];

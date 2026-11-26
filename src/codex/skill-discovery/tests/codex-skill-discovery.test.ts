@@ -204,6 +204,60 @@ describe("Codex write-target gate (edit / tool / guard root consistency)", () =>
   });
 });
 
+describe("Codex installed canonical binding (release install layout)", () => {
+  test("prefers .agents/agentdev/common over the source fallback when present", () => {
+    const f = buildFixture();
+    writeFixture(
+      path.join("ws", ".agents", "agentdev", "common", "skills", "agentdev-installed", "SKILL.md"),
+      "---\nname: agentdev-installed\ndescription: installed canonical\n---\n",
+    );
+    writeFixture(
+      path.join("ws", ".agents", "agentdev", "common", "commands", "agentdev", "installed.md"),
+      "# installed\n\n## workflow\n\nDelegates to `agentdev-workflow-installed` skill.\n",
+    );
+    writeFixture(
+      path.join("ws", ".agents", "skills", "agentdev-workflow-installed", "SKILL.md"),
+      "---\nname: agentdev-workflow-installed\ndescription: installed entry\n---\n",
+    );
+    expect(path.resolve(codexCanonicalSkillsDir(f.ws))).toBe(
+      path.resolve(path.join(f.ws, ".agents", "agentdev", "common", "skills")),
+    );
+    expect(path.resolve(codexCanonicalCommandsDir(f.ws))).toBe(
+      path.resolve(path.join(f.ws, ".agents", "agentdev", "common", "commands", "agentdev")),
+    );
+  });
+
+  test("resolves skills and command entries through the installed canonical copy", () => {
+    const f = buildFixture();
+    writeFixture(
+      path.join("ws", ".agents", "agentdev", "common", "skills", "agentdev-installed", "SKILL.md"),
+      "---\nname: agentdev-installed\ndescription: installed canonical\n---\n",
+    );
+    writeFixture(
+      path.join("ws", ".agents", "agentdev", "common", "commands", "agentdev", "installed.md"),
+      "# installed\n\n## workflow\n\nDelegates to `agentdev-workflow-installed` skill.\n",
+    );
+    writeFixture(
+      path.join("ws", ".agents", "skills", "agentdev-workflow-installed", "SKILL.md"),
+      "---\nname: agentdev-workflow-installed\ndescription: installed entry\n---\n",
+    );
+    const discovered = codexDiscoverSkill(f.ws, f.ws, "agentdev-installed");
+    expect(discovered.ok).toBe(true);
+    if (discovered.ok) {
+      expect(discovered.entry.origin).toBe("canonical");
+      expect(isInside(discovered.entry.skillRoot, f.ws)).toBe(true);
+    }
+    const entry = codexApplyPublicEntry(f.ws, f.ws, "installed", "issue-7");
+    expect(entry.ok).toBe(true);
+    if (entry.ok) {
+      expect(entry.application.commandText).toContain("agentdev-workflow-installed");
+      expect(entry.application.workflowSkill.skillName).toBe("agentdev-workflow-installed");
+      expect(entry.application.workflowSkill.origin).toBe("entry");
+      expect(entry.application.args).toBe("issue-7");
+    }
+  });
+});
+
 function isInside(target: string, root: string): boolean {
   const t = path.resolve(target).replace(/\\/g, "/").replace(/\/+$/, "");
   const r = path.resolve(root).replace(/\\/g, "/").replace(/\/+$/, "");

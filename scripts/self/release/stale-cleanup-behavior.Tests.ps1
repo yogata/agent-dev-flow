@@ -12,6 +12,8 @@
     検査の統一: 旧正本 wrong-target の修復と収束、候補外 wrong-target の保持と衝突報告、
     LocalMode 正本解決の期待値）。健全・修復可能群（TS-001〜004、TS-006、TS-008）と
     判定不能衝突群（TS-007）を分離し、TS-007 に修復全件の収束を要求しない。
+    TS-009 は Senpi 選択の接続投影（.agents/agentdev/）と .agents/skills 不存在時の
+    stale 管理判定・切替除去（REQ-099-038）を検証する。
 
     実行方法:
         pwsh -NoProfile -File scripts/self/release/stale-cleanup-behavior.Tests.ps1
@@ -29,6 +31,7 @@
 # ADF-COVERS(verification): REQ-050-015
 # ADF-COVERS(verification): REQ-050-002, REQ-050-003, REQ-050-005
 # ADF-COVERS(verification): REQ-099-012
+# ADF-COVERS(verification): REQ-099-038
 
 #Requires -Version 7.0
 
@@ -987,6 +990,48 @@ function Invoke-Ts008Consumer {
     }
 }
 
+function Invoke-Ts009Consumer {
+    <#
+    .SYNOPSIS
+        TS-009: Senpi 選択の接続投影（.agents/agentdev/）と .agents/skills 不存在時の
+        stale 管理判定。.agents/skills が存在しない導入でも .agents/agentdev 配下の
+        管理投影が stale 判定・切替除去の対象になること（REQ-099-038）を検証する。
+    #>
+    Write-Host '=== TS-009 (consumer: senpi connection projection switch without .agents/skills) ==='
+    $root = New-ConsumerRepo
+    try {
+        # Senpi のみで導入: .senpi/skills 投影 + .agents/agentdev 接続投影。.agents/skills は不在のまま。
+        $applySenpi = Invoke-EntryScript -ScriptPath $InstallScript -Mode 'apply' -Cwd $root -ExtraArgs @('-Hosts', 'senpi')
+        Assert-True 'TS-009 senpi-only apply succeeds' ($applySenpi.ExitCode -eq 0) $applySenpi.Output
+        $senpiEntry = Join-Path $root '.senpi\skills\agentdev-testskill\SKILL.md'
+        $commonConn = Join-Path $root '.agents\agentdev\common'
+        $senpiConn = Join-Path $root '.agents\agentdev\senpi'
+        Assert-True 'TS-009 senpi-only apply places the senpi entry projection and agentdev connections' `
+            ((Test-PathExists $senpiEntry) -and (Test-PathExists $commonConn) -and (Test-PathExists $senpiConn)) ''
+        Assert-True 'TS-009 senpi-only apply creates no .agents/skills entries' `
+            (-not (Test-PathExists (Join-Path $root '.agents\skills'))) ''
+
+        $checkSenpi = Invoke-EntryScript -ScriptPath $InstallScript -Mode 'check' -Cwd $root -ExtraArgs @('-Hosts', 'senpi')
+        Assert-True 'TS-009 check converges after senpi-only apply' ($checkSenpi.ExitCode -eq 0) $checkSenpi.Output
+
+        # OpenCode へ切替: .agents/skills が存在しないままでも .agents/agentdev の stale 除去が働く
+        $applyOC = Invoke-EntryScript -ScriptPath $InstallScript -Mode 'apply' -Cwd $root -ExtraArgs @('-Hosts', 'opencode')
+        Assert-True 'TS-009 switch to opencode removes the senpi stale projections' `
+            (($applyOC.ExitCode -eq 0) -and
+             ($applyOC.Output -match 'Removing stale managed junction') -and
+             (-not (Test-PathExists (Join-Path $root '.senpi\skills\agentdev-testskill'))) -and
+             (-not (Test-PathExists $senpiConn)) -and
+             (-not (Test-PathExists $commonConn))) $applyOC.Output
+        Assert-True 'TS-009 switch places the opencode projection' `
+            (Test-PathExists (Join-Path $root '.opencode\skills\agentdev-testskill')) ''
+
+        $checkOC = Invoke-EntryScript -ScriptPath $InstallScript -Mode 'check' -Cwd $root -ExtraArgs @('-Hosts', 'opencode')
+        Assert-True 'TS-009 check converges after the switch' ($checkOC.ExitCode -eq 0) $checkOC.Output
+    } finally {
+        Remove-TempRepo $root
+    }
+}
+
 # ============================================================
 # Main
 # ============================================================
@@ -1005,6 +1050,7 @@ Invoke-Ts006SelfSync
 Invoke-Ts007Consumer
 Invoke-Ts007SelfSync
 Invoke-Ts008Consumer
+Invoke-Ts009Consumer
 
 Write-Host ''
 if ($script:FailureCount -gt 0) {

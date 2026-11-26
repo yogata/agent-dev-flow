@@ -26,10 +26,12 @@
 // The limited-distribution host connection areas (src/codex, src/antigravity;
 // DEC-069) are canonical-tree roots: the source/archive projections
 // enumerate them (the release archive stages them for distribution
-// completeness), but the installed projections do not enumerate the
-// connection areas themselves — the installer places only their shared
-// entry projection (.agents/skills/agentdev-*, projected from the
-// canonical skills), which the installed projections enumerate.
+// completeness). The installed projections additionally enumerate the
+// installed Senpi entry projection (.senpi/skills/, the canonical agentdev-*
+// skills) and the installed connection copies
+// (.agents/agentdev/common|senpi|codex|antigravity), alongside the shared
+// entry projection (.agents/skills/agentdev-*, projected from the canonical
+// skills).
 
 import * as path from "path";
 import * as fs from "fs";
@@ -224,6 +226,18 @@ export function collectTargets(repoRoot: string, projection: Projection): Artifa
   ];
   if (isInstalledProjection) {
     scanParents.push([path.join(".agents", "skills"), shippableSkills]);
+    // Senpi entry projection (.senpi/skills/): the canonical agentdev-*
+    // skills (junctions at checkout install, real copies at archive
+    // install), so the shippable skills filter applies.
+    scanParents.push([path.join(".senpi", "skills"), shippableSkills]);
+    // Installed connection copies (.agents/agentdev/<area>): the archive
+    // edition places real-file copies of src/common, src/senpi, src/codex
+    // and src/antigravity under these fixed area names.
+    scanParents.push([
+      path.join(".agents", "agentdev"),
+      (name: string) =>
+        name === "common" || name === "senpi" || name === "codex" || name === "antigravity",
+    ]);
   }
   for (const [rel, accept] of scanParents) {
     const parent = path.join(repoRoot, rel);

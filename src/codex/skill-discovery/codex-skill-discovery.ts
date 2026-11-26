@@ -9,10 +9,12 @@
 //   - Entry root: <workspaceRoot>/.agents/skills/ is the Codex public
 //     entry projection (the installer populates it from the canonical
 //     skills).
-//   - Canonical root: <repoRoot>/src/common/skills/ and
-//     <repoRoot>/src/common/commands/agentdev/ are the common canonical
-//     sources. The canonical skills dir is the fallback when the entry
-//     projection is absent (fresh workspace before install, worktree
+//   - Canonical root: the installed common copy
+//     <repoRoot>/.agents/agentdev/common/ (release install placement,
+//     checkout junction) is preferred when present; <repoRoot>/src/common/
+//     is the fallback (source checkout without install). Within the
+//     canonical root, the canonical skills dir is the fallback when the
+//     entry projection is absent (fresh workspace before install, worktree
 //     without propagated links).
 //   - Public command entry: the entry resolves the full command text and
 //     the delegated Workflow Skill (`agentdev-workflow-<businessName>`)
@@ -23,6 +25,7 @@
 //   - Repo root: passed in by the caller; this module never walks up to
 //     find it.
 
+import * as fs from "node:fs";
 import * as path from "node:path";
 import {
   assertWithinWorkspace,
@@ -40,11 +43,14 @@ import {
 /** Codex public entry skills dir, relative to the workspace root. */
 export const CODEX_ENTRY_SKILLS_DIR = ".agents/skills";
 
-/** Common canonical skills dir, relative to the repo root. */
+/** Common canonical skills dir, relative to the repo root (source fallback). */
 export const CODEX_CANONICAL_SKILLS_DIR = "src/common/skills";
 
-/** Common canonical commands dir, relative to the repo root. */
+/** Common canonical commands dir, relative to the repo root (source fallback). */
 export const CODEX_CANONICAL_COMMANDS_DIR = "src/common/commands/agentdev";
+
+/** Installed common canonical root, relative to the repo root. */
+export const CODEX_INSTALLED_COMMON_ROOT = ".agents/agentdev/common";
 
 /** Absolute Codex public entry skills dir for the designated workspace. */
 export function codexEntrySkillsDir(workspaceRoot: string): string {
@@ -53,11 +59,15 @@ export function codexEntrySkillsDir(workspaceRoot: string): string {
 
 /** Absolute common canonical skills dir for the given repo root. */
 export function codexCanonicalSkillsDir(repoRoot: string): string {
+  const installed = path.join(repoRoot, CODEX_INSTALLED_COMMON_ROOT, "skills");
+  if (fs.existsSync(installed)) return installed;
   return path.join(repoRoot, CODEX_CANONICAL_SKILLS_DIR);
 }
 
 /** Absolute common canonical commands dir for the given repo root. */
 export function codexCanonicalCommandsDir(repoRoot: string): string {
+  const installed = path.join(repoRoot, CODEX_INSTALLED_COMMON_ROOT, "commands", "agentdev");
+  if (fs.existsSync(installed)) return installed;
   return path.join(repoRoot, CODEX_CANONICAL_COMMANDS_DIR);
 }
 

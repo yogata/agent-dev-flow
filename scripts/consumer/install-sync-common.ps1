@@ -5,10 +5,12 @@
 
 .DESCRIPTION
     ジャンクション正本判定、管理物（所有権）判定、stale / 管理外投影の判定、
-    配置対象ホストの検出と確定、Codex/Antigravity 配置選択の確定と .agents 共有
-    投影の管理判定、正本解決、plugin loader shim の固定内容、実行環境診断、
-    third-party Skill 宣言の解決と drift 検知という共有判定を、両公開入口の
-    同名重複関数の解消とともに1箇所で所有する（実行時パッケージ境界
+    配置対象ホストの検出と確定、4エージェント（OpenCode/Senpi/Codex/Antigravity）
+    選択集合の確定（明示指定 > selectedAgents 記録 > 旧 agentHosts 補助信号 >
+    配置からの検出、fail-closed 停止、空選択の配置前拒否）と .agents 共有投影
+    （skills 入口と agentdev 接続投影）の管理判定、正本解決、plugin loader shim の
+    固定内容、実行環境診断、third-party Skill 宣言の解決と drift 検知という共有判定を、
+    両公開入口の同名重複関数の解消とともに1箇所で所有する（実行時パッケージ境界
     Design「導入方式ポリシー」節の共有定義化契約）。同じ規則に対して両入口が
     同じ結果を返すことを1箇所で管理する。
 
@@ -20,7 +22,8 @@
     スコープ契約: 本モジュールの関数は dot-source 元スクリプトのスコープ変数
     （$ProjectionDir、$SenpiProjectionDir、$ProjectionParentRels、
     $CommonSourceDir、$OpencodeHostSourceDir、$SenpiHostSourceDir、
-    $LocalMode 等）を動的スコープで参照する。呼び出し元スクリプトは本モジュール
+    $CodexHostSourceDir、$AntigravityHostSourceDir、$LocalMode 等）を
+    動的スコープで参照する。呼び出し元スクリプトは本モジュール
     の読込前にこれらの変数を定義すること。入口固有の構成差（LocalMode
     リダイレクト、新規環境の既定配置対象）は関数パラメータで引き渡す。
     Codex/Antigravity 系の判定（agents 管理列挙エントリの変換・.agents 共有投影の
@@ -90,8 +93,9 @@ function Test-JunctionTargetMatchesSource {
 function Resolve-SenpiTargetRel {
     <#
     .SYNOPSIS
-        Convert a managed enumeration entry ('senpi:<subdir>') to its Senpi
-        projection relative path ('<subdir>'). Non-senpi entries return $null.
+        Convert a managed enumeration entry ('senpi:<rel>') to its Senpi entry
+        projection relative path ('<rel>', e.g. 'skills\agentdev-x').
+        Non-senpi entries return $null.
     #>
     param([string]$TargetEntry)
     if ($TargetEntry -like 'senpi:*') { return $TargetEntry.Substring('senpi:'.Length) }
@@ -112,20 +116,20 @@ function Resolve-AgentEntryTargetRel {
 function Test-ManagedSenpiJunction {
     <#
     .SYNOPSIS
-        .senpi/ 配下の junction が ADF 管理投影物（Senpi 投影）であることを確定する
-        （REQ-058-001、REQ-058-008）。
+        .senpi\skills\ 配下の junction が ADF 管理投影物（Senpi 入口投影）であること
+        を確定する（REQ-058-001、REQ-058-008）。
 
     .DESCRIPTION
-        確定基準: リンク先が、当該 junction 名に対応する Senpi 正本パス
-        （src/senpi/<名前>）に一致する場合のみ管理物とみなす。正本以外を向く
-        junction やリンク先を確定できない junction は管理物判定不能として扱い、
-        自動削除の対象にしない非破壊境界である（REQ-058-008）。
+        確定基準: リンク先が、当該 Senpi 投影相対パス（senpi:skills\<名前>）に対応する
+        正本パス（src/common/skills/<名前>）に一致する場合のみ管理物とみなす。
+        正本以外を向く junction やリンク先を確定できない junction は管理物判定不能
+        として扱い、自動削除の対象にしない非破壊境界である（REQ-058-008）。
     #>
-    param([string]$JunctionName, [string]$JunctionFullName)
+    param([string]$SenpiRel, [string]$JunctionFullName)
     $targetObj = Get-JunctionTarget -Path $JunctionFullName
     $targetList = @($targetObj) | ForEach-Object { [string]$_ } | Where-Object { $_ }
     if ($targetList.Count -eq 0) { return $false }
-    $expectedFull = [System.IO.Path]::GetFullPath((Join-Path $SenpiHostSourceDir $JunctionName)).TrimEnd('\', '/')
+    $expectedFull = [System.IO.Path]::GetFullPath((Join-Path $CommonSourceDir $SenpiRel)).TrimEnd('\', '/')
     foreach ($target in $targetList) {
         $resolved = $null
         try {
@@ -141,20 +145,28 @@ function Test-ManagedSenpiJunction {
 function Test-HasSenpiManagedProjection {
     <#
     .SYNOPSIS
-        .senpi/ に管理物と確定できる Senpi 投影が存在するか判定する（配置対象検出用）。
+        .senpi\skills\ に管理物と確定できる Senpi 入口投影が存在するか判定する
+        （配置対象検出用）。
     #>
-    if (-not (Test-Path -LiteralPath $SenpiProjectionDir)) { return $false }
-    $found = Get-ChildItem -LiteralPath $SenpiProjectionDir -Directory -Force -ErrorAction SilentlyContinue |
+    $senpiSkillsRoot = Join-Path $SenpiProjectionDir 'skills'
+    if (-not (Test-Path -LiteralPath $senpiSkillsRoot)) { return $false }
+    $found = Get-ChildItem -LiteralPath $senpiSkillsRoot -Directory -Force -ErrorAction SilentlyContinue |
         Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
-        Where-Object { Test-ManagedSenpiJunction -JunctionName $_.Name -JunctionFullName $_.FullName }
+        Where-Object { Test-ManagedSenpiJunction -SenpiRel "skills\$($_.Name)" -JunctionFullName $_.FullName }
     return [bool]$found
 }
 
 function Test-HasAgentManagedProjection {
     <#
     .SYNOPSIS
-        .agents\skills 配下に管理物と確定できる ADF 管理投影（Codex / Antigravity
-        共有の入口投影）が存在するか判定する（配置維持の検出用）。
+        Codex / Antigravity 共有の入口投影（.agents\skills 配下）に管理物と確定できる
+        ADF 管理投影が存在するか判定する（REQ-099-040 の曖昧検出信号用）。
+
+    .DESCRIPTION
+        .agents\agentdev 配下は Senpi の接続投影（agentdev\senpi）を含むため、
+        Codex / Antigravity 選択の曖昧性の信号には使わない。接続投影の所有権は
+        Get-DetectedAgentDevSelection が agentdev\codex / agentdev\antigravity で
+        確定する。
     #>
     if (-not $AgentProjectionDir) { return $false }
     $skillsRoot = Join-Path $AgentProjectionDir 'skills'
@@ -242,37 +254,269 @@ function Resolve-TargetHosts {
     return $FallbackHosts
 }
 
-function Resolve-TargetAgentHosts {
+# --- Agent selection set resolution（4エージェント選択集合の単一定義） ---
+
+$AgentSelectionCanonicalOrder = @('opencode', 'senpi', 'codex', 'antigravity')
+
+function Expand-InstallHostsArg {
     <#
     .SYNOPSIS
-        Codex / Antigravity の配置選択を確定する（REQ-009-040）。
+        -Hosts パラメータ値（none/opencode/senpi/both）を配置対象集合へ展開する。
+        未指定（空文字）と展開不能な値は $null を返す（明示指定と区別するため）。
+        none は空配列を ,@() で単一オブジェクトとして返す（パイプライン出力による
+        空配列の消失を防ぎ、明示的な空選択と省略の区別を保持する）。
+    #>
+    param([string]$HostsValue)
+    switch ($HostsValue) {
+        'none'     { return ,@() }
+        'opencode' { return @('opencode') }
+        'senpi'    { return @('senpi') }
+        'both'     { return @('opencode', 'senpi') }
+        default    { return $null }
+    }
+}
+
+function Expand-InstallAgentHostsArg {
+    <#
+    .SYNOPSIS
+        -AgentHosts パラメータ値（none/codex/antigravity/both）を配置対象集合へ展開する。
+        未指定（空文字）と展開不能な値は $null を返す（明示指定と区別するため）。
+        none は空配列を ,@() で単一オブジェクトとして返す（パイプライン出力による
+        空配列の消失を防ぎ、明示的な空選択と省略の区別を保持する）。
+    #>
+    param([string]$AgentHostsValue)
+    switch ($AgentHostsValue) {
+        'none'        { return ,@() }
+        'codex'       { return @('codex') }
+        'antigravity' { return @('antigravity') }
+        'both'        { return @('codex', 'antigravity') }
+        default       { return $null }
+    }
+}
+
+function Get-AgentDevSourceDir {
+    <#
+    .SYNOPSIS
+        .agents\agentdev 配下の接続投影名（common/senpi/codex/antigravity）の正本
+        ディレクトリを返す。common は共通正本（$CommonSourceDir）の接続領域全体、
+        senpi/codex/antigravity は各ホスト接続領域全体（呼び出し元が定義する
+        $SenpiHostSourceDir / $CodexHostSourceDir / $AntigravityHostSourceDir。
+        未定義は $null）へ対応する。
+    #>
+    param([string]$EntryName)
+    switch ($EntryName) {
+        'common'      { return $CommonSourceDir }
+        'senpi'       { return $SenpiHostSourceDir }
+        'codex'       { return $CodexHostSourceDir }
+        'antigravity' { return $AntigravityHostSourceDir }
+        default       { return $null }
+    }
+}
+
+function Get-AgentSelectionRecord {
+    <#
+    .SYNOPSIS
+        install-state オブジェクトから選択記録（現行 selectedAgents、旧構成 agentHosts）
+        を読み取って検証する。
 
     .DESCRIPTION
-        明示指定（-AgentHosts パラメータまたはウィザード選択）を最優先とし、
-        省略時は install-state 記録の選択を維持する。状態記録は呼び出し側が読み込んだ
-        install-state オブジェクトの引渡しで参照する（本モジュールは状態記録を
-        直接読まない）。記録のない既存導入で .agents 管理投影のみが残る場合の配置
-        維持は呼び出し側が Test-HasAgentManagedProjection の検出で補う。
+        状態は ok（現行 selectedAgents が有効）/ legacy（旧 agentHosts 配列の展開値。
+        REQ-009-040 の補助信号）/ invalid（読めたが不正）/ empty（選択フィールドなし）
+        で返す。selectedAgents は空でなく既知エージェント名のみの配列のとき有効と
+        みなし、存在するが不正な場合は旧 agentHosts へフォールバックせず invalid を
+        返す（記録の信頼性判断を単純に保つため）。agentHosts の値は
+        none/codex/antigravity/both に限定し、展開不能な値を含む場合は invalid。
+    #>
+    param([object]$InstallState)
+    if ($null -eq $InstallState) { return $null }
+    # 記録は JSON デシリアライズ後の pscustomobject であること。それ以外（文字列
+    # 等の不正な引数）は読めたが不正な記録として invalid に分類する（省略側が
+    # ある場合の fail-closed 停止対象）。
+    if ($InstallState -isnot [pscustomobject]) { return [PSCustomObject]@{ Status = 'invalid'; Agents = @() } }
+    if ($InstallState.PSObject.Properties.Name -contains 'selectedAgents') {
+        $value = $InstallState.selectedAgents
+        if ($value -is [array]) {
+            $names = @($value | ForEach-Object { [string]$_ })
+            $known = @($names | Where-Object { $_ -in $AgentSelectionCanonicalOrder })
+            if ($names.Count -gt 0 -and $known.Count -eq $names.Count) {
+                return [PSCustomObject]@{ Status = 'ok'; Agents = @($names) }
+            }
+        }
+        return [PSCustomObject]@{ Status = 'invalid'; Agents = @() }
+    }
+    if ($InstallState.PSObject.Properties.Name -contains 'agentHosts' -and $InstallState.agentHosts -is [array]) {
+        $expanded = @()
+        foreach ($entry in @($InstallState.agentHosts)) {
+            $part = Expand-InstallAgentHostsArg -AgentHostsValue ([string]$entry)
+            if ($null -eq $part) { return [PSCustomObject]@{ Status = 'invalid'; Agents = @() } }
+            $expanded += $part
+        }
+        $expanded = @($expanded | Select-Object -Unique)
+        return [PSCustomObject]@{ Status = 'legacy'; Agents = @($expanded) }
+    }
+    return [PSCustomObject]@{ Status = 'empty'; Agents = @() }
+}
 
-    .PARAMETER ExplicitAgentHosts
-        明示指定された配置選択（-AgentHosts パラメータ値。未指定は空）。
+function Resolve-AgentSelectionSet {
+    <#
+    .SYNOPSIS
+        4エージェント（OpenCode/Senpi/Codex/Antigravity）の配置選択集合を単一定義で
+        確定する（REQ-099-036〜043）。
 
-    .PARAMETER InstallState
-        呼び出し側で読み込んだ install-state オブジェクト（未導入・未記録は $null）。
+    .DESCRIPTION
+        優先順位: 明示指定 > selectedAgents 記録 > 旧 agentHosts 記録（補助信号）>
+        所有権確認可能な配置からの検出。省略された側は現行の配置または記録から
+        引き継ぐ。確定できない場合は fail-closed で停止メッセージを返し、呼び出し側は
+        配置へ進まない。空選択（結合集合が空）は配置前に拒否する。
+
+        - StateInvalid スイッチ（記録ファイルが読めない）または selectedAgents /
+          agentHosts フィールドが不正な記録のとき、省略側があるなら停止する
+          （REQ-099-040）。両側明示なら記録を放棄して明示値で確定する。
+        - 記録がなく、Codex/Antigravity 側が空に確定し、.agents/skills の管理投影だけが
+          残る場合: 曖昧として停止し明示選択を案内する（REQ-099-040）。
+        - 新規導入で一方のみ指定の場合: 指定側を配置対象とし、省略側は案内に回す
+          （Guidance。OpenCode/Senpi 側の新規既定は NewInstallFallbackOpenHosts）。
+
+        呼び出し側は Resolved が真のときのみ配置へ進み、SelectedAgents を記録する。
     #>
     param(
-        [string]$ExplicitAgentHosts,
-        [object]$InstallState = $null
+        [string]$ExplicitHosts = '',
+        [string]$ExplicitAgentHosts = '',
+        [object]$InstallState = $null,
+        [switch]$StateInvalid,
+        [string[]]$DetectedHostsList = @(),
+        [string[]]$DetectedAgentSelection = @(),
+        [switch]$HasAgentEntryProjection,
+        [string[]]$NewInstallFallbackOpenHosts = @('opencode', 'senpi')
     )
-    if ($ExplicitAgentHosts) {
-        if ($ExplicitAgentHosts -eq 'both') { return @('codex', 'antigravity') }
-        if ($ExplicitAgentHosts -eq 'none') { return @() }
-        return @($ExplicitAgentHosts)
+    $explicitOpen = if ($ExplicitHosts) { Expand-InstallHostsArg -HostsValue $ExplicitHosts } else { $null }
+    $explicitAgents = if ($ExplicitAgentHosts) { Expand-InstallAgentHostsArg -AgentHostsValue $ExplicitAgentHosts } else { $null }
+
+    $record = Get-AgentSelectionRecord -InstallState $InstallState
+    $recordKnown = $false
+    $recordOpen = @()
+    $recordAgents = @()
+    if ($record -and $record.Status -eq 'ok') {
+        $recordKnown = $true
+        $recordOpen = @($record.Agents | Where-Object { $_ -in @('opencode', 'senpi') })
+        $recordAgents = @($record.Agents | Where-Object { $_ -in @('codex', 'antigravity') })
+    } elseif ($record -and $record.Status -eq 'legacy') {
+        $recordKnown = $true
+        $recordAgents = @($record.Agents)
     }
-    if ($null -ne $InstallState -and $InstallState.agentHosts -is [array]) {
-        return @($InstallState.agentHosts)
+
+    $recordBroken = $StateInvalid -or ($record -and $record.Status -eq 'invalid')
+    if ($recordBroken) {
+        if ($null -eq $explicitOpen -or $null -eq $explicitAgents) {
+            return [PSCustomObject]@{
+                Resolved = $false
+                SelectedAgents = @()
+                Stop = '.agentdev/install-state.json の読み込みまたは内容検証に失敗したため、省略された配置対象側を現行の記録から引き継げません。選択対象を両パラメータ（-Hosts と -AgentHosts）で明示指定して再実行してください。'
+                Guidance = @()
+                OpenInherited = $false
+                AgentsInherited = $false
+            }
+        }
+        $recordKnown = $false
     }
-    return @()
+
+    $openSide = $explicitOpen
+    $agentsSide = $explicitAgents
+    $openInherited = $false
+    $agentsInherited = $false
+    $guidance = [System.Collections.Generic.List[string]]::new()
+
+    if ($null -eq $openSide) {
+        if ($recordKnown) { $openSide = $recordOpen; $openInherited = $true }
+        elseif ($DetectedHostsList.Count -gt 0) { $openSide = $DetectedHostsList; $openInherited = $true }
+        else { $openSide = @($NewInstallFallbackOpenHosts); $openInherited = $true }
+    }
+    if ($null -eq $agentsSide) {
+        if ($recordKnown) { $agentsSide = $recordAgents; $agentsInherited = $true }
+        elseif ($DetectedAgentSelection.Count -gt 0) { $agentsSide = $DetectedAgentSelection; $agentsInherited = $true }
+        else { $agentsSide = @(); $agentsInherited = $true }
+    }
+
+    if ($null -eq $explicitAgents -and -not $recordKnown -and $agentsSide.Count -eq 0 -and $HasAgentEntryProjection) {
+        return [PSCustomObject]@{
+            Resolved = $false
+            SelectedAgents = @()
+            Stop = '.agents/skills 配下に管理投影が残っていますが、Codex/Antigravity の選択を記録または所有権確認可能な配置から確定できません。-AgentHosts で選択を明示指定してください。'
+            Guidance = @()
+            OpenInherited = $openInherited
+            AgentsInherited = $agentsInherited
+        }
+    }
+
+    $combined = @($openSide) + @($agentsSide)
+    $ordered = @($AgentSelectionCanonicalOrder | Where-Object { $_ -in $combined })
+
+    if ($ordered.Count -eq 0) {
+        return [PSCustomObject]@{
+            Resolved = $false
+            SelectedAgents = @()
+            Stop = '配置対象の選択が空です（OpenCode、Senpi、Codex、Antigravity すべてなし）。少なくとも1つのエージェントを選択してください。'
+            Guidance = @()
+            OpenInherited = $openInherited
+            AgentsInherited = $agentsInherited
+        }
+    }
+
+    if (-not $recordKnown -and $agentsInherited -and $agentsSide.Count -eq 0) {
+        $guidance.Add('Codex/Antigravity の配置選択が指定されていないため配置しません。追加する場合は -AgentHosts を指定して再実行してください。')
+    }
+
+    return [PSCustomObject]@{
+        Resolved = $true
+        SelectedAgents = $ordered
+        Stop = $null
+        Guidance = @($guidance)
+        OpenInherited = $openInherited
+        AgentsInherited = $agentsInherited
+    }
+}
+
+function Get-AgentSelectionDisplay {
+    <#
+    .SYNOPSIS
+        選択集合の人間可読ラベルを返す（空集合は「なし」）。
+    #>
+    param([string[]]$SelectedAgents = @())
+    $labels = @{
+        'opencode'    = 'OpenCode'
+        'senpi'       = 'Senpi'
+        'codex'       = 'Codex'
+        'antigravity' = 'Antigravity'
+    }
+    if ($SelectedAgents.Count -eq 0) { return 'なし' }
+    return (@($AgentSelectionCanonicalOrder | Where-Object { $_ -in $SelectedAgents } | ForEach-Object { $labels[$_] }) -join ' + ')
+}
+
+function Get-DetectedAgentDevSelection {
+    <#
+    .SYNOPSIS
+        .agents\agentdev 配下の所有権確認可能な junction から Codex/Antigravity の
+        配置検出を行う（記録のない既存導入の選択推定用。REQ-099-040）。
+
+    .DESCRIPTION
+        agentdev\codex / agentdev\antigravity の管理物と確定できる junction が存在する
+        エージェントのみ返す。共通投影（agentdev\common）と共有入口（.agents/skills）は
+        両エージェントで共有されるため検出に使わない。管理物確定は
+        Test-ManagedProjectionJunction（agentdev\<名前> の正本候補）による。
+    #>
+    param([string]$AgentDevRoot)
+    $detected = [System.Collections.Generic.List[string]]::new()
+    if (-not $AgentDevRoot -or -not (Test-Path -LiteralPath $AgentDevRoot)) { return @() }
+    foreach ($entryName in @('codex', 'antigravity')) {
+        $junctionPath = Join-Path $AgentDevRoot $entryName
+        if (-not (Test-Path -LiteralPath $junctionPath)) { continue }
+        $item = Get-Item -LiteralPath $junctionPath -Force -ErrorAction SilentlyContinue
+        if (-not ($item -and ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint))) { continue }
+        if (Test-ManagedProjectionJunction -JunctionRel "agentdev\$entryName" -JunctionFullName $item.FullName) {
+            $detected.Add($entryName)
+        }
+    }
+    return @($detected)
 }
 
 function Get-HostsDisplay {
@@ -297,8 +541,10 @@ function Get-TargetSourcePath {
     .SYNOPSIS
         Resolve the absolute source path backing a projection relative path.
         OpenCode targets back to the canonical sources (src/common/ for
-        commands/skills/tools, src/opencode/ for plugins). Senpi targets back
-        to src/senpi/<subdir>. consumer 入口の LocalMode 指定時のみ、
+        commands/skills/tools, src/opencode/ for plugins). Senpi entry targets
+        (senpi:skills\<name>) back to src/common/skills/<name>; the Senpi host
+        connection area itself is placed as the agentdev\senpi connection copy.
+        consumer 入口の LocalMode 指定時のみ、
         tools\agentdev-gh は src/common/tools/agentdev-gh/local/ へ
         リダイレクトされる（REQ-009-020）。
 
@@ -316,7 +562,11 @@ function Get-TargetSourcePath {
     )
     $senpiRel = Resolve-SenpiTargetRel -TargetEntry $RelPath
     if ($null -ne $senpiRel) {
-        return Join-Path $SenpiHostSourceDir $senpiRel
+        return Join-Path $CommonSourceDir $senpiRel
+    }
+    if ($RelPath -like 'agentdev\*') {
+        $agentdevSource = Get-AgentDevSourceDir -EntryName $RelPath.Substring('agentdev\'.Length)
+        if ($agentdevSource) { return $agentdevSource }
     }
     if ($LocalRedirectToolRel -and $LocalRedirectSourceDir -and $LocalMode -and $RelPath -eq $LocalRedirectToolRel) {
         return $LocalRedirectSourceDir
@@ -361,17 +611,24 @@ function Test-ManagedProjectionJunction {
     $targetList = @($targetObj) | ForEach-Object { [string]$_ } | Where-Object { $_ }
     if ($targetList.Count -eq 0) { return $false }
     $expectedSources = @()
+    $isAgentDevRel = $JunctionRel -like 'agentdev\*'
     if ($JunctionRel -like 'plugins\*') {
         $expectedSources += (Join-Path $OpencodeHostSourceDir $JunctionRel)
+    } elseif ($isAgentDevRel) {
+        $agentdevSource = Get-AgentDevSourceDir -EntryName $JunctionRel.Substring('agentdev\'.Length)
+        if ($agentdevSource) { $expectedSources += $agentdevSource }
     } else {
         $expectedSources += (Join-Path $CommonSourceDir $JunctionRel)
     }
-    # 旧単一正本候補（旧構成 consumer の管理物確定用。REQ-099-012 更新互換）。
-    # 旧単一正本の実パスは OpenCode 接続領域と同一である（consumer 入口が
-    # $LegacyUnifiedSourceDir として定義する経路と同一）。未定義の呼び出し元
-    # （self-hosting 入口）では OpenCode 接続領域を候補に使う（候補集合は不変）。
-    $legacySourceDir = if ($LegacyUnifiedSourceDir) { $LegacyUnifiedSourceDir } else { $OpencodeHostSourceDir }
-    $expectedSources += (Join-Path $legacySourceDir $JunctionRel)
+    if (-not $isAgentDevRel) {
+        # 旧単一正本候補（旧構成 consumer の管理物確定用。REQ-099-012 更新互換）。
+        # 旧単一正本の実パスは OpenCode 接続領域と同一である（consumer 入口が
+        # $LegacyUnifiedSourceDir として定義する経路と同一）。未定義の呼び出し元
+        # （self-hosting 入口）では OpenCode 接続領域を候補に使う（候補集合は不変）。
+        # agentdev\<名前> の接続投影は旧構成に存在しないため候補に含めない。
+        $legacySourceDir = if ($LegacyUnifiedSourceDir) { $LegacyUnifiedSourceDir } else { $OpencodeHostSourceDir }
+        $expectedSources += (Join-Path $legacySourceDir $JunctionRel)
+    }
     if ($LocalRedirectToolRel -and $LocalRedirectSourceDir -and $JunctionRel -eq $LocalRedirectToolRel) {
         $expectedSources += ($LocalRedirectSourceDir)
     }
@@ -404,7 +661,8 @@ function Get-StaleManagedJunctions {
         返却要素は RelPath（管理列挙の相対パス表現）と FullName（絶対パス）を持つ。
         正本の管理対象列挙（追加・修復対象を含む現行対象）に含まれない junction のうち、
         管理物と確定できるものだけを返す。対象範囲は OpenCode 投影（.opencode/ の
-        commands/skills/tools/plugins 配下）と Senpi 投影（.senpi/ 直下）の両方であり、
+        commands/skills/tools/plugins 配下）と Senpi 入口投影
+        （.senpi\skills\ 直下）の両方であり、
         配置対象から外れたホストの管理投影物も stale として扱う（REQ-099-012 の
         対象別除去）。管理物判定不能な junction は返さない（REQ-058-008 の非破壊境界）。
 
@@ -435,13 +693,14 @@ function Get-StaleManagedJunctions {
                 }
             }
     }
-    if (Test-Path -LiteralPath $SenpiProjectionDir) {
-        Get-ChildItem -LiteralPath $SenpiProjectionDir -Directory -Force |
+    $senpiSkillsRoot = Join-Path $SenpiProjectionDir 'skills'
+    if (Test-Path -LiteralPath $senpiSkillsRoot) {
+        Get-ChildItem -LiteralPath $senpiSkillsRoot -Directory -Force |
             Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
             ForEach-Object {
-                $targetEntry = "senpi:$($_.Name)"
+                $targetEntry = "senpi:skills\$($_.Name)"
                 if ($targetEntry -notin $CurrentTargets) {
-                    if (Test-ManagedSenpiJunction -JunctionName $_.Name -JunctionFullName $_.FullName) {
+                    if (Test-ManagedSenpiJunction -SenpiRel "skills\$($_.Name)" -JunctionFullName $_.FullName) {
                         $stale.Add([PSCustomObject]@{ RelPath = $targetEntry; FullName = $_.FullName })
                     }
                 }
@@ -472,17 +731,31 @@ function Get-StaleManagedAgentJunctions {
     $stale = [System.Collections.Generic.List[object]]::new()
     if (-not $AgentProjectionDir) { return $stale }
     $skillsRoot = Join-Path $AgentProjectionDir 'skills'
-    if (-not (Test-Path -LiteralPath $skillsRoot)) { return $stale }
-    Get-ChildItem -LiteralPath $skillsRoot -Directory -Force |
-        Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
-        ForEach-Object {
-            $entry = "agents:skills\$($_.Name)"
-            if ($entry -notin $CurrentAgentEntryTargets) {
-                if (Test-ManagedProjectionJunction -JunctionRel "skills\$($_.Name)" -JunctionFullName $_.FullName) {
-                    $stale.Add([PSCustomObject]@{ RelPath = $entry; FullName = $_.FullName })
+    if (Test-Path -LiteralPath $skillsRoot) {
+        Get-ChildItem -LiteralPath $skillsRoot -Directory -Force |
+            Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
+            ForEach-Object {
+                $entry = "agents:skills\$($_.Name)"
+                if ($entry -notin $CurrentAgentEntryTargets) {
+                    if (Test-ManagedProjectionJunction -JunctionRel "skills\$($_.Name)" -JunctionFullName $_.FullName) {
+                        $stale.Add([PSCustomObject]@{ RelPath = $entry; FullName = $_.FullName })
+                    }
                 }
             }
-        }
+    }
+    $agentDevRoot = Join-Path $AgentProjectionDir 'agentdev'
+    if (Test-Path -LiteralPath $agentDevRoot) {
+        Get-ChildItem -LiteralPath $agentDevRoot -Directory -Force |
+            Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
+            ForEach-Object {
+                $entry = "agents:agentdev\$($_.Name)"
+                if ($entry -notin $CurrentAgentEntryTargets) {
+                    if (Test-ManagedProjectionJunction -JunctionRel "agentdev\$($_.Name)" -JunctionFullName $_.FullName) {
+                        $stale.Add([PSCustomObject]@{ RelPath = $entry; FullName = $_.FullName })
+                    }
+                }
+            }
+    }
     return $stale
 }
 
@@ -519,11 +792,12 @@ function Get-UnmanagedProjectionJunctionRels {
                 }
             }
     }
-    if (Test-Path -LiteralPath $SenpiProjectionDir) {
-        Get-ChildItem -LiteralPath $SenpiProjectionDir -Directory -Force |
+    $senpiSkillsRoot = Join-Path $SenpiProjectionDir 'skills'
+    if (Test-Path -LiteralPath $senpiSkillsRoot) {
+        Get-ChildItem -LiteralPath $senpiSkillsRoot -Directory -Force |
             Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
             ForEach-Object {
-                $targetEntry = "senpi:$($_.Name)"
+                $targetEntry = "senpi:skills\$($_.Name)"
                 if ($targetEntry -notin $CurrentTargets -and $targetEntry -notin $staleRels) {
                     $unmanaged.Add($targetEntry)
                 }
@@ -548,15 +822,27 @@ function Get-UnmanagedAgentProjectionJunctionRels {
     $unmanaged = [System.Collections.Generic.List[string]]::new()
     if (-not $AgentProjectionDir) { return $unmanaged }
     $skillsRoot = Join-Path $AgentProjectionDir 'skills'
-    if (-not (Test-Path -LiteralPath $skillsRoot)) { return $unmanaged }
-    Get-ChildItem -LiteralPath $skillsRoot -Directory -Force |
-        Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
-        ForEach-Object {
-            $entry = "agents:skills\$($_.Name)"
-            if ($entry -notin $CurrentAgentEntryTargets -and $entry -notin $staleRels) {
-                $unmanaged.Add($entry)
+    if (Test-Path -LiteralPath $skillsRoot) {
+        Get-ChildItem -LiteralPath $skillsRoot -Directory -Force |
+            Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
+            ForEach-Object {
+                $entry = "agents:skills\$($_.Name)"
+                if ($entry -notin $CurrentAgentEntryTargets -and $entry -notin $staleRels) {
+                    $unmanaged.Add($entry)
+                }
             }
-        }
+    }
+    $agentDevRoot = Join-Path $AgentProjectionDir 'agentdev'
+    if (Test-Path -LiteralPath $agentDevRoot) {
+        Get-ChildItem -LiteralPath $agentDevRoot -Directory -Force |
+            Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
+            ForEach-Object {
+                $entry = "agents:agentdev\$($_.Name)"
+                if ($entry -notin $CurrentAgentEntryTargets -and $entry -notin $staleRels) {
+                    $unmanaged.Add($entry)
+                }
+            }
+    }
     return $unmanaged
 }
 

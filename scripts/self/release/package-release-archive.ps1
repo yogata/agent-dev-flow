@@ -23,6 +23,11 @@ param()
 #                                      into the main repo)
 #     src/antigravity/**              (Antigravity host connection area; same
 #                                      distribution-completeness contract)
+#     src/senpi/**                    (Senpi host connection area; the Senpi
+#                                      entry projection copies agentdev-*
+#                                      skills under .senpi/skills/ and the
+#                                      connection copy places this area at
+#                                      .agents/agentdev/senpi/)
 #     scripts/install.ps1            (projected from scripts/consumer/archive/install.ps1)
 #     README-INSTALL.md
 #     THIRD-PARTY-NOTICES.md         (third-party dependency and license notices)
@@ -45,7 +50,10 @@ param()
 #   2. archive projection on the archive EXTRAS (README-INSTALL.md,
 #      scripts/install.ps1 archive edition) — these live outside src/common/
 #      so the host checker's archive profile would otherwise skip them
-#   3. archive-installed projection on the extracted+installed content
+#   3. the selection-aware installed projection check
+#      (check_installed_projection.ts) after the trusted installer ran for
+#      EVERY one of the 15 non-empty agent selections (4 agents, 2^4 - 1;
+#      explicit -Hosts/-AgentHosts per run)
 # The final archive is published by an atomic no-clobber HARD LINK after
 # all validations pass. The link primitive lives in
 # scripts/self/release/publish-hard-link.ts (trusted host Bun helper that calls
@@ -68,12 +76,12 @@ param()
 #   3  pre-existing final archive collision (never overwritten)
 #   6  archive projection boundary check failed (src/common/ + host
 #      connection area, or extras)
-#   7  archive-installed projection boundary check failed
-#   8  trusted host boundary checker or publish helper missing (fail-closed,
-#      Oracle finding 6)
-#   9  archive expansion, installer invocation, install-into-target
-#      verification, version pin metadata missing in the staged plugin, or
-#      atomic publish failed after staging
+#   7  installed projection check failed for any of the 15 selections
+#   8  trusted host boundary checker, installed projection checker, or
+#      publish helper missing (fail-closed, Oracle finding 6)
+#   9  archive expansion, trusted installer invocation (any selection),
+#      installed projection check invocation, version pin metadata missing
+#      in the staged plugin, or atomic publish failed after staging
 
 $ErrorActionPreference = "Stop"
 
@@ -101,9 +109,11 @@ $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
 # stay in the OpenCode host connection area (src/opencode/plugins).
 $srcCommands = Join-Path $repoRoot "src\common\commands\agentdev"
 $srcSkills = Join-Path $repoRoot "src\common\skills"
-# New host connection areas (src/codex/, src/antigravity/). Shipped in the
-# archive for distribution completeness; collecting them is NOT an
-# installation into the main repo.
+# Host connection areas (src/senpi/, src/codex/, src/antigravity/). Shipped
+# in the archive for distribution completeness; collecting them is NOT an
+# installation into the main repo. The archive-edition installer consumes
+# senpi (the Senpi projection) and codex/antigravity (the connection copies).
+$srcSenpi = Join-Path $repoRoot "src\senpi"
 $srcCodex = Join-Path $repoRoot "src\codex"
 $srcAntigravity = Join-Path $repoRoot "src\antigravity"
 # Archive-dedicated installer ORIGINAL (REQ-050-010). Travels inside the
@@ -129,6 +139,9 @@ if (-not (Test-Path -LiteralPath $installScript)) {
 if (-not (Test-Path -LiteralPath $thirdPartyNotices)) {
     Fail-Exit 2 "package-release-archive: THIRD-PARTY-NOTICES.md missing at repo root: $thirdPartyNotices (the archive must carry the third-party dependency notices; fail-closed)"
 }
+if (-not (Test-Path -LiteralPath $srcSenpi)) {
+    Fail-Exit 2 "package-release-archive: required source directory missing: $srcSenpi (Senpi host connection area; the archive must carry the distribution originals; fail-closed)"
+}
 if (-not (Test-Path -LiteralPath $srcCodex)) {
     Fail-Exit 2 "package-release-archive: required source directory missing: $srcCodex (Codex host connection area; the archive must carry the distribution originals; fail-closed)"
 }
@@ -140,9 +153,17 @@ if (-not (Test-Path -LiteralPath $srcAntigravity)) {
 # v2:REQ-0145-014 / integrity-contracts.md "release profile", the host checker
 # is the authority; the archive copy ships for consumer install but is not
 # trusted to validate itself.
-$boundaryChecker = Join-Path $repoRoot ".opencode\skills\repo-agentdev-integrity\scripts\check_distribution_boundary.ts"
+$boundaryChecker = Join-Path $repoRoot ".opencode\skills\repo-agentdev-integrity\trusted-distribution-gate\check_distribution_boundary.ts"
 if (-not (Test-Path -LiteralPath $boundaryChecker)) {
     Fail-Exit 8 "package-release-archive: trusted host boundary checker missing: $boundaryChecker (fail-closed per Oracle finding 6)"
+}
+
+# Trusted selection-aware installed projection checker (NOT a candidate copy
+# inside the archive). Verifies the placed/removed projection of an installed
+# consumer root against the selection recorded in .agentdev/install-state.json.
+$installedChecker = Join-Path $repoRoot ".opencode\skills\repo-agentdev-integrity\trusted-distribution-gate\check_installed_projection.ts"
+if (-not (Test-Path -LiteralPath $installedChecker)) {
+    Fail-Exit 8 "package-release-archive: trusted host installed projection checker missing: $installedChecker (fail-closed)"
 }
 
 # Trusted host publish primitive (NOT the candidate copy inside the archive).
@@ -253,11 +274,14 @@ try {
         }
     }
 
-    # New host connection areas (src/codex/, src/antigravity/): staged as
-    # real-file recursive copies. Shipped for distribution completeness;
-    # the archive-edition installer does not consume them (its -AgentHosts
-    # placement projects from src/common/skills/).
+    # Host connection areas (src/senpi/, src/codex/, src/antigravity/):
+    # staged as real-file recursive copies. The archive-edition installer
+    # consumes senpi (the Senpi entry projection copies agentdev-* skills
+    # under .senpi/skills/ and the Senpi connection copy places this area at
+    # .agents/agentdev/senpi/) and codex/antigravity (the
+    # .agents/agentdev/<agent> connection copies).
     foreach ($newHostArea in @(
+        @{ Name = "senpi";       Source = $srcSenpi },
         @{ Name = "codex";       Source = $srcCodex },
         @{ Name = "antigravity"; Source = $srcAntigravity }
     )) {
@@ -350,13 +374,11 @@ try {
     # ONLY by the atomic publish step after every validation passes.
     Compress-Archive -Path $stageArchiveRoot -DestinationPath $stagedZip -Force
 
-    # Post-archive validation: extract to a unique TEMP root, install, and
-    # run the archive-installed projection. Unique roots avoid collisions
-    # with concurrent or prior runs (no deterministic commitShort-suffix).
+    # Post-archive validation: extract to a unique TEMP root, then install
+    # and check EVERY one of the 15 non-empty agent selections (4 agents,
+    # 2^4 - 1). Unique roots avoid collisions with concurrent or prior runs.
     $extractRoot = Join-Path $stageBase "extract-$runId"
-    $installedRoot = Join-Path $stageBase "installed-$runId"
     New-Item -ItemType Directory -Path $extractRoot -Force | Out-Null
-    New-Item -ItemType Directory -Path $installedRoot -Force | Out-Null
 
     Expand-Archive -LiteralPath $stagedZip -DestinationPath $extractRoot -Force
     $extractedRoot = Get-ChildItem -LiteralPath $extractRoot -Directory | Select-Object -First 1
@@ -368,7 +390,6 @@ try {
     # The archive-edition installer resolves the canonical layout under src/
     # (src/common/ + src/opencode/plugins/, DEC-049) itself.
     $installedSrc = Join-Path $extractedRootPath "src"
-    $installedTarget = Join-Path $installedRoot ".opencode"
     # Verify the candidate archive CONTAINS the archive edition installer
     # (scripts/install.ps1) as an artifact. Presence is required; the file
     # is NOT executed (Stage B byte-binding / untrusted-execution defense,
@@ -378,16 +399,17 @@ try {
         Cleanup-Stage
         Fail-Exit 9 "package-release-archive: scripts/install.ps1 (archive edition) missing from extracted archive: $installFromArchive"
     }
-    # Stage B vendor pre-provisioning (verification environment only): the
-    # staged plugin ships version pin metadata only (vendor/ excluded from
-    # the archive) and the trusted installer enforces vendor completeness at
-    # the installed projection. Provision the release runner's locally
-    # generated vendor artifacts (when present) into the extracted plugin so
-    # the Stage B install simulates a consumer that already completed the
-    # README resolution steps (bun install && bun run build:engine). This is
-    # a local copy of already-generated artifacts; no dependency generation
-    # and no network fetching is performed. Environments without the local
-    # vendor still stop fail-closed with the installer's guidance.
+    # Vendor pre-provisioning (verification environment only): the staged
+    # plugin ships version pin metadata only (vendor/ excluded from the
+    # archive) and the installer enforces vendor completeness for OpenCode
+    # selections only (exit 6). Provision the release runner's locally
+    # generated vendor artifacts (when present) into the extracted plugin
+    # source so the OpenCode selections simulate a consumer that already
+    # completed the README resolution steps (bun install && bun run
+    # build:engine). Non-OpenCode selections never consult the vendor check.
+    # This is a local copy of already-generated artifacts; no dependency
+    # generation and no network fetching is performed. Environments without
+    # the local vendor still stop fail-closed with the installer's guidance.
     $extractedTextlintGuard = Join-Path $installedSrc "opencode\plugins\agentdev-textlint-guard"
     $hostVendor = Join-Path $repoRoot "src\opencode\plugins\agentdev-textlint-guard\vendor"
     if ((Test-Path -LiteralPath $extractedTextlintGuard) -and (Test-Path -LiteralPath $hostVendor)) {
@@ -395,27 +417,62 @@ try {
         New-Item -ItemType Directory -Path $dstVendor -Force | Out-Null
         Copy-Item -Path (Join-Path $hostVendor "*") -Destination $dstVendor -Recurse -Force
     }
-    # Run the TRUSTED host installer original ($installScript at the release
-    # runner's working tree, scripts/consumer/archive/install.ps1) against
-    # the extracted SOURCE, NOT the candidate copy extracted from the
-    # archive. The candidate archive's installer artifact is verified
-    # present above but never executed, so a mutated archive cannot run
-    # arbitrary code through its installer (in particular it cannot mutate
-    # $stagedZip between Compress-Archive and publication).
-    # -AgentHosts both: the internal verification also exercises the
-    # Codex/Antigravity entry projection placement (.agents/skills/ real
-    # copies), so the archive-installed boundary check below covers the
-    # agent entry projection files too.
-    & powershell -NoProfile -ExecutionPolicy Bypass -File $installScript -Source $installedSrc -Target $installedTarget -Mode copy -AgentHosts both
-    if ($LASTEXITCODE -ne 0) {
-        Cleanup-Stage
-        Fail-Exit 9 "package-release-archive: trusted archive installer exited with $LASTEXITCODE"
+    # For EVERY non-empty agent selection: run the TRUSTED host installer
+    # original ($installScript at the release runner's working tree,
+    # scripts/consumer/archive/install.ps1) with explicit -Hosts/-AgentHosts
+    # against the extracted SOURCE (NOT the candidate copy extracted from
+    # the archive; the candidate installer artifact is verified present
+    # above but never executed, so a mutated archive cannot run arbitrary
+    # code through its installer), then run the trusted selection-aware
+    # installed projection checker (check_installed_projection.ts) against
+    # the fresh installed root. The checker verifies the placed/removed
+    # projection against the selection recorded in the install state record
+    # the installer wrote.
+    $openCombos = @(
+        @{ Hosts = "none";     Open = @() },
+        @{ Hosts = "opencode"; Open = @("opencode") },
+        @{ Hosts = "senpi";    Open = @("senpi") },
+        @{ Hosts = "both";     Open = @("opencode", "senpi") }
+    )
+    $agentCombos = @(
+        @{ AgentHosts = "none";        Agents = @() },
+        @{ AgentHosts = "codex";       Agents = @("codex") },
+        @{ AgentHosts = "antigravity"; Agents = @("antigravity") },
+        @{ AgentHosts = "both";        Agents = @("codex", "antigravity") }
+    )
+    $selectionCombos = @()
+    foreach ($oc in $openCombos) {
+        foreach ($ac in $agentCombos) {
+            $agents = @(@($oc.Open) + @($ac.Agents))
+            if ($agents.Count -eq 0) { continue }
+            $selectionCombos += @{
+                Label = ($agents -join "+")
+                Hosts = $oc.Hosts
+                AgentHosts = $ac.AgentHosts
+            }
+        }
     }
-    Write-Host "package-release-archive: running archive-installed projection boundary check"
-    & bun run $boundaryChecker --profile archive-installed $installedRoot --json 2>&1 | Out-Host
-    if ($LASTEXITCODE -ne 0) {
+    if ($selectionCombos.Count -ne 15) {
         Cleanup-Stage
-        Fail-Exit 7 "package-release-archive: archive-installed projection boundary check failed (exit $LASTEXITCODE); no final archive produced."
+        Fail-Exit 9 "package-release-archive: expected 15 non-empty agent selections, built $($selectionCombos.Count)"
+    }
+    $selectionIndex = 0
+    foreach ($combo in $selectionCombos) {
+        $selectionIndex++
+        $installedRootN = Join-Path $stageBase ("installed-$selectionIndex-$runId")
+        $installedTargetN = Join-Path $installedRootN ".opencode"
+        New-Item -ItemType Directory -Path $installedRootN -Force | Out-Null
+        Write-Host ("package-release-archive: verifying selection [$($combo.Label)] (-Hosts $($combo.Hosts) -AgentHosts $($combo.AgentHosts))")
+        & powershell -NoProfile -ExecutionPolicy Bypass -File $installScript -Source $installedSrc -Target $installedTargetN -Mode copy -Hosts $combo.Hosts -AgentHosts $combo.AgentHosts
+        if ($LASTEXITCODE -ne 0) {
+            Cleanup-Stage
+            Fail-Exit 9 "package-release-archive: trusted archive installer exited with $LASTEXITCODE for selection [$($combo.Label)]"
+        }
+        & bun run $installedChecker --root $installedRootN --source $installedSrc --json 2>&1 | Out-Host
+        if ($LASTEXITCODE -ne 0) {
+            Cleanup-Stage
+            Fail-Exit 7 "package-release-archive: installed projection check failed (exit $LASTEXITCODE) for selection [$($combo.Label)]; no final archive produced."
+        }
     }
 
     # Atomic no-clobber hard-link publish (linearization point). The

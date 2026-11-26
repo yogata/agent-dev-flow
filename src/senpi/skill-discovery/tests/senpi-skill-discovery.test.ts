@@ -148,6 +148,25 @@ describe("Senpi write-target gate (edit / tool / guard root consistency)", () =>
   });
 });
 
+describe("Senpi installed canonical binding (release install layout)", () => {
+  test("prefers .agents/agentdev/common over the source fallback when present", () => {
+    const f = buildFixture();
+    writeFixture(
+      path.join("ws", ".agents", "agentdev", "common", "skills", "agentdev-installed", "SKILL.md"),
+      "---\nname: agentdev-installed\ndescription: installed canonical\n---\n",
+    );
+    expect(path.resolve(senpiCanonicalSkillsDir(f.ws))).toBe(
+      path.resolve(path.join(f.ws, ".agents", "agentdev", "common", "skills")),
+    );
+    const discovered = senpiDiscoverSkill(f.ws, f.ws, "agentdev-installed");
+    expect(discovered.ok).toBe(true);
+    if (discovered.ok) {
+      expect(discovered.entry.origin).toBe("canonical");
+      expect(isInside(discovered.entry.skillRoot, f.ws)).toBe(true);
+    }
+  });
+});
+
 function isInside(target: string, root: string): boolean {
   const t = path.resolve(target).replace(/\\/g, "/").replace(/\/+$/, "");
   const r = path.resolve(root).replace(/\\/g, "/").replace(/\/+$/, "");

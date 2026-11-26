@@ -1,6 +1,6 @@
 # AgentDevFlow Release Archive — Install Guide
 
-この README は release archive（`agentdev-release-<sha>.zip`）を受け取った利用者向けの導入手順書である。archive には AgentDevFlow 配布物（command / skill / reference / template / script）が実ファイルとして格納されており、Windows junction や Unix symlink に依存しない。archive はマルチホスト正本モデル（共通正本 `src/common/` とホスト接続領域 `src/opencode/`）の構成で生成される。
+この README は release archive（`agentdev-release-<sha>.zip`）を受け取った利用者向けの導入手順書である。archive には AgentDevFlow 配布物（command / skill / reference / template / script）が実ファイルとして格納されており、Windows junction や Unix symlink に依存しない。archive はマルチホスト正本モデル（共通正本 `src/common/` とホスト接続領域 `src/opencode/`・`src/senpi/`・`src/codex/`・`src/antigravity/`）の構成で生成される。
 
 ## 同梱内容
 
@@ -10,12 +10,15 @@ agentdev-release-<sha>/
   src/common/skills/agentdev-*/**
   src/common/tools/agentdev-*/**
   src/opencode/plugins/agentdev-*/**
+  src/senpi/**
+  src/codex/**
+  src/antigravity/**
   scripts/install.ps1
   README-INSTALL.md
   THIRD-PARTY-NOTICES.md
 ```
 
-`scripts/install.ps1`（archive 版 installer）は archive 内の `src/` ツリー（共通正本 `src/common/` と OpenCode 接続領域 `src/opencode/plugins/`）を `.opencode/` 配下へ実ファイルとして配置する導入スクリプトである。archive は配布物の自己完結を保証し、展開先リポジトリの `src/` 状態に依存しない。archive 版は junction を作成しない archive 固有の導入契約を持つ（通常 checkout 版 `scripts/install.ps1` とは別の installation projection である）。
+`scripts/install.ps1`（archive 版 installer）は archive 内の `src/` ツリーを導入先リポジトリへ実ファイルとして配置する導入スクリプトである。配置対象は4エージェント（OpenCode、Senpi、Codex、Antigravity）から1つ以上を選ぶ選択集合で決まり、`-Hosts`（OpenCode / Senpi。`none` で両者を外す）と `-AgentHosts`（Codex / Antigravity。`none` で両者を外す）で明示選択する。省略した側は導入先の選択記録（`.agentdev/install-state.json` の `selectedAgents`）または所有権確認済みの配置済みコピーから継承し、選択集合が空になる指定は配置前に拒否される。archive は配布物の自己完結を保証し、展開先リポジトリの `src/` 状態に依存しない。archive 版は junction を作成しない archive 固有の導入契約を持つ（通常 checkout 版 `scripts/install.ps1` とは別の installation projection である）。
 
 third-party 依存の実体（`vendor/` 配下の engine bundle と kuromoji 辞書）は同梱しない。agentdev-textlint-guard plugin は版固定情報（`package.json` + `bun.lock`）のみを配布し、依存は導入時に生成する（THIRD-PARTY-NOTICES.md に依存とライセンス種別の通知を記載する）。
 
@@ -45,10 +48,20 @@ $unpackedRoot = Join-Path $temp "agentdev-release-<sha>"
 & (Join-Path $unpackedRoot "scripts\install.ps1") `
     -Source (Join-Path $unpackedRoot "src") `
     -Target (Join-Path $repoRoot ".opencode") `
-    -Mode copy
+    -Mode copy `
+    -Hosts opencode `
+    -AgentHosts none
 ```
 
-導入完了後、`<repoRoot>/.opencode/commands/agentdev/` と `<repoRoot>/.opencode/skills/agentdev-*/` が実ファイルとして配置される。一時展開先（`$unpackedRoot`）には配置が発生しない。
+導入完了後、選択した配置対象に応じて、OpenCode は `<repoRoot>/.opencode/`、Senpi は `<repoRoot>/.senpi/skills/` と `<repoRoot>/.agents/agentdev/`、Codex / Antigravity は `<repoRoot>/.agents/skills/` と `<repoRoot>/.agents/agentdev/` 配下に実ファイルが配置される。一時展開先（`$unpackedRoot`）には配置が発生しない。
+
+### 導入後の確認と起動
+
+配置と読み込みの検証は導入側（installer の配置検査と配置結果の確認）が担い、実際のエージェントでの業務確認は利用者が担当する。各エージェントの起動方法は次のとおり。
+
+- OpenCode: 導入先リポジトリのルートで `opencode` を起動すると、`.opencode/` 配下のコマンド・スキル・ツール・Plugin が読み込まれる
+- Senpi: Senpi を導入先リポジトリのルートで起動すると、`.senpi/skills/` 配下のスキルエントリと `.agents/agentdev/` 経由の接続領域が読み込まれる
+- Codex / Antigravity: 各エージェントのスキル探索対象に `.agents/skills/` を含めて起動すると、`.agents/skills/` 配下のスキルと `.agents/agentdev/` 経由の接続領域が読み込まれる
 
 ## 導入時の依存生成手順（agentdev-textlint-guard plugin）
 
@@ -65,7 +78,9 @@ Pop-Location
 & (Join-Path $unpackedRoot "scripts\install.ps1") `
     -Source (Join-Path $unpackedRoot "src") `
     -Target (Join-Path $repoRoot ".opencode") `
-    -Mode copy
+    -Mode copy `
+    -Hosts opencode `
+    -AgentHosts none
 ```
 
 依存生成の完了後、textlint 検査は空のパッケージキャッシュ・ネットワーク遮断下でも動作する（node_modules は不要）。
@@ -112,6 +127,7 @@ installer（`scripts/install.ps1`）は宣言済み Skill が `.opencode/skills/
 | コード | 意味 |
 |--------|------|
 | 0      | 成功（全配置完了、内容一致） |
+| 1      | 選択解決または記録の検査に失敗（選択記録が読めない・不正、選択の曖昧、選択集合が空。メッセージに従い対処してから再実行） |
 | 4      | 配置先に既存ファイルがあり、内容が異なる（上書きせず停止） |
 | 5      | 必須ディレクトリの作成に失敗、または Source が存在しない |
 | 6      | textlint guard plugin の依存実体（vendor）が配置先に未生成または不完全（「導入時の依存生成手順」を実行してから再実行） |
