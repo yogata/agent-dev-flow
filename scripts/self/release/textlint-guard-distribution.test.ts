@@ -163,53 +163,63 @@ function expectShim(pluginsDir: string): void {
   );
 }
 
+/**
+ * consumer install 検証用の最小フィクスチャを構築して root パスを返す。
+ * マルチホスト正本モデルの最小フィクスチャ: 共通正本 src/common/（commands/tools の
+ * 投影元・usable checkout 判定材料）+ OpenCode 接続領域 src/opencode/（plugins）+
+ * Senpi 接続領域 src/senpi/（配置対象ホスト既定 both の投影元）。
+ * 版固定情報のみ配布の前提で vendor は未生成。
+ */
+function buildConsumerFixture(gitCloneStyle: boolean): string {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), `adftl-dist-${gitCloneStyle ? "git" : "zip"}-`));
+  const srcCommon = path.join(root, ".agentdev-plugin", "src", "common");
+  const srcOpencode = path.join(root, ".agentdev-plugin", "src", "opencode");
+  const srcSenpi = path.join(root, ".agentdev-plugin", "src", "senpi");
+  fs.mkdirSync(path.join(srcCommon, "commands", "agentdev"), { recursive: true });
+  fs.writeFileSync(path.join(srcCommon, "commands", "agentdev", "case-run.md"), "# case-run\n", "utf8");
+  // check モードは .opencode/tools の存在を期待するため既存テストと同じ最小 tools エントリを置く
+  fs.mkdirSync(path.join(srcCommon, "tools", "agentdev-gh"), { recursive: true });
+  fs.writeFileSync(path.join(srcCommon, "tools", "agentdev-gh", "index.ts"), "// tool\n", "utf8");
+  fs.copyFileSync(path.join(REPO_ROOT, "src", "common", "VERSION"), path.join(srcCommon, "VERSION"));
+  fs.mkdirSync(path.join(srcSenpi, "connection-demo"), { recursive: true });
+  fs.writeFileSync(path.join(srcSenpi, "connection-demo", "connection.ts"), "// senpi connection\n", "utf8");
+  fs.writeFileSync(path.join(srcSenpi, "README.md"), "# src/senpi/ (Senpi host connection area)\n", "utf8");
+  fs.mkdirSync(path.join(srcCommon, "skills", "agentdev-workflow-case-run"), { recursive: true });
+  fs.writeFileSync(path.join(srcCommon, "skills", "agentdev-workflow-case-run", "SKILL.md"), "# case-run skill\n", "utf8");
+  placeMechanicalStepSkillScripts(REPO_ROOT, path.join(srcCommon, "skills"));
+  placeRealPlugin(path.join(srcOpencode, "plugins"));
+  fs.mkdirSync(path.join(root, "scripts", "consumer"), { recursive: true });
+  fs.copyFileSync(INSTALL_PS1, path.join(root, "scripts", "install.ps1"));
+  fs.copyFileSync(path.join(REPO_ROOT, "scripts", "consumer", "common.ps1"), path.join(root, "scripts", "consumer", "common.ps1"));
+  fs.copyFileSync(
+    path.join(REPO_ROOT, "scripts", "consumer", "install-sync-common.ps1"),
+    path.join(root, "scripts", "consumer", "install-sync-common.ps1"),
+  );
+  fs.copyFileSync(
+    path.join(REPO_ROOT, "scripts", "consumer", "distribution-exclusion.ps1"),
+    path.join(root, "scripts", "consumer", "distribution-exclusion.ps1"),
+  );
+  execFileSync("git", ["init", "-q", "-b", "main"], { cwd: root });
+  execFileSync("git", ["config", "user.email", "t@t"], { cwd: root });
+  execFileSync("git", ["config", "user.name", "t"], { cwd: root });
+  if (gitCloneStyle) {
+    const plugin = path.join(root, ".agentdev-plugin");
+    fs.writeFileSync(path.join(plugin, ".gitattributes"), "* text=auto eol=lf\n", "utf-8");
+    execFileSync("git", ["init", "-q", "-b", "main"], { cwd: plugin });
+    execFileSync("git", ["config", "user.email", "t@t"], { cwd: plugin });
+    execFileSync("git", ["config", "user.name", "t"], { cwd: plugin });
+    execFileSync("git", ["add", "-A"], { cwd: plugin });
+    execFileSync("git", ["commit", "-q", "-m", "plugin"], { cwd: plugin });
+  }
+  return root;
+}
+
 describe("agentdev-textlint-guard distribution / consumer install (TS-005 / TS-006)", () => {
   function consumerScenario(label: string, gitCloneStyle: boolean): void {
     test(`${label}: vendor 欠落で fail-closed 停止と案内、導入手順後の offline gate`, () => {
-      const root = fs.mkdtempSync(path.join(os.tmpdir(), `adftl-dist-${gitCloneStyle ? "git" : "zip"}-`));
+      const root = buildConsumerFixture(gitCloneStyle);
       try {
-        // マルチホスト正本モデルの最小フィクスチャ: 共通正本 src/common/（commands/tools の
-        // 投影元・usable checkout 判定材料）+ OpenCode 接続領域 src/opencode/（plugins）+
-        // Senpi 接続領域 src/senpi/（配置対象ホスト既定 both の投影元）
-        const srcCommon = path.join(root, ".agentdev-plugin", "src", "common");
-        const srcOpencode = path.join(root, ".agentdev-plugin", "src", "opencode");
-        const srcSenpi = path.join(root, ".agentdev-plugin", "src", "senpi");
-        fs.mkdirSync(path.join(srcCommon, "commands", "agentdev"), { recursive: true });
-        fs.writeFileSync(path.join(srcCommon, "commands", "agentdev", "case-run.md"), "# case-run\n", "utf8");
-        // check モードは .opencode/tools の存在を期待するため既存テストと同じ最小 tools エントリを置く
-        fs.mkdirSync(path.join(srcCommon, "tools", "agentdev-gh"), { recursive: true });
-        fs.writeFileSync(path.join(srcCommon, "tools", "agentdev-gh", "index.ts"), "// tool\n", "utf8");
-        fs.copyFileSync(path.join(REPO_ROOT, "src", "common", "VERSION"), path.join(srcCommon, "VERSION"));
-        fs.mkdirSync(path.join(srcSenpi, "connection-demo"), { recursive: true });
-        fs.writeFileSync(path.join(srcSenpi, "connection-demo", "connection.ts"), "// senpi connection\n", "utf8");
-        fs.writeFileSync(path.join(srcSenpi, "README.md"), "# src/senpi/ (Senpi host connection area)\n", "utf8");
-        placeMechanicalStepSkillScripts(REPO_ROOT, path.join(srcCommon, "skills"));
-        placeRealPlugin(path.join(srcOpencode, "plugins"));
-        fs.mkdirSync(path.join(root, "scripts", "consumer"), { recursive: true });
-        fs.copyFileSync(INSTALL_PS1, path.join(root, "scripts", "install.ps1"));
-        fs.copyFileSync(path.join(REPO_ROOT, "scripts", "consumer", "common.ps1"), path.join(root, "scripts", "consumer", "common.ps1"));
-        fs.copyFileSync(
-          path.join(REPO_ROOT, "scripts", "consumer", "install-sync-common.ps1"),
-          path.join(root, "scripts", "consumer", "install-sync-common.ps1"),
-        );
-        fs.copyFileSync(
-          path.join(REPO_ROOT, "scripts", "consumer", "distribution-exclusion.ps1"),
-          path.join(root, "scripts", "consumer", "distribution-exclusion.ps1"),
-        );
-        execFileSync("git", ["init", "-q", "-b", "main"], { cwd: root });
-        execFileSync("git", ["config", "user.email", "t@t"], { cwd: root });
-        execFileSync("git", ["config", "user.name", "t"], { cwd: root });
-        if (gitCloneStyle) {
-          const plugin = path.join(root, ".agentdev-plugin");
-          fs.writeFileSync(path.join(plugin, ".gitattributes"), "* text=auto eol=lf\n", "utf-8");
-          execFileSync("git", ["init", "-q", "-b", "main"], { cwd: plugin });
-          execFileSync("git", ["config", "user.email", "t@t"], { cwd: plugin });
-          execFileSync("git", ["config", "user.name", "t"], { cwd: plugin });
-          execFileSync("git", ["add", "-A"], { cwd: plugin });
-          execFileSync("git", ["commit", "-q", "-m", "plugin"], { cwd: plugin });
-        }
-
-        const pluginCheckout = path.join(srcOpencode, "plugins", "agentdev-textlint-guard");
+        const pluginCheckout = path.join(root, ".agentdev-plugin", "src", "opencode", "plugins", "agentdev-textlint-guard");
         // 版固定情報は配布され、導入時生成依存（vendor）は未生成の前提
         expect(fs.existsSync(path.join(pluginCheckout, "package.json"))).toBe(true);
         expect(fs.existsSync(path.join(pluginCheckout, "bun.lock"))).toBe(true);
@@ -286,6 +296,35 @@ describe("agentdev-textlint-guard distribution / consumer install (TS-005 / TS-0
 
   consumerScenario("git clone checkout", true);
   consumerScenario("source ZIP checkout (.git absent inside the plugin checkout)", false);
+
+  test("OpenCode deselected: apply succeeds without the textlint vendor artifacts and without the vendor guidance (REQ-099-041)", () => {
+    const root = buildConsumerFixture(true);
+    try {
+      const pluginCheckout = path.join(root, ".agentdev-plugin", "src", "opencode", "plugins", "agentdev-textlint-guard");
+      // 版固定情報のみ配布で vendor 未生成の前提
+      expect(fs.existsSync(path.join(pluginCheckout, "vendor"))).toBe(false);
+
+      // OpenCode を選択しない明示選択での適用は、OpenCode 用 textlint の依存実体
+      // （vendor）や OpenCode 用 third-party Skill 配置を要求せず成功する（REQ-099-041 前半）
+      const apply = runPwsh(path.join(root, "scripts", "install.ps1"), ["-Mode", "apply", "-Hosts", "senpi", "-AgentHosts", "none"], root);
+      expect(apply.exitCode).toBe(0);
+      expect(apply.stdout).toContain("Placement targets were set by explicit selection.");
+      expect(apply.stdout).not.toContain("bun install");
+      expect(apply.stdout).not.toContain("bun run build:engine");
+      expect(fs.existsSync(path.join(root, ".opencode", "plugins", "agentdev-textlint-guard"))).toBe(false);
+
+      // Senpi 選択の配置と接続投影は行われる
+      expect(fs.existsSync(path.join(root, ".senpi", "skills", "agentdev-workflow-case-run", "SKILL.md"))).toBe(true);
+      expect(fs.existsSync(path.join(root, ".agents", "agentdev", "common"))).toBe(true);
+
+      const record = JSON.parse(fs.readFileSync(path.join(root, ".agentdev", "install-state.json"), "utf-8")) as {
+        selectedAgents: string[];
+      };
+      expect(record.selectedAgents).toEqual(["senpi"]);
+    } finally {
+      rmrf(root);
+    }
+  }, 600000);
 });
 
 describe("agentdev-textlint-guard distribution / archive install (TS-005)", () => {
