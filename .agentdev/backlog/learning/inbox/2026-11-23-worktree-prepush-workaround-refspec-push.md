@@ -19,3 +19,7 @@ status: unreviewed
 - **想定反映先**: worktree-operations.md、worktree 構造的制約 Knowledge
 - **関連**: `.agentdev/learning/inbox/2026-11-21-worktree-prepush-junction-unpropagation.md`（同根制約の初回観測）、`.agentdev/learning/inbox/2026-11-23-worktree-machine-step-gate-zod-resolution.md`（隣接課題・scripts node_modules）、`.agentdev/intake/inbox/2026-11-23-worktree-dependency-setup-normalization.md`（正規手段への統合課題）
 - **タグ**: `#worktree` `#pre-push` `#junction` `#push`
+
+補足（2026-11-26、Root Case #4227 設計PR #4228 の push で再確認）:
+
+- worktree（.worktrees/4227-definition）からの push は Step 1 で同一の module not found（extensions-integrity.ts から `../../agentdev-project-extensions/scripts/lib/extension_state.ts`）で失敗。バリエーション (1)（メインリポジトリ側から push し REPO_ROOT をメインに解決）で解決し、Step 1〜3 はすべてメイン側で合格（freshness 0 違反、cli.ts full 1738 files 24 OK、bun test 1453 pass）。docs のみを変更する Definition branch であるため生成投影の複製・junction 作成は不要だった
