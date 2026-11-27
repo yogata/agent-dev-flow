@@ -221,6 +221,18 @@ function New-SelfRepo {
     return $root
 }
 
+function Add-MechanicalStepSkillScripts {
+    <#
+    .SYNOPSIS
+        機械工程前提検証（REQ-009-053）の probe 対象 scripts を consumer 型一時リポジトリの
+        正本（.agentdev-plugin/src/common/skills）へ配置する。check の収束を要求する TS で使う。
+    #>
+    param([string]$Root)
+    $skillsDir = Join-Path $Root '.agentdev-plugin\src\common\skills'
+    & bun (Join-Path $PSScriptRoot 'mechanical-step-skills.ts') $RepoRoot $skillsDir
+    if ($LASTEXITCODE -ne 0) { throw "mechanical-step skill scripts placement failed (exit $LASTEXITCODE): $skillsDir" }
+}
+
 function Invoke-Ts001Consumer {
     <#
     .SYNOPSIS
@@ -999,6 +1011,7 @@ function Invoke-Ts009Consumer {
     #>
     Write-Host '=== TS-009 (consumer: senpi connection projection switch without .agents/skills) ==='
     $root = New-ConsumerRepo
+    Add-MechanicalStepSkillScripts -Root $root
     try {
         # Senpi のみで導入: .senpi/skills 投影 + .agents/agentdev 接続投影。.agents/skills は不在のまま。
         $applySenpi = Invoke-EntryScript -ScriptPath $InstallScript -Mode 'apply' -Cwd $root -ExtraArgs @('-Hosts', 'senpi')

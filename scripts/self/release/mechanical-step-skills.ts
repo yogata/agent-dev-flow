@@ -70,3 +70,12 @@ export function placeMechanicalStepSkillScripts(repoRoot: string, fixtureSkillsD
     copyTreeExcludingNodeModules(src, path.join(fixtureSkillsDir, name, "scripts"));
   }
 }
+
+if (import.meta.main) {
+  const [repoRoot, fixtureSkillsDir] = process.argv.slice(2);
+  if (!repoRoot || !fixtureSkillsDir) {
+    process.stderr.write("usage: bun mechanical-step-skills.ts <repoRoot> <fixtureSkillsDir>\n");
+    process.exit(2);
+  }
+  placeMechanicalStepSkillScripts(repoRoot, fixtureSkillsDir);
+}
