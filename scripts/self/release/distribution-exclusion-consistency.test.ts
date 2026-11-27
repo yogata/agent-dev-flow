@@ -245,6 +245,7 @@ describe("shared judgment module / judgment equality across entry configurations
       `$r4 = Resolve-AgentSelectionSet -InstallState $currentRecord`,
       `$legacyRecord = [pscustomobject]@{ agentHosts = @('antigravity') }`,
       `$r5 = Resolve-AgentSelectionSet -InstallState $legacyRecord`,
+      `$legacyDetected = Resolve-AgentSelectionSet -InstallState $legacyRecord -DetectedHostsList @('senpi')`,
       `$r6 = Resolve-AgentSelectionSet -InstallState ([pscustomobject]@{ distributionVersion = '1.0.0' })`,
       `$r7 = Resolve-AgentSelectionSet -InstallState ([pscustomobject]@{ selectedAgents = @('bogus') })`,
       `$r8 = Resolve-AgentSelectionSet -ExplicitHosts 'both' -ExplicitAgentHosts 'codex' -InstallState ([pscustomobject]@{ selectedAgents = @('bogus') })`,
@@ -256,7 +257,8 @@ describe("shared judgment module / judgment equality across entry configurations
       `  explicitAgentCodexFresh = (@($r2.SelectedAgents) -join ',')`,
       `  explicitAgentNoneFresh = (@($r3.SelectedAgents) -join ',')`,
       `  recordCodex = (@($r4.SelectedAgents) -join ',') + '|' + $r4.OpenInherited`,
-      `  legacyAntigravity = (@($r5.SelectedAgents) -join ',')`,
+      `  legacyAntigravityNoPlacementsDefaultAndGuidance = (@($r5.SelectedAgents) -join ',') + '|' + (@($r5.Guidance).Count -gt 0)`,
+      `  legacyAntigravityWithDetectedSenpiKeepsDetection = (@($legacyDetected.SelectedAgents) -join ',')`,
       `  noRecordFresh = (@($r6.SelectedAgents) -join ',') + '|' + (@($r6.Guidance).Count -gt 0)`,
       `  invalidRecordOmitted = $r7.Resolved`,
       `  invalidRecordBothExplicit = (@($r8.SelectedAgents) -join ',')`,
@@ -272,7 +274,8 @@ describe("shared judgment module / judgment equality across entry configurations
     expect(report.explicitAgentCodexFresh).toBe("opencode,senpi,codex");
     expect(report.explicitAgentNoneFresh).toBe("opencode,senpi");
     expect(report.recordCodex).toBe("codex|True");
-    expect(report.legacyAntigravity).toBe("antigravity");
+    expect(report.legacyAntigravityNoPlacementsDefaultAndGuidance).toBe("opencode,senpi,antigravity|True");
+    expect(report.legacyAntigravityWithDetectedSenpiKeepsDetection).toBe("senpi,antigravity");
     expect(report.noRecordFresh).toBe("opencode,senpi|True");
     expect(report.invalidRecordOmitted).toBe(false);
     expect(report.invalidRecordBothExplicit).toBe("opencode,senpi,codex");
