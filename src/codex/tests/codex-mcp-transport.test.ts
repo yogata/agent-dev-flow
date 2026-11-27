@@ -228,6 +228,37 @@ describe("codex-mcp-transport の tools/call", () => {
     expect(log).toHaveLength(3);
   });
 
+  test("プラグイン復旧後の再開: 最初の呼出しが利用不能でも次の呼出しから成功する", async () => {
+    let invokeCount = 0;
+    const transport = createCodexMcpTransport({
+      token: "secret-token",
+      serverUrl: SERVER,
+      post: async (_url, _headers, body) => {
+        const method = (JSON.parse(body) as { method: string }).method;
+        if (method === "notifications/initialized") {
+          return { status: 202, contentType: "application/json", text: "", sessionId: null };
+        }
+        if (method === "tools/call") {
+          return jsonReply(200, {
+            jsonrpc: "2.0",
+            id: 2,
+            result: { content: [{ type: "text", text: JSON.stringify({ number: 7 }) }] },
+          });
+        }
+        invokeCount += 1;
+        if (invokeCount === 1) return jsonReply(503, {});
+        return initOk();
+      },
+    });
+    const first = await transport.invoke(CALL);
+    expectUnavailable(first, "HTTP 503");
+    const second = await transport.invoke(CALL);
+    expect(second.ok).toBe(true);
+    if (second.ok) {
+      expect(second.payload).toEqual({ number: 7 });
+    }
+  });
+
   test("text ブロックが JSON でない場合は operation-failed", async () => {
     const reply = await invokeWith(() => jsonReply(200, {
       jsonrpc: "2.0",

@@ -89,6 +89,17 @@ Codex と Antigravity の GitHub 操作は、ホスト接続領域の adapter �
 
 停止と再開、切替の手順の詳細は共通案内スキル `agentdev-host-github-guidance` を参照する。
 
+#### プラグイン利用不能の観測可能性（ホスト別）
+
+adapter は接続のみを担い、ホスト側のプラグイン構成（登録・有効化・無効化）を管理しない。そのため利用不能の観測は adapter から見える接続面に限られ、ホスト側の管理状態そのものではない。
+
+| ホスト | adapter が観測できる利用不能 | ホスト側管理状態の観測 |
+|---|---|---|
+| Codex | トークン環境変数（`GITHUB_PAT_TOKEN`）未設定、接続先サーバーへの到達不能・認証拒否（HTTP 401/403/5xx、network error）、tool 面に必要な操作がない（コメント削除・Release 作成・Release 公開・search 軸） | adapter から直接観測できない。実ホストでの動作は利用者が確認する |
+| Antigravity | tool 面が公開情報で確認できないため、全操作が能力表の未確認停止として観測される | 能力表の確認と実機検証は利用者が行う |
+
+いずれの観測でも adapter は暗黙に gh 経路へ切り替えず、構造化失敗で停止する。
+
 #### GitHub 実行経路の実績記録
 
 新ホストの対応はホスト単位で判定し、実際に使用した GitHub 実行経路と実機検証の実施者と結果を本表に記録する。
@@ -98,7 +109,7 @@ Codex と Antigravity の GitHub 操作は、ホスト接続領域の adapter �
 | Codex | プラグイン経路（GitHub hosted MCP server の tool 面への対応付け。リポジトリ操作の契約試験は 偽 transport で実施） | 未実施（利用者の確認待ち） | 契約試験合格（issue 更新の labels・一覧系を含む主要操作。search・コメント削除・Release 作成・Release 公開は tool 面の能力不足として停止を確認）。実ホストでのプラグイン接続は未確認 |
 | Antigravity | プラグイン経路（能力表が全操作未確認のため全操作が停止する設計） | 未実施（利用者の確認待ち） | 停止動作の契約試験合格。能力表の確認と実機検証は利用者が行う |
 
-gh 経路は切替後に利用できる。gh 経路の主要操作系列（読戻し検証を含む）は共通判定（four-combination 共通 helper）により両ホストの adapter で契約試験合格している。
+gh 経路は切替後に利用できる。gh 経路の主要操作系列（読戻し検証を含む）は共通判定（four-combination 共通 helper）により両ホストの adapter で契約試験合格している。隔離検証環境（`yogata/adf-gh-isolated-verify`）では gh 経路の実走行（`issue_read`、`issue_create`、`comment_create`、`release_create` 草稿と `release_read` 読戻し、`issue_list` の search 軸）と経路切替後の再起動（別プロセスでの同一経路解決）を確認した。検索軸の結果反映に時間差があることを確認したため、再開前の照合では検索 0 件だけで未実行と確定せず、再照会または別の読み取りで交差確認する（共通案内スキルの再開規則）。
 
 ### 利用者が行う動作確認項目と期待結果
 
