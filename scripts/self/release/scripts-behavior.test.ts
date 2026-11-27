@@ -21,6 +21,12 @@
 //     recorded as selectedAgents, omitted selections maintain the recorded
 //     state, explicit none removes the managed entries, and the
 //     misexecution stop precedes placement (REQ-009-040)
+//   - selection handover and switch conflicts: a fresh install given only
+//     one of -Hosts / -AgentHosts guides how to specify the other, a legacy
+//     record holding only agentHosts keeps the OpenCode/Senpi selection that
+//     placements confirm, and a switch that leaves an unidentifiable
+//     junction on a removed placement target's managed path keeps it,
+//     reports the conflict and leaves the record unchanged (REQ-099-040)
 //
 // The consumer layout is exercised in both checkout forms accepted by
 // REQ-050 / REQ-009: git clone style (.git present) and source ZIP style
@@ -31,6 +37,7 @@
 // ADF-COVERS(verification): REQ-097-002
 // ADF-COVERS(verification): REQ-009-040
 // ADF-COVERS(verification): REQ-099-036, REQ-099-037, REQ-099-038, REQ-099-039
+// ADF-COVERS(verification): REQ-099-040
 
 import { describe, expect, test } from "bun:test";
 import * as crypto from "crypto";
@@ -734,4 +741,147 @@ describe("scripts behavior / agent host selection (REQ-009-040)", () => {
       expect(digestTree(path.join(REPO_ROOT, ".agents"))).toEqual(agentsBefore);
     }
   }, 120000);
+});
+
+describe("scripts behavior / selection handover and switch conflicts (REQ-099-040)", () => {
+  const OPEN_SKILL_REL = ".opencode/skills/agentdev-workflow-case-run";
+
+  function readSelectedAgents(root: string): string[] {
+    const record = JSON.parse(fs.readFileSync(path.join(root, ".agentdev", "install-state.json"), "utf-8")) as {
+      selectedAgents?: string[];
+    };
+    return record.selectedAgents ?? [];
+  }
+
+  function isJunction(p: string): boolean {
+    try {
+      return fs.lstatSync(p).isSymbolicLink();
+    } catch {
+      return false;
+    }
+  }
+
+  function placeForeignJunction(root: string, rel: string): string {
+    const junction = path.join(root, rel);
+    fs.mkdirSync(path.dirname(junction), { recursive: true });
+    if (isJunction(junction)) fs.unlinkSync(junction);
+    const foreign = path.join(root, "foreign-target");
+    fs.mkdirSync(foreign, { recursive: true });
+    fs.writeFileSync(path.join(foreign, "SKILL.md"), "# foreign\n");
+    fs.symlinkSync(foreign, junction, "junction");
+    return junction;
+  }
+
+  function nonInfoLinesIdentifying(r: RunResult, rel: string): string[] {
+    const slash = rel.replace(/^\.opencode\//, "");
+    return (r.stdout + "\n" + r.stderr)
+      .split(/\r?\n/)
+      .map((l) => l.trim().replace(/\\/g, "/"))
+      .filter((l) => l && !l.includes("[INFO]") && l.endsWith(` ${slash}`));
+  }
+
+  test("fresh install given only one of -Hosts / -AgentHosts guides how to specify the other", () => {
+    const cases = [
+      { extra: ["-AgentHosts", "antigravity"], other: "-Hosts", expected: ["opencode", "senpi", "antigravity"] },
+      { extra: ["-Hosts", "opencode"], other: "-AgentHosts", expected: ["opencode"] },
+    ];
+    for (const c of cases) {
+      const root = makeConsumerRepo(false);
+      try {
+        const apply = runInstall(root, "apply", c.extra);
+        expect(apply.exitCode).toBe(0);
+        expect(readSelectedAgents(root)).toEqual(c.expected);
+        const lines = (apply.stdout + "\n" + apply.stderr).split(/\r?\n/);
+        expect(lines.some((l) => l.includes(c.other))).toBe(true);
+      } finally {
+        rmrf(root);
+      }
+    }
+  }, 300000);
+
+  test("a legacy record holding only agentHosts keeps the OpenCode/Senpi selection that placements confirm", () => {
+    const cases = [
+      { agentHosts: ["codex"], expected: ["opencode", "senpi", "codex"], sharedEntryKept: true },
+      { agentHosts: [], expected: ["opencode", "senpi"], sharedEntryKept: false },
+    ];
+    for (const c of cases) {
+      const root = makeConsumerRepo(false);
+      try {
+        expect(runInstall(root, "apply", ["-AgentHosts", "codex"]).exitCode).toBe(0);
+        const recordPath = path.join(root, ".agentdev", "install-state.json");
+        const { selectedAgents: _selected, ...record } = JSON.parse(fs.readFileSync(recordPath, "utf-8")) as {
+          selectedAgents: string[];
+          [k: string]: unknown;
+        };
+        fs.writeFileSync(recordPath, JSON.stringify({ ...record, agentHosts: c.agentHosts }), "utf-8");
+
+        const apply = runInstall(root, "apply");
+        expect(apply.exitCode).toBe(0);
+        expect(readSelectedAgents(root)).toEqual(c.expected);
+        expect(fs.existsSync(path.join(root, OPEN_SKILL_REL, "SKILL.md"))).toBe(true);
+        const sharedEntry = path.join(root, ".agents", "skills", "agentdev-workflow-case-run", "SKILL.md");
+        expect(fs.existsSync(sharedEntry)).toBe(c.sharedEntryKept);
+      } finally {
+        rmrf(root);
+      }
+    }
+  }, 400000);
+
+  test("a switch that leaves an unidentifiable junction on a removed placement target's managed path keeps it, reports the conflict and leaves the record unchanged", () => {
+    for (const withRecord of [true, false]) {
+      const root = makeConsumerRepo(false);
+      try {
+        expect(runInstall(root, "apply", ["-Hosts", "both", "-AgentHosts", "codex"]).exitCode).toBe(0);
+        const recordPath = path.join(root, ".agentdev", "install-state.json");
+        const recordBefore = withRecord ? fs.readFileSync(recordPath) : null;
+        if (!withRecord) fs.rmSync(recordPath, { force: true });
+        const junction = placeForeignJunction(root, OPEN_SKILL_REL);
+
+        const dry = runInstall(root, "dry-run", ["-Hosts", "none"]);
+        expect(nonInfoLinesIdentifying(dry, OPEN_SKILL_REL).length).toBeGreaterThan(0);
+
+        const apply = runInstall(root, "apply", ["-Hosts", "none"]);
+        expect(apply.exitCode).not.toBe(0);
+        expect(isJunction(junction)).toBe(true);
+        expect(nonInfoLinesIdentifying(apply, OPEN_SKILL_REL).length).toBeGreaterThan(0);
+        if (recordBefore === null) {
+          expect(fs.existsSync(recordPath)).toBe(false);
+        } else {
+          expect(fs.readFileSync(recordPath).equals(recordBefore)).toBe(true);
+        }
+      } finally {
+        rmrf(root);
+      }
+    }
+  }, 600000);
+
+  test("an unidentifiable junction on the managed path of a placement target that was never selected does not block the install", () => {
+    const root = makeConsumerRepo(false);
+    try {
+      const junction = placeForeignJunction(root, OPEN_SKILL_REL);
+      const apply = runInstall(root, "apply", ["-Hosts", "none", "-AgentHosts", "codex"]);
+      expect(apply.exitCode).toBe(0);
+      expect(readSelectedAgents(root)).toEqual(["codex"]);
+      expect(isJunction(junction)).toBe(true);
+      const check = runInstall(root, "check");
+      expect(check.exitCode).toBe(0);
+    } finally {
+      rmrf(root);
+    }
+  }, 300000);
+
+  test("a switch keeps an unidentifiable junction outside managed paths and updates the record", () => {
+    const root = makeConsumerRepo(false);
+    try {
+      expect(runInstall(root, "apply", ["-Hosts", "both", "-AgentHosts", "codex"]).exitCode).toBe(0);
+      const junction = placeForeignJunction(root, ".opencode/skills/user-foreign-skill");
+      const apply = runInstall(root, "apply", ["-Hosts", "none"]);
+      expect(apply.exitCode).toBe(0);
+      expect(readSelectedAgents(root)).toEqual(["codex"]);
+      expect(isJunction(junction)).toBe(true);
+      expect(runInstall(root, "check").exitCode).toBe(0);
+    } finally {
+      rmrf(root);
+    }
+  }, 300000);
 });

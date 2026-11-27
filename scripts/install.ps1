@@ -472,10 +472,14 @@ function Get-ConsumerJunctionTargets {
         Returns sorted array of relative paths. OpenCode targets are relative to
         .opencode/; Senpi targets are relative to .senpi/ and prefixed 'senpi:'
         to keep both host scopes in one managed enumeration.
+
+    .PARAMETER SelectedHosts
+        配置対象とする OpenCode/Senpi の選択。省略時は現在解決済みの選択を使う。
     #>
+    param([string[]]$SelectedHosts = $ResolvedHosts)
     $targets = [System.Collections.Generic.List[string]]::new()
 
-    if ($ResolvedHosts -contains 'opencode') {
+    if ($SelectedHosts -contains 'opencode') {
         # commands\agentdev (canonical source: src/common/)
         $cmdSource = Join-Path $CommonSourceDir 'commands\agentdev'
         if (Test-Path -LiteralPath $cmdSource) {
@@ -507,7 +511,7 @@ function Get-ConsumerJunctionTargets {
         }
     }
 
-    if ($ResolvedHosts -contains 'senpi') {
+    if ($SelectedHosts -contains 'senpi') {
         # Senpi entry projection (placement-contract level enumeration):
         # agentdev-* skills of the canonical tree are projected under
         # .senpi/skills/ (same enumeration contract as the Codex / Antigravity
@@ -544,10 +548,21 @@ function Get-AgentEntryJunctionTargets {
         され、コマンド本文は実行時に配置済み接続投影
         （.agents/agentdev/common/commands/agentdev/）から、ない場合は正本から解決される
         （展開元を固定しない）。
+
+    .PARAMETER SelectedHosts
+        配置対象とする OpenCode/Senpi の選択。省略時は現在解決済みの選択を使う。
+
+    .PARAMETER SelectedAgentHosts
+        配置対象とする Codex/Antigravity の選択。省略時は現在解決済みの選択を使う。
     #>
-    if (-not $AgentDevProjectionActive) { return @() }
+    param(
+        [string[]]$SelectedHosts = $ResolvedHosts,
+        [string[]]$SelectedAgentHosts = $ResolvedAgentHosts
+    )
+    $agentPlacementActive = $SelectedAgentHosts.Count -gt 0
+    if (-not $agentPlacementActive -and ($SelectedHosts -notcontains 'senpi')) { return @() }
     $targets = [System.Collections.Generic.List[string]]::new()
-    if ($AgentPlacementActive) {
+    if ($agentPlacementActive) {
         $skillsSource = Join-Path $CommonSourceDir 'skills'
         if (Test-Path -LiteralPath $skillsSource) {
             Get-ChildItem -LiteralPath $skillsSource -Directory -Filter 'agentdev-*' |
@@ -555,10 +570,46 @@ function Get-AgentEntryJunctionTargets {
         }
     }
     $targets.Add('agents:agentdev\common')
-    if ($ResolvedHosts -contains 'senpi') { $targets.Add('agents:agentdev\senpi') }
-    if ($ResolvedAgentHosts -contains 'codex') { $targets.Add('agents:agentdev\codex') }
-    if ($ResolvedAgentHosts -contains 'antigravity') { $targets.Add('agents:agentdev\antigravity') }
+    if ($SelectedHosts -contains 'senpi') { $targets.Add('agents:agentdev\senpi') }
+    if ($SelectedAgentHosts -contains 'codex') { $targets.Add('agents:agentdev\codex') }
+    if ($SelectedAgentHosts -contains 'antigravity') { $targets.Add('agents:agentdev\antigravity') }
     return ($targets | Sort-Object)
+}
+
+function Write-UnmanagedJunctionReport {
+    <#
+    .SYNOPSIS
+        管理物判定不能な junction（REQ-058-008 の非破壊境界。削除も置換もしない）を報告する。
+
+    .DESCRIPTION
+        切替で外れた配置対象の管理パス（$RemovalCandidateManagedRels）上にあるものは
+        衝突として扱う。外れたエージェントの管理パスを AgentDevFlow が所有を確認でき
+        ない資産が占有している状態であり、保持したうえで apply を正常終了させず、選択の
+        記録を更新しない。管理パス外のものは情報として報告するのみである。
+        衝突とした管理列挙の相対パスを返す。
+    #>
+    param(
+        [string[]]$UnmanagedRels = @(),
+        [ValidateSet('check', 'dry-run', 'apply')][string]$ReportMode
+    )
+    $conflicts = [System.Collections.Generic.List[string]]::new()
+    foreach ($unmanagedRel in $UnmanagedRels) {
+        if ($unmanagedRel -in $RemovalCandidateManagedRels) {
+            $conflicts.Add($unmanagedRel)
+            if ($ReportMode -eq 'check') {
+                Write-Host "[DIVERGENCE] Unmanaged junction at managed path of a deselected placement target (apply keeps it and reports a conflict): $unmanagedRel"
+            } elseif ($ReportMode -eq 'dry-run') {
+                Write-Host "[ERROR] Unmanaged junction at managed path (apply would keep it and report a conflict): $unmanagedRel"
+            } else {
+                Write-Host "[ERROR] Unmanaged junction at managed path (kept, not removed): $unmanagedRel"
+            }
+        } elseif ($ReportMode -eq 'dry-run') {
+            Write-Host "[INFO] Junction not managed by AgentDevFlow (would be left untouched): $unmanagedRel"
+        } else {
+            Write-Host "[INFO] Junction not managed by AgentDevFlow (left untouched): $unmanagedRel"
+        }
+    }
+    return $conflicts
 }
 
 function Test-TextlintGuardPluginPresent {
@@ -962,6 +1013,24 @@ if ($LocalMode) {
 
 $targets = Get-ConsumerJunctionTargets
 $agentEntryTargets = @(Get-AgentEntryJunctionTargets)
+# 切替で外れる配置対象（切替前の選択にあり、今回の選択にないエージェント）の管理列挙。
+# その管理パスを管理物判定不能の junction が占有している状態は衝突として扱う
+# （Write-UnmanagedJunctionReport）。選択中のエージェントが使い続ける共有投影は外す。
+$removedAgents = @($Selection.PreviousAgents | Where-Object { $_ -notin $SelectedAgents })
+$removalCandidateRels = @()
+foreach ($removedAgent in $removedAgents) {
+    switch ($removedAgent) {
+        'opencode' { $removalCandidateRels += @(Get-ConsumerJunctionTargets -SelectedHosts @('opencode')) }
+        'senpi' {
+            $removalCandidateRels += @(Get-ConsumerJunctionTargets -SelectedHosts @('senpi'))
+            $removalCandidateRels += @(Get-AgentEntryJunctionTargets -SelectedHosts @('senpi') -SelectedAgentHosts @())
+        }
+        default { $removalCandidateRels += @(Get-AgentEntryJunctionTargets -SelectedHosts @() -SelectedAgentHosts @($removedAgent)) }
+    }
+}
+$RemovalCandidateManagedRels = @($removalCandidateRels |
+    Where-Object { $_ -and ($_ -notin @($targets)) -and ($_ -notin $agentEntryTargets) } |
+    Sort-Object -Unique)
 
 # ============================================================
 # CHECK MODE
@@ -1292,17 +1361,14 @@ if ($Mode -eq 'check') {
         Write-Host "[ORPHAN] Stale managed junction (apply removes it): $($staleItem.RelPath)"
         $divergences++
     }
-    foreach ($unmanagedRel in (Get-UnmanagedProjectionJunctionRels -CurrentTargets $targets -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir)) {
-        Write-Host "[INFO] Junction not managed by AgentDevFlow (left untouched): $unmanagedRel"
-    }
+    $unmanagedConflicts = @(Write-UnmanagedJunctionReport -UnmanagedRels (Get-UnmanagedProjectionJunctionRels -CurrentTargets $targets -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir) -ReportMode 'check')
     $staleAgentJunctions = @(Get-StaleManagedAgentJunctions -CurrentAgentEntryTargets $agentEntryTargets)
     foreach ($staleAgentItem in $staleAgentJunctions) {
         Write-Host "[ORPHAN] Stale managed junction (apply removes it): $($staleAgentItem.RelPath)"
         $divergences++
     }
-    foreach ($unmanagedAgentRel in (Get-UnmanagedAgentProjectionJunctionRels -CurrentAgentEntryTargets $agentEntryTargets)) {
-        Write-Host "[INFO] Junction not managed by AgentDevFlow (left untouched): $unmanagedAgentRel"
-    }
+    $unmanagedConflicts += @(Write-UnmanagedJunctionReport -UnmanagedRels (Get-UnmanagedAgentProjectionJunctionRels -CurrentAgentEntryTargets $agentEntryTargets) -ReportMode 'check')
+    $divergences += $unmanagedConflicts.Count
     if ($staleJunctions.Count -eq 0 -and $staleAgentJunctions.Count -eq 0) {
         Write-Host '[OK] No orphan junctions detected'
     }
@@ -1743,16 +1809,12 @@ if ($Mode -eq 'dry-run') {
             Write-Host "[WOULD REMOVE] Stale managed junction: $($staleItem.RelPath)"
         }
     }
-    foreach ($unmanagedRel in (Get-UnmanagedProjectionJunctionRels -CurrentTargets $targets -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir)) {
-        Write-Host "[INFO] Junction not managed by AgentDevFlow (would be left untouched): $unmanagedRel"
-    }
+    Write-UnmanagedJunctionReport -UnmanagedRels (Get-UnmanagedProjectionJunctionRels -CurrentTargets $targets -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir) -ReportMode 'dry-run' | Out-Null
     $dryRunStaleAgent = @(Get-StaleManagedAgentJunctions -CurrentAgentEntryTargets $agentEntryTargets)
     foreach ($staleAgentItem in $dryRunStaleAgent) {
         Write-Host "[WOULD REMOVE] Stale managed junction: $($staleAgentItem.RelPath)"
     }
-    foreach ($unmanagedAgentRel in (Get-UnmanagedAgentProjectionJunctionRels -CurrentAgentEntryTargets $agentEntryTargets)) {
-        Write-Host "[INFO] Junction not managed by AgentDevFlow (would be left untouched): $unmanagedAgentRel"
-    }
+    Write-UnmanagedJunctionReport -UnmanagedRels (Get-UnmanagedAgentProjectionJunctionRels -CurrentAgentEntryTargets $agentEntryTargets) -ReportMode 'dry-run' | Out-Null
     if ($dryRunStale.Count -eq 0 -and $dryRunStaleAgent.Count -eq 0) {
         Write-Host '[OK] No stale managed junctions to remove'
     }
@@ -2095,12 +2157,13 @@ if ($Mode -eq 'apply') {
             $applyRemoveFailures.Add($staleAgentItem.RelPath)
         }
     }
-    # 管理物判定不能な junction は削除せず報告のみ（REQ-058-008）
-    foreach ($unmanagedRel in (Get-UnmanagedProjectionJunctionRels -CurrentTargets $targets -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir)) {
-        Write-Host "[INFO] Junction not managed by AgentDevFlow (left untouched): $unmanagedRel"
+    # 管理物判定不能な junction は削除せず報告のみ（REQ-058-008）。配置対象から外れた
+    # ホストの管理パス上のものは衝突に加える（保持し、記録を更新せずに非正常終了する）。
+    foreach ($unmanagedConflictRel in @(Write-UnmanagedJunctionReport -UnmanagedRels (Get-UnmanagedProjectionJunctionRels -CurrentTargets $targets -LocalRedirectToolRel $LocalModeRedirectToolRel -LocalRedirectSourceDir $LocalSourceDir) -ReportMode 'apply')) {
+        $applyConflicts.Add($unmanagedConflictRel)
     }
-    foreach ($unmanagedAgentRel in (Get-UnmanagedAgentProjectionJunctionRels -CurrentAgentEntryTargets $agentEntryTargets)) {
-        Write-Host "[INFO] Junction not managed by AgentDevFlow (left untouched): $unmanagedAgentRel"
+    foreach ($unmanagedAgentConflictRel in @(Write-UnmanagedJunctionReport -UnmanagedRels (Get-UnmanagedAgentProjectionJunctionRels -CurrentAgentEntryTargets $agentEntryTargets) -ReportMode 'apply')) {
+        $applyConflicts.Add($unmanagedAgentConflictRel)
     }
     if ($applyStale.Count -eq 0 -and $applyStaleAgent.Count -eq 0) {
         Write-Host '[OK] No stale managed junctions to remove'

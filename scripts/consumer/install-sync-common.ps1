@@ -380,9 +380,9 @@ function Resolve-AgentSelectionSet {
         確定する（REQ-099-036〜043）。
 
     .DESCRIPTION
-        優先順位: 明示指定 > selectedAgents 記録 > 旧 agentHosts 記録（補助信号）>
-        所有権確認可能な配置からの検出。省略された側は現行の配置または記録から
-        引き継ぐ。確定できない場合は fail-closed で停止メッセージを返し、呼び出し側は
+        優先順位: 明示指定 > selectedAgents 記録 > 旧 agentHosts 記録（Codex/Antigravity
+        側の補助信号）> 所有権確認可能な配置からの検出。省略された側は現行の配置または
+        記録から引き継ぐ。確定できない場合は fail-closed で停止メッセージを返し、呼び出し側は
         配置へ進まない。空選択（結合集合が空）は配置前に拒否する。
 
         - StateInvalid スイッチ（記録ファイルが読めない）または selectedAgents /
@@ -390,6 +390,8 @@ function Resolve-AgentSelectionSet {
           （REQ-099-040）。両側明示なら記録を放棄して明示値で確定する。
         - 記録がなく、Codex/Antigravity 側が空に確定し、.agents/skills の管理投影だけが
           残る場合: 曖昧として停止し明示選択を案内する（REQ-099-040）。
+        - 旧 agentHosts 記録は Codex/Antigravity 側だけを引き継ぎ、OpenCode/Senpi 側は
+          所有権確認可能な配置から検出する（検出できなければ新規既定）。
         - 新規導入で一方のみ指定の場合: 指定側を配置対象とし、省略側は案内に回す
           （Guidance。OpenCode/Senpi 側の新規既定は NewInstallFallbackOpenHosts）。
 
@@ -410,10 +412,14 @@ function Resolve-AgentSelectionSet {
 
     $record = Get-AgentSelectionRecord -InstallState $InstallState
     $recordKnown = $false
+    # 旧 agentHosts 記録は Codex/Antigravity 側の選択だけを持ち、OpenCode/Senpi 側の
+    # 選択は記録していない（所有権確認可能な配置から検出する）。
+    $recordOpenKnown = $false
     $recordOpen = @()
     $recordAgents = @()
     if ($record -and $record.Status -eq 'ok') {
         $recordKnown = $true
+        $recordOpenKnown = $true
         $recordOpen = @($record.Agents | Where-Object { $_ -in @('opencode', 'senpi') })
         $recordAgents = @($record.Agents | Where-Object { $_ -in @('codex', 'antigravity') })
     } elseif ($record -and $record.Status -eq 'legacy') {
@@ -440,12 +446,15 @@ function Resolve-AgentSelectionSet {
     $agentsSide = $explicitAgents
     $openInherited = $false
     $agentsInherited = $false
+    # 新規導入（記録も所有権確認可能な OpenCode/Senpi 配置もない）で OpenCode/Senpi 側が
+    # 省略された場合。入口固有の新規既定を適用し、案内で指定方法を示す。
+    $openFromNewInstallFallback = $false
     $guidance = [System.Collections.Generic.List[string]]::new()
 
     if ($null -eq $openSide) {
-        if ($recordKnown) { $openSide = $recordOpen; $openInherited = $true }
+        if ($recordOpenKnown) { $openSide = $recordOpen; $openInherited = $true }
         elseif ($DetectedHostsList.Count -gt 0) { $openSide = $DetectedHostsList; $openInherited = $true }
-        else { $openSide = @($NewInstallFallbackOpenHosts); $openInherited = $true }
+        else { $openSide = @($NewInstallFallbackOpenHosts); $openInherited = $true; $openFromNewInstallFallback = $true }
     }
     if ($null -eq $agentsSide) {
         if ($recordKnown) { $agentsSide = $recordAgents; $agentsInherited = $true }
@@ -478,13 +487,25 @@ function Resolve-AgentSelectionSet {
         }
     }
 
+    if ($openFromNewInstallFallback) {
+        $openFallbackLabel = Get-AgentSelectionDisplay -SelectedAgents @($openSide)
+        $guidance.Add("OpenCode/Senpi の配置選択が指定されていないため新規導入の既定（$openFallbackLabel）を配置します。変更する場合は -Hosts を指定して再実行してください。")
+    }
     if (-not $recordKnown -and $agentsInherited -and $agentsSide.Count -eq 0) {
         $guidance.Add('Codex/Antigravity の配置選択が指定されていないため配置しません。追加する場合は -AgentHosts を指定して再実行してください。')
     }
 
+    # 切替前の選択（記録の selectedAgents、なければ所有権確認可能な配置からの検出と
+    # 旧 agentHosts 記録）。今回の選択に含まれないエージェントの管理パスを特定し、
+    # 切替で外れる配置を所有権確認不能の資産が占有している状態を衝突として扱うために使う。
+    $previousOpen = if ($recordOpenKnown) { $recordOpen } else { @($DetectedHostsList) }
+    $previousAgentHosts = if ($recordKnown) { $recordAgents } else { @($DetectedAgentSelection) }
+    $previousAgents = @($AgentSelectionCanonicalOrder | Where-Object { $_ -in (@($previousOpen) + @($previousAgentHosts)) })
+
     return [PSCustomObject]@{
         Resolved = $true
         SelectedAgents = $ordered
+        PreviousAgents = $previousAgents
         Stop = $null
         Guidance = @($guidance)
         OpenInherited = $openInherited
