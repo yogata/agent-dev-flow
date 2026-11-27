@@ -1,6 +1,8 @@
 component: agentdev-workflow-case-auto
 implementation:
   src/common/skills/agentdev-workflow-case-auto/SKILL.md:
+    - REQ-034-049
+    - REQ-034-050
     - REQ-034-032
     - REQ-103-014
     - REQ-103-015
@@ -59,6 +61,12 @@ implementation:
     - REQ-125-003
   src/common/skills/agentdev-workflow-case-auto/references/finite-execution.md:
     - REQ-125-004
+  src/common/skills/agentdev-workflow-case-auto/references/preparation.md:
+    - REQ-034-049
+    - REQ-034-050
+  src/common/skills/agentdev-workflow-case-auto/scripts/src/preparation.ts:
+    - REQ-034-049
+    - REQ-034-050
   src/common/skills/agentdev-workflow-case-auto/scripts/src/records-report.ts:
     - REQ-034-021
     - REQ-101-008
@@ -105,6 +113,12 @@ implementation:
     - REQ-096-015
     - REQ-101-009
 verification:
+  scripts/self/release/case-auto-preparation-isolated.ts:
+    - REQ-034-049
+    - REQ-034-050
+  src/common/skills/agentdev-workflow-case-auto/scripts/tests/preparation.test.ts:
+    - REQ-034-049
+    - REQ-034-050
   src/common/skills/agentdev-workflow-case-auto/scripts/tests/handoff-and-direct-execution-pins.test.ts:
     - REQ-125-002
     - REQ-125-003

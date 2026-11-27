@@ -2,7 +2,7 @@
 title: サブエージェント委譲契約
 status: accepted
 created: 2026-09-20
-updated: "2026-11-18"
+updated: "2026-11-27"
 ---
 <!-- ADF-COVERS(implementation): REQ-002-033, REQ-002-034 -->
 <!-- ADF-COVERS(implementation): REQ-003-001, REQ-003-002, REQ-003-003, REQ-003-004, REQ-003-006, REQ-003-011, REQ-003-012, REQ-003-014, REQ-003-020 -->
@@ -132,6 +132,8 @@ delegation_type は参考分類であり、Command 本文での使用は任意�
 GitHub I/O を伴う委譲の Custom Tool 経路: 委譲先サブエージェントは GitHub Issue / PR 操作を Custom Tool（`agentdev_gh`）の操作契約経由で実行する。driver 経由で委譲された場合も同じ経路であり、起動手段（driver、実行制御パラメータ）の差異を Tool 操作契約の利用方式に反映しない。生 gh コマンドの直接実行（WRITE）は正規経路としない（custom-tool-contracts Design「迂回防止」）。
 
 ## 委譲制約（9）
+
+case-auto の先行作業では、同じ対象 Issue の正式委譲と区別できる作業識別子を用いる。入力に固定基点・所有パス・依存インターフェース・個別試験を含める。副作用境界は別 worktree・別ローカルブランチ・許可範囲の編集と個別試験に限る。成果の受領は基点・コミット・変更パス・試験証跡を照合し、正式担当が個別に採否を判断する。運用順序と枠制御は [case-auto の並列実行設計](../commands/case-auto/references/parallel-orchestration.md) が所有する。
 
 | 制約 | 説明 |
 |---|---|

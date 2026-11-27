@@ -12,6 +12,8 @@
 
 ## STEP-S4: 実行担当サブエージェント委譲（adapter 委譲内 adversarial-review 含む）
 
+case-auto が先行作業の成果を渡した場合は、正式 case-run の依存充足後に、[先行作業の投入・取り込み](../../agentdev-workflow-case-auto/references/preparation.md) の採用判定を実行する。採用分も正式ブランチ上で個別試験を再実行し、最終 HEAD の品質ゲートに含める。採用できない成果があれば残件を通常経路で実行する。
+
 ### Purpose
 
 実装実行を adapter skill を読み込んだ実行担当サブエージェントへ委譲し、委譲の壁時計時間を計測する。
