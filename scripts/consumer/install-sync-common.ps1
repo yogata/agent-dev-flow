@@ -116,20 +116,30 @@ function Resolve-AgentEntryTargetRel {
 function Test-ManagedSenpiJunction {
     <#
     .SYNOPSIS
-        .senpi\skills\ 配下の junction が ADF 管理投影物（Senpi 入口投影）であること
-        を確定する（REQ-058-001、REQ-058-008）。
+        .senpi\ 配下の junction が ADF 管理投影物（Senpi 投影）であることを確定する
+        （REQ-058-001、REQ-058-008）。
 
     .DESCRIPTION
-        確定基準: リンク先が、当該 Senpi 投影相対パス（senpi:skills\<名前>）に対応する
-        正本パス（src/common/skills/<名前>）に一致する場合のみ管理物とみなす。
+        判定対象は2系統の Senpi 投影で、呼び出し形式（パラメータ）で区別する。
+        -JunctionName は自己ホスト接続領域投影（.senpi\<名前> の正本は
+        src/senpi/<名前>）、-SenpiRel は Senpi 入口投影（senpi:skills\<名前> の
+        正本は src/common/skills/<名前>）。
+        リンク先が、当該形式に対応する正本パスに一致する場合のみ管理物とみなす。
         正本以外を向く junction やリンク先を確定できない junction は管理物判定不能
         として扱い、自動削除の対象にしない非破壊境界である（REQ-058-008）。
     #>
-    param([string]$SenpiRel, [string]$JunctionFullName)
+    param([string]$JunctionName, [string]$SenpiRel, [string]$JunctionFullName)
     $targetObj = Get-JunctionTarget -Path $JunctionFullName
     $targetList = @($targetObj) | ForEach-Object { [string]$_ } | Where-Object { $_ }
     if ($targetList.Count -eq 0) { return $false }
-    $expectedFull = [System.IO.Path]::GetFullPath((Join-Path $CommonSourceDir $SenpiRel)).TrimEnd('\', '/')
+    if ($JunctionName) {
+        $expectedSource = Join-Path $SenpiHostSourceDir $JunctionName
+    } elseif ($SenpiRel) {
+        $expectedSource = Join-Path $CommonSourceDir $SenpiRel
+    } else {
+        return $false
+    }
+    $expectedFull = [System.IO.Path]::GetFullPath($expectedSource).TrimEnd('\', '/')
     foreach ($target in $targetList) {
         $resolved = $null
         try {
@@ -145,9 +155,15 @@ function Test-ManagedSenpiJunction {
 function Test-HasSenpiManagedProjection {
     <#
     .SYNOPSIS
-        .senpi\skills\ に管理物と確定できる Senpi 入口投影が存在するか判定する
-        （配置対象検出用）。
+        .senpi\ 直下（自己ホスト接続領域投影）または .senpi\skills\ 直下（Senpi 入口投影）
+        に管理物と確定できる Senpi 投影が存在するか判定する（配置対象検出用）。
     #>
+    if (Test-Path -LiteralPath $SenpiProjectionDir) {
+        $topFound = Get-ChildItem -LiteralPath $SenpiProjectionDir -Directory -Force -ErrorAction SilentlyContinue |
+            Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
+            Where-Object { Test-ManagedSenpiJunction -JunctionName $_.Name -JunctionFullName $_.FullName }
+        if ($topFound) { return $true }
+    }
     $senpiSkillsRoot = Join-Path $SenpiProjectionDir 'skills'
     if (-not (Test-Path -LiteralPath $senpiSkillsRoot)) { return $false }
     $found = Get-ChildItem -LiteralPath $senpiSkillsRoot -Directory -Force -ErrorAction SilentlyContinue |
@@ -541,10 +557,10 @@ function Get-TargetSourcePath {
     .SYNOPSIS
         Resolve the absolute source path backing a projection relative path.
         OpenCode targets back to the canonical sources (src/common/ for
-        commands/skills/tools, src/opencode/ for plugins). Senpi entry targets
-        (senpi:skills\<name>) back to src/common/skills/<name>; the Senpi host
-        connection area itself is placed as the agentdev\senpi connection copy.
-        consumer 入口の LocalMode 指定時のみ、
+        commands/skills/tools, src/opencode/ for plugins). Senpi targets back
+        to each model's source: entry projections (senpi:skills\<name>) to
+        src/common/skills/<name>, and the self-host connection area
+        (senpi:\<rel>) to src/senpi/<rel>. consumer 入口の LocalMode 指定時のみ、
         tools\agentdev-gh は src/common/tools/agentdev-gh/local/ へ
         リダイレクトされる（REQ-009-020）。
 
@@ -562,7 +578,10 @@ function Get-TargetSourcePath {
     )
     $senpiRel = Resolve-SenpiTargetRel -TargetEntry $RelPath
     if ($null -ne $senpiRel) {
-        return Join-Path $CommonSourceDir $senpiRel
+        if ($senpiRel -like 'skills\*') {
+            return Join-Path $CommonSourceDir $senpiRel
+        }
+        return Join-Path $SenpiHostSourceDir $senpiRel
     }
     if ($RelPath -like 'agentdev\*') {
         $agentdevSource = Get-AgentDevSourceDir -EntryName $RelPath.Substring('agentdev\'.Length)
@@ -661,8 +680,8 @@ function Get-StaleManagedJunctions {
         返却要素は RelPath（管理列挙の相対パス表現）と FullName（絶対パス）を持つ。
         正本の管理対象列挙（追加・修復対象を含む現行対象）に含まれない junction のうち、
         管理物と確定できるものだけを返す。対象範囲は OpenCode 投影（.opencode/ の
-        commands/skills/tools/plugins 配下）と Senpi 入口投影
-        （.senpi\skills\ 直下）の両方であり、
+        commands/skills/tools/plugins 配下）と Senpi 投影（自己ホスト接続領域投影
+        .senpi\ 直下・Senpi 入口投影 .senpi\skills\ 直下の両方）であり、
         配置対象から外れたホストの管理投影物も stale として扱う（REQ-099-012 の
         対象別除去）。管理物判定不能な junction は返さない（REQ-058-008 の非破壊境界）。
 
@@ -689,6 +708,18 @@ function Get-StaleManagedJunctions {
                     if (Test-ManagedProjectionJunction -JunctionRel $junctionRel -JunctionFullName $_.FullName `
                             -LocalRedirectToolRel $LocalRedirectToolRel -LocalRedirectSourceDir $LocalRedirectSourceDir) {
                         $stale.Add([PSCustomObject]@{ RelPath = $junctionRel; FullName = $_.FullName })
+                    }
+                }
+            }
+    }
+    if (Test-Path -LiteralPath $SenpiProjectionDir) {
+        Get-ChildItem -LiteralPath $SenpiProjectionDir -Directory -Force |
+            Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
+            ForEach-Object {
+                $targetEntry = "senpi:$($_.Name)"
+                if ($targetEntry -notin $CurrentTargets) {
+                    if (Test-ManagedSenpiJunction -JunctionName $_.Name -JunctionFullName $_.FullName) {
+                        $stale.Add([PSCustomObject]@{ RelPath = $targetEntry; FullName = $_.FullName })
                     }
                 }
             }
@@ -789,6 +820,16 @@ function Get-UnmanagedProjectionJunctionRels {
                 $junctionRel = "$parentRel\$($_.Name)"
                 if ($junctionRel -notin $CurrentTargets -and $junctionRel -notin $staleRels) {
                     $unmanaged.Add($junctionRel)
+                }
+            }
+    }
+    if (Test-Path -LiteralPath $SenpiProjectionDir) {
+        Get-ChildItem -LiteralPath $SenpiProjectionDir -Directory -Force |
+            Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint } |
+            ForEach-Object {
+                $targetEntry = "senpi:$($_.Name)"
+                if ($targetEntry -notin $CurrentTargets -and $targetEntry -notin $staleRels) {
+                    $unmanaged.Add($targetEntry)
                 }
             }
     }

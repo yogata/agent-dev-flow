@@ -32,11 +32,9 @@
     Placement targets (hosts) follow REQ-099-010: the default (omitted) keeps
     the currently placed hosts detected from the projection state (a fresh
     repo defaults to OpenCode only, the first-class reference harness).
-    -Hosts senpi / both additionally place the Senpi entry projection
-    (.senpi\skills\agentdev-* -> src/common/skills/agentdev-*) and the
-    .agents connection copies (.agents\agentdev\common -> src/common/,
-    .agents\agentdev\senpi -> src/senpi/), using the placement contract
-    (directory structure) only. The self-host Senpi placement is an
+    -Hosts senpi / both additionally project the Senpi host connection area
+    (src/senpi/) into .senpi/ as individual junctions, using the placement
+    contract (directory structure) only. The self-host Senpi placement is an
     explicitly selected configuration; this script never reports it as a
     verified compatibility claim (REQ-099-011).
 
@@ -55,9 +53,7 @@
     One of: opencode, senpi, both
     配置対象ホストの選択（REQ-099-010）。省略時は現在の配置対象を検出して維持し、
     検出不能（新規）は opencode（first-class reference harness）のみとする。
-    senpi / both を明示指定した場合のみ、Senpi 入口投影（src/common/skills/agentdev-*
-    → .senpi/skills/）と .agents 接続投影（src/common → .agents/agentdev/common、
-    src/senpi → .agents/agentdev/senpi）を作成する。
+    senpi / both を明示指定した場合のみ src/senpi/ → .senpi/ 投影を作成する。
 
 .EXAMPLE
     ./scripts/self-sync.ps1
@@ -89,8 +85,6 @@ $OpencodeHostSourceDir = Join-Path $RepoRoot 'src\opencode'
 $SenpiHostSourceDir = Join-Path $RepoRoot 'src\senpi'
 $ProjectionDir = Join-Path $RepoRoot '.opencode'
 $SenpiProjectionDir = Join-Path $RepoRoot '.senpi'
-$AgentProjectionDir = Join-Path $RepoRoot '.agents'
-$AgentDevConnectionDir = Join-Path $RepoRoot '.agents\agentdev'
 $CommandsDir = Join-Path $ProjectionDir 'commands'
 $SkillsDir = Join-Path $ProjectionDir 'skills'
 $ToolsDir = Join-Path $ProjectionDir 'tools'
@@ -156,10 +150,8 @@ function Get-SelectiveJunctionTargets {
         sources (src/common/ + src/opencode/ host connection area, plus
         src/senpi/ when Senpi placement is selected).
         Returns sorted array of relative paths. OpenCode targets are relative
-        to .opencode/; Senpi entry targets are 'senpi:skills\<name>' entries
-        (placed under .senpi\skills\); .agents connection targets are
-        'agents:agentdev\<name>' entries (placed under .agents\agentdev\),
-        prefixed to keep all scopes in one enumeration.
+        to .opencode/; Senpi targets are single segments relative to .senpi/
+        and prefixed 'senpi:' to keep both host scopes in one enumeration.
     #>
     $targets = [System.Collections.Generic.List[string]]::new()
 
@@ -193,18 +185,11 @@ function Get-SelectiveJunctionTargets {
     }
 
     if ($ResolvedHosts -contains 'senpi') {
-        # Senpi entry projection: canonical agentdev-* skills from src/common/skills/
-        # placed as individual junctions under .senpi\skills\.
-        $senpiSkillsSource = Join-Path $CommonSourceDir 'skills'
-        if (Test-Path -LiteralPath $senpiSkillsSource) {
-            Get-ChildItem -LiteralPath $senpiSkillsSource -Directory -Filter 'agentdev-*' |
-                ForEach-Object { $targets.Add("senpi:skills\$($_.Name)") }
+        # Senpi host connection area (placement-contract level enumeration).
+        if (Test-Path -LiteralPath $SenpiHostSourceDir) {
+            Get-ChildItem -LiteralPath $SenpiHostSourceDir -Directory |
+                ForEach-Object { $targets.Add("senpi:$($_.Name)") }
         }
-
-        # Senpi selection also places the .agents connection copies
-        # (agentdev\common sibling is required by senpi modules' relative imports).
-        $targets.Add('agents:agentdev\common')
-        $targets.Add('agents:agentdev\senpi')
     }
 
     return ($targets | Sort-Object)
@@ -293,8 +278,6 @@ if ($ResolvedHosts -contains 'senpi' -and -not (Test-Path -LiteralPath $SenpiHos
 }
 
 $targets = Get-SelectiveJunctionTargets
-# .agents 接続投影の現行管理列挙（agents: エントリのみ。stale 判定の3モード共通入力）。
-$agentEntryTargets = @($targets | Where-Object { $_ -like 'agents:*' })
 
 # 依存を導入時生成する plugin package の vendor 完全性の前置確認（check モード以外は
 # 欠落・部分生成状態で fail-closed 停止し導入手順を案内する。check は乖離報告として扱う）
@@ -355,30 +338,6 @@ if ($Mode -eq 'check') {
         }
     }
 
-    # 2a-bis. Senpi entry projection parent and .agents connection parent must be
-    # real directories (Senpi placement only)
-    if ($ResolvedHosts -contains 'senpi') {
-        $senpiSkillsRoot = Join-Path $SenpiProjectionDir 'skills'
-        if (Test-Junction -Path $senpiSkillsRoot) {
-            Write-Host '[DIVERGENCE] .senpi/skills is a junction (must be real directory)'
-            $divergences++
-        } elseif (-not (Test-Path -LiteralPath $senpiSkillsRoot)) {
-            Write-Host '[DIVERGENCE] .senpi/skills does not exist'
-            $divergences++
-        } else {
-            Write-Host '[OK] .senpi/skills is a real directory'
-        }
-        if (Test-Junction -Path $AgentDevConnectionDir) {
-            Write-Host '[DIVERGENCE] .agents/agentdev is a junction (must be real directory)'
-            $divergences++
-        } elseif (-not (Test-Path -LiteralPath $AgentDevConnectionDir)) {
-            Write-Host '[DIVERGENCE] .agents/agentdev does not exist'
-            $divergences++
-        } else {
-            Write-Host '[OK] .agents/agentdev is a real directory'
-        }
-    }
-
     # 2b. plugin 依存実体（導入時生成依存）: vendor 完全性。
     # 欠落（部分生成状態を含む）は乖離として報告し、導入手順を案内する。
     $checkIncompleteVendor = @(Get-PluginPackagesWithUnresolvedVendor)
@@ -399,7 +358,7 @@ if ($Mode -eq 'check') {
                 Write-Host "[DIVERGENCE] Missing Senpi projection junction: .senpi/$senpiRel"
                 $divergences++
             } elseif (Test-Junction -Path $targetPath) {
-                $expectedSource = Get-TargetSourcePath -RelPath $relPath
+                $expectedSource = Join-Path $SenpiHostSourceDir $senpiRel
                 $actualTarget = Get-JunctionTarget -Path $targetPath
                 if ($actualTarget -and (Test-Path -LiteralPath $actualTarget) -and ((Resolve-Path -LiteralPath $actualTarget).Path -eq (Resolve-Path -LiteralPath $expectedSource).Path)) {
                     Write-Host "[OK] Senpi junction: .senpi/$senpiRel"
@@ -409,27 +368,6 @@ if ($Mode -eq 'check') {
                 }
             } else {
                 Write-Host "[DIVERGENCE] Exists but not a junction: .senpi/$senpiRel"
-                $divergences++
-            }
-            continue
-        }
-        $agentRel = Resolve-AgentEntryTargetRel -TargetEntry $relPath
-        if ($null -ne $agentRel) {
-            $targetPath = Join-Path $AgentProjectionDir $agentRel
-            if (-not (Test-Path -LiteralPath $targetPath)) {
-                Write-Host "[DIVERGENCE] Missing .agents connection junction: .agents/$agentRel"
-                $divergences++
-            } elseif (Test-Junction -Path $targetPath) {
-                $expectedSource = Get-TargetSourcePath -RelPath $agentRel
-                $actualTarget = Get-JunctionTarget -Path $targetPath
-                if ($actualTarget -and (Test-Path -LiteralPath $actualTarget) -and ((Resolve-Path -LiteralPath $actualTarget).Path -eq (Resolve-Path -LiteralPath $expectedSource).Path)) {
-                    Write-Host "[OK] .agents connection junction: .agents/$agentRel"
-                } else {
-                    Write-Host "[DIVERGENCE] Broken .agents connection junction: .agents/$agentRel (expected: $expectedSource, actual: $actualTarget)"
-                    $divergences++
-                }
-            } else {
-                Write-Host "[DIVERGENCE] Exists but not a junction: .agents/$agentRel"
                 $divergences++
             }
             continue
@@ -465,18 +403,10 @@ if ($Mode -eq 'check') {
         Write-Host "[DIVERGENCE] Orphaned junction (apply removes it): $($staleItem.RelPath)"
         $divergences++
     }
-    $staleAgentJunctions = @(Get-StaleManagedAgentJunctions -CurrentAgentEntryTargets $agentEntryTargets)
-    foreach ($staleItem in $staleAgentJunctions) {
-        Write-Host "[DIVERGENCE] Orphaned junction (apply removes it): $($staleItem.RelPath)"
-        $divergences++
-    }
     foreach ($unmanagedRel in (Get-UnmanagedProjectionJunctionRels -CurrentTargets $targets)) {
         Write-Host "[INFO] Junction not managed by AgentDevFlow (left untouched): $unmanagedRel"
     }
-    foreach ($unmanagedAgentRel in (Get-UnmanagedAgentProjectionJunctionRels -CurrentAgentEntryTargets $agentEntryTargets)) {
-        Write-Host "[INFO] Junction not managed by AgentDevFlow (left untouched): $unmanagedAgentRel"
-    }
-    if (($staleJunctions.Count -eq 0) -and ($staleAgentJunctions.Count -eq 0)) {
+    if ($staleJunctions.Count -eq 0) {
         Write-Host '[OK] No orphan junctions detected'
     }
 
@@ -573,25 +503,6 @@ if ($Mode -eq 'dry-run') {
         }
     }
 
-    # Parent directory status (Senpi entry projection and .agents connection)
-    if ($ResolvedHosts -contains 'senpi') {
-        $senpiSkillsRoot = Join-Path $SenpiProjectionDir 'skills'
-        if (-not (Test-Path -LiteralPath $senpiSkillsRoot)) {
-            Write-Host '[WOULD ADD] .senpi/skills/ (real directory)'
-        } elseif (Test-Junction -Path $senpiSkillsRoot) {
-            Write-Host '[ERROR] .senpi/skills/ is a junction (unexpected state)'
-        } else {
-            Write-Host '[OK] .senpi/skills/ exists as real directory'
-        }
-        if (-not (Test-Path -LiteralPath $AgentDevConnectionDir)) {
-            Write-Host '[WOULD ADD] .agents/agentdev/ (real directory)'
-        } elseif (Test-Junction -Path $AgentDevConnectionDir) {
-            Write-Host '[ERROR] .agents/agentdev/ is a junction (unexpected state)'
-        } else {
-            Write-Host '[OK] .agents/agentdev/ exists as real directory'
-        }
-    }
-
     Write-Host ''
     Write-Host '--- Planned junctions ---'
 
@@ -599,12 +510,12 @@ if ($Mode -eq 'dry-run') {
         $senpiRel = Resolve-SenpiTargetRel -TargetEntry $relPath
         if ($null -ne $senpiRel) {
             $targetPath = Join-Path $SenpiProjectionDir $senpiRel
-            $expectedSource = Get-TargetSourcePath -RelPath $relPath
+            $expectedSource = Join-Path $SenpiHostSourceDir $senpiRel
             if (Test-Junction -Path $targetPath) {
                 $actualTarget = Get-JunctionTarget -Path $targetPath
                 if (Test-JunctionTargetMatchesSource -JunctionFullName $targetPath -SourcePath $expectedSource) {
                     Write-Host "[OK] Already junctioned: .senpi/$senpiRel"
-                } elseif (Test-ManagedSenpiJunction -SenpiRel $senpiRel -JunctionFullName $targetPath) {
+                } elseif (Test-ManagedSenpiJunction -JunctionName $senpiRel -JunctionFullName $targetPath) {
                     # wrong target（管理物）: 旧正本・消失済み正本を含む修復対象（REQ-058-004）
                     if ($actualTarget -and (Test-Path -LiteralPath (@($actualTarget) | Select-Object -First 1))) {
                         Write-Host "[WOULD REMOVE] Wrong-target junction: .senpi/$senpiRel (actual: $actualTarget)"
@@ -620,31 +531,6 @@ if ($Mode -eq 'dry-run') {
                 Write-Host "[ERROR] Path exists and is not a junction: .senpi/$senpiRel"
             } else {
                 Write-Host "[WOULD ADD] Create junction: .senpi/$senpiRel -> $expectedSource"
-            }
-            continue
-        }
-        $agentRel = Resolve-AgentEntryTargetRel -TargetEntry $relPath
-        if ($null -ne $agentRel) {
-            $targetPath = Join-Path $AgentProjectionDir $agentRel
-            $expectedSource = Get-TargetSourcePath -RelPath $agentRel
-            if (Test-Junction -Path $targetPath) {
-                $actualTarget = Get-JunctionTarget -Path $targetPath
-                if (Test-JunctionTargetMatchesSource -JunctionFullName $targetPath -SourcePath $expectedSource) {
-                    Write-Host "[OK] Already junctioned: .agents/$agentRel"
-                } elseif (Test-ManagedProjectionJunction -JunctionRel $agentRel -JunctionFullName $targetPath) {
-                    if ($actualTarget -and (Test-Path -LiteralPath (@($actualTarget) | Select-Object -First 1))) {
-                        Write-Host "[WOULD REMOVE] Wrong-target junction: .agents/$agentRel (actual: $actualTarget)"
-                    } else {
-                        Write-Host "[WOULD REMOVE] Broken junction: .agents/$agentRel"
-                    }
-                    Write-Host "[WOULD ADD] Re-create junction: .agents/$agentRel -> $expectedSource"
-                } else {
-                    Write-Host "[ERROR] Unmanaged junction at managed path (apply would keep it and report a conflict): .agents/$agentRel (actual: $actualTarget)"
-                }
-            } elseif (Test-Path -LiteralPath $targetPath) {
-                Write-Host "[ERROR] Path exists and is not a junction: .agents/$agentRel"
-            } else {
-                Write-Host "[WOULD ADD] Create junction: .agents/$agentRel -> $expectedSource"
             }
             continue
         }
@@ -685,17 +571,10 @@ if ($Mode -eq 'dry-run') {
             Write-Host "[WOULD REMOVE] Stale managed junction: $($staleItem.RelPath)"
         }
     }
-    $dryRunStaleAgent = @(Get-StaleManagedAgentJunctions -CurrentAgentEntryTargets $agentEntryTargets)
-    foreach ($staleItem in $dryRunStaleAgent) {
-        Write-Host "[WOULD REMOVE] Stale managed junction: $($staleItem.RelPath)"
-    }
     foreach ($unmanagedRel in (Get-UnmanagedProjectionJunctionRels -CurrentTargets $targets)) {
         Write-Host "[INFO] Junction not managed by AgentDevFlow (would be left untouched): $unmanagedRel"
     }
-    foreach ($unmanagedAgentRel in (Get-UnmanagedAgentProjectionJunctionRels -CurrentAgentEntryTargets $agentEntryTargets)) {
-        Write-Host "[INFO] Junction not managed by AgentDevFlow (would be left untouched): $unmanagedAgentRel"
-    }
-    if (($dryRunStale.Count -eq 0) -and ($dryRunStaleAgent.Count -eq 0)) {
+    if ($dryRunStale.Count -eq 0) {
         Write-Host '[OK] No stale managed junctions to remove'
     }
 
@@ -794,8 +673,6 @@ if ($Mode -eq 'apply') {
         } else {
             Write-Host '[OK] .senpi/ exists as real directory'
         }
-        Write-Host '[ACTION] Ensuring .agents/agentdev/ as real directory'
-        New-Item -ItemType Directory -Path $AgentDevConnectionDir -Force | Out-Null
     }
 
     # Step 2: Parent Directories
@@ -825,13 +702,13 @@ if ($Mode -eq 'apply') {
         $senpiRel = Resolve-SenpiTargetRel -TargetEntry $relPath
         if ($null -ne $senpiRel) {
             $targetPath = Join-Path $SenpiProjectionDir $senpiRel
-            $sourcePath = Get-TargetSourcePath -RelPath $relPath
+            $sourcePath = Join-Path $SenpiHostSourceDir $senpiRel
 
             if (Test-Junction -Path $targetPath) {
                 if (Test-JunctionTargetMatchesSource -JunctionFullName $targetPath -SourcePath $sourcePath) {
                     Write-Host "[OK] Already junctioned: .senpi/$senpiRel"
                     continue
-                } elseif (Test-ManagedSenpiJunction -SenpiRel $senpiRel -JunctionFullName $targetPath) {
+                } elseif (Test-ManagedSenpiJunction -JunctionName $senpiRel -JunctionFullName $targetPath) {
                     $actualTarget = Get-JunctionTarget -Path $targetPath
                     if ($actualTarget -and (Test-Path -LiteralPath (@($actualTarget) | Select-Object -First 1))) {
                         Write-Host "[ACTION] Removing junction (wrong target): .senpi/$senpiRel"
@@ -855,65 +732,11 @@ if ($Mode -eq 'apply') {
                 exit 1
             }
 
-            # Ensure parent directory exists (.senpi/skills/)
-            $parentPath = Split-Path $targetPath -Parent
-            if (-not (Test-Path -LiteralPath $parentPath)) {
-                New-Item -ItemType Directory -Path $parentPath -Force | Out-Null
-            }
-
             Write-Host "[ACTION] Creating junction: .senpi/$senpiRel"
             # Use absolute source path for mklink (robust regardless of $PWD)
             $result = cmd /c "mklink /J `"$targetPath`" `"$sourcePath`" 2>&1"
             if ($LASTEXITCODE -ne 0) {
                 Write-Error "[ERROR] Failed to create junction .senpi/${senpiRel}: $result"
-                exit 1
-            }
-            continue
-        }
-        $agentRel = Resolve-AgentEntryTargetRel -TargetEntry $relPath
-        if ($null -ne $agentRel) {
-            $targetPath = Join-Path $AgentProjectionDir $agentRel
-            $sourcePath = Get-TargetSourcePath -RelPath $agentRel
-
-            if (Test-Junction -Path $targetPath) {
-                if (Test-JunctionTargetMatchesSource -JunctionFullName $targetPath -SourcePath $sourcePath) {
-                    Write-Host "[OK] Already junctioned: .agents/$agentRel"
-                    continue
-                } elseif (Test-ManagedProjectionJunction -JunctionRel $agentRel -JunctionFullName $targetPath) {
-                    $actualTarget = Get-JunctionTarget -Path $targetPath
-                    if ($actualTarget -and (Test-Path -LiteralPath (@($actualTarget) | Select-Object -First 1))) {
-                        Write-Host "[ACTION] Removing junction (wrong target): .agents/$agentRel"
-                    } else {
-                        Write-Host "[ACTION] Removing broken junction: .agents/$agentRel"
-                    }
-                    cmd /c "rmdir `"$targetPath`"" 2>&1
-                    if ($LASTEXITCODE -ne 0) {
-                        Write-Error "[ERROR] Failed to remove junction: .agents/$agentRel"
-                        exit 1
-                    }
-                } else {
-                    # wrong target（管理物と確認できない）: 自動置換せず保持して衝突報告する
-                    $actualTarget = Get-JunctionTarget -Path $targetPath
-                    Write-Host "[ERROR] Unmanaged junction at managed path (kept, not replaced): .agents/$agentRel (actual: $actualTarget)"
-                    $applyConflicts.Add(".agents/$agentRel")
-                    continue
-                }
-            } elseif (Test-Path -LiteralPath $targetPath) {
-                Write-Error "[ERROR] Path exists and is not a junction: .agents/$agentRel"
-                exit 1
-            }
-
-            # Ensure parent directory exists
-            $parentPath = Split-Path $targetPath -Parent
-            if (-not (Test-Path -LiteralPath $parentPath)) {
-                New-Item -ItemType Directory -Path $parentPath -Force | Out-Null
-            }
-
-            Write-Host "[ACTION] Creating junction: .agents/$agentRel"
-            # Use absolute source path for mklink (robust regardless of $PWD)
-            $result = cmd /c "mklink /J `"$targetPath`" `"$sourcePath`" 2>&1"
-            if ($LASTEXITCODE -ne 0) {
-                Write-Error "[ERROR] Failed to create junction .agents/${agentRel}: $result"
                 exit 1
             }
             continue
@@ -1022,23 +845,11 @@ if ($Mode -eq 'apply') {
             $applyRemoveFailures.Add($staleItem.RelPath)
         }
     }
-    $applyStaleAgent = @(Get-StaleManagedAgentJunctions -CurrentAgentEntryTargets $agentEntryTargets)
-    foreach ($staleItem in $applyStaleAgent) {
-        Write-Host "[ACTION] Removing stale managed junction: $($staleItem.RelPath)"
-        $rmResult = cmd /c "rmdir `"$($staleItem.FullName)`"" 2>&1
-        if ($LASTEXITCODE -ne 0) {
-            Write-Host "[ERROR] Failed to remove stale managed junction: $($staleItem.RelPath) ($rmResult)"
-            $applyRemoveFailures.Add($staleItem.RelPath)
-        }
-    }
     # 管理物判定不能な junction は削除せず報告のみ（REQ-058-008）
     foreach ($unmanagedRel in (Get-UnmanagedProjectionJunctionRels -CurrentTargets $targets)) {
         Write-Host "[INFO] Junction not managed by AgentDevFlow (left untouched): $unmanagedRel"
     }
-    foreach ($unmanagedAgentRel in (Get-UnmanagedAgentProjectionJunctionRels -CurrentAgentEntryTargets $agentEntryTargets)) {
-        Write-Host "[INFO] Junction not managed by AgentDevFlow (left untouched): $unmanagedAgentRel"
-    }
-    if (($applyStale.Count -eq 0) -and ($applyStaleAgent.Count -eq 0)) {
+    if ($applyStale.Count -eq 0) {
         Write-Host '[OK] No stale managed junctions to remove'
     }
     # REQ-058-011: 削除失敗が残る場合は成功として扱わず、判別可能な終了コードで報告する

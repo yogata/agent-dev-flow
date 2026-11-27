@@ -454,15 +454,13 @@ function Invoke-Ts005SelfSyncHosts {
         $apply1 = Invoke-EntryScript -ScriptPath $entry -Mode 'apply' -Cwd $root
         $ocProjected = (Test-PathExists (Join-Path $root '.opencode\commands\agentdev')) -and
             (Test-PathExists (Join-Path $root '.opencode\plugins\agentdev-testplugin'))
-        $senpiNotPlaced = -not (Test-PathExists (Join-Path $root '.senpi\skills\agentdev-testskill'))
+        $senpiNotPlaced = -not (Test-PathExists (Join-Path $root '.senpi\connection-demo'))
         Assert-True 'TS-005 self-sync default (fresh) places OpenCode only' `
             (($apply1.ExitCode -eq 0) -and $ocProjected -and $senpiNotPlaced) $apply1.Output
 
-        # 明示指定 both: Senpi エントリ投影と接続投影（.senpi/skills + .agents/agentdev）を配置する
+        # 明示指定 both: Senpi 接続領域を .senpi/ へ投影する
         $apply2 = Invoke-EntryScript -ScriptPath $entry -Mode 'apply' -Cwd $root -ExtraArgs @('-Hosts', 'both')
-        $senpiProjected = (Test-PathExists (Join-Path $root '.senpi\skills\agentdev-testskill')) -and
-            (Test-PathExists (Join-Path $root '.agents\agentdev\common')) -and
-            (Test-PathExists (Join-Path $root '.agents\agentdev\senpi'))
+        $senpiProjected = Test-PathExists (Join-Path $root '.senpi\connection-demo')
         Assert-True 'TS-005 self-sync explicit both projects the Senpi host connection area' `
             (($apply2.ExitCode -eq 0) -and $senpiProjected) $apply2.Output
 
@@ -475,7 +473,7 @@ function Invoke-Ts005SelfSyncHosts {
 
         # 対象別除去: opencode へ明示変更し Senpi 管理投影のみ除去
         $apply4 = Invoke-EntryScript -ScriptPath $entry -Mode 'apply' -Cwd $root -ExtraArgs @('-Hosts', 'opencode')
-        $senpiRemoved = -not (Test-PathExists (Join-Path $root '.senpi\skills\agentdev-testskill'))
+        $senpiRemoved = -not (Test-PathExists (Join-Path $root '.senpi\connection-demo'))
         $ocIntact = Test-PathExists (Join-Path $root '.opencode\skills\agentdev-testskill')
         Assert-True 'TS-005 self-sync explicit change removes only the deselected host managed projection' `
             (($apply4.ExitCode -eq 0) -and $senpiRemoved -and $ocIntact) $apply4.Output

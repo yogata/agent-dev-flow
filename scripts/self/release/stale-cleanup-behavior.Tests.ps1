@@ -844,20 +844,20 @@ function Invoke-Ts007Consumer {
         $alienSenpi = Join-Path $root 'alien-senpi-target'
         New-Item -ItemType Directory -Path $alienSenpi -Force | Out-Null
         Set-Content -LiteralPath (Join-Path $alienSenpi 'probe.txt') -Value 'alien'
-        Remove-TestJunction -LinkPath (Join-Path $root '.senpi\connection-demo')
-        New-TestJunction -LinkPath (Join-Path $root '.senpi\connection-demo') -TargetPath $alienSenpi
+        Remove-TestJunction -LinkPath (Join-Path $root '.senpi\skills\agentdev-testskill')
+        New-TestJunction -LinkPath (Join-Path $root '.senpi\skills\agentdev-testskill') -TargetPath $alienSenpi
 
         $check1 = Invoke-EntryScript -ScriptPath $InstallScript -Mode 'check' -Cwd $root
         Assert-True 'TS-007 check reports candidate-外 links as NG with identified targets (exit 1)' `
             (($check1.ExitCode -eq 1) -and
              ($check1.Output -match 'plugins\\agentdev-testplugin') -and
-             ($check1.Output -match 'connection-demo')) $check1.Output
+             ($check1.Output -match 'senpi/skills\\agentdev-testskill')) $check1.Output
 
         $dry = Invoke-EntryScript -ScriptPath $InstallScript -Mode 'dry-run' -Cwd $root
         Assert-True 'TS-007 dry-run does not predict removal or re-creation for candidate-外 links (keep report instead)' `
             (($dry.ExitCode -eq 0) -and
              ($dry.Output -notmatch '\[WOULD REMOVE[^\r\n]*agentdev-testplugin') -and
-             ($dry.Output -notmatch '\[WOULD[^\r\n]*connection-demo') -and
+             ($dry.Output -notmatch '\[WOULD[^\r\n]*senpi/skills\\agentdev-testskill') -and
              ($dry.Output -match 'Unmanaged junction at managed path')) $dry.Output
 
         $apply = Invoke-EntryScript -ScriptPath $InstallScript -Mode 'apply' -Cwd $root
@@ -869,7 +869,7 @@ function Invoke-Ts007Consumer {
         Assert-True 'TS-007 candidate-外 plugin target entity kept' `
             (Test-PathExists (Join-Path $alienPlugin 'probe.txt')) ''
         Assert-True 'TS-007 candidate-外 Senpi link kept (link and target intact)' `
-            ((Get-TestJunctionTargetString (Join-Path $root '.senpi\connection-demo')) -ieq [System.IO.Path]::GetFullPath($alienSenpi)) ''
+            ((Get-TestJunctionTargetString (Join-Path $root '.senpi\skills\agentdev-testskill')) -ieq [System.IO.Path]::GetFullPath($alienSenpi)) ''
         Assert-True 'TS-007 candidate-外 Senpi target entity kept' `
             (Test-PathExists (Join-Path $alienSenpi 'probe.txt')) ''
 
