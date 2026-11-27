@@ -45,6 +45,8 @@ case-run は実行担当サブエージェントを委譲起動する。
 
 ## worktree 取り扱い
 
+case-auto から先行作業を起動する場合も1回に1件の背景委譲とし、[先行作業の投入・取り込み](../../agentdev-workflow-case-auto/references/preparation.md) の同時枠と起動間隔に従う。先行担当の委譲は指定された別 worktree・別ローカルブランチで個別試験とローカルコミットまでとする。正式担当だけが採用、GitHub 書込み、統合品質ゲートを扱う。
+
 - case-run が委譲の prompt 内で worktree root（`.worktrees/{N}-{type}/`）を相対パスで明示的に指定する。メインリポジトリパスは渡さない
 - 実行担当サブエージェントは worktree 内で作業する。ランタイム作業領域（実行監査トレイル等）は worktree 配下に作成され、AgentDevFlow 側は関与しない。worktree 削除時にランタイム作業領域も破棄される（永続状態として扱わない）
 
