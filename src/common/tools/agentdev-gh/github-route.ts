@@ -8,7 +8,8 @@
 //
 // 経路の推定はしない。記録のないホストは plugin 扱いとし、設定が読めない
 // または値が不正な場合は既定経路へも gh 経路へも暗黙に切り替えず失敗を返す
-// （呼び出し側は GitHub 操作の前に停止する）。
+// （呼び出し側は GitHub 操作の前に停止する）。重複キーは最後の値で確定
+// させず不正として拒否する（切替スクリプト側の検査と同一規則）。
 
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -55,10 +56,21 @@ function parseRouteValue(value: unknown): GithubRoute | null {
   return value as GithubRoute;
 }
 
+/** 文書中のオブジェクトキー位置の文字列トークン（閉じ引用符の後がコロン）。 */
+const KEY_POSITION_TOKEN = /"(?:[^"\\]|\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4}))*"\s*:/g;
+
+/** キー位置トークンを JSON 文字列として復号し、出現順のキー名一覧を返す。 */
+function keyNamesInDocumentOrder(text: string): string[] {
+  return [...text.matchAll(KEY_POSITION_TOKEN)].map((m) => {
+    const token = m[0].replace(/\s*:$/, "");
+    return JSON.parse(token) as string;
+  });
+}
+
 /**
  * 経路設定ファイルの内容を解析する（純粋関数、例外を投げない）。
  * 先頭の UTF-8 BOM は許容する。空または空白のみの内容、不正な JSON、
- * オブジェクト以外（配列、null、プリミティブ）、未知のキー、
+ * オブジェクト以外（配列、null、プリミティブ）、重複キー、未知のキー、
  * 値が plugin / gh 以外のキーのいずれも不正とする。キーの欠落は
  * plugin 扱いであるため解析に成功する。
  */
@@ -77,6 +89,13 @@ export function parseGithubRouteConfig(text: string): GithubRouteConfigParseResu
     return invalid("route config file must be a JSON object");
   }
   const record = parsed as Record<string, unknown>;
+  const seenKeys = new Set<string>();
+  for (const name of keyNamesInDocumentOrder(withoutBom)) {
+    if (seenKeys.has(name)) {
+      return invalid(`route config file has a duplicate key: ${name}`);
+    }
+    seenKeys.add(name);
+  }
   const routes: Partial<Record<GithubRouteHost, GithubRoute>> = {};
   for (const key of Object.keys(record)) {
     if (!GITHUB_ROUTE_HOSTS.includes(key as GithubRouteHost)) {

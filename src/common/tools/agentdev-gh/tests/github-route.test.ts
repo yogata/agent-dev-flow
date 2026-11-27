@@ -120,6 +120,16 @@ describe("parseGithubRouteConfig の拒否", () => {
     expectInvalid('{"antigravity":null}', "invalid value for antigravity");
     expectInvalid('{"codex":1}', "invalid value for codex");
   });
+
+  test("重複キーは最後の値で確定させず拒否する（切替スクリプトと同一規則）", () => {
+    expectInvalid('{"codex":"gh","codex":"plugin"}', "duplicate key: codex");
+    expectInvalid('{"antigravity":"plugin","antigravity":"gh"}', "duplicate key: antigravity");
+    expectInvalid('{"codex":"gh","codex":"gh"}', "duplicate key: codex");
+  });
+
+  test("エスケープ表記を含む重複キーも復号して検出する", () => {
+    expectInvalid('{"\\u0063odex":"gh","codex":"plugin"}', "duplicate key: codex");
+  });
 });
 
 describe("resolveGithubRoute", () => {
@@ -151,6 +161,17 @@ describe("resolveGithubRoute", () => {
     const r = await resolveGithubRoute(root, "codex");
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.kind).toBe("config-invalid");
+  });
+
+  test("重複キーの設定ファイルは config-invalid", async () => {
+    const root = makeTempRoot();
+    writeConfig(root, '{"codex":"gh","codex":"plugin"}');
+    const r = await resolveGithubRoute(root, "codex");
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.kind).toBe("config-invalid");
+      expect(r.detail).toContain("duplicate key: codex");
+    }
   });
 
   test("ファイルの代わりにディレクトリがある等の読取失敗は config-unreadable", async () => {
