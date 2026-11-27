@@ -333,22 +333,27 @@ function Read-InstallStateRecordArchive {
     if ($raw -isnot [pscustomobject]) {
         return [pscustomobject]@{ Status = "invalid"; Agents = @(); Raw = $null }
     }
+    $invalid = [pscustomobject]@{ Status = "invalid"; Agents = @(); Raw = $null }
     if ($raw.PSObject.Properties["selectedAgents"]) {
         $requested = @($raw.selectedAgents)
         $agents = @($requested | ForEach-Object { [string]$_ } | Where-Object { $_ -in $AgentSelectionCanonicalOrder })
-        if ($agents.Count -gt 0 -and $agents.Count -eq $requested.Count) {
-            return [pscustomobject]@{ Status = "ok"; Agents = $agents; Raw = $raw }
-        }
+        if ($agents.Count -eq 0 -or $agents.Count -ne $requested.Count) { return $invalid }
+        return [pscustomobject]@{ Status = "ok"; Agents = $agents; Raw = $raw }
     }
-    if ($raw.PSObject.Properties["agentHosts"] -and $raw.agentHosts -is [string]) {
-        switch ($raw.agentHosts) {
-            "none"        { return [pscustomobject]@{ Status = "legacy"; Agents = @(); Raw = $raw } }
-            "codex"       { return [pscustomobject]@{ Status = "legacy"; Agents = @("codex"); Raw = $raw } }
-            "antigravity" { return [pscustomobject]@{ Status = "legacy"; Agents = @("antigravity"); Raw = $raw } }
-            "both"        { return [pscustomobject]@{ Status = "legacy"; Agents = @("codex", "antigravity"); Raw = $raw } }
+    if ($raw.PSObject.Properties["agentHosts"] -and $raw.agentHosts -is [array]) {
+        $legacyAgents = @()
+        foreach ($entry in @($raw.agentHosts)) {
+            switch ([string]$entry) {
+                "none"        { }
+                "codex"       { $legacyAgents += "codex" }
+                "antigravity" { $legacyAgents += "antigravity" }
+                "both"        { $legacyAgents += @("codex", "antigravity") }
+                default       { return $invalid }
+            }
         }
+        return [pscustomobject]@{ Status = "legacy"; Agents = @($legacyAgents | Select-Object -Unique); Raw = $raw }
     }
-    return [pscustomobject]@{ Status = "invalid"; Agents = @(); Raw = $null }
+    return [pscustomobject]@{ Status = "empty"; Agents = @(); Raw = $raw }
 }
 
 $stateRecord = Read-InstallStateRecordArchive
@@ -403,7 +408,7 @@ if ($stateRecord.Status -eq "ok") {
     Write-Host "install-from-archive: legacy install state (agentHosts) used as an auxiliary signal"
 }
 
-$freshTarget = (($stateRecord.Status -eq "missing") -and (-not $observedOpen) -and (-not $observedSenpi) -and ($observedAgentSet.Count -eq 0) -and (-not $observedEntryOnly))
+$freshTarget = (($stateRecord.Status -in @("missing", "empty")) -and (-not $observedOpen) -and (-not $observedSenpi) -and ($observedAgentSet.Count -eq 0) -and (-not $observedEntryOnly))
 
 $openSet = @()
 if ($null -ne $openExplicit) { $openSet = $openExplicit }
