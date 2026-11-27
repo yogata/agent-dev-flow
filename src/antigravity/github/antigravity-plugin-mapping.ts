@@ -15,6 +15,7 @@ import type { GhToolOperation } from "../../common/tools/agentdev-gh/contracts.t
 import type {
   PluginCall,
   PluginMapping,
+  PluginMappingContext,
 } from "../../common/tools/agentdev-gh/plugin-runner.ts";
 import type {
   GhRunnerFailureClass,
@@ -79,18 +80,25 @@ function stoppedForUnconfirmed(operation: GhToolOperation): GhRunnerReply {
 const NO_CALLS: readonly PluginCall[] = [];
 
 /**
- * Antigravity ホストの GitHub プラグイン対応付け。
- * supports は能力表を唯一の参照元とする。全操作が未確認のため plan は空配列を
- * 返し、interpret は停止応答を返す（いずれも副作用を持たず例外を投げない）。
+ * Antigravity ホストの GitHub プラグイン対応付けを構築する。
+ * 共通境界の工場形式（createXPluginMapping(context)）に従い、context.repo は
+ * 能力表の確認済み行が呼び出し計画を持つときの引数束縛に使う。全操作が
+ * 未確認の間は plan が空配列を返し、interpret が停止応答を返す
+ * （いずれも副作用を持たず例外を投げない）。
  */
-export const antigravityPluginMapping: PluginMapping = {
-  supports(operation) {
-    return ANTIGRAVITY_PLUGIN_CAPABILITIES[operation].supported;
-  },
-  plan(_request) {
-    return NO_CALLS;
-  },
-  interpret(request) {
-    return stoppedForUnconfirmed(request.operation);
-  },
-};
+export function createAntigravityPluginMapping(
+  context: PluginMappingContext,
+): PluginMapping {
+  void context;
+  return {
+    supports(operation) {
+      return ANTIGRAVITY_PLUGIN_CAPABILITIES[operation].supported;
+    },
+    plan(_request) {
+      return NO_CALLS;
+    },
+    interpret(request) {
+      return stoppedForUnconfirmed(request.operation);
+    },
+  };
+}

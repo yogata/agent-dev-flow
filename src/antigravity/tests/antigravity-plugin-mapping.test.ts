@@ -16,8 +16,10 @@ import { createPluginRunner } from "../../common/tools/agentdev-gh/plugin-runner
 import type { GhRunnerRequest } from "../../common/tools/agentdev-gh/runner.ts";
 import {
   ANTIGRAVITY_PLUGIN_CAPABILITIES,
-  antigravityPluginMapping,
+  createAntigravityPluginMapping,
 } from "../github/antigravity-plugin-mapping.ts";
+
+const REPO = "octo/hello";
 
 /** 操作ごとの代表要求（plan / interpret が任意の引数でも例外を投げないことの検証に使う）。 */
 function sampleRequest(operation: GhToolOperation): GhRunnerRequest {
@@ -60,6 +62,8 @@ function sampleRequest(operation: GhToolOperation): GhRunnerRequest {
 }
 
 describe("Antigravity GitHub プラグイン対応付け", () => {
+  const mapping = createAntigravityPluginMapping({ repo: REPO });
+
   test("能力表は操作カタログの20操作を過不足なく持つ", () => {
     const tableKeys = Object.keys(ANTIGRAVITY_PLUGIN_CAPABILITIES);
     expect(tableKeys.length).toBe(GH_TOOL_OPERATIONS.length);
@@ -71,7 +75,7 @@ describe("Antigravity GitHub プラグイン対応付け", () => {
       const capability = ANTIGRAVITY_PLUGIN_CAPABILITIES[operation];
       expect(capability.supported).toBe(false);
       expect(capability.evidence).toBe("unconfirmed");
-      expect(antigravityPluginMapping.supports(operation)).toBe(
+      expect(mapping.supports(operation)).toBe(
         capability.supported,
       );
     }
@@ -79,7 +83,7 @@ describe("Antigravity GitHub プラグイン対応付け", () => {
 
   test("未確認操作の plan は空配列を返し例外を投げない", () => {
     for (const operation of GH_TOOL_OPERATIONS) {
-      const calls = antigravityPluginMapping.plan(sampleRequest(operation));
+      const calls = mapping.plan(sampleRequest(operation));
       expect(calls).toEqual([]);
     }
   });
@@ -87,7 +91,7 @@ describe("Antigravity GitHub プラグイン対応付け", () => {
   test("能力が確認された行は呼び出し計画を必ず持つ（表の更新だけで成立する）", () => {
     for (const operation of GH_TOOL_OPERATIONS) {
       if (!ANTIGRAVITY_PLUGIN_CAPABILITIES[operation].supported) continue;
-      const calls = antigravityPluginMapping.plan(sampleRequest(operation));
+      const calls = mapping.plan(sampleRequest(operation));
       expect(calls.length > 0).toBe(true);
     }
   });
@@ -103,7 +107,7 @@ describe("Antigravity GitHub プラグイン対応付け", () => {
     ];
     for (const operation of GH_TOOL_OPERATIONS) {
       for (const payloads of malformedPayloads) {
-        const reply = antigravityPluginMapping.interpret(
+        const reply = mapping.interpret(
           sampleRequest(operation),
           payloads,
         );
@@ -130,7 +134,7 @@ describe("Antigravity GitHub プラグイン対応付け", () => {
         };
       },
     };
-    const runner = createPluginRunner(antigravityPluginMapping, transport);
+    const runner = createPluginRunner(mapping, transport);
     for (const operation of GH_TOOL_OPERATIONS) {
       const reply = await runner.run(sampleRequest(operation));
       expect(reply.ok).toBe(false);
