@@ -57,6 +57,14 @@ export interface PluginMapping {
   ): GhRunnerReply;
 }
 
+/**
+ * ホスト接続領域が mapping を組み立てるのに必要な context。
+ * repo は Tool 設定から与えられる owner/name 形式の対象リポジトリである。
+ */
+export interface PluginMappingContext {
+  readonly repo: string;
+}
+
 const STOPPED_CLASS: GhRunnerFailureClass = "operation-failed";
 
 function stopped(error: string): GhRunnerReply {
