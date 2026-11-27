@@ -7,13 +7,14 @@ Codex ホスト向けの接続を配置する領域である。ホスト接続�
 | パス | 内容 |
 |---|---|
 | `skill-discovery/` | Skill 探索・読込と公開 command 入口の接続。共通正本の契約（`src/common/skills/agentdev-skill-resolution/`）へ、Codex 公開入口（`.agents/skills/`）と指定 workspace の束縛を行う接続。解決規則は共通正本側に置き、本領域では重複実装しない |
+| `github/` | GitHub 接続 adapter。Custom Tool を登録できない Codex のために共通の agentdev_gh 操作契約（engine・VERIFY）を提供する接続。Codex の GitHub プラグイン（GitHub hosted MCP server）への対応付け（`codex-plugin-mapping.ts`）、プラグインへの呼出し手段（`codex-mcp-transport.ts`）、adapter の入口（`agentdev-gh-adapter.ts`）で構成する。操作契約・fail-closed ゲートは共通 Tool engine が所有し、本領域は接続の配線のみを担う |
 | `document-management.md` | 文書管理の接続指示。Codex 上で command を適用する際の workspace 確認・command 全文の適用・全条件適用・副作用前の拒否規則 |
 
 ## 公開入口
 
 Codex の公開入口は `.agents/skills/` 配下のスキル投影である。公開8コマンド（req-define、backlog-auto、case-auto、phase 系5操作）は `agentdev-workflow-<業務名>` スキルを公開入口とする。入口は command 全文（`src/common/commands/agentdev/<業務名>.md`）と委譲先 Workflow Skill と無改変の引数を返す。
 
-導入先への投影は installer の `-AgentHosts` 明示選択で行われる。選択時は共有入口 root `.agents/skills/` へ共通原本（`src/common/skills/`）の `agentdev-*` スキルがジャンクション投影される。本領域は repo 内で検証可能な接続のみを配置する。GitHub 操作は Codex 既存の GitHub プラグイン能力を利用者が確認してから用いる（共通案内スキル `agentdev-host-github-guidance`）。Issue/PR 作成は OpenCode 側へ引き渡す。
+導入先への投影は installer の `-AgentHosts` 明示選択で行われる。選択時は共有入口 root `.agents/skills/` へ共通原本（`src/common/skills/`）の `agentdev-*` スキルがジャンクション投影される。本領域は repo 内で検証可能な接続のみを配置する。GitHub 操作はホスト接続領域の adapter（`github/`）が共通の agentdev_gh 操作契約を Codex の GitHub プラグインに接続して行う（既定の経路。案内は共通案内スキル `agentdev-host-github-guidance`）。プラグインが無効または必要な操作を提供しない場合は GitHub 操作を利用者の判断まで停止し、利用者の明示判断によって `scripts/switch-github-route.ps1` で gh 経路へ切り替える。
 
 ## 拘束条件
 

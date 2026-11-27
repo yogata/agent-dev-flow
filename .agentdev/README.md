@@ -26,7 +26,7 @@ AgentDevFlow の永続 domain state を格納するディレクトリ（REQ-001�
 | `backlog/runs/<一式識別子>/set-state.json`（evidence 配下に検証証跡） | backlog-auto 一気通貫実行の状態記録（義務スナップショット、対応表、基準点情報、進捗、リリース状態） | backlog-auto（同一実行の単一書き手） | backlog-auto 再開・全体完了突合・リリース手順 | 全体完了とリリース完了まで保持する。リリース完了後の削除可否は結果報告に記録する（配置・形式・単一書き手の規約は backlog-auto の workflow skill references「set-state 永続化契約」節） |
 | `install-state.json` | 導入済み配布版の記録と配置選択（`selectedAgents`。4エージェントの選択集合の正本記録） | install.ps1 apply（完了時に記録、省略時選択の継承元） | install.ps1 check（記録版と配布版の版比較）、install.ps1 の省略時選択継承 | 永続。旧痕跡がある間は記録を更新しない（/agentdev/migrate の案内対象） |
 
-状態表の約束対象は上記の正規状態の領域に限定する。正規状態でない実行時キャッシュ・検証記録・設定・拡張・一時領域（`cache/`・`close-acceptance/`・`config/`・`extensions/`・`tmp/`）は本表の約束対象外とする。
+状態表の約束対象は上記の正規状態の領域に限定する。正規状態でない実行時キャッシュ・検証記録・設定・拡張・一時領域（`cache/`・`close-acceptance/`・`config/`・`extensions/`・`tmp/`）は本表の約束対象外とする。`config/github-route.json` は Codex と Antigravity の GitHub 実行経路の設定（値は plugin / gh）であり、切替の公開入口（`scripts/switch-github-route.ps1`）が利用者の明示判断で書き、両ホスト接続領域の adapter が GitHub 操作の前に読む。記録のないホストはプラグイン経路として扱う。
 
 
 ## .agentdev/ の性質

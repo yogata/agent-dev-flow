@@ -14,6 +14,7 @@ agentdev-release-<sha>/
   src/codex/**
   src/antigravity/**
   scripts/install.ps1
+  scripts/switch-github-route.ps1
   README-INSTALL.md
   THIRD-PARTY-NOTICES.md
 ```
@@ -26,6 +27,7 @@ third-party 依存の実体（`vendor/` 配下の engine bundle と kuromoji 辞
 
 - Windows PowerShell 5.1 以降、または PowerShell 7 (`pwsh`)
 - 展開先リポジトリのルートに書き込み権限
+- Codex / Antigravity を選択した導入で GitHub 操作を行う場合は bun（adapter の起動に使用）
 
 ## 導入手順
 
@@ -54,6 +56,21 @@ $unpackedRoot = Join-Path $temp "agentdev-release-<sha>"
 ```
 
 導入完了後、選択した配置対象に応じて、OpenCode は `<repoRoot>/.opencode/`、Senpi は `<repoRoot>/.senpi/skills/` と `<repoRoot>/.agents/agentdev/`、Codex / Antigravity は `<repoRoot>/.agents/skills/` と `<repoRoot>/.agents/agentdev/` 配下に実ファイルが配置される。一時展開先（`$unpackedRoot`）には配置が発生しない。
+
+### GitHub 実行経路（Codex / Antigravity を選択した場合）
+
+Codex と Antigravity では、GitHub 操作（Issue・PR・Comment・Release）はホスト接続領域の adapter が共通の agentdev_gh 操作契約を提供する。実行経路は導入先リポジトリの `.agentdev/config/github-route.json` で決まり、記録のないホストは GitHub プラグイン経路（既定）である。
+
+- GitHub 操作の実行は、導入先リポジトリのルートから `bun .agents/agentdev/<ホスト>/github/agentdev-gh-adapter.ts --input request.json` で行う（案内は共通案内スキル `agentdev-host-github-guidance`）
+- GitHub プラグインが無効・未構成、または必要な操作を提供しない場合は GitHub 操作を利用者の判断まで停止する（臨時の切り替えは行わない）
+- 恒久的にプラグイン経路を使えない場合は、利用者の明示判断によって archive の `scripts/switch-github-route.ps1` で gh 経路へ切り替える（導入先リポジトリのルートで実行する）。切替後の経路は再起動後も使われる
+
+```powershell
+# 例: Codex を gh 経路へ切り替える（Antigravity の記録は保持される）
+& (Join-Path $unpackedRoot "scripts\switch-github-route.ps1") -AgentHosts codex -Route gh
+```
+
+gh 経路では `gh` CLI の認証と対象リポジトリへの権限が操作前に確認される。詳細な停止と再開、切替の判断は共通案内スキルとマルチホスト運用ガイドを参照する。
 
 ### 導入後の確認と起動
 
