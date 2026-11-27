@@ -118,6 +118,8 @@ $srcSkills = Join-Path $repoRoot "src\common\skills"
 $srcSenpi = Join-Path $repoRoot "src\senpi"
 $srcCodex = Join-Path $repoRoot "src\codex"
 $srcAntigravity = Join-Path $repoRoot "src\antigravity"
+# GitHub 実行経路切替の公開入口（REQ-050-017）。archive にも同じ名前で同梱する。
+$switchRouteScript = Join-Path $repoRoot "scripts\switch-github-route.ps1"
 # Archive-dedicated installer ORIGINAL (REQ-050-010). Travels inside the
 # archive under the projection name scripts/install.ps1.
 $installScript = Join-Path $repoRoot "scripts\consumer\archive\install.ps1"
@@ -149,6 +151,9 @@ if (-not (Test-Path -LiteralPath $srcCodex)) {
 }
 if (-not (Test-Path -LiteralPath $srcAntigravity)) {
     Fail-Exit 2 "package-release-archive: required source directory missing: $srcAntigravity (Antigravity host connection area; the archive must carry the distribution originals; fail-closed)"
+}
+if (-not (Test-Path -LiteralPath $switchRouteScript)) {
+    Fail-Exit 2 "package-release-archive: GitHub route switch public entry missing: $switchRouteScript (the archive must carry scripts/switch-github-route.ps1, REQ-050-017; fail-closed)"
 }
 
 # Trusted host checker (NOT the candidate copy inside the archive). Per
@@ -325,7 +330,7 @@ try {
     # the archive under its public entry name scripts/switch-github-route.ps1.
     # The archive edition is the same file as the checkout edition (the entry
     # resolves the target repository from the current directory only).
-    Copy-Item -LiteralPath (Join-Path $repoRoot "scripts\switch-github-route.ps1") -Destination (Join-Path $stageScripts "switch-github-route.ps1") -Force
+    Copy-Item -LiteralPath $switchRouteScript -Destination (Join-Path $stageScripts "switch-github-route.ps1") -Force
 
     # The distribution exclusion canon travels inside the archive at its
     # repository-relative location so the archive-edition installer
