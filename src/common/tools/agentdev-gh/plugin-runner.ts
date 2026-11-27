@@ -50,6 +50,12 @@ export interface PluginMapping {
   supports(operation: GhToolOperation): boolean;
   /** runner の操作 1 件に必要な呼出しを実行順に返す。 */
   plan(request: GhRunnerRequest): readonly PluginCall[];
+  /**
+   * plan の呼出しがすべて成功した後の継続呼出し（省略可）。応答（実行順）を
+   * 受けた続きの呼出しを 1 件返し、null を返すまで繰り返される。現状読取の
+   * 応答を前提とする引数組み立て（role 保持を伴う labels 更新等）に用いる。
+   */
+  nextCall?(request: GhRunnerRequest, payloads: readonly unknown[]): PluginCall | null;
   /** 呼出しの応答（実行順）を runner の応答へ解釈する。 */
   interpret(
     request: GhRunnerRequest,
@@ -97,6 +103,17 @@ export function createPluginRunner(
           return stopped(reply.error);
         }
         payloads.push(reply.payload);
+      }
+      if (mapping.nextCall !== undefined) {
+        for (;;) {
+          const next = mapping.nextCall(request, payloads);
+          if (next === null) break;
+          const reply = await transport.invoke(next);
+          if (!reply.ok) {
+            return stopped(reply.error);
+          }
+          payloads.push(reply.payload);
+        }
       }
       return mapping.interpret(request, payloads);
     },

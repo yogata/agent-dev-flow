@@ -166,3 +166,67 @@ describe("createPluginRunner の成功経路", () => {
     await expect(runner.run(REQUEST)).rejects.toThrow("transport crashed");
   });
 });
+
+describe("createPluginRunner の継続呼出し（nextCall）", () => {
+  test("plan 後の応答を受けて続きの呼出しを組み立て、null で停止する", async () => {
+    const interpretPayloads: Array<readonly unknown[]> = [];
+    const mapping: PluginMapping = {
+      supports: () => true,
+      plan: () => [{ tool: "read_current", args: { number: 1 } }],
+      nextCall: (_request, payloads) => {
+        if (payloads.length === 1) {
+          return { tool: "write_labels", args: { role: (payloads[0] as { role: string }).role } };
+        }
+        return null;
+      },
+      interpret: (_request, payloads) => {
+        interpretPayloads.push(payloads);
+        return { ok: true, payload: { calls: payloads.length } };
+      },
+    };
+    const transport = fakeTransport((call) => ({
+      ok: true as const,
+      payload: call.tool === "read_current" ? { role: "tracking" } : { done: true },
+    }));
+    const runner = createPluginRunner(mapping, transport);
+    const reply = await runner.run(REQUEST);
+    expect(reply.ok).toBe(true);
+    expect(transport.calls.map((c) => c.tool)).toEqual(["read_current", "write_labels"]);
+    expect(transport.calls[1]?.args).toEqual({ role: "tracking" });
+    expect(interpretPayloads).toEqual([[{ role: "tracking" }, { done: true }]]);
+  });
+
+  test("継続呼出し中の transport 失敗は以後の呼出しを行わず失敗応答で停止する", async () => {
+    const mapping: PluginMapping = {
+      supports: () => true,
+      plan: () => [{ tool: "read_current", args: { number: 1 } }],
+      nextCall: (_request, payloads) => (payloads.length === 1
+        ? { tool: "write_labels", args: {} }
+        : null),
+      interpret: () => ({ ok: true, payload: {} }),
+    };
+    const transport = fakeTransport((call) => {
+      if (call.tool === "write_labels") {
+        return { ok: false, kind: "operation-failed" as const, error: "write failed" };
+      }
+      return { ok: true as const, payload: { role: "tracking" } };
+    });
+    const runner = createPluginRunner(mapping, transport);
+    const reply = await runner.run(REQUEST);
+    expect(reply.ok).toBe(false);
+    if (!reply.ok) {
+      expect(reply.error).toBe("write failed");
+      expect(reply.failureClass).toBe("operation-failed");
+    }
+    expect(transport.calls.map((c) => c.tool)).toEqual(["read_current", "write_labels"]);
+  });
+
+  test("nextCall を持たない mapping は従来どおり plan だけで完結する", async () => {
+    const mapping = fakeMapping();
+    const transport = okTransport();
+    const runner = createPluginRunner(mapping, transport);
+    const reply = await runner.run(REQUEST);
+    expect(reply.ok).toBe(true);
+    expect(transport.calls).toHaveLength(1);
+  });
+});

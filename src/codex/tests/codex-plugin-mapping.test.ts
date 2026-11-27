@@ -6,7 +6,9 @@
 // unsupported 操作は plan が空で transport が 1 度も呼ばれないことを検証する。
 
 import { describe, expect, test } from "bun:test";
+import * as os from "node:os";
 import { GH_TOOL_OPERATIONS, type GhToolOperation } from "../../common/tools/agentdev-gh/contracts.ts";
+import { buildGhToolEnv, executeOperation } from "../../common/tools/agentdev-gh/engine.ts";
 import { AGENTDEV_GH_OPERATION_SPECS } from "../../common/tools/agentdev-gh/index.ts";
 import {
   createPluginRunner,
@@ -346,15 +348,110 @@ describe("Codex GitHub プラグイン対応付け", () => {
     });
   }
 
-  test("issue_update の labels 要求は副作用前に空 plan で停止する", async () => {
+  test("issue_update の labels 要求は現状読取の role を保持して物理ラベルへ落とす（追跡Issue・追跡軸なし要求）", async () => {
     const { reply, calls } = await runOp(
       "issue_update",
-      { number: 7, labels: ["area"] },
-      () => restIssue(),
+      { number: 7, labels: ["new-area"] },
+      (_call, index) => (index === 0
+        ? restIssue({ labels: [{ name: "tracking" }, { name: "old-area" }] })
+        : restIssue({ labels: [{ name: "tracking" }, { name: "new-area" }] })),
     );
-    expect(calls).toHaveLength(0);
+    expect(calls).toEqual([
+      { tool: "issue_read", args: { owner: OWNER, repo: NAME, method: "get", issue_number: 7 } },
+      { tool: "issue_write", args: { owner: OWNER, repo: NAME, method: "update", issue_number: 7, labels: ["tracking", "new-area"] } },
+    ]);
+    expect(reply.ok).toBe(true);
+    if (reply.ok) {
+      expect(reply.payload).toMatchObject({ before: { role: "tracking", labels: ["tracking", "old-area"] } });
+    }
+  });
+
+  test("issue_update の labels 要求は Case Issue ではそのままのラベルを書く", async () => {
+    const { calls } = await runOp(
+      "issue_update",
+      { number: 7, labels: ["new-area"] },
+      (_call, index) => (index === 0
+        ? restIssue()
+        : restIssue({ labels: [{ name: "new-area" }] })),
+    );
+    expect(calls).toEqual([
+      { tool: "issue_read", args: { owner: OWNER, repo: NAME, method: "get", issue_number: 7 } },
+      { tool: "issue_write", args: { owner: OWNER, repo: NAME, method: "update", issue_number: 7, labels: ["new-area"] } },
+    ]);
+  });
+
+  test("issue_update の labels 要求が追跡軸ラベルを含む場合は role 変更要求として扱う", async () => {
+    const { calls } = await runOp(
+      "issue_update",
+      { number: 7, labels: ["tracking", "area"] },
+      (_call, index) => (index === 0
+        ? restIssue()
+        : restIssue({ labels: [{ name: "tracking" }, { name: "area" }] })),
+    );
+    expect(calls).toEqual([
+      { tool: "issue_read", args: { owner: OWNER, repo: NAME, method: "get", issue_number: 7 } },
+      { tool: "issue_write", args: { owner: OWNER, repo: NAME, method: "update", issue_number: 7, labels: ["tracking", "area"] } },
+    ]);
+  });
+
+  test("issue_update の空 labels 要求は追跡Issueの追跡軸のみを残す", async () => {
+    const { calls } = await runOp(
+      "issue_update",
+      { number: 7, labels: [] },
+      (_call, index) => (index === 0
+        ? restIssue({ labels: [{ name: "tracking" }, { name: "old-area" }] })
+        : restIssue({ labels: [{ name: "tracking" }] })),
+    );
+    expect(calls).toEqual([
+      { tool: "issue_read", args: { owner: OWNER, repo: NAME, method: "get", issue_number: 7 } },
+      { tool: "issue_write", args: { owner: OWNER, repo: NAME, method: "update", issue_number: 7, labels: ["tracking"] } },
+    ]);
+  });
+
+  test("issue_update の現状読取がラベルを読めない場合は書込み前に停止する", async () => {
+    const { reply, calls } = await runOp(
+      "issue_update",
+      { number: 7, labels: ["new-area"] },
+      (_call, index) => (index === 0 ? restIssue({ labels: "not-array" }) : restIssue()),
+    );
+    expect(calls).toEqual([
+      { tool: "issue_read", args: { owner: OWNER, repo: NAME, method: "get", issue_number: 7 } },
+    ]);
     expect(reply.ok).toBe(false);
-    if (!reply.ok) expect(reply.error).toContain("does not provide the operation: issue_update");
+    if (!reply.ok) {
+      expect(reply.error).toContain("could not build the write call");
+    }
+  });
+
+  test("issue_update の labels 要求は engine の VERIFY（読戻し・role 保持照合）を通過する", async () => {
+    let issue = restIssue({ labels: [{ name: "tracking" }, { name: "old-area" }] });
+    const transport: PluginTransport = {
+      async invoke(call) {
+        if (call.tool === "issue_read" && call.args.method === "get") {
+          return { ok: true, payload: issue };
+        }
+        if (call.tool === "issue_write" && call.args.method === "update") {
+          if (Array.isArray(call.args.labels)) {
+            issue = { ...issue, labels: (call.args.labels as string[]).map((name) => ({ name })) };
+          }
+          if (typeof call.args.title === "string") issue = { ...issue, title: call.args.title };
+          return { ok: true, payload: issue };
+        }
+        return { ok: false, kind: "operation-failed", error: `unexpected call: ${call.tool}` };
+      },
+    };
+    const runner = createPluginRunner(createCodexPluginMapping({ repo: REPO }), transport);
+    const env = buildGhToolEnv({ repo: REPO }, { tempDir: () => os.tmpdir() }, runner);
+    if (!env.ok) throw new Error(env.failure.detail);
+    const spec = AGENTDEV_GH_OPERATION_SPECS.find((s) => s.operation === "issue_update");
+    if (spec === undefined) throw new Error("issue_update spec not found");
+    const result = await executeOperation(env.env, spec, {
+      operation: "issue_update",
+      number: 7,
+      labels: ["new-area"],
+    });
+    expect(result.ok).toBe(true);
+    expect(issue.labels).toEqual([{ name: "tracking" }, { name: "new-area" }]);
   });
 
   test("issue_list の search 軸は tool face と意味が異なるため空 plan で停止する", async () => {

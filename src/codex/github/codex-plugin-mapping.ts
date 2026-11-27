@@ -43,7 +43,7 @@ export interface CodexPluginCapability {
 export const CODEX_PLUGIN_CAPABILITIES: readonly CodexPluginCapability[] = [
   { operation: "issue_create", supported: true, tools: ["issue_write"], evidence: "issue_write (method create) accepts title/body/labels with explicit owner/repo" },
   { operation: "issue_read", supported: true, tools: ["issue_read"], evidence: "issue_read (method get) returns a single issue by issue_number" },
-  { operation: "issue_update", supported: true, tools: ["issue_read", "issue_write"], evidence: "issue_write (method update) accepts title/body; labels are not mapped and stop with an empty plan" },
+  { operation: "issue_update", supported: true, tools: ["issue_read", "issue_write"], evidence: "issue_write (method update) accepts title/body/labels; labels are built from the pre-read reply with role preservation" },
   { operation: "issue_close", supported: true, tools: ["issue_write"], evidence: "issue_write (method update) accepts state/state_reason" },
   { operation: "pr_create", supported: true, tools: ["create_pull_request"], evidence: "create_pull_request accepts title/body/head/base with explicit owner/repo" },
   { operation: "pr_read", supported: true, tools: ["pull_request_read"], evidence: "pull_request_read (method get) returns a single pull request by pullNumber" },
@@ -275,20 +275,10 @@ export function createCodexPluginMapping(
         return read === null ? [] : [{ tool: "issue_read", args: read }];
       }
       case "issue_update": {
-        // labels 要求は対応しない（副作用前に空 plan で停止）。
-        if (args.labels !== undefined) return [];
+        // 更新呼出しの引数（labels の role 保持計算）は現状読取の応答に依存する
+        // ため、plan は現状読取のみを返し、更新呼出しは nextCall で組み立てる。
         const read = withBase({ method: "get", issue_number: args.number });
-        const patch: Record<string, unknown> = { method: "update", issue_number: args.number };
-        if (args.title !== undefined && args.title !== null) patch.title = args.title;
-        if (args.body !== undefined && args.body !== null) patch.body = args.body;
-        const update = withBase(patch);
-        if (read === null || update === null) return [];
-        // 実行前状態（before）は engine の VERIFY 照合基準であり、gh CLI 実装と
-        // 同一に現状読取（GET）から復元する。
-        return [
-          { tool: "issue_read", args: read },
-          { tool: "issue_write", args: update },
-        ];
+        return read === null ? [] : [{ tool: "issue_read", args: read }];
       }
       case "issue_close": {
         const update = withBase({
@@ -396,9 +386,42 @@ export function createCodexPluginMapping(
     }
   };
 
+  /**
+   * issue_update の更新呼出し（plan の現状読取が 1 応答済みのときだけ組み立てる）。
+   * labels 要求は gh CLI 実装と同一の role 保持計算で物理ラベルへ落とす:
+   * 要求に追跡軸ラベルを含む場合は role 変更要求として buildTrackingLabels し、
+   * 含まない場合は現状 role を復元する（部分更新不変条件）。
+   */
+  const issueUpdateCallOf = (
+    request: GhRunnerRequest,
+    payloads: readonly unknown[],
+  ): PluginCall | null => {
+    if (request.operation !== "issue_update" || payloads.length !== 1) return null;
+    const current = payloads[0];
+    if (!isRecord(current)) return null;
+    const args = request.args;
+    const patch: Record<string, unknown> = { method: "update", issue_number: args.number };
+    if (args.title !== undefined && args.title !== null) patch.title = args.title;
+    if (args.body !== undefined && args.body !== null) patch.body = args.body;
+    if (Array.isArray(args.labels)) {
+      const labelsRequested = stringArrayOf(args.labels);
+      const currentLabels = labelNames(current);
+      if (currentLabels === null) return null;
+      const roleRequested = labelsRequested.includes(TRACKING_ROLE_LABEL)
+        ? "tracking"
+        : deriveRole(currentLabels);
+      patch.labels = roleRequested === "tracking"
+        ? buildTrackingLabels(labelsRequested)
+        : [...labelsRequested];
+    }
+    const update = withBase(patch);
+    return update === null ? null : { tool: "issue_write", args: update };
+  };
+
   return {
     supports: (operation) => CAPABILITY_BY_OPERATION.get(operation)?.supported ?? false,
     plan: planOf,
+    nextCall: issueUpdateCallOf,
     interpret: (request, payloads) => interpretOf(request, payloads),
   };
 }
@@ -495,6 +518,9 @@ function interpretIssueMutation(
   expectedState: "open",
   updateError: string,
 ): GhRunnerReply {
+  if (payloads.length < 2) {
+    return failReply("issue mutation could not build the write call from the pre-read reply");
+  }
   if (!isRecord(payloads[0])) return failReply("issue reply is not an object");
   const before = beforeFrom(payloads[0]);
   if (before === null) return failReply("issue mutation cannot read current labels");
