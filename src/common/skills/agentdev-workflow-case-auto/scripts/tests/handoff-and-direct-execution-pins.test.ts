@@ -24,6 +24,22 @@ function findRepoRoot(start: string): string {
 
 const REPO_ROOT = findRepoRoot(import.meta.dir);
 
+test("同じ Root への復旧を公開 workflow の再開手順から参照する", () => {
+  const skill = readSkill();
+  expect(skill).toContain("同じ Root でこの再開入口を使う");
+  const recovery = fs.readFileSync(
+    path.join(REPO_ROOT, "src", "common", "skills", "agentdev-workflow-orchestration",
+      "references", "case-auto-recovery.md"),
+    "utf-8",
+  );
+  expect(recovery).toContain("実行単位ごとに作成済みの子 Issue");
+  expect(recovery).toContain("対象 Case・base・head で作成済みの実装PR");
+  expect(recovery).toContain("対象 PR のマージ状態と取り込みコミット");
+  expect(recovery).toContain("不足が確定した処理だけを再試行する");
+  expect(recovery).toContain("読取不能、複数候補、不一致が残る場合");
+  expect(recovery).toContain("マージ済みで記録が未反映なら記録・終了処理を継続する");
+});
+
 function readSkill(): string {
   return fs.readFileSync(
     path.join(
