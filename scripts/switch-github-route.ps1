@@ -94,9 +94,9 @@ function Get-RouteConfigFromText {
         経路設定ファイルの内容を検査し、ホストごとの経路を返す。
     .DESCRIPTION
         先頭の UTF-8 BOM は許容する（ReadAllText が検出して除去する）。空・空白のみの
-        内容、不正な JSON、オブジェクト以外、未知のキー、plugin / gh 以外の値は不正と
-        する。キーの欠落は plugin 扱いであるため受理する。判定規則は共通 Tool 側の
-        設定読み取り（src/common/tools/agentdev-gh/github-route.ts）と同じである。
+        内容、不正な JSON、オブジェクト以外、重複キー、未知のキー、plugin / gh 以外の
+        値は不正とする。キーの欠落は plugin 扱いであるため受理する。判定規則は共通
+        Tool 側の設定読み取り（agentdev-gh の GitHub 実行経路設定読取り）と同じである。
     #>
     param([string]$Text)
 
@@ -114,6 +114,18 @@ function Get-RouteConfigFromText {
     if ($null -eq $parsed -or $parsed -isnot [pscustomobject]) {
         $invalid.Reason = 'JSON オブジェクトではありません'
         return $invalid
+    }
+    # 重複キーは最後の値で確定させず不正として拒否する（共通 Tool 側と同一規則）。
+    # キー位置の文字列トークンを取り出して JSON 文字列として復号し、出現順で判定する。
+    $keyTokens = [regex]::Matches($Text, '"(?:[^"\\]|\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4}))*"\s*:')
+    $seenKeys = @{}
+    foreach ($token in $keyTokens) {
+        $name = ($token.Value -replace '\s*:$', '') | ConvertFrom-Json
+        if ($seenKeys.ContainsKey($name)) {
+            $invalid.Reason = "重複キーがあります: $name"
+            return $invalid
+        }
+        $seenKeys[$name] = $true
     }
     foreach ($name in $parsed.PSObject.Properties.Name) {
         if ($name -notin @('codex', 'antigravity')) {

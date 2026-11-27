@@ -1,9 +1,10 @@
 // Layout and contract tests for the scripts/ public entry boundary
 // (REQ-050). Pins the structural contract that case-run TS-001 verifies
 // manually, as a permanent regression guard:
-//   - scripts/ top level holds exactly the three public entries
-//     (install.ps1, self-sync.ps1, setup-hooks.ts; REQ-050-001 as
-//     modernized by DEC-066 decision 3) plus the internal directories
+//   - scripts/ top level holds exactly the four public entries
+//     (install.ps1, self-sync.ps1, setup-hooks.ts,
+//     switch-github-route.ps1; REQ-050-001 as modernized by DEC-066
+//     decision 3 and DEC-071 decision 3) plus the internal directories
 //     (consumer/, git-hooks/, self/) — nothing else (REQ-050-001,
 //     REQ-050-007, REQ-050-008, REQ-050-009)
 //   - both entries offer the three modes via ValidateSet (REQ-050-002,
@@ -16,7 +17,7 @@
 //   - current user-facing documents no longer reference the three retired
 //     entries as the current procedure (REQ-050-014)
 
-// ADF-COVERS(verification): REQ-050-001, REQ-050-002, REQ-050-003, REQ-050-004, REQ-050-007, REQ-050-008, REQ-050-009, REQ-050-013, REQ-050-014
+// ADF-COVERS(verification): REQ-050-001, REQ-050-002, REQ-050-003, REQ-050-004, REQ-050-007, REQ-050-008, REQ-050-009, REQ-050-013, REQ-050-014, REQ-050-017
 // ADF-COVERS(verification): REQ-052-008
 // ADF-COVERS(verification): REQ-091-001
 
@@ -27,7 +28,12 @@ import * as path from "path";
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 const SCRIPTS_DIR = path.join(REPO_ROOT, "scripts");
 
-const PUBLIC_ENTRIES = ["install.ps1", "self-sync.ps1", "setup-hooks.ts"] as const;
+const PUBLIC_ENTRIES = [
+  "install.ps1",
+  "self-sync.ps1",
+  "setup-hooks.ts",
+  "switch-github-route.ps1",
+] as const;
 const INTERNAL_DIRS = ["consumer", "git-hooks", "self"] as const;
 const RETIRED_ENTRIES = [
   "install-consumer-opencode.ps1",
@@ -71,7 +77,7 @@ function executableLines(text: string): string[] {
 }
 
 describe("scripts layout / public entry boundary (REQ-050-001, REQ-050-007, REQ-050-008, REQ-050-009)", () => {
-  test("scripts/ top level contains only the three public entries and the internal dirs", () => {
+  test("scripts/ top level contains only the four public entries and the internal dirs", () => {
     const entries = fs.readdirSync(SCRIPTS_DIR, { withFileTypes: true });
     const files = entries.filter((e) => e.isFile()).map((e) => e.name).sort();
     const dirs = entries.filter((e) => e.isDirectory()).map((e) => e.name).sort();

@@ -244,6 +244,21 @@ describe("switch-github-route / 既存設定の保護", () => {
     }
   }, 60000);
 
+  test("重複キーの既存設定は上書きせず、修正または削除を案内して停止する（共通 Tool 側と同一規則）", () => {
+    const { root, script } = makeCheckoutConsumer();
+    try {
+      writeConfig(root, '{"codex":"gh","codex":"plugin"}');
+      const before = fs.readFileSync(configPath(root));
+      const r = runSwitch(script, ["-AgentHosts", "codex", "-Route", "gh"], root);
+      expect(r.exitCode).toBe(1);
+      expect(r.stdout).toContain("重複キーがあります: codex");
+      expect(r.stdout).toContain("修正するか削除");
+      expect(fs.readFileSync(configPath(root)).equals(before)).toBe(true);
+    } finally {
+      rmrf(root);
+    }
+  }, 60000);
+
   test(".agentdev/config ディレクトリが欠落している場合は作成して書き込む", () => {
     const { root, script } = makeCheckoutConsumer();
     try {
