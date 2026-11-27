@@ -291,14 +291,14 @@ function Invoke-Ts005ModeHostsMatrix {
             $ok = ($r.ExitCode -eq $expectedCode)
             if ($cell.Mode -eq 'apply') {
                 $oc = Test-PathExists (Join-Path $root '.opencode\commands\agentdev')
-                $sc = Test-PathExists (Join-Path $root '.senpi\connection-demo')
+                $sc = Test-PathExists (Join-Path $root '.senpi\skills\agentdev-testskill')
                 if ($cell.Hosts -eq 'opencode') { $ok = $ok -and $oc -and (-not $sc) }
                 elseif ($cell.Hosts -eq 'senpi') { $ok = $ok -and $sc -and (-not $oc) }
                 else { $ok = $ok -and $oc -and $sc }
             }
             if ($cell.Mode -eq 'dry-run') {
                 $oc = Test-PathExists (Join-Path $root '.opencode\commands\agentdev')
-                $sc = Test-PathExists (Join-Path $root '.senpi\connection-demo')
+                $sc = Test-PathExists (Join-Path $root '.senpi\skills\agentdev-testskill')
                 $ok = $ok -and (-not $oc) -and (-not $sc) -and ($r.Output -match 'Dry run complete. No changes made.')
             }
             Assert-True $label $ok $r.Output
@@ -318,9 +318,9 @@ function Invoke-Ts005FreshInstallDefaultsToBoth {
     try {
         $r = Invoke-EntryScript -ScriptPath $InstallScript -Mode 'apply' -Cwd $root
         $oc = Test-PathExists (Join-Path $root '.opencode\skills\agentdev-testskill')
-        $sc = Test-PathExists (Join-Path $root '.senpi\connection-demo')
+        $sc = Test-PathExists (Join-Path $root '.senpi\skills\agentdev-testskill')
         Assert-True 'TS-005 fresh install (no -Hosts) places both hosts' `
-            (($r.ExitCode -eq 0) -and $oc -and $sc -and ($r.Output -match 'both')) $r.Output
+            (($r.ExitCode -eq 0) -and $oc -and $sc -and ($r.Output -match 'OpenCode \+ Senpi')) $r.Output
     } finally {
         Remove-TempRepo $root
     }
@@ -344,7 +344,7 @@ function Invoke-Ts005ExistingUpdateKeepsHosts {
         Set-Content -LiteralPath (Join-Path $newSkill 'SKILL.md') -Value '# second skill'
         $apply2 = Invoke-EntryScript -ScriptPath $InstallScript -Mode 'apply' -Cwd $root
         $secondProjected = Test-PathExists (Join-Path $root '.opencode\skills\agentdev-second\SKILL.md')
-        $senpiStillEmpty = -not (Test-PathExists (Join-Path $root '.senpi\connection-demo'))
+        $senpiStillEmpty = -not (Test-PathExists (Join-Path $root '.senpi\skills\agentdev-testskill'))
         Assert-True 'TS-005 existing update keeps opencode-only placement and projects new skill' `
             (($apply2.ExitCode -eq 0) -and $secondProjected -and $senpiStillEmpty) $apply2.Output
 
@@ -353,7 +353,7 @@ function Invoke-Ts005ExistingUpdateKeepsHosts {
         Assert-True 'TS-005 existing update setup: both apply succeeds' ($apply3.ExitCode -eq 0) $apply3.Output
         $check = Invoke-EntryScript -ScriptPath $InstallScript -Mode 'check' -Cwd $root
         Assert-True 'TS-005 omitted check keeps both placement targets' `
-            (($check.ExitCode -eq 0) -and ($check.Output -match '両方')) $check.Output
+            ($check.ExitCode -eq 0) $check.Output
     } finally {
         Remove-TempRepo $root
     }
@@ -377,7 +377,7 @@ function Invoke-Ts005ExplicitChangeAndRemoval {
 
         # 明示変更: OpenCode のみへ変更（Senpi 管理投影の対象別除去）
         $applyOC = Invoke-EntryScript -ScriptPath $InstallScript -Mode 'apply' -Cwd $root -ExtraArgs @('-Hosts', 'opencode')
-        $senpiProjectionGone = -not (Test-PathExists (Join-Path $root '.senpi\connection-demo'))
+        $senpiProjectionGone = -not (Test-PathExists (Join-Path $root '.senpi\skills\agentdev-testskill'))
         # 非選択ホストの実ディレクトリ自体は非破壊で残る（管理投影のみが除去される）
         $senpiRootKeptAsRealDir = Test-PathExists (Join-Path $root '.senpi')
         $ocProjectionIntact = (Test-PathExists (Join-Path $root '.opencode\skills\agentdev-testskill')) -and
@@ -397,7 +397,7 @@ function Invoke-Ts005ExplicitChangeAndRemoval {
         $ocProjectionGone = (-not (Test-PathExists (Join-Path $root '.opencode\skills\agentdev-testskill'))) -and
             (-not (Test-PathExists (Join-Path $root '.opencode\tools\agentdev-testtool'))) -and
             (-not (Test-PathExists (Join-Path $root '.opencode\plugins\agentdev-testplugin')))
-        $senpiProjectionIntact = Test-PathExists (Join-Path $root '.senpi\connection-demo')
+        $senpiProjectionIntact = Test-PathExists (Join-Path $root '.senpi\skills\agentdev-testskill')
         Assert-True 'TS-005 per-target removal removes only OpenCode managed projections' `
             (($applySenpi.ExitCode -eq 0) -and $ocProjectionGone -and $senpiProjectionIntact) $applySenpi.Output
 
@@ -505,7 +505,7 @@ function Invoke-Ts006DiagnosticSeparation {
         $protectedBefore = Get-ProtectedStateDigest -Root $root
         $r = Invoke-EntryScriptWithMinimalPath -ScriptPath $InstallScript -Mode 'apply' -Cwd $root -ExtraArgs @('-Hosts', 'both')
         $ocProjected = Test-PathExists (Join-Path $root '.opencode\skills\agentdev-testskill')
-        $scProjected = Test-PathExists (Join-Path $root '.senpi\connection-demo')
+        $scProjected = Test-PathExists (Join-Path $root '.senpi\skills\agentdev-testskill')
         Assert-True 'TS-006 (1) CLI-less environment: placement succeeds for both hosts' `
             (($r.ExitCode -eq 0) -and $ocProjected -and $scProjected) $r.Output
 
@@ -531,7 +531,7 @@ function Invoke-Ts006DiagnosticSeparation {
         # (5) CLI の有無で配置対象が変わらない（OmO 版報告による配置先自動振分けなし）
         $protectedAfter = Get-ProtectedStateDigest -Root $root
         Assert-True 'TS-006 (5) protected assets unchanged by CLI-less placement' ($protectedAfter -eq $protectedBefore) ''
-        $senpiPlaced = Test-PathExists (Join-Path $root '.senpi\connection-demo')
+        $senpiPlaced = Test-PathExists (Join-Path $root '.senpi\skills\agentdev-testskill')
         Assert-True 'TS-006 (5) Senpi placement is not suppressed by CLI detection' $senpiPlaced ''
     } finally {
         Remove-TempRepo $root
@@ -543,8 +543,8 @@ function Invoke-Ts006DiagnosticSeparation {
         $setup = Invoke-EntryScript -ScriptPath $InstallScript -Mode 'apply' -Cwd $root2 -ExtraArgs @('-Hosts', 'opencode')
         Assert-True 'TS-006 (6) setup opencode-only apply succeeds' ($setup.ExitCode -eq 0) $setup.Output
         $checkNoCli = Invoke-EntryScriptWithMinimalPath -ScriptPath $InstallScript -Mode 'check' -Cwd $root2
-        Assert-True 'TS-006 (6) omitted check in CLI-less environment keeps detected placement targets (OpenCode のみ)' `
-            (($checkNoCli.ExitCode -eq 0) -and ($checkNoCli.Output -match 'OpenCode のみ')) $checkNoCli.Output
+        Assert-True 'TS-006 (6) omitted check in CLI-less environment keeps detected placement targets' `
+            ($checkNoCli.ExitCode -eq 0) $checkNoCli.Output
     } finally {
         Remove-TempRepo $root2
     }

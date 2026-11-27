@@ -14,11 +14,19 @@
 //     stop install.ps1 / self-sync.ps1 with exit 7 and guide the acquisition
 //     CLI; environments without a declaration file skip the check; the
 //     consumer archive installer skips it on copy as well
-//   - agent host selection: -AgentHosts places the shared .agents/skills/
-//     entry projection for Codex / Antigravity; unselected installs place
-//     nothing, omitted selections maintain the recorded state, explicit
-//     none removes the managed entries, and the misexecution stop precedes
-//     placement (REQ-009-040)
+//   - agent selection: the 4-agent selection set (OpenCode / Senpi via
+//     -Hosts, Codex / Antigravity via -AgentHosts) resolves as one set,
+//     fresh installs default to OpenCode + Senpi with the Senpi entry
+//     projection and the .agents/agentdev/ connection, the resolved set is
+//     recorded as selectedAgents, omitted selections maintain the recorded
+//     state, explicit none removes the managed entries, and the
+//     misexecution stop precedes placement (REQ-009-040)
+//   - selection handover and switch conflicts: a fresh install given only
+//     one of -Hosts / -AgentHosts guides how to specify the other, a legacy
+//     record holding only agentHosts keeps the OpenCode/Senpi selection that
+//     placements confirm, and a switch that leaves an unidentifiable
+//     junction on a removed placement target's managed path keeps it,
+//     reports the conflict and leaves the record unchanged (REQ-099-040)
 //
 // The consumer layout is exercised in both checkout forms accepted by
 // REQ-050 / REQ-009: git clone style (.git present) and source ZIP style
@@ -28,6 +36,8 @@
 // ADF-COVERS(verification): REQ-052-007
 // ADF-COVERS(verification): REQ-097-002
 // ADF-COVERS(verification): REQ-009-040
+// ADF-COVERS(verification): REQ-099-036, REQ-099-037, REQ-099-038, REQ-099-039
+// ADF-COVERS(verification): REQ-099-040
 
 import { describe, expect, test } from "bun:test";
 import * as crypto from "crypto";
@@ -93,6 +103,8 @@ function digestTree(root: string): Map<string, string> {
  *   <root>/.agentdev-plugin/src/common/{VERSION,commands/agentdev,skills/...,tools/...}
  *   <root>/.agentdev-plugin/src/opencode/plugins/...  (OpenCode host connection)
  *   <root>/.agentdev-plugin/src/senpi/                (Senpi host connection: placement contract)
+ *   <root>/.agentdev-plugin/src/codex/                (Codex host connection area)
+ *   <root>/.agentdev-plugin/src/antigravity/          (Antigravity host connection area)
  *   <root>/.agentdev-plugin/src/common/tools/agentdev-gh/local  (localSource only)
  *   <root>/scripts/{install.ps1,consumer/common.ps1}
  */
@@ -105,6 +117,8 @@ function makeConsumerRepo(zipCheckout: boolean, localSource = false): string {
   fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode", "plugins", "agentdev-gh-write-guard"), { recursive: true });
   fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "opencode", "plugins", "agentdev-gh-tool"), { recursive: true });
   fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "senpi", "connection-demo"), { recursive: true });
+  fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "codex"), { recursive: true });
+  fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "antigravity"), { recursive: true });
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "common", "commands", "agentdev", "case-run.md"), "# case-run\n");
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "common", "skills", "agentdev-workflow-case-run", "SKILL.md"), "# case-run skill\n");
   placeMechanicalStepSkillScripts(
@@ -116,6 +130,8 @@ function makeConsumerRepo(zipCheckout: boolean, localSource = false): string {
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "opencode", "plugins", "agentdev-gh-tool", "plugin.ts"), "// agentdev-gh-tool plugin\n");
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "senpi", "README.md"), "# src/senpi/ (Senpi host connection area)\n");
   fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "senpi", "connection-demo", "connection.ts"), "// senpi connection\n");
+  fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "codex", "README.md"), "# src/codex/ (Codex host connection area)\n");
+  fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "antigravity", "README.md"), "# src/antigravity/ (Antigravity host connection area)\n");
   if (localSource) {
     fs.mkdirSync(path.join(root, ".agentdev-plugin", "src", "common", "tools", "agentdev-gh", "local"), { recursive: true });
     fs.writeFileSync(path.join(root, ".agentdev-plugin", "src", "common", "tools", "agentdev-gh", "local", "runner-local.ts"), "// local runner\n");
@@ -465,6 +481,12 @@ describe("scripts behavior / third-party skill drift detection", () => {
       fs.mkdirSync(path.join(src, "common", "skills", "agentdev-x"), { recursive: true });
       fs.writeFileSync(path.join(src, "common", "commands", "agentdev", "case-run.md"), "# case-run\n", "utf-8");
       fs.writeFileSync(path.join(src, "common", "skills", "agentdev-x", "SKILL.md"), "# x\n", "utf-8");
+      // Default selection resolves to OpenCode + Senpi, and the required-when-selected
+      // source checks demand both connection areas inside the archive.
+      fs.mkdirSync(path.join(src, "opencode", "plugins", "agentdev-gh-tool"), { recursive: true });
+      fs.writeFileSync(path.join(src, "opencode", "plugins", "agentdev-gh-tool", "plugin.ts"), "// plugin\n", "utf-8");
+      fs.mkdirSync(path.join(src, "senpi"), { recursive: true });
+      fs.writeFileSync(path.join(src, "senpi", "README.md"), "# senpi\n", "utf-8");
       const target = path.join(root, ".opencode");
       const r = runPwsh(
         [
@@ -613,13 +635,22 @@ describe("scripts behavior / distribution version state (REQ-126-003)", () => {
 
 // --- Codex / Antigravity agent host selection (REQ-009-040) ---
 describe("scripts behavior / agent host selection (REQ-009-040)", () => {
-  test("unselected new install places nothing under .agents/ and check stays clean", () => {
+  test("unselected new install defaults to OpenCode + Senpi and places no Codex/Antigravity entries", () => {
     const root = makeConsumerRepo(false);
     try {
       const apply = runInstall(root, "apply");
       expect(apply.exitCode).toBe(0);
-      expect(apply.stdout).toContain("[INFO] Agent host placement (Codex/Antigravity entry .agents/skills/): なし");
-      expect(fs.existsSync(path.join(root, ".agents"))).toBe(false);
+      expect(apply.stdout).toContain("[INFO] Placement targets: OpenCode + Senpi");
+      // Senpi selection creates the entry projection and the agentdev connection.
+      expect(fs.existsSync(path.join(root, ".senpi", "skills", "agentdev-workflow-case-run", "SKILL.md"))).toBe(true);
+      expect(fs.existsSync(path.join(root, ".agents", "agentdev", "common"))).toBe(true);
+      expect(fs.existsSync(path.join(root, ".agents", "agentdev", "senpi"))).toBe(true);
+      // No Codex / Antigravity selection: no .agents/skills entries.
+      expect(fs.existsSync(path.join(root, ".agents", "skills"))).toBe(false);
+
+      const recordPath = path.join(root, ".agentdev", "install-state.json");
+      const record = JSON.parse(fs.readFileSync(recordPath, "utf-8")) as { selectedAgents: string[] };
+      expect(record.selectedAgents).toEqual(["opencode", "senpi"]);
 
       const check = runInstall(root, "check");
       expect(check.exitCode).toBe(0);
@@ -633,8 +664,7 @@ describe("scripts behavior / agent host selection (REQ-009-040)", () => {
     try {
       const apply = runInstall(root, "apply", ["-AgentHosts", "codex"]);
       expect(apply.exitCode).toBe(0);
-      expect(apply.stdout).toContain("[INFO] Agent host placement was set by explicit selection.");
-      expect(apply.stdout).toContain(".agents/skills/agentdev-*/");
+      expect(apply.stdout).toContain("[INFO] Placement targets were set by explicit selection.");
 
       const entry = path.join(root, ".agents", "skills", "agentdev-workflow-case-run");
       expect(fs.existsSync(entry)).toBe(true);
@@ -643,8 +673,8 @@ describe("scripts behavior / agent host selection (REQ-009-040)", () => {
       expect(fs.existsSync(path.join(root, ".opencode", "skills", "agentdev-workflow-case-run", "SKILL.md"))).toBe(true);
 
       const recordPath = path.join(root, ".agentdev", "install-state.json");
-      const record = JSON.parse(fs.readFileSync(recordPath, "utf-8")) as { agentHosts: string[] };
-      expect(record.agentHosts).toEqual(["codex"]);
+      const record = JSON.parse(fs.readFileSync(recordPath, "utf-8")) as { selectedAgents: string[] };
+      expect(record.selectedAgents).toEqual(["opencode", "senpi", "codex"]);
 
       const check = runInstall(root, "check");
       expect(check.exitCode).toBe(0);
@@ -664,7 +694,7 @@ describe("scripts behavior / agent host selection (REQ-009-040)", () => {
       const second = runInstall(root, "apply");
       expect(second.exitCode).toBe(0);
       expect(second.stdout).toContain(
-        "inherited from the current selection or placement state (maintained)",
+        "Placement targets were inherited from the current selection, placement state, or record.",
       );
       expect(digestTree(path.join(root, ".agents"))).toEqual(entryBefore);
 
@@ -697,11 +727,161 @@ describe("scripts behavior / agent host selection (REQ-009-040)", () => {
   }, 240000);
 
   test("misexecution stop precedes agent host placement on the self-hosting repo", () => {
+    // REPO_ROOT may already carry the self-hosting projections (.senpi / .agents);
+    // the stop must place nothing, so both trees must remain unchanged.
     const before = digestTree(path.join(REPO_ROOT, ".opencode"));
+    const agentsBefore = fs.existsSync(path.join(REPO_ROOT, ".agents"))
+      ? digestTree(path.join(REPO_ROOT, ".agents"))
+      : null;
     const r = runInstall(REPO_ROOT, "apply", ["-AgentHosts", "codex"]);
     expect(r.exitCode).toBe(1);
     expect(r.stdout).toContain("scripts/self-sync.ps1 を使ってください");
-    expect(fs.existsSync(path.join(REPO_ROOT, ".agents"))).toBe(false);
     expect(digestTree(path.join(REPO_ROOT, ".opencode"))).toEqual(before);
+    if (agentsBefore !== null) {
+      expect(digestTree(path.join(REPO_ROOT, ".agents"))).toEqual(agentsBefore);
+    }
   }, 120000);
+});
+
+describe("scripts behavior / selection handover and switch conflicts (REQ-099-040)", () => {
+  const OPEN_SKILL_REL = ".opencode/skills/agentdev-workflow-case-run";
+
+  function readSelectedAgents(root: string): string[] {
+    const record = JSON.parse(fs.readFileSync(path.join(root, ".agentdev", "install-state.json"), "utf-8")) as {
+      selectedAgents?: string[];
+    };
+    return record.selectedAgents ?? [];
+  }
+
+  function isJunction(p: string): boolean {
+    try {
+      return fs.lstatSync(p).isSymbolicLink();
+    } catch {
+      return false;
+    }
+  }
+
+  function placeForeignJunction(root: string, rel: string): string {
+    const junction = path.join(root, rel);
+    fs.mkdirSync(path.dirname(junction), { recursive: true });
+    if (isJunction(junction)) fs.unlinkSync(junction);
+    const foreign = path.join(root, "foreign-target");
+    fs.mkdirSync(foreign, { recursive: true });
+    fs.writeFileSync(path.join(foreign, "SKILL.md"), "# foreign\n");
+    fs.symlinkSync(foreign, junction, "junction");
+    return junction;
+  }
+
+  function nonInfoLinesIdentifying(r: RunResult, rel: string): string[] {
+    const slash = rel.replace(/^\.opencode\//, "");
+    return (r.stdout + "\n" + r.stderr)
+      .split(/\r?\n/)
+      .map((l) => l.trim().replace(/\\/g, "/"))
+      .filter((l) => l && !l.includes("[INFO]") && l.endsWith(` ${slash}`));
+  }
+
+  test("fresh install given only one of -Hosts / -AgentHosts guides how to specify the other", () => {
+    const cases = [
+      { extra: ["-AgentHosts", "antigravity"], other: "-Hosts", expected: ["opencode", "senpi", "antigravity"] },
+      { extra: ["-Hosts", "opencode"], other: "-AgentHosts", expected: ["opencode"] },
+    ];
+    for (const c of cases) {
+      const root = makeConsumerRepo(false);
+      try {
+        const apply = runInstall(root, "apply", c.extra);
+        expect(apply.exitCode).toBe(0);
+        expect(readSelectedAgents(root)).toEqual(c.expected);
+        const lines = (apply.stdout + "\n" + apply.stderr).split(/\r?\n/);
+        expect(lines.some((l) => l.includes(c.other))).toBe(true);
+      } finally {
+        rmrf(root);
+      }
+    }
+  }, 300000);
+
+  test("a legacy record holding only agentHosts keeps the OpenCode/Senpi selection that placements confirm", () => {
+    const cases = [
+      { agentHosts: ["codex"], expected: ["opencode", "senpi", "codex"], sharedEntryKept: true },
+      { agentHosts: [], expected: ["opencode", "senpi"], sharedEntryKept: false },
+    ];
+    for (const c of cases) {
+      const root = makeConsumerRepo(false);
+      try {
+        expect(runInstall(root, "apply", ["-AgentHosts", "codex"]).exitCode).toBe(0);
+        const recordPath = path.join(root, ".agentdev", "install-state.json");
+        const { selectedAgents: _selected, ...record } = JSON.parse(fs.readFileSync(recordPath, "utf-8")) as {
+          selectedAgents: string[];
+          [k: string]: unknown;
+        };
+        fs.writeFileSync(recordPath, JSON.stringify({ ...record, agentHosts: c.agentHosts }), "utf-8");
+
+        const apply = runInstall(root, "apply");
+        expect(apply.exitCode).toBe(0);
+        expect(readSelectedAgents(root)).toEqual(c.expected);
+        expect(fs.existsSync(path.join(root, OPEN_SKILL_REL, "SKILL.md"))).toBe(true);
+        const sharedEntry = path.join(root, ".agents", "skills", "agentdev-workflow-case-run", "SKILL.md");
+        expect(fs.existsSync(sharedEntry)).toBe(c.sharedEntryKept);
+      } finally {
+        rmrf(root);
+      }
+    }
+  }, 400000);
+
+  test("a switch that leaves an unidentifiable junction on a removed placement target's managed path keeps it, reports the conflict and leaves the record unchanged", () => {
+    for (const withRecord of [true, false]) {
+      const root = makeConsumerRepo(false);
+      try {
+        expect(runInstall(root, "apply", ["-Hosts", "both", "-AgentHosts", "codex"]).exitCode).toBe(0);
+        const recordPath = path.join(root, ".agentdev", "install-state.json");
+        const recordBefore = withRecord ? fs.readFileSync(recordPath) : null;
+        if (!withRecord) fs.rmSync(recordPath, { force: true });
+        const junction = placeForeignJunction(root, OPEN_SKILL_REL);
+
+        const dry = runInstall(root, "dry-run", ["-Hosts", "none"]);
+        expect(nonInfoLinesIdentifying(dry, OPEN_SKILL_REL).length).toBeGreaterThan(0);
+
+        const apply = runInstall(root, "apply", ["-Hosts", "none"]);
+        expect(apply.exitCode).not.toBe(0);
+        expect(isJunction(junction)).toBe(true);
+        expect(nonInfoLinesIdentifying(apply, OPEN_SKILL_REL).length).toBeGreaterThan(0);
+        if (recordBefore === null) {
+          expect(fs.existsSync(recordPath)).toBe(false);
+        } else {
+          expect(fs.readFileSync(recordPath).equals(recordBefore)).toBe(true);
+        }
+      } finally {
+        rmrf(root);
+      }
+    }
+  }, 600000);
+
+  test("an unidentifiable junction on the managed path of a placement target that was never selected does not block the install", () => {
+    const root = makeConsumerRepo(false);
+    try {
+      const junction = placeForeignJunction(root, OPEN_SKILL_REL);
+      const apply = runInstall(root, "apply", ["-Hosts", "none", "-AgentHosts", "codex"]);
+      expect(apply.exitCode).toBe(0);
+      expect(readSelectedAgents(root)).toEqual(["codex"]);
+      expect(isJunction(junction)).toBe(true);
+      const check = runInstall(root, "check");
+      expect(check.exitCode).toBe(0);
+    } finally {
+      rmrf(root);
+    }
+  }, 300000);
+
+  test("a switch keeps an unidentifiable junction outside managed paths and updates the record", () => {
+    const root = makeConsumerRepo(false);
+    try {
+      expect(runInstall(root, "apply", ["-Hosts", "both", "-AgentHosts", "codex"]).exitCode).toBe(0);
+      const junction = placeForeignJunction(root, ".opencode/skills/user-foreign-skill");
+      const apply = runInstall(root, "apply", ["-Hosts", "none"]);
+      expect(apply.exitCode).toBe(0);
+      expect(readSelectedAgents(root)).toEqual(["codex"]);
+      expect(isJunction(junction)).toBe(true);
+      expect(runInstall(root, "check").exitCode).toBe(0);
+    } finally {
+      rmrf(root);
+    }
+  }, 300000);
 });

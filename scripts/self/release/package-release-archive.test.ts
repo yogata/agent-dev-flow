@@ -19,6 +19,7 @@
 //     explicit -AgentHosts selection (REQ-009-040).
 
 // ADF-COVERS(verification): REQ-099-020
+// ADF-COVERS(verification): REQ-099-042
 
 import { describe, expect, test } from "bun:test";
 import * as fs from "fs";
@@ -68,13 +69,15 @@ describe("package-release-archive canonical collection (REQ-099-020)", () => {
     expect(text).not.toContain('Join-Path $repoRoot "src\\opencode\\$kind"');
   });
 
-  test("new host connection areas are staged and the internal installer verification uses -AgentHosts both (REQ-009-040)", () => {
+  test("host connection areas (senpi/codex/antigravity) are staged and the internal installer verification uses -AgentHosts both (REQ-009-040, REQ-099-042)", () => {
     const text = fs.readFileSync(PACKAGE_ARCHIVE_PS1, "utf-8");
+    expect(text).toContain('Join-Path $repoRoot "src\\senpi"');
     expect(text).toContain('Join-Path $repoRoot "src\\codex"');
     expect(text).toContain('Join-Path $repoRoot "src\\antigravity"');
+    expect(text).toContain('@{ Name = "senpi"');
     expect(text).toContain('@{ Name = "codex"');
     expect(text).toContain('@{ Name = "antigravity"');
-    expect(text).toContain("-AgentHosts both");
+    expect(text).toContain('AgentHosts = "both"');
   });
 
   test("archive-bundled install guide documents the canonical bundled layout", () => {
@@ -101,6 +104,8 @@ describe("archive-edition installer places the canonical projection (REQ-099-020
       fs.writeFileSync(path.join(src, "common", "skills", "agentdev-x", "SKILL.md"), "# x\n", "utf-8");
       fs.writeFileSync(path.join(src, "common", "tools", "agentdev-testtool", "index.ts"), "// tool\n", "utf-8");
       fs.writeFileSync(path.join(src, "opencode", "plugins", "agentdev-testplugin", "plugin.ts"), "// plugin\n", "utf-8");
+      fs.mkdirSync(path.join(src, "senpi"), { recursive: true });
+      fs.writeFileSync(path.join(src, "senpi", "README.md"), "# senpi\n", "utf-8");
       const target = path.join(root, ".opencode");
       const r = runPwsh(
         ["-File", ARCHIVE_INSTALLER, "-Source", src, "-Target", target, "-Mode", "copy"],
@@ -141,25 +146,35 @@ describe("archive-edition installer places the canonical projection (REQ-099-020
       const src = path.join(root, "src");
       fs.mkdirSync(path.join(src, "common", "commands", "agentdev"), { recursive: true });
       fs.mkdirSync(path.join(src, "common", "skills", "agentdev-x"), { recursive: true });
+      fs.mkdirSync(path.join(src, "opencode", "plugins", "agentdev-testplugin"), { recursive: true });
       fs.writeFileSync(path.join(src, "common", "commands", "agentdev", "case-run.md"), "# case-run\n", "utf-8");
       fs.writeFileSync(path.join(src, "common", "skills", "agentdev-x", "SKILL.md"), "# x\n", "utf-8");
+      fs.writeFileSync(path.join(src, "opencode", "plugins", "agentdev-testplugin", "plugin.ts"), "// plugin\n", "utf-8");
+      fs.mkdirSync(path.join(src, "senpi"), { recursive: true });
+      fs.writeFileSync(path.join(src, "senpi", "README.md"), "# senpi\n", "utf-8");
+      fs.mkdirSync(path.join(src, "codex"), { recursive: true });
+      fs.writeFileSync(path.join(src, "codex", "README.md"), "# codex\n", "utf-8");
       const target = path.join(root, ".opencode");
 
-      // Omitted -AgentHosts: neither placement nor removal under .agents/.
+      // Omitted -AgentHosts on a fresh target: the agent-side subtree stays
+      // unplaced (no .agents/skills) while the Senpi connection copy still
+      // lands under .agents/agentdev/.
       const plain = runPwsh(["-File", ARCHIVE_INSTALLER, "-Source", src, "-Target", target, "-Mode", "copy"], root);
       expect(plain.exitCode).toBe(0);
-      expect(fs.existsSync(path.join(root, ".agents"))).toBe(false);
+      expect(fs.existsSync(path.join(root, ".agents", "skills"))).toBe(false);
+      expect(fs.existsSync(path.join(root, ".agents", "agentdev", "senpi", "README.md"))).toBe(true);
 
       // Explicit selection: junction-free real-file copies under .agents/skills/.
       const placed = runPwsh(["-File", ARCHIVE_INSTALLER, "-Source", src, "-Target", target, "-Mode", "copy", "-AgentHosts", "codex"], root);
       expect(placed.exitCode).toBe(0);
       const entry = path.join(root, ".agents", "skills", "agentdev-x", "SKILL.md");
       expect(fs.existsSync(entry)).toBe(true);
+      expect(fs.existsSync(path.join(root, ".agents", "agentdev", "codex", "README.md"))).toBe(true);
 
-      // Explicit deselect: stale agentdev-* copies are removed.
+      // Explicit deselect: stale agent-side copies are removed.
       const removed = runPwsh(["-File", ARCHIVE_INSTALLER, "-Source", src, "-Target", target, "-Mode", "copy", "-AgentHosts", "none"], root);
       expect(removed.exitCode).toBe(0);
-      expect(removed.stdout).toContain("removed stale agent entry skill: .agents/skills/agentdev-x");
+      expect(removed.stdout).toContain("removed agent-owned copies, root 'agent-skills'");
       expect(fs.existsSync(path.join(root, ".agents", "skills", "agentdev-x"))).toBe(false);
     } finally {
       rmrf(root);

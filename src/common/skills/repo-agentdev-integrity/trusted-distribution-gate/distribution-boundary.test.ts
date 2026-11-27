@@ -13,6 +13,8 @@
  * text/binary/unknown tri-state where unknown fails closed.
  */
 
+// ADF-COVERS(verification): REQ-002-007
+
 import { expect, test, describe } from "bun:test";
 import {
   classifyLine,
@@ -1663,6 +1665,46 @@ describe("distribution-boundary-fs junction / symlink traversal (REQ-029-006)", 
         const listing = collectTargets(root, projection).textFiles
           .map((f) => f.replace(/\\/g, "/"));
         expect(listing.some((f) => f.includes("/.agents/"))).toBe(false);
+      }
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test("installed projections enumerate the Senpi projection and installed connection copies (REQ-099-042)", () => {
+    const root = makeTempRepo();
+    try {
+      const senpiEntryDir = path.join(root, ".senpi", "skills", "agentdev-demo-entry");
+      fs.mkdirSync(senpiEntryDir, { recursive: true });
+      fs.writeFileSync(path.join(senpiEntryDir, "SKILL.md"), "---\nname: demo\n---\n", "utf-8");
+      const senpiConnDir = path.join(root, ".agents", "agentdev", "senpi", "skill-discovery");
+      fs.mkdirSync(senpiConnDir, { recursive: true });
+      fs.writeFileSync(path.join(senpiConnDir, "senpi-skill-discovery.ts"), "export {};\n", "utf-8");
+      const connDir = path.join(root, ".agents", "agentdev", "codex", "commands", "agentdev");
+      fs.mkdirSync(connDir, { recursive: true });
+      fs.writeFileSync(path.join(connDir, "req-define.md"), "# req-define\n", "utf-8");
+
+      for (const projection of ["link", "archive-installed"] as const) {
+        const listing = collectTargets(root, projection).textFiles
+          .map((f) => f.replace(/\\/g, "/"));
+        expect(
+          listing.some((f) => f.endsWith(".senpi/skills/agentdev-demo-entry/SKILL.md")),
+        ).toBe(true);
+        expect(
+          listing.some((f) =>
+            f.endsWith(".agents/agentdev/senpi/skill-discovery/senpi-skill-discovery.ts"),
+          ),
+        ).toBe(true);
+        expect(
+          listing.some((f) => f.endsWith(".agents/agentdev/codex/commands/agentdev/req-define.md")),
+        ).toBe(true);
+      }
+      for (const projection of ["source", "archive"] as const) {
+        const listing = collectTargets(root, projection).textFiles
+          .map((f) => f.replace(/\\/g, "/"));
+        expect(
+          listing.some((f) => f.includes("/.senpi/") || f.includes("/.agents/agentdev/")),
+        ).toBe(false);
       }
     } finally {
       fs.rmSync(root, { recursive: true, force: true });

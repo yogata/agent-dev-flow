@@ -85,6 +85,17 @@ if(fs.existsSync(flag)){console.error("forced-fail "+profile);process.exit(1);}
 process.exit(0);
 `;
 
+// Stub selection-aware installed projection checker (same invocation
+// contract as the real check_installed_projection.ts: --root/--source/--json).
+// Deterministic failure hook: exits 1 when the checked root carries a
+// .fail-installed-projection flag file.
+const STUB_INSTALLED_CHECKER_TS = `const a=process.argv.slice(2);
+let root=".";
+for(let i=0;i<a.length;i++){if(a[i]==="--root"){root=a[i+1];i++;}}
+if(require("fs").existsSync(require("path").join(root,".fail-installed-projection"))){console.error("forced-fail installed-projection");process.exit(1);}
+process.exit(0);
+`;
+
 interface RunResult {
   exitCode: number;
   stdout: string;
@@ -98,7 +109,7 @@ interface RepoPaths {
   scriptPath: string;
   /** <root>/scripts/consumer/archive/install.ps1 (real copy by default). */
   installerPath: string;
-  /** <root>/.opencode/skills/repo-agentdev-integrity/scripts/check_distribution_boundary.ts */
+  /** <root>/.opencode/skills/repo-agentdev-integrity/trusted-distribution-gate/check_distribution_boundary.ts */
   checkerPath: string;
   /** <root>/src/common/commands/agentdev */
   commandsDir: string;
@@ -129,7 +140,7 @@ function makeFakeRepo(): RepoPaths {
   fs.mkdirSync(path.join(root, "scripts", "consumer", "archive"), { recursive: true });
   fs.mkdirSync(path.join(root, "src", "common", "commands", "agentdev"), { recursive: true });
   fs.mkdirSync(path.join(root, "src", "common", "skills"), { recursive: true });
-  fs.mkdirSync(path.join(root, ".opencode", "skills", "repo-agentdev-integrity", "scripts"), { recursive: true });
+  fs.mkdirSync(path.join(root, ".opencode", "skills", "repo-agentdev-integrity", "trusted-distribution-gate"), { recursive: true });
 
   fs.writeFileSync(path.join(root, "src", "common", "commands", "agentdev", "probe-cmd.md"), "# probe command\n");
   fs.mkdirSync(path.join(root, "src", "common", "skills", "agentdev-probe"), { recursive: true });
@@ -144,14 +155,22 @@ function makeFakeRepo(): RepoPaths {
   fs.writeFileSync(path.join(root, "src", "codex", "README.md"), "# probe codex connection area\n");
   fs.mkdirSync(path.join(root, "src", "antigravity"), { recursive: true });
   fs.writeFileSync(path.join(root, "src", "antigravity", "README.md"), "# probe antigravity connection area\n");
+  fs.mkdirSync(path.join(root, "src", "senpi"), { recursive: true });
+  fs.writeFileSync(path.join(root, "src", "senpi", "README.md"), "# probe senpi connection area\n");
+  fs.mkdirSync(path.join(root, "src", "opencode", "plugins", "agentdev-probe-host-plugin"), { recursive: true });
+  fs.writeFileSync(path.join(root, "src", "opencode", "plugins", "agentdev-probe-host-plugin", "plugin.ts"), "// probe host plugin\n");
 
   fs.copyFileSync(REAL_SCRIPT, path.join(root, "scripts", "self", "release", "package-release-archive.ps1"));
   fs.copyFileSync(REAL_INSTALLER, path.join(root, "scripts", "consumer", "archive", "install.ps1"));
   fs.copyFileSync(REAL_PUBLISHER, path.join(root, "scripts", "self", "release", "publish-hard-link.ts"));
   fs.copyFileSync(CANON_PS1, path.join(root, "scripts", "consumer", "distribution-exclusion.ps1"));
   fs.writeFileSync(
-    path.join(root, ".opencode", "skills", "repo-agentdev-integrity", "scripts", "check_distribution_boundary.ts"),
+    path.join(root, ".opencode", "skills", "repo-agentdev-integrity", "trusted-distribution-gate", "check_distribution_boundary.ts"),
     STUB_CHECKER_TS,
+  );
+  fs.writeFileSync(
+    path.join(root, ".opencode", "skills", "repo-agentdev-integrity", "trusted-distribution-gate", "check_installed_projection.ts"),
+    STUB_INSTALLED_CHECKER_TS,
   );
 
   execFileSync("git", ["init", "-q"], { cwd: root, env: gitEnv() });
@@ -168,7 +187,7 @@ function makeFakeRepo(): RepoPaths {
     root,
     scriptPath: path.join(root, "scripts", "self", "release", "package-release-archive.ps1"),
     installerPath: path.join(root, "scripts", "consumer", "archive", "install.ps1"),
-    checkerPath: path.join(root, ".opencode", "skills", "repo-agentdev-integrity", "scripts", "check_distribution_boundary.ts"),
+    checkerPath: path.join(root, ".opencode", "skills", "repo-agentdev-integrity", "trusted-distribution-gate", "check_distribution_boundary.ts"),
     commandsDir: path.join(root, "src", "common", "commands", "agentdev"),
     skillsDir: path.join(root, "src", "common", "skills"),
     readmePath: path.join(root, "README-INSTALL.md"),
@@ -481,20 +500,17 @@ describe("package-release-archive.ps1 / archive-installed boundary failure", () 
   test("leaves no newly published ZIP and no staging residue (exit 7)", () => {
     const repo = makeFakeRepo();
     try {
-      // The archive and archive-installed projections scan the same content
-      // shape, so the only way to fail archive-installed WITHOUT first
-      // failing archive is for the installer to inject a violation post-stage.
-      // The marker is assembled at runtime so the staged installer source
-      // does not itself contain the literal VIOLATION-MARKER-REQ-9999 string
-      // (which would trip the archive check on the staged copy). The injection
-      // must be placed BEFORE the installer's trailing `exit 0` or it never
-      // runs.
+      // The installed-side validation is the selection-aware installed
+      // projection checker (check_installed_projection.ts), not a marker
+      // scan of the installed tree. Force its failure deterministically:
+      // patch the installer to drop a .fail-installed-projection flag at
+      // the install root before its trailing `exit 0`; the stub checker
+      // exits 1 when the flag exists, driving the script into the exit-7
+      // cleanup path.
       const realInstallerBody = fs.readFileSync(repo.installerPath, "utf-8");
       const injection =
-        `$injectDir = Join-Path $Target "skills\\agentdev-injected"\n` +
-        `New-Item -ItemType Directory -Path $injectDir -Force | Out-Null\n` +
-        `$m = "VIOLATION-" + "MARKER-" + "REQ-" + "9999"\n` +
-        `"$m injected by installer." | Out-File (Join-Path $injectDir "SKILL.md") -Encoding utf8\n`;
+        `$flagDir = $repoRootDir\n` +
+        `Set-Content -LiteralPath (Join-Path $flagDir ".fail-installed-projection") -Value "fail" -Encoding utf8\n`;
       const patched = realInstallerBody.replace(/^exit 0\b/m, `${injection}exit 0`);
       expect(patched).not.toEqual(realInstallerBody);
       fs.writeFileSync(repo.installerPath, patched);

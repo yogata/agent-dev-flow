@@ -39,10 +39,10 @@ function countFunctionDefs(text: string, name: string): number {
   return (text.match(new RegExp(`^function\\s+${name}\\b`, "gm")) ?? []).length;
 }
 
-// The 15 same-name judgment functions previously duplicated by the two
-// public entries, plus the entry-specific detection helpers that moved into
-// the shared module, plus the Codex / Antigravity agent-host selection and
-// shared-entry-projection judgment helpers (REQ-009-040).
+// The judgment functions unified in the shared module: the same-name
+// projection/stale judgment set, the entry-specific detection helpers, and
+// the 4-agent selection set resolution helpers (REQ-009-040,
+// REQ-099-036-040).
 const UNIFIED_FUNCTIONS = [
   "Test-Junction",
   "Get-JunctionTarget",
@@ -59,7 +59,12 @@ const UNIFIED_FUNCTIONS = [
   "Get-UnmanagedProjectionJunctionRels",
   "Resolve-AgentEntryTargetRel",
   "Test-HasAgentManagedProjection",
-  "Resolve-TargetAgentHosts",
+  "Expand-InstallAgentHostsArg",
+  "Get-AgentDevSourceDir",
+  "Get-AgentSelectionRecord",
+  "Resolve-AgentSelectionSet",
+  "Get-AgentSelectionDisplay",
+  "Get-DetectedAgentDevSelection",
   "Get-StaleManagedAgentJunctions",
   "Get-UnmanagedAgentProjectionJunctionRels",
   "New-PluginLoaderShimContent",
@@ -229,38 +234,53 @@ describe("shared judgment module / judgment equality across entry configurations
     expect(report.unmanagedBogusEqual).toBe(true);
   });
 
-  test("Resolve-TargetAgentHosts resolves explicit selection, record maintenance, and the new-install default (REQ-009-040)", () => {
+  test("Resolve-AgentSelectionSet resolves explicit selection, record maintenance, legacy fallback, and fail-closed stops (REQ-009-040, REQ-099-036, REQ-099-037, REQ-099-040)", () => {
     const script = [
       `$ErrorActionPreference='Stop'`,
       `. '${SHARED_MODULE_PS1.replace(/\\/g, "/")}'`,
-      `$explicitBoth = @((Resolve-TargetAgentHosts -ExplicitAgentHosts 'both')) -join ','`,
-      `$explicitCodex = @((Resolve-TargetAgentHosts -ExplicitAgentHosts 'codex')) -join ','`,
-      `$explicitAntigravity = @((Resolve-TargetAgentHosts -ExplicitAgentHosts 'antigravity')) -join ','`,
-      `$explicitNone = @((Resolve-TargetAgentHosts -ExplicitAgentHosts 'none')) -join ','`,
-      `$withRecord = [pscustomobject]@{ agentHosts = @('codex') }`,
-      `$maintained = @((Resolve-TargetAgentHosts -InstallState $withRecord)) -join ','`,
-      `$noAgentRecord = [pscustomobject]@{ distributionVersion = '1.0.0' }`,
-      `$noRecord = @((Resolve-TargetAgentHosts -InstallState $noAgentRecord)) -join ','`,
-      `$newInstall = @((Resolve-TargetAgentHosts)) -join ','`,
+      `$r1 = Resolve-AgentSelectionSet -ExplicitHosts 'both' -ExplicitAgentHosts 'both'`,
+      `$r2 = Resolve-AgentSelectionSet -ExplicitAgentHosts 'codex'`,
+      `$r3 = Resolve-AgentSelectionSet -ExplicitAgentHosts 'none'`,
+      `$currentRecord = [pscustomobject]@{ selectedAgents = @('codex') }`,
+      `$r4 = Resolve-AgentSelectionSet -InstallState $currentRecord`,
+      `$legacyRecord = [pscustomobject]@{ agentHosts = @('antigravity') }`,
+      `$r5 = Resolve-AgentSelectionSet -InstallState $legacyRecord`,
+      `$legacyDetected = Resolve-AgentSelectionSet -InstallState $legacyRecord -DetectedHostsList @('senpi')`,
+      `$r6 = Resolve-AgentSelectionSet -InstallState ([pscustomobject]@{ distributionVersion = '1.0.0' })`,
+      `$r7 = Resolve-AgentSelectionSet -InstallState ([pscustomobject]@{ selectedAgents = @('bogus') })`,
+      `$r8 = Resolve-AgentSelectionSet -ExplicitHosts 'both' -ExplicitAgentHosts 'codex' -InstallState ([pscustomobject]@{ selectedAgents = @('bogus') })`,
+      `$r9 = Resolve-AgentSelectionSet -StateInvalid`,
+      `$r10 = Resolve-AgentSelectionSet -StateInvalid -ExplicitHosts 'opencode' -ExplicitAgentHosts 'codex'`,
+      `$r11 = Resolve-AgentSelectionSet -HasAgentEntryProjection`,
       `[pscustomobject]@{`,
-      `  explicitBoth = $explicitBoth`,
-      `  explicitCodex = $explicitCodex`,
-      `  explicitAntigravity = $explicitAntigravity`,
-      `  explicitNone = $explicitNone`,
-      `  maintained = $maintained`,
-      `  noRecord = $noRecord`,
-      `  newInstall = $newInstall`,
+      `  explicitAll = (@($r1.SelectedAgents) -join ',') + '|' + $r1.Resolved`,
+      `  explicitAgentCodexFresh = (@($r2.SelectedAgents) -join ',')`,
+      `  explicitAgentNoneFresh = (@($r3.SelectedAgents) -join ',')`,
+      `  recordCodex = (@($r4.SelectedAgents) -join ',') + '|' + $r4.OpenInherited`,
+      `  legacyAntigravityNoPlacementsDefaultAndGuidance = (@($r5.SelectedAgents) -join ',') + '|' + (@($r5.Guidance).Count -gt 0)`,
+      `  legacyAntigravityWithDetectedSenpiKeepsDetection = (@($legacyDetected.SelectedAgents) -join ',')`,
+      `  noRecordFresh = (@($r6.SelectedAgents) -join ',') + '|' + (@($r6.Guidance).Count -gt 0)`,
+      `  invalidRecordOmitted = $r7.Resolved`,
+      `  invalidRecordBothExplicit = (@($r8.SelectedAgents) -join ',')`,
+      `  stateInvalidOmitted = ('' + $r9.Resolved) + '|' + ($null -ne $r9.Stop)`,
+      `  stateInvalidBothExplicit = (@($r10.SelectedAgents) -join ',')`,
+      `  ambiguousAgentEntry = ('' + $r11.Resolved) + '|' + ($r11.Stop -like '*-AgentHosts*')`,
       `} | ConvertTo-Json -Compress`,
     ].join("\n");
     const r = runPwshScript(script);
     expect(r.exitCode).toBe(0);
     const report = JSON.parse(r.stdout.trim());
-    expect(report.explicitBoth).toBe("codex,antigravity");
-    expect(report.explicitCodex).toBe("codex");
-    expect(report.explicitAntigravity).toBe("antigravity");
-    expect(report.explicitNone).toBe("");
-    expect(report.maintained).toBe("codex");
-    expect(report.noRecord).toBe("");
-    expect(report.newInstall).toBe("");
+    expect(report.explicitAll).toBe("opencode,senpi,codex,antigravity|True");
+    expect(report.explicitAgentCodexFresh).toBe("opencode,senpi,codex");
+    expect(report.explicitAgentNoneFresh).toBe("opencode,senpi");
+    expect(report.recordCodex).toBe("codex|True");
+    expect(report.legacyAntigravityNoPlacementsDefaultAndGuidance).toBe("opencode,senpi,antigravity|True");
+    expect(report.legacyAntigravityWithDetectedSenpiKeepsDetection).toBe("senpi,antigravity");
+    expect(report.noRecordFresh).toBe("opencode,senpi|True");
+    expect(report.invalidRecordOmitted).toBe(false);
+    expect(report.invalidRecordBothExplicit).toBe("opencode,senpi,codex");
+    expect(report.stateInvalidOmitted).toBe("False|True");
+    expect(report.stateInvalidBothExplicit).toBe("opencode,codex");
+    expect(report.ambiguousAgentEntry).toBe("False|True");
   });
 });

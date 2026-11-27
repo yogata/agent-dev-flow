@@ -42,6 +42,7 @@ implementation:
     - REQ-099-027
     - REQ-099-028
     - REQ-099-029
+    - REQ-099-043
   docs/reports/req-099-wave3-verification.md:
     - REQ-099-007
     - REQ-099-016

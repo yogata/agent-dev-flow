@@ -8,9 +8,13 @@
 // Binding contract:
 //   - Entry root: <workspaceRoot>/.senpi/skills/ is the Senpi public entry
 //     projection (the installer populates it from the canonical skills).
-//   - Canonical root: <repoRoot>/src/common/skills/ is the common canonical
-//     skills source. It is the fallback when the entry projection is absent
-//     (fresh workspace before install, worktree without propagated links).
+//   - Canonical root: the installed common copy
+//     <repoRoot>/.agents/agentdev/common/skills/ (release install placement,
+//     checkout junction) is preferred when present; <repoRoot>/src/common/
+//     skills/ is the fallback (source checkout without install). The
+//     canonical skills dir itself is the fallback when the entry projection
+//     is absent (fresh workspace before install, worktree without
+//     propagated links).
 //   - Workspace containment: every resolved skill root, bundled asset, and
 //     write target must resolve beneath the designated workspace root. The
 //     workspace root is passed in by the host runtime; it is never guessed.
@@ -18,6 +22,7 @@
 //     active worktree, consumer installs resolve it to the installed
 //     package). This module never walks up to find it.
 
+import * as fs from "node:fs";
 import * as path from "node:path";
 import {
   assertWithinWorkspace,
@@ -31,8 +36,11 @@ import {
 /** Senpi public entry skills dir, relative to the workspace root. */
 export const SENPI_ENTRY_SKILLS_DIR = ".senpi/skills";
 
-/** Common canonical skills dir, relative to the repo root. */
+/** Common canonical skills dir, relative to the repo root (source fallback). */
 export const SENPI_CANONICAL_SKILLS_DIR = "src/common/skills";
+
+/** Installed common canonical root, relative to the repo root. */
+export const SENPI_INSTALLED_COMMON_ROOT = ".agents/agentdev/common";
 
 /** Absolute Senpi public entry skills dir for the designated workspace. */
 export function senpiEntrySkillsDir(workspaceRoot: string): string {
@@ -41,6 +49,8 @@ export function senpiEntrySkillsDir(workspaceRoot: string): string {
 
 /** Absolute common canonical skills dir for the given repo root. */
 export function senpiCanonicalSkillsDir(repoRoot: string): string {
+  const installed = path.join(repoRoot, SENPI_INSTALLED_COMMON_ROOT, "skills");
+  if (fs.existsSync(installed)) return installed;
   return path.join(repoRoot, SENPI_CANONICAL_SKILLS_DIR);
 }
 

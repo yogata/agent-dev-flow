@@ -15,7 +15,7 @@ AgentDevFlow は共通原本とホスト別接続領域に分かれる。
 | Codex 接続 | `src/codex/` | Codex 用 Skill 探索接続、入口構成、文書管理の接続指示 |
 | Antigravity 接続 | `src/antigravity/` | Antigravity 用 Skill 探索接続、入口構成、文書管理の接続指示 |
 
-導入時の投影は installer が行う。OpenCode 配置対象では `.opencode/` 配下の commands、skills、tools、plugins が共通原本へのジャンクションになる。Senpi 配置対象では `.senpi/` 直下へ `src/senpi/` 配下の各サブディレクトリが個別ジャンクションとして投影される。Codex・Antigravity 配置対象（`-AgentHosts` による明示選択）では共有入口 root `.agents/skills/` へ共通原本の `agentdev-*` スキルがジャンクションとして投影される。投影の選択と切替手順は [Consumer Project 導入](consumer-project-setup.md) を参照する。
+導入時の投影は installer が行う。OpenCode 配置対象では `.opencode/` 配下の commands、skills、tools、plugins が共通原本へのジャンクションになる。Senpi 配置対象では、共通原本の `agentdev-*` スキルが Senpi 公開入口 `.senpi/skills/` へ個別ジャンクションとして投影され、あわせて接続投影として `.agents/agentdev/common`（共通原本全体）と `.agents/agentdev/senpi`（Senpi 接続領域全体）が配置される。Codex・Antigravity 配置対象（`-AgentHosts` による明示選択）では、共有入口 root `.agents/skills/` へ共通原本の `agentdev-*` スキルがジャンクションとして投影され、あわせて接続投影として `.agents/agentdev/common` と各ホスト接続領域全体（`.agents/agentdev/codex`、`.agents/agentdev/antigravity`）が配置される。投影の選択と切替手順は [Consumer Project 導入](consumer-project-setup.md) を参照する。
 
 両ホストの公開入口は同じ共通原本を参照する。ホスト別の業務手順のコピーは存在せず、共通原本への編集が両ホストへ反映される。
 

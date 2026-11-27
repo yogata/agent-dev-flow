@@ -11,8 +11,8 @@ AgentDevFlow は5種のリポジトリ種別を定義する（詳細は Design [
 
 | 種別 | 説明 | `.opencode/` の意味 | 例 |
 |------|------|---------------------|-----|
-| **本体リポジトリ**（self-hosting） | AgentDevFlow 本体開発リポジトリ。原本と配置先が同一リポジトリに存在 | `.opencode/` = 実行時の配置先（共通原本 `src/common/` と OpenCode 接続領域 `src/opencode/` へのジャンクション投影）。明示指定時は Senpi 接続領域 `src/senpi/` を `.senpi/` へ投影可能 | agent-dev-flow |
-| **consumer-with-agentdev** | AgentDevFlow を導入する製品リポジトリ。AgentDevFlow 提供 skill/command を利用 | `.opencode/` = プロジェクト独自設定の入口 + AgentDevFlow 提供 command/skill の実行時の位置。配置対象ホスト（OpenCode / Senpi / 両方）を選択でき、Senpi 選択時は `.senpi/` にも投影される | 各種製品開発リポジトリ |
+| **本体リポジトリ**（self-hosting） | AgentDevFlow 本体開発リポジトリ。原本と配置先が同一リポジトリに存在 | `.opencode/` = 実行時の配置先（共通原本 `src/common/` と OpenCode 接続領域 `src/opencode/` へのジャンクション投影）。明示指定時は Senpi 公開入口 `.senpi/skills/` と `.agents/agentdev/` 接続投影を含められる | agent-dev-flow |
+| **consumer-with-agentdev** | AgentDevFlow を導入する製品リポジトリ。AgentDevFlow 提供 skill/command を利用 | `.opencode/` = プロジェクト独自設定の入口 + AgentDevFlow 提供 command/skill の実行時の位置。配置対象ホスト（OpenCode / Senpi / 両方）を選択でき、Senpi 選択時は `.senpi/skills/` と `.agents/agentdev/` にも投影される | 各種製品開発リポジトリ |
 | **consumer-local** | AgentDevFlow を利用しない OpenCode プロジェクト。独自 command/skill のみ | `.opencode/` = プロジェクト独自設定専用。`agentdev` 名前空間は使用しない | 実験的リポジトリ |
 | **consumer-generated** | ローカル版 OpenCode を導入する利用側リポジトリ。GitHub Issue/PR を使わない個人利用環境向け | `.opencode/` = link mode により接続された AgentDevFlow 実行時の位置。Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）だけ `src/common/tools/agentdev-gh/local/` から差し替え | 個人利用環境のローカルリポジトリ |
 | **plugin-future** | 将来の plugin/npm/package 配布形態（現在は未対応） | `.opencode/` = plugin が管理する実行時の位置 | （将来） |
@@ -29,7 +29,7 @@ AgentDevFlow は5種のリポジトリ種別を定義する（詳細は Design [
   plugins/agentdev-*/ → ジャンクション → src/opencode/plugins/agentdev-*/
 src/common/          → 共通原本（host 非依存の業務契約・本文、template、Tool engine、guard 共通判定）
 src/opencode/        → OpenCode 接続領域の原本（plugin/hook 原本）
-src/senpi/           → Senpi 接続領域の原本（配置契約。明示指定時に .senpi/ へ投影）
+src/senpi/           → Senpi 接続領域の原本（配置契約。明示指定時に .senpi/skills/ と .agents/agentdev/senpi へ投影）
 src/codex/           → Codex 接続領域の原本（限定配布。リリースアーカイブに同梱、self-sync の投影対象外）
 src/antigravity/     → Antigravity 接続領域の原本（限定配布。リリースアーカイブに同梱、self-sync の投影対象外）
 scripts/
@@ -38,7 +38,7 @@ scripts/
 
 - 共通原本・原本の編集は `src/common/` と `src/opencode/` で行う
 - `.opencode/` は ジャンクション/symlink による実行時の配置先
-- `scripts/self-sync.ps1` で原本↔配置先の同期を管理する（`-Hosts` 未指定時は現在の配置対象を維持。明示指定時のみ Senpi 投影を含められる）
+- `scripts/self-sync.ps1` で原本↔配置先の同期を管理する（`-Hosts` 未指定時は現在の配置対象を維持。明示指定時のみ Senpi 投影（.senpi/skills/ と .agents/agentdev/）を含められる）
 
 ### 適用プロジェクト（consumer-with-agentdev）
 
@@ -56,8 +56,11 @@ scripts/
   commands/{local}/               → プロジェクト独自コマンド（実ディレクトリ）
   skills/agentdev-*/              → ジャンクション → .agentdev-plugin/src/common/skills/agentdev-*/
   skills/{local}-*/               → プロジェクト独自スキル（実ディレクトリ）
-.senpi/                           → Senpi 配置対象選択時のみ作成。.agentdev-plugin/src/senpi/ 配下の
-                                     各サブディレクトリへの個別ジャンクション投影
+.senpi/skills/agentdev-*/          → Senpi 配置対象選択時のみ作成。.agentdev-plugin/src/common/skills/agentdev-* への
+                                      個別ジャンクション投影（Senpi 公開入口）
+.agents/agentdev/common            → Senpi・Codex・Antigravity 配置対象選択時に作成。共通原本全体へのジャンクション
+                                      （Senpi 接続モジュールは相対パスで兄弟の common/ を参照する）
+.agents/agentdev/{senpi,codex,antigravity}/ → 選択されたホストの接続領域全体へのジャンクション
 .agents/skills/agentdev-*/        → Codex・Antigravity 配置対象選択時（-AgentHosts codex / antigravity /
                                      both）のみ作成。.agentdev-plugin/src/common/skills/agentdev-* への
                                      ジャンクション投影（両ホスト共通の共有入口 root）
@@ -67,7 +70,7 @@ scripts/
 - `.agentdev/` は AgentDevFlow のドメイン状態用（Intake, Learning, Backlog 等）として予約
 - `.opencode/` は AgentDevFlow 提供 command/skill とプロジェクト独自設定の混在場所
 - 配置対象ホスト（OpenCode のみ / Senpi のみ / 両方）は `install.ps1 -Hosts` または対話ウィザードで選択する。`-Hosts` 未指定の更新では現在の配置対象が維持され、明示指定時のみ変更される（REQ-099-010）。ホスト別の投影（`.opencode/` と `.senpi/`）は管理範囲が分離され、片方の更新・除去は他方を壊さない（REQ-099-012）
-- Codex・Antigravity は `-AgentHosts`（`codex` / `antigravity` / `both` / `none`）またはウィザードの選択で導入先リポジトリ単位で選択する。新規導入で選択しなければ配置されず、既存導入で省略した場合は現在の配置が維持され、明示指定でのみ変更・解除される。投影先は両ホスト共通の共有入口 root `.agents/skills/` であり、OpenCode・Senpi の投影（`.opencode/`、`.senpi/`）とは管理範囲が分離される（REQ-099-012）
+- Codex・Antigravity は `-AgentHosts`（`codex` / `antigravity` / `both` / `none`）またはウィザードの選択で導入先リポジトリ単位で選択する。新規導入で選択しなければ配置されず、既存導入で省略した場合は現在の配置が維持され、明示指定でのみ変更・解除される。投影先は両ホスト共通の共有入口 root `.agents/skills/` と接続投影 `.agents/agentdev/codex` / `.agents/agentdev/antigravity` である。`.agents/agentdev/common` は Senpi 選択時にも配置され（Senpi 接続モジュールの共通ライブラリ参照先）、入口投影（`.agents/skills/`）と接続投影（`.agents/agentdev/`）は管理範囲が分離される（REQ-099-012）
 - AgentDevFlow 提供ファイルは ジャンクション（更新時にチェックアウトを更新すれば自動反映）
 - プロジェクト独自ファイルは直接管理する
 
@@ -216,8 +219,8 @@ git clone https://github.com/yogata/agent-dev-flow.git .agentdev-plugin
 | 選択 | 投影先 | 使い分け |
 |------|--------|----------|
 | `opencode` | `.opencode/` | OpenCode のみを利用する環境 |
-| `senpi` | `.senpi/` | Senpi（OmO Native v5）のみを利用する環境 |
-| `both` | `.opencode/` + `.senpi/` | 過渡期に両ホストへ配置する環境。新規導入の推奨 |
+| `senpi` | `.senpi/skills/` + `.agents/agentdev/` | Senpi（OmO Native v5）のみを利用する環境 |
+| `both` | `.opencode/` + `.senpi/skills/` + `.agents/agentdev/` | 過渡期に両ホストへ配置する環境。新規導入の推奨 |
 
 - `-Hosts` を省略した場合、現在の配置対象を配置先の状態から検出して維持する。検出不能（新規導入）は `both` となる
 - 明示指定（パラメータまたはウィザード選択）した場合のみ配置対象が変更される。選択から外れたホストの ADF 管理投影物は apply で除去対象として報告され、check / dry-run で予測報告される
@@ -315,7 +318,7 @@ scripts/ 直下の公開入口は consumer 向け `scripts/install.ps1` と self
 
 | スクリプト | 対象リポジトリ種別 | 役割 |
 |--------|---------------|------|
-| `scripts/self-sync.ps1` | `self-hosting` | `src/common/` + `src/opencode/` → `.opencode/` の同期（apply / check / dry-run）。`-Hosts` 明示指定時は `src/senpi/` → `.senpi/` 投影を含められる（REQ-099-010）。省略時は現在の配置対象を維持 |
+| `scripts/self-sync.ps1` | `self-hosting` | `src/common/` + `src/opencode/` → `.opencode/` の同期（apply / check / dry-run）。`-Hosts` 明示指定時は Senpi 入口投影（`.senpi/skills/`）と `.agents/agentdev/` 接続投影を含められる（REQ-099-010）。省略時は現在の配置対象を維持 |
 | `scripts/install.ps1` | `consumer-with-agentdev`, `consumer-generated` | チェックアウト済み `.agentdev-plugin/` を前提としたジャンクション作成（apply / check / dry-run）。配置対象ホスト（OpenCode のみ / Senpi のみ / 両方）と新ホスト選択（`-AgentHosts`: codex / antigravity / both / none）の選択を含む。check は状態確認（link mode 自動検出、版報告は `.git` 存在時のみ、orphan 検出、実行環境診断を含む）を兼ねる |
 | （link 設定: `-LocalMode`） | `consumer-generated` | `install.ps1 -Mode apply -LocalMode` が Custom Tool `agentdev_gh` の実行ディレクトリ（`.opencode/tools/agentdev-gh/`）のみ `src/common/tools/agentdev-gh/local/` へ接続し、それ以外を原本（`src/common/` 配下 + `src/opencode/plugins/`）へ接続する（REQ-011-006）。決定的な変換ロジックを実装したスクリプトは使用しない |
 
@@ -325,7 +328,7 @@ scripts/ 直下の公開入口は consumer 向け `scripts/install.ps1` と self
 ./scripts/self-sync.ps1 -Mode apply   # src/common/ + src/opencode/ → .opencode/ 同期（現在の配置対象を維持）
 ./scripts/self-sync.ps1 -Mode check   # 乖離の検出（実行環境診断を含む）
 ./scripts/self-sync.ps1 -Mode dry-run # 変更予測
-./scripts/self-sync.ps1 -Mode apply -Hosts both   # Senpi 接続領域（src/senpi/ → .senpi/）を含めて同期
+./scripts/self-sync.ps1 -Mode apply -Hosts both   # Senpi 入口投影（.senpi/skills/）と .agents/agentdev/ 接続投影を含めて同期
 ```
 
 本体リポジトリでの Senpi 投影は明示指定時のみ作成される自己ホスト構成であり、対応済みの検証済み組合せ宣言を伴わない（REQ-099-011）。
@@ -368,7 +371,9 @@ scripts/ 直下の公開入口は consumer 向け `scripts/install.ps1` と self
 .opencode/plugins/agentdev-*/
 .opencode/plugins/agentdev-*.ts
 # Senpi 配置対象選択時（-Hosts senpi / both）の投影先
-.senpi/
+.senpi/skills/
+# Senpi / Codex / Antigravity 配置対象選択時の接続投影先
+.agents/agentdev/
 # Codex / Antigravity 配置対象選択時（-AgentHosts codex / antigravity / both）の投影先
 .agents/skills/agentdev-*/
 ```
@@ -384,18 +389,18 @@ Custom Tool（`.opencode/tools/agentdev-*/`）と Plugin / Hook（`.opencode/plu
 ### 新規適用プロジェクトの導入手順
 
 1. `.agentdev-plugin/` に agent-dev-flow のチェックアウトを用意する（git clone またはソース ZIP 展開）
-2. `./.agentdev-plugin/scripts/install.ps1 -Mode apply` を実行（対話ウィザードで配置対象ホストを問われる。新規導入では両ホストが推奨。省略時も `both` が適用される）
+2. `./.agentdev-plugin/scripts/install.ps1 -Mode apply` を実行（対話ウィザードで OpenCode / Senpi / Codex / Antigravity の配置対象を選択する。新規導入では OpenCode と Senpi が推奨。省略時もその組合せが適用される）
 3. GitHub repo 設定 `deleteBranchOnMerge=true` を設定し、確認コマンドで `true` を確認する（上記「GitHub repo 設定 deleteBranchOnMerge（必須導入条件）」参照。設定が無効・照会不能の場合も Case 開始は停止しないが、リモートブランチの自動削除が機能しない・確認できない運用上の帰結は同節に記載する）
 4. `./.agentdev-plugin/scripts/install.ps1 -Mode check` で動作確認（配置検査と実行環境診断が区別されて報告される）
 5. `.agentdev/` ディレクトリが存在することを確認（Intake/Learning 用）
-6. `.gitignore` に推奨エントリを追加（Senpi 選択時は `.senpi/` を、Codex・Antigravity 選択時は `.agents/skills/agentdev-*/` を含める）
+6. `.gitignore` に推奨エントリを追加（Senpi 選択時は `.senpi/skills/` と `.agents/agentdev/` を、Codex・Antigravity 選択時は `.agents/skills/agentdev-*/` を含める）
 
 ### 既存プロジェクトへの導入手順
 
 1. 既存の `.opencode/` 内容を確認
 2. `agentdev` 名前空間との衝突がないことを確認
 3. `.agentdev-plugin/` に agent-dev-flow のチェックアウトを用意する（git clone またはソース ZIP 展開）
-4. `./.agentdev-plugin/scripts/install.ps1 -Mode apply` でインストール（`-Hosts` 省略時は検出結果に従い、既存配置がなければ両ホスト）
+4. `./.agentdev-plugin/scripts/install.ps1 -Mode apply` でインストール（`-Hosts` / `-AgentHosts` 省略時は検出結果と選択記録に従い、既存配置がなければ OpenCode と Senpi）
 5. `./.agentdev-plugin/scripts/install.ps1 -Mode check` で整合性確認
 6. `.gitignore` を更新
 
