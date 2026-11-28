@@ -1,7 +1,7 @@
 # マルチホスト運用ガイド（OpenCode と Senpi の併存利用、Codex と Antigravity の限定配布）
 
-OpenCode と Senpi（OmO Native v5）を併存利用するための運用手順に加え、Codex と Antigravity の限定配布についても案内するガイドである。
-構造の正はマルチホスト原本モデル Design（[マルチホスト原本モデル](../designs/foundations/multi-host-canonical-model.md)）、意思決定の正は [DEC-049](../decisions/DEC-049.md)、Codex と Antigravity の限定配布の意思決定は [DEC-069](../decisions/DEC-069.md)、成果の正は [REQ-099](../requirements/REQ-099.md) とする。本ガイドは基準を複製せず、手順と判断材料へ導く。
+OpenCode と Senpi（OmO Native v5）を併存利用するための運用手順に加え、Codex と Antigravity の限定配布と GitHub 操作の接続についても案内するガイドである。
+構造の正はマルチホスト原本モデル Design（[マルチホスト原本モデル](../designs/foundations/multi-host-canonical-model.md)）、意思決定の正は [DEC-049](../decisions/DEC-049.md)、Codex と Antigravity の限定配布の意思決定は [DEC-069](../decisions/DEC-069.md)、新ホストの GitHub 接続と gh 経路切替の意思決定は [DEC-071](../decisions/DEC-071.md)、成果の正は [REQ-099](../requirements/REQ-099.md) とする。本ガイドは基準を複製せず、手順と判断材料へ導く。
 
 ## 構造の全体像
 
@@ -12,8 +12,8 @@ AgentDevFlow は共通原本とホスト別接続領域に分かれる。
 | 共通原本 | `src/common/` | 業務契約・本文（commands、skills）、template、Tool engine、guard 共通判定 |
 | OpenCode 接続 | `src/opencode/` | OpenCode 用 plugin/hook の原本、Tool 登録配線、guard 接続 |
 | Senpi 接続 | `src/senpi/` | Senpi 用 Tool 登録単位、Skill 探索接続、guard 接続 |
-| Codex 接続 | `src/codex/` | Codex 用 Skill 探索接続、入口構成、文書管理の接続指示 |
-| Antigravity 接続 | `src/antigravity/` | Antigravity 用 Skill 探索接続、入口構成、文書管理の接続指示 |
+| Codex 接続 | `src/codex/` | Codex 用 Skill 探索接続、GitHub 接続 adapter、入口構成、文書管理の接続指示 |
+| Antigravity 接続 | `src/antigravity/` | Antigravity 用 Skill 探索接続、GitHub 接続 adapter、入口構成、文書管理の接続指示 |
 
 導入時の投影は installer が行う。OpenCode 配置対象では `.opencode/` 配下の commands、skills、tools、plugins が共通原本へのジャンクションになる。Senpi 配置対象では、共通原本の `agentdev-*` スキルが Senpi 公開入口 `.senpi/skills/` へ個別ジャンクションとして投影され、あわせて接続投影として `.agents/agentdev/common`（共通原本全体）と `.agents/agentdev/senpi`（Senpi 接続領域全体）が配置される。Codex・Antigravity 配置対象（`-AgentHosts` による明示選択）では、共有入口 root `.agents/skills/` へ共通原本の `agentdev-*` スキルがジャンクションとして投影され、あわせて接続投影として `.agents/agentdev/common` と各ホスト接続領域全体（`.agents/agentdev/codex`、`.agents/agentdev/antigravity`）が配置される。投影の選択と切替手順は [Consumer Project 導入](consumer-project-setup.md) を参照する。
 
@@ -30,11 +30,11 @@ Codex 接続と Antigravity 接続は限定配布である（DEC-069）。接続
 | ADF | Wave 2 接続実装を統合した main（2026-10-02 時点） | 各 Wave 2 PR の検証記録 |
 | OpenCode | OmO v4.19.4 を想定した接続（first-class reference harness） | 共通 resolver 契約テスト、installer projection テスト |
 | Senpi | OmO Native v5 を想定した接続 | senpi-skill-discovery 契約テスト、Senpi Tool 登録テスト、guard 接続テスト |
-| Codex | 限定配布（Skill 探索と入口構成のみ。Tool 登録・hook・guard・取得機構なし。installer は `-AgentHosts` による選択投影） | codex-skill-discovery 契約テスト、構造テスト、installer 選択投影の振る舞い試験（実機での組合せ検証なし） |
-| Antigravity | 限定配布（同上。公開情報に基づく静的検討） | antigravity-skill-discovery 契約テスト、構造テスト、installer 選択投影の振る舞い試験（実機での組合せ検証なし） |
+| Codex | 限定配布（Skill 探索と入口構成に加え GitHub 接続 adapter。Tool 登録・hook・guard・取得機構なし。installer は `-AgentHosts` による選択投影） | codex-skill-discovery 契約テスト、構造テスト、Codex GitHub 接続（mapping・transport・adapter）の契約テスト、installer 選択投影の振る舞い試験（実機での組合せ検証なし） |
+| Antigravity | 限定配布（同上。GitHub 接続は能力表が全操作未確認のため停止。実機確認は利用者） | antigravity-skill-discovery 契約テスト、構造テスト、Antigravity GitHub 接続 adapter の契約テスト、installer 選択投影の振る舞い試験（実機での組合せ検証なし） |
 | バックエンド | GitHub 実装とローカルIssue実現（操作契約は Custom Tool 操作契約に限定） | Tool engine の共通契約テスト |
 
-実ランタイムでの全組合せ試験の試験記録は Epic #3316 の統合検証（Issue #3324）を参照する。対象は REQ-099-007 の OpenCode×GitHub、OpenCode×ローカルIssue、Senpi×GitHub、Senpi×ローカルIssue である。配置の完了や契約テストの結果をもって、全組合せの実行対応済みと報告しない。Codex と Antigravity の GitHub 操作は、各ホスト既存の GitHub プラグインの能力を利用者が確認してから用いる（詳細は「Codex と Antigravity の限定配布」節）。
+実ランタイムでの全組合せ試験の試験記録は Epic #3316 の統合検証（Issue #3324）を参照する。対象は REQ-099-007 の OpenCode×GitHub、OpenCode×ローカルIssue、Senpi×GitHub、Senpi×ローカルIssue である。配置の完了や契約テストの結果をもって、全組合せの実行対応済みと報告しない。Codex と Antigravity の GitHub 操作は「Codex と Antigravity の限定配布」節のとおりホスト接続領域の adapter 経由で行い、実機での確認は利用者が行う。
 
 ## バックエンドとホストの選択
 
@@ -47,19 +47,19 @@ Codex 接続と Antigravity 接続は限定配布である（DEC-069）。接続
 
 ## Codex と Antigravity の限定配布
 
-Codex と Antigravity への対応は限定配布である（DEC-069）。取り込みの根拠と境界は次のとおりである。
+Codex と Antigravity への対応は限定配布である（DEC-069、GitHub 接続は DEC-071 が部分置換）。取り込みの根拠と境界は次のとおりである。
 
-- **取り込みの根拠**: ADF が補うのは共通原本への接続（Skill 探索、command 全文の適用）と品質の終了時確認に限定する。ホストが既に持つ能力（GitHub プラグイン等）を ADF で再実装しない
-- **移管しない機構**: Custom Tool 登録（`agentdev_gh`、`agentdev_third_party`）、hook、guard、third-party 取得機構の4機構は両ホストへ移管しない。MCP も実装しない
-- **GitHub 操作**: 各ホスト既存の GitHub プラグインの能力を利用者が確認してから用いる。Issue・PR・Release の作成と更新は OpenCode へ引き渡す（共通スキル `agentdev-host-github-guidance`）
-- **OpenCode の併用**: OpenCode を併用するのは GitHub 操作の引き渡しと終了時の品質ゲートの2つに限定する。それ以外の機能に OpenCode の併用を前提としない
+- **取り込みの根拠**: ADF が補うのは共通原本への接続（Skill 探索、command 全文の適用）、GitHub 操作の接続（agentdev_gh 操作契約の adapter 提供）、品質の終了時確認に限定する。ホストが既に持つ能力（GitHub プラグイン等）を ADF で再実装しない
+- **移管しない機構**: Custom Tool 登録（`agentdev_gh`、`agentdev_third_party`）、hook、guard、third-party 取得機構の4機構は両ホストへ移管しない。MCP サーバー化と ADF 独自の MCP 接続も行わない
+- **GitHub 操作**: ホスト接続領域の adapter が共通の agentdev_gh 操作契約（engine・読戻し照合・失敗の意味）を各ホストの GitHub プラグインへ接続して行う。操作契約を参照する上位の command と skill は OpenCode・Senpi と同じ参照先を使う
+- **OpenCode の併用**: 終了時の品質ゲートのために限定する。GitHub 操作の引き渡しを前提としない。それ以外の機能に OpenCode の併用を前提としない
 
 ### 能力比較
 
 | 項目 | OpenCode | Senpi | Codex・Antigravity |
 |---|---|---|---|
 | 公開入口 | `/agentdev/<業務名>` slash command | `agentdev-workflow-<業務名>` スキル | `agentdev-workflow-<業務名>` スキル |
-| Custom Tool（`agentdev_gh` 等） | 登録あり | 登録あり | 登録なし（ホスト既存 GitHub プラグインを利用者確認の上で使用） |
+| Custom Tool（`agentdev_gh` 等） | 登録あり | 登録あり | 登録なし（ホスト接続領域の adapter が同じ操作契約を提供） |
 | guard・hook | 接続あり | 接続あり | なし |
 | installer 投影・リリース同梱 | 対象 | 対象 | 限定（`-AgentHosts` 明示選択時に共有入口 root のみ投影。接続領域原本はリリースアーカイブに同梱） |
 
@@ -77,6 +77,40 @@ Codex と Antigravity への対応は限定配布である（DEC-069）。取り
 
 Codex の入口 root（`.agents/skills`）は Codex の公開文書（[Build skills](https://learn.chatgpt.com/docs/build-skills)）に基づく。Antigravity の入口 root（`.agents/skills`）は Antigravity の公開資料（[Agent skills](https://antigravity.google/docs/skills/)）が示す既定の root に基づく。Antigravity は公開情報に基づく静的検討であり、実機確認は行っていない。
 
+### GitHub 実行経路（Codex・Antigravity）
+
+Codex と Antigravity の GitHub 操作は、ホスト接続領域の adapter が共通の agentdev_gh 操作契約を提供する。adapter は導入先リポジトリのルートから bun で起動し、結果は stdout の JSON で返る（終了コードは成功 0 / 失敗 1）。操作前の承認と書込み後の読戻しは OpenCode と同じ規則で維持される。
+
+- **実行経路の解決**: `.agentdev/config/github-route.json`（キー `codex` / `antigravity`、値 `plugin` / `gh`）。記録のないホストはプラグイン経路である。設定が読めない・不正な場合は経路を推定せず GitHub 操作の前に停止する
+- **プラグイン経路（既定）**: 各ホストの GitHub プラグインに接続する。Codex の tool 面は GitHub の hosted MCP server である。プラグインが無効・未構成・操作非提供の場合は GitHub 操作を利用者の判断まで停止し、暗黙に gh 経路へ切り替えない
+- **gh 経路（切替後）**: 既存の gh 用 runner を使う。操作前に `gh repo view` で認証と権限を確認する。切替は利用者の明示判断によって `scripts/switch-github-route.ps1` でのみ行い、切替後の経路は再起動後も使われる
+- **結果が不明な操作をまたぐ再開**: 書込みの結果が不明になった場合は再実行せず、再開前に読み取り操作で GitHub の状態を照合して重複作成を防ぐ（一意なら継続、未実行なら実行、複数候補または照合不能なら停止して利用者の判断を求める）
+- **失敗の分類**: 失敗は adapter の欠陥（接続を修正して再検証）とプラグインの能力不足（停止と切替の判断対象）に分けて記録する
+
+停止と再開、切替の手順の詳細は共通案内スキル `agentdev-host-github-guidance` を参照する。
+
+#### プラグイン利用不能の観測可能性（ホスト別）
+
+adapter は接続のみを担い、ホスト側のプラグイン構成（登録・有効化・無効化）を管理しない。そのため利用不能の観測は adapter から見える接続面に限られ、ホスト側の管理状態そのものではない。
+
+| ホスト | adapter が観測できる利用不能 | ホスト側管理状態の観測 |
+|---|---|---|
+| Codex | トークン環境変数（`GITHUB_PAT_TOKEN`）未設定、接続先サーバーへの到達不能・認証拒否（HTTP 401/403/5xx、network error）、tool 面に必要な操作がない（コメント削除・Release 作成・Release 公開・search 軸） | adapter から直接観測できない。実ホストでの動作は利用者が確認する |
+| Antigravity | tool 面が公開情報で確認できないため、全操作が能力表の未確認停止として観測される | 能力表の確認と実機検証は利用者が行う |
+
+いずれの観測でも adapter は暗黙に gh 経路へ切り替えず、構造化失敗で停止する。
+
+#### GitHub 実行経路の実績記録
+
+新ホストの対応はホスト単位で判定し、実際に使用した GitHub 実行経路と実機検証の実施者と結果を本表に記録する。
+
+| ホスト | 実際に使用した経路 | 実機検証の実施者 | 実績 |
+|---|---|---|---|
+| Codex | プラグイン経路（GitHub hosted MCP server の tool 面への対応付け。リポジトリ操作の契約試験は 偽 transport で実施） | 未実施（利用者の確認待ち） | 契約試験合格（issue 更新の labels・一覧系を含む主要操作。search・コメント削除・Release 作成・Release 公開は tool 面の能力不足として停止を確認）。実ホストでのプラグイン接続は未確認 |
+| Antigravity | プラグイン経路（能力表が全操作未確認のため全操作が停止する設計） | 未実施（利用者の確認待ち） | 停止動作の契約試験合格。能力表の確認と実機検証は利用者が行う |
+
+gh 経路は切替後に利用できる。gh 経路の主要操作系列（読戻し検証を含む）は共通判定（four-combination 共通 helper）により両ホストの adapter で契約試験合格している。隔離検証環境（`yogata/adf-gh-isolated-verify`）では gh 経路の実走行（`issue_read`、`issue_create`、`comment_create`、`release_create` 草稿と `release_read` 読戻し、`issue_list` の search 軸）と経路切替後の再起動（別プロセスでの同一経路解決）を確認した。検索軸の結果反映に時間差があることを確認したため、再開前の照合では検索 0 件だけで未実行と確定せず、再照会または別の読み取りで交差確認する（共通案内スキルの再開規則）。
+
 ### 利用者が行う動作確認項目と期待結果
 
 | 確認項目 | 期待結果 |
@@ -84,13 +118,18 @@ Codex の入口 root（`.agents/skills`）は Codex の公開文書（[Build ski
 | 入口スキルの解決 | `agentdev-workflow-<業務名>` が各ホストの入口 root から解決できる |
 | command 本文の読込 | 業務名に対応する command 全文が読み込まれ、引数の意味が OpenCode・Senpi と同一である |
 | 書込先の拘束 | 共通原本領域外への書込が接続の判定で拒否される |
-| GitHub 操作の能力確認 | ホストの GitHub プラグイン能力が利用者により確認済みである。確認できない操作は blocked として報告される |
-| Issue/PR 作成の引き渡し | Issue・PR・Release の作成と更新が OpenCode 側で実行される |
+| GitHub 操作の実行 | adapter の起動（`bun .agents/agentdev/<ホスト>/github/agentdev-gh-adapter.ts --input request.json`）で GitHub 操作が共通の操作契約により実行され、構造化応答（JSON）が返る |
+| GitHub 操作の能力確認 | プラグイン経路で提供されない操作は構造化失敗で停止する（暗黙の経路切り替えなし）。Codex は実機での接続確認、Antigravity は能力表の確認と実機検証を利用者が行う |
 | 終了時の品質ゲート | 対象 worktree に対する最終検査（`gate.ts`）の終了コードが `0` である。違反がある場合は終了コード `1` となり、成功として扱われない |
 
 ### 終了時の品質ゲート
 
-両ホストには書込み前 hook を登録しない。そのため作業に使った worktree を閉じる前に、OpenCode 向けの最終検査（`gate.ts`）を対象 worktree に対して実行し、不合格のまま閉じない。
+両ホストには書込み前 hook を登録しない。終了時の品質ゲートは導入の選択に応じて区別する。
+
+- OpenCode を選択した導入では、作業に使った worktree を閉じる前に OpenCode 向けの最終検査（`gate.ts`）を対象 worktree に対して実行し、不合格のまま閉じない
+- OpenCode を選択していない導入では、OpenCode 用 plugin に依存する検査（`gate.ts` による文章品質検査）を終了時の品質ゲートの対象外とし、結果にその旨を記録する。plugin に依存しない終了時の必須検査（`bun test` 等）は実施し、その失敗を成功として扱わない
+
+OpenCode を選択した導入での `gate.ts` の実行手順は次のとおりである。
 
 1. 対象 worktree で変更を確定させる
 2. AgentDevFlow が導入済みの配置にある `gate.ts` を、`--root` に対象 worktree のパスを指定して実行する（`gate.ts` の配置場所は plugin の README「導入時の依存生成手順」の表を参照）
@@ -190,6 +229,7 @@ backlog-review、intake-promote、learning-promote、inspect-docs、inspect-prom
 - [マルチホスト原本モデル](../designs/foundations/multi-host-canonical-model.md): 共通原本とホスト別接続の配置契約
 - [DEC-049](../decisions/DEC-049.md): マルチホスト配布モデルの意思決定
 - [DEC-069](../decisions/DEC-069.md): Codex・Antigravity の限定配布とホスト既存能力の優先
+- [DEC-071](../decisions/DEC-071.md): 新ホストの GitHub 接続と gh 経路切替
 - [REQ-099](../requirements/REQ-099.md): マルチホスト併存利用の要件
 - [durable state と再構成](../designs/foundations/durable-state-and-recovery.md): 永続状態の権威と再構成の契約
 - [コマンド選択](command-selection.md): 状態から次のコマンドを選ぶ入口表

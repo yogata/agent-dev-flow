@@ -3,6 +3,7 @@ implementation:
   src/common/README.md:
     - REQ-099-001
     - REQ-099-002
+    - REQ-099-035
     - REQ-002-007
     - REQ-002-008
     - REQ-002-047
@@ -42,32 +43,62 @@ implementation:
     - REQ-099-027
     - REQ-099-028
     - REQ-099-029
+    - REQ-099-030
+    - REQ-099-031
+    - REQ-099-032
+    - REQ-099-033
+    - REQ-099-034
+    - REQ-099-035
     - REQ-099-043
   docs/reports/req-099-wave3-verification.md:
     - REQ-099-007
     - REQ-099-016
   src/codex/README.md:
     - REQ-099-021
+    - REQ-099-023
+    - REQ-099-035
   src/codex/document-management.md:
     - REQ-099-021
     - REQ-099-022
   src/codex/skill-discovery/codex-skill-discovery.ts:
     - REQ-099-021
     - REQ-099-022
+  src/codex/github/codex-plugin-mapping.ts:
+    - REQ-099-023
+    - REQ-099-035
+  src/codex/github/codex-mcp-transport.ts:
+    - REQ-099-023
+    - REQ-099-032
+  src/codex/github/agentdev-gh-adapter.ts:
+    - REQ-099-023
+    - REQ-099-035
   src/antigravity/README.md:
     - REQ-099-021
     - REQ-099-024
+    - REQ-099-023
   src/antigravity/document-management.md:
     - REQ-099-021
     - REQ-099-022
   src/antigravity/skill-discovery/antigravity-skill-discovery.ts:
     - REQ-099-021
     - REQ-099-022
+  src/antigravity/github/antigravity-plugin-mapping.ts:
+    - REQ-099-023
+    - REQ-099-024
+  src/antigravity/github/agentdev-gh-adapter.ts:
+    - REQ-099-023
+    - REQ-099-024
+    - REQ-099-035
   src/common/skills/agentdev-skill-resolution/scripts/src/command-entry.ts:
     - REQ-099-022
   src/common/skills/agentdev-host-github-guidance/SKILL.md:
     - REQ-099-023
     - REQ-099-028
+    - REQ-099-024
+    - REQ-099-032
+    - REQ-099-033
+    - REQ-099-034
+    - REQ-099-035
 verification:
   src/common/guards/gh-write/tests/gh-command-detector.test.ts:
     - REQ-099-013
@@ -87,6 +118,12 @@ verification:
     - REQ-099-027
     - REQ-099-028
     - REQ-099-029
+    - REQ-099-030
+    - REQ-099-031
+    - REQ-099-032
+    - REQ-099-033
+    - REQ-099-034
+    - REQ-099-035
   src/opencode/plugins/agentdev-gh-tool/tests/four-combination.test.ts:
     - REQ-099-007
   src/senpi/tools/agentdev-gh-tool/tests/four-combination.test.ts:
@@ -116,3 +153,20 @@ verification:
     - REQ-099-021
   src/common/skills/agentdev-skill-resolution/scripts/tests/command-entry.test.ts:
     - REQ-099-022
+  src/codex/tests/codex-plugin-mapping.test.ts:
+    - REQ-099-023
+    - REQ-099-035
+  src/codex/tests/codex-mcp-transport.test.ts:
+    - REQ-099-023
+    - REQ-099-032
+  src/codex/tests/codex-adapter.test.ts:
+    - REQ-099-023
+    - REQ-099-032
+    - REQ-099-035
+  src/antigravity/tests/antigravity-plugin-mapping.test.ts:
+    - REQ-099-023
+    - REQ-099-024
+  src/antigravity/tests/antigravity-adapter.test.ts:
+    - REQ-099-023
+    - REQ-099-024
+    - REQ-099-035

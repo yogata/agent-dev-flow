@@ -1,0 +1,11 @@
+component: github-route-switch
+implementation:
+  scripts/switch-github-route.ps1:
+    - REQ-099-033
+    - REQ-050-017
+    - REQ-009-055
+verification:
+  scripts/self/release/switch-github-route-behavior.test.ts:
+    - REQ-099-033
+    - REQ-050-017
+    - REQ-009-055

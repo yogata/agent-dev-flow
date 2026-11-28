@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param()
 
-# ADF-COVERS(implementation): REQ-050-009, REQ-050-010
+# ADF-COVERS(implementation): REQ-050-009, REQ-050-010, REQ-050-017
 # ADF-COVERS(verification): REQ-050-010, REQ-050-011
 # ADF-COVERS(implementation): REQ-052-007
 #
@@ -29,6 +29,8 @@ param()
 #                                      connection copy places this area at
 #                                      .agents/agentdev/senpi/)
 #     scripts/install.ps1            (projected from scripts/consumer/archive/install.ps1)
+#     scripts/switch-github-route.ps1 (GitHub execution route switch entry; same
+#                                      file as the checkout edition, REQ-050-017)
 #     README-INSTALL.md
 #     THIRD-PARTY-NOTICES.md         (third-party dependency and license notices)
 # Junctions are resolved to real file content so the archive is self-contained.
@@ -116,6 +118,8 @@ $srcSkills = Join-Path $repoRoot "src\common\skills"
 $srcSenpi = Join-Path $repoRoot "src\senpi"
 $srcCodex = Join-Path $repoRoot "src\codex"
 $srcAntigravity = Join-Path $repoRoot "src\antigravity"
+# GitHub 実行経路切替の公開入口（REQ-050-017）。archive にも同じ名前で同梱する。
+$switchRouteScript = Join-Path $repoRoot "scripts\switch-github-route.ps1"
 # Archive-dedicated installer ORIGINAL (REQ-050-010). Travels inside the
 # archive under the projection name scripts/install.ps1.
 $installScript = Join-Path $repoRoot "scripts\consumer\archive\install.ps1"
@@ -147,6 +151,9 @@ if (-not (Test-Path -LiteralPath $srcCodex)) {
 }
 if (-not (Test-Path -LiteralPath $srcAntigravity)) {
     Fail-Exit 2 "package-release-archive: required source directory missing: $srcAntigravity (Antigravity host connection area; the archive must carry the distribution originals; fail-closed)"
+}
+if (-not (Test-Path -LiteralPath $switchRouteScript)) {
+    Fail-Exit 2 "package-release-archive: GitHub route switch public entry missing: $switchRouteScript (the archive must carry scripts/switch-github-route.ps1, REQ-050-017; fail-closed)"
 }
 
 # Trusted host checker (NOT the candidate copy inside the archive). Per
@@ -319,6 +326,12 @@ try {
     # installation projection and must NOT be forced into this archive.
     Copy-Item -LiteralPath $installScript -Destination (Join-Path $stageScripts "install.ps1") -Force
 
+    # The GitHub execution route switch entry (REQ-050-017) travels inside
+    # the archive under its public entry name scripts/switch-github-route.ps1.
+    # The archive edition is the same file as the checkout edition (the entry
+    # resolves the target repository from the current directory only).
+    Copy-Item -LiteralPath $switchRouteScript -Destination (Join-Path $stageScripts "switch-github-route.ps1") -Force
+
     # The distribution exclusion canon travels inside the archive at its
     # repository-relative location so the archive-edition installer
     # (projected scripts/install.ps1) resolves the consumer exclusion set
@@ -358,6 +371,7 @@ try {
     $extrasScanCommands = Join-Path $extrasScanRoot "src\common\commands\agentdev"
     New-Item -ItemType Directory -Path $extrasScanCommands -Force | Out-Null
     Copy-Item -LiteralPath (Join-Path $stageScripts "install.ps1") -Destination (Join-Path $extrasScanCommands "install.ps1.archive-extra.ps1") -Force
+    Copy-Item -LiteralPath (Join-Path $stageScripts "switch-github-route.ps1") -Destination (Join-Path $extrasScanCommands "switch-github-route.ps1.archive-extra.ps1") -Force
     Copy-Item -LiteralPath (Join-Path $stageScriptsConsumer "distribution-exclusion.ps1") -Destination (Join-Path $extrasScanCommands "distribution-exclusion.archive-extra.ps1") -Force
     if ($readmePresent) {
         Copy-Item -LiteralPath (Join-Path $stageArchiveRoot "README-INSTALL.md") -Destination (Join-Path $extrasScanCommands "README-INSTALL.md") -Force

@@ -35,6 +35,7 @@ const REAL_SCRIPT = path.join(REPO_ROOT, "scripts", "self", "release", "package-
 const REAL_INSTALLER = path.join(REPO_ROOT, "scripts", "consumer", "archive", "install.ps1");
 const REAL_PUBLISHER = path.join(REPO_ROOT, "scripts", "self", "release", "publish-hard-link.ts");
 const CANON_PS1 = path.join(REPO_ROOT, "scripts", "consumer", "distribution-exclusion.ps1");
+const REAL_SWITCH_PS1 = path.join(REPO_ROOT, "scripts", "switch-github-route.ps1");
 
 // Stub boundary checker used by every scenario. The real
 // check_distribution_boundary.ts is a heavy TS module that pulls in lib/;
@@ -164,6 +165,8 @@ function makeFakeRepo(): RepoPaths {
   fs.copyFileSync(REAL_INSTALLER, path.join(root, "scripts", "consumer", "archive", "install.ps1"));
   fs.copyFileSync(REAL_PUBLISHER, path.join(root, "scripts", "self", "release", "publish-hard-link.ts"));
   fs.copyFileSync(CANON_PS1, path.join(root, "scripts", "consumer", "distribution-exclusion.ps1"));
+  // scripts/switch-github-route.ps1 は release archive の必須同梱物（不在時 fail-closed、exit 2）。
+  fs.copyFileSync(REAL_SWITCH_PS1, path.join(root, "scripts", "switch-github-route.ps1"));
   fs.writeFileSync(
     path.join(root, ".opencode", "skills", "repo-agentdev-integrity", "trusted-distribution-gate", "check_distribution_boundary.ts"),
     STUB_CHECKER_TS,
@@ -300,6 +303,8 @@ describe("package-release-archive.ps1 / tools and plugins staging (REQ-052-007)"
       expect(fs.existsSync(rel(path.join("src", "opencode", "plugins", "agentdev-probe-guard", "plugin.ts")))).toBe(true);
       expect(fs.existsSync(rel(path.join("src", "common", "tools", "agentdev-probe", "node_modules")))).toBe(false);
       expect(fs.existsSync(rel(path.join("src", "common", "tools", "local-only")))).toBe(false);
+      // REQ-050-017: the route switch public entry travels inside the archive.
+      expect(fs.existsSync(rel(path.join("scripts", "switch-github-route.ps1")))).toBe(true);
     } finally {
       rmrf(repo.root);
     }
@@ -473,6 +478,23 @@ describe("package-release-archive.ps1 / missing trusted installer", () => {
       const report = inspect(repo);
       expect(report.finalZip).toBe(false);
           expect(report.trustStageDirs).toEqual([]);
+    } finally {
+      rmrf(repo.root);
+    }
+  }, 120000);
+});
+
+describe("package-release-archive.ps1 / missing route switch entry", () => {
+  test("missing scripts/switch-github-route.ps1 fails closed (exit 2), no ZIP, no residue", () => {
+    const repo = makeFakeRepo();
+    try {
+      fs.rmSync(path.join(repo.root, "scripts", "switch-github-route.ps1"), { force: true });
+      const res = runScript(repo);
+      expect(res.exitCode).toBe(2);
+      expect(res.stderr).toContain("switch-github-route.ps1");
+      const report = inspect(repo);
+      expect(report.finalZip).toBe(false);
+      expect(report.trustStageDirs).toEqual([]);
     } finally {
       rmrf(repo.root);
     }
