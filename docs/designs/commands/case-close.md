@@ -21,6 +21,7 @@ updated: "2026-11-18"
 <!-- ADF-COVERS(design): REQ-032-040, REQ-032-041（QG-4 file-level split 標準化と bun 版更新時再検証の実行構成設計） -->
 <!-- ADF-COVERS(design): REQ-030-032 -->
 <!-- ADF-COVERS(design): REQ-032-047, REQ-032-048（QG-4 最終受け入れの検証義務に基づく試験範囲選択と最終受け入れ判定の design 実体） -->
+<!-- ADF-COVERS(design): REQ-032-049（統合・クローズ工程の実作業委譲と判断主体保持） -->
 <!-- ADF-COVERS(design): REQ-125-001 -->
 <!-- ADF-COVERS(verification): REQ-125-008（Epic 横断最終検証義務 TS-007 の照合を QG-4 独立再検査と Epic Wave クローズ手続きで実施する design 実体） -->
 
@@ -56,6 +57,24 @@ case-run / 実行担当サブエージェント / 外部実行バックエンド
 ## 完了判定と委譲結果サマリ
 
 子への委譲と親への返却には [委譲結果サマリ](../workflows/delegation-contracts.md#親セッション向け委譲結果サマリ) を適用する。QG-4 を含む完了判定の確認対象は既存の正規証拠とし、子の判定や要約で独立再検査を代替しない。
+
+## 統合・クローズ工程の実作業委譲
+
+case-close は統合・クローズ工程の読取・検証の実作業（PR 差分確認、コンフリクト調査、テスト再実行、証拠と正規成果物との照合）を判断主体の直接実行に抱え込まず、読取りと検証を担当するサブエージェントへ委譲して行う。書込みを伴う作業（複数文書の同期、修正）は case-close が case-auto からの工程委譲の範囲内で行う。case-close は [委譲結果サマリ](../workflows/delegation-contracts.md#親セッション向け委譲結果サマリ) を受領して進行を判定する。
+
+| 実行主体 | 変更後の責務 |
+|---|---|
+| Command | 該当なし（case-close は公開 command を持たない内部 lifecycle 段階） |
+| Adapter Skill | 委譲プロンプトと返却を接続し、正規結果とサマリの区別を保つ |
+| Subagent | case-auto からの工程委譲で case-close を実行するサブエージェントは書込みを伴う同期、永続化、状態遷移を行う。読取りと検証を担当するサブエージェントは PR 差分確認、コンフリクト調査、テスト再実行、トレーサビリティ check の実行、証拠と正規成果物との照合を行い、最終本文をサマリに限定する |
+| Harness | 起動、起動時刻制御および結果転送を担う |
+
+- 読取りと検証の委譲は書き込み禁止型（`gate_check`、`semantic_review`、`log_analysis`）として扱う。テスト再実行に伴う一時資材の作成・利用は、委譲時最小契約の副作用境界に許可する操作を具体名で列挙する。
+- 書込みを伴う作業（複数文書の同期、修正）は、既存の書込み許可のある委譲（`step_execution`: case-auto からの工程委譲）の範囲内で case-close が行う。工程セッションの下部へ書込み権限付きの委譲種別を新設しない。
+- 委譲の起動方法（case-close の工程セッション内で起動するか、親オーケストレータ経由で起動するか）は harness の責務であり、AGENTS.md および references/<harness>.md に置く。本 Design は委譲の入力、副作用境界、出力契約だけを定める。
+- 完了条件チェックボックスの評価と更新は case-close の専任のままで、サマリ本文だけでは達成扱いとしない。決定的な check の実行と証拠と正規成果物との照合は実行担当と独立な検証サブエージェントが行い、case-close はサマリに記録された最小限の参照と正規証拠を突合して判定する。この照合は実行担当の判定や要約とは独立に行う再検査であり、「完了判定と委譲結果サマリ」節の規律を緩めない。
+- 進行判断、永続化、Issue/PR 状態遷移、commit、push、merge、ユーザー確認は case-close が保持する。直接実行の上限と子セッションの生ログを読み戻さない規律は委譲契約 Design「親セッション向け委譲結果サマリ」節に従う。
+- サブエージェントを起動できない場合は既存契約（`delegation-unavailable` の報告）と環境制約時の親オーケストレータ直接書込みフォールバックに従う。
 
 ## 出力
 
@@ -122,7 +141,7 @@ worktree を削除する前に、未追跡ファイルだけを対象とする c
 
 ## トレーサビリティ能力の利用（QG-4 独立再検査）
 
-case-close は QG-4 の一部として、対象要件行の設計根拠対応、implementation 対応、verification 対応の完全性を `agentdev-traceability` の check で対応関係全体（正規成果物の inline declaration と top-level `traceability/` 配下の sidecar を同一に扱う）から独立して再検査する（REQ-021-018）。
+case-close は QG-4 の一部として、対象要件行の設計根拠対応、implementation 対応、verification 対応の完全性を `agentdev-traceability` の check で対応関係全体（正規成果物の inline declaration と top-level `traceability/` 配下の sidecar を同一に扱う）から独立して再検査する。check の実行と証拠と正規成果物との照合は実行担当と独立な検証サブエージェントへ委譲して行い、観点の評価と完了条件チェックボックスの確定は case-close が行う（REQ-021-018、「統合・クローズ工程の実作業委譲」節）。
 case-run 側の事前検査とは独立に実施する。検証手段との対応関係と「今回その検証を実行して合格したか」という実行結果（Issue, PR, QG の記録）を分離して扱う（REQ-021-019）。
 
 - 対象要件行に、プロジェクトの採用した工程・成果物規約が要求する設計根拠対応、implementation 対応、または policy が required と判定する要件行の verification 対応の欠落が残る場合はマージせず停止する。Decision 対応の欠落は QG-4 の不合格条件に含めない
