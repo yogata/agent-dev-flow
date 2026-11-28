@@ -141,6 +141,8 @@ verification:
     - REQ-099-015
     - REQ-099-016
     - REQ-125-001
+    - REQ-125-010
+    - REQ-032-049
   src/codex/skill-discovery/tests/codex-skill-discovery.test.ts:
     - REQ-099-021
     - REQ-099-022

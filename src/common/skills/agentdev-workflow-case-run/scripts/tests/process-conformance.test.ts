@@ -130,6 +130,16 @@ describe("TS-001 委譲結果返却サマリ契約（八項目・3〜4 KB 上限
     expect(backlogAutoSkill).toContain("完遂判定は既存の突合手続（義務スナップショット・対応表）で行う");
   });
 
+  test("case-close に実作業委譲・独立検証・保持範囲と生ログ読戻し抑止が明記されている", () => {
+    expect(caseCloseSkill).toContain("## 統合・クローズ工程の実作業委譲と判断主体保持");
+    expect(caseCloseSkill).toContain("PR 差分確認、コンフリクト調査、テスト再実行、`check` 実行、証拠と正規成果物との照合は、読取りと検証を担当する書き込み禁止型サブエージェント");
+    expect(caseCloseSkill).toContain("実行担当と独立な検証サブエージェントが行う");
+    expect(caseCloseSkill).toContain("既存の書込み許可のある工程委譲（case-auto からの工程委譲）の範囲内で case-close が行う");
+    expect(caseCloseSkill).toContain("完了条件チェックボックスの評価と更新、進行判断、永続化、Issue/PR 状態遷移、commit、push、merge、ユーザー確認は case-close が保持する");
+    expect(caseCloseSkill).toContain("子セッションの生ログ（詳細な実行履歴）");
+    expect(caseCloseSkill).toContain("委譲結果サマリに記録された参照");
+  });
+
   test("返却サマリ雛形の八項目構造を保持し、雛形本文の UTF-8 バイト数が上限目安 3〜4 KB 以内である", () => {
     expect(delegationReference).toContain("返却サマリ雛形");
     for (const item of summaryItems) {

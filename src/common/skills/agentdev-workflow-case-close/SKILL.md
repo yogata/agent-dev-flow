@@ -12,7 +12,7 @@ case-auto の内部段階として単一 Issue または Epic Issue と PR 番�
 | STEP | 実行と出口条件 | 詳細 |
 |---|---|---|
 | STEP-1 | Issue・PR を解決し、単一 Issue と Epic Wave を分岐 | [Issue 解決と QG-4](references/issue-resolution-and-qg4.md) |
-| STEP-2 | 正規完了条件を再読込し、観点8の評価範囲で証拠を照合してチェックボックスを評価・更新。未達・証拠不足は停止 | [Issue 解決と QG-4](references/issue-resolution-and-qg4.md) |
+| STEP-2 | 正規完了条件を再読込し、独立検証サブエージェントによる証拠照合結果を受領して観点8の評価範囲でチェックボックスを評価・更新。未達・証拠不足は停止 | [Issue 解決と QG-4](references/issue-resolution-and-qg4.md) |
 | STEP-3 | QG-4 合格後に targeted docs、拡張整合、配布依存境界 最終 gate、最終試験を実施。Design は全件を棚卸しし整合する draft のみ昇格 | [references/docs-and-design-promotion.md](references/docs-and-design-promotion.md) |
 | STEP-4 | gate 合格後、HEAD を記録して main へ squash merge。Level 1 rebase 失敗は case-auto の Level 2/3 へ | [マージとコンフリクト](references/pr-merge-and-conflict.md) |
 | STEP-5 | マージ後の CI を確認し、検査済み完了記録と本文結果を反映して Issue を閉じる | [クリーンアップと Capture](references/cleanup-and-capture.md) |
@@ -30,9 +30,16 @@ Issue 本文と正規記録、PR・HEAD、Design status、worktree、Capture フ
 
 機械工程は `scripts/src/close_mechanical_steps.ts` の pre-merge / post-merge を利用する。観点評価、警告・失敗・Design 確定の意味判断はモデルが行う。Issue 更新と PR マージ・Issue 終了は `agentdev_gh` を用いる。Local の `pr_merge` は取り込み結果の記録であり取り込みは case-close が行う。`--delete-branch` は使用せず、ローカル削除は別 STEP、リモート削除は GitHub に委譲する。
 
+## 統合・クローズ工程の実作業委譲と判断主体保持
+
+- **読取り・検証の実作業委譲**: PR 差分確認、コンフリクト調査、テスト再実行、`check` 実行、証拠と正規成果物との照合は、読取りと検証を担当する書き込み禁止型サブエージェント（`gate_check` / `semantic_review` / `log_analysis`）へ委譲して行う。完了判定（QG-4）に用いる `check` 実行と証拠照合は、実行担当と独立な検証サブエージェントが行う。
+- **書込みを伴う複数文書同期の区別**: 複数文書の同期や修正など書込みを伴う作業は、工程下部に新たな書込み権限付き委譲を設けず、既存の書込み許可のある工程委譲（case-auto からの工程委譲）の範囲内で case-close が行う。
+- **判断主体の保持**: 完了条件チェックボックスの評価と更新、進行判断、永続化、Issue/PR 状態遷移、commit、push、merge、ユーザー確認は case-close が保持する。直接実行の上限と環境制約時の直接書込みフォールバックは委譲契約 Design「親セッション向け委譲結果サマリ」節に従う。
+- **生ログ読戻し抑止**: case-close は子セッションの生ログ（詳細な実行履歴）や、探索・検証対象の生の本文・大量の検索結果を読み戻したり自ら収集したりしない。進行判定と完了判定（QG-4）は委譲結果サマリに記録された参照（退避先のパス、PR の URL、テスト結果の件数など）と正規証拠（PR 本文の検証差分・Issue コメント SSoT・検証記録）との突合によって行い、参照先の確認は当該参照に限る。
+
 ## トレーサビリティ能力の利用（QG-4 独立再検査）
 
-Design 対応、implementation 対応、verification 対応（policy が required と判定する要件行）の完全性を `agentdev-traceability` の `check --req` で case-run と独立に検査する。inline declaration と top-level `traceability/` 配下の sidecar を同一に扱う。`missing-design` / `missing-implementation` / `missing-verification` と対象の未解決不合格は完了阻止とし、case-run へ差し戻す。Decision 対応の欠落は不合格条件に含めない。既定は required だが、policy が optional と明示した要件行の verification 対応欠落は完全性違反に含めない。全現行要件行の corpus 計数は診断用とし、今回の試験結果と恒常的な検証対応を区別する。
+Design 対応、implementation 対応、verification 対応（policy が required と判定する要件行）の完全性は、実行担当と独立な検証サブエージェントへ `agentdev-traceability` の `check --req` 実行と証拠照合を委譲して case-run と独立に再検査し、観点の評価と完了条件チェックボックスの確定は case-close が行う。inline declaration と top-level `traceability/` 配下の sidecar を同一に扱う。`missing-design` / `missing-implementation` / `missing-verification` と対象の未解決不合格は完了阻止とし、case-run へ差し戻す。Decision 対応の欠落は不合格条件に含めない。既定は required だが、policy が optional と明示した要件行の verification 対応欠落は完全性違反に含めない。全現行要件行の corpus 計数は診断用とし、今回の試験結果と恒常的な検証対応を区別する。
 
 必須検査が検査不能の場合は合格として扱わず、検査不能の旨を報告して完了判定とマージへ進まない。機能不在、実行失敗、空結果、候補過多だけなら既存 gate・独立探索へ切り替える。同等以上の観測能力があり未証明範囲を増やさない代替手順を証跡化し、代替の履行なしに成功扱いしない。正規成果物側の実不整合は fail とする。
 
