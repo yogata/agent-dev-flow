@@ -88,6 +88,8 @@ implementation:
     - REQ-125-001
     - REQ-125-004
     - REQ-125-006
+    - REQ-125-010
+    - REQ-032-049
   src/common/skills/agentdev-workflow-case-close/references/close-acceptance-evidence.md:
     - REQ-125-004
 verification:
